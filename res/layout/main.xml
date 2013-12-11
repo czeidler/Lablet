@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools" android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              tools:context=".AndroidPhysicsTracker">
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start New Experiment:"
+            android:id="@+id/textView" android:layout_gravity="left|center_vertical"
+            android:textSize="18dip"/>
+    <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="151dp"
+            android:id="@+id/newExperiments" android:choiceMode="singleChoice" android:layout_marginBottom="-244dp"
+            />
+</LinearLayout>
+

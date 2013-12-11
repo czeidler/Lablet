@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Physics Tracker</string>
+    <string name="action_back">Back</string>
+    <string name="action_analyse">Analyse</string>
+</resources>
