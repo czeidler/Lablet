@@ -1,19 +1,24 @@
 package com.example.AndroidPhysicsTracker;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.CameraProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.*;
 import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import java.io.File;
 import java.io.IOException;
 
-public class CameraExperimentActivity extends Activity {
+public class CameraExperimentActivity extends ExperimentActivity {
     private SurfaceView preview = null;
     private VideoView videoView = null;
     private Button startButton = null;
@@ -27,6 +32,11 @@ public class CameraExperimentActivity extends Activity {
 
     private MenuItem analyseMenuItem = null;
     private int cameraId = 0;
+
+    CameraExperiment experiment = null;
+
+    private File videoFile = null;
+    private boolean done = false;
 
     static final int CAMERA_FACE = Camera.CameraInfo.CAMERA_FACING_BACK;
 
@@ -48,9 +58,8 @@ public class CameraExperimentActivity extends Activity {
         analyseMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                setResult(RESULT_OK);
-                finish();
-                return false;
+                finishExperiment();
+                return true;
             }
         });
         return super.onCreateOptionsMenu(menu);
@@ -111,6 +120,11 @@ public class CameraExperimentActivity extends Activity {
             recorder.release();
             recorder = null;
         }
+
+        if (!done) {
+            // delete all files
+            deleteStorageDir();
+        }
         super.onDestroy();
     }
 
@@ -146,6 +160,14 @@ public class CameraExperimentActivity extends Activity {
         super.onPause();
     }
 
+    protected void createExperiment() {
+        experiment = new CameraExperiment();
+    }
+
+    public Experiment getExperiment() {
+        return experiment;
+    }
+
     private void startRecording() {
         try {
             camera.unlock();
@@ -161,11 +183,20 @@ public class CameraExperimentActivity extends Activity {
             recorder.setVideoFrameRate(profile.videoFrameRate);
             recorder.setVideoEncodingBitRate(profile.videoBitRate);
 
-            recorder.setOutputFile("/sdcard/recordvideooutput.3gpp");
+            File outputDir = getStorageDir();
+            videoFile = new File(outputDir, experiment.getVideoName());
+            videoFile.createNewFile();
+            recorder.setOutputFile(videoFile.getPath());
 
             recorder.prepare();
         } catch (Exception e) {
             e.printStackTrace();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Unable to start recording!");
+            builder.setNeutralButton("Ok", null);
+            builder.create().show();
+            setState(null);
+            return;
         }
         recorder.start();
     }
@@ -175,6 +206,22 @@ public class CameraExperimentActivity extends Activity {
         recorder.reset();
 
         camera.lock();
+    }
+
+    private void finishExperiment() {
+        done = true;
+
+        try {
+            saveExperimentToFile();
+            Intent data = new Intent();
+            data.putExtra("experiment_uid", experiment.getUid());
+            setResult(RESULT_OK, data);
+        } catch (IOException e) {
+            e.printStackTrace();
+            setResult(RESULT_CANCELED);
+        }
+
+        finish();
     }
 
     SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
@@ -286,7 +333,9 @@ public class CameraExperimentActivity extends Activity {
             preview.setVisibility(View.INVISIBLE);
             videoView.setVisibility(View.VISIBLE);
 
-            videoView.setVideoPath("/sdcard/recordvideooutput.3gpp");
+            if (videoFile == null)
+                return;
+            videoView.setVideoPath(videoFile.getPath());
             videoView.requestFocus();
             videoView.start();
         }
