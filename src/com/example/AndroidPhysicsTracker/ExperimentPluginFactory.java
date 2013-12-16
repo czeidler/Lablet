@@ -16,6 +16,10 @@ public class ExperimentPluginFactory {
         plugins.add(new CameraExperimentPlugin());
     }
 
+    public List<ExperimentPlugin> getPluginList() {
+        return plugins;
+    }
+
     public static ExperimentPluginFactory getFactory() {
         if (factory == null)
             factory = new ExperimentPluginFactory();

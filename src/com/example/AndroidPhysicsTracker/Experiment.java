@@ -1,6 +1,7 @@
 package com.example.AndroidPhysicsTracker;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.format.Time;
 
@@ -30,6 +31,10 @@ abstract public class Experiment {
             uid += "_";
             uid += identifier;
         }
+    }
+
+    static public File getMainExperimentDir(Context context) {
+        return context.getExternalFilesDir(null);
     }
 
     public void setStorageDir(File dir) {

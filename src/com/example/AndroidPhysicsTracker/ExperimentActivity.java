@@ -2,7 +2,6 @@ package com.example.AndroidPhysicsTracker;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.text.format.Time;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -46,7 +45,7 @@ abstract public class ExperimentActivity extends Activity {
     protected File getStorageDir() throws IOException {
         String directoryName = getExperiment().getUid();
 
-        File path = getExternalFilesDir(null);
+        File path = Experiment.getMainExperimentDir(this);
         if (path != null) {
             File file = new File(path, directoryName);
             if (!file.exists())
