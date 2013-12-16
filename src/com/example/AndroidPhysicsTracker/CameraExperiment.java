@@ -10,6 +10,10 @@ import java.io.File;
 public class CameraExperiment extends Experiment {
     private String videoFileName = "video.3gpp";
 
+    public CameraExperiment() {
+        super();
+    }
+
     public CameraExperiment(Bundle bundle, File storageDir) {
         super(bundle, storageDir);
         videoFileName = bundle.getString("videoName");

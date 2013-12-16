@@ -42,7 +42,7 @@ abstract public class Experiment {
 
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
-        bundle.putString("uid", getIdentifier());
+        bundle.putString("uid", uid);
 
         return bundle;
     }

@@ -41,6 +41,10 @@ public class AndroidPhysicsTracker extends Activity {
                 startExperiment(plugin);
             }
         });
+
+        // for testing
+        //Intent intent = new Intent(this, ExperimentAnalyserActivity.class);
+        //startActivityForResult(intent, ANALYSE_EXPERIMENT);
     }
 
     @Override
@@ -49,7 +53,9 @@ public class AndroidPhysicsTracker extends Activity {
             return;
 
         if (requestCode == PERFORM_EXPERIMENT) {
+            String experimentPath = data.getStringExtra("experiment_path");
             Intent intent = new Intent(this, ExperimentAnalyserActivity.class);
+            intent.putExtra("experiment_path", experimentPath);
             startActivityForResult(intent, ANALYSE_EXPERIMENT);
             return;
         }

@@ -214,7 +214,8 @@ public class CameraExperimentActivity extends ExperimentActivity {
         try {
             saveExperimentToFile();
             Intent data = new Intent();
-            data.putExtra("experiment_uid", experiment.getUid());
+            File outputDir = getStorageDir();
+            data.putExtra("experiment_path", outputDir.getPath());
             setResult(RESULT_OK, data);
         } catch (IOException e) {
             e.printStackTrace();

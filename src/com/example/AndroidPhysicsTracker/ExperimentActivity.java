@@ -32,7 +32,7 @@ abstract public class ExperimentActivity extends Activity {
     protected void saveExperimentToFile() throws IOException {
         Experiment experiment = getExperiment();
         Bundle bundle = new Bundle();
-        bundle.putString("experiment_id", experiment.getUid());
+        bundle.putString("experiment_identifier", experiment.getIdentifier());
         Bundle experimentData = experiment.toBundle();
         bundle.putBundle("data", experimentData);
 
