@@ -12,14 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Created by lec on 12/12/13.
- */
+
 public class PersistentBundle {
     public Bundle unflattenBundle(InputStream input) throws IOException, XmlPullParserException {
         Bundle bundle= new Bundle();
         XmlPullParserFactory pullParserFactory;
-        XmlPullParser parser = null;
+        XmlPullParser parser;
         try {
             pullParserFactory = XmlPullParserFactory.newInstance();
             parser = pullParserFactory.newPullParser();
@@ -30,7 +28,6 @@ public class PersistentBundle {
 
         parser.setInput(input, null);
 
-        int tag = parser.getEventType();
         unflattenBundle(parser, bundle);
 
         return bundle;
@@ -53,38 +50,46 @@ public class PersistentBundle {
 
     private void unflattenBundle(XmlPullParser parser, Bundle bundle) throws XmlPullParserException, IOException {
         int tag = parser.getEventType();
-        while (tag != XmlPullParser.END_TAG){
+        int endTagCount = 0;
+        while (endTagCount <= 0 && tag != XmlPullParser.END_DOCUMENT) {
             switch (tag){
                 case XmlPullParser.START_DOCUMENT:
                     break;
+                case XmlPullParser.END_TAG:
+                    endTagCount++;
+                    break;
+
                 case XmlPullParser.START_TAG:
+                    endTagCount--;
                     String key = parser.getName();
-                    if (key == "key"){
+                    if (key.equals("key")){
                         String keyName = parser.getAttributeValue("", "name");
                         String typeName = parser.getAttributeValue("", "type");
-                        if (typeName == "string")
+                        if (typeName.equals("string"))
                             handleStringValue(parser, keyName, bundle);
-                        else if (typeName == "int")
+                        else if (typeName.equals("int"))
                             handleIntegerValue(parser, keyName, bundle);
-                        else if (typeName == "boolean")
+                        else if (typeName.equals("boolean"))
                             handleBooleanValue(parser, keyName, bundle);
-                        else if (typeName == "float")
+                        else if (typeName.equals("float"))
                             handleFloatValue(parser, keyName, bundle);
-                        else if (typeName == "double")
+                        else if (typeName.equals("double"))
                             handleDoubleValue(parser, keyName, bundle);
-                        else if (typeName == "string_array")
+                        else if (typeName.equals("string_array"))
                             handleStringArray(parser, keyName, bundle);
-                        else if (typeName == "int_array")
+                        else if (typeName.equals("int_array"))
                             handleIntegerArray(parser, keyName, bundle);
-                        else if (typeName == "boolean_array")
+                        else if (typeName.equals("boolean_array"))
                             handleBooleanArray(parser, keyName, bundle);
-                        else if (typeName == "float_array")
+                        else if (typeName.equals("float_array"))
                             handleFloatArray(parser, keyName, bundle);
-                        else if (typeName == "double_array")
+                        else if (typeName.equals("double_array"))
                             handleDoubleArray(parser, keyName, bundle);
-                        else if (typeName == "bundle")
+                        else if (typeName.equals("bundle")) {
                             handleBundle(parser, keyName, bundle);
-                        else
+                            // handleBundle already called parser.next so just continue
+                            continue;
+                        } else
                             throw new NotSerializableException();
                     }
                     break;
@@ -155,7 +160,7 @@ public class PersistentBundle {
         int value = bundle.getInt(key);
         startKeyTag(key, "int", serializer);
         serializer.startTag("", "value");
-        String string = new String();
+        String string = "";
         string += value;
         serializer.text(string);
         serializer.endTag("", "value");
@@ -166,7 +171,7 @@ public class PersistentBundle {
         boolean value = bundle.getBoolean(key);
         startKeyTag(key, "boolean", serializer);
         serializer.startTag("", "value");
-        String string = new String();
+        String string = "";
         string += value;
         serializer.text(string);
         serializer.endTag("", "value");
@@ -177,7 +182,7 @@ public class PersistentBundle {
         float value = bundle.getFloat(key);
         startKeyTag(key, "float", serializer);
         serializer.startTag("", "value");
-        String string = new String();
+        String string = "";
         string += value;
         serializer.text(string);
         serializer.endTag("", "value");
@@ -188,7 +193,7 @@ public class PersistentBundle {
         double value = bundle.getDouble(key);
         startKeyTag(key, "double", serializer);
         serializer.startTag("", "value");
-        String string = new String();
+        String string = "";
         string += value;
         serializer.text(string);
         serializer.endTag("", "value");
@@ -197,6 +202,7 @@ public class PersistentBundle {
 
     private void writeStringArray(String key, Bundle bundle, XmlSerializer serializer) throws IOException {
         String[] array = bundle.getStringArray(key);
+        assert array != null;
         startKeyTag(key, "string_array", serializer);
         for (String value : array) {
             serializer.startTag("", "value");
@@ -208,10 +214,11 @@ public class PersistentBundle {
 
     private void writeIntegerArray(String key, Bundle bundle, XmlSerializer serializer) throws IOException {
         int[] array = bundle.getIntArray(key);
+        assert array != null;
         startKeyTag(key, "int_array", serializer);
         for (int value : array) {
             serializer.startTag("", "value");
-            String string = new String();
+            String string = "";
             string += value;
             serializer.text(string);
             serializer.endTag("", "value");
@@ -221,10 +228,11 @@ public class PersistentBundle {
 
     private void writeBooleanArray(String key, Bundle bundle, XmlSerializer serializer) throws IOException {
         boolean[] array = bundle.getBooleanArray(key);
+        assert array != null;
         startKeyTag(key, "boolean_array", serializer);
         for (boolean value : array) {
             serializer.startTag("", "value");
-            String string = new String();
+            String string = "";
             string += value;
             serializer.text(string);
             serializer.endTag("", "value");
@@ -234,10 +242,11 @@ public class PersistentBundle {
 
     private void writeFloatArray(String key, Bundle bundle, XmlSerializer serializer) throws IOException {
         float[] array = bundle.getFloatArray(key);
+        assert array != null;
         startKeyTag(key, "float_array", serializer);
         for (float value : array) {
             serializer.startTag("", "value");
-            String string = new String();
+            String string = "";
             string += value;
             serializer.text(string);
             serializer.endTag("", "value");
@@ -248,9 +257,10 @@ public class PersistentBundle {
     private void writeDoubleArray(String key, Bundle bundle, XmlSerializer serializer) throws IOException {
         double[] array = bundle.getDoubleArray(key);
         startKeyTag(key, "double_array", serializer);
+        assert array != null;
         for (double value : array) {
             serializer.startTag("", "value");
-            String string = new String();
+            String string = "";
             string += value;
             serializer.text(string);
             serializer.endTag("", "value");
@@ -260,14 +270,19 @@ public class PersistentBundle {
 
     private void handleStringValue(XmlPullParser parser, String key, Bundle bundle) throws IOException, XmlPullParserException {
         int tag = parser.next();
+        boolean valueTag = false;
         while (tag != XmlPullParser.END_DOCUMENT){
             switch (tag){
                 case XmlPullParser.START_TAG:
                     String tagName = parser.getName();
-                    if (tagName == "value") {
-                        String value = parser.getText();
-                        bundle.putString(key, value);
-                    }
+                    if (tagName.equals("value"))
+                        valueTag = true;
+                    break;
+                case XmlPullParser.TEXT:
+                    if (!valueTag)
+                        break;
+                    String value = parser.getText();
+                    bundle.putString(key, value);
                     break;
                 case XmlPullParser.END_TAG:
                     return;
@@ -278,14 +293,19 @@ public class PersistentBundle {
 
     private void handleIntegerValue(XmlPullParser parser, String key, Bundle bundle) throws IOException, XmlPullParserException {
         int tag = parser.next();
+        boolean valueTag = false;
         while (tag != XmlPullParser.END_DOCUMENT){
             switch (tag){
                 case XmlPullParser.START_TAG:
                     String tagName = parser.getName();
-                    if (tagName == "value") {
-                        String value = parser.getText();
-                        bundle.putInt(key, Integer.parseInt(value));
-                    }
+                    if (tagName.equals("value"))
+                        valueTag = true;
+                    break;
+                case XmlPullParser.TEXT:
+                    if (!valueTag)
+                        break;
+                    String value = parser.getText();
+                    bundle.putInt(key, Integer.parseInt(value));
                     break;
                 case XmlPullParser.END_TAG:
                     return;
@@ -296,14 +316,19 @@ public class PersistentBundle {
 
     private void handleBooleanValue(XmlPullParser parser, String key, Bundle bundle) throws IOException, XmlPullParserException {
         int tag = parser.next();
+        boolean valueTag = false;
         while (tag != XmlPullParser.END_DOCUMENT){
             switch (tag){
                 case XmlPullParser.START_TAG:
                     String tagName = parser.getName();
-                    if (tagName == "value") {
-                        String value = parser.getText();
-                        bundle.putBoolean(key, Boolean.parseBoolean(value));
-                    }
+                    if (tagName.equals("value"))
+                        valueTag = true;
+                    break;
+                case XmlPullParser.TEXT:
+                    if (!valueTag)
+                        break;
+                    String value = parser.getText();
+                    bundle.putBoolean(key, Boolean.parseBoolean(value));
                     break;
                 case XmlPullParser.END_TAG:
                     return;
@@ -314,14 +339,19 @@ public class PersistentBundle {
 
     private void handleFloatValue(XmlPullParser parser, String key, Bundle bundle) throws IOException, XmlPullParserException {
         int tag = parser.next();
+        boolean valueTag = false;
         while (tag != XmlPullParser.END_DOCUMENT){
             switch (tag){
                 case XmlPullParser.START_TAG:
                     String tagName = parser.getName();
-                    if (tagName == "value") {
-                        String value = parser.getText();
-                        bundle.putFloat(key, Float.parseFloat(value));
-                    }
+                    if (tagName.equals("value"))
+                        valueTag = true;
+                    break;
+                case XmlPullParser.TEXT:
+                    if (!valueTag)
+                        break;
+                    String value = parser.getText();
+                    bundle.putFloat(key, Float.parseFloat(value));
                     break;
                 case XmlPullParser.END_TAG:
                     return;
@@ -333,14 +363,19 @@ public class PersistentBundle {
 
     private void handleDoubleValue(XmlPullParser parser, String key, Bundle bundle) throws IOException, XmlPullParserException {
         int tag = parser.next();
+        boolean valueTag = false;
         while (tag != XmlPullParser.END_DOCUMENT){
             switch (tag){
                 case XmlPullParser.START_TAG:
                     String tagName = parser.getName();
-                    if (tagName == "value") {
-                        String value = parser.getText();
-                        bundle.putDouble(key, Double.parseDouble(value));
-                    }
+                    if (tagName.equals("value"))
+                        valueTag = true;
+                    break;
+                case XmlPullParser.TEXT:
+                    if (!valueTag)
+                        break;
+                    String value = parser.getText();
+                    bundle.putDouble(key, Double.parseDouble(value));
                     break;
                 case XmlPullParser.END_TAG:
                     return;
@@ -357,7 +392,7 @@ public class PersistentBundle {
             switch (tag){
                 case XmlPullParser.START_TAG:
                     String tagName = parser.getName();
-                    if (tagName == "value") {
+                    if (tagName.equals("value")) {
                         inValueTag = true;
                         String value = parser.getText();
                         array.add(value);
@@ -384,7 +419,7 @@ public class PersistentBundle {
             switch (tag){
                 case XmlPullParser.START_TAG:
                     String tagName = parser.getName();
-                    if (tagName == "value") {
+                    if (tagName.equals("value")) {
                         inValueTag = true;
                         String stringValue = parser.getText();
                         int value = Integer.parseInt(stringValue);
@@ -415,7 +450,7 @@ public class PersistentBundle {
             switch (tag){
                 case XmlPullParser.START_TAG:
                     String tagName = parser.getName();
-                    if (tagName == "value") {
+                    if (tagName.equals("value")) {
                         inValueTag = true;
                         String stringValue = parser.getText();
                         boolean value = Boolean.parseBoolean(stringValue);
@@ -446,7 +481,7 @@ public class PersistentBundle {
             switch (tag){
                 case XmlPullParser.START_TAG:
                     String tagName = parser.getName();
-                    if (tagName == "value") {
+                    if (tagName.equals("value")) {
                         inValueTag = true;
                         String stringValue = parser.getText();
                         float value = Float.parseFloat(stringValue);
@@ -473,11 +508,11 @@ public class PersistentBundle {
         int tag = parser.next();
         boolean inValueTag = false;
         List<Double> array = new ArrayList<Double>();
-        while (tag != XmlPullParser.END_DOCUMENT){
+        while (tag != XmlPullParser.END_DOCUMENT) {
             switch (tag){
                 case XmlPullParser.START_TAG:
                     String tagName = parser.getName();
-                    if (tagName == "value") {
+                    if (tagName.equals("value")) {
                         inValueTag = true;
                         String stringValue = parser.getText();
                         double value = Double.parseDouble(stringValue);
@@ -502,8 +537,9 @@ public class PersistentBundle {
 
     private void handleBundle(XmlPullParser parser, String keyName, Bundle bundle) throws IOException, XmlPullParserException {
         Bundle subBundle = new Bundle();
+        parser.next();
         unflattenBundle(parser, subBundle);
-        bundle.putBundle("keyName", subBundle);
+        bundle.putBundle(keyName, subBundle);
     }
 
 }
