@@ -63,6 +63,7 @@ public class AndroidPhysicsTracker extends Activity {
 
         File experimentDir = Experiment.getMainExperimentDir(this);
         if (experimentDir.exists()) {
+            // TODO: Events are never received, check why. Manually call updateExperimentList in onResume for now.
             experimentDirObserver = new ExperimentDirObserver(experimentDir.getPath());
             experimentDirObserver.startWatching();
         }
@@ -120,7 +121,7 @@ public class AndroidPhysicsTracker extends Activity {
         File experimentDir = Experiment.getMainExperimentDir(this);
         if (experimentDir.isDirectory()) {
             File[] children = experimentDir.listFiles();
-            for (File child : children)
+            for (File child : children != null ? children : new File[0])
                 experimentList.add(child.getName());
         }
 
