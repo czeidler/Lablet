@@ -30,16 +30,7 @@ abstract public class Experiment {
     public Experiment(Context experimentContext) {
         context = experimentContext;
 
-        String identifier = getIdentifier();
-
-        Time now = new Time(Time.getCurrentTimezone());
-        now.setToNow();
-        uid = new String();
-        uid += now;
-        if (identifier != "") {
-            uid += "_";
-            uid += identifier;
-        }
+        uid = generateNewUid();
     }
 
     static public File getMainExperimentDir(Context context) {
@@ -73,4 +64,20 @@ abstract public class Experiment {
     abstract public int getNumberOfRuns();
     abstract public Bundle getRunAt(int i);
 
+    protected String generateNewUid() {
+        String identifier = getIdentifier();
+
+        Time now = new Time(Time.getCurrentTimezone());
+        android.text.format.DateFormat dateFormat = new android.text.format.DateFormat();
+        CharSequence dateString = dateFormat.format("yyyy-MM-dd_hh:mm:ss", new java.util.Date());
+
+        now.setToNow();
+        String newUid = new String();
+        if (identifier != "") {
+            newUid += identifier;
+            newUid += "_";
+        }
+        newUid += dateString;
+        return newUid;
+    }
 }
