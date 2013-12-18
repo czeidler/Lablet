@@ -81,7 +81,7 @@ public class SeekToFrameExtractor {
 
         // thread safe
         public void quit() {
-            Looper.myLooper().quit();
+            seekHandler.getLooper().quit();
             decoder.stop();
             decoder.release();
             extractor.release();
