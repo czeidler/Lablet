@@ -62,24 +62,34 @@ public class ExperimentAnalyserActivity extends Activity {
         Bundle experimentData = bundle.getBundle("data");
         if (experimentData == null)
             showErrorAndFinish("failed to load experiment data");
-        Experiment experiment = plugin.loadExperiment(experimentData, storageDir);
+        Experiment experiment = plugin.loadExperiment(this, experimentData, storageDir);
 
         setContentView(R.layout.experimentanalyser);
 
         experimentRunLayout = (RelativeLayout)findViewById(R.id.experimentRunLayout);
-        View experimentRunView = plugin.createExperimentRunView(this, experiment);
-        markerView = new MarkerView(this);
 
-        experimentRunLayout.addView(experimentRunView);
+        View experimentRunView = plugin.createExperimentRunView(this, experiment);
+        markerView = new MarkerView(this, experimentRunView);
+
+        RelativeLayout.LayoutParams runViewParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+
+        experimentRunLayout.addView(experimentRunView, runViewParams);
 
         RelativeLayout.LayoutParams makerViewParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+
         makerViewParams.addRule(RelativeLayout.ALIGN_LEFT, experimentRunView.getId());
         makerViewParams.addRule(RelativeLayout.ALIGN_TOP, experimentRunView.getId());
         makerViewParams.addRule(RelativeLayout.ALIGN_RIGHT, experimentRunView.getId());
         makerViewParams.addRule(RelativeLayout.ALIGN_BOTTOM, experimentRunView.getId());
 
         experimentRunLayout.addView(markerView, makerViewParams);
+
+
+        ExperimentRunViewControl runViewControl = (ExperimentRunViewControl)findViewById(
+                R.id.experimentRunViewControl);
+        runViewControl.setTo(experiment, (IExperimentRunView)experimentRunView);
     }
 
     private void showErrorAndFinish(String error) {

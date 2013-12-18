@@ -8,19 +8,28 @@ import android.text.format.Time;
 import java.io.File;
 
 
+interface IExperimentRunView {
+    public void setCurrentRun(Bundle bundle);
+}
+
+
 abstract public class Experiment {
     private int xUnit;
     private int yUnit;
 
     private String uid;
     private File storageDir;
+    protected Context context;
 
-    public Experiment(Bundle bundle, File storageDir) {
+    public Experiment(Context experimentContext, Bundle bundle, File storageDir) {
+        context = experimentContext;
         uid = bundle.getString("uid");
         this.storageDir = storageDir;
     }
 
-    public Experiment() {
+    public Experiment(Context experimentContext) {
+        context = experimentContext;
+
         String identifier = getIdentifier();
 
         Time now = new Time(Time.getCurrentTimezone());
@@ -62,6 +71,6 @@ abstract public class Experiment {
 
 
     abstract public int getNumberOfRuns();
-    abstract public ExperimentRun getRunAt(int i);
+    abstract public Bundle getRunAt(int i);
 
 }

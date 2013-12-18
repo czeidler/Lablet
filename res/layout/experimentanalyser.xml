@@ -6,8 +6,14 @@
               android:layout_height="match_parent">
 
     <RelativeLayout android:id="@+id/experimentRunLayout"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:layout_marginLeft="0dp"
-            android:layout_alignParentTop="true" android:layout_marginTop="0dp">
+            android:layout_alignParentTop="true" android:layout_marginTop="0dp"
+            android:layout_above="@+id/experimentRunViewControl" android:layout_alignParentRight="true">
     </RelativeLayout>
+    <view android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          class="com.example.AndroidPhysicsTracker.ExperimentRunViewControl" android:id="@+id/experimentRunViewControl"
+          android:layout_alignParentBottom="true" android:layout_alignParentLeft="true"
+          android:layout_alignParentRight="true" android:orientation="horizontal"/>
 </RelativeLayout>

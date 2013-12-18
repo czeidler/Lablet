@@ -27,8 +27,8 @@ public class CameraExperimentPlugin implements ExperimentPlugin {
     }
 
     @Override
-    public Experiment loadExperiment(Bundle data, File storageDir) {
-        return new CameraExperiment(data, storageDir);
+    public Experiment loadExperiment(Context context, Bundle data, File storageDir) {
+        return new CameraExperiment(context, data, storageDir);
     }
 
     @Override

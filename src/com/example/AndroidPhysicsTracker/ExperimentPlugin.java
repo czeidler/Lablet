@@ -13,6 +13,6 @@ interface ExperimentPlugin {
     String getName();
     void startExperimentActivity(Activity parentActivity, int requestCode);
 
-    Experiment loadExperiment(Bundle data, File storageDir);
+    Experiment loadExperiment(Context context, Bundle data, File storageDir);
     View createExperimentRunView(Context context, Experiment experiment);
 }

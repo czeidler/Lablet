@@ -1,42 +1,64 @@
 package com.example.AndroidPhysicsTracker;
 
+import android.content.Context;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 
 import java.io.File;
 
-/**
- * Created by lec on 16/12/13.
- */
-public class CameraExperiment extends Experiment {
-    private String videoFileName = "video.3gpp";
 
-    public CameraExperiment() {
-        super();
+public class CameraExperiment extends Experiment {
+    private String videoFileName = "";
+    private int numberOfRuns = 0;
+    private int duration = 0;
+
+    public CameraExperiment(Context experimentContext) {
+        super(experimentContext);
     }
 
-    public CameraExperiment(Bundle bundle, File storageDir) {
-        super(bundle, storageDir);
-        videoFileName = bundle.getString("videoName");
+    public CameraExperiment(Context experimentContext, Bundle bundle, File storageDir) {
+        super(experimentContext, bundle, storageDir);
+        setVideoFileName(bundle.getString("videoName"));
     }
 
     @Override
     public int getNumberOfRuns() {
-        return 0;
+        return numberOfRuns;
     }
 
     @Override
-    public ExperimentRun getRunAt(int i) {
-        return null;
+    public Bundle getRunAt(int i) {
+        if (i < 0 || i >= numberOfRuns)
+            return null;
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("frame_position", (int)(duration * ((float)i / (numberOfRuns - 1))));
+
+        return bundle;
     }
 
     public Bundle toBundle() {
         Bundle bundle = super.toBundle();
 
-        bundle.putString("videoName", getVideoName());
+        bundle.putString("videoName", videoFileName);
         return bundle;
     }
 
-    public String getVideoName() {
+    public void setVideoFileName(String video) {
+        if (video == null)
+            return;
+        videoFileName = video;
+        File file = new File(getStorageDir(), videoFileName);
+
+        MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.parse(file.getPath()));
+        duration = mediaPlayer.getDuration();
+
+        numberOfRuns = 20;
+        mediaPlayer.release();
+    }
+
+    public String getVideoFileName() {
         return videoFileName;
     }
 }

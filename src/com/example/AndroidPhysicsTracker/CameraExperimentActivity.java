@@ -40,6 +40,8 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
     static final int CAMERA_FACE = Camera.CameraInfo.CAMERA_FACING_BACK;
 
+    static private String videoFileName = "video.mp4";
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.perform_experiment_activity_actions, menu);
@@ -161,7 +163,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
     }
 
     protected void createExperiment() {
-        experiment = new CameraExperiment();
+        experiment = new CameraExperiment(this);
     }
 
     public Experiment getExperiment() {
@@ -176,7 +178,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
             recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
             recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            recorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+            recorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
 
             CamcorderProfile profile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH);
             recorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameWidth);
@@ -184,7 +186,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
             recorder.setVideoEncodingBitRate(profile.videoBitRate);
 
             File outputDir = getStorageDir();
-            videoFile = new File(outputDir, experiment.getVideoName());
+            videoFile = new File(outputDir, getVideoFileName());
             videoFile.createNewFile();
             recorder.setOutputFile(videoFile.getPath());
 
@@ -208,9 +210,14 @@ public class CameraExperimentActivity extends ExperimentActivity {
         camera.lock();
     }
 
+    private String getVideoFileName() {
+        return videoFileName;
+    }
+
     private void finishExperiment() {
         done = true;
 
+        experiment.setVideoFileName(getVideoFileName());
         try {
             saveExperimentToFile();
             Intent data = new Intent();
