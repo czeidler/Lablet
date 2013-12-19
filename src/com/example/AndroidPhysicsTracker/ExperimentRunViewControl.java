@@ -1,24 +1,25 @@
 package com.example.AndroidPhysicsTracker;
 
 import android.content.Context;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 
-import java.io.InputStream;
-
 
 public class ExperimentRunViewControl extends LinearLayout {
-    private Experiment experiment = null;
-    private IExperimentRunView runView = null;
+    private int numberOfRuns = 0;
 
     private int currentFrame = 0;
 
     private TextView progressLabel = null;
     private SeekBar seekBar = null;
+
+    private RunChangedListener runChangedListener = null;
+
+    static abstract public class RunChangedListener {
+        abstract public void onRunChanged(int run);
+    }
 
     public ExperimentRunViewControl(Context context) {
         super(context);
@@ -38,6 +39,15 @@ public class ExperimentRunViewControl extends LinearLayout {
         init(context);
     }
 
+    public void setOnRunChangedListener(RunChangedListener listener) {
+        runChangedListener = listener;
+    }
+
+    private void notifyRunChanged(int run) {
+        if (runChangedListener != null)
+            runChangedListener.onRunChanged(run);
+    }
+
     private void init(Context context) {
         LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         layoutInflater.inflate(R.layout.experimentrunviewcontrol, this, true);
@@ -50,13 +60,13 @@ public class ExperimentRunViewControl extends LinearLayout {
         prevButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                setCurrentFrame(getCurrentFrame() - 1);
+                setCurrentRun(getCurrentFrame() - 1);
             }
         });
         nextButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                setCurrentFrame(getCurrentFrame() + 1);
+                setCurrentRun(getCurrentFrame() + 1);
             }
         });
 
@@ -65,7 +75,7 @@ public class ExperimentRunViewControl extends LinearLayout {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (!fromUser)
                     return;
-                setCurrentFrame(progress);
+                setCurrentRun(progress);
             }
 
             @Override
@@ -82,30 +92,26 @@ public class ExperimentRunViewControl extends LinearLayout {
         progressLabel.setText("--/--");
     }
 
-    public void setTo(Experiment experiment, IExperimentRunView runView) {
-        this.experiment = experiment;
-        this.runView = runView;
+    public void setTo(int nRuns) {
+        numberOfRuns = nRuns;
 
-        setCurrentFrame(0);
+        setCurrentRun(0);
     }
 
-    private void setCurrentFrame(int frame) {
-        if (experiment == null)
+    private void setCurrentRun(int run) {
+        if (run < 0 || run >= numberOfRuns)
             return;
 
-        if (frame < 0 || frame >= experiment.getNumberOfRuns())
-            return;
+        currentFrame = run;
 
-        currentFrame = frame;
-
-        String labelText = String.valueOf(frame);
+        String labelText = String.valueOf(run);
         labelText += "/";
-        labelText += String.valueOf(experiment.getNumberOfRuns() - 1);
+        labelText += String.valueOf(numberOfRuns - 1);
         progressLabel.setText(labelText);
 
-        seekBar.setMax(experiment.getNumberOfRuns() - 1);
-        seekBar.setProgress(frame);
-        runView.setCurrentRun(experiment.getRunAt(frame));
+        seekBar.setMax(numberOfRuns - 1);
+        seekBar.setProgress(run);
+        notifyRunChanged(run);
     }
 
     private int getCurrentFrame() {

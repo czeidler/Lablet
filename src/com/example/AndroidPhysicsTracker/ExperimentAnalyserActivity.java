@@ -10,14 +10,18 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.*;
 
+import static com.example.AndroidPhysicsTracker.ExperimentRunViewControl.*;
+
 
 /**
  * Created by lec on 11/12/13.
  */
 public class ExperimentAnalyserActivity extends Activity {
     private RelativeLayout experimentRunLayout = null;
+    private View experimentRunView = null;
     private MarkerView markerView = null;
     private ExperimentPlugin plugin = null;
+    private Experiment experiment = null;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,13 +66,13 @@ public class ExperimentAnalyserActivity extends Activity {
         Bundle experimentData = bundle.getBundle("data");
         if (experimentData == null)
             showErrorAndFinish("failed to load experiment data");
-        Experiment experiment = plugin.loadExperiment(this, experimentData, storageDir);
+        experiment = plugin.loadExperiment(this, experimentData, storageDir);
 
         setContentView(R.layout.experimentanalyser);
 
         experimentRunLayout = (RelativeLayout)findViewById(R.id.experimentRunLayout);
 
-        View experimentRunView = plugin.createExperimentRunView(this, experiment);
+        experimentRunView = plugin.createExperimentRunView(this, experiment);
         markerView = new MarkerView(this, experimentRunView);
 
         RelativeLayout.LayoutParams runViewParams = new RelativeLayout.LayoutParams(
@@ -89,7 +93,15 @@ public class ExperimentAnalyserActivity extends Activity {
 
         ExperimentRunViewControl runViewControl = (ExperimentRunViewControl)findViewById(
                 R.id.experimentRunViewControl);
-        runViewControl.setTo(experiment, (IExperimentRunView)experimentRunView);
+        runViewControl.setTo(experiment.getNumberOfRuns());
+
+        runViewControl.setOnRunChangedListener(new ExperimentRunViewControl.RunChangedListener() {
+            @Override
+            public void onRunChanged(int run) {
+                ((IExperimentRunView)experimentRunView).setCurrentRun(run);
+                markerView.setCurrentRun(run);
+            }
+        });
     }
 
     private void showErrorAndFinish(String error) {
