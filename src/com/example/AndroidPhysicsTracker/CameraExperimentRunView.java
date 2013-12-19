@@ -20,7 +20,7 @@ public class CameraExperimentRunView extends SurfaceView implements IExperimentR
     public CameraExperimentRunView(Context context, Experiment experiment) {
         super(context);
 
-setWillNotDraw(false);
+        setWillNotDraw(false);
 
         assert(experiment instanceof CameraExperiment);
         this.experiment = (CameraExperiment)experiment;
@@ -66,14 +66,5 @@ setWillNotDraw(false);
 
         if (seekToFrameExtractor != null)
             seekToFrameExtractor.seekToFrame(positionMicroSeconds);
-
-        Paint paint = new Paint();
-        paint.setColor(Color.GREEN);
-
-        Rect frame = new Rect();
-        getDrawingRect(frame);
-
-        canvas.drawLine(frame.left, frame.top, frame.right, frame.top, paint);
-        canvas.drawLine(frame.right, frame.top, frame.left, frame.bottom, paint);
     }
 }
