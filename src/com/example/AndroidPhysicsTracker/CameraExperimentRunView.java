@@ -40,10 +40,7 @@ public class CameraExperimentRunView extends SurfaceView implements IExperimentR
                 seekToFrameExtractor = new SeekToFrameExtractor(videoFile, holder.getSurface());
             } catch (IOException e) {
                 e.printStackTrace();
-                Context context = getContext();
-                assert context != null;
-                Toast toast = Toast.makeText(context, "can't open video file", Toast.LENGTH_LONG);
-                toast.show();
+                toastMessage("can't open video file");
             }
         }
 
@@ -54,10 +51,30 @@ public class CameraExperimentRunView extends SurfaceView implements IExperimentR
     };
 
     @Override
-    public void setCurrentRun(Bundle bundle) {
+    public void setCurrentRun(int run) {
+        Bundle bundle = experiment.getRunAt(run);
+        if (bundle == null) {
+            toastMessage("can't get run information!");
+            return;
+        }
         positionMicroSeconds = bundle.getInt("frame_position");
         positionMicroSeconds *= 1000;
         invalidate();
+    }
+
+    @Override
+    public int getNumberOfRuns() {
+        return experiment.getNumberOfRuns();
+    }
+
+    @Override
+    public void fromScreen(PointF screen, PointF real) {
+        real.set(screen);
+    }
+
+    @Override
+    public void toScreen(PointF real, PointF screen) {
+        screen.set(real);
     }
 
     @Override
@@ -66,5 +83,12 @@ public class CameraExperimentRunView extends SurfaceView implements IExperimentR
 
         if (seekToFrameExtractor != null)
             seekToFrameExtractor.seekToFrame(positionMicroSeconds);
+    }
+
+    private void toastMessage(String message) {
+        Context context = getContext();
+        assert context != null;
+        Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
+        toast.show();
     }
 }

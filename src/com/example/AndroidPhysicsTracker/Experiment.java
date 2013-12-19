@@ -2,6 +2,7 @@ package com.example.AndroidPhysicsTracker;
 
 
 import android.content.Context;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.text.format.Time;
 
@@ -9,7 +10,12 @@ import java.io.File;
 
 
 interface IExperimentRunView {
-    public void setCurrentRun(Bundle bundle);
+    public void setCurrentRun(int run);
+    public int getNumberOfRuns();
+
+    // convert a coordinate on the screen to the real value of the measurement
+    public void fromScreen(PointF screen, PointF real);
+    public void toScreen(PointF real, PointF screen);
 }
 
 
