@@ -22,6 +22,7 @@ public class ExperimentAnalyserActivity extends Activity {
     private MarkerView markerView = null;
     private ExperimentPlugin plugin = null;
     private Experiment experiment = null;
+    private MarkerDataTableAdapter markerDataTableAdapter = null;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +75,7 @@ public class ExperimentAnalyserActivity extends Activity {
 
         experimentRunView = plugin.createExperimentRunView(this, experiment);
         markerView = new MarkerView(this, experimentRunView);
+        markerDataTableAdapter = markerView.createNewMarkerSeries();
 
         RelativeLayout.LayoutParams runViewParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
