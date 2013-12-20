@@ -12,6 +12,7 @@ import android.view.Surface;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.Semaphore;
 
 
 /*
@@ -20,9 +21,17 @@ Reads a video file and displays it at given time position on the surface. The su
 public class SeekToFrameExtractor {
     SeekToThread seekToThread;
 
+    private final Semaphore threadReadySemaphore = new Semaphore(1);
+
     public SeekToFrameExtractor(File mediaFile, Surface surface) throws IOException {
         seekToThread = new SeekToThread(mediaFile, surface);
         seekToThread.start();
+        // wait till thread is up and running
+        try {
+            threadReadySemaphore.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void release() {
@@ -82,6 +91,11 @@ public class SeekToFrameExtractor {
         // thread safe
         public void quit() {
             seekHandler.getLooper().quit();
+            try {
+                seekToThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             decoder.stop();
             decoder.release();
             extractor.release();
@@ -103,6 +117,7 @@ public class SeekToFrameExtractor {
                 }
 
             };
+            threadReadySemaphore.release();
             Looper.loop();
         }
 
