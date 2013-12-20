@@ -37,6 +37,10 @@ public class CameraExperimentRunView extends SurfaceView implements IExperimentR
             File storageDir = experiment.getStorageDir();
             File videoFile = new File(storageDir, experiment.getVideoFileName());
             try {
+                if (seekToFrameExtractor != null) {
+                    seekToFrameExtractor.release();
+                    seekToFrameExtractor = null;
+                }
                 seekToFrameExtractor = new SeekToFrameExtractor(videoFile, holder.getSurface());
             } catch (IOException e) {
                 e.printStackTrace();
