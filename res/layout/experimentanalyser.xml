@@ -8,12 +8,15 @@
     <RelativeLayout android:id="@+id/experimentRunLayout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:layout_marginLeft="0dp"
-            android:layout_alignParentTop="true" android:layout_marginTop="0dp"
-            android:layout_above="@+id/experimentRunViewControl" android:layout_alignParentRight="true">
+            android:layout_above="@+id/experimentRunViewControl" android:layout_below="@+id/markerTableView">
     </RelativeLayout>
     <view android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           class="com.example.AndroidPhysicsTracker.ExperimentRunViewControl" android:id="@+id/experimentRunViewControl"
           android:layout_alignParentBottom="true" android:layout_alignParentLeft="true"
           android:layout_alignParentRight="true" android:orientation="horizontal"/>
+    <view android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          class="com.example.AndroidPhysicsTracker.TableView" android:id="@+id/markerTableView"
+          android:layout_alignParentTop="true" android:layout_alignParentRight="true"/>
 </RelativeLayout>

@@ -77,6 +77,9 @@ public class ExperimentAnalyserActivity extends Activity {
         markerView = new MarkerView(this, experimentRunView);
         markerDataTableAdapter = markerView.createNewMarkerSeries();
 
+        TableView tableView = (TableView)findViewById(R.id.markerTableView);
+        tableView.setAdapter(markerDataTableAdapter);
+
         RelativeLayout.LayoutParams runViewParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
 
