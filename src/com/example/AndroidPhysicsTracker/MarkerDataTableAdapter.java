@@ -2,8 +2,10 @@ package com.example.AndroidPhysicsTracker;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.PointF;
 import android.view.View;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -23,10 +25,12 @@ class MarkerData {
 public class MarkerDataTableAdapter implements  ITableAdapter<MarkerData> {
     private List<MarkerData> markerDataList;
     private List<ITableAdapterListener> listeners;
+    private int selectedRow;
 
     public MarkerDataTableAdapter() {
         markerDataList = new ArrayList<MarkerData>();
         listeners = new ArrayList<ITableAdapterListener>();
+        selectedRow = -1;
     }
 
     @Override
@@ -53,6 +57,9 @@ public class MarkerDataTableAdapter implements  ITableAdapter<MarkerData> {
     public View getView(Context context, int row, int column) throws IndexOutOfBoundsException {
         MarkerData data = getRow(row);
         TextView textView = new TextView(context);
+        textView.setTextColor(Color.BLACK);
+        textView.setBackgroundColor(Color.WHITE);
+
         String text = new String();
         if (column == 0)
             text += data.runId;
@@ -95,6 +102,17 @@ public class MarkerDataTableAdapter implements  ITableAdapter<MarkerData> {
     }
 
     @Override
+    public void selectRow(int row) {
+        selectedRow = row;
+        notifyRowSelected(row);
+    }
+
+    @Override
+    public int getSelectedRow() {
+        return selectedRow;
+    }
+
+    @Override
     public void addListener(ITableAdapterListener listener) {
         listeners.add(listener);
     }
@@ -112,5 +130,10 @@ public class MarkerDataTableAdapter implements  ITableAdapter<MarkerData> {
     private void notifyRowUpdated(int row) {
         for (ITableAdapterListener listener : listeners)
             listener.onRowUpdated(this, row);
+    }
+
+    private void notifyRowSelected(int row) {
+        for (ITableAdapterListener listener : listeners)
+            listener.onRowSelected(this, row);
     }
 }

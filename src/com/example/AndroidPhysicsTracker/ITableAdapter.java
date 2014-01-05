@@ -15,12 +15,16 @@ public interface ITableAdapter<T> {
     public int addRow(T row);
     public void removeRow(int row);
 
+    public void selectRow(int row);
+    public int getSelectedRow();
+
     public void addListener(ITableAdapterListener listener);
 
     public interface ITableAdapterListener {
         public void onRowAdded(ITableAdapter<?> table, int row);
         public void onRowRemoved(ITableAdapter<?> table, int row);
         public void onRowUpdated(ITableAdapter<?> table, int row);
+        public void onRowSelected(ITableAdapter<?> table, int row);
     }
 }
 
