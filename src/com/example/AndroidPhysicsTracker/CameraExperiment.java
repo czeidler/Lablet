@@ -10,6 +10,8 @@ import java.io.File;
 
 public class CameraExperiment extends Experiment {
     private String videoFileName = "";
+    private int videoHeight;
+    private int videoWidth;
     private int numberOfRuns = 0;
     private int duration = 0;
 
@@ -53,6 +55,8 @@ public class CameraExperiment extends Experiment {
 
         MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.parse(file.getPath()));
         duration = mediaPlayer.getDuration();
+        videoHeight = mediaPlayer.getVideoHeight();
+        videoWidth = mediaPlayer.getVideoWidth();
 
         numberOfRuns = 20;
         mediaPlayer.release();
@@ -60,5 +64,13 @@ public class CameraExperiment extends Experiment {
 
     public String getVideoFileName() {
         return videoFileName;
+    }
+
+    public int getVideoHeight() {
+        return videoHeight;
+    }
+
+    public int getVideoWidth() {
+        return videoWidth;
     }
 }
