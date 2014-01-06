@@ -20,7 +20,6 @@ public class ExperimentAnalyserActivity extends Activity {
     private MarkerView markerView = null;
     private ExperimentPlugin plugin = null;
     private Experiment experiment = null;
-    private MarkersDataModel markersDataModel = null;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,16 +66,17 @@ public class ExperimentAnalyserActivity extends Activity {
             showErrorAndFinish("failed to load experiment data");
         experiment = plugin.loadExperiment(this, experimentData, storageDir);
 
+        // setup views
         setContentView(R.layout.experimentanalyser);
 
         experimentRunLayout = (RelativeLayout)findViewById(R.id.experimentRunLayout);
 
         experimentRunView = plugin.createExperimentRunView(this, experiment);
         markerView = new MarkerView(this, experimentRunView);
-        markersDataModel = markerView.createNewMarkerSeries();
+        markerView.setTagMarkers(experiment.getTagMarkers());
 
         TableView tableView = (TableView)findViewById(R.id.markerTableView);
-        tableView.setAdapter(new MarkerDataTableAdapter(markersDataModel));
+        tableView.setAdapter(new MarkerDataTableAdapter(experiment.getTagMarkers()));
 
         RelativeLayout.LayoutParams runViewParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);

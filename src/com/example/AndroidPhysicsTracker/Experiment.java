@@ -27,16 +27,21 @@ abstract public class Experiment {
     private File storageDir;
     protected Context context;
 
+    private MarkersDataModel tagMarkers;
+
     public Experiment(Context experimentContext, Bundle bundle, File storageDir) {
         context = experimentContext;
         uid = bundle.getString("uid");
         this.storageDir = storageDir;
+
+        init();
     }
 
     public Experiment(Context experimentContext) {
         context = experimentContext;
-
         uid = generateNewUid();
+
+        init();
     }
 
     static public File getMainExperimentDir(Context context) {
@@ -49,6 +54,10 @@ abstract public class Experiment {
 
     public File getStorageDir() {
         return storageDir;
+    }
+
+    public MarkersDataModel getTagMarkers() {
+        return tagMarkers;
     }
 
     public Bundle toBundle() {
@@ -85,5 +94,9 @@ abstract public class Experiment {
         }
         newUid += dateString;
         return newUid;
+    }
+
+    private void init() {
+        tagMarkers = new MarkersDataModel();
     }
 }

@@ -304,13 +304,11 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
         setCurrentRun(0);
     }
 
-    public MarkersDataModel createNewMarkerSeries() {
-        MarkersDataModel data = new MarkersDataModel();
-        markerDataList.add(data);
-        data.addListener(this);
-        markerSeriesList.add(new MarkerSeries(experimentRunView, data));
+    public void setTagMarkers(MarkersDataModel markers) {
+        markerDataList.add(markers);
+        markers.addListener(this);
+        markerSeriesList.add(new MarkerSeries(experimentRunView, markers));
         setCurrentRun(currentRun);
-        return data;
     }
 
     public void setCurrentRun(int run) {
