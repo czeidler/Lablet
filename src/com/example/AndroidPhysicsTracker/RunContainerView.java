@@ -18,14 +18,14 @@ public class RunContainerView extends RelativeLayout {
     public void setRunView(View view, Experiment experiment) {
         this.experimentRunView = view;
 
+        // run view
         RelativeLayout.LayoutParams runViewParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-
+            RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         addView(experimentRunView, runViewParams);
 
+        // marker view
         RelativeLayout.LayoutParams makerViewParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-
         makerViewParams.addRule(RelativeLayout.ALIGN_LEFT, experimentRunView.getId());
         makerViewParams.addRule(RelativeLayout.ALIGN_TOP, experimentRunView.getId());
         makerViewParams.addRule(RelativeLayout.ALIGN_RIGHT, experimentRunView.getId());
