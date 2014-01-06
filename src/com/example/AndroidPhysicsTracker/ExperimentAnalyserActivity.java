@@ -15,9 +15,7 @@ import java.io.*;
  * Created by lec on 11/12/13.
  */
 public class ExperimentAnalyserActivity extends Activity {
-    private RelativeLayout experimentRunLayout = null;
     private View experimentRunView = null;
-    private MarkerView markerView = null;
     private ExperimentPlugin plugin = null;
     private Experiment experiment = null;
 
@@ -66,45 +64,26 @@ public class ExperimentAnalyserActivity extends Activity {
             showErrorAndFinish("failed to load experiment data");
         experiment = plugin.loadExperiment(this, experimentData, storageDir);
 
+        setupViews();
+    }
+
+    private void setupViews() {
         // setup views
         setContentView(R.layout.experimentanalyser);
 
-        experimentRunLayout = (RelativeLayout)findViewById(R.id.experimentRunLayout);
-
         experimentRunView = plugin.createExperimentRunView(this, experiment);
-        markerView = new MarkerView(this, experimentRunView);
-        markerView.setTagMarkers(experiment.getTagMarkers());
-
-        TableView tableView = (TableView)findViewById(R.id.markerTableView);
-        tableView.setAdapter(new MarkerDataTableAdapter(experiment.getTagMarkers()));
-
-        RelativeLayout.LayoutParams runViewParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-
-        experimentRunLayout.addView(experimentRunView, runViewParams);
-
-        RelativeLayout.LayoutParams makerViewParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-
-        makerViewParams.addRule(RelativeLayout.ALIGN_LEFT, experimentRunView.getId());
-        makerViewParams.addRule(RelativeLayout.ALIGN_TOP, experimentRunView.getId());
-        makerViewParams.addRule(RelativeLayout.ALIGN_RIGHT, experimentRunView.getId());
-        makerViewParams.addRule(RelativeLayout.ALIGN_BOTTOM, experimentRunView.getId());
-
-        experimentRunLayout.addView(markerView, makerViewParams);
-
 
         ExperimentRunViewControl runViewControl = (ExperimentRunViewControl)findViewById(
                 R.id.experimentRunViewControl);
         runViewControl.setTo(experiment.getNumberOfRuns());
 
-        runViewControl.setOnRunChangedListener(new ExperimentRunViewControl.RunChangedListener() {
-            @Override
-            public void onRunChanged(int run) {
-                ((IExperimentRunView)experimentRunView).setCurrentRun(run);
-                markerView.setCurrentRun(run);
-            }
-        });
+        RunContainerView runContainerView = (RunContainerView)findViewById(R.id.experimentRunContainer);
+        runContainerView.setRunView(experimentRunView, experiment);
+        runContainerView.setExperimentRunViewControl(runViewControl);
+
+        // marker table view
+        TableView tableView = (TableView)findViewById(R.id.tagMarkerTableView);
+        tableView.setAdapter(new MarkerDataTableAdapter(experiment.getTagMarkers()));
     }
 
     private void showErrorAndFinish(String error) {
