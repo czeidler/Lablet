@@ -10,8 +10,6 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.*;
 
-import static com.example.AndroidPhysicsTracker.ExperimentRunViewControl.*;
-
 
 /**
  * Created by lec on 11/12/13.
@@ -22,7 +20,7 @@ public class ExperimentAnalyserActivity extends Activity {
     private MarkerView markerView = null;
     private ExperimentPlugin plugin = null;
     private Experiment experiment = null;
-    private MarkerDataTableAdapter markerDataTableAdapter = null;
+    private MarkersDataModel markersDataModel = null;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,10 +73,10 @@ public class ExperimentAnalyserActivity extends Activity {
 
         experimentRunView = plugin.createExperimentRunView(this, experiment);
         markerView = new MarkerView(this, experimentRunView);
-        markerDataTableAdapter = markerView.createNewMarkerSeries();
+        markersDataModel = markerView.createNewMarkerSeries();
 
         TableView tableView = (TableView)findViewById(R.id.markerTableView);
-        tableView.setAdapter(markerDataTableAdapter);
+        tableView.setAdapter(new MarkerDataTableAdapter(markersDataModel));
 
         RelativeLayout.LayoutParams runViewParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);

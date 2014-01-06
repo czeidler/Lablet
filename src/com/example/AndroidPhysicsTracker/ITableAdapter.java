@@ -12,9 +12,6 @@ public interface ITableAdapter<T> {
     public T getRow(int row);
     public View getView(Context context, int row, int column);
 
-    public int addRow(T row);
-    public void removeRow(int row);
-
     public void selectRow(int row);
     public int getSelectedRow();
 

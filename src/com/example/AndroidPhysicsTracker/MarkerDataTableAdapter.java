@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.view.View;
-import android.widget.TableLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -21,21 +20,19 @@ class MarkerData {
     }
 }
 
-
-public class MarkerDataTableAdapter implements  ITableAdapter<MarkerData> {
-    private List<MarkerData> markerDataList;
+public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, MarkersDataModel.IMarkersDataModelListener {
+    private MarkersDataModel model;
     private List<ITableAdapterListener> listeners;
-    private int selectedRow;
 
-    public MarkerDataTableAdapter() {
-        markerDataList = new ArrayList<MarkerData>();
+    public MarkerDataTableAdapter(MarkersDataModel model) {
+        this.model = model;
+        model.addListener(this);
         listeners = new ArrayList<ITableAdapterListener>();
-        selectedRow = -1;
     }
 
     @Override
     public int getRowCount() {
-        return markerDataList.size();
+        return model.getMarkerCount();
     }
 
     @Override
@@ -50,7 +47,7 @@ public class MarkerDataTableAdapter implements  ITableAdapter<MarkerData> {
 
     @Override
     public MarkerData getRow(int index) throws IndexOutOfBoundsException {
-        return markerDataList.get(index);
+        return model.getMarkerDataAt(index);
     }
 
     @Override
@@ -74,47 +71,39 @@ public class MarkerDataTableAdapter implements  ITableAdapter<MarkerData> {
         return textView;
     }
 
-    public void setMarkerPosition(PointF position, int row) {
-        MarkerData data = getRow(row);
-        data.positionReal = position;
-        notifyRowUpdated(row);
-    }
-
-    @Override
-    public int addRow(MarkerData data) {
-        for (int i = 0; i < markerDataList.size(); i++) {
-            MarkerData current = markerDataList.get(i);
-            if (current.runId > data.runId) {
-                markerDataList.add(i, data);
-                notifyRowAdded(i);
-                return i;
-            }
-        }
-        markerDataList.add(data);
-        notifyRowAdded(markerDataList.size() - 1);
-        return markerDataList.size() - 1;
-    }
-
-    @Override
-    public void removeRow(int row) throws IndexOutOfBoundsException {
-        markerDataList.remove(row);
-        notifyRowRemoved(row);
-    }
-
     @Override
     public void selectRow(int row) {
-        selectedRow = row;
-        notifyRowSelected(row);
+        model.selectMarkerData(row);
     }
 
     @Override
     public int getSelectedRow() {
-        return selectedRow;
+        return model.getSelectedMarkerData();
     }
 
     @Override
     public void addListener(ITableAdapterListener listener) {
         listeners.add(listener);
+    }
+
+    @Override
+    public void onDataAdded(MarkersDataModel model, int index) {
+        notifyRowAdded(index);
+    }
+
+    @Override
+    public void onDataRemoved(MarkersDataModel model, int index, MarkerData data) {
+        notifyRowRemoved(index);
+    }
+
+    @Override
+    public void onDataChanged(MarkersDataModel model, int index) {
+        notifyRowChanged(index);
+    }
+
+    @Override
+    public void onDataSelected(MarkersDataModel model, int index) {
+        notifyRowSelected(index);
     }
 
     private void notifyRowAdded(int row) {
@@ -127,7 +116,7 @@ public class MarkerDataTableAdapter implements  ITableAdapter<MarkerData> {
             listener.onRowRemoved(this, row);
     }
 
-    private void notifyRowUpdated(int row) {
+    private void notifyRowChanged(int row) {
         for (ITableAdapterListener listener : listeners)
             listener.onRowUpdated(this, row);
     }

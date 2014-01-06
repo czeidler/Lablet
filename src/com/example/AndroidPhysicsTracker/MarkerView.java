@@ -2,7 +2,6 @@ package com.example.AndroidPhysicsTracker;
 
 import android.content.Context;
 import android.graphics.*;
-import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -181,17 +180,17 @@ class SimpleMarker extends DragableMarker {
 
 class MarkerSeries {
     private IExperimentRunView experimentRunView = null;
-    private MarkerDataTableAdapter markerData = null;
+    private MarkersDataModel markerData = null;
     private List<DragableMarker> markerList;
 
-    public MarkerSeries(IExperimentRunView runView, MarkerDataTableAdapter data) {
+    public MarkerSeries(IExperimentRunView runView, MarkersDataModel data) {
         markerList = new ArrayList<DragableMarker>();
         experimentRunView = runView;
         markerData = data;
     }
 
     public void draw(Canvas canvas, float priority) {
-        int currentMarkerRow = markerData.getSelectedRow();
+        int currentMarkerRow = markerData.getSelectedMarkerData();
         IMarker topMarker = getMarkerForRow(currentMarkerRow);
         for (int i = 0; i < markerList.size(); i++) {
             IMarker marker = markerList.get(i);
@@ -219,7 +218,7 @@ class MarkerSeries {
 
     public List<IMarker> getSelectableMarkerList() {
         List<IMarker> returnMarkerList = new ArrayList<IMarker>();
-        int currentMarkerRow = markerData.getSelectedRow();
+        int currentMarkerRow = markerData.getSelectedMarkerData();
 
         if (currentMarkerRow < 0 || currentMarkerRow >= markerList.size())
             return returnMarkerList;
@@ -228,24 +227,24 @@ class MarkerSeries {
         return returnMarkerList;
     }
 
-    public void markerAdded(ITableAdapter<MarkerData> data, int row) {
+    public void markerAdded(MarkersDataModel data, int row) {
         SimpleMarker marker = new SimpleMarker(this);
         PointF screenPos = new PointF();
-        experimentRunView.toScreen(data.getRow(row).positionReal, screenPos);
+        experimentRunView.toScreen(data.getMarkerDataAt(row).positionReal, screenPos);
         marker.setPosition(screenPos);
         markerList.add(row, marker);
-        markerData.selectRow(row);
+        markerData.selectMarkerData(row);
     }
 
     public void markerRemoved(int row) {
         markerList.remove(row);
-        if (row == markerData.getSelectedRow())
-            markerData.selectRow(0);
+        if (row == markerData.getSelectedMarkerData())
+            markerData.selectMarkerData(0);
     }
 
     public void markerChanged(int row) {
         DragableMarker marker = markerList.get(row);
-        MarkerData data = markerData.getRow(row);
+        MarkerData data = markerData.getMarkerDataAt(row);
         PointF screenPos = new PointF();
         experimentRunView.toScreen(data.positionReal, screenPos);
         marker.setPosition(screenPos);
@@ -254,11 +253,11 @@ class MarkerSeries {
     public void setCurrentRun(int run) {
         // check if we have the run in the data list
         MarkerData data = null;
-        for (int i = 0; i < markerData.getRowCount(); i++) {
-            MarkerData foundData = markerData.getRow(i);
+        for (int i = 0; i < markerData.getMarkerCount(); i++) {
+            MarkerData foundData = markerData.getMarkerDataAt(i);
             if (foundData.runId == run) {
                 data = foundData;
-                markerData.selectRow(i);
+                markerData.selectMarkerData(i);
                 break;
             }
         }
@@ -266,8 +265,8 @@ class MarkerSeries {
         if (data == null) {
             data = new MarkerData();
             data.runId = run;
-            markerData.addRow(data);
-            markerData.selectRow(markerData.getRowCount() - 1);
+            markerData.addMarkerData(data);
+            markerData.selectMarkerData(markerData.getMarkerCount() - 1);
         }
     }
 
@@ -278,12 +277,12 @@ class MarkerSeries {
     }
 }
 
-public class MarkerView extends ViewGroup implements ITableAdapter.ITableAdapterListener {
+public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDataModelListener {
     private View targetView = null;
 
     private IMarker selectedMarker = null;
     private List<MarkerSeries> markerSeriesList;
-    private List<MarkerDataTableAdapter> markerDataList;
+    private List<MarkersDataModel> markerDataList;
     private Rect viewFrame = null;
     private boolean touchEventHandledLastTime = false;
     private IExperimentRunView experimentRunView = null;
@@ -301,12 +300,12 @@ public class MarkerView extends ViewGroup implements ITableAdapter.ITableAdapter
 
         markerSeriesList = new ArrayList<MarkerSeries>();
 
-        markerDataList = new ArrayList<MarkerDataTableAdapter>();
+        markerDataList = new ArrayList<MarkersDataModel>();
         setCurrentRun(0);
     }
 
-    public MarkerDataTableAdapter createNewMarkerSeries() {
-        MarkerDataTableAdapter data = new MarkerDataTableAdapter();
+    public MarkersDataModel createNewMarkerSeries() {
+        MarkersDataModel data = new MarkersDataModel();
         markerDataList.add(data);
         data.addListener(this);
         markerSeriesList.add(new MarkerSeries(experimentRunView, data));
@@ -404,35 +403,37 @@ public class MarkerView extends ViewGroup implements ITableAdapter.ITableAdapter
         viewFrame.bottom = h;
     }
 
-    @Override
-    public void onRowAdded(ITableAdapter<?> table, int row) {
-        MarkerSeries markerSeries = findMarkerSeriesFor(table);
-        markerSeries.markerAdded((ITableAdapter<MarkerData>)table, row);
-        invalidate();
-    }
-
-    @Override
-    public void onRowRemoved(ITableAdapter<?> table, int row) {
-        MarkerSeries markerSeries = findMarkerSeriesFor(table);
-        markerSeries.markerRemoved(row);
-        invalidate();
-    }
-
-    @Override
-    public void onRowUpdated(ITableAdapter<?> table, int row) {
-        MarkerSeries markerSeries = findMarkerSeriesFor(table);
-        markerSeries.markerChanged(row);
-    }
-
-    @Override
-    public void onRowSelected(ITableAdapter<?> table, int row) {
-    }
-
-    MarkerSeries findMarkerSeriesFor(ITableAdapter<?> table) {
+    MarkerSeries findMarkerSeriesFor(MarkersDataModel model) {
         for (int i = 0; i < markerDataList.size(); i++) {
-            if (markerDataList.get(i) == table)
+            if (markerDataList.get(i) == model)
                 return markerSeriesList.get(i);
         }
         return null;
+    }
+
+
+    @Override
+    public void onDataAdded(MarkersDataModel model, int index) {
+        MarkerSeries markerSeries = findMarkerSeriesFor(model);
+        markerSeries.markerAdded(model, index);
+        invalidate();
+    }
+
+    @Override
+    public void onDataRemoved(MarkersDataModel model, int index, MarkerData data) {
+        MarkerSeries markerSeries = findMarkerSeriesFor(model);
+        markerSeries.markerRemoved(index);
+        invalidate();
+    }
+
+    @Override
+    public void onDataChanged(MarkersDataModel model, int index) {
+        MarkerSeries markerSeries = findMarkerSeriesFor(model);
+        markerSeries.markerChanged(index);
+    }
+
+    @Override
+    public void onDataSelected(MarkersDataModel model, int index) {
+
     }
 }
