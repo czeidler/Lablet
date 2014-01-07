@@ -42,10 +42,6 @@ abstract class DragableMarker implements IMarker {
         position = pos;
     }
 
-    public PointF getPosition() {
-        return position;
-    }
-
     public boolean handleActionDown(MotionEvent event) {
         PointF point = new PointF(event.getX(), event.getY());
         dragOffset.x = point.x - position.x;
@@ -230,7 +226,9 @@ class MarkerSeries {
         if (frame.bottom < newPosition.y)
             newPosition.y = frame.bottom;
 
-        markerData.setMarkerPosition(newPosition, row);
+        PointF newReal = new PointF();
+        experimentRunView.fromScreen(newPosition, newReal);
+        markerData.setMarkerPosition(newReal, row);
     }
 
     public List<IMarker> getSelectableMarkerList() {

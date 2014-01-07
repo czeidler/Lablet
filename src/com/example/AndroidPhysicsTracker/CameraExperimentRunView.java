@@ -16,6 +16,7 @@ public class CameraExperimentRunView extends SurfaceView implements IExperimentR
     private int positionMicroSeconds = 0;
 
     private SeekToFrameExtractor seekToFrameExtractor = null;
+    private Rect frame = new Rect();
 
     public CameraExperimentRunView(Context context, Experiment experiment) {
         super(context);
@@ -56,6 +57,8 @@ public class CameraExperimentRunView extends SurfaceView implements IExperimentR
         }
 
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            getDrawingRect(frame);
+
             File storageDir = experiment.getStorageDir();
             File videoFile = new File(storageDir, experiment.getVideoFileName());
             try {
@@ -95,12 +98,14 @@ public class CameraExperimentRunView extends SurfaceView implements IExperimentR
 
     @Override
     public void fromScreen(PointF screen, PointF real) {
-        real.set(screen);
+        real.x = screen.x / frame.width() * 100;
+        real.y = 100 - screen.y / frame.height() * 100;
     }
 
     @Override
     public void toScreen(PointF real, PointF screen) {
-        screen.set(real);
+        screen.x = real.x * frame.width() / 100;
+        screen.y = (100 - real.y) * frame.height() / 100;
     }
 
     @Override
