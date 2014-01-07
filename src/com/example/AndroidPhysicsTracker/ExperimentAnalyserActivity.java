@@ -5,15 +5,12 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.RelativeLayout;
+import android.view.ViewGroup;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.*;
 
 
-/**
- * Created by lec on 11/12/13.
- */
 public class ExperimentAnalyserActivity extends Activity {
     private View experimentRunView = null;
     private ExperimentPlugin plugin = null;
@@ -84,6 +81,10 @@ public class ExperimentAnalyserActivity extends Activity {
         // marker table view
         TableView tableView = (TableView)findViewById(R.id.tagMarkerTableView);
         tableView.setAdapter(new MarkerDataTableAdapter(experiment.getTagMarkers()));
+
+        // marker graph view
+        GraphView2D graphView = (GraphView2D)findViewById(R.id.tagMarkerGraphView);
+        graphView.setAdapter(new MarkerGraphAdapter(experiment.getTagMarkers()));
     }
 
     private void showErrorAndFinish(String error) {
