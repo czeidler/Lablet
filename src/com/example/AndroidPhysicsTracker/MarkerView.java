@@ -216,6 +216,20 @@ class MarkerSeries {
         int row = markerList.lastIndexOf(marker);
         if (row < 0)
             return;
+
+        // sanitize position
+        View view = (View)experimentRunView;
+        Rect frame = new Rect();
+        view.getDrawingRect(frame);
+        if (frame.left > newPosition.x)
+            newPosition.x = frame.left;
+        if (frame.right < newPosition.x)
+            newPosition.x = frame.right;
+        if (frame.top > newPosition.y)
+            newPosition.y = frame.top;
+        if (frame.bottom < newPosition.y)
+            newPosition.y = frame.bottom;
+
         markerData.setMarkerPosition(newPosition, row);
     }
 
