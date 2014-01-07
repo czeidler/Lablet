@@ -44,13 +44,14 @@ public class MarkersDataModel {
     }
 
     public void addMarkerData(MarkerData data) {
-        markerDataList.add(data);
-        notifyDataAdded(markerDataList.size() - 1);
-    }
-
-    public void addMarkerData(int index, MarkerData data) {
-        markerDataList.add(index, data);
-        notifyDataAdded(index);
+        int i = 0;
+        for (; i < markerDataList.size(); i++) {
+            MarkerData current = markerDataList.get(i);
+            if (current.runId > data.runId)
+                break;
+        }
+        markerDataList.add(i, data);
+        notifyDataAdded(i);
     }
 
     public int getMarkerCount() {
