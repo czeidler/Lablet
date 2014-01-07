@@ -213,18 +213,7 @@ class MarkerSeries {
         if (row < 0)
             return;
 
-        // sanitize position
-        View view = (View)experimentRunView;
-        Rect frame = new Rect();
-        view.getDrawingRect(frame);
-        if (frame.left > newPosition.x)
-            newPosition.x = frame.left;
-        if (frame.right < newPosition.x)
-            newPosition.x = frame.right;
-        if (frame.top > newPosition.y)
-            newPosition.y = frame.top;
-        if (frame.bottom < newPosition.y)
-            newPosition.y = frame.bottom;
+        sanitizeScreenPoint(newPosition);
 
         PointF newReal = new PointF();
         experimentRunView.fromScreen(newPosition, newReal);
@@ -280,6 +269,16 @@ class MarkerSeries {
         if (data == null) {
             data = new MarkerData();
             data.runId = run;
+            if (markerData.getMarkerCount() > 0) {
+                MarkerData prevData = markerData.getMarkerDataAt(markerData.getMarkerCount() - 1);
+                data.positionReal = prevData.positionReal;
+                // TODO take unit and scale into account
+                data.positionReal.x += 5;
+                PointF screenPos = new PointF();
+                experimentRunView.toScreen(data.positionReal, screenPos);
+                sanitizeScreenPoint(screenPos);
+                experimentRunView.fromScreen(screenPos, data.positionReal);
+            }
             markerData.addMarkerData(data);
             markerData.selectMarkerData(markerData.getMarkerCount() - 1);
         }
@@ -289,6 +288,20 @@ class MarkerSeries {
         if (row < 0 || row >= markerList.size())
             return null;
         return markerList.get(row);
+    }
+
+    private void sanitizeScreenPoint(PointF point) {
+        View view = (View)experimentRunView;
+        Rect frame = new Rect();
+        view.getDrawingRect(frame);
+        if (frame.left > point.x)
+            point.x = frame.left;
+        if (frame.right < point.x)
+            point.x = frame.right;
+        if (frame.top > point.y)
+            point.y = frame.top;
+        if (frame.bottom < point.y)
+            point.y = frame.bottom;
     }
 }
 
