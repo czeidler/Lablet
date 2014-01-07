@@ -187,6 +187,9 @@ class MarkerSeries {
         markerList = new ArrayList<DragableMarker>();
         experimentRunView = runView;
         markerData = data;
+
+        for (int i = 0; i < markerData.getMarkerCount(); i++)
+            markerAdded(markerData, i);
     }
 
     public void draw(Canvas canvas, float priority) {
