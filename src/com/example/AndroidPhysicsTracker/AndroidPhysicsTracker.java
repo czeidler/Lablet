@@ -3,6 +3,7 @@ package com.example.AndroidPhysicsTracker;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.FileObserver;
 import android.view.Menu;
@@ -37,7 +38,11 @@ public class AndroidPhysicsTracker extends Activity {
         // plugin list
         experimentPluginList = ExperimentPluginFactory.getFactory().getPluginList();
 
+        int grey = 70;
+        int listBackgroundColor = Color.rgb(grey, grey, grey);
+
         ListView newExperimentList = (ListView)findViewById(R.id.newExperiments);
+        newExperimentList.setBackgroundColor(listBackgroundColor);
         newExperimentList.setAdapter(new ArrayAdapter<ExperimentPlugin>(this,
                 android.R.layout.simple_list_item_1, experimentPluginList));
 
@@ -51,6 +56,7 @@ public class AndroidPhysicsTracker extends Activity {
 
         // experiment list
         experimentListView = (ListView)findViewById(R.id.existingExperimentListView);
+        experimentListView.setBackgroundColor(listBackgroundColor);
         experimentList = new ArrayList<String>();
 
         experimentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
