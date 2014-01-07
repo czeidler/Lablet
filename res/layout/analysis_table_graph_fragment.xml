@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal" android:baselineAligned="false">
+
+    <view android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          class="com.example.AndroidPhysicsTracker.TableView" android:id="@+id/tagMarkerTableView"/>
+    <view android:layout_width="989dp"
+          android:layout_height="367dp"
+          class="com.example.AndroidPhysicsTracker.GraphView2D" android:id="@+id/tagMarkerGraphView"/>
+</LinearLayout>
