@@ -25,6 +25,7 @@ interface IGraphAdapter {
     public void addListener(IGraphAdapterListener listener);
     public int getDataPointCount();
     public IGraphDataPoint getDataPoint(int index);
+    public void release();
 }
 
 
@@ -41,8 +42,18 @@ public class GraphView2D extends LineGraphView implements IGraphAdapter.IGraphAd
     }
 
     public void setAdapter(IGraphAdapter adapter) {
+        if (this.adapter != null)
+            this.adapter.release();
         this.adapter = adapter;
+
+        if (this.adapter == null) {
+            graphViewSeries.resetData(new GraphViewData[0]);
+            return;
+        }
+
         this.adapter.addListener(this);
+
+        refillGraph();
     }
 
     @Override
@@ -88,6 +99,11 @@ class MarkerGraphAdapter implements IGraphAdapter, MarkersDataModel.IMarkersData
         listeners = new ArrayList<IGraphAdapterListener>();
         data = markersDataModel;
         data.addListener(this);
+    }
+
+    public void release() {
+        data.removeListener(this);
+        listeners.clear();
     }
 
     @Override

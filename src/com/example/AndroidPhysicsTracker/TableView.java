@@ -24,10 +24,15 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
     }
 
     public void setAdapter(ITableAdapter<?> tableAdapter) {
-        adapter = tableAdapter;
-        adapter.addListener(this);
-
         removeAllViews();
+        if (adapter != null)
+            adapter.release();
+        adapter = tableAdapter;
+
+        if (adapter == null)
+            return;
+
+        adapter.addListener(this);
 
         for (int row = 0; row < adapter.getRowCount(); row++) {
             TableRow tableRow = createRow(row);

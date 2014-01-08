@@ -15,7 +15,7 @@ public class RunContainerView extends RelativeLayout {
 
     }
 
-    public void setRunView(View view, Experiment experiment) {
+    public void setRunView(View view) {
         this.experimentRunView = view;
 
         // run view
@@ -32,8 +32,19 @@ public class RunContainerView extends RelativeLayout {
         makerViewParams.addRule(RelativeLayout.ALIGN_BOTTOM, experimentRunView.getId());
 
         markerView = new MarkerView(getContext(), experimentRunView);
-        markerView.setTagMarkers(experiment.getTagMarkers());
         addView(markerView, makerViewParams);
+    }
+
+    public void addMarkerData(MarkersDataModel data) {
+        markerView.addTagMarkers(data);
+    }
+
+    public boolean removeMarkerData(MarkersDataModel data) {
+        return markerView.removeMarkers(data);
+    }
+
+    public void release() {
+        markerView.release();
     }
 
     public void setExperimentRunViewControl(ExperimentRunViewControl control) {

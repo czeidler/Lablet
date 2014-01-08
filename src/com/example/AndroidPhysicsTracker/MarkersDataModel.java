@@ -43,6 +43,10 @@ public class MarkersDataModel {
         listeners.add(listener);
     }
 
+    public boolean removeListener(IMarkersDataModelListener listener) {
+        return listeners.remove(listener);
+    }
+
     public void addMarkerData(MarkerData data) {
         int i = 0;
         for (; i < markerDataList.size(); i++) {

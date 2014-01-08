@@ -30,6 +30,11 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
         listeners = new ArrayList<ITableAdapterListener>();
     }
 
+    public void release() {
+        model.removeListener(this);
+        listeners.clear();
+    }
+
     @Override
     public int getRowCount() {
         return model.getMarkerCount();

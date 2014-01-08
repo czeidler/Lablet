@@ -1,18 +1,18 @@
 package com.example.AndroidPhysicsTracker;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.View;
-import android.view.ViewGroup;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.*;
 
 
-public class ExperimentAnalyserActivity extends Activity {
-    private View experimentRunView = null;
+public class ExperimentAnalyserActivity extends FragmentActivity {
     private ExperimentPlugin plugin = null;
     private Experiment experiment = null;
 
@@ -61,21 +61,49 @@ public class ExperimentAnalyserActivity extends Activity {
             showErrorAndFinish("failed to load experiment data");
         experiment = plugin.loadExperiment(this, experimentData, storageDir);
 
-        setupViews();
+        setContentView(R.layout.experimentanalyser);
+        // Instantiate a ViewPager and a PagerAdapter.
+        ViewPager mPager = (ViewPager)findViewById(R.id.pager);
+        ScreenSlidePagerAdapter mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        mPager.setAdapter(mPagerAdapter);
+        //setupViews();
+    }
+
+    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+        public ScreenSlidePagerAdapter(android.support.v4.app.FragmentManager fragmentManager) {
+            super(fragmentManager);
+        }
+
+        @Override
+        public android.support.v4.app.Fragment getItem(int position) {
+            if (position == 0)
+                return new AnalysisRunViewFragment(plugin, experiment);
+            else if (position == 1)
+                return new AnalysisMixedDataFragment(plugin, experiment);
+            else if (position == 2)
+                return new AnalysisTableGraphDataFragment(plugin, experiment);
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return 3;
+        }
     }
 
     private void setupViews() {
         // setup views
         setContentView(R.layout.experimentanalyser);
 
-        experimentRunView = plugin.createExperimentRunView(this, experiment);
+        View experimentRunView = plugin.createExperimentRunView(this, experiment);
 
         ExperimentRunViewControl runViewControl = (ExperimentRunViewControl)findViewById(
                 R.id.experimentRunViewControl);
         runViewControl.setTo(experiment.getNumberOfRuns());
 
         RunContainerView runContainerView = (RunContainerView)findViewById(R.id.experimentRunContainer);
-        runContainerView.setRunView(experimentRunView, experiment);
+        runContainerView.setRunView(experimentRunView);
+        runContainerView.addMarkerData(experiment.getTagMarkers());
         runContainerView.setExperimentRunViewControl(runViewControl);
 
         // marker table view
@@ -95,3 +123,5 @@ public class ExperimentAnalyserActivity extends Activity {
         finish();
     }
 }
+
+

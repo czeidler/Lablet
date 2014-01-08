@@ -1,38 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal" android:baselineAligned="false">
-    <RelativeLayout
-            android:orientation="vertical"
-            android:layout_weight="3"
-            android:layout_width="100dp"
-            android:layout_height="fill_parent">
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              class="com.example.AndroidPhysicsTracker.RunContainerView" android:id="@+id/experimentRunContainer"
-              android:layout_alignParentLeft="true" android:layout_alignParentRight="true"
-              android:layout_alignParentTop="true"
-              android:layout_marginLeft="0dp" android:layout_marginTop="0dp"/>
-        <view android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              class="com.example.AndroidPhysicsTracker.ExperimentRunViewControl" android:id="@+id/experimentRunViewControl"
-              android:orientation="horizontal"
-              android:layout_below="@+id/experimentRunContainer"
-              android:layout_alignParentLeft="true" android:layout_alignParentRight="true"/>
-    </RelativeLayout>
-    <LinearLayout
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_width="100dp"
-            android:layout_height="fill_parent">
-        <view android:layout_width="wrap_content"
-              android:layout_height="367dp"
-              class="com.example.AndroidPhysicsTracker.GraphView2D" android:id="@+id/tagMarkerGraphView"
-              android:layout_gravity="center_horizontal"/>
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              class="com.example.AndroidPhysicsTracker.TableView" android:id="@+id/tagMarkerTableView"/>
-    </LinearLayout>
-</LinearLayout>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent" android:layout_height="match_parent">
+    <view android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          class="com.example.AndroidPhysicsTracker.AnalysisViewPager" android:id="@+id/pager" />
+</FrameLayout>
