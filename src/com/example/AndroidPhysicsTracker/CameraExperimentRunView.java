@@ -74,7 +74,8 @@ public class CameraExperimentRunView extends SurfaceView implements IExperimentR
         }
 
         public void surfaceDestroyed(SurfaceHolder holder) {
-            seekToFrameExtractor.release();
+            if (seekToFrameExtractor != null)
+                seekToFrameExtractor.release();
             seekToFrameExtractor = null;
         }
     };
