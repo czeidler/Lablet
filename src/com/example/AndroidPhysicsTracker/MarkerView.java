@@ -307,11 +307,28 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
         setCurrentRun(0);
     }
 
-    public void setTagMarkers(MarkersDataModel markers) {
+    public void release() {
+        for (MarkersDataModel data : markerDataList) {
+            data.removeListener(this);
+        }
+    }
+
+    public void addTagMarkers(MarkersDataModel markers) {
         markerDataList.add(markers);
         markers.addListener(this);
         markerSeriesList.add(new MarkerSeries(experimentRunView, markers));
         setCurrentRun(currentRun);
+    }
+
+    public boolean removeMarkers(MarkersDataModel markers) {
+        int index = markerDataList.indexOf(markers);
+        if (index < 0)
+            return false;
+        markerDataList.remove(index);
+        markers.removeListener(this);
+        markerSeriesList.remove(index);
+
+        return true;
     }
 
     public void setCurrentRun(int run) {

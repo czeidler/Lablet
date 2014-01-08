@@ -9,15 +9,12 @@ public class AnalysisTableGraphDataFragment extends android.support.v4.app.Fragm
     private ExperimentPlugin plugin = null;
     private Experiment experiment = null;
 
+    private TableView tableView = null;
+    private GraphView2D graphView = null;
+
     public AnalysisTableGraphDataFragment(ExperimentPlugin plugin, Experiment experiment) {
         this.plugin = plugin;
         this.experiment = experiment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -26,13 +23,21 @@ public class AnalysisTableGraphDataFragment extends android.support.v4.app.Fragm
         View view = inflater.inflate(R.layout.analysis_table_graph_fragment, container, false);
 
         // marker table view
-        TableView tableView = (TableView)view.findViewById(R.id.tagMarkerTableView);
+        tableView = (TableView)view.findViewById(R.id.tagMarkerTableView);
         tableView.setAdapter(new MarkerDataTableAdapter(experiment.getTagMarkers()));
 
         // marker graph view
-        GraphView2D graphView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
+        graphView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
         graphView.setAdapter(new MarkerGraphAdapter(experiment.getTagMarkers()));
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        tableView.setAdapter(null);
+        graphView.setAdapter(null);
+
+        super.onDestroyView();
     }
 }

@@ -9,14 +9,11 @@ public class AnalysisRunViewFragment extends android.support.v4.app.Fragment {
     private ExperimentPlugin plugin = null;
     private Experiment experiment = null;
 
+    private RunContainerView runContainerView = null;
+
     public AnalysisRunViewFragment(ExperimentPlugin plugin, Experiment experiment) {
         this.plugin = plugin;
         this.experiment = experiment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -30,10 +27,18 @@ public class AnalysisRunViewFragment extends android.support.v4.app.Fragment {
                 R.id.experimentRunViewControl);
         runViewControl.setTo(experiment.getNumberOfRuns());
 
-        RunContainerView runContainerView = (RunContainerView)view.findViewById(R.id.experimentRunContainer);
-        runContainerView.setRunView(experimentRunView, experiment);
+        runContainerView = (RunContainerView)view.findViewById(R.id.experimentRunContainer);
+        runContainerView.setRunView(experimentRunView);
+        runContainerView.addMarkerData(experiment.getTagMarkers());
         runContainerView.setExperimentRunViewControl(runViewControl);
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        runContainerView.release();
+
+        super.onDestroyView();
     }
 }

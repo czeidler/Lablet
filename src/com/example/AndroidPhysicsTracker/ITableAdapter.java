@@ -17,6 +17,8 @@ public interface ITableAdapter<T> {
 
     public void addListener(ITableAdapterListener listener);
 
+    public void release();
+
     public interface ITableAdapterListener {
         public void onRowAdded(ITableAdapter<?> table, int row);
         public void onRowRemoved(ITableAdapter<?> table, int row);

@@ -102,7 +102,8 @@ public class ExperimentAnalyserActivity extends FragmentActivity {
         runViewControl.setTo(experiment.getNumberOfRuns());
 
         RunContainerView runContainerView = (RunContainerView)findViewById(R.id.experimentRunContainer);
-        runContainerView.setRunView(experimentRunView, experiment);
+        runContainerView.setRunView(experimentRunView);
+        runContainerView.addMarkerData(experiment.getTagMarkers());
         runContainerView.setExperimentRunViewControl(runViewControl);
 
         // marker table view

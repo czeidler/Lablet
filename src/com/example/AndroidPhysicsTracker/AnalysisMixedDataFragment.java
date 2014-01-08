@@ -9,15 +9,13 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
     private ExperimentPlugin plugin = null;
     private Experiment experiment = null;
 
+    private RunContainerView runContainerView = null;
+    private TableView tableView = null;
+    private GraphView2D graphView = null;
+
     public AnalysisMixedDataFragment(ExperimentPlugin plugin, Experiment experiment) {
         this.plugin = plugin;
         this.experiment = experiment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -28,22 +26,31 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         View experimentRunView = plugin.createExperimentRunView(getActivity(), experiment);
 
         ExperimentRunViewControl runViewControl = (ExperimentRunViewControl)view.findViewById(
-                R.id.experimentRunViewControl);
+            R.id.experimentRunViewControl);
         runViewControl.setTo(experiment.getNumberOfRuns());
 
-        RunContainerView runContainerView = (RunContainerView)view.findViewById(R.id.experimentRunContainer);
-        runContainerView.setRunView(experimentRunView, experiment);
+        runContainerView = (RunContainerView)view.findViewById(R.id.experimentRunContainer);
+        runContainerView.setRunView(experimentRunView);
+        runContainerView.addMarkerData(experiment.getTagMarkers());
         runContainerView.setExperimentRunViewControl(runViewControl);
 
         // marker table view
-        TableView tableView = (TableView)view.findViewById(R.id.tagMarkerTableView);
+        tableView = (TableView)view.findViewById(R.id.tagMarkerTableView);
         tableView.setAdapter(new MarkerDataTableAdapter(experiment.getTagMarkers()));
 
         // marker graph view
-        GraphView2D graphView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
+        graphView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
         graphView.setAdapter(new MarkerGraphAdapter(experiment.getTagMarkers()));
-
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        runContainerView.release();
+        tableView.setAdapter(null);
+        graphView.setAdapter(null);
+
+        super.onDestroyView();
     }
 }
 
