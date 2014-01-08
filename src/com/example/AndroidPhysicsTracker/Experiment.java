@@ -51,10 +51,11 @@ abstract public class Experiment {
     public void setStorageDir(File dir) {
         storageDir = dir;
     }
-
     public File getStorageDir() {
         return storageDir;
     }
+
+    public void onSaveAdditionalData(File dir) {}
 
     public MarkersDataModel getTagMarkers() {
         return tagMarkers;

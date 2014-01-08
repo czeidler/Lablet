@@ -1,15 +1,11 @@
 package com.example.AndroidPhysicsTracker;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
-import android.media.CameraProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.*;
 import android.widget.Button;
 import android.widget.MediaController;
@@ -32,8 +28,6 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
     private MenuItem analyseMenuItem = null;
     private int cameraId = 0;
-
-    CameraExperiment experiment = null;
 
     private File videoFile = null;
     private boolean done = false;
@@ -67,14 +61,13 @@ public class CameraExperimentActivity extends ExperimentActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    /**
-     * Called when the activity is first created.
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.performcameraexperiment);
+        setExperiment(new CameraExperiment(this));
+
+        setContentView(R.layout.perform_camera_experiment);
 
         preview = (SurfaceView)findViewById(R.id.surfaceView);
         previewHolder = preview.getHolder();
@@ -162,14 +155,6 @@ public class CameraExperimentActivity extends ExperimentActivity {
         super.onPause();
     }
 
-    protected void createExperiment() {
-        experiment = new CameraExperiment(this);
-    }
-
-    public Experiment getExperiment() {
-        return experiment;
-    }
-
     private void startRecording() {
         try {
             camera.unlock();
@@ -217,7 +202,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
     private void finishExperiment() {
         done = true;
 
-        experiment.setVideoFileName(getVideoFileName());
+        ((CameraExperiment)experiment).setVideoFileName(getVideoFileName());
         try {
             saveExperimentToFile();
             Intent data = new Intent();

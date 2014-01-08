@@ -27,6 +27,20 @@ public class CameraExperimentPlugin implements ExperimentPlugin {
     }
 
     @Override
+    public void startRunSettingsActivity(Experiment experiment, Activity parentActivity, int requestCode) {
+        Intent intent = new Intent(parentActivity, CameraRunSettingsActivity.class);
+        intent.putExtra("experiment_path", experiment.getStorageDir().getPath());
+        parentActivity.startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    public boolean hasRunEditActivity(StringBuilder menuName) {
+        if (menuName != null)
+            menuName.append("Video Settings");
+        return true;
+    }
+
+    @Override
     public Experiment loadExperiment(Context context, Bundle data, File storageDir) {
         return new CameraExperiment(context, data, storageDir);
     }

@@ -1,23 +1,20 @@
 package com.example.AndroidPhysicsTracker;
 
-import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
-/**
- * Created by lec on 16/12/13.
- */
-abstract public class ExperimentActivity extends Activity {
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-        createExperiment();
-        Experiment experiment = getExperiment();
+abstract public class ExperimentActivity extends FragmentActivity {
+    protected Experiment experiment = null;
+    protected ExperimentPlugin plugin = null;
 
+    protected void setExperiment(Experiment experiment) {
+        this.experiment = experiment;
         try {
             experiment.setStorageDir(getStorageDir());
         } catch (IOException e) {
@@ -25,8 +22,65 @@ abstract public class ExperimentActivity extends Activity {
         }
     }
 
-    abstract protected void createExperiment();
-    abstract public Experiment getExperiment();
+    public Experiment getExperiment() {
+        return experiment;
+    }
+
+    protected void loadExperiment(Intent intent) {
+        if (intent == null)
+            showErrorAndFinish("can't load experiment (Intent is null)");
+
+        File storageDir = null;
+        Bundle bundle = null;
+
+        String experimentPath = intent.getStringExtra("experiment_path");
+        if (experimentPath != null) {
+            storageDir = new File(experimentPath);
+            File file = new File(storageDir, "experiment.xml");
+
+            InputStream inStream = null;
+            try {
+                inStream = new FileInputStream(file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                showErrorAndFinish("experiment file not found");
+            }
+
+            PersistentBundle persistentBundle = new PersistentBundle();
+            try {
+                bundle = persistentBundle.unflattenBundle(inStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+                showErrorAndFinish("can't read experiment file");
+            }
+            String experimentIdentifier = bundle.getString("experiment_identifier");
+
+            ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
+            plugin = factory.findExperimentPlugin(experimentIdentifier);
+        }
+
+        if (plugin == null)
+            showErrorAndFinish("unknown experiment type");
+
+        assert bundle != null;
+        Bundle experimentData = bundle.getBundle("data");
+        if (experimentData == null)
+            showErrorAndFinish("failed to load experiment data");
+        experiment = plugin.loadExperiment(this, experimentData, storageDir);
+
+        if (experiment == null)
+            showErrorAndFinish("can't load experiment");
+    }
+
+    protected void showErrorAndFinish(String error) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(error);
+        builder.setNeutralButton("Ok", null);
+        builder.create().show();
+        finish();
+    }
 
     protected void saveExperimentToFile() throws IOException {
         Experiment experiment = getExperiment();
@@ -34,6 +88,7 @@ abstract public class ExperimentActivity extends Activity {
         bundle.putString("experiment_identifier", experiment.getIdentifier());
         Bundle experimentData = experiment.toBundle();
         bundle.putBundle("data", experimentData);
+        experiment.onSaveAdditionalData(getStorageDir());
 
         // save the bundle
         File projectFile = new File(getStorageDir(), "experiment.xml");

@@ -50,7 +50,7 @@ public class ExperimentRunViewControl extends LinearLayout {
 
     private void init(Context context) {
         LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        layoutInflater.inflate(R.layout.experimentrunviewcontrol, this, true);
+        layoutInflater.inflate(R.layout.experiment_run_view_control, this, true);
 
         Button prevButton = (Button)findViewById(R.id.frameBackButton);
         Button nextButton = (Button)findViewById(R.id.nextFrameButton);
