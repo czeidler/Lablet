@@ -23,6 +23,7 @@ class VideoFrameView extends SurfaceView {
     private int videoHeight;
     private int videoFrameRate;
 
+    private int queuedRequest = -1;
 
     public VideoFrameView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -89,6 +90,10 @@ class VideoFrameView extends SurfaceView {
                     seekToFrameExtractor = null;
                 }
                 seekToFrameExtractor = new SeekToFrameExtractor(videoFile, holder.getSurface());
+                if (queuedRequest >= 0) {
+                    seekToFrame(queuedRequest);
+                    queuedRequest = -1;
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 toastMessage("can't open video file");
@@ -138,6 +143,8 @@ class VideoFrameView extends SurfaceView {
     public void seekToFrame(int positionMicroSeconds) {
         if (seekToFrameExtractor != null)
             seekToFrameExtractor.seekToFrame(positionMicroSeconds);
+        else
+            queuedRequest = positionMicroSeconds;
     }
 
     public int getVideoWidth() {
