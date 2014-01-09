@@ -20,7 +20,7 @@ Reads a video file and displays it at given time position on the surface. The su
  */
 public class SeekToFrameExtractor {
     SeekToThread seekToThread;
-    private final Semaphore threadReadySemaphore = new Semaphore(1);
+    private final Semaphore threadReadySemaphore = new Semaphore(0);
 
     public SeekToFrameExtractor(File mediaFile, Surface surface) throws IOException {
         seekToThread = new SeekToThread(mediaFile, surface);
