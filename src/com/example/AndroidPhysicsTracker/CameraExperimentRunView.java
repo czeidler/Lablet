@@ -29,28 +29,6 @@ public class CameraExperimentRunView extends VideoFrameView implements IExperime
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
-        float ratio = (float)(experiment.getVideoWidth()) / experiment.getVideoHeight();
-
-        int specWidth = MeasureSpec.getSize(widthMeasureSpec);
-        int specHeight = MeasureSpec.getSize(heightMeasureSpec);
-
-        int width;
-        int height;
-        if ((float)(specWidth) / specHeight < ratio) {
-            // smaller ratio than the video
-            width = specWidth;
-            height = (int)(width / ratio);
-        } else {
-            height = specHeight;
-            width = (int)(height * ratio);
-        }
-
-        setMeasuredDimension(width, height);
-    }
-
-    @Override
     public void setCurrentRun(int run) {
         Bundle bundle = experiment.getRunAt(run);
         if (bundle == null) {

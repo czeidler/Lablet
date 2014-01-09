@@ -20,8 +20,11 @@ Reads a video file and displays it at given time position on the surface. The su
  */
 public class SeekToFrameExtractor {
     SeekToThread seekToThread;
-
     private final Semaphore threadReadySemaphore = new Semaphore(1);
+
+    private int videoWidth;
+    private int videoHeight;
+    private int videoFrameRate;
 
     public SeekToFrameExtractor(File mediaFile, Surface surface) throws IOException {
         seekToThread = new SeekToThread(mediaFile, surface);
@@ -49,6 +52,18 @@ public class SeekToFrameExtractor {
         return seekHandler.sendMessage(message);
     }
 
+    public int getVideoWidth() {
+        return videoWidth;
+    }
+
+    public int getVideoHeight() {
+        return videoHeight;
+    }
+
+    public int getVideoFrameRate() {
+        return videoFrameRate;
+    }
+
     class SeekToThread extends Thread {
         final static int SEEK_MESSAGE = 1;
 
@@ -71,6 +86,12 @@ public class SeekToFrameExtractor {
                     extractor.selectTrack(i);
                     decoder = MediaCodec.createDecoderByType(mime);
                     decoder.configure(format, surface, null, 0);
+
+                    videoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
+                    videoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
+                    videoFrameRate = format.getInteger(MediaFormat.KEY_FRAME_RATE);
+                    if (videoFrameRate == 0)
+                        videoFrameRate = 30;
                     break;
                 }
             }

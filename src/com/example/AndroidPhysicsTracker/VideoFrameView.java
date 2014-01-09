@@ -15,6 +15,7 @@ class VideoFrameView extends SurfaceView {
     protected Rect frame = new Rect();
 
     protected String videoFilePath = "";
+    private boolean keepRatio = true;
 
     public VideoFrameView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -29,6 +30,33 @@ class VideoFrameView extends SurfaceView {
     private void init() {
         setWillNotDraw(false);
         getHolder().addCallback(surfaceCallback);
+    }
+
+    public void setKeepVideoRatio(boolean keep) {
+        keepRatio = keep;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        float ratio = 4/3;
+        if (seekToFrameExtractor != null)
+            ratio = (float)(seekToFrameExtractor.getVideoWidth()) / seekToFrameExtractor.getVideoHeight();
+
+        int specWidth = MeasureSpec.getSize(widthMeasureSpec);
+        int specHeight = MeasureSpec.getSize(heightMeasureSpec);
+
+        int width;
+        int height;
+        if ((float)(specWidth) / specHeight < ratio) {
+            // smaller ratio than the video
+            width = specWidth;
+            height = (int)(width / ratio);
+        } else {
+            height = specHeight;
+            width = (int)(height * ratio);
+        }
+
+        setMeasuredDimension(width, height);
     }
 
     SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
