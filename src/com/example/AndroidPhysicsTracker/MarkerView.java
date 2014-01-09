@@ -188,6 +188,12 @@ class MarkerSeries {
             markerAdded(markerData, i);
     }
 
+    public void reload() {
+        markerList.clear();
+        for (int i = 0; i < markerData.getMarkerCount(); i++)
+            markerAdded(markerData, i);
+    }
+
     public void draw(Canvas canvas, float priority) {
         int currentMarkerRow = markerData.getSelectedMarkerData();
         IMarker topMarker = getMarkerForRow(currentMarkerRow);
@@ -473,6 +479,12 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
     public void onDataChanged(MarkersDataModel model, int index) {
         MarkerSeries markerSeries = findMarkerSeriesFor(model);
         markerSeries.markerChanged(index);
+    }
+
+    @Override
+    public void onAllDataChanged(MarkersDataModel model) {
+        MarkerSeries markerSeries = findMarkerSeriesFor(model);
+        markerSeries.reload();
     }
 
     @Override

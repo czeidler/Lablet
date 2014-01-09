@@ -23,6 +23,7 @@ public interface ITableAdapter<T> {
         public void onRowAdded(ITableAdapter<?> table, int row);
         public void onRowRemoved(ITableAdapter<?> table, int row);
         public void onRowUpdated(ITableAdapter<?> table, int row);
+        public void onAllRowsUpdated(ITableAdapter<?> table);
         public void onRowSelected(ITableAdapter<?> table, int row);
     }
 }

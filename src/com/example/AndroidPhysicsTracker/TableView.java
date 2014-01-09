@@ -34,6 +34,11 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
 
         adapter.addListener(this);
 
+        reload();
+    }
+
+    private void reload() {
+        removeAllViews();
         for (int row = 0; row < adapter.getRowCount(); row++) {
             TableRow tableRow = createRow(row);
             addView(tableRow);
@@ -60,6 +65,11 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
         // TODO reuse the existing TableRow?
         onRowRemoved(table, row);
         onRowAdded(table, row);
+    }
+
+    @Override
+    public void onAllRowsUpdated(ITableAdapter<?> table) {
+        reload();
     }
 
     @Override

@@ -12,6 +12,7 @@ public class MarkersDataModel {
         public void onDataAdded(MarkersDataModel model, int index);
         public void onDataRemoved(MarkersDataModel model, int index, MarkerData data);
         public void onDataChanged(MarkersDataModel model, int index);
+        public void onAllDataChanged(MarkersDataModel model);
         public void onDataSelected(MarkersDataModel model, int index);
     }
 
@@ -72,6 +73,11 @@ public class MarkersDataModel {
         return data;
     }
 
+    public void clear() {
+        markerDataList.clear();
+        notifyAllDataChanged();
+    }
+
     public void notifyDataAdded(int index) {
         for (IMarkersDataModelListener listener : listeners)
             listener.onDataAdded(this, index);
@@ -85,6 +91,11 @@ public class MarkersDataModel {
     public void notifyDataChanged(int index) {
         for (IMarkersDataModelListener listener : listeners)
             listener.onDataChanged(this, index);
+    }
+
+    public void notifyAllDataChanged() {
+        for (IMarkersDataModelListener listener : listeners)
+            listener.onAllDataChanged(this);
     }
 
     private void notifyDataSelected(int index) {

@@ -107,6 +107,11 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
     }
 
     @Override
+    public void onAllDataChanged(MarkersDataModel model) {
+        notifyAllRowsChanged();
+    }
+
+    @Override
     public void onDataSelected(MarkersDataModel model, int index) {
         notifyRowSelected(index);
     }
@@ -124,6 +129,11 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
     private void notifyRowChanged(int row) {
         for (ITableAdapterListener listener : listeners)
             listener.onRowUpdated(this, row);
+    }
+
+    private void notifyAllRowsChanged() {
+        for (ITableAdapterListener listener : listeners)
+            listener.onAllRowsUpdated(this);
     }
 
     private void notifyRowSelected(int row) {

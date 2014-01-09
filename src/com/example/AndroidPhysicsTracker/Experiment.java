@@ -44,6 +44,7 @@ abstract public class Experiment {
     protected boolean loadExperiment(Bundle bundle, File storageDir) {
         uid = bundle.getString("uid");
         this.storageDir = storageDir;
+        tagMarkers.clear();
         return true;
     }
 
