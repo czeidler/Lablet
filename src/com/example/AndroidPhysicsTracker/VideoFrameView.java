@@ -42,6 +42,8 @@ class VideoFrameView extends SurfaceView {
         if (seekToFrameExtractor != null)
             ratio = (float)(seekToFrameExtractor.getVideoWidth()) / seekToFrameExtractor.getVideoHeight();
 
+        int specWidthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int specHeightMode = MeasureSpec.getMode(heightMeasureSpec);
         int specWidth = MeasureSpec.getSize(widthMeasureSpec);
         int specHeight = MeasureSpec.getSize(heightMeasureSpec);
 
@@ -56,7 +58,17 @@ class VideoFrameView extends SurfaceView {
             width = (int)(height * ratio);
         }
 
+        if (specWidthMode == MeasureSpec.AT_MOST || specHeightMode == MeasureSpec.AT_MOST) {
+            widthMeasureSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST);
+            heightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.AT_MOST);
+
+            getLayoutParams().width = width;
+            getLayoutParams().height = height;
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        }
+
         setMeasuredDimension(width, height);
+        return;
     }
 
     SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
@@ -98,6 +110,18 @@ class VideoFrameView extends SurfaceView {
     public void seekToFrame(int positionMicroSeconds) {
         if (seekToFrameExtractor != null)
             seekToFrameExtractor.seekToFrame(positionMicroSeconds);
+    }
+
+    public int getVideoWidth() {
+        return seekToFrameExtractor.getVideoWidth();
+    }
+
+    public int getVideoHeight() {
+        return seekToFrameExtractor.getVideoHeight();
+    }
+
+    public int getVideoFrameRate() {
+        return seekToFrameExtractor.getVideoFrameRate();
     }
 
     protected void toastMessage(String message) {
