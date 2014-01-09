@@ -25,25 +25,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Frame Rate [Hz]:"
+            android:text="Analysis Frame Rate [Hz]:"
             android:id="@+id/textView" android:layout_gravity="right"
-            android:layout_alignTop="@+id/frameRatePicker" android:layout_alignParentLeft="true"/>
+            android:layout_alignParentBottom="true" android:layout_alignParentLeft="true"/>
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/buttonSetEnd"
-            android:layout_alignTop="@+id/buttonSetStart" android:layout_alignLeft="@+id/editEnd" android:text="Set"/>
+            android:layout_alignTop="@+id/buttonSetStart" android:layout_alignLeft="@+id/editEnd" android:text="Set From Current Pos"/>
     <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="number"
             android:ems="10"
             android:id="@+id/editEnd"
-            android:layout_alignParentBottom="true" android:layout_alignParentRight="true" android:editable="false"/>
+            android:layout_alignParentBottom="true" android:layout_alignParentRight="true" android:editable="false"
+            android:enabled="false"/>
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Set"
+            android:text="Set From Current Pos"
             android:id="@+id/buttonSetStart"
             android:layout_above="@+id/editStart" android:layout_alignLeft="@+id/editStart"/>
     <EditText
@@ -52,12 +53,13 @@
             android:inputType="number"
             android:ems="10"
             android:id="@+id/editStart"
-            android:layout_alignBottom="@+id/textView3" android:layout_toLeftOf="@+id/textView3"/>
+            android:layout_alignBottom="@+id/textView3" android:layout_toLeftOf="@+id/textView3"
+            android:editable="false" android:enabled="false"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Analisis End Position:"
+            android:text="Analysis Start Position:"
             android:id="@+id/textView2"
             android:layout_alignBottom="@+id/editStart" android:layout_toLeftOf="@+id/editStart"/>
     <TextView
