@@ -13,13 +13,14 @@ public class CameraExperiment extends Experiment {
     private int videoHeight;
     private int videoWidth;
     private int numberOfRuns;
-    // milli seconds
-    private int duration;
 
-    private int frameRate;
     // milli seconds
-    private int videoStart;
-    private int videoEnd;
+    private int videoDuration;
+
+    private int analysisFrameRate;
+    // milli seconds
+    private int analysisVideoStart;
+    private int analysisVideoEnd;
 
     public CameraExperiment(Context experimentContext) {
         super(experimentContext);
@@ -40,7 +41,7 @@ public class CameraExperiment extends Experiment {
         if (i < 0 || i >= numberOfRuns)
             return null;
 
-        int position = (int)(videoStart + (float)1000 / frameRate * i);
+        int position = (int)(analysisVideoStart + (float)1000 / analysisFrameRate * i);
 
         Bundle bundle = new Bundle();
         bundle.putInt("frame_position", position);
@@ -54,8 +55,8 @@ public class CameraExperiment extends Experiment {
 
         setVideoFileName(bundle.getString("videoName"));
 
-        setVideoStart(bundle.getInt("videoStart"));
-        setVideoEnd(bundle.getInt("videoEnd"));
+        setAnalysisVideoStart(bundle.getInt("videoStart"));
+        setAnalysisVideoEnd(bundle.getInt("videoEnd"));
         // must be called here (needs video start and end time as well as the duration)
         setFrameRate(bundle.getInt("frameRate"));
         return true;
@@ -66,9 +67,9 @@ public class CameraExperiment extends Experiment {
 
         bundle.putString("videoName", videoFileName);
 
-        bundle.putInt("frameRate", getFrameRate());
-        bundle.putInt("videoStart", getVideoStart());
-        bundle.putInt("videoEnd", getVideoEnd());
+        bundle.putInt("frameRate", getAnalysisFrameRate());
+        bundle.putInt("videoStart", getAnalysisVideoStart());
+        bundle.putInt("videoEnd", getAnalysisVideoEnd());
         return bundle;
     }
 
@@ -77,7 +78,7 @@ public class CameraExperiment extends Experiment {
         File file = new File(getStorageDir(), videoFileName);
 
         MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.parse(file.getPath()));
-        duration = mediaPlayer.getDuration();
+        videoDuration = mediaPlayer.getDuration();
         videoHeight = mediaPlayer.getVideoHeight();
         videoWidth = mediaPlayer.getVideoWidth();
 
@@ -96,35 +97,39 @@ public class CameraExperiment extends Experiment {
         return videoWidth;
     }
 
-    public int getFrameRate() {
-        return frameRate;
+    public int getAnalysisFrameRate() {
+        return analysisFrameRate;
     }
 
     public void setFrameRate(int rate) {
-        frameRate = rate;
-        if (frameRate <= 0)
-            frameRate = 10;
+        analysisFrameRate = rate;
+        if (analysisFrameRate <= 0)
+            analysisFrameRate = 10;
 
-        int runTime = videoEnd - videoStart;
-        numberOfRuns = runTime * frameRate / 1000;
+        int runTime = analysisVideoEnd - analysisVideoStart;
+        numberOfRuns = runTime * analysisFrameRate / 1000;
     }
 
-    public int getVideoStart() {
-        return videoStart;
+    public int getVideoDuration() {
+        return videoDuration;
     }
 
-    public void setVideoStart(int videoStart) {
-        this.videoStart = videoStart;
+    public int getAnalysisVideoStart() {
+        return analysisVideoStart;
     }
 
-    public int getVideoEnd() {
-        return videoEnd;
+    public void setAnalysisVideoStart(int videoStart) {
+        this.analysisVideoStart = videoStart;
     }
 
-    public void setVideoEnd(int end) {
-        videoEnd = end;
+    public int getAnalysisVideoEnd() {
+        return analysisVideoEnd;
+    }
 
-        if (videoEnd <= 0)
-            videoEnd = duration;
+    public void setAnalysisVideoEnd(int end) {
+        analysisVideoEnd = end;
+
+        if (analysisVideoEnd <= 0)
+            analysisVideoEnd = videoDuration;
     }
 }
