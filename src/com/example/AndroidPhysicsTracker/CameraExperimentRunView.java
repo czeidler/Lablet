@@ -11,12 +11,9 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class CameraExperimentRunView extends SurfaceView implements IExperimentRunView {
+public class CameraExperimentRunView extends VideoFrameView implements IExperimentRunView {
     private CameraExperiment experiment;
     private int positionMicroSeconds = 0;
-
-    private SeekToFrameExtractor seekToFrameExtractor = null;
-    private Rect frame = new Rect();
 
     public CameraExperimentRunView(Context context, Experiment experiment) {
         super(context);
@@ -26,7 +23,9 @@ public class CameraExperimentRunView extends SurfaceView implements IExperimentR
         assert(experiment instanceof CameraExperiment);
         this.experiment = (CameraExperiment)experiment;
 
-        getHolder().addCallback(surfaceCallback);
+        File storageDir = experiment.getStorageDir();
+        File videoFile = new File(storageDir, this.experiment.getVideoFileName());
+        setVideoFilePath(videoFile.getPath());
     }
 
     @Override
@@ -51,35 +50,6 @@ public class CameraExperimentRunView extends SurfaceView implements IExperimentR
         setMeasuredDimension(width, height);
     }
 
-    SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
-        public void surfaceCreated(SurfaceHolder holder) {
-            // no-op -- wait until surfaceChanged()
-        }
-
-        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-            getDrawingRect(frame);
-
-            File storageDir = experiment.getStorageDir();
-            File videoFile = new File(storageDir, experiment.getVideoFileName());
-            try {
-                if (seekToFrameExtractor != null) {
-                    seekToFrameExtractor.release();
-                    seekToFrameExtractor = null;
-                }
-                seekToFrameExtractor = new SeekToFrameExtractor(videoFile, holder.getSurface());
-            } catch (IOException e) {
-                e.printStackTrace();
-                toastMessage("can't open video file");
-            }
-        }
-
-        public void surfaceDestroyed(SurfaceHolder holder) {
-            if (seekToFrameExtractor != null)
-                seekToFrameExtractor.release();
-            seekToFrameExtractor = null;
-        }
-    };
-
     @Override
     public void setCurrentRun(int run) {
         Bundle bundle = experiment.getRunAt(run);
@@ -89,7 +59,8 @@ public class CameraExperimentRunView extends SurfaceView implements IExperimentR
         }
         positionMicroSeconds = bundle.getInt("frame_position");
         positionMicroSeconds *= 1000;
-        invalidate();
+
+        seekToFrame(positionMicroSeconds);
     }
 
     @Override
@@ -107,20 +78,5 @@ public class CameraExperimentRunView extends SurfaceView implements IExperimentR
     public void toScreen(PointF real, PointF screen) {
         screen.x = real.x * frame.width() / 100;
         screen.y = (100 - real.y) * frame.height() / 100;
-    }
-
-    @Override
-    public void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        if (seekToFrameExtractor != null)
-            seekToFrameExtractor.seekToFrame(positionMicroSeconds);
-    }
-
-    private void toastMessage(String message) {
-        Context context = getContext();
-        assert context != null;
-        Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
-        toast.show();
     }
 }
