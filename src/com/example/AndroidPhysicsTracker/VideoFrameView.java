@@ -2,6 +2,9 @@ package com.example.AndroidPhysicsTracker;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.media.MediaCodec;
+import android.media.MediaExtractor;
+import android.media.MediaFormat;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -15,7 +18,11 @@ class VideoFrameView extends SurfaceView {
     protected Rect frame = new Rect();
 
     protected String videoFilePath = "";
-    private boolean keepRatio = true;
+
+    private int videoWidth;
+    private int videoHeight;
+    private int videoFrameRate;
+
 
     public VideoFrameView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -32,15 +39,11 @@ class VideoFrameView extends SurfaceView {
         getHolder().addCallback(surfaceCallback);
     }
 
-    public void setKeepVideoRatio(boolean keep) {
-        keepRatio = keep;
-    }
-
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         float ratio = 4/3;
         if (seekToFrameExtractor != null)
-            ratio = (float)(seekToFrameExtractor.getVideoWidth()) / seekToFrameExtractor.getVideoHeight();
+            ratio = (float)(getVideoWidth()) / getVideoHeight();
 
         int specWidthMode = MeasureSpec.getMode(widthMeasureSpec);
         int specHeightMode = MeasureSpec.getMode(heightMeasureSpec);
@@ -105,6 +108,31 @@ class VideoFrameView extends SurfaceView {
 
     public void setVideoFilePath(String path) {
         videoFilePath = path;
+
+
+        MediaExtractor extractor = new MediaExtractor();
+        try {
+            extractor.setDataSource(videoFilePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        for (int i = 0; i < extractor.getTrackCount(); i++) {
+            MediaFormat format = extractor.getTrackFormat(i);
+            String mime = format.getString(MediaFormat.KEY_MIME);
+
+            if (mime.startsWith("video/")) {
+                extractor.selectTrack(i);
+
+                videoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
+                videoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
+                videoFrameRate = format.getInteger(MediaFormat.KEY_FRAME_RATE);
+                if (videoFrameRate == 0)
+                    videoFrameRate = 30;
+                break;
+            }
+        }
     }
 
     public void seekToFrame(int positionMicroSeconds) {
@@ -113,16 +141,17 @@ class VideoFrameView extends SurfaceView {
     }
 
     public int getVideoWidth() {
-        return seekToFrameExtractor.getVideoWidth();
+        return videoWidth;
     }
 
     public int getVideoHeight() {
-        return seekToFrameExtractor.getVideoHeight();
+        return videoHeight;
     }
 
     public int getVideoFrameRate() {
-        return seekToFrameExtractor.getVideoFrameRate();
+        return videoFrameRate;
     }
+
 
     protected void toastMessage(String message) {
         Context context = getContext();
