@@ -376,6 +376,11 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
 
         for (MarkerSeries markerSeries : markerSeriesList)
             markerSeries.draw(canvas, 1);
+
+        Rect frame = new Rect();
+        getDrawingRect(frame);
+        if (frame.width() != parentWidth || frame.height() != parentHeight)
+            requestLayout();
     }
 
     @Override
