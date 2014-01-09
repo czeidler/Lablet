@@ -6,17 +6,23 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-public class RunContainerView extends RelativeLayout {
+public class RunContainerView extends RelativeLayout implements RunDataModel.IRunDataModelListener{
     private View experimentRunView = null;
     private MarkerView markerView = null;
+    private RunDataModel runDataModel = null;
 
     public RunContainerView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
     }
 
-    public void setRunView(View view) {
-        this.experimentRunView = view;
+    public void setTo(View runView, RunDataModel model) {
+        this.experimentRunView = runView;
+
+        if (runDataModel != null)
+            runDataModel.removeListener(this);
+        runDataModel = model;
+        runDataModel.addListener(this);
 
         // run view
         RelativeLayout.LayoutParams runViewParams = new RelativeLayout.LayoutParams(
@@ -33,6 +39,8 @@ public class RunContainerView extends RelativeLayout {
 
         markerView = new MarkerView(getContext(), experimentRunView);
         addView(markerView, makerViewParams);
+
+        onRunChanged(runDataModel.getCurrentRun());
     }
 
     public void addMarkerData(MarkersDataModel data) {
@@ -47,13 +55,15 @@ public class RunContainerView extends RelativeLayout {
         markerView.release();
     }
 
-    public void setExperimentRunViewControl(ExperimentRunViewControl control) {
-        control.setOnRunChangedListener(new ExperimentRunViewControl.RunChangedListener() {
-            @Override
-            public void onRunChanged(int run) {
-                ((IExperimentRunView)experimentRunView).setCurrentRun(run);
-                markerView.setCurrentRun(run);
-            }
-        });
+    @Override
+    public void onRunChanged(int newRun) {
+        ((IExperimentRunView)experimentRunView).setCurrentRun(newRun);
+        markerView.setCurrentRun(newRun);
+        markerView.invalidate();
+    }
+
+    @Override
+    public void onNumberOfRunsChanged() {
+
     }
 }

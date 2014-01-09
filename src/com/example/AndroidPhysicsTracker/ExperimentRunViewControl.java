@@ -7,45 +7,26 @@ import android.view.View;
 import android.widget.*;
 
 
-public class ExperimentRunViewControl extends LinearLayout {
-    private int numberOfRuns = 0;
-
-    private int currentFrame = 0;
+public class ExperimentRunViewControl extends LinearLayout implements RunDataModel.IRunDataModelListener {
+    private RunDataModel runDataModel = null;
 
     private TextView progressLabel = null;
     private SeekBar seekBar = null;
 
-    private RunChangedListener runChangedListener = null;
-
-    static abstract public class RunChangedListener {
-        abstract public void onRunChanged(int run);
+    @Override
+    public void onRunChanged(int newRun) {
+        updateViews();
     }
 
-    public ExperimentRunViewControl(Context context) {
-        super(context);
-
-        init(context);
+    @Override
+    public void onNumberOfRunsChanged() {
+        updateViews();
     }
 
     public ExperimentRunViewControl(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         init(context);
-    }
-
-    public ExperimentRunViewControl(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-
-        init(context);
-    }
-
-    public void setOnRunChangedListener(RunChangedListener listener) {
-        runChangedListener = listener;
-    }
-
-    private void notifyRunChanged(int run) {
-        if (runChangedListener != null)
-            runChangedListener.onRunChanged(run);
     }
 
     private void init(Context context) {
@@ -60,13 +41,13 @@ public class ExperimentRunViewControl extends LinearLayout {
         prevButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                setCurrentRun(getCurrentFrame() - 1);
+                runDataModel.setCurrentRun(runDataModel.getCurrentRun() - 1);
             }
         });
         nextButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                setCurrentRun(getCurrentFrame() + 1);
+                runDataModel.setCurrentRun(runDataModel.getCurrentRun() + 1);
             }
         });
 
@@ -75,7 +56,7 @@ public class ExperimentRunViewControl extends LinearLayout {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (!fromUser)
                     return;
-                setCurrentRun(progress);
+                runDataModel.setCurrentRun(progress);
             }
 
             @Override
@@ -92,29 +73,24 @@ public class ExperimentRunViewControl extends LinearLayout {
         progressLabel.setText("--/--");
     }
 
-    public void setTo(int nRuns) {
-        numberOfRuns = nRuns;
+    public void setTo(RunDataModel model) {
+        if (runDataModel != null)
+            runDataModel.removeListener(this);
 
-        setCurrentRun(0);
+        runDataModel = model;
+        runDataModel.addListener(this);
+
+        updateViews();
     }
 
-    private void setCurrentRun(int run) {
-        if (run < 0 || run >= numberOfRuns)
-            return;
-
-        currentFrame = run;
-
+    private void updateViews() {
+        int run = runDataModel.getCurrentRun();
         String labelText = String.valueOf(run);
         labelText += "/";
-        labelText += String.valueOf(numberOfRuns - 1);
+        labelText += String.valueOf(runDataModel.getNumberOfRuns() - 1);
         progressLabel.setText(labelText);
 
-        seekBar.setMax(numberOfRuns - 1);
+        seekBar.setMax(runDataModel.getNumberOfRuns() - 1);
         seekBar.setProgress(run);
-        notifyRunChanged(run);
-    }
-
-    private int getCurrentFrame() {
-        return currentFrame;
     }
 }

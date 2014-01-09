@@ -25,14 +25,15 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
 
         View experimentRunView = plugin.createExperimentRunView(getActivity(), experiment);
 
+        ExperimentAnalyserActivity activity = (ExperimentAnalyserActivity)getActivity();
+
         ExperimentRunViewControl runViewControl = (ExperimentRunViewControl)view.findViewById(
             R.id.experimentRunViewControl);
-        runViewControl.setTo(experiment.getNumberOfRuns());
+        runViewControl.setTo(activity.getRunDataModel());
 
         runContainerView = (RunContainerView)view.findViewById(R.id.experimentRunContainer);
-        runContainerView.setRunView(experimentRunView);
+        runContainerView.setTo(experimentRunView, activity.getRunDataModel());
         runContainerView.addMarkerData(experiment.getTagMarkers());
-        runContainerView.setExperimentRunViewControl(runViewControl);
 
         // marker table view
         tableView = (TableView)view.findViewById(R.id.tagMarkerTableView);

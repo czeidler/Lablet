@@ -13,11 +13,15 @@ import android.view.View;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ExperimentAnalyserActivity extends ExperimentActivity {
 
     static final int PERFORM_RUN_SETTINGS = 0;
+
+    private RunDataModel runDataModel;
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -69,12 +73,18 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
 
         loadExperiment(getIntent());
 
+        runDataModel = new RunDataModel();
+        runDataModel.setNumberOfRuns(experiment.getNumberOfRuns());
+
         setContentView(R.layout.experiment_analyser);
         // Instantiate a ViewPager and a PagerAdapter.
-        ViewPager mPager = (ViewPager)findViewById(R.id.pager);
-        ScreenSlidePagerAdapter mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
-        mPager.setAdapter(mPagerAdapter);
-        //setupViews();
+        ViewPager pager = (ViewPager)findViewById(R.id.pager);
+        ScreenSlidePagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        pager.setAdapter(pagerAdapter);
+    }
+
+    public RunDataModel getRunDataModel() {
+        return runDataModel;
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

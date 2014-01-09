@@ -184,8 +184,7 @@ class MarkerSeries {
         experimentRunView = runView;
         markerData = data;
 
-        for (int i = 0; i < markerData.getMarkerCount(); i++)
-            markerAdded(markerData, i);
+        reload();
     }
 
     public void reload() {
@@ -320,7 +319,6 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
     private Rect viewFrame = null;
     private boolean touchEventHandledLastTime = false;
     private IExperimentRunView experimentRunView = null;
-    private int currentRun;
 
     public MarkerView(Context context, View target) {
         super(context);
@@ -333,22 +331,21 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
         getDrawingRect(viewFrame);
 
         markerSeriesList = new ArrayList<MarkerSeries>();
-
         markerDataList = new ArrayList<MarkersDataModel>();
-        setCurrentRun(0);
     }
 
     public void release() {
         for (MarkersDataModel data : markerDataList) {
             data.removeListener(this);
         }
+        markerDataList.clear();
+        markerSeriesList.clear();
     }
 
     public void addTagMarkers(MarkersDataModel markers) {
         markerDataList.add(markers);
         markers.addListener(this);
         markerSeriesList.add(new MarkerSeries(experimentRunView, markers));
-        setCurrentRun(currentRun);
     }
 
     public boolean removeMarkers(MarkersDataModel markers) {
@@ -363,8 +360,6 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
     }
 
     public void setCurrentRun(int run) {
-        currentRun = run;
-
         if (selectedMarker != null) {
             selectedMarker.setSelected(false);
             selectedMarker = null;
@@ -450,6 +445,8 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         viewFrame.right = w;
         viewFrame.bottom = h;
+        for (MarkerSeries markerSeries : markerSeriesList)
+            markerSeries.reload();
     }
 
     MarkerSeries findMarkerSeriesFor(MarkersDataModel model) {
@@ -459,7 +456,6 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
         }
         return null;
     }
-
 
     @Override
     public void onDataAdded(MarkersDataModel model, int index) {
@@ -479,16 +475,18 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
     public void onDataChanged(MarkersDataModel model, int index) {
         MarkerSeries markerSeries = findMarkerSeriesFor(model);
         markerSeries.markerChanged(index);
+        invalidate();
     }
 
     @Override
     public void onAllDataChanged(MarkersDataModel model) {
         MarkerSeries markerSeries = findMarkerSeriesFor(model);
         markerSeries.reload();
+        invalidate();
     }
 
     @Override
     public void onDataSelected(MarkersDataModel model, int index) {
-
+        invalidate();
     }
 }
