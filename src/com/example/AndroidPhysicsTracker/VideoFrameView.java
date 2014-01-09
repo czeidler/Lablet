@@ -69,6 +69,7 @@ class VideoFrameView extends SurfaceView {
             getLayoutParams().width = width;
             getLayoutParams().height = height;
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            return;
         }
 
         setMeasuredDimension(width, height);
@@ -77,7 +78,6 @@ class VideoFrameView extends SurfaceView {
 
     SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
         public void surfaceCreated(SurfaceHolder holder) {
-            // no-op -- wait until surfaceChanged()
         }
 
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
@@ -98,6 +98,7 @@ class VideoFrameView extends SurfaceView {
                 e.printStackTrace();
                 toastMessage("can't open video file");
             }
+            requestLayout();
         }
 
         public void surfaceDestroyed(SurfaceHolder holder) {
@@ -166,4 +167,5 @@ class VideoFrameView extends SurfaceView {
         Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
         toast.show();
     }
+
 }

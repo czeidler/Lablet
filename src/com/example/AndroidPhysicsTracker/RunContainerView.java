@@ -17,7 +17,16 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
     }
 
     public void setTo(View runView, RunDataModel model) {
-        this.experimentRunView = runView;
+        experimentRunView = runView;
+
+        experimentRunView.addOnLayoutChangeListener(new OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View view, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
+                int parentWidth = experimentRunView.getMeasuredWidth();
+                int parentHeight = experimentRunView.getMeasuredHeight();
+                markerView.setSize(parentWidth, parentHeight);
+            }
+        });
 
         if (runDataModel != null)
             runDataModel.removeListener(this);
@@ -39,12 +48,11 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
 
         markerView = new MarkerView(getContext(), experimentRunView);
         addView(markerView, makerViewParams);
-
-        onRunChanged(runDataModel.getCurrentRun());
     }
 
     public void addMarkerData(MarkersDataModel data) {
         markerView.addTagMarkers(data);
+        onRunChanged(runDataModel.getCurrentRun());
     }
 
     public boolean removeMarkerData(MarkersDataModel data) {

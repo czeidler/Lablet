@@ -242,7 +242,6 @@ class MarkerSeries {
         experimentRunView.toScreen(data.getMarkerDataAt(row).positionReal, screenPos);
         marker.setPosition(screenPos);
         markerList.add(row, marker);
-        markerData.selectMarkerData(row);
     }
 
     public void markerRemoved(int row) {
@@ -276,7 +275,7 @@ class MarkerSeries {
             data.runId = run;
             if (markerData.getMarkerCount() > 0) {
                 MarkerData prevData = markerData.getMarkerDataAt(markerData.getMarkerCount() - 1);
-                data.positionReal = prevData.positionReal;
+                data.positionReal.set(prevData.positionReal);
                 // TODO take unit and scale into account
                 data.positionReal.x += 5;
                 PointF screenPos = new PointF();
@@ -311,8 +310,6 @@ class MarkerSeries {
 }
 
 public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDataModelListener {
-    private View targetView = null;
-
     private IMarker selectedMarker = null;
     private List<MarkerSeries> markerSeriesList;
     private List<MarkersDataModel> markerDataList;
@@ -320,9 +317,11 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
     private boolean touchEventHandledLastTime = false;
     private IExperimentRunView experimentRunView = null;
 
+    private int parentWidth;
+    private int parentHeight;
+
     public MarkerView(Context context, View target) {
         super(context);
-        targetView = target;
         experimentRunView = (IExperimentRunView)target;
 
         setWillNotDraw(false);
@@ -369,11 +368,6 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
             markerSeries.setCurrentRun(run);
         }
         invalidate();
-    }
-
-    @Override
-    protected void onLayout(boolean b, int i, int i2, int i3, int i4) {
-
     }
 
     @Override
@@ -435,10 +429,34 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
     }
 
     @Override
+    protected void onLayout(boolean b, int i, int i2, int i3, int i4) {
+
+    }
+
+    public void setSize(int width, int height) {
+        parentWidth = width;
+        parentHeight = height;
+    }
+
+    @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        Rect rect = new Rect();
-        targetView.getDrawingRect(rect);
-        setMeasuredDimension(rect.width(), rect.height());
+        int specWidthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int specHeightMode = MeasureSpec.getMode(heightMeasureSpec);
+
+        int width = parentWidth;
+        int height = parentHeight;
+
+        if (specWidthMode == MeasureSpec.AT_MOST || specHeightMode == MeasureSpec.AT_MOST) {
+            widthMeasureSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST);
+            heightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.AT_MOST);
+
+            getLayoutParams().width = parentWidth;
+            getLayoutParams().height = parentHeight;
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            return;
+        }
+
+        setMeasuredDimension(parentWidth, parentHeight);
     }
 
     @Override
@@ -447,6 +465,7 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
         viewFrame.bottom = h;
         for (MarkerSeries markerSeries : markerSeriesList)
             markerSeries.reload();
+        invalidate();
     }
 
     MarkerSeries findMarkerSeriesFor(MarkersDataModel model) {
