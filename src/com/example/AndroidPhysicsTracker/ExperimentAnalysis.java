@@ -10,6 +10,7 @@ public class ExperimentAnalysis {
 
     private RunDataModel runDataModel;
     private MarkersDataModel tagMarkers;
+    private Bundle experimentSpecificData = null;
 
     public ExperimentAnalysis(Experiment experiment) {
         this.experiment = experiment;
@@ -27,9 +28,15 @@ public class ExperimentAnalysis {
     public MarkersDataModel getTagMarkers() {
         return tagMarkers;
     }
+    public Bundle getExperimentSpecificData() { return experimentSpecificData; }
+    public void setExperimentSpecificData(Bundle data) {
+        experimentSpecificData = data;
+    }
 
     public Bundle analysisDataToBundle() {
         Bundle analysisDataBundle = new Bundle();
+
+        analysisDataBundle.putInt("currentRun", runDataModel.getCurrentRun());
 
         if (tagMarkers.getMarkerCount() > 0) {
             Bundle tagMarkerBundle = new Bundle();
@@ -48,17 +55,18 @@ public class ExperimentAnalysis {
 
             analysisDataBundle.putBundle("tagMarkers", tagMarkerBundle);
         }
+
+        if (experimentSpecificData != null)
+            analysisDataBundle.putBundle("experiment_specific_data", experimentSpecificData);
         return analysisDataBundle;
     }
 
     protected boolean loadAnalysisData(Bundle bundle, File storageDir) {
         tagMarkers.clear();
 
-        Bundle analysisDataBundle = bundle.getBundle("analysis_data");
-        if (analysisDataBundle == null)
-            return false;
+        runDataModel.setCurrentRun(bundle.getInt("currentRun"));
 
-        Bundle tagMarkerBundle = analysisDataBundle.getBundle("tagMarkers");
+        Bundle tagMarkerBundle = bundle.getBundle("tagMarkers");
         if (tagMarkerBundle != null) {
             tagMarkers.clear();
             int[] runIds = tagMarkerBundle.getIntArray("runIds");
@@ -75,6 +83,8 @@ public class ExperimentAnalysis {
                 }
             }
         }
+
+        experimentSpecificData = bundle.getBundle("experiment_specific_data");
         return true;
     }
 }

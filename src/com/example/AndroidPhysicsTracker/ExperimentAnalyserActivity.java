@@ -104,7 +104,11 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         if (bundle == null)
             return false;
 
-        return experimentAnalysis.loadAnalysisData(bundle, experiment.getStorageDir());
+        Bundle analysisDataBundle = bundle.getBundle("analysis_data");
+        if (analysisDataBundle == null)
+            return false;
+
+        return experimentAnalysis.loadAnalysisData(analysisDataBundle, experiment.getStorageDir());
     }
 
     protected void saveAnalysisDataToFile() throws IOException {
