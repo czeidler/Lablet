@@ -119,13 +119,13 @@ public class PersistentBundle {
                 }
             } else if (o.getClass() == String.class) {
                 writeValue(new StringHandlerHelper(), key, bundle, serializer);
-            } else if (o.getClass() == int.class) {
+            } else if (o.getClass() == Integer.class) {
                 writeValue(new IntegerHandlerHelper(), key, bundle, serializer);
-            } else if (o.getClass() == boolean.class) {
+            } else if (o.getClass() == Boolean.class) {
                 writeValue(new BooleanHandlerHelper(), key, bundle, serializer);
-            } else if (o.getClass() == float.class) {
+            } else if (o.getClass() == Float.class) {
                 writeValue(new FloatHandlerHelper(), key, bundle, serializer);
-            } else if (o.getClass() == double.class) {
+            } else if (o.getClass() == Double.class) {
                 writeValue(new DoubleHandlerHelper(), key, bundle, serializer);
             } else if (o.getClass() == Bundle.class) {
                 startKeyTag(key, "bundle", serializer);
@@ -322,7 +322,7 @@ public class PersistentBundle {
 
         @Override
         public String getTypeName() {
-            return "integer";
+            return "int";
         }
     }
 
