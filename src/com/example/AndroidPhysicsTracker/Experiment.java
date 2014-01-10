@@ -27,8 +27,6 @@ abstract public class Experiment {
     private File storageDir;
     protected Context context;
 
-    private MarkersDataModel tagMarkers;
-
     public Experiment(Context experimentContext, Bundle bundle, File storageDir) {
         init(experimentContext);
 
@@ -44,7 +42,6 @@ abstract public class Experiment {
     protected boolean loadExperiment(Bundle bundle, File storageDir) {
         uid = bundle.getString("uid");
         this.storageDir = storageDir;
-        tagMarkers.clear();
         return true;
     }
 
@@ -61,11 +58,7 @@ abstract public class Experiment {
 
     public void onSaveAdditionalData(File dir) {}
 
-    public MarkersDataModel getTagMarkers() {
-        return tagMarkers;
-    }
-
-    public Bundle toBundle() {
+    public Bundle experimentDataToBundle() {
         Bundle bundle = new Bundle();
         bundle.putString("uid", uid);
 
@@ -103,6 +96,5 @@ abstract public class Experiment {
 
     private void init(Context experimentContext) {
         context = experimentContext;
-        tagMarkers = new MarkersDataModel();
     }
 }

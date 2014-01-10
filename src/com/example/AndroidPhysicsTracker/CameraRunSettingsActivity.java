@@ -22,7 +22,8 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        loadExperiment(getIntent());
+        if (!loadExperiment(getIntent()))
+            return;
 
         cameraExperiment = (CameraExperiment)getExperiment();
 

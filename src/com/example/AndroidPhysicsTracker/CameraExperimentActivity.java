@@ -204,7 +204,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
         ((CameraExperiment)experiment).setVideoFileName(getVideoFileName());
         try {
-            saveExperimentToFile();
+            saveExperimentDataToFile();
             Intent data = new Intent();
             File outputDir = getStorageDir();
             data.putExtra("experiment_path", outputDir.getPath());

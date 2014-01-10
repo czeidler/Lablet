@@ -62,8 +62,8 @@ public class CameraExperiment extends Experiment {
         return true;
     }
 
-    public Bundle toBundle() {
-        Bundle bundle = super.toBundle();
+    public Bundle experimentDataToBundle() {
+        Bundle bundle = super.experimentDataToBundle();
 
         bundle.putString("videoName", videoFileName);
 

@@ -7,14 +7,14 @@ import android.view.ViewGroup;
 
 public class AnalysisTableGraphDataFragment extends android.support.v4.app.Fragment {
     private ExperimentPlugin plugin = null;
-    private Experiment experiment = null;
+    private ExperimentAnalysis experimentAnalysis = null;
 
     private TableView tableView = null;
     private GraphView2D graphView = null;
 
-    public AnalysisTableGraphDataFragment(ExperimentPlugin plugin, Experiment experiment) {
+    public AnalysisTableGraphDataFragment(ExperimentPlugin plugin, ExperimentAnalysis experimentAnalysis) {
         this.plugin = plugin;
-        this.experiment = experiment;
+        this.experimentAnalysis = experimentAnalysis;
     }
 
     @Override
@@ -24,11 +24,11 @@ public class AnalysisTableGraphDataFragment extends android.support.v4.app.Fragm
 
         // marker table view
         tableView = (TableView)view.findViewById(R.id.tagMarkerTableView);
-        tableView.setAdapter(new MarkerDataTableAdapter(experiment.getTagMarkers()));
+        tableView.setAdapter(new MarkerDataTableAdapter(experimentAnalysis.getTagMarkers()));
 
         // marker graph view
         graphView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
-        graphView.setAdapter(new MarkerGraphAdapter(experiment.getTagMarkers()));
+        graphView.setAdapter(new MarkerGraphAdapter(experimentAnalysis.getTagMarkers()));
 
         return view;
     }

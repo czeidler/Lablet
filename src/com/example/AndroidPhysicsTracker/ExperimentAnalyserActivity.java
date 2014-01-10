@@ -18,13 +18,16 @@ import java.util.List;
 
 
 public class ExperimentAnalyserActivity extends ExperimentActivity {
-
     static final int PERFORM_RUN_SETTINGS = 0;
+    final String EXPERIMENT_ANALYSIS_FILE_NAME = "experiment_analysis.xml";
 
-    private RunDataModel runDataModel;
+    ExperimentAnalysis experimentAnalysis;
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        if (getExperiment() == null)
+            return false;
+
         getMenuInflater().inflate(R.menu.experiment_analyser_activity_actions, menu);
 
         MenuItem backItem = menu.findItem(R.id.action_back);
@@ -71,10 +74,11 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        loadExperiment(getIntent());
+        if (!loadExperiment(getIntent()))
+            return;
 
-        runDataModel = new RunDataModel();
-        runDataModel.setNumberOfRuns(experiment.getNumberOfRuns());
+        experimentAnalysis = new ExperimentAnalysis(experiment);
+        loadAnalysisDataToFile();
 
         setContentView(R.layout.experiment_analyser);
         // Instantiate a ViewPager and a PagerAdapter.
@@ -83,8 +87,36 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         pager.setAdapter(pagerAdapter);
     }
 
-    public RunDataModel getRunDataModel() {
-        return runDataModel;
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        try {
+            saveAnalysisDataToFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected boolean loadAnalysisDataToFile() {
+        File projectFile = new File(experiment.getStorageDir(), EXPERIMENT_ANALYSIS_FILE_NAME);
+        Bundle bundle = loadBundleFromFile(projectFile);
+        if (bundle == null)
+            return false;
+
+        return experimentAnalysis.loadAnalysisData(bundle, experiment.getStorageDir());
+    }
+
+    protected void saveAnalysisDataToFile() throws IOException {
+        Bundle bundle = new Bundle();
+        Bundle experimentData = experimentAnalysis.analysisDataToBundle();
+        bundle.putBundle("analysis_data", experimentData);
+
+        // save the bundle
+        File projectFile = new File(getStorageDir(), EXPERIMENT_ANALYSIS_FILE_NAME);
+        FileWriter fileWriter = new FileWriter(projectFile);
+        PersistentBundle persistentBundle = new PersistentBundle();
+        persistentBundle.flattenBundle(bundle, fileWriter);
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
@@ -95,11 +127,11 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
             if (position == 0)
-                return new AnalysisRunViewFragment(plugin, experiment);
+                return new AnalysisRunViewFragment(plugin, experimentAnalysis);
             else if (position == 1)
-                return new AnalysisMixedDataFragment(plugin, experiment);
+                return new AnalysisMixedDataFragment(plugin, experimentAnalysis);
             else if (position == 2)
-                return new AnalysisTableGraphDataFragment(plugin, experiment);
+                return new AnalysisTableGraphDataFragment(plugin, experimentAnalysis);
             return null;
         }
 
