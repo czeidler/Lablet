@@ -55,14 +55,11 @@ public class PersistentBundle {
             switch (tag){
                 case XmlPullParser.START_DOCUMENT:
                     break;
-                case XmlPullParser.END_TAG:
-                    endTagCount++;
-                    break;
 
                 case XmlPullParser.START_TAG:
                     endTagCount--;
                     String key = parser.getName();
-                    if (key != null && key.equals("key")){
+                    if (key.equals("key")){
                         String keyName = parser.getAttributeValue("", "name");
                         String typeName = parser.getAttributeValue("", "type");
                         if (typeName.equals("string"))
@@ -85,11 +82,17 @@ public class PersistentBundle {
                             handleArray(new FloatHandlerHelper(), parser, keyName, bundle);
                         else if (typeName.equals("double_array"))
                             handleArray(new DoubleHandlerHelper(), parser, keyName, bundle);
-                        else if (typeName.equals("bundle"))
+                        else if (typeName.equals("bundle")) {
                             handleBundle(parser, keyName, bundle);
-                        else
+                            // handle bundle read its own end tag
+                            endTagCount++;
+                        } else
                             throw new NotSerializableException();
                     }
+                    break;
+
+                case XmlPullParser.END_TAG:
+                    endTagCount++;
                     break;
             }
             if (endTagCount > 0)
@@ -153,7 +156,7 @@ public class PersistentBundle {
         serializer.startTag("", "value");
         serializer.text(helper.toString(value));
         serializer.endTag("", "value");
-        serializer.endTag("", "key");
+        endKeyTag(serializer);
     }
 
     private <T> void writeArray(HandlerHelper<T> helper, String key, Bundle bundle, XmlSerializer serializer) throws IOException {
@@ -165,7 +168,7 @@ public class PersistentBundle {
             serializer.text(helper.toString(value));
             serializer.endTag("", "value");
         }
-        serializer.endTag("", "key");
+        endKeyTag(serializer);
     }
 
     private <T> void handleValue(HandlerHelper<T> helper, XmlPullParser parser, String key, Bundle bundle) throws IOException, XmlPullParserException {
