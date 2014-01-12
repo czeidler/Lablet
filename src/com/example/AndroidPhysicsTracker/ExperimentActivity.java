@@ -36,7 +36,6 @@ abstract public class ExperimentActivity extends FragmentActivity {
             inStream = new FileInputStream(file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            showErrorAndFinish("can't open file: " + file.getName());
             return null;
         }
 

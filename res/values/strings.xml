@@ -3,4 +3,6 @@
     <string name="app_name">Physics Tracker</string>
     <string name="action_back">Back</string>
     <string name="action_analyse">Analyse</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_apply">Apply</string>
 </resources>

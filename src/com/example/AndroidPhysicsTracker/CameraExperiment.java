@@ -55,10 +55,10 @@ public class CameraExperiment extends Experiment {
 
         setVideoFileName(bundle.getString("videoName"));
 
-        setAnalysisVideoStart(bundle.getInt("videoStart"));
-        setAnalysisVideoEnd(bundle.getInt("videoEnd"));
+        setAnalysisVideoStart(0);
+        setAnalysisVideoEnd(0);
         // must be called here (needs video start and end time as well as the duration)
-        setFrameRate(bundle.getInt("frameRate"));
+        setFrameRate(0);
         return true;
     }
 
@@ -67,9 +67,6 @@ public class CameraExperiment extends Experiment {
 
         bundle.putString("videoName", videoFileName);
 
-        bundle.putInt("frameRate", getAnalysisFrameRate());
-        bundle.putInt("videoStart", getAnalysisVideoStart());
-        bundle.putInt("videoEnd", getAnalysisVideoEnd());
         return bundle;
     }
 

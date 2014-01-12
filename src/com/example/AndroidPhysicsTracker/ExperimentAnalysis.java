@@ -31,6 +31,7 @@ public class ExperimentAnalysis {
     public Bundle getExperimentSpecificData() { return experimentSpecificData; }
     public void setExperimentSpecificData(Bundle data) {
         experimentSpecificData = data;
+        onRunSpecificDataChanged();
     }
 
     public Bundle analysisDataToBundle() {
@@ -84,7 +85,9 @@ public class ExperimentAnalysis {
             }
         }
 
-        experimentSpecificData = bundle.getBundle("experiment_specific_data");
+        setExperimentSpecificData(bundle.getBundle("experiment_specific_data"));
         return true;
     }
+
+    protected void onRunSpecificDataChanged() {}
 }

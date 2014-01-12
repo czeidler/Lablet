@@ -46,7 +46,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             settingsItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
-                    startRunSettingsActivity();
+                    startRunSettingsActivity(experimentAnalysis.getExperimentSpecificData());
                     return true;
                 }
             });
@@ -57,8 +57,8 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void startRunSettingsActivity() {
-        plugin.startRunSettingsActivity(experiment, this, PERFORM_RUN_SETTINGS);
+    private void startRunSettingsActivity(Bundle analysisSpecificData) {
+        plugin.startRunSettingsActivity(experiment, analysisSpecificData, this, PERFORM_RUN_SETTINGS);
     }
 
     @Override
@@ -67,7 +67,16 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             return;
 
         if (requestCode == PERFORM_RUN_SETTINGS) {
-            // TODO reload settings
+            Bundle runSettings = data.getExtras();
+            //if (data.hasExtra("run_settings"))
+              //  runSettings = data.getBundleExtra("run_settings");
+            if (runSettings != null) {
+                Bundle specificData = experimentAnalysis.getExperimentSpecificData();
+                if (specificData == null)
+                    specificData = new Bundle();
+                specificData.putBundle("run_settings", runSettings);
+                experimentAnalysis.setExperimentSpecificData(specificData);
+            }
             return;
         }
     }
@@ -77,7 +86,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         if (!loadExperiment(getIntent()))
             return;
 
-        experimentAnalysis = new ExperimentAnalysis(experiment);
+        experimentAnalysis = plugin.loadExperimentAnalysis(experiment);
         loadAnalysisDataToFile();
 
         setContentView(R.layout.experiment_analyser);

@@ -1,6 +1,9 @@
 package com.example.AndroidPhysicsTracker;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 
@@ -12,6 +15,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
     private VideoFrameView videoFrameView;
 
     private SeekBar seekBar = null;
+    private NumberPicker frameRatePicker = null;
     private EditText editVideoStart = null;
     private EditText editVideoEnd = null;
 
@@ -19,9 +23,34 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
     private int videoEndValue;
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.simpel_settings_menu, menu);
+
+        MenuItem backItem = menu.findItem(R.id.action_cancel);
+        backItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                setResult(RESULT_CANCELED);
+                finish();
+                return false;
+            }
+        });
+        MenuItem applyMenuItem = menu.findItem(R.id.action_apply);
+        applyMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                applySettingsAndFinish();
+                return true;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Intent intent = getIntent();
         if (!loadExperiment(getIntent()))
             return;
 
@@ -56,22 +85,31 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
             }
         });
 
-        NumberPicker frameRatePicker = (NumberPicker)findViewById(R.id.frameRatePicker);
+        frameRatePicker = (NumberPicker)findViewById(R.id.frameRatePicker);
         frameRatePicker.setMinValue(1);
         frameRatePicker.setMaxValue(videoFrameView.getVideoFrameRate());
-        frameRatePicker.setValue(cameraExperiment.getAnalysisFrameRate());
 
+        editVideoStart = (EditText)findViewById(R.id.editStart);
+        editVideoEnd = (EditText)findViewById(R.id.editEnd);
+
+        // get initial values
+        Bundle runSettings = null;
+        Bundle analysisSpecificData = intent.getExtras().getBundle("analysisSpecificData");
+        if (analysisSpecificData != null)
+            runSettings = analysisSpecificData.getBundle("run_settings");
+        if (runSettings != null) {
+            cameraExperiment.setFrameRate(runSettings.getInt("analysis_frame_rate"));
+            cameraExperiment.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
+            cameraExperiment.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
+        }
+        int frameRate = cameraExperiment.getAnalysisFrameRate();
         videoStartValue = cameraExperiment.getAnalysisVideoStart();
         videoEndValue = cameraExperiment.getAnalysisVideoEnd();
 
-        editVideoStart = (EditText)findViewById(R.id.editStart);
-        String string = "";
-        string += videoStartValue;
-        editVideoStart.setText(string);
-        editVideoEnd = (EditText)findViewById(R.id.editEnd);
-        string = "";
-        string += videoEndValue;
-        editVideoEnd.setText(string);
+        // initial views with values
+        frameRatePicker.setValue(frameRate);
+        setVideoStart(videoStartValue);
+        setVideoEnd(videoEndValue);
 
         Button setStartButton = (Button)findViewById(R.id.buttonSetStart);
         setStartButton.setOnClickListener(new View.OnClickListener() {
@@ -82,9 +120,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
                     return;
                 }
                 videoStartValue = seekBar.getProgress();
-                String string = "";
-                string += videoStartValue;
-                editVideoStart.setText(string);
+                setVideoStart(videoStartValue);
             }
         });
 
@@ -97,16 +133,34 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
                     return;
                 }
                 videoEndValue = seekBar.getProgress();
-                String string = "";
-                string += videoEndValue;
-                editVideoEnd.setText(string);
+                setVideoEnd(videoEndValue);
             }
         });
+
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
+    private void setVideoStart(int value) {
+        String string = "";
+        string += value;
+        editVideoStart.setText(string);
+    }
+
+    private void setVideoEnd(int value) {
+        String string = "";
+        string += value;
+        editVideoEnd.setText(string);
+    }
+
+    private void applySettingsAndFinish() {
+        Intent intent = new Intent();
+
+        intent.putExtra("analysis_frame_rate", frameRatePicker.getValue());
+        intent.putExtra("analysis_video_start", Integer.parseInt(editVideoStart.getText().toString()));
+        intent.putExtra("analysis_video_end", Integer.parseInt(editVideoEnd.getText().toString()));
+
+        setResult(RESULT_OK, intent);
+
+        finish();
     }
 
     public void seekTo(int time) {

@@ -37,7 +37,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
     static private String videoFileName = "video.mp4";
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.perform_experiment_activity_actions, menu);
 
         MenuItem backItem = menu.findItem(R.id.action_back);
