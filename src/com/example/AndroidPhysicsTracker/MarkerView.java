@@ -19,6 +19,8 @@ interface IMarker {
 
     public void setSelected(boolean selected);
     public boolean isSelected();
+
+    public void setPosition(PointF position);
 }
 
 /* DragableMarker can be selected. If it is selected there can also be a drag handler to move the marker.
@@ -189,7 +191,7 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
     protected View markerView = null;
     protected MarkersDataModel markerData = null;
 
-    protected List<DragableMarker> markerList;
+    protected List<IMarker> markerList;
 
 
     public AbstractMarkersPainter(View parent, IExperimentRunView runView, MarkersDataModel model) {
@@ -198,7 +200,7 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
         markerData = model;
         markerData.addListener(this);
 
-        markerList = new ArrayList<DragableMarker>();
+        markerList = new ArrayList<IMarker>();
         onViewSizeChanged();
     }
 
@@ -265,7 +267,7 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
     }
 
     public void updateMarker(int row) {
-        DragableMarker marker = markerList.get(row);
+        IMarker marker = markerList.get(row);
         MarkerData data = markerData.getMarkerDataAt(row);
         PointF screenPos = new PointF();
         experimentRunView.toScreen(data.getPosition(), screenPos);
@@ -370,7 +372,69 @@ class TagMarkerDataModelPainter extends AbstractMarkersPainter {
             markerData.selectMarkerData(markerData.getMarkerCount() - 1);
         }
     }
+}
 
+class CalibrationMarkerPainter extends AbstractMarkersPainter {
+
+    public CalibrationMarkerPainter(View parent, IExperimentRunView runView, MarkersDataModel model) {
+        super(parent, runView, model);
+    }
+
+    @Override
+    protected DragableMarker createMarkerForRow(int row) {
+        return new SimpleMarker(this);
+    }
+
+    @Override
+    public void draw(Canvas canvas, float priority) {
+        for (IMarker marker : markerList)
+            marker.onDraw(canvas, priority);
+
+        if (markerData.getMarkerCount() != 2)
+            return;
+
+        PointF screenPos1 = getScreenPos(0);
+        PointF screenPos2 = getScreenPos(1);
+        Paint paint = new Paint();
+        paint.setColor(Color.GREEN);
+        canvas.drawLine(screenPos1.x, screenPos1.y, screenPos2.x, screenPos2.y, paint);
+    }
+
+    public void addMarker(int row) {
+        DragableMarker marker = createMarkerForRow(row);
+        marker.setPosition(markerData.getMarkerDataAt(row).getPosition());
+        markerList.add(row, marker);
+    }
+
+    public void updateMarker(int row) {
+        IMarker marker = markerList.get(row);
+        marker.setPosition(markerData.getMarkerDataAt(row).getPosition());
+    }
+    
+    @Override
+    public void markerMoveRequest(DragableMarker marker, PointF newPosition) {
+        int row = markerList.lastIndexOf(marker);
+        if (row < 0)
+            return;
+
+        sanitizeScreenPoint(newPosition);
+        markerData.setMarkerPosition(newPosition, row);
+    }
+
+    @Override
+    public List<IMarker> getSelectableMarkerList() {
+        return markerList;
+    }
+
+    @Override
+    public void setCurrentRun(int run) {
+
+    }
+
+    private PointF getScreenPos(int markerIndex) {
+        MarkerData data = markerData.getMarkerDataAt(markerIndex);
+        return data.getPosition();
+    }
 }
 
 public class MarkerView extends ViewGroup {
@@ -402,8 +466,12 @@ public class MarkerView extends ViewGroup {
         markerPainterList.clear();
     }
 
-    public void addTagMarkers(MarkersDataModel markers) {
-        markerPainterList.add(new TagMarkerDataModelPainter(this, experimentRunView, markers));
+    public void addXYCalibrationMarkers(MarkersDataModel marker) {
+        markerPainterList.add(new CalibrationMarkerPainter(this, experimentRunView, marker));
+    }
+
+    public void addTagMarkers(MarkersDataModel marker) {
+        markerPainterList.add(new TagMarkerDataModelPainter(this, experimentRunView, marker));
     }
 
     public boolean removeMarkers(MarkersDataModel model) {

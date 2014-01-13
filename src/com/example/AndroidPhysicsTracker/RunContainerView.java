@@ -50,9 +50,13 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
         addView(markerView, makerViewParams);
     }
 
-    public void addMarkerData(MarkersDataModel data) {
+    public void addTagMarkerData(MarkersDataModel data) {
         markerView.addTagMarkers(data);
         onRunChanged(runDataModel.getCurrentRun());
+    }
+
+    public void addXYCalibrationData(MarkersDataModel data) {
+        markerView.addXYCalibrationMarkers(data);
     }
 
     public boolean removeMarkerData(MarkersDataModel data) {

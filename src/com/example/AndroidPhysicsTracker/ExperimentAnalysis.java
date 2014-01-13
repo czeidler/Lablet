@@ -1,6 +1,7 @@
 package com.example.AndroidPhysicsTracker;
 
 
+import android.graphics.PointF;
 import android.os.Bundle;
 
 import java.io.File;
@@ -10,6 +11,7 @@ public class ExperimentAnalysis {
 
     private RunDataModel runDataModel;
     private MarkersDataModel tagMarkers;
+    private MarkersDataModel xyCalibrationMarkers;
     private Bundle experimentSpecificData = null;
 
     public ExperimentAnalysis(Experiment experiment) {
@@ -19,6 +21,13 @@ public class ExperimentAnalysis {
         runDataModel.setNumberOfRuns(experiment.getNumberOfRuns());
 
         tagMarkers = new MarkersDataModel();
+        xyCalibrationMarkers = new MarkersDataModel();
+        MarkerData point1 = new MarkerData(-1);
+        point1.setPosition(new PointF(20, 20));
+        xyCalibrationMarkers.addMarkerData(point1);
+        MarkerData point2 = new MarkerData(-2);
+        point2.setPosition(new PointF(100, 20));
+        xyCalibrationMarkers.addMarkerData(point2);
     }
 
     public Experiment getExperiment() { return  experiment; }
@@ -28,6 +37,7 @@ public class ExperimentAnalysis {
     public MarkersDataModel getTagMarkers() {
         return tagMarkers;
     }
+    public MarkersDataModel getXYCalibrationMarkers() { return xyCalibrationMarkers; }
     public Bundle getExperimentSpecificData() { return experimentSpecificData; }
     public void setExperimentSpecificData(Bundle data) {
         experimentSpecificData = data;

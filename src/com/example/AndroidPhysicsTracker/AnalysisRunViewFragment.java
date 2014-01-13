@@ -31,7 +31,8 @@ public class AnalysisRunViewFragment extends android.support.v4.app.Fragment {
 
         runContainerView = (RunContainerView)view.findViewById(R.id.experimentRunContainer);
         runContainerView.setTo(experimentRunView, experimentAnalysis.getRunDataModel());
-        runContainerView.addMarkerData(experimentAnalysis.getTagMarkers());
+        runContainerView.addTagMarkerData(experimentAnalysis.getTagMarkers());
+        runContainerView.addXYCalibrationData(experimentAnalysis.getXYCalibrationMarkers());
 
         return view;
     }
