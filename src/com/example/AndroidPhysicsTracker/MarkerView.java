@@ -28,9 +28,9 @@ abstract class DragableMarker implements IMarker {
     protected PointF dragOffset;
     protected boolean isSelected;
     protected boolean isDragging;
-    protected MarkerSeries parent = null;
+    protected AbstractMarkersPainter parent = null;
 
-    public DragableMarker(MarkerSeries parentContainer) {
+    public DragableMarker(AbstractMarkersPainter parentContainer) {
         position = new PointF(0, 0);
         dragOffset = new PointF(0, 0);
         isSelected = false;
@@ -110,7 +110,7 @@ class SimpleMarker extends DragableMarker {
     private Paint paint = null;
     private int mainAlpha = 255;
 
-    public SimpleMarker(MarkerSeries parentContainer) {
+    public SimpleMarker(AbstractMarkersPainter parentContainer) {
         super(parentContainer);
         paint = new Paint();
     }
@@ -174,23 +174,137 @@ class SimpleMarker extends DragableMarker {
 }
 
 
-class MarkerSeries {
-    private IExperimentRunView experimentRunView = null;
-    private MarkersDataModel markerData = null;
-    private List<DragableMarker> markerList;
+interface IMarkerDataModelPainter {
+    public MarkersDataModel getModel();
+    public void release();
 
-    public MarkerSeries(IExperimentRunView runView, MarkersDataModel data) {
-        markerList = new ArrayList<DragableMarker>();
+    public void draw(Canvas canvas, float priority);
+    public List<IMarker> getSelectableMarkerList();
+    public void onViewSizeChanged();
+    public void setCurrentRun(int run);
+}
+
+abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, MarkersDataModel.IMarkersDataModelListener {
+    protected IExperimentRunView experimentRunView = null;
+    protected View markerView = null;
+    protected MarkersDataModel markerData = null;
+
+    protected List<DragableMarker> markerList;
+
+
+    public AbstractMarkersPainter(View parent, IExperimentRunView runView, MarkersDataModel model) {
         experimentRunView = runView;
-        markerData = data;
+        markerView = parent;
+        markerData = model;
+        markerData.addListener(this);
 
-        reload();
+        markerList = new ArrayList<DragableMarker>();
+        onViewSizeChanged();
     }
 
-    public void reload() {
+    public MarkersDataModel getModel() {
+        return markerData;
+    }
+
+    public void release() {
+        markerData.removeListener(this);
+    }
+
+    public void onViewSizeChanged() {
         markerList.clear();
         for (int i = 0; i < markerData.getMarkerCount(); i++)
-            markerAdded(markerData, i);
+            addMarker(i);
+    }
+
+    public void markerMoveRequest(DragableMarker marker, PointF newPosition) {
+        int row = markerList.lastIndexOf(marker);
+        if (row < 0)
+            return;
+
+        sanitizeScreenPoint(newPosition);
+
+        PointF newReal = new PointF();
+        experimentRunView.fromScreen(newPosition, newReal);
+        markerData.setMarkerPosition(newReal, row);
+    }
+
+    protected IMarker getMarkerForRow(int row) {
+        if (row < 0 || row >= markerList.size())
+            return null;
+        return markerList.get(row);
+    }
+
+    protected void sanitizeScreenPoint(PointF point) {
+        View view = (View)experimentRunView;
+        Rect frame = new Rect();
+        view.getDrawingRect(frame);
+        if (frame.left > point.x)
+            point.x = frame.left;
+        if (frame.right < point.x)
+            point.x = frame.right;
+        if (frame.top > point.y)
+            point.y = frame.top;
+        if (frame.bottom < point.y)
+            point.y = frame.bottom;
+    }
+
+    abstract protected DragableMarker createMarkerForRow(int row);
+
+    public void addMarker(int row) {
+        DragableMarker marker = createMarkerForRow(row);
+        PointF screenPos = new PointF();
+        experimentRunView.toScreen(markerData.getMarkerDataAt(row).getPosition(), screenPos);
+        marker.setPosition(screenPos);
+        markerList.add(row, marker);
+    }
+
+    public void removeMarker(int row) {
+        markerList.remove(row);
+        if (row == markerData.getSelectedMarkerData())
+            markerData.selectMarkerData(0);
+    }
+
+    public void updateMarker(int row) {
+        DragableMarker marker = markerList.get(row);
+        MarkerData data = markerData.getMarkerDataAt(row);
+        PointF screenPos = new PointF();
+        experimentRunView.toScreen(data.getPosition(), screenPos);
+        marker.setPosition(screenPos);
+    }
+
+    @Override
+    public void onDataAdded(MarkersDataModel model, int index) {
+        addMarker(index);
+        markerView.invalidate();
+    }
+
+    @Override
+    public void onDataRemoved(MarkersDataModel model, int index, MarkerData data) {
+        removeMarker(index);
+        markerView.invalidate();
+    }
+
+    @Override
+    public void onDataChanged(MarkersDataModel model, int index) {
+        updateMarker(index);
+        markerView.invalidate();
+    }
+
+    @Override
+    public void onAllDataChanged(MarkersDataModel model) {
+        onViewSizeChanged();
+        markerView.invalidate();
+    }
+
+    @Override
+    public void onDataSelected(MarkersDataModel model, int index) {
+        markerView.invalidate();
+    }
+}
+
+class TagMarkerDataModelPainter extends AbstractMarkersPainter {
+    public TagMarkerDataModelPainter(View parent, IExperimentRunView runView, MarkersDataModel data) {
+        super(parent, runView, data);
     }
 
     public void draw(Canvas canvas, float priority) {
@@ -213,18 +327,6 @@ class MarkerSeries {
             topMarker.onDraw(canvas, (float)1.0);
     }
 
-    public void markerMoveRequest(DragableMarker marker, PointF newPosition) {
-        int row = markerList.lastIndexOf(marker);
-        if (row < 0)
-            return;
-
-        sanitizeScreenPoint(newPosition);
-
-        PointF newReal = new PointF();
-        experimentRunView.fromScreen(newPosition, newReal);
-        markerData.setMarkerPosition(newReal, row);
-    }
-
     public List<IMarker> getSelectableMarkerList() {
         List<IMarker> returnMarkerList = new ArrayList<IMarker>();
         int currentMarkerRow = markerData.getSelectedMarkerData();
@@ -236,26 +338,8 @@ class MarkerSeries {
         return returnMarkerList;
     }
 
-    public void markerAdded(MarkersDataModel data, int row) {
-        SimpleMarker marker = new SimpleMarker(this);
-        PointF screenPos = new PointF();
-        experimentRunView.toScreen(data.getMarkerDataAt(row).getPosition(), screenPos);
-        marker.setPosition(screenPos);
-        markerList.add(row, marker);
-    }
-
-    public void markerRemoved(int row) {
-        markerList.remove(row);
-        if (row == markerData.getSelectedMarkerData())
-            markerData.selectMarkerData(0);
-    }
-
-    public void markerChanged(int row) {
-        DragableMarker marker = markerList.get(row);
-        MarkerData data = markerData.getMarkerDataAt(row);
-        PointF screenPos = new PointF();
-        experimentRunView.toScreen(data.getPosition(), screenPos);
-        marker.setPosition(screenPos);
+    protected DragableMarker createMarkerForRow(int row) {
+        return new SimpleMarker(this);
     }
 
     public void setCurrentRun(int run) {
@@ -287,31 +371,11 @@ class MarkerSeries {
         }
     }
 
-    public IMarker getMarkerForRow(int row) {
-        if (row < 0 || row >= markerList.size())
-            return null;
-        return markerList.get(row);
-    }
-
-    private void sanitizeScreenPoint(PointF point) {
-        View view = (View)experimentRunView;
-        Rect frame = new Rect();
-        view.getDrawingRect(frame);
-        if (frame.left > point.x)
-            point.x = frame.left;
-        if (frame.right < point.x)
-            point.x = frame.right;
-        if (frame.top > point.y)
-            point.y = frame.top;
-        if (frame.bottom < point.y)
-            point.y = frame.bottom;
-    }
 }
 
-public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDataModelListener {
+public class MarkerView extends ViewGroup {
     private IMarker selectedMarker = null;
-    private List<MarkerSeries> markerSeriesList;
-    private List<MarkersDataModel> markerDataList;
+    private List<IMarkerDataModelPainter> markerPainterList;
     private Rect viewFrame = null;
     private boolean touchEventHandledLastTime = false;
     private IExperimentRunView experimentRunView = null;
@@ -328,31 +392,26 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
         viewFrame = new Rect();
         getDrawingRect(viewFrame);
 
-        markerSeriesList = new ArrayList<MarkerSeries>();
-        markerDataList = new ArrayList<MarkersDataModel>();
+        markerPainterList = new ArrayList<IMarkerDataModelPainter>();
     }
 
     public void release() {
-        for (MarkersDataModel data : markerDataList) {
-            data.removeListener(this);
-        }
-        markerDataList.clear();
-        markerSeriesList.clear();
+        for (IMarkerDataModelPainter data : markerPainterList)
+            data.release();
+
+        markerPainterList.clear();
     }
 
     public void addTagMarkers(MarkersDataModel markers) {
-        markerDataList.add(markers);
-        markers.addListener(this);
-        markerSeriesList.add(new MarkerSeries(experimentRunView, markers));
+        markerPainterList.add(new TagMarkerDataModelPainter(this, experimentRunView, markers));
     }
 
-    public boolean removeMarkers(MarkersDataModel markers) {
-        int index = markerDataList.indexOf(markers);
-        if (index < 0)
+    public boolean removeMarkers(MarkersDataModel model) {
+        IMarkerDataModelPainter painter = findMarkersPainter(model);
+        if (painter == null)
             return false;
-        markerDataList.remove(index);
-        markers.removeListener(this);
-        markerSeriesList.remove(index);
+        painter.release();
+        markerPainterList.remove(painter);
 
         return true;
     }
@@ -363,8 +422,8 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
             selectedMarker = null;
         }
 
-        for (MarkerSeries markerSeries : markerSeriesList) {
-            markerSeries.setCurrentRun(run);
+        for (IMarkerDataModelPainter tagMarkerCollection : markerPainterList) {
+            tagMarkerCollection.setCurrentRun(run);
         }
         invalidate();
     }
@@ -373,8 +432,8 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        for (MarkerSeries markerSeries : markerSeriesList)
-            markerSeries.draw(canvas, 1);
+        for (IMarkerDataModelPainter markerPainter : markerPainterList)
+            markerPainter.draw(canvas, 1);
 
         Rect frame = new Rect();
         getDrawingRect(frame);
@@ -385,8 +444,8 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         List<IMarker> allMarkerList = new ArrayList<IMarker>();
-        for (MarkerSeries markerSeries : markerSeriesList)
-            allMarkerList.addAll(markerSeries.getSelectableMarkerList());
+        for (IMarkerDataModelPainter markerPainter : markerPainterList)
+            allMarkerList.addAll(markerPainter.getSelectableMarkerList());
 
         int action = event.getActionMasked();
         boolean handled = false;
@@ -467,49 +526,16 @@ public class MarkerView extends ViewGroup implements MarkersDataModel.IMarkersDa
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         viewFrame.right = w;
         viewFrame.bottom = h;
-        for (MarkerSeries markerSeries : markerSeriesList)
-            markerSeries.reload();
+        for (IMarkerDataModelPainter tagMarkerCollection : markerPainterList)
+            tagMarkerCollection.onViewSizeChanged();
         invalidate();
     }
 
-    MarkerSeries findMarkerSeriesFor(MarkersDataModel model) {
-        for (int i = 0; i < markerDataList.size(); i++) {
-            if (markerDataList.get(i) == model)
-                return markerSeriesList.get(i);
+    private IMarkerDataModelPainter findMarkersPainter(MarkersDataModel model) {
+        for (IMarkerDataModelPainter painter : markerPainterList) {
+            if (painter.getModel() == painter);
+            return painter;
         }
         return null;
-    }
-
-    @Override
-    public void onDataAdded(MarkersDataModel model, int index) {
-        MarkerSeries markerSeries = findMarkerSeriesFor(model);
-        markerSeries.markerAdded(model, index);
-        invalidate();
-    }
-
-    @Override
-    public void onDataRemoved(MarkersDataModel model, int index, MarkerData data) {
-        MarkerSeries markerSeries = findMarkerSeriesFor(model);
-        markerSeries.markerRemoved(index);
-        invalidate();
-    }
-
-    @Override
-    public void onDataChanged(MarkersDataModel model, int index) {
-        MarkerSeries markerSeries = findMarkerSeriesFor(model);
-        markerSeries.markerChanged(index);
-        invalidate();
-    }
-
-    @Override
-    public void onAllDataChanged(MarkersDataModel model) {
-        MarkerSeries markerSeries = findMarkerSeriesFor(model);
-        markerSeries.reload();
-        invalidate();
-    }
-
-    @Override
-    public void onDataSelected(MarkersDataModel model, int index) {
-        invalidate();
     }
 }
