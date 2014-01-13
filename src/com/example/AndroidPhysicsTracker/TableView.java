@@ -13,6 +13,7 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
     protected ITableAdapter<?> adapter = null;
     TableRow selectedRow = null;
     final int rowBackgroundColor = Color.WHITE;
+    final int headerRowBackgroundColor = Color.rgb(100, 100, 100);
     final int selectedRowColor = Color.rgb(200, 200, 200);
 
     public TableView(Context context) {
@@ -48,6 +49,7 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
 
     @Override
     public void onRowAdded(ITableAdapter<?> table, int row) {
+        row ++;
         TableRow tableRow = createRow(row);
         addView(tableRow, row);
         if (adapter.getSelectedRow() == row)
@@ -56,6 +58,7 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
 
     @Override
     public void onRowRemoved(ITableAdapter<?> table, int row) {
+        row ++;
         // TODO check if that selects the right row
         removeViewAt(row);
     }
@@ -90,7 +93,10 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
 
         for (int column = 0; column < adapter.getColumnCount(); column++) {
             View cell = adapter.getView(getContext(), row, column);
-            cell.setBackgroundColor(rowBackgroundColor);
+            if (row == 0)
+                cell.setBackgroundColor(headerRowBackgroundColor);
+            else
+                cell.setBackgroundColor(rowBackgroundColor);
             tableRow.addView(cell);
             TableRow.LayoutParams cellParams = (TableRow.LayoutParams)cell.getLayoutParams();
             cellParams.setMargins(1, 1, 1, 1);
@@ -106,6 +112,8 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
             selectedRow = null;
         }
 
+        // take header into account
+        row ++;
         if (row < 0 || row >= adapter.getRowCount())
             return;
 

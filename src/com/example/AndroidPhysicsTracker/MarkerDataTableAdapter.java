@@ -14,11 +14,13 @@ import java.util.List;
 public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, MarkersDataModel.IMarkersDataModelListener {
     private MarkersDataModel model;
     private List<ITableAdapterListener> listeners;
+    private Experiment experiment;
 
-    public MarkerDataTableAdapter(MarkersDataModel model) {
+    public MarkerDataTableAdapter(MarkersDataModel model, Experiment experiment) {
         this.model = model;
         model.addListener(this);
         listeners = new ArrayList<ITableAdapterListener>();
+        this.experiment = experiment;
     }
 
     public void release() {
@@ -28,7 +30,8 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
 
     @Override
     public int getRowCount() {
-        return model.getMarkerCount();
+        // markers plus header
+        return model.getMarkerCount() + 1;
     }
 
     @Override
@@ -38,7 +41,7 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
 
     @Override
     public int getColumnCount() {
-        return 3;
+        return 4;
     }
 
     @Override
@@ -48,7 +51,10 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
 
     @Override
     public View getView(Context context, int row, int column) throws IndexOutOfBoundsException {
-        MarkerData data = getRow(row);
+        if (row == 0)
+            return makeHeaderCell(context, column);
+
+        MarkerData data = getRow(row - 1);
         TextView textView = new TextView(context);
         textView.setTextColor(Color.BLACK);
         textView.setBackgroundColor(Color.WHITE);
@@ -60,6 +66,28 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
             text += data.getPosition().x;
         else if (column == 2)
             text += data.getPosition().y;
+        else if (column == 3)
+            text += experiment.getRunValueAt(data.getRunId());
+        else
+            throw new IndexOutOfBoundsException();
+
+        textView.setText(text);
+        return textView;
+    }
+
+    private View makeHeaderCell(Context context, int column) {
+        TextView textView = new TextView(context);
+        textView.setTextColor(Color.WHITE);
+
+        String text = null;
+        if (column == 0)
+            text = "id";
+        else if (column == 1)
+            text = "x";
+        else if (column == 2)
+            text = "y";
+        else if (column == 3)
+            text = "run value";
         else
             throw new IndexOutOfBoundsException();
 
