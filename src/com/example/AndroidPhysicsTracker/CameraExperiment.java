@@ -41,12 +41,17 @@ public class CameraExperiment extends Experiment {
         if (i < 0 || i >= numberOfRuns)
             return null;
 
-        int position = (int)(analysisVideoStart + (float)1000 / analysisFrameRate * i);
+        int position = (int)getRunValueAt(i);
 
         Bundle bundle = new Bundle();
         bundle.putInt("frame_position", position);
 
         return bundle;
+    }
+
+    @Override
+    public float getRunValueAt(int i) {
+        return analysisVideoStart + (float)1000 / analysisFrameRate * i;
     }
 
     protected boolean loadExperiment(Bundle bundle, File storageDir) {
@@ -75,6 +80,7 @@ public class CameraExperiment extends Experiment {
         File file = new File(getStorageDir(), videoFileName);
 
         MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.parse(file.getPath()));
+
         videoDuration = mediaPlayer.getDuration();
         videoHeight = mediaPlayer.getVideoHeight();
         videoWidth = mediaPlayer.getVideoWidth();

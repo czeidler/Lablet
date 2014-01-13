@@ -76,6 +76,7 @@ abstract public class Experiment {
 
     abstract public int getNumberOfRuns();
     abstract public Bundle getRunAt(int i);
+    abstract public float getRunValueAt(int i);
 
     protected String generateNewUid() {
         String identifier = getIdentifier();
