@@ -42,13 +42,14 @@ public class ExperimentAnalysis {
         if (tagMarkers.getMarkerCount() > 0) {
             Bundle tagMarkerBundle = new Bundle();
             int[] runIds = new int[tagMarkers.getMarkerCount()];
+            float[] runValues = new float[tagMarkers.getMarkerCount()];
             float[] xPositions = new float[tagMarkers.getMarkerCount()];
             float[] yPositions = new float[tagMarkers.getMarkerCount()];
             for (int i = 0; i < tagMarkers.getMarkerCount(); i++) {
                 MarkerData data = tagMarkers.getMarkerDataAt(i);
-                runIds[i] = data.runId;
-                xPositions[i] = data.positionReal.x;
-                yPositions[i] = data.positionReal.y;
+                runIds[i] = data.getRunId();
+                xPositions[i] = data.getPosition().x;
+                yPositions[i] = data.getPosition().y;
             }
             tagMarkerBundle.putIntArray("runIds", runIds);
             tagMarkerBundle.putFloatArray("xPositions", xPositions);
@@ -74,12 +75,11 @@ public class ExperimentAnalysis {
             float[] xPositions = tagMarkerBundle.getFloatArray("xPositions");
             float[] yPositions = tagMarkerBundle.getFloatArray("yPositions");
 
-            if (runIds != null && xPositions != null && yPositions != null
-                    && runIds.length == xPositions.length && xPositions.length == yPositions.length) {
+            if (runIds != null && xPositions != null && yPositions != null && runIds.length == xPositions.length
+                && xPositions.length == yPositions.length) {
                 for (int i = 0; i < runIds.length; i++) {
-                    MarkerData data = new MarkerData();
-                    data.runId = runIds[i];
-                    data.positionReal.set(xPositions[i], yPositions[i]);
+                    MarkerData data = new MarkerData(runIds[i]);
+                    data.getPosition().set(xPositions[i], yPositions[i]);
                     tagMarkers.addMarkerData(data);
                 }
             }

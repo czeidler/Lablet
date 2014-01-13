@@ -135,12 +135,12 @@ class MarkerGraphAdapter implements IGraphAdapter, MarkersDataModel.IMarkersData
 
         @Override
         public double getX() {
-            return data.getMarkerDataAt(index).positionReal.x;
+            return data.getMarkerDataAt(index).getPosition().x;
         }
 
         @Override
         public double getY() {
-            return data.getMarkerDataAt(index).positionReal.y;
+            return data.getMarkerDataAt(index).getPosition().y;
         }
     }
 

@@ -7,6 +7,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+class MarkerData {
+    private int runId;
+    private PointF positionReal;
+
+    public MarkerData(int run) {
+        runId = run;
+        positionReal = new PointF();
+    }
+
+    public int getRunId() {
+        return runId;
+    }
+
+    public void setRunId(int runId) {
+        this.runId = runId;
+    }
+
+    public PointF getPosition() {
+        return positionReal;
+    }
+
+    public void setPosition(PointF positionReal) {
+        this.positionReal.set(positionReal);
+    }
+}
+
 public class MarkersDataModel {
     interface IMarkersDataModelListener {
         public void onDataAdded(MarkersDataModel model, int index);
@@ -36,7 +62,7 @@ public class MarkersDataModel {
 
     public void setMarkerPosition(PointF position, int index) {
         MarkerData data = getMarkerDataAt(index);
-        data.positionReal = position;
+        data.setPosition(position);
         notifyDataChanged(index);
     }
 
@@ -48,15 +74,18 @@ public class MarkersDataModel {
         return listeners.remove(listener);
     }
 
-    public void addMarkerData(MarkerData data) {
+    public boolean addMarkerData(MarkerData data) {
         int i = 0;
         for (; i < markerDataList.size(); i++) {
             MarkerData current = markerDataList.get(i);
-            if (current.runId > data.runId)
+            if (current.getRunId() > data.getRunId())
                 break;
+            if (current.getRunId() == data.getRunId())
+                return false;
         }
         markerDataList.add(i, data);
         notifyDataAdded(i);
+        return true;
     }
 
     public int getMarkerCount() {

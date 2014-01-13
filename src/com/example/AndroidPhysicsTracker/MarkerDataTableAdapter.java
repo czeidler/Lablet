@@ -11,15 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-class MarkerData {
-    public int runId;
-    public PointF positionReal;
-
-    public MarkerData() {
-        positionReal = new PointF();
-    }
-}
-
 public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, MarkersDataModel.IMarkersDataModelListener {
     private MarkersDataModel model;
     private List<ITableAdapterListener> listeners;
@@ -64,11 +55,11 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
 
         String text = new String();
         if (column == 0)
-            text += data.runId;
+            text += data.getRunId();
         else if (column == 1)
-            text += data.positionReal.x;
+            text += data.getPosition().x;
         else if (column == 2)
-            text += data.positionReal.y;
+            text += data.getPosition().y;
         else
             throw new IndexOutOfBoundsException();
 

@@ -68,8 +68,6 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
 
         if (requestCode == PERFORM_RUN_SETTINGS) {
             Bundle runSettings = data.getExtras();
-            //if (data.hasExtra("run_settings"))
-              //  runSettings = data.getBundleExtra("run_settings");
             if (runSettings != null) {
                 Bundle specificData = experimentAnalysis.getExperimentSpecificData();
                 if (specificData == null)

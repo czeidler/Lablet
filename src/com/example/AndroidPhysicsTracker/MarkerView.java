@@ -239,7 +239,7 @@ class MarkerSeries {
     public void markerAdded(MarkersDataModel data, int row) {
         SimpleMarker marker = new SimpleMarker(this);
         PointF screenPos = new PointF();
-        experimentRunView.toScreen(data.getMarkerDataAt(row).positionReal, screenPos);
+        experimentRunView.toScreen(data.getMarkerDataAt(row).getPosition(), screenPos);
         marker.setPosition(screenPos);
         markerList.add(row, marker);
     }
@@ -254,7 +254,7 @@ class MarkerSeries {
         DragableMarker marker = markerList.get(row);
         MarkerData data = markerData.getMarkerDataAt(row);
         PointF screenPos = new PointF();
-        experimentRunView.toScreen(data.positionReal, screenPos);
+        experimentRunView.toScreen(data.getPosition(), screenPos);
         marker.setPosition(screenPos);
     }
 
@@ -263,7 +263,7 @@ class MarkerSeries {
         MarkerData data = null;
         for (int i = 0; i < markerData.getMarkerCount(); i++) {
             MarkerData foundData = markerData.getMarkerDataAt(i);
-            if (foundData.runId == run) {
+            if (foundData.getRunId() == run) {
                 data = foundData;
                 markerData.selectMarkerData(i);
                 break;
@@ -271,17 +271,16 @@ class MarkerSeries {
         }
 
         if (data == null) {
-            data = new MarkerData();
-            data.runId = run;
+            data = new MarkerData(run);
             if (markerData.getMarkerCount() > 0) {
                 MarkerData prevData = markerData.getMarkerDataAt(markerData.getMarkerCount() - 1);
-                data.positionReal.set(prevData.positionReal);
+                data.setPosition(prevData.getPosition());
                 // TODO take unit and scale into account
-                data.positionReal.x += 5;
+                data.getPosition().x += 5;
                 PointF screenPos = new PointF();
-                experimentRunView.toScreen(data.positionReal, screenPos);
+                experimentRunView.toScreen(data.getPosition(), screenPos);
                 sanitizeScreenPoint(screenPos);
-                experimentRunView.fromScreen(screenPos, data.positionReal);
+                experimentRunView.fromScreen(screenPos, data.getPosition());
             }
             markerData.addMarkerData(data);
             markerData.selectMarkerData(markerData.getMarkerCount() - 1);
