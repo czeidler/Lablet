@@ -42,7 +42,6 @@ public class ExperimentAnalysis {
         if (tagMarkers.getMarkerCount() > 0) {
             Bundle tagMarkerBundle = new Bundle();
             int[] runIds = new int[tagMarkers.getMarkerCount()];
-            float[] runValues = new float[tagMarkers.getMarkerCount()];
             float[] xPositions = new float[tagMarkers.getMarkerCount()];
             float[] yPositions = new float[tagMarkers.getMarkerCount()];
             for (int i = 0; i < tagMarkers.getMarkerCount(); i++) {
@@ -66,6 +65,7 @@ public class ExperimentAnalysis {
     protected boolean loadAnalysisData(Bundle bundle, File storageDir) {
         tagMarkers.clear();
 
+        setExperimentSpecificData(bundle.getBundle("experiment_specific_data"));
         runDataModel.setCurrentRun(bundle.getInt("currentRun"));
 
         Bundle tagMarkerBundle = bundle.getBundle("tagMarkers");
@@ -85,7 +85,6 @@ public class ExperimentAnalysis {
             }
         }
 
-        setExperimentSpecificData(bundle.getBundle("experiment_specific_data"));
         return true;
     }
 

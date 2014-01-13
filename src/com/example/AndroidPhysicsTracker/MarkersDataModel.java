@@ -78,10 +78,10 @@ public class MarkersDataModel {
         int i = 0;
         for (; i < markerDataList.size(); i++) {
             MarkerData current = markerDataList.get(i);
-            if (current.getRunId() > data.getRunId())
-                break;
             if (current.getRunId() == data.getRunId())
                 return false;
+            if (current.getRunId() > data.getRunId())
+                break;
         }
         markerDataList.add(i, data);
         notifyDataAdded(i);
