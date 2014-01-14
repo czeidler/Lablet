@@ -29,11 +29,16 @@
             android:layout_width="100dp"
             android:layout_height="fill_parent">
         <view android:layout_width="wrap_content"
-              android:layout_height="367dp"
+              android:layout_height="268dp"
               class="com.example.AndroidPhysicsTracker.GraphView2D" android:id="@+id/tagMarkerGraphView"
               android:layout_gravity="center_horizontal"/>
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              class="com.example.AndroidPhysicsTracker.TableView" android:id="@+id/tagMarkerTableView"/>
+        <ScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/scrollView" android:layout_gravity="center_horizontal">
+            <view android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  class="com.example.AndroidPhysicsTracker.TableView" android:id="@+id/tagMarkerTableView"/>
+        </ScrollView>
     </LinearLayout>
 </LinearLayout>
