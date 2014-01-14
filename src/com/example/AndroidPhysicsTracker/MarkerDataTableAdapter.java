@@ -59,13 +59,14 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
         textView.setTextColor(Color.BLACK);
         textView.setBackgroundColor(Color.WHITE);
 
+        PointF position = model.getCalibratedMarkerPositionAt(row - 1);
         String text = new String();
         if (column == 0)
             text += data.getRunId();
         else if (column == 1)
-            text += data.getPosition().x;
+            text += position.x;
         else if (column == 2)
-            text += data.getPosition().y;
+            text += position.y;
         else if (column == 3)
             text += experiment.getRunValueAt(data.getRunId());
         else

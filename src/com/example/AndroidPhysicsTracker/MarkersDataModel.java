@@ -33,7 +33,7 @@ class MarkerData {
     }
 }
 
-public class MarkersDataModel {
+public class MarkersDataModel implements Calibration.ICalibrationListener {
     interface IMarkersDataModelListener {
         public void onDataAdded(MarkersDataModel model, int index);
         public void onDataRemoved(MarkersDataModel model, int index, MarkerData data);
@@ -45,10 +45,37 @@ public class MarkersDataModel {
     private List<MarkerData> markerDataList;
     private List<IMarkersDataModelListener> listeners;
     private int selectedDataIndex = -1;
+    private Calibration calibration = null;
 
     public MarkersDataModel() {
         markerDataList = new ArrayList<MarkerData>();
         listeners = new ArrayList<IMarkersDataModelListener>();
+    }
+
+    /**
+     * If calibration is set, listeners get an onAllDataChanged notification when the calibration changed.
+     * @param calibration
+     */
+    public void setCalibration(Calibration calibration) {
+        if (this.calibration != null)
+            this.calibration.removeListener(this);
+        this.calibration = calibration;
+        this.calibration.addListener(this);
+        notifyAllDataChanged();
+    }
+
+    @Override
+    public void onCalibrationChanged() {
+        notifyAllDataChanged();
+    }
+
+    public PointF getCalibratedMarkerPositionAt(int index) {
+        MarkerData data = getMarkerDataAt(index);
+        PointF raw = data.getPosition();
+        if (calibration == null)
+            return raw;
+        PointF calibratedPosition = new PointF(calibration.fromXRaw(raw.x), calibration.fromYRaw(raw.y));
+        return calibratedPosition;
     }
 
     public void selectMarkerData(int index) {

@@ -10,8 +10,12 @@ public class ExperimentAnalysis {
     private Experiment experiment;
 
     private RunDataModel runDataModel;
+    private Calibration calibration;
+
     private MarkersDataModel tagMarkers;
     private MarkersDataModel xyCalibrationMarkers;
+    private XYCalibrationSetter xyCalibrationSetter;
+
     private Bundle experimentSpecificData = null;
 
     public ExperimentAnalysis(Experiment experiment) {
@@ -20,19 +24,27 @@ public class ExperimentAnalysis {
         runDataModel = new RunDataModel();
         runDataModel.setNumberOfRuns(experiment.getNumberOfRuns());
 
+        calibration = new Calibration();
+
         tagMarkers = new MarkersDataModel();
+        tagMarkers.setCalibration(calibration);
+
         xyCalibrationMarkers = new MarkersDataModel();
         MarkerData point1 = new MarkerData(-1);
-        point1.setPosition(new PointF(20, 20));
+        point1.setPosition(new PointF(10, 10));
         xyCalibrationMarkers.addMarkerData(point1);
         MarkerData point2 = new MarkerData(-2);
-        point2.setPosition(new PointF(100, 20));
+        point2.setPosition(new PointF(30, 10));
         xyCalibrationMarkers.addMarkerData(point2);
+        xyCalibrationSetter = new XYCalibrationSetter(calibration, xyCalibrationMarkers);
     }
 
     public Experiment getExperiment() { return  experiment; }
     public RunDataModel getRunDataModel() {
         return runDataModel;
+    }
+    public Calibration getCalibration() {
+        return calibration;
     }
     public MarkersDataModel getTagMarkers() {
         return tagMarkers;

@@ -375,6 +375,7 @@ class TagMarkerDataModelPainter extends AbstractMarkersPainter {
 }
 
 class CalibrationMarkerPainter extends AbstractMarkersPainter {
+    private Calibration calibration;
 
     public CalibrationMarkerPainter(View parent, IExperimentRunView runView, MarkersDataModel model) {
         super(parent, runView, model);
@@ -400,27 +401,6 @@ class CalibrationMarkerPainter extends AbstractMarkersPainter {
         canvas.drawLine(screenPos1.x, screenPos1.y, screenPos2.x, screenPos2.y, paint);
     }
 
-    public void addMarker(int row) {
-        DragableMarker marker = createMarkerForRow(row);
-        marker.setPosition(markerData.getMarkerDataAt(row).getPosition());
-        markerList.add(row, marker);
-    }
-
-    public void updateMarker(int row) {
-        IMarker marker = markerList.get(row);
-        marker.setPosition(markerData.getMarkerDataAt(row).getPosition());
-    }
-    
-    @Override
-    public void markerMoveRequest(DragableMarker marker, PointF newPosition) {
-        int row = markerList.lastIndexOf(marker);
-        if (row < 0)
-            return;
-
-        sanitizeScreenPoint(newPosition);
-        markerData.setMarkerPosition(newPosition, row);
-    }
-
     @Override
     public List<IMarker> getSelectableMarkerList() {
         return markerList;
@@ -433,7 +413,9 @@ class CalibrationMarkerPainter extends AbstractMarkersPainter {
 
     private PointF getScreenPos(int markerIndex) {
         MarkerData data = markerData.getMarkerDataAt(markerIndex);
-        return data.getPosition();
+        PointF screen = new PointF();
+        experimentRunView.toScreen(data.getPosition(), screen);
+        return screen;
     }
 }
 
