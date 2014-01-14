@@ -109,6 +109,7 @@ abstract class DragableMarker implements IMarker {
 class SimpleMarker extends DragableMarker {
     final static float RADIUS = 30;
     final static float RING_RADIUS = 100;
+    final static float RING_WIDTH = 40;
     private Paint paint = null;
     private int mainAlpha = 255;
 
@@ -140,7 +141,7 @@ class SimpleMarker extends DragableMarker {
 
         if (isSelected()) {
             paint.setColor(makeColor(100, 0, 200, 100));
-            paint.setStrokeWidth(RADIUS);
+            paint.setStrokeWidth(RING_WIDTH);
             paint.setStyle(Paint.Style.STROKE);
             canvas.drawCircle(position.x, position.y, RING_RADIUS, paint);
         }
@@ -154,7 +155,7 @@ class SimpleMarker extends DragableMarker {
 
     protected boolean isPointOnDragArea(PointF point) {
         float distance = (float)Math.sqrt(Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2));
-        if (distance < RING_RADIUS + RADIUS / 2 && distance > RING_RADIUS - RADIUS / 2)
+        if (distance < RING_RADIUS + RING_WIDTH / 2 && distance > RING_RADIUS - RING_WIDTH / 2)
             return true;
         return isPointOnSelectArea(point);
     }
@@ -374,6 +375,26 @@ class TagMarkerDataModelPainter extends AbstractMarkersPainter {
     }
 }
 
+class CalibrationMarker extends SimpleMarker {
+    private Paint paint = null;
+
+    public CalibrationMarker(AbstractMarkersPainter parentContainer) {
+        super(parentContainer);
+        paint = new Paint();
+    }
+
+    @Override
+    public void onDraw(Canvas canvas, float priority) {
+        if (isSelected()) {
+            super.onDraw(canvas, priority);
+            return;
+        }
+
+        paint.setColor(Color.argb(100, 0, 255, 0));
+        canvas.drawCircle(position.x, position.y, 7, paint);
+    }
+}
+
 class CalibrationMarkerPainter extends AbstractMarkersPainter {
     private Calibration calibration;
 
@@ -383,7 +404,7 @@ class CalibrationMarkerPainter extends AbstractMarkersPainter {
 
     @Override
     protected DragableMarker createMarkerForRow(int row) {
-        return new SimpleMarker(this);
+        return new CalibrationMarker(this);
     }
 
     @Override
@@ -397,6 +418,7 @@ class CalibrationMarkerPainter extends AbstractMarkersPainter {
         PointF screenPos1 = getScreenPos(0);
         PointF screenPos2 = getScreenPos(1);
         Paint paint = new Paint();
+        paint.setAntiAlias(true);
         paint.setColor(Color.GREEN);
         canvas.drawLine(screenPos1.x, screenPos1.y, screenPos2.x, screenPos2.y, paint);
     }
