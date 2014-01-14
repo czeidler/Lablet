@@ -2,6 +2,7 @@ package com.example.AndroidPhysicsTracker;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -120,6 +121,9 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        File csvFile = new File(experiment.getStorageDir(), "tag_markers.csv");
+        exportTagMarkerCSVData(csvFile);
     }
 
     protected boolean loadAnalysisDataToFile() {
@@ -145,6 +149,57 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         FileWriter fileWriter = new FileWriter(projectFile);
         PersistentBundle persistentBundle = new PersistentBundle();
         persistentBundle.flattenBundle(bundle, fileWriter);
+    }
+
+    protected void exportTagMarkerCSVData(File output) {
+        output.setWritable(true);
+        FileOutputStream outputStream = null;
+        if (!output.exists()) {
+            try {
+                output.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+        try {
+            outputStream = new FileOutputStream(output);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        MarkersDataModel tagMarkers = experimentAnalysis.getTagMarkers();
+        try {
+            outputStream.write("id, x, y, runValue\n".getBytes());
+            for (int i = 0; i < tagMarkers.getMarkerCount(); i++) {
+                MarkerData markerData = tagMarkers.getMarkerDataAt(i);
+                String string = "";
+                string += markerData.getRunId();
+                outputStream.write(string.getBytes());
+                outputStream.write(",".getBytes());
+
+                PointF position = tagMarkers.getCalibratedMarkerPositionAt(i);
+                string = "";
+                string += position.x;
+                outputStream.write(string.getBytes());
+                outputStream.write(",".getBytes());
+
+                string = "";
+                string += position.y;
+                outputStream.write(string.getBytes());
+                outputStream.write(",".getBytes());
+
+                string = "";
+                string += experiment.getRunValueAt(i);
+                outputStream.write(string.getBytes());
+
+                outputStream.write("\n".getBytes());
+            }
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
