@@ -72,19 +72,29 @@ public class PersistentBundle {
                             handleValue(new FloatHandlerHelper(), parser, keyName, bundle);
                         else if (typeName.equals("double"))
                             handleValue(new DoubleHandlerHelper(), parser, keyName, bundle);
-                        else if (typeName.equals("string_array"))
+                        else if (typeName.equals("string_array")) {
                             handleArray(new StringHandlerHelper(), parser, keyName, bundle);
-                        else if (typeName.equals("int_array"))
+                            // handleArray read its own end tag
+                            endTagCount++;
+                        } else if (typeName.equals("int_array")) {
                             handleArray(new IntegerHandlerHelper(), parser, keyName, bundle);
-                        else if (typeName.equals("boolean_array"))
+                            // handleArray read its own end tag
+                            endTagCount++;
+                        } else if (typeName.equals("boolean_array")) {
                             handleArray(new BooleanHandlerHelper(), parser, keyName, bundle);
-                        else if (typeName.equals("float_array"))
+                            // handleArray read its own end tag
+                            endTagCount++;
+                        } else if (typeName.equals("float_array")) {
                             handleArray(new FloatHandlerHelper(), parser, keyName, bundle);
-                        else if (typeName.equals("double_array"))
+                            // handleArray read its own end tag
+                            endTagCount++;
+                        } else if (typeName.equals("double_array")) {
                             handleArray(new DoubleHandlerHelper(), parser, keyName, bundle);
-                        else if (typeName.equals("bundle")) {
+                            // handleArray read its own end tag
+                            endTagCount++;
+                        } else if (typeName.equals("bundle")) {
                             handleBundle(parser, keyName, bundle);
-                            // handle bundle read its own end tag
+                            // handleBundle read its own end tag
                             endTagCount++;
                         } else
                             throw new NotSerializableException();
