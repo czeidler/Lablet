@@ -68,22 +68,28 @@ public class Calibration {
 }
 
 
-class XYCalibrationSetter implements MarkersDataModel.IMarkersDataModelListener {
+class LengthCalibrationSetter implements MarkersDataModel.IMarkersDataModelListener {
     private Calibration calibration;
     private MarkersDataModel calibrationMarkers;
 
     private float calibrationValue;
 
-    public  XYCalibrationSetter(Calibration calibration, MarkersDataModel data) {
+    public LengthCalibrationSetter(Calibration calibration, MarkersDataModel data) {
         this.calibration = calibration;
         this.calibrationMarkers = data;
         this.calibrationMarkers.addListener(this);
 
         calibrationValue = 1;
+        calibrate();
     }
 
     public void setCalibrationValue(float value) {
         calibrationValue = value;
+        calibrate();
+    }
+
+    public float getCalibrationValue() {
+        return calibrationValue;
     }
 
     private void calibrate() {

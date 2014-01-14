@@ -1,20 +1,13 @@
 package com.example.AndroidPhysicsTracker;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import org.xmlpull.v1.XmlPullParserException;
+import android.view.*;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class ExperimentAnalyserActivity extends ExperimentActivity {
@@ -54,7 +47,21 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             settingsItem.setVisible(false);
         }
 
-        return super.onCreateOptionsMenu(menu);
+        MenuItem calibrationMenu = menu.findItem(R.id.action_calibration_settings);
+        calibrationMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                startCalibrationMenu();
+                return true;
+            }
+        });
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void startCalibrationMenu() {
+        CalibrationView calibrationView = new CalibrationView(this, experimentAnalysis.getLengthCalibrationSetter());
+        calibrationView.show();
     }
 
     private void startRunSettingsActivity(Bundle analysisSpecificData) {
@@ -78,6 +85,8 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             return;
         }
     }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -92,6 +101,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         ViewPager pager = (ViewPager)findViewById(R.id.pager);
         ScreenSlidePagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
+
     }
 
     @Override

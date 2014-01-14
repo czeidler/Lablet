@@ -10,4 +10,8 @@
           android:icon="@drawable/ic_launcher"
           android:title="@string/action_analyse"
           yourapp:showAsAction="ifRoom|withText"/>
+    <item android:id="@+id/action_calibration_settings"
+          android:icon="@drawable/ic_launcher"
+          android:title="@string/action_calibration"
+          yourapp:showAsAction="ifRoom|withText"/>
 </menu>

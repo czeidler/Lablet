@@ -13,8 +13,9 @@ public class ExperimentAnalysis {
     private Calibration calibration;
 
     private MarkersDataModel tagMarkers;
-    private MarkersDataModel xyCalibrationMarkers;
-    private XYCalibrationSetter xyCalibrationSetter;
+    private MarkersDataModel lengthCalibrationMarkers;
+
+    private LengthCalibrationSetter lengthCalibrationSetter;
 
     private Bundle experimentSpecificData = null;
 
@@ -29,14 +30,14 @@ public class ExperimentAnalysis {
         tagMarkers = new MarkersDataModel();
         tagMarkers.setCalibration(calibration);
 
-        xyCalibrationMarkers = new MarkersDataModel();
+        lengthCalibrationMarkers = new MarkersDataModel();
         MarkerData point1 = new MarkerData(-1);
-        point1.setPosition(new PointF(10, 10));
-        xyCalibrationMarkers.addMarkerData(point1);
+        point1.setPosition(new PointF(10, 90));
+        lengthCalibrationMarkers.addMarkerData(point1);
         MarkerData point2 = new MarkerData(-2);
-        point2.setPosition(new PointF(30, 10));
-        xyCalibrationMarkers.addMarkerData(point2);
-        xyCalibrationSetter = new XYCalibrationSetter(calibration, xyCalibrationMarkers);
+        point2.setPosition(new PointF(30, 90));
+        lengthCalibrationMarkers.addMarkerData(point2);
+        lengthCalibrationSetter = new LengthCalibrationSetter(calibration, lengthCalibrationMarkers);
     }
 
     public Experiment getExperiment() { return  experiment; }
@@ -46,10 +47,13 @@ public class ExperimentAnalysis {
     public Calibration getCalibration() {
         return calibration;
     }
+    public LengthCalibrationSetter getLengthCalibrationSetter() {
+        return lengthCalibrationSetter;
+    }
     public MarkersDataModel getTagMarkers() {
         return tagMarkers;
     }
-    public MarkersDataModel getXYCalibrationMarkers() { return xyCalibrationMarkers; }
+    public MarkersDataModel getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
     public Bundle getExperimentSpecificData() { return experimentSpecificData; }
     public void setExperimentSpecificData(Bundle data) {
         experimentSpecificData = data;
@@ -79,6 +83,15 @@ public class ExperimentAnalysis {
             analysisDataBundle.putBundle("tagMarkers", tagMarkerBundle);
         }
 
+
+        PointF point1 = lengthCalibrationMarkers.getMarkerDataAt(0).getPosition();
+        PointF point2 = lengthCalibrationMarkers.getMarkerDataAt(1).getPosition();
+        analysisDataBundle.putFloat("lengthCalibrationPoint1x", point1.x);
+        analysisDataBundle.putFloat("lengthCalibrationPoint1y", point1.y);
+        analysisDataBundle.putFloat("lengthCalibrationPoint2x", point2.x);
+        analysisDataBundle.putFloat("lengthCalibrationPoint2y", point2.y);
+        analysisDataBundle.putFloat("lengthCalibrationValue", lengthCalibrationSetter.getCalibrationValue());
+
         if (experimentSpecificData != null)
             analysisDataBundle.putBundle("experiment_specific_data", experimentSpecificData);
         return analysisDataBundle;
@@ -106,6 +119,19 @@ public class ExperimentAnalysis {
                 }
             }
         }
+
+        PointF point1 = lengthCalibrationMarkers.getMarkerDataAt(0).getPosition();
+        PointF point2 = lengthCalibrationMarkers.getMarkerDataAt(1).getPosition();
+        if (bundle.containsKey("lengthCalibrationPoint1x"))
+            point1.x = bundle.getFloat("lengthCalibrationPoint1x");
+        if (bundle.containsKey("lengthCalibrationPoint1y"))
+            point1.y = bundle.getFloat("lengthCalibrationPoint1y");
+        if (bundle.containsKey("lengthCalibrationPoint2x"))
+            point2.x = bundle.getFloat("lengthCalibrationPoint2x");
+        if (bundle.containsKey("lengthCalibrationPoint2y"))
+            point2.y = bundle.getFloat("lengthCalibrationPoint2y");
+        if (bundle.containsKey("lengthCalibrationValue"))
+            lengthCalibrationSetter.setCalibrationValue(bundle.getFloat("lengthCalibrationValue"));
 
         return true;
     }
