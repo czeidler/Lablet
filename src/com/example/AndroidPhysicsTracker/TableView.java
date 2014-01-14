@@ -52,8 +52,8 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
         row ++;
         TableRow tableRow = createRow(row);
         addView(tableRow, row);
-        if (adapter.getSelectedRow() == row)
-            selectRow(row);
+        if (adapter.getSelectedRow() == row - 1)
+            selectRow(row - 1);
     }
 
     @Override
