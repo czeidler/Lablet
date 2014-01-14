@@ -105,6 +105,13 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        experimentAnalysis.getRunDataModel().setCurrentRun(experimentAnalysis.getRunDataModel().getCurrentRun());
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
 
