@@ -17,6 +17,10 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
 
     ExperimentAnalysis experimentAnalysis;
 
+    public ExperimentAnalysis getExperimentAnalysis() {
+        return experimentAnalysis;
+    }
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (getExperiment() == null)
@@ -210,11 +214,11 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
             if (position == 0)
-                return new AnalysisRunViewFragment(plugin, experimentAnalysis);
+                return new AnalysisRunViewFragment();
             else if (position == 1)
-                return new AnalysisMixedDataFragment(plugin, experimentAnalysis);
+                return new AnalysisMixedDataFragment();
             else if (position == 2)
-                return new AnalysisTableGraphDataFragment(plugin, experimentAnalysis);
+                return new AnalysisTableGraphDataFragment();
             return null;
         }
 

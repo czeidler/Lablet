@@ -28,6 +28,9 @@ abstract public class ExperimentActivity extends FragmentActivity {
     public Experiment getExperiment() {
         return experiment;
     }
+    public ExperimentPlugin getExperimentPlugin() {
+        return plugin;
+    }
 
     protected Bundle loadBundleFromFile(File file) {
         Bundle bundle = null;
