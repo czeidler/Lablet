@@ -43,7 +43,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
                 return true;
             }
         });
-        return super.onCreateOptionsMenu(menu);
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override

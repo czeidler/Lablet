@@ -58,7 +58,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
                 return true;
             }
         });
-        return super.onCreateOptionsMenu(menu);
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
