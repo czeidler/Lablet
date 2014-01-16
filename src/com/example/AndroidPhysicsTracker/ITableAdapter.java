@@ -11,6 +11,7 @@ public interface ITableAdapter<T> {
 
     public T getRow(int row);
     public View getView(Context context, int row, int column);
+    public void updateView(View view, int row, int column);
 
     public void selectRow(int row);
     public int getSelectedRow();
@@ -22,7 +23,7 @@ public interface ITableAdapter<T> {
     public interface ITableAdapterListener {
         public void onRowAdded(ITableAdapter<?> table, int row);
         public void onRowRemoved(ITableAdapter<?> table, int row);
-        public void onRowUpdated(ITableAdapter<?> table, int row);
+        public void onRowUpdated(ITableAdapter<?> table, int row, int number);
         public void onAllRowsUpdated(ITableAdapter<?> table);
         public void onRowSelected(ITableAdapter<?> table, int row);
     }

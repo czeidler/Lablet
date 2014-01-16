@@ -2,6 +2,9 @@ package com.example.AndroidPhysicsTracker;
 
 import android.content.Context;
 import android.graphics.*;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +23,7 @@ interface IMarker {
     public void setSelected(boolean selected);
     public boolean isSelected();
 
+    public PointF getPosition();
     public void setPosition(PointF position);
 }
 
@@ -40,6 +44,9 @@ abstract class DragableMarker implements IMarker {
         parent = parentContainer;
     }
 
+    public PointF getPosition() {
+        return position;
+    }
     public void setPosition(PointF pos) {
         position = pos;
     }
@@ -71,6 +78,9 @@ abstract class DragableMarker implements IMarker {
 
         isDragging = false;
 
+        if (wasDragging)
+            parent.markerMoveRequest(this, position);
+
         return wasDragging;
     }
 
@@ -95,7 +105,7 @@ abstract class DragableMarker implements IMarker {
     }
 
     protected void onDraggedTo(PointF point) {
-        parent.markerMoveRequest(this, point);
+        setPosition(point);
     }
 
     abstract protected boolean isPointOnSelectArea(PointF point);
@@ -225,6 +235,7 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
             return;
 
         sanitizeScreenPoint(newPosition);
+        marker.setPosition(newPosition);
 
         PointF newReal = new PointF();
         experimentRunView.fromScreen(newPosition, newReal);
@@ -267,12 +278,14 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
             markerData.selectMarkerData(0);
     }
 
-    public void updateMarker(int row) {
-        IMarker marker = markerList.get(row);
-        MarkerData data = markerData.getMarkerDataAt(row);
-        PointF screenPos = new PointF();
-        experimentRunView.toScreen(data.getPosition(), screenPos);
-        marker.setPosition(screenPos);
+    public void updateMarker(int row, int number) {
+        for (int i = row; i < row + number; i++) {
+            IMarker marker = markerList.get(i);
+            MarkerData data = markerData.getMarkerDataAt(i);
+            PointF screenPos = new PointF();
+            experimentRunView.toScreen(data.getPosition(), screenPos);
+            marker.setPosition(screenPos);
+        }
     }
 
     @Override
@@ -288,8 +301,8 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
     }
 
     @Override
-    public void onDataChanged(MarkersDataModel model, int index) {
-        updateMarker(index);
+    public void onDataChanged(MarkersDataModel model, int index, int number) {
+        updateMarker(index, number);
         markerView.invalidate();
     }
 
@@ -434,10 +447,7 @@ class CalibrationMarkerPainter extends AbstractMarkersPainter {
     }
 
     private PointF getScreenPos(int markerIndex) {
-        MarkerData data = markerData.getMarkerDataAt(markerIndex);
-        PointF screen = new PointF();
-        experimentRunView.toScreen(data.getPosition(), screen);
-        return screen;
+        return markerList.get(markerIndex).getPosition();
     }
 }
 

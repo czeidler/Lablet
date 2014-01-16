@@ -22,6 +22,7 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
 
     public TableView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setAlwaysDrawnWithCacheEnabled(true);
     }
 
     public void setAdapter(ITableAdapter<?> tableAdapter) {
@@ -64,10 +65,12 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
     }
 
     @Override
-    public void onRowUpdated(ITableAdapter<?> table, int row) {
-        // TODO reuse the existing TableRow?
-        onRowRemoved(table, row);
-        onRowAdded(table, row);
+    public void onRowUpdated(ITableAdapter<?> table, int row, int number) {
+        for (int i = row + 1; i < row + 1 + number; i++) {
+            TableRow tableRow = (TableRow)getChildAt(i);
+            for (int column = 0; column < adapter.getColumnCount(); column++)
+                adapter.updateView(tableRow.getChildAt(column), i, column);
+        }
     }
 
     @Override
@@ -87,6 +90,7 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
 
     private TableRow createRow(int row) {
         TableRow tableRow = new TableRow(getContext());
+
         TableLayout.LayoutParams params = new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT);
         tableRow.setLayoutParams(params);

@@ -114,7 +114,7 @@ class LengthCalibrationSetter implements MarkersDataModel.IMarkersDataModelListe
     }
 
     @Override
-    public void onDataChanged(MarkersDataModel model, int index) {
+    public void onDataChanged(MarkersDataModel model, int index, int number) {
         calibrate();
     }
 

@@ -2,6 +2,8 @@ package com.example.AndroidPhysicsTracker;
 
 
 import android.graphics.PointF;
+import android.os.Handler;
+import android.os.Message;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +39,7 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
     interface IMarkersDataModelListener {
         public void onDataAdded(MarkersDataModel model, int index);
         public void onDataRemoved(MarkersDataModel model, int index, MarkerData data);
-        public void onDataChanged(MarkersDataModel model, int index);
+        public void onDataChanged(MarkersDataModel model, int index, int number);
         public void onAllDataChanged(MarkersDataModel model);
         public void onDataSelected(MarkersDataModel model, int index);
     }
@@ -61,12 +63,12 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
             this.calibration.removeListener(this);
         this.calibration = calibration;
         this.calibration.addListener(this);
-        notifyAllDataChanged();
+        onCalibrationChanged();
     }
 
     @Override
     public void onCalibrationChanged() {
-        notifyAllDataChanged();
+        notifyDataChanged(0, markerDataList.size());
     }
 
     public PointF getCalibratedMarkerPositionAt(int index) {
@@ -90,7 +92,7 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
     public void setMarkerPosition(PointF position, int index) {
         MarkerData data = getMarkerDataAt(index);
         data.setPosition(position);
-        notifyDataChanged(index);
+        notifyDataChanged(index, 1);
     }
 
     public void addListener(IMarkersDataModelListener listener) {
@@ -144,9 +146,9 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
             listener.onDataRemoved(this, index, data);
     }
 
-    public void notifyDataChanged(int index) {
+    public void notifyDataChanged(int index, int number) {
         for (IMarkersDataModelListener listener : listeners)
-            listener.onDataChanged(this, index);
+            listener.onDataChanged(this, index, number);
     }
 
     public void notifyAllDataChanged() {

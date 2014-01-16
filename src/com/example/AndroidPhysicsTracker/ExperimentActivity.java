@@ -163,7 +163,7 @@ abstract public class ExperimentActivity extends FragmentActivity {
         if (file.isDirectory()) {
             String[] children = file.list();
             for (String child : children) {
-                if (!recursiveDeleteFile(new File(file, child)));
+                if (!recursiveDeleteFile(new File(file, child)))
                     return false;
             }
         }

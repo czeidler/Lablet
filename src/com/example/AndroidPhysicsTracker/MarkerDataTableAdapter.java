@@ -54,10 +54,22 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
         if (row == 0)
             return makeHeaderCell(context, column);
 
-        MarkerData data = getRow(row - 1);
         TextView textView = new TextView(context);
         textView.setTextColor(Color.BLACK);
         textView.setBackgroundColor(Color.WHITE);
+
+        populateTextView(textView, row, column);
+
+        return textView;
+    }
+
+    @Override
+    public void updateView(View view, int row, int column) {
+        populateTextView((TextView)view, row, column);
+    }
+
+    private void populateTextView(TextView textView, int row, int column) {
+        MarkerData data = getRow(row - 1);
 
         PointF position = model.getCalibratedMarkerPositionAt(row - 1);
         String text = new String();
@@ -73,7 +85,6 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
             throw new IndexOutOfBoundsException();
 
         textView.setText(text);
-        return textView;
     }
 
     private View makeHeaderCell(Context context, int column) {
@@ -122,8 +133,8 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
     }
 
     @Override
-    public void onDataChanged(MarkersDataModel model, int index) {
-        notifyRowChanged(index);
+    public void onDataChanged(MarkersDataModel model, int index, int number) {
+        notifyRowChanged(index, number);
     }
 
     @Override
@@ -146,9 +157,9 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
             listener.onRowRemoved(this, row);
     }
 
-    private void notifyRowChanged(int row) {
+    private void notifyRowChanged(int row, int number) {
         for (ITableAdapterListener listener : listeners)
-            listener.onRowUpdated(this, row);
+            listener.onRowUpdated(this, row, number);
     }
 
     private void notifyAllRowsChanged() {

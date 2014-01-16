@@ -6,6 +6,7 @@ import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.*;
 import android.widget.Button;
 import android.widget.MediaController;
@@ -115,11 +116,6 @@ public class CameraExperimentActivity extends ExperimentActivity {
             recorder.release();
             recorder = null;
         }
-
-        if (!done) {
-            // delete all files
-            deleteStorageDir();
-        }
         super.onDestroy();
     }
 
@@ -150,6 +146,11 @@ public class CameraExperimentActivity extends ExperimentActivity {
     @Override
     public void onPause() {
         setState(null);
+
+        if (!done) {
+            // delete all files
+            deleteStorageDir();
+        }
 
         camera.release();
         camera = null;

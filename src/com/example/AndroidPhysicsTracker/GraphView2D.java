@@ -18,7 +18,7 @@ interface IGraphAdapter {
     interface IGraphAdapterListener {
         public void onDataPointAdded(IGraphAdapter graph, int index);
         public void onDataPointRemoved(IGraphAdapter graph, int index);
-        public void onDataPointChanged(IGraphAdapter graph, int index);
+        public void onDataPointChanged(IGraphAdapter graph, int index, int number);
         public void onAllDataPointsChanged(IGraphAdapter graph);
         public void onDataPointSelected(IGraphAdapter graph, int index);
     }
@@ -72,7 +72,7 @@ public class GraphView2D extends LineGraphView implements IGraphAdapter.IGraphAd
     }
 
     @Override
-    public void onDataPointChanged(IGraphAdapter graph, int index) {
+    public void onDataPointChanged(IGraphAdapter graph, int index, int number) {
         refillGraph();
     }
 
@@ -155,8 +155,8 @@ class MarkerGraphAdapter implements IGraphAdapter, MarkersDataModel.IMarkersData
     }
 
     @Override
-    public void onDataChanged(MarkersDataModel model, int index) {
-        notifyDataChanged(index);
+    public void onDataChanged(MarkersDataModel model, int index, int number) {
+        notifyDataChanged(index, number);
     }
 
     @Override
@@ -179,9 +179,9 @@ class MarkerGraphAdapter implements IGraphAdapter, MarkersDataModel.IMarkersData
             listener.onDataPointRemoved(this, index);
     }
 
-    public void notifyDataChanged(int index) {
+    public void notifyDataChanged(int index, int number) {
         for (IGraphAdapterListener listener : listeners)
-            listener.onDataPointChanged(this, index);
+            listener.onDataPointChanged(this, index, number);
     }
 
     public void notifyAllDataChanged() {
