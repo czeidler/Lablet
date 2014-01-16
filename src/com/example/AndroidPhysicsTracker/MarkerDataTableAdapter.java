@@ -76,9 +76,9 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
         if (column == 0)
             text += data.getRunId();
         else if (column == 1)
-            text += position.x;
+            text += String.format("%.2f", position.x);
         else if (column == 2)
-            text += position.y;
+            text += String.format("%.2f", position.y);
         else if (column == 3)
             text += experiment.getRunValueAt(data.getRunId());
         else
