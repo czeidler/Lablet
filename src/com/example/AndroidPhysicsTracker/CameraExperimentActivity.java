@@ -142,6 +142,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
         if (camera == null)
             camera = Camera.open();
 
+
         if (previewHolder.getSurface() != null)
             setState(new PreviewState());
     }
@@ -165,8 +166,9 @@ public class CameraExperimentActivity extends ExperimentActivity {
             recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             recorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
 
-            CamcorderProfile profile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH);
-            recorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameWidth);
+            //TODO: the quality may change for different cameras. Find the quality matching with the pref preview size.
+            CamcorderProfile profile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_480P);
+            recorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
             recorder.setVideoFrameRate(profile.videoFrameRate);
             recorder.setVideoEncodingBitRate(profile.videoBitRate);
 
