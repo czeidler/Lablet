@@ -2,6 +2,7 @@ package com.example.AndroidPhysicsTracker;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -107,6 +108,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         ScreenSlidePagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
 
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
     @Override
