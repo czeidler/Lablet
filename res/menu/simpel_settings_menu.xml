@@ -3,11 +3,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:yourapp="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/action_cancel"
-          android:icon="@drawable/ic_launcher"
+          android:icon="@drawable/ic_action_cancel"
           android:title="@string/action_cancel"
           yourapp:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/action_apply"
-          android:icon="@drawable/ic_launcher"
+          android:icon="@drawable/ic_action_accept"
           android:title="@string/action_apply"
           yourapp:showAsAction="ifRoom|withText"/>
 </menu>
