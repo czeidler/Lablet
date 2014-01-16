@@ -59,7 +59,7 @@ abstract class DragableMarker implements IMarker {
         if (!isSelected) {
             if (isPointOnSelectArea(point))
                 isSelected = true;
-            if (isPointOnDragArea(point))
+            if (isSelected && isPointOnDragArea(point))
                 isDragging = true;
 
             if (isSelected || isDragging)
