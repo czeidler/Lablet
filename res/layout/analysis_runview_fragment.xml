@@ -8,7 +8,8 @@
     <view android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           class="com.example.AndroidPhysicsTracker.RunContainerView" android:id="@+id/experimentRunContainer"
-          android:layout_alignParentTop="true" android:layout_above="@+id/experimentRunViewControl"
+          android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:layout_alignParentRight="true"
+          android:layout_above="@+id/experimentRunViewControl"
           android:layout_marginLeft="0dp" android:layout_marginTop="0dp" android:gravity="center_vertical|center_horizontal"/>
     <view android:layout_width="fill_parent"
           android:layout_height="wrap_content"

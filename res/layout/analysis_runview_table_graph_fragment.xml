@@ -10,23 +10,24 @@
             android:layout_weight="3"
             android:layout_width="100dp"
             android:layout_height="fill_parent">
+        <view android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              class="com.example.AndroidPhysicsTracker.ExperimentRunViewControl" android:id="@+id/experimentRunViewControl"
+              android:orientation="horizontal"
+              android:layout_below="@+id/experimentRunContainer"
+              android:layout_alignParentLeft="true" android:layout_alignParentRight="true"
+              android:layout_alignParentBottom="true"/>
         <view android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               class="com.example.AndroidPhysicsTracker.RunContainerView" android:id="@+id/experimentRunContainer"
               android:layout_alignParentLeft="true" android:layout_alignParentRight="true"
               android:layout_alignParentTop="true"
               android:layout_marginLeft="0dp" android:layout_marginTop="0dp"/>
-        <view android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              class="com.example.AndroidPhysicsTracker.ExperimentRunViewControl" android:id="@+id/experimentRunViewControl"
-              android:orientation="horizontal"
-              android:layout_below="@+id/experimentRunContainer"
-              android:layout_alignParentLeft="true" android:layout_alignParentRight="true"/>
     </RelativeLayout>
     <LinearLayout
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_width="100dp"
+            android:layout_width="120dp"
             android:layout_height="fill_parent">
         <view android:layout_width="wrap_content"
               android:layout_height="268dp"

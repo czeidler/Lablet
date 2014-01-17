@@ -42,9 +42,9 @@ class VideoFrameView extends SurfaceView {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        float ratio = 4/3;
+        float ratio = 4.f/3;
         if (seekToFrameExtractor != null)
-            ratio = (float)(getVideoWidth()) / getVideoHeight();
+            ratio = ((float)getVideoWidth()) / getVideoHeight();
 
         int specWidthMode = MeasureSpec.getMode(widthMeasureSpec);
         int specHeightMode = MeasureSpec.getMode(heightMeasureSpec);
@@ -56,10 +56,10 @@ class VideoFrameView extends SurfaceView {
         if ((float)(specWidth) / specHeight < ratio) {
             // smaller ratio than the video
             width = specWidth;
-            height = (int)(width / ratio);
+            height = (int)((float)width / ratio);
         } else {
             height = specHeight;
-            width = (int)(height * ratio);
+            width = (int)((float)height * ratio);
         }
 
         if (specWidthMode == MeasureSpec.AT_MOST || specHeightMode == MeasureSpec.AT_MOST) {
