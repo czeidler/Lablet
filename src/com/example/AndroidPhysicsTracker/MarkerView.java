@@ -126,6 +126,7 @@ class SimpleMarker extends DragableMarker {
     public SimpleMarker(AbstractMarkersPainter parentContainer) {
         super(parentContainer);
         paint = new Paint();
+        paint.setAntiAlias(true);
     }
 
     @Override
