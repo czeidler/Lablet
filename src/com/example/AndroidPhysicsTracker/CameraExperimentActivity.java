@@ -174,6 +174,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
             builder.create().show();
         } else {
+            deleteStorageDir();
             setResult(RESULT_CANCELED);
             finish();
         }
