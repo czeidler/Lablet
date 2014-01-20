@@ -6,4 +6,5 @@
     <string name="action_cancel">Cancel</string>
     <string name="action_apply">Apply</string>
     <string name="action_calibration">Calibration</string>
+    <string name="action_delete">Delete</string>
 </resources>

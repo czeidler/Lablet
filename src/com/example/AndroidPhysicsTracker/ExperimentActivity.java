@@ -159,7 +159,7 @@ abstract public class ExperimentActivity extends FragmentActivity {
         return recursiveDeleteFile(file);
     }
 
-    private boolean recursiveDeleteFile(File file) {
+    static public boolean recursiveDeleteFile(File file) {
         if (file.isDirectory()) {
             String[] children = file.list();
             for (String child : children) {
