@@ -10,12 +10,18 @@
             android:layout_height="wrap_content"
             android:id="@+id/seekBar" android:layout_gravity="center_horizontal"
             android:layout_above="@+id/frameRatePicker" android:layout_alignParentLeft="true"/>
-    <view android:layout_width="wrap_content"
-          android:layout_height="fill_parent"
-          class="com.example.AndroidPhysicsTracker.VideoFrameView" android:id="@+id/videoFrameView"
-          android:layout_gravity="center_horizontal"
-          android:layout_above="@+id/seekBar" android:layout_centerHorizontal="true"
-          android:layout_alignParentTop="true"/>
+    <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_above="@+id/seekBar"
+            android:layout_alignParentTop="true">
+            <view android:layout_width="wrap_content"
+                  android:layout_height="match_parent"
+                  android:layout_gravity="center_horizontal"
+                  class="com.example.AndroidPhysicsTracker.VideoFrameView" android:id="@+id/videoFrameView"
+                  android:layout_centerHorizontal="true" android:layout_alignParentBottom="true"
+                  android:layout_alignParentTop="true"/>
+    </RelativeLayout>
     <NumberPicker
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
