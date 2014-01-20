@@ -56,6 +56,8 @@ public class AndroidPhysicsTracker extends Activity {
     private List<ExperimentPlugin> experimentPluginList = null;
     private ArrayList<ExperimentDirectoryEntry> experimentList = null;
     private CheckBoxAdapter experimentListAdaptor = null;
+    private CheckBox selectAllCheckBox = null;
+    private MenuItem deleteItem = null;
     private AlertDialog deleteExperimentAlertBox = null;
     private ListView experimentListView = null;
     private ExperimentDirObserver experimentDirObserver = null;
@@ -85,7 +87,7 @@ public class AndroidPhysicsTracker extends Activity {
 
         deleteExperimentAlertBox = builder.create();
 
-        final MenuItem deleteItem = menu.findItem(R.id.action_delete);
+        deleteItem = menu.findItem(R.id.action_delete);
         assert deleteItem != null;
         deleteItem.setVisible(false);
         deleteItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -125,9 +127,14 @@ public class AndroidPhysicsTracker extends Activity {
     private void deleteSelectedExperiments() {
         File experimentDir = Experiment.getMainExperimentDir(this);
         for (ExperimentDirectoryEntry entry : experimentList) {
+            if (!entry.getSelected())
+                continue;
             File experimentFile = new File(experimentDir, entry.getName());
             ExperimentActivity.recursiveDeleteFile(experimentFile);
         }
+        selectAllCheckBox.setChecked(false);
+        deleteItem.setVisible(false);
+        updateExperimentList();
     }
 
     @Override
@@ -169,7 +176,7 @@ public class AndroidPhysicsTracker extends Activity {
             }
         });
 
-        CheckBox selectAllCheckBox = (CheckBox)findViewById(R.id.checkBoxSelectAll);
+        selectAllCheckBox = (CheckBox)findViewById(R.id.checkBoxSelectAll);
         selectAllCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
