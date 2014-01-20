@@ -1,12 +1,12 @@
 package com.example.AndroidPhysicsTracker;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.view.*;
 import android.widget.Button;
 import android.widget.MediaController;
@@ -31,7 +31,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
     private int cameraId = 0;
 
     private File videoFile = null;
-    private boolean done = false;
+    private boolean unsavedExperimentData = false;
 
     static final int CAMERA_FACE = Camera.CameraInfo.CAMERA_FACING_BACK;
 
@@ -45,8 +45,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
         backItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                setResult(RESULT_CANCELED);
-                finish();
+                onBackPressed();
                 return false;
             }
         });
@@ -147,14 +146,37 @@ public class CameraExperimentActivity extends ExperimentActivity {
     public void onPause() {
         setState(null);
 
-        if (!done) {
-            // delete all files
-            deleteStorageDir();
-        }
-
         camera.release();
         camera = null;
         super.onPause();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (unsavedExperimentData) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Experiment is not saved quit anyway?");
+            builder.setNegativeButton("Continue", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                }
+            });
+            builder.setPositiveButton("Discard Experiment!", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    deleteStorageDir();
+                    unsavedExperimentData = false;
+                    setResult(RESULT_CANCELED);
+                    finish();
+                }
+            });
+
+            builder.create().show();
+        } else {
+            setResult(RESULT_CANCELED);
+            finish();
+        }
     }
 
     private void startRecording() {
@@ -203,7 +225,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
     }
 
     private void finishExperiment() {
-        done = true;
+        unsavedExperimentData = false;
 
         ((CameraExperiment)experiment).setVideoFileName(getVideoFileName());
         try {
@@ -264,6 +286,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
     class PreviewState extends AbstractViewState {
         public void enterState() {
+            unsavedExperimentData = false;
             startButton.setEnabled(true);
             stopButton.setEnabled(false);
             newButton.setVisibility(View.INVISIBLE);
@@ -307,6 +330,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
                 stopRecording();
                 isRecording = false;
             }
+            unsavedExperimentData = true;
             camera.stopPreview();
         }
 
