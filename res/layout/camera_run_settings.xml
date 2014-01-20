@@ -40,7 +40,7 @@
             android:ems="10"
             android:id="@+id/editEnd"
             android:layout_alignParentBottom="true" android:layout_alignParentRight="true" android:editable="false"
-            android:enabled="false"/>
+            android:enabled="true"/>
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
             android:ems="10"
             android:id="@+id/editStart"
             android:layout_alignBottom="@+id/textView3" android:layout_toLeftOf="@+id/textView3"
-            android:editable="false" android:enabled="false"/>
+            android:editable="false" android:enabled="true"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -69,4 +69,17 @@
             android:text="Analysis End Position:"
             android:id="@+id/textView3"
             android:layout_alignBottom="@+id/editEnd" android:layout_toLeftOf="@+id/editEnd"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Frame length [ms]:"
+            android:id="@+id/textView4" android:layout_above="@+id/buttonSetStart"
+            android:layout_alignParentLeft="true"/>
+    <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/editFrameLength" android:layout_alignTop="@+id/buttonSetStart"
+            android:layout_alignParentLeft="true" android:layout_alignBottom="@+id/buttonSetStart"
+            android:layout_alignRight="@+id/textView4" android:editable="false" android:enabled="true"/>
 </RelativeLayout>
