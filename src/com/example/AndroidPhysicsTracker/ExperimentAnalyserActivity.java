@@ -107,6 +107,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         ViewPager pager = (ViewPager)findViewById(R.id.pager);
         ScreenSlidePagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
+        pager.setCurrentItem(1);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
