@@ -11,8 +11,19 @@ class StartEndMarker extends DragableMarker {
     private final float WIDTH = 30;
     private final float HEIGHT = 35;
 
+    Paint lightColor = new Paint();
+    Paint darkenColor = new Paint();
+
     public StartEndMarker(AbstractMarkersPainter parentContainer) {
         super(parentContainer);
+
+        lightColor.setColor(Color.rgb(0, 200, 0));
+        lightColor.setAntiAlias(true);
+        lightColor.setStyle(Paint.Style.FILL);
+
+        darkenColor.setColor(Color.rgb(0, 180, 0));
+        darkenColor.setAntiAlias(true);
+        darkenColor.setStyle(Paint.Style.FILL);
     }
 
     @Override
@@ -22,22 +33,33 @@ class StartEndMarker extends DragableMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
-        Paint paint = new Paint();
-        paint.setColor(Color.GREEN);
-        paint.setAntiAlias(true);
-        paint.setStyle(Paint.Style.FILL);
+
 
         final int TRIANGLE_HEIGHT = 10;
         Path path = new Path();
-        path.moveTo(position.x, 0);
-        path.lineTo(position.x + WIDTH / 2, TRIANGLE_HEIGHT);
-        path.lineTo(position.x - WIDTH / 2, TRIANGLE_HEIGHT);
 
-        canvas.drawPath(path, paint);
+        // bright left
+        path.moveTo(position.x, 0);
+        path.lineTo(position.x - WIDTH / 2, TRIANGLE_HEIGHT);
+        path.lineTo(position.x, TRIANGLE_HEIGHT);
+        canvas.drawPath(path, lightColor);
 
         RectF rect = getRect();
         rect.top = TRIANGLE_HEIGHT;
-        canvas.drawRect(rect, paint);
+        rect.right = position.x;
+        canvas.drawRect(rect, lightColor);
+
+        // darken right
+        path = new Path();
+        path.moveTo(position.x - 1, 0);
+        path.lineTo(position.x + WIDTH / 2, TRIANGLE_HEIGHT);
+        path.lineTo(position.x - 1, TRIANGLE_HEIGHT);
+        canvas.drawPath(path, darkenColor);
+
+        rect = getRect();
+        rect.top = TRIANGLE_HEIGHT;
+        rect.left = position.x -1;
+        canvas.drawRect(rect, darkenColor);
     }
 
     private RectF getRect() {
