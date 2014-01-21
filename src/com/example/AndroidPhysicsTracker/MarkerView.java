@@ -461,18 +461,17 @@ public class MarkerView extends ViewGroup {
     public MarkerView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        setWillNotDraw(false);
-
-        viewFrame = new Rect();
-        getDrawingRect(viewFrame);
-
-        markerPainterList = new ArrayList<IMarkerDataModelPainter>();
+        init();
     }
 
     public MarkerView(Context context, View target) {
         super(context);
         experimentRunView = (IExperimentRunView)target;
 
+        init();
+    }
+
+    private void init() {
         setWillNotDraw(false);
 
         viewFrame = new Rect();
@@ -555,6 +554,9 @@ public class MarkerView extends ViewGroup {
                     break;
                 }
             }
+            if (handled)
+                getParent().requestDisallowInterceptTouchEvent(true);
+
         } else if (action == MotionEvent.ACTION_UP) {
             for (IMarker marker : allMarkerList) {
                 if (marker.handleActionUp(event)) {
@@ -582,6 +584,7 @@ public class MarkerView extends ViewGroup {
             invalidate();
         }
         touchEventHandledLastTime = handled;
+
         return handled;
     }
 
