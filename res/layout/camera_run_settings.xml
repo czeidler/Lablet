@@ -5,16 +5,12 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent" android:focusableInTouchMode="true">
 
-    <SeekBar
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/seekBar" android:layout_gravity="center_horizontal"
-            android:layout_above="@+id/frameRatePicker" android:layout_alignParentLeft="true"/>
+
     <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_above="@+id/seekBar"
-            android:layout_alignParentTop="true">
+            android:layout_alignParentTop="true" android:layout_toLeftOf="@+id/frameRateLayout"
+            android:layout_above="@+id/seekBar" android:id="@+id/relativeLayout">
             <view android:layout_width="wrap_content"
                   android:layout_height="match_parent"
                   android:layout_gravity="center_horizontal"
@@ -22,70 +18,81 @@
                   android:layout_centerHorizontal="true" android:layout_alignParentBottom="true"
                   android:layout_alignParentTop="true"/>
     </RelativeLayout>
-    <NumberPicker
-            android:layout_width="wrap_content"
+    <SeekBar
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/frameRatePicker" android:layout_gravity="right"
-            android:layout_alignParentBottom="true" android:layout_toRightOf="@+id/textView"/>
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Analysis Frame Rate [Hz]:"
-            android:id="@+id/textView" android:layout_gravity="right"
-            android:layout_alignParentBottom="true" android:layout_alignParentLeft="true"/>
-    <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/buttonSetEnd"
-            android:layout_alignTop="@+id/buttonSetStart" android:layout_alignLeft="@+id/editEnd" android:text="Set From Current Pos"/>
+            android:id="@+id/seekBar" android:layout_gravity="center_horizontal"
+            android:layout_above="@+id/startEndSeekBar" android:layout_alignParentLeft="true"
+            android:layout_alignRight="@+id/relativeLayout"/>
+    <view android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          class="com.example.AndroidPhysicsTracker.StartEndSeekBar" android:id="@+id/startEndSeekBar"
+          android:layout_alignParentLeft="true"
+          android:layout_above="@+id/editStart" android:layout_alignRight="@+id/seekBar"/>
     <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/editEnd"
-            android:layout_alignParentBottom="true" android:layout_alignParentRight="true" android:editable="false"
-            android:enabled="true"/>
-    <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Set From Current Pos"
-            android:id="@+id/buttonSetStart"
-            android:layout_above="@+id/editStart" android:layout_alignLeft="@+id/editStart"/>
-    <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="number"
             android:ems="10"
             android:id="@+id/editStart"
-            android:layout_alignBottom="@+id/textView3" android:layout_toLeftOf="@+id/textView3"
-            android:editable="false" android:enabled="true"/>
+            android:editable="false" android:enabled="true"
+            android:layout_alignParentBottom="true" android:layout_toRightOf="@+id/textView2" android:focusable="false"/>
+    <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:id="@+id/editEnd"
+            android:editable="false"
+            android:enabled="true"
+            android:layout_alignParentBottom="true" android:layout_toRightOf="@+id/textView3" android:focusable="false"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Analysis Start Position:"
             android:id="@+id/textView2"
-            android:layout_alignBottom="@+id/editStart" android:layout_toLeftOf="@+id/editStart"/>
+            android:layout_alignParentBottom="true" android:layout_alignParentLeft="true"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Analysis End Position:"
             android:id="@+id/textView3"
-            android:layout_alignBottom="@+id/editEnd" android:layout_toLeftOf="@+id/editEnd"/>
-    <TextView
+            android:layout_alignParentBottom="true" android:layout_toRightOf="@+id/editStart"/>
+    <LinearLayout
+            android:id="@+id/frameRateLayout"
+            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Frame length [ms]:"
-            android:id="@+id/textView4" android:layout_above="@+id/buttonSetStart"
-            android:layout_alignParentLeft="true"/>
-    <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/editFrameLength" android:layout_alignTop="@+id/buttonSetStart"
-            android:layout_alignParentLeft="true" android:layout_alignBottom="@+id/buttonSetStart"
-            android:layout_alignRight="@+id/textView4" android:editable="false" android:enabled="true"/>
+            android:layout_height="wrap_content" android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Analysis Frame Rate [Hz]:"
+                android:id="@+id/textView" android:layout_gravity="left"/>
+        <NumberPicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/frameRatePicker" android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"/>
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Frame length [ms]:"
+                    android:id="@+id/textView4"/>
+            <EditText
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/editFrameLength"
+                    android:editable="false" android:enabled="true"
+                    android:focusable="false" android:inputType="none"
+                    android:minWidth="100dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
 </RelativeLayout>

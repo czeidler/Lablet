@@ -2,9 +2,7 @@ package com.example.AndroidPhysicsTracker;
 
 import android.content.Context;
 import android.graphics.*;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -202,7 +200,7 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
     protected IExperimentRunView experimentRunView = null;
     protected View markerView = null;
     protected MarkersDataModel markerData = null;
-
+    protected Rect frame = new Rect();
     protected List<IMarker> markerList;
 
 
@@ -225,6 +223,8 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
     }
 
     public void onViewSizeChanged() {
+        markerView.getDrawingRect(frame);
+
         markerList.clear();
         for (int i = 0; i < markerData.getMarkerCount(); i++)
             addMarker(i);
@@ -236,7 +236,6 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
             return;
 
         sanitizeScreenPoint(newPosition);
-        marker.setPosition(newPosition);
 
         PointF newReal = new PointF();
         experimentRunView.fromScreen(newPosition, newReal);
@@ -250,9 +249,6 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
     }
 
     protected void sanitizeScreenPoint(PointF point) {
-        View view = (View)experimentRunView;
-        Rect frame = new Rect();
-        view.getDrawingRect(frame);
         if (frame.left > point.x)
             point.x = frame.left;
         if (frame.right < point.x)
@@ -287,6 +283,16 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
             experimentRunView.toScreen(data.getPosition(), screenPos);
             marker.setPosition(screenPos);
         }
+    }
+
+    @Override
+    public List<IMarker> getSelectableMarkerList() {
+        return markerList;
+    }
+
+    @Override
+    public void setCurrentRun(int run) {
+
     }
 
     @Override
@@ -437,16 +443,6 @@ class CalibrationMarkerPainter extends AbstractMarkersPainter {
         canvas.drawLine(screenPos1.x, screenPos1.y, screenPos2.x, screenPos2.y, paint);
     }
 
-    @Override
-    public List<IMarker> getSelectableMarkerList() {
-        return markerList;
-    }
-
-    @Override
-    public void setCurrentRun(int run) {
-
-    }
-
     private PointF getScreenPos(int markerIndex) {
         return markerList.get(markerIndex).getPosition();
     }
@@ -454,13 +450,24 @@ class CalibrationMarkerPainter extends AbstractMarkersPainter {
 
 public class MarkerView extends ViewGroup {
     private IMarker selectedMarker = null;
-    private List<IMarkerDataModelPainter> markerPainterList;
-    private Rect viewFrame = null;
+    protected List<IMarkerDataModelPainter> markerPainterList;
+    protected Rect viewFrame = null;
     private boolean touchEventHandledLastTime = false;
     private IExperimentRunView experimentRunView = null;
 
     private int parentWidth;
     private int parentHeight;
+
+    public MarkerView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+
+        setWillNotDraw(false);
+
+        viewFrame = new Rect();
+        getDrawingRect(viewFrame);
+
+        markerPainterList = new ArrayList<IMarkerDataModelPainter>();
+    }
 
     public MarkerView(Context context, View target) {
         super(context);
@@ -486,7 +493,11 @@ public class MarkerView extends ViewGroup {
     }
 
     public void addTagMarkers(MarkersDataModel marker) {
-        markerPainterList.add(new TagMarkerDataModelPainter(this, experimentRunView, marker));
+        addPainter(new TagMarkerDataModelPainter(this, experimentRunView, marker));
+    }
+
+    protected void addPainter(IMarkerDataModelPainter painter) {
+        markerPainterList.add(painter);
     }
 
     public boolean removeMarkers(MarkersDataModel model) {
@@ -505,9 +516,9 @@ public class MarkerView extends ViewGroup {
             selectedMarker = null;
         }
 
-        for (IMarkerDataModelPainter tagMarkerCollection : markerPainterList) {
+        for (IMarkerDataModelPainter tagMarkerCollection : markerPainterList)
             tagMarkerCollection.setCurrentRun(run);
-        }
+
         invalidate();
     }
 
@@ -552,15 +563,15 @@ public class MarkerView extends ViewGroup {
                 }
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
-            if (viewFrame.contains((int)event.getX(), (int)event.getY())) {
+            //if (viewFrame.contains((int)event.getX(), (int)event.getY())) {
                 for (IMarker marker : allMarkerList) {
                     if (marker.handleActionMove(event)) {
                         handled = true;
                         break;
                     }
                 }
-            } else
-                handled = touchEventHandledLastTime;
+            //} else
+            //    handled = touchEventHandledLastTime;
         }
         if (handled)
             invalidate();

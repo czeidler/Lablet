@@ -1,6 +1,7 @@
 package com.example.AndroidPhysicsTracker;
 
 import android.content.Intent;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,9 +18,9 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
 
     private SeekBar seekBar = null;
     private NumberPicker frameRatePicker = null;
-    private EditText editVideoStart = null;
-    private EditText editVideoEnd = null;
-    private EditText editFrameLength = null;
+    private TextView editVideoStart = null;
+    private TextView editVideoEnd = null;
+    private TextView editFrameLength = null;
 
     private int videoStartValue;
     private int videoEndValue;
@@ -92,7 +93,49 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
             }
         });
 
-        editFrameLength = (EditText)findViewById(R.id.editFrameLength);
+        StartEndSeekBar startEndSeekBar = (StartEndSeekBar)findViewById(R.id.startEndSeekBar);
+        startEndSeekBar.setPadding(seekBar.getPaddingLeft(), seekBar.getPaddingTop(), seekBar.getPaddingRight(),
+                seekBar.getPaddingBottom());
+        startEndSeekBar.getMarkersDataModel().addListener(new MarkersDataModel.IMarkersDataModelListener() {
+            @Override
+            public void onDataAdded(MarkersDataModel model, int index) {
+
+            }
+
+            @Override
+            public void onDataRemoved(MarkersDataModel model, int index, MarkerData data) {
+
+            }
+
+            @Override
+            public void onDataChanged(MarkersDataModel model, int index, int number) {
+                int duration = cameraExperiment.getVideoDuration();
+                int progress = 0;
+                for (int i = index; i < index + number; i++) {
+                    if (i == 0) {
+                        progress = (int)(model.getMarkerDataAt(0).getPosition().x * duration);
+                        setVideoStart(progress);
+                    } else {
+                        progress = (int)(model.getMarkerDataAt(1).getPosition().x * duration);
+                        setVideoEnd(progress);
+                    }
+                }
+                seekBar.setProgress(progress);
+                seekTo(progress);
+            }
+
+            @Override
+            public void onAllDataChanged(MarkersDataModel model) {
+
+            }
+
+            @Override
+            public void onDataSelected(MarkersDataModel model, int index) {
+
+            }
+        });
+
+        editFrameLength = (TextView)findViewById(R.id.editFrameLength);
 
         frameRatePicker = (NumberPicker)findViewById(R.id.frameRatePicker);
         frameRatePicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
@@ -102,8 +145,8 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
             }
         });
 
-        editVideoStart = (EditText)findViewById(R.id.editStart);
-        editVideoEnd = (EditText)findViewById(R.id.editEnd);
+        editVideoStart = (TextView)findViewById(R.id.editStart);
+        editVideoEnd = (TextView)findViewById(R.id.editEnd);
 
         // get initial values
         Bundle runSettings = null;
@@ -116,8 +159,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
             cameraExperiment.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
         }
         int analysisFrameRate = cameraExperiment.getAnalysisFrameRate();
-        videoStartValue = cameraExperiment.getAnalysisVideoStart();
-        videoEndValue = cameraExperiment.getAnalysisVideoEnd();
+
 
         // initial views with values
         calculateFrameRateValues(videoFrameView.getVideoFrameRate());
@@ -127,34 +169,16 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         int pickerFrameRateIndex = getNumberPickerIndexForFrameRate(analysisFrameRate);
         frameRatePicker.setValue(pickerFrameRateIndex);
         setFrameRateLengthEdit(frameRateList.get(pickerFrameRateIndex));
+
+        videoStartValue = cameraExperiment.getAnalysisVideoStart();
+        videoEndValue = cameraExperiment.getAnalysisVideoEnd();
         setVideoStart(videoStartValue);
         setVideoEnd(videoEndValue);
-
-        Button setStartButton = (Button)findViewById(R.id.buttonSetStart);
-        setStartButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (seekBar.getProgress() >= videoEndValue) {
-                    toastMessage("Start value must be smaller than the end value!");
-                    return;
-                }
-                videoStartValue = seekBar.getProgress();
-                setVideoStart(videoStartValue);
-            }
-        });
-
-        Button setEndButton = (Button)findViewById(R.id.buttonSetEnd);
-        setEndButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (videoStartValue >= seekBar.getProgress()) {
-                    toastMessage("Start value must be smaller than the end value!");
-                    return;
-                }
-                videoEndValue = seekBar.getProgress();
-                setVideoEnd(videoEndValue);
-            }
-        });
+        PointF point = new PointF();
+        point.x = (float)videoStartValue / duration;
+        startEndSeekBar.getMarkersDataModel().getMarkerDataAt(0).setPosition(point);
+        point.x = (float)videoEndValue / duration;
+        startEndSeekBar.getMarkersDataModel().getMarkerDataAt(1).setPosition(point);
     }
 
     private void calculateFrameRateValues(int maxFrameRate) {
@@ -193,12 +217,14 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
     }
 
     private void setVideoStart(int value) {
+        videoStartValue = value;
         String string = "";
         string += value;
         editVideoStart.setText(string);
     }
 
     private void setVideoEnd(int value) {
+        videoEndValue = value;
         String string = "";
         string += value;
         editVideoEnd.setText(string);
@@ -208,8 +234,8 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         Intent intent = new Intent();
 
         intent.putExtra("analysis_frame_rate", frameRateList.get(frameRatePicker.getValue()));
-        intent.putExtra("analysis_video_start", Integer.parseInt(editVideoStart.getText().toString()));
-        intent.putExtra("analysis_video_end", Integer.parseInt(editVideoEnd.getText().toString()));
+        intent.putExtra("analysis_video_start", videoStartValue);
+        intent.putExtra("analysis_video_end", videoEndValue);
 
         setResult(RESULT_OK, intent);
 
