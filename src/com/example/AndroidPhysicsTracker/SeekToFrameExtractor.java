@@ -79,7 +79,6 @@ public class SeekToFrameExtractor {
 
             decoder.start();
 
-            inputBuffers = decoder.getInputBuffers();
             bufferInfo = new MediaCodec.BufferInfo();
         }
 
@@ -124,6 +123,9 @@ public class SeekToFrameExtractor {
         private void performSeekTo(long seekTarget) {
             final int DEQUE_TIMEOUT = 1000;
 
+            decoder.flush();
+            inputBuffers = decoder.getInputBuffers();
+
             // coarse seek
             extractor.seekTo(seekTarget, MediaExtractor.SEEK_TO_PREVIOUS_SYNC);
 
@@ -136,7 +138,7 @@ public class SeekToFrameExtractor {
 
                     int sampleSize = extractor.readSampleData(buffer, 0);
                     if (sampleSize < 0) {
-                        //decoder.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                        decoder.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
                         positionReached = true;
                     } else {
                         decoder.queueInputBuffer(inIndex, 0, sampleSize, extractor.getSampleTime(), 0);
