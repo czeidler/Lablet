@@ -107,7 +107,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         ViewPager pager = (ViewPager)findViewById(R.id.pager);
         ScreenSlidePagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
-        pager.setCurrentItem(1);
+        pager.setCurrentItem(0);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
@@ -217,17 +217,15 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
             if (position == 0)
-                return new AnalysisRunViewFragment();
-            else if (position == 1)
                 return new AnalysisMixedDataFragment();
-            else if (position == 2)
+            else if (position == 1)
                 return new AnalysisTableGraphDataFragment();
             return null;
         }
 
         @Override
         public int getCount() {
-            return 3;
+            return 2;
         }
     }
 
