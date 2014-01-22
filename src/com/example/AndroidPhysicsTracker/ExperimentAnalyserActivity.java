@@ -129,7 +129,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             e.printStackTrace();
         }
 
-        File csvFile = new File(experiment.getStorageDir(), "tag_markers.csv");
+        File csvFile = new File(experiment.getStorageDir(), experiment.getUid() + "_tag_markers.csv");
         exportTagMarkerCSVData(csvFile);
     }
 

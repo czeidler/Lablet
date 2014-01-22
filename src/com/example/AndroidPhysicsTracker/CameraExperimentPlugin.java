@@ -11,13 +11,14 @@ import android.view.View;
 import java.io.File;
 
 public class CameraExperimentPlugin implements ExperimentPlugin {
+    @Override
     public String getName() {
         return CameraExperiment.class.getSimpleName();
     }
 
     @Override
     public String toString() {
-        return getName();
+        return "Camera Experiment";
     }
 
     @Override
