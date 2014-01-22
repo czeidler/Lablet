@@ -181,6 +181,11 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         startEndSeekBar.getMarkersDataModel().getMarkerDataAt(1).setPosition(point);
     }
 
+    @Override
+    public void onBackPressed() {
+        applySettingsAndFinish();
+    }
+
     private void calculateFrameRateValues(int maxFrameRate) {
         frameRateList.clear();
         frameRateList.add(1);
