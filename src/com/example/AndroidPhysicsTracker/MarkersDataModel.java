@@ -103,18 +103,18 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
         return listeners.remove(listener);
     }
 
-    public boolean addMarkerData(MarkerData data) {
+    public int addMarkerData(MarkerData data) {
         int i = 0;
         for (; i < markerDataList.size(); i++) {
             MarkerData current = markerDataList.get(i);
             if (current.getRunId() == data.getRunId())
-                return false;
+                return -1;
             if (current.getRunId() > data.getRunId())
                 break;
         }
         markerDataList.add(i, data);
         notifyDataAdded(i);
-        return true;
+        return i;
     }
 
     public int getMarkerCount() {
@@ -123,6 +123,15 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
 
     public MarkerData getMarkerDataAt(int index) {
         return markerDataList.get(index);
+    }
+
+    public int findMarkerDataByRun(int run) {
+        for (int i = 0; i < getMarkerCount(); i++) {
+            MarkerData data = getMarkerDataAt(i);
+            if (data.getRunId() == run)
+                return i;
+        }
+        return -1;
     }
 
     public MarkerData removeMarkerData(int index) {

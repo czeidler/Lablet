@@ -326,6 +326,8 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
 }
 
 class TagMarkerDataModelPainter extends AbstractMarkersPainter {
+    LastInsertMarkerManager lastInsertMarkerManager = new LastInsertMarkerManager();
+
     public TagMarkerDataModelPainter(View parent, IExperimentRunView runView, MarkersDataModel data) {
         super(parent, runView, data);
     }
@@ -365,32 +367,61 @@ class TagMarkerDataModelPainter extends AbstractMarkersPainter {
         return new SimpleMarker(this);
     }
 
+    /**
+     * If the last inserted marker hasn't moved remove it again.
+     */
+    private class LastInsertMarkerManager {
+        private int markerInsertedInLastRun = -1;
+        private PointF lastMarkerPosition = new PointF();
+
+        void onCurrentRunChanging(MarkersDataModel markersDataModel) {
+            if (markerInsertedInLastRun >= 0) {
+                MarkerData lastMarkerData = markerData.getMarkerDataAt(markerInsertedInLastRun);
+                if (lastMarkerData.getPosition().equals(lastMarkerPosition)) {
+                    markerData.removeMarkerData(markerInsertedInLastRun);
+                    int selectedIndex = markerInsertedInLastRun - 1;
+                    if (selectedIndex < 0)
+                        selectedIndex = 0;
+                    markersDataModel.selectMarkerData(selectedIndex);
+                }
+                markerInsertedInLastRun = -1;
+            }
+        }
+
+        void onNewMarkerInserted(int index, MarkerData data) {
+            markerInsertedInLastRun = index;
+            lastMarkerPosition.set(data.getPosition());
+        }
+    }
+
     public void setCurrentRun(int run) {
+        lastInsertMarkerManager.onCurrentRunChanging(markerData);
+
         // check if we have the run in the data list
         MarkerData data = null;
-        for (int i = 0; i < markerData.getMarkerCount(); i++) {
-            MarkerData foundData = markerData.getMarkerDataAt(i);
-            if (foundData.getRunId() == run) {
-                data = foundData;
-                markerData.selectMarkerData(i);
-                break;
-            }
+        int index = markerData.findMarkerDataByRun(run);
+        if (index >= 0) {
+            data = markerData.getMarkerDataAt(index);
+            markerData.selectMarkerData(index);
         }
 
         if (data == null) {
             data = new MarkerData(run);
             if (markerData.getMarkerCount() > 0) {
-                MarkerData prevData = markerData.getMarkerDataAt(markerData.getMarkerCount() - 1);
+                int selectedIndex = markerData.getSelectedMarkerData();
+                MarkerData prevData = markerData.getMarkerDataAt(selectedIndex);
                 data.setPosition(prevData.getPosition());
-                // TODO take unit and scale into account
                 data.getPosition().x += 5;
+
                 PointF screenPos = new PointF();
                 experimentRunView.toScreen(data.getPosition(), screenPos);
                 sanitizeScreenPoint(screenPos);
                 experimentRunView.fromScreen(screenPos, data.getPosition());
             }
-            markerData.addMarkerData(data);
-            markerData.selectMarkerData(markerData.getMarkerCount() - 1);
+            int newIndex = markerData.addMarkerData(data);
+            markerData.selectMarkerData(newIndex);
+
+            lastInsertMarkerManager.onNewMarkerInserted(newIndex, data);
         }
     }
 }
