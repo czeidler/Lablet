@@ -27,6 +27,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         if (getExperiment() == null)
             return false;
 
+        menu.clear();
         getMenuInflater().inflate(R.menu.experiment_analyser_activity_actions, menu);
 
         MenuItem backItem = menu.findItem(R.id.action_back);

@@ -29,6 +29,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
         getMenuInflater().inflate(R.menu.simpel_settings_menu, menu);
 
         MenuItem backItem = menu.findItem(R.id.action_cancel);

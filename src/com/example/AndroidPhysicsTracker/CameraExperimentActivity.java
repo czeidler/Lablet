@@ -39,6 +39,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
         getMenuInflater().inflate(R.menu.perform_experiment_activity_actions, menu);
 
         MenuItem backItem = menu.findItem(R.id.action_back);
