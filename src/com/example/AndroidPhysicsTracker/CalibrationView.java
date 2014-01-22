@@ -15,6 +15,7 @@ public class CalibrationView extends AlertDialog {
     private LengthCalibrationSetter calibrationSetter;
     private ExperimentAnalysis experimentAnalysis;
     private EditText lengthEditText;
+    private Spinner spinnerUnit;
 
     protected CalibrationView(Context context, LengthCalibrationSetter calibrationSetter, ExperimentAnalysis analysis) {
         super(context);
@@ -30,11 +31,24 @@ public class CalibrationView extends AlertDialog {
         setTitle("Calibration");
         addContentView(contentView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
 
+        // scale length
         lengthEditText = (EditText)contentView.findViewById(R.id.lengthEditText);
         String text = new String();
         text += calibrationSetter.getCalibrationValue();
         lengthEditText.setText(text);
 
+        // unit spinner
+        spinnerUnit = (Spinner)contentView.findViewById(R.id.spinnerUnit);
+        List<String> list = new ArrayList<String>();
+        list.add("[m]");
+        list.add("[mm]");
+        ArrayAdapter<String> unitsAdapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_spinner_item, list);
+        spinnerUnit.setAdapter(unitsAdapter);
+        if (experimentAnalysis.getXUnitPrefix().equals("m"))
+            spinnerUnit.setSelection(1);
+
+        // button bar
         Button cancelButton = (Button)contentView.findViewById(R.id.cancelButton);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,35 +63,17 @@ public class CalibrationView extends AlertDialog {
             public void onClick(View view) {
                 float calibrationValue = Float.parseFloat(lengthEditText.getText().toString());
                 calibrationSetter.setCalibrationValue(calibrationValue);
-                dismiss();
-            }
-        });
 
-        Spinner spinnerUnit = (Spinner)contentView.findViewById(R.id.spinnerUnit);
-        List<String> list = new ArrayList<String>();
-        list.add("[m]");
-        list.add("[mm]");
-        ArrayAdapter<String> unitsAdapter = new ArrayAdapter<String>(getContext(),
-                android.R.layout.simple_spinner_item, list);
-        spinnerUnit.setAdapter(unitsAdapter);
-        if (experimentAnalysis.getXUnitPrefix().equals("m"))
-            spinnerUnit.setSelection(1);
-
-        spinnerUnit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                if (position == 0) {
+                int spinnerPosition = spinnerUnit.getSelectedItemPosition();
+                if (spinnerPosition == 0) {
                     experimentAnalysis.setXUnitPrefix("");
                     experimentAnalysis.setYUnitPrefix("");
-                } else if (position == 1) {
+                } else if (spinnerPosition == 1) {
                     experimentAnalysis.setXUnitPrefix("m");
                     experimentAnalysis.setYUnitPrefix("m");
                 }
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
+                dismiss();
             }
         });
     }
