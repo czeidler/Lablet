@@ -12,7 +12,7 @@
             android:ems="10"
             android:id="@+id/lengthEditText"
             android:layout_below="@+id/textView" android:layout_alignParentLeft="true" android:numeric="decimal"
-            android:layout_alignParentRight="true"/>
+            />
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -33,4 +33,9 @@
             android:text="Cancel"
             android:id="@+id/cancelButton"
             android:layout_below="@+id/lengthEditText" android:layout_toLeftOf="@+id/applyButton"/>
+    <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinnerUnit" android:layout_alignParentRight="true" android:layout_below="@+id/textView"
+            android:layout_above="@+id/applyButton" android:layout_toRightOf="@+id/lengthEditText"/>
 </RelativeLayout>

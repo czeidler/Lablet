@@ -11,16 +11,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, MarkersDataModel.IMarkersDataModelListener {
+public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, MarkersDataModel.IMarkersDataModelListener,
+        ExperimentAnalysis.IExperimentAnalysisListener {
     private MarkersDataModel model;
     private List<ITableAdapterListener> listeners;
-    private Experiment experiment;
+    private ExperimentAnalysis experimentAnalysis;
 
-    public MarkerDataTableAdapter(MarkersDataModel model, Experiment experiment) {
+    public MarkerDataTableAdapter(MarkersDataModel model, ExperimentAnalysis experimentAnalysis) {
         this.model = model;
         model.addListener(this);
         listeners = new ArrayList<ITableAdapterListener>();
-        this.experiment = experiment;
+        this.experimentAnalysis = experimentAnalysis;
+        this.experimentAnalysis.addListener(this);
     }
 
     public void release() {
@@ -65,6 +67,10 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
 
     @Override
     public void updateView(View view, int row, int column) {
+        if (row == 0) {
+            populateHeaderView((TextView)view, column);
+            return;
+        }
         populateTextView((TextView)view, row, column);
     }
 
@@ -80,7 +86,7 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
         else if (column == 2)
             text += String.format("%.2f", position.y);
         else if (column == 3)
-            text += String.format("%.1f", experiment.getRunValueAt(data.getRunId()));
+            text += String.format("%.1f", experimentAnalysis.getExperiment().getRunValueAt(data.getRunId()));
         else
             throw new IndexOutOfBoundsException();
 
@@ -91,20 +97,24 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
         TextView textView = new TextView(context);
         textView.setTextColor(Color.WHITE);
 
+        populateHeaderView(textView, column);
+        return textView;
+    }
+
+    private void populateHeaderView(TextView textView, int column) {
         String text = null;
         if (column == 0)
             text = "id";
         else if (column == 1)
-            text = "x";
+            text = "x [" + experimentAnalysis.getXUnit() + "]";
         else if (column == 2)
-            text = "y";
+            text = "y [" + experimentAnalysis.getYUnit() + "]";
         else if (column == 3)
             text = "run value";
         else
             throw new IndexOutOfBoundsException();
 
         textView.setText(text);
-        return textView;
     }
 
     @Override
@@ -159,7 +169,7 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
 
     private void notifyRowChanged(int row, int number) {
         for (ITableAdapterListener listener : listeners)
-            listener.onRowUpdated(this, row, number);
+            listener.onRowUpdated(this, row + 1, number);
     }
 
     private void notifyAllRowsChanged() {
@@ -170,5 +180,11 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
     private void notifyRowSelected(int row) {
         for (ITableAdapterListener listener : listeners)
             listener.onRowSelected(this, row);
+    }
+
+    @Override
+    public void onUnitPrefixChanged() {
+        for (ITableAdapterListener listener : listeners)
+            listener.onRowUpdated(this, 0, 1);
     }
 }

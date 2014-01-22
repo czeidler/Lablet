@@ -6,18 +6,21 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CalibrationView extends AlertDialog {
     private LengthCalibrationSetter calibrationSetter;
+    private ExperimentAnalysis experimentAnalysis;
     private EditText lengthEditText;
 
-    protected CalibrationView(Context context, LengthCalibrationSetter calibrationSetter) {
+    protected CalibrationView(Context context, LengthCalibrationSetter calibrationSetter, ExperimentAnalysis analysis) {
         super(context);
 
         this.calibrationSetter = calibrationSetter;
+        this.experimentAnalysis = analysis;
     }
 
     @Override
@@ -50,5 +53,32 @@ public class CalibrationView extends AlertDialog {
             }
         });
 
+        Spinner spinnerUnit = (Spinner)contentView.findViewById(R.id.spinnerUnit);
+        List<String> list = new ArrayList<String>();
+        list.add("[m]");
+        list.add("[mm]");
+        ArrayAdapter<String> unitsAdapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_spinner_item, list);
+        spinnerUnit.setAdapter(unitsAdapter);
+        if (experimentAnalysis.getXUnitPrefix().equals("m"))
+            spinnerUnit.setSelection(1);
+
+        spinnerUnit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                if (position == 0) {
+                    experimentAnalysis.setXUnitPrefix("");
+                    experimentAnalysis.setYUnitPrefix("");
+                } else if (position == 1) {
+                    experimentAnalysis.setXUnitPrefix("m");
+                    experimentAnalysis.setYUnitPrefix("m");
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
     }
 }

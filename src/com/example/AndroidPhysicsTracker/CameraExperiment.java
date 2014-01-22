@@ -32,6 +32,16 @@ public class CameraExperiment extends Experiment {
     }
 
     @Override
+    public String getXUnit() {
+        return "m";
+    }
+
+    @Override
+    public String getYUnit() {
+        return "m";
+    }
+
+    @Override
     public int getNumberOfRuns() {
         return numberOfRuns;
     }

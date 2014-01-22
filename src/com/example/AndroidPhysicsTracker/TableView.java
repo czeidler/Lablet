@@ -66,7 +66,7 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
 
     @Override
     public void onRowUpdated(ITableAdapter<?> table, int row, int number) {
-        for (int i = row + 1; i < row + 1 + number; i++) {
+        for (int i = row; i < row + number; i++) {
             TableRow tableRow = (TableRow)getChildAt(i);
             for (int column = 0; column < adapter.getColumnCount(); column++)
                 adapter.updateView(tableRow.getChildAt(column), i, column);

@@ -5,12 +5,21 @@ import android.graphics.PointF;
 import android.os.Bundle;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExperimentAnalysis {
+    interface IExperimentAnalysisListener {
+        void onUnitPrefixChanged();
+    }
+
     private Experiment experiment;
 
     private RunDataModel runDataModel;
     private Calibration calibration;
+
+    private String xUnitPrefix = "";
+    private String yUnitPrefix = "";
 
     private MarkersDataModel tagMarkers;
     private MarkersDataModel lengthCalibrationMarkers;
@@ -18,6 +27,8 @@ public class ExperimentAnalysis {
     private LengthCalibrationSetter lengthCalibrationSetter;
 
     private Bundle experimentSpecificData = null;
+
+    private List<IExperimentAnalysisListener> listenerList = new ArrayList<IExperimentAnalysisListener>();
 
     public ExperimentAnalysis(Experiment experiment) {
         this.experiment = experiment;
@@ -59,6 +70,34 @@ public class ExperimentAnalysis {
         experimentSpecificData = data;
         onRunSpecificDataChanged();
     }
+    public String getXUnitPrefix() {
+        return xUnitPrefix;
+    }
+
+    public String getYUnitPrefix() {
+        return yUnitPrefix;
+    }
+
+    public void addListener(IExperimentAnalysisListener listener) {
+        listenerList.add(listener);
+    }
+
+    public void setXUnitPrefix(String xUnitPrefix) {
+        this.xUnitPrefix = xUnitPrefix;
+        notifyUnitPrefixChanged();
+    }
+    public void setYUnitPrefix(String yUnitPrefix) {
+        this.yUnitPrefix = yUnitPrefix;
+        notifyUnitPrefixChanged();
+    }
+
+    public String getXUnit() {
+        return getXUnitPrefix() + experiment.getXUnit();
+    }
+
+    public String getYUnit() {
+        return getYUnitPrefix() + experiment.getYUnit();
+    }
 
     public Bundle analysisDataToBundle() {
         Bundle analysisDataBundle = new Bundle();
@@ -91,6 +130,9 @@ public class ExperimentAnalysis {
         analysisDataBundle.putFloat("lengthCalibrationPoint2x", point2.x);
         analysisDataBundle.putFloat("lengthCalibrationPoint2y", point2.y);
         analysisDataBundle.putFloat("lengthCalibrationValue", lengthCalibrationSetter.getCalibrationValue());
+
+        analysisDataBundle.putString("xUnitPrefix", getXUnitPrefix());
+        analysisDataBundle.putString("yUnitPrefix", getYUnitPrefix());
 
         if (experimentSpecificData != null)
             analysisDataBundle.putBundle("experiment_specific_data", experimentSpecificData);
@@ -133,8 +175,18 @@ public class ExperimentAnalysis {
         if (bundle.containsKey("lengthCalibrationValue"))
             lengthCalibrationSetter.setCalibrationValue(bundle.getFloat("lengthCalibrationValue"));
 
+        if (bundle.containsKey("xUnitPrefix"))
+            setXUnitPrefix(bundle.getString("xUnitPrefix"));
+        if (bundle.containsKey("yUnitPrefix"))
+            setYUnitPrefix(bundle.getString("yUnitPrefix"));
+
         return true;
     }
 
     protected void onRunSpecificDataChanged() {}
+
+    private void notifyUnitPrefixChanged() {
+        for (IExperimentAnalysisListener listener : listenerList)
+            listener.onUnitPrefixChanged();
+    }
 }

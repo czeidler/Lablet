@@ -20,9 +20,6 @@ interface IExperimentRunView {
 
 
 abstract public class Experiment {
-    private int xUnit;
-    private int yUnit;
-
     private String uid;
     private File storageDir;
     protected Context context;
@@ -37,6 +34,14 @@ abstract public class Experiment {
         init(experimentContext);
 
         uid = generateNewUid();
+    }
+
+    public String getXUnit() {
+        return "";
+    }
+
+    public String getYUnit() {
+        return "";
     }
 
     protected boolean loadExperiment(Bundle bundle, File storageDir) {

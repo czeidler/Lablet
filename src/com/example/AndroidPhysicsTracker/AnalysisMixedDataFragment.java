@@ -33,7 +33,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         // marker table view
         tableView = (TableView)view.findViewById(R.id.tagMarkerTableView);
         tableView.setAdapter(new MarkerDataTableAdapter(experimentAnalysis.getTagMarkers(),
-                experimentAnalysis.getExperiment()));
+                experimentAnalysis));
 
         // marker graph view
         graphView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
