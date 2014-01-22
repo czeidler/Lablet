@@ -216,9 +216,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
 
     private void setFrameRateLengthEdit(int frameRate) {
         float length = 1.0f / frameRate * 1000;
-        String stringValue = "";
-        stringValue += (int)length;
-        editFrameLength.setText(stringValue);
+        editFrameLength.setText(String.format("%.1f", length));
     }
 
     private void setVideoStart(int value) {

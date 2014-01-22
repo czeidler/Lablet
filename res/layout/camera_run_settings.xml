@@ -48,14 +48,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Analysis Start Position:"
+            android:text="Analysis Start Position [ms]:"
             android:id="@+id/textView2"
             android:layout_alignParentBottom="true" android:layout_alignParentLeft="true"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Analysis End Position:"
+            android:text="Analysis End Position [ms]:"
             android:id="@+id/textView3"
             android:layout_alignParentBottom="true" android:layout_toRightOf="@+id/editStart"/>
     <LinearLayout

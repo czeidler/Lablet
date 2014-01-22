@@ -80,7 +80,7 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
         else if (column == 2)
             text += String.format("%.2f", position.y);
         else if (column == 3)
-            text += experiment.getRunValueAt(data.getRunId());
+            text += String.format("%.1f", experiment.getRunValueAt(data.getRunId()));
         else
             throw new IndexOutOfBoundsException();
 
