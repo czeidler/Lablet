@@ -180,7 +180,9 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
 
         MarkersDataModel tagMarkers = experimentAnalysis.getTagMarkers();
         try {
-            outputStream.write("id, x, y, runValue\n".getBytes());
+            String header = "id, x [" + experimentAnalysis.getXUnit() + "], y [" + experimentAnalysis.getYUnit()
+                    + "], runValue\n";
+            outputStream.write(header.getBytes());
             for (int i = 0; i < tagMarkers.getMarkerCount(); i++) {
                 MarkerData markerData = tagMarkers.getMarkerDataAt(i);
                 String string = "";
