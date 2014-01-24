@@ -4,7 +4,7 @@ package com.example.AndroidPhysicsTracker;
 import android.graphics.PointF;
 import android.os.Bundle;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -181,6 +181,41 @@ public class ExperimentAnalysis {
             setYUnitPrefix(bundle.getString("yUnitPrefix"));
 
         return true;
+    }
+
+    public void exportTagMarkerCSVData(OutputStream outputStream) {
+        try {
+            String header = "id, x [" + getXUnit() + "], y [" + getYUnit()
+                    + "], runValue\n";
+            outputStream.write(header.getBytes());
+            for (int i = 0; i < tagMarkers.getMarkerCount(); i++) {
+                MarkerData markerData = tagMarkers.getMarkerDataAt(i);
+                String string = "";
+                string += markerData.getRunId();
+                outputStream.write(string.getBytes());
+                outputStream.write(",".getBytes());
+
+                PointF position = tagMarkers.getCalibratedMarkerPositionAt(i);
+                string = "";
+                string += position.x;
+                outputStream.write(string.getBytes());
+                outputStream.write(",".getBytes());
+
+                string = "";
+                string += position.y;
+                outputStream.write(string.getBytes());
+                outputStream.write(",".getBytes());
+
+                string = "";
+                string += experiment.getRunValueAt(i);
+                outputStream.write(string.getBytes());
+
+                outputStream.write("\n".getBytes());
+            }
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     protected void onRunSpecificDataChanged() {}

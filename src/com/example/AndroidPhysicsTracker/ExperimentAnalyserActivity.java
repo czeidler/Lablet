@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.PointF;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -63,6 +64,14 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             }
         });
 
+        MenuItem mailItem = menu.findItem(R.id.action_mail_results);
+        mailItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                mailData();
+                return true;
+            }
+        });
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -74,6 +83,21 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
 
     private void startRunSettingsActivity(Bundle analysisSpecificData) {
         plugin.startRunSettingsActivity(experiment, analysisSpecificData, this, PERFORM_RUN_SETTINGS);
+    }
+
+    private void mailData() {
+        // first save data again
+        exportTagMarkerCSVData();
+        File tagMarkerCSVFile = getTagMarkerCSVFile();
+
+        // start mail intent
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/html");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Experiment Data");
+        intent.putExtra(Intent.EXTRA_TEXT, "Attached is your experiment data.");
+        intent .putExtra(Intent.EXTRA_STREAM, Uri.fromFile(tagMarkerCSVFile));
+
+        startActivity(Intent.createChooser(intent, "Send Email"));
     }
 
     @Override
@@ -131,8 +155,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             e.printStackTrace();
         }
 
-        File csvFile = new File(experiment.getStorageDir(), experiment.getUid() + "_tag_markers.csv");
-        exportTagMarkerCSVData(csvFile);
+        exportTagMarkerCSVData();
     }
 
     protected boolean loadAnalysisDataToFile() {
@@ -160,57 +183,31 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         persistentBundle.flattenBundle(bundle, fileWriter);
     }
 
-    protected void exportTagMarkerCSVData(File output) {
-        output.setWritable(true);
+    private File getTagMarkerCSVFile() {
+        return new File(experiment.getStorageDir(), experiment.getUid() + "_tag_markers.csv");
+    }
+
+    private void exportTagMarkerCSVData() {
+        File csvFile = getTagMarkerCSVFile();
+
+        csvFile.setWritable(true);
         FileOutputStream outputStream = null;
-        if (!output.exists()) {
+        if (!csvFile.exists()) {
             try {
-                output.createNewFile();
+                csvFile.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
             }
         }
         try {
-            outputStream = new FileOutputStream(output);
+            outputStream = new FileOutputStream(csvFile);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return;
         }
 
-        MarkersDataModel tagMarkers = experimentAnalysis.getTagMarkers();
-        try {
-            String header = "id, x [" + experimentAnalysis.getXUnit() + "], y [" + experimentAnalysis.getYUnit()
-                    + "], runValue\n";
-            outputStream.write(header.getBytes());
-            for (int i = 0; i < tagMarkers.getMarkerCount(); i++) {
-                MarkerData markerData = tagMarkers.getMarkerDataAt(i);
-                String string = "";
-                string += markerData.getRunId();
-                outputStream.write(string.getBytes());
-                outputStream.write(",".getBytes());
-
-                PointF position = tagMarkers.getCalibratedMarkerPositionAt(i);
-                string = "";
-                string += position.x;
-                outputStream.write(string.getBytes());
-                outputStream.write(",".getBytes());
-
-                string = "";
-                string += position.y;
-                outputStream.write(string.getBytes());
-                outputStream.write(",".getBytes());
-
-                string = "";
-                string += experiment.getRunValueAt(i);
-                outputStream.write(string.getBytes());
-
-                outputStream.write("\n".getBytes());
-            }
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        experimentAnalysis.exportTagMarkerCSVData(outputStream);
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

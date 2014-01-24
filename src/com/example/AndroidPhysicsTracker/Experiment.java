@@ -87,12 +87,11 @@ abstract public class Experiment {
         String identifier = getIdentifier();
 
         Time now = new Time(Time.getCurrentTimezone());
-        android.text.format.DateFormat dateFormat = new android.text.format.DateFormat();
-        CharSequence dateString = dateFormat.format("yyyy-MM-dd_hh:mm:ss", new java.util.Date());
+        CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", new java.util.Date());
 
         now.setToNow();
-        String newUid = new String();
-        if (identifier != "") {
+        String newUid = "";
+        if (!identifier.equals("")) {
             newUid += identifier;
             newUid += "_";
         }
