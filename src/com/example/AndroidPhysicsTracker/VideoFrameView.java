@@ -9,43 +9,28 @@ import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import java.io.File;
 import java.io.IOException;
 
-class VideoFrameView extends SurfaceView {
-    protected SeekToFrameExtractor seekToFrameExtractor = null;
-    protected Rect frame = new Rect();
+class RatioSurfaceView extends SurfaceView {
+    private float ratio = 4.f/3;
 
-    protected String videoFilePath = "";
-
-    private int videoWidth;
-    private int videoHeight;
-    private int videoFrameRate;
-
-    private int queuedRequest = -1;
-
-    public VideoFrameView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-
-    public VideoFrameView(Context context) {
+    public RatioSurfaceView(Context context) {
         super(context);
-        init();
     }
 
-    private void init() {
-        setWillNotDraw(false);
-        getHolder().addCallback(surfaceCallback);
+    public RatioSurfaceView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public void setRatio(float ratio) {
+        this.ratio = ratio;
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        float ratio = 4.f/3;
-        if (seekToFrameExtractor != null)
-            ratio = ((float)getVideoWidth()) / getVideoHeight();
-
         int specWidthMode = MeasureSpec.getMode(widthMeasureSpec);
         int specHeightMode = MeasureSpec.getMode(heightMeasureSpec);
         int specWidth = MeasureSpec.getSize(widthMeasureSpec);
@@ -75,6 +60,34 @@ class VideoFrameView extends SurfaceView {
         setMeasuredDimension(width, height);
         return;
     }
+}
+
+public class VideoFrameView extends RatioSurfaceView {
+    protected SeekToFrameExtractor seekToFrameExtractor = null;
+    protected Rect frame = new Rect();
+
+    protected String videoFilePath = "";
+
+    private int videoWidth;
+    private int videoHeight;
+    private int videoFrameRate;
+
+    private int queuedRequest = -1;
+
+    public VideoFrameView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    public VideoFrameView(Context context) {
+        super(context);
+        init();
+    }
+
+    private void init() {
+        setWillNotDraw(false);
+        getHolder().addCallback(surfaceCallback);
+    }
 
     SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
         public void surfaceCreated(SurfaceHolder holder) {
@@ -90,6 +103,7 @@ class VideoFrameView extends SurfaceView {
                     seekToFrameExtractor = null;
                 }
                 seekToFrameExtractor = new SeekToFrameExtractor(videoFile, holder.getSurface());
+
                 if (queuedRequest >= 0) {
                     seekToFrame(queuedRequest);
                     queuedRequest = -1;
@@ -139,6 +153,8 @@ class VideoFrameView extends SurfaceView {
                 break;
             }
         }
+
+        setRatio(((float)getVideoWidth()) / getVideoHeight());
     }
 
     public void seekToFrame(int positionMicroSeconds) {

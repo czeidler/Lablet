@@ -16,7 +16,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class CameraExperimentActivity extends ExperimentActivity {
-    private SurfaceView preview = null;
+    private RatioSurfaceView preview = null;
     private VideoView videoView = null;
     private Button startButton = null;
     private Button stopButton = null;
@@ -70,7 +70,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
         setContentView(R.layout.perform_camera_experiment);
 
-        preview = (SurfaceView)findViewById(R.id.surfaceView);
+        preview = (RatioSurfaceView)findViewById(R.id.surfaceView);
         previewHolder = preview.getHolder();
         previewHolder.addCallback(surfaceCallback);
 
@@ -125,7 +125,6 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
         if (camera == null) {
             Camera.CameraInfo info = new Camera.CameraInfo();
-
             for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
                 Camera.getCameraInfo(i, info);
 
@@ -138,6 +137,8 @@ public class CameraExperimentActivity extends ExperimentActivity {
         if (camera == null)
             camera = Camera.open();
 
+        Camera.Size size = camera.getParameters().getPictureSize();
+        preview.setRatio((float)size.width / (float)size.height);
 
         if (previewHolder.getSurface() != null)
             setState(new PreviewState());
