@@ -41,12 +41,15 @@ public class CalibrationView extends AlertDialog {
         spinnerUnit = (Spinner)contentView.findViewById(R.id.spinnerUnit);
         List<String> list = new ArrayList<String>();
         list.add("[m]");
+        list.add("[cm]");
         list.add("[mm]");
         ArrayAdapter<String> unitsAdapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item, list);
         spinnerUnit.setAdapter(unitsAdapter);
-        if (experimentAnalysis.getXUnitPrefix().equals("m"))
+        if (experimentAnalysis.getXUnitPrefix().equals("cm"))
             spinnerUnit.setSelection(1);
+        if (experimentAnalysis.getXUnitPrefix().equals("mm"))
+            spinnerUnit.setSelection(2);
 
         // button bar
         Button cancelButton = (Button)contentView.findViewById(R.id.cancelButton);
@@ -69,6 +72,9 @@ public class CalibrationView extends AlertDialog {
                     experimentAnalysis.setXUnitPrefix("");
                     experimentAnalysis.setYUnitPrefix("");
                 } else if (spinnerPosition == 1) {
+                    experimentAnalysis.setXUnitPrefix("c");
+                    experimentAnalysis.setYUnitPrefix("c");
+                } else if (spinnerPosition == 2) {
                     experimentAnalysis.setXUnitPrefix("m");
                     experimentAnalysis.setYUnitPrefix("m");
                 }
