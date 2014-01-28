@@ -7,7 +7,7 @@
 
     <view android:layout_width="1000dp"
           android:layout_height="480dp"
-          class="com.example.AndroidPhysicsTracker.GraphView2D" android:id="@+id/tagMarkerGraphView"
+          class="nz.ac.aucklanduni.physics.tracker.GraphView2D" android:id="@+id/tagMarkerGraphView"
           android:layout_alignParentTop="true" android:layout_alignParentRight="true"/>
     <ScrollView
             android:layout_width="wrap_content"
@@ -18,7 +18,7 @@
             android:layout_alignParentTop="true" android:layout_marginLeft="40px">
         <view android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              class="com.example.AndroidPhysicsTracker.TableView" android:id="@+id/tagMarkerTableView"
+              class="nz.ac.aucklanduni.physics.tracker.TableView" android:id="@+id/tagMarkerTableView"
               android:gravity="center_horizontal"/>
     </ScrollView>
 </RelativeLayout>
