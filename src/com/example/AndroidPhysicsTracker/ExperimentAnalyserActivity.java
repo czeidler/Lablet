@@ -64,14 +64,6 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             }
         });
 
-        MenuItem mailItem = menu.findItem(R.id.action_mail_results);
-        mailItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                mailData();
-                return true;
-            }
-        });
         return super.onPrepareOptionsMenu(menu);
     }
 
