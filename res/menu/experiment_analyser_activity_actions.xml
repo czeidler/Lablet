@@ -11,7 +11,7 @@
           android:title="@string/action_calibration"
           yourapp:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/action_back"
-          android:icon="@drawable/ic_action_back"
-          android:title="@string/action_back"
+          android:icon="@drawable/ic_action_accept"
+          android:title="@string/action_done"
           yourapp:showAsAction="ifRoom|withText"/>
 </menu>

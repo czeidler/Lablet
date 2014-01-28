@@ -113,8 +113,10 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!loadExperiment(getIntent()))
+        if (!loadExperiment(getIntent())) {
+            showErrorAndFinish("Unable to load the experiment.");
             return;
+        }
 
         experimentAnalysis = plugin.loadExperimentAnalysis(experiment);
         loadAnalysisDataToFile();
@@ -133,12 +135,16 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
     protected void onResume() {
         super.onResume();
 
-        experimentAnalysis.getRunDataModel().setCurrentRun(experimentAnalysis.getRunDataModel().getCurrentRun());
+        if (experimentAnalysis != null)
+            experimentAnalysis.getRunDataModel().setCurrentRun(experimentAnalysis.getRunDataModel().getCurrentRun());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+
+        if (experimentAnalysis == null)
+            return;
 
         try {
             saveAnalysisDataToFile();

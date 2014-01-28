@@ -55,7 +55,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
         analyseMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                finishExperiment();
+                finishExperiment(true);
                 return true;
             }
         });
@@ -157,14 +157,20 @@ public class CameraExperimentActivity extends ExperimentActivity {
     public void onBackPressed() {
         if (unsavedExperimentData) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Experiment is not saved quit anyway?");
-            builder.setNegativeButton("Continue", new DialogInterface.OnClickListener() {
+            builder.setTitle("Experiment is not saved");
+            builder.setNeutralButton("Continue", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
 
                 }
             });
-            builder.setPositiveButton("Discard Experiment!", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finishExperiment(false);
+                }
+            });
+            builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     deleteStorageDir();
@@ -227,7 +233,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
         return videoFileName;
     }
 
-    private void finishExperiment() {
+    private void finishExperiment(boolean startAnalysis) {
         unsavedExperimentData = false;
 
         ((CameraExperiment)experiment).setVideoFileName(getVideoFileName());
@@ -236,6 +242,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
             Intent data = new Intent();
             File outputDir = getStorageDir();
             data.putExtra("experiment_path", outputDir.getPath());
+            data.putExtra("start_analysis", startAnalysis);
             setResult(RESULT_OK, data);
         } catch (IOException e) {
             e.printStackTrace();

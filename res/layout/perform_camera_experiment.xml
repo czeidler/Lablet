@@ -16,11 +16,12 @@
             android:layout_height="wrap_content"
             android:text="Stop"
             android:id="@+id/stopButton"
-            android:layout_centerVertical="true" android:layout_alignParentRight="true"/>
+            android:layout_centerVertical="true" android:layout_alignParentRight="true"
+            android:layout_toRightOf="@+id/linearLayout"/>
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New"
+            android:text="Discard"
             android:id="@+id/newButton"
             android:layout_below="@+id/stopButton" android:layout_alignParentRight="true"/>
     <LinearLayout
@@ -28,8 +29,8 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/recordButton" android:layout_toLeftOf="@+id/stopButton"
-            android:id="@+id/linearLayout">
+            android:layout_toRightOf="@+id/recordButton"
+            android:id="@+id/linearLayout" android:layout_toLeftOf="@+id/newButton">
         <FrameLayout
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent" android:layout_gravity="center">

@@ -227,8 +227,14 @@ public class AndroidPhysicsTracker extends Activity {
             return;
 
         if (requestCode == PERFORM_EXPERIMENT) {
-            String experimentPath = data.getStringExtra("experiment_path");
-            startAnalyzeActivity(experimentPath);
+            if (data == null)
+                return;
+            if (!data.getBooleanExtra("start_analysis", false))
+                return;
+            if (data.hasExtra("experiment_path")) {
+                String experimentPath = data.getStringExtra("experiment_path");
+                startAnalyzeActivity(experimentPath);
+            }
             return;
         }
 

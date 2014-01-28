@@ -4,7 +4,7 @@
       xmlns:yourapp="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/action_back"
           android:icon="@drawable/ic_action_back"
-          android:title="@string/action_back"
+          android:title="@string/action_done"
           yourapp:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/action_analyse"
           android:icon="@drawable/ic_chart_line"
