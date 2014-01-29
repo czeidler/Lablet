@@ -67,8 +67,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
     }
 
     private void startCalibrationMenu() {
-        CalibrationView calibrationView = new CalibrationView(this, experimentAnalysis.getLengthCalibrationSetter(),
-                experimentAnalysis);
+        CalibrationView calibrationView = new CalibrationView(this, experimentAnalysis);
         calibrationView.show();
     }
 

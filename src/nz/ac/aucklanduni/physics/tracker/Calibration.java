@@ -92,14 +92,17 @@ class LengthCalibrationSetter implements MarkersDataModel.IMarkersDataModelListe
         return calibrationValue;
     }
 
-    private void calibrate() {
-        if (calibrationMarkers.getMarkerCount() != 2)
-            return;
+    public float scaleLength() {
         PointF point1 = calibrationMarkers.getMarkerDataAt(0).getPosition();
         PointF point2 = calibrationMarkers.getMarkerDataAt(1).getPosition();
 
-        float length = (float)Math.sqrt(Math.pow(point1.x - point2.x, 2) +  Math.pow(point1.y - point2.y, 2));
-        float value = calibrationValue / length;
+        return  (float)Math.sqrt(Math.pow(point1.x - point2.x, 2) +  Math.pow(point1.y - point2.y, 2));
+    }
+
+    private void calibrate() {
+        if (calibrationMarkers.getMarkerCount() != 2)
+            return;
+        float value = calibrationValue / scaleLength();
         calibration.setCalibration(value, value);
     }
 

@@ -56,7 +56,7 @@ abstract class DragableMarker implements IMarker {
 
         if (!isSelected) {
             if (isPointOnSelectArea(point))
-                isSelected = true;
+                setSelected(true);
             if (isSelected && isPointOnDragArea(point))
                 isDragging = true;
 
@@ -66,7 +66,7 @@ abstract class DragableMarker implements IMarker {
             isDragging = true;
             return true;
         }
-        isSelected = false;
+        setSelected(false);
         isDragging = false;
         return false;
     }
@@ -95,7 +95,7 @@ abstract class DragableMarker implements IMarker {
 
     public void setSelected(boolean selected) {
         isSelected = selected;
-        isDragging = false;
+        parent.markerSelected(this, selected);
     }
 
     public boolean isSelected() {
@@ -230,6 +230,19 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
             addMarker(i);
     }
 
+    public void markerSelected(IMarker marker, boolean selected) {
+        int markerIndex = markerList.indexOf(marker);
+        int selectedIndex = markerData.getSelectedMarkerData();
+        if (selected) {
+            markerData.selectMarkerData(markerIndex);
+        } else {
+            if (markerIndex == selectedIndex)
+                markerData.selectMarkerData(-1);
+        }
+
+        markerView.invalidate();
+    }
+
     public void markerMoveRequest(DragableMarker marker, PointF newPosition) {
         int row = markerList.lastIndexOf(marker);
         if (row < 0)
@@ -292,7 +305,6 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
 
     @Override
     public void setCurrentRun(int run) {
-
     }
 
     @Override
@@ -326,7 +338,7 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
 }
 
 class TagMarkerDataModelPainter extends AbstractMarkersPainter {
-    LastInsertMarkerManager lastInsertMarkerManager = new LastInsertMarkerManager();
+    private LastInsertMarkerManager lastInsertMarkerManager = new LastInsertMarkerManager();
 
     public TagMarkerDataModelPainter(View parent, IExperimentRunView runView, MarkersDataModel data) {
         super(parent, runView, data);
@@ -392,6 +404,10 @@ class TagMarkerDataModelPainter extends AbstractMarkersPainter {
             markerInsertedInLastRun = index;
             lastMarkerPosition.set(data.getPosition());
         }
+    }
+
+    public void markerSelected(IMarker marker, boolean selected) {
+
     }
 
     public void setCurrentRun(int run) {
@@ -472,6 +488,34 @@ class CalibrationMarkerPainter extends AbstractMarkersPainter {
         paint.setAntiAlias(true);
         paint.setColor(Color.GREEN);
         canvas.drawLine(screenPos1.x, screenPos1.y, screenPos2.x, screenPos2.y, paint);
+
+        if (markerData.getSelectedMarkerData() < 0)
+            return;
+
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(15);
+        int scaleLength = (int)Math.sqrt(Math.pow(screenPos1.x - screenPos2.x, 2)
+                + Math.pow(screenPos1.y - screenPos2.y, 2));
+        String text = "Scale length [pixel]: ";
+        text += scaleLength;
+        PointF textPosition = new PointF(1f, 96f);
+        PointF screenTextPosition = new PointF();
+        experimentRunView.toScreen(textPosition, screenTextPosition);
+
+        // draw text background box
+        Rect textBound = new Rect();
+        textBound.left = (int)screenTextPosition.x;
+        textBound.top = (int)screenTextPosition.y + (int)Math.ceil(paint.ascent());
+        textBound.right = textBound.left + (int)Math.ceil(paint.measureText(text)) + 2;
+        textBound.bottom = (int)screenTextPosition.y + (int)Math.ceil(paint.descent()) + 2;
+        paint.setColor(Color.argb(150, 100, 100, 100));
+        canvas.drawRect(textBound, paint);
+
+        // draw text
+        paint.setColor(Color.GREEN);
+        canvas.drawText(text, screenTextPosition.x, screenTextPosition.y, paint);
+
+
     }
 
     private PointF getScreenPos(int markerIndex) {
@@ -614,6 +658,7 @@ public class MarkerView extends ViewGroup {
             selectedMarker = null;
             invalidate();
         }
+
         touchEventHandledLastTime = handled;
 
         return handled;

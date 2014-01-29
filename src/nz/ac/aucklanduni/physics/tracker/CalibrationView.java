@@ -17,10 +17,10 @@ public class CalibrationView extends AlertDialog {
     private EditText lengthEditText;
     private Spinner spinnerUnit;
 
-    protected CalibrationView(Context context, LengthCalibrationSetter calibrationSetter, ExperimentAnalysis analysis) {
+    protected CalibrationView(Context context, ExperimentAnalysis analysis) {
         super(context);
 
-        this.calibrationSetter = calibrationSetter;
+        this.calibrationSetter = analysis.getLengthCalibrationSetter();
         this.experimentAnalysis = analysis;
     }
 
@@ -33,7 +33,7 @@ public class CalibrationView extends AlertDialog {
 
         // scale length
         lengthEditText = (EditText)contentView.findViewById(R.id.lengthEditText);
-        String text = new String();
+        String text = "";
         text += calibrationSetter.getCalibrationValue();
         lengthEditText.setText(text);
 
