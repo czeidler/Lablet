@@ -77,6 +77,8 @@ class StartEndMarker extends DragableMarker {
 }
 
 class StartEndPainter extends AbstractMarkersPainter {
+    int numberOfSteps = 10;
+
     public StartEndPainter(View parent, IExperimentRunView runView, MarkersDataModel data) {
         super(parent, runView, data);
     }
@@ -85,7 +87,6 @@ class StartEndPainter extends AbstractMarkersPainter {
     protected DragableMarker createMarkerForRow(int row) {
         return new StartEndMarker(this);
     }
-
 
     @Override
     public void draw(Canvas canvas, float priority) {
@@ -104,6 +105,7 @@ class StartEndPainter extends AbstractMarkersPainter {
         PointF newReal = new PointF();
         sanitizeScreenPoint(newPosition);
         experimentRunView.fromScreen(newPosition, newReal);
+        newReal.x = toStepPosition(newReal.x);
 
         if (row == 0) {
             MarkerData marker2 = markerData.getMarkerDataAt(1);
@@ -116,11 +118,32 @@ class StartEndPainter extends AbstractMarkersPainter {
         }
         markerData.setMarkerPosition(newReal, row);
     }
+
+    public void setNumberOfSteps(int steps) {
+        numberOfSteps = steps;
+
+        MarkerData marker1 = markerData.getMarkerDataAt(0);
+        marker1.getPosition().x = toStepPosition(marker1.getPosition().x);
+        markerData.setMarkerPosition(marker1.getPosition(), 0);
+
+        MarkerData marker2 = markerData.getMarkerDataAt(1);
+        marker2.getPosition().x = toStepPosition(marker2.getPosition().x);
+        markerData.setMarkerPosition(marker2.getPosition(), 1);
+    }
+
+    private float toStepPosition(float floatPosition) {
+        if (numberOfSteps <= 1)
+            return 0.5f;
+        float stepSize = 1.0f / (numberOfSteps - 1);
+        int stepPosition = Math.round(floatPosition / stepSize);
+        return stepSize * stepPosition;
+    }
 }
 
 
 public class StartEndSeekBar extends MarkerView implements IExperimentRunView {
     private MarkersDataModel markersDataModel;
+    private StartEndPainter startEndPainter;
 
     public StartEndSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -129,7 +152,8 @@ public class StartEndSeekBar extends MarkerView implements IExperimentRunView {
         markersDataModel.addMarkerData(new MarkerData(0));
         markersDataModel.addMarkerData(new MarkerData(1));
 
-        addPainter(new StartEndPainter(this, this, markersDataModel));
+        startEndPainter = new StartEndPainter(this, this, markersDataModel);
+        addPainter(startEndPainter);
         invalidate();
     }
 
@@ -183,5 +207,9 @@ public class StartEndSeekBar extends MarkerView implements IExperimentRunView {
 
         screen.x = paddingLeft + real.x * barWidth;
         screen.y = 0;
+    }
+
+    public void setMax(int max) {
+        startEndPainter.setNumberOfSteps(max + 1);
     }
 }

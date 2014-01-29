@@ -16,10 +16,12 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
     private VideoFrameView videoFrameView;
 
     private SeekBar seekBar = null;
+    private StartEndSeekBar startEndSeekBar = null;
     private NumberPicker frameRatePicker = null;
-    private TextView editVideoStart = null;
-    private TextView editVideoEnd = null;
-    private TextView editFrameLength = null;
+    private EditText editVideoStart = null;
+    private EditText editVideoEnd = null;
+    private EditText editFrames = null;
+    private EditText editFrameLength = null;
 
     private int videoStartValue;
     private int videoEndValue;
@@ -73,13 +75,14 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
 
         seekBar = (SeekBar)findViewById(R.id.seekBar);
         int duration = cameraExperiment.getVideoDuration();
-        seekBar.setMax(duration);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (!fromUser)
                     return;
-                seekTo(progress);
+                int frameRate = getFrameRateFromPicker();
+                float frameSize = 1000.f / frameRate;
+                seekTo((int)(frameSize * progress));
             }
 
             @Override
@@ -93,7 +96,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
             }
         });
 
-        StartEndSeekBar startEndSeekBar = (StartEndSeekBar)findViewById(R.id.startEndSeekBar);
+        startEndSeekBar = (StartEndSeekBar)findViewById(R.id.startEndSeekBar);
         startEndSeekBar.setPadding(seekBar.getPaddingLeft(), seekBar.getPaddingTop(), seekBar.getPaddingRight(),
                 seekBar.getPaddingBottom());
         startEndSeekBar.getMarkersDataModel().addListener(new MarkersDataModel.IMarkersDataModelListener() {
@@ -109,19 +112,23 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
 
             @Override
             public void onDataChanged(MarkersDataModel model, int index, int number) {
-                int duration = cameraExperiment.getVideoDuration();
+                int frameRate = getFrameRateFromPicker();
+                int duration = getDurationAtFrameRate(frameRate);
+
                 int progress = 0;
                 for (int i = index; i < index + number; i++) {
                     if (i == 0) {
-                        progress = (int)(model.getMarkerDataAt(0).getPosition().x * duration);
+                        progress = Math.round(model.getMarkerDataAt(i).getPosition().x * duration);
                         setVideoStart(progress);
-                    } else {
-                        progress = (int)(model.getMarkerDataAt(1).getPosition().x * duration);
+                    } else if (i == 1){
+                        progress = Math.round(model.getMarkerDataAt(i).getPosition().x * duration);
                         setVideoEnd(progress);
                     }
                 }
-                seekBar.setProgress(progress);
+                seekBar.setProgress(findFrame(progress));
                 seekTo(progress);
+
+                updateEditFrames();
             }
 
             @Override
@@ -135,18 +142,20 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
             }
         });
 
-        editFrameLength = (TextView)findViewById(R.id.editFrameLength);
+        editFrameLength = (EditText)findViewById(R.id.editFrameLength);
 
         frameRatePicker = (NumberPicker)findViewById(R.id.frameRatePicker);
         frameRatePicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker numberPicker, int old, int newValue) {
-                setFrameRateLengthEdit(frameRateList.get(newValue));
+                int frameRate = frameRateList.get(newValue);
+                setFrameRate(frameRate);
             }
         });
 
-        editVideoStart = (TextView)findViewById(R.id.editStart);
-        editVideoEnd = (TextView)findViewById(R.id.editEnd);
+        editVideoStart = (EditText)findViewById(R.id.editStart);
+        editVideoEnd = (EditText)findViewById(R.id.editEnd);
+        editFrames = (EditText)findViewById(R.id.editFrames);
 
         // get initial values
         Bundle runSettings = null;
@@ -168,7 +177,6 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         frameRatePicker.setDisplayedValues(getFrameRateStringList());
         int pickerFrameRateIndex = getNumberPickerIndexForFrameRate(analysisFrameRate);
         frameRatePicker.setValue(pickerFrameRateIndex);
-        setFrameRateLengthEdit(frameRateList.get(pickerFrameRateIndex));
 
         videoStartValue = cameraExperiment.getAnalysisVideoStart();
         videoEndValue = cameraExperiment.getAnalysisVideoEnd();
@@ -179,11 +187,41 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         startEndSeekBar.getMarkersDataModel().getMarkerDataAt(0).setPosition(point);
         point.x = (float)videoEndValue / duration;
         startEndSeekBar.getMarkersDataModel().getMarkerDataAt(1).setPosition(point);
+
+        setFrameRate(getFrameRateFromPicker());
     }
 
     @Override
     public void onBackPressed() {
         applySettingsAndFinish();
+    }
+
+    private int findFrame(int milliSeconds) {
+        int frameRate = getFrameRateFromPicker();
+        return Math.round((float)(frameRate * milliSeconds) / 1000);
+    }
+
+    private int getDurationAtFrameRate(int frameRate) {
+        int duration = cameraExperiment.getVideoDuration();
+        int stepSize = Math.round(1000.0f / frameRate);
+        int numberOfSteps = Math.round((float)(frameRate * duration) / 1000);
+        duration = stepSize * (numberOfSteps - 1);
+        return duration;
+    }
+
+    private void updateEditFrames() {
+        int frameRate = getFrameRateFromPicker();
+        int duration = getDurationAtFrameRate(frameRate);
+
+        float start = startEndSeekBar.getMarkersDataModel().getMarkerDataAt(0).getPosition().x;
+        start *= duration;
+        float end = startEndSeekBar.getMarkersDataModel().getMarkerDataAt(1).getPosition().x;
+        end *= duration;
+
+        int numberOfFrames = (int)((frameRate * (end - start)) / 1000) + 1;
+        String text = "";
+        text += numberOfFrames;
+        editFrames.setText(text);
     }
 
     private void calculateFrameRateValues(int maxFrameRate) {
@@ -204,6 +242,23 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
             list[i] = stringValue;
         }
         return list;
+    }
+
+    private void setFrameRate(int frameRate) {
+        setFrameRateLengthEdit(frameRate);
+        int duration = cameraExperiment.getVideoDuration();
+        int numberOfSteps = Math.round((float) (frameRate * duration) / 1000);
+
+        // seek bar
+        float oldRelativeProgress = (float)seekBar.getProgress() / seekBar.getMax();
+        seekBar.setMax(numberOfSteps - 1);
+
+        startEndSeekBar.setMax(numberOfSteps - 1);
+
+        // startEndSeek.setNumberOfSteps changes the progress bar, update it to the old value again
+        seekBar.setProgress((int)(oldRelativeProgress * numberOfSteps));
+
+        updateEditFrames();
     }
 
     private int getNumberPickerIndexForFrameRate(int frameRate) {
@@ -236,13 +291,17 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
     private void applySettingsAndFinish() {
         Intent intent = new Intent();
 
-        intent.putExtra("analysis_frame_rate", frameRateList.get(frameRatePicker.getValue()));
+        intent.putExtra("analysis_frame_rate", getFrameRateFromPicker());
         intent.putExtra("analysis_video_start", videoStartValue);
         intent.putExtra("analysis_video_end", videoEndValue);
 
         setResult(RESULT_OK, intent);
 
         finish();
+    }
+
+    private int getFrameRateFromPicker() {
+        return frameRateList.get(frameRatePicker.getValue());
     }
 
     public void seekTo(int time) {

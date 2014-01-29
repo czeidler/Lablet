@@ -120,7 +120,7 @@ public class CameraExperiment extends Experiment {
             analysisFrameRate = 10;
 
         int runTime = analysisVideoEnd - analysisVideoStart;
-        numberOfRuns = runTime * analysisFrameRate / 1000;
+        numberOfRuns = runTime * analysisFrameRate / 1000 + 1;
     }
 
     public int getVideoDuration() {
