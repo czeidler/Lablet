@@ -1,3 +1,10 @@
+/*
+ * Copyright 2013-2014.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
 package nz.ac.aucklanduni.physics.tracker;
 
 import android.media.MediaCodec;
@@ -15,8 +22,8 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.Semaphore;
 
 
-/*
-Reads a video file and displays it at given time position on the surface. The surface must be fully initialized.
+/**
+ * Reads a video file and displays it at given time position on the surface. The surface must be fully initialized.
  */
 public class SeekToFrameExtractor {
     SeekToThread seekToThread;

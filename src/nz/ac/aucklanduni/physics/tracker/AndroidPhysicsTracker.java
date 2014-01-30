@@ -1,3 +1,10 @@
+/*
+ * Copyright 2013-2014.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
 package nz.ac.aucklanduni.physics.tracker;
 
 import android.app.Activity;
@@ -247,10 +254,6 @@ public class AndroidPhysicsTracker extends Activity {
         plugin.startExperimentActivity(this, PERFORM_EXPERIMENT);
     }
 
-    private void onExperimentSelected(boolean selected) {
-
-    }
-
     private void updateExperimentList() {
         experimentList.clear();
         File experimentDir = Experiment.getMainExperimentDir(this);
@@ -299,9 +302,11 @@ public class AndroidPhysicsTracker extends Activity {
 
                 convertView = layoutInflater.inflate(layoutId, null);
             }
+            assert convertView != null;
             ExperimentDirectoryEntry entry = listItems.get(position);
 
             CheckBox checkBox = (CheckBox)convertView.findViewById(R.id.checkBox);
+            assert checkBox != null;
             checkBox.setTag(entry);
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -311,7 +316,7 @@ public class AndroidPhysicsTracker extends Activity {
                 }
             });
             TextView textView = (TextView)convertView.findViewById(android.R.id.text1);
-
+            assert textView != null;
             checkBox.setChecked(entry.getSelected());
             textView.setText(entry.getName());
             return convertView;

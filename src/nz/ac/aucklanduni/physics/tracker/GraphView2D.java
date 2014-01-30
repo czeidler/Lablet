@@ -1,3 +1,10 @@
+/*
+ * Copyright 2013-2014.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
 package nz.ac.aucklanduni.physics.tracker;
 
 import android.content.Context;
@@ -8,6 +15,7 @@ import com.jjoe64.graphview.LineGraphView;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 interface IGraphAdapter {
     interface IGraphDataPoint {

@@ -1,3 +1,10 @@
+/*
+ * Copyright 2013-2014.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
 package nz.ac.aucklanduni.physics.tracker;
 
 import android.os.Bundle;
@@ -18,11 +25,13 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         ExperimentAnalysis experimentAnalysis = activity.getExperimentAnalysis();
 
         View view = inflater.inflate(R.layout.analysis_runview_table_graph_fragment, container, false);
+        assert view != null;
 
         View experimentRunView = plugin.createExperimentRunView(activity, experimentAnalysis.getExperiment());
 
         ExperimentRunViewControl runViewControl = (ExperimentRunViewControl)view.findViewById(
             R.id.experimentRunViewControl);
+        assert runViewControl != null;
         runViewControl.setTo(experimentAnalysis.getRunDataModel());
 
         runContainerView = (RunContainerView)view.findViewById(R.id.experimentRunContainer);
@@ -32,6 +41,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
 
         // marker table view
         tableView = (TableView)view.findViewById(R.id.tagMarkerTableView);
+        assert tableView != null;
         tableView.setAdapter(new MarkerDataTableAdapter(experimentAnalysis.getTagMarkers(),
                 experimentAnalysis));
 

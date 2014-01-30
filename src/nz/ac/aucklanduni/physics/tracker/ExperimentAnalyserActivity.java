@@ -1,3 +1,10 @@
+/*
+ * Copyright 2013-2014.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
 package nz.ac.aucklanduni.physics.tracker;
 
 import android.app.Activity;
@@ -31,6 +38,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         getMenuInflater().inflate(R.menu.experiment_analyser_activity_actions, menu);
 
         MenuItem backItem = menu.findItem(R.id.action_back);
+        assert backItem != null;
         backItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -40,6 +48,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             }
         });
         MenuItem settingsItem = menu.findItem(R.id.action_run_settings);
+        assert settingsItem != null;
         StringBuilder settingsName = new StringBuilder();
         if (plugin.hasRunEditActivity(settingsName)) {
             settingsItem.setTitle(settingsName);
@@ -55,6 +64,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         }
 
         MenuItem calibrationMenu = menu.findItem(R.id.action_calibration_settings);
+        assert calibrationMenu != null;
         calibrationMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -104,7 +114,6 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
                 specificData.putBundle("run_settings", runSettings);
                 experimentAnalysis.setExperimentSpecificData(specificData);
             }
-            return;
         }
     }
 
@@ -186,11 +195,14 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
     private void exportTagMarkerCSVData() {
         File csvFile = getTagMarkerCSVFile();
 
-        csvFile.setWritable(true);
-        FileOutputStream outputStream = null;
+        if (!csvFile.setWritable(true))
+            return;
+
+        FileOutputStream outputStream;
         if (!csvFile.exists()) {
             try {
-                csvFile.createNewFile();
+                if (!csvFile.createNewFile())
+                    return;
             } catch (IOException e) {
                 e.printStackTrace();
                 return;

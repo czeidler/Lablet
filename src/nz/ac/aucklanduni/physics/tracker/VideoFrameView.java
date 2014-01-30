@@ -1,3 +1,10 @@
+/*
+ * Copyright 2013-2014.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
 package nz.ac.aucklanduni.physics.tracker;
 
 import android.content.Context;
@@ -11,6 +18,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
+
 
 class RatioSurfaceView extends SurfaceView {
     private float ratio = 4.f/3;
