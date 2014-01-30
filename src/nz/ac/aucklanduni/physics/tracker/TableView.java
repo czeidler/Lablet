@@ -74,8 +74,10 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
     public void onRowUpdated(ITableAdapter<?> table, int row, int number) {
         for (int i = row; i < row + number; i++) {
             TableRow tableRow = (TableRow)getChildAt(i);
-            for (int column = 0; column < adapter.getColumnCount(); column++)
+            assert tableRow != null;
+            for (int column = 0; column < adapter.getColumnCount(); column++) {
                 adapter.updateView(tableRow.getChildAt(column), i, column);
+            }
         }
     }
 
@@ -109,6 +111,7 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
                 cell.setBackgroundColor(rowBackgroundColor);
             tableRow.addView(cell);
             TableRow.LayoutParams cellParams = (TableRow.LayoutParams)cell.getLayoutParams();
+            assert cellParams != null;
             cellParams.setMargins(1, 1, 1, 1);
             cellParams.weight = adapter.getColumnWeight(column);
         }

@@ -23,14 +23,17 @@ public class AnalysisTableGraphDataFragment extends android.support.v4.app.Fragm
         ExperimentAnalysis experimentAnalysis = activity.getExperimentAnalysis();
 
         View view = inflater.inflate(R.layout.analysis_table_graph_fragment, container, false);
+        assert view != null;
 
         // marker table view
         tableView = (TableView)view.findViewById(R.id.tagMarkerTableView);
+        assert tableView != null;
         tableView.setAdapter(new MarkerDataTableAdapter(experimentAnalysis.getTagMarkers(),
                 experimentAnalysis));
 
         // marker graph view
         graphView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
+        assert graphView != null;
         graphView.setAdapter(new MarkerGraphAdapter(experimentAnalysis.getTagMarkers()));
 
         return view;

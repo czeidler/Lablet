@@ -17,7 +17,6 @@ import java.io.File;
 
 interface IExperimentRunView {
     public void setCurrentRun(int run);
-    public int getNumberOfRuns();
 
     // convert a coordinate on the screen to the real value of the measurement
     public void fromScreen(PointF screen, PointF real);

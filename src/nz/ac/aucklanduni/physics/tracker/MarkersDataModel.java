@@ -26,10 +26,6 @@ class MarkerData {
         return runId;
     }
 
-    public void setRunId(int runId) {
-        this.runId = runId;
-    }
-
     public PointF getPosition() {
         return positionReal;
     }
@@ -60,7 +56,7 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
 
     /**
      * If calibration is set, listeners get an onAllDataChanged notification when the calibration changed.
-     * @param calibration
+     * @param calibration the calibration to use in getCalibratedMarkerPositionAt
      */
     public void setCalibration(Calibration calibration) {
         if (this.calibration != null)
@@ -80,8 +76,7 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
         PointF raw = data.getPosition();
         if (calibration == null)
             return raw;
-        PointF calibratedPosition = new PointF(calibration.fromXRaw(raw.x), calibration.fromYRaw(raw.y));
-        return calibratedPosition;
+        return new PointF(calibration.fromXRaw(raw.x), calibration.fromYRaw(raw.y));
     }
 
     public void selectMarkerData(int index) {

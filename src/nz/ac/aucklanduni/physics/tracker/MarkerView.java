@@ -13,6 +13,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -194,7 +195,6 @@ class SimpleMarker extends DragableMarker {
 
 
 interface IMarkerDataModelPainter {
-    public MarkersDataModel getModel();
     public void release();
 
     public void draw(Canvas canvas, float priority);
@@ -219,10 +219,6 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
 
         markerList = new ArrayList<IMarker>();
         onViewSizeChanged();
-    }
-
-    public MarkersDataModel getModel() {
-        return markerData;
     }
 
     public void release() {
@@ -470,8 +466,6 @@ class CalibrationMarker extends SimpleMarker {
 }
 
 class CalibrationMarkerPainter extends AbstractMarkersPainter {
-    private Calibration calibration;
-
     public CalibrationMarkerPainter(View parent, IExperimentRunView runView, MarkersDataModel model) {
         super(parent, runView, model);
     }
@@ -534,7 +528,6 @@ public class MarkerView extends ViewGroup {
     private IMarker selectedMarker = null;
     protected List<IMarkerDataModelPainter> markerPainterList;
     protected Rect viewFrame = null;
-    private boolean touchEventHandledLastTime = false;
     private IExperimentRunView experimentRunView = null;
 
     private int parentWidth;
@@ -581,16 +574,6 @@ public class MarkerView extends ViewGroup {
         markerPainterList.add(painter);
     }
 
-    public boolean removeMarkers(MarkersDataModel model) {
-        IMarkerDataModelPainter painter = findMarkersPainter(model);
-        if (painter == null)
-            return false;
-        painter.release();
-        markerPainterList.remove(painter);
-
-        return true;
-    }
-
     public void setCurrentRun(int run) {
         if (selectedMarker != null) {
             selectedMarker.setSelected(false);
@@ -610,9 +593,7 @@ public class MarkerView extends ViewGroup {
         for (IMarkerDataModelPainter markerPainter : markerPainterList)
             markerPainter.draw(canvas, 1);
 
-        Rect frame = new Rect();
-        getDrawingRect(frame);
-        if (frame.width() != parentWidth || frame.height() != parentHeight)
+        if (viewFrame.width() != parentWidth || viewFrame.height() != parentHeight)
             requestLayout();
     }
 
@@ -636,8 +617,11 @@ public class MarkerView extends ViewGroup {
                     break;
                 }
             }
-            if (handled)
-                getParent().requestDisallowInterceptTouchEvent(true);
+            if (handled) {
+                ViewParent parent = getParent();
+                if (parent != null)
+                    parent.requestDisallowInterceptTouchEvent(true);
+            }
 
         } else if (action == MotionEvent.ACTION_UP) {
             for (IMarker marker : allMarkerList) {
@@ -647,15 +631,12 @@ public class MarkerView extends ViewGroup {
                 }
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
-            //if (viewFrame.contains((int)event.getX(), (int)event.getY())) {
-                for (IMarker marker : allMarkerList) {
-                    if (marker.handleActionMove(event)) {
-                        handled = true;
-                        break;
-                    }
+            for (IMarker marker : allMarkerList) {
+                if (marker.handleActionMove(event)) {
+                    handled = true;
+                    break;
                 }
-            //} else
-            //    handled = touchEventHandledLastTime;
+            }
         }
         if (handled)
             invalidate();
@@ -665,8 +646,6 @@ public class MarkerView extends ViewGroup {
             selectedMarker = null;
             invalidate();
         }
-
-        touchEventHandledLastTime = handled;
 
         return handled;
     }
@@ -693,8 +672,10 @@ public class MarkerView extends ViewGroup {
             widthMeasureSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST);
             heightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.AT_MOST);
 
-            getLayoutParams().width = parentWidth;
-            getLayoutParams().height = parentHeight;
+            LayoutParams params = getLayoutParams();
+            assert params != null;
+            params.width = parentWidth;
+            params.height = parentHeight;
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             return;
         }
@@ -709,13 +690,5 @@ public class MarkerView extends ViewGroup {
         for (IMarkerDataModelPainter tagMarkerCollection : markerPainterList)
             tagMarkerCollection.onViewSizeChanged();
         invalidate();
-    }
-
-    private IMarkerDataModelPainter findMarkersPainter(MarkersDataModel model) {
-        for (IMarkerDataModelPainter painter : markerPainterList) {
-            if (painter.getModel() == painter);
-            return painter;
-        }
-        return null;
     }
 }

@@ -17,8 +17,6 @@ import java.io.File;
 
 public class CameraExperiment extends Experiment {
     private String videoFileName;
-    private int videoHeight;
-    private int videoWidth;
     private int numberOfRuns;
 
     // milli seconds
@@ -99,22 +97,12 @@ public class CameraExperiment extends Experiment {
         MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.parse(file.getPath()));
 
         videoDuration = mediaPlayer.getDuration();
-        videoHeight = mediaPlayer.getVideoHeight();
-        videoWidth = mediaPlayer.getVideoWidth();
 
         mediaPlayer.release();
     }
 
     public String getVideoFileName() {
         return videoFileName;
-    }
-
-    public int getVideoHeight() {
-        return videoHeight;
-    }
-
-    public int getVideoWidth() {
-        return videoWidth;
     }
 
     public int getAnalysisFrameRate() {

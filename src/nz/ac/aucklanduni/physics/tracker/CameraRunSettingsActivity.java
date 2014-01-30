@@ -41,6 +41,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         getMenuInflater().inflate(R.menu.simpel_settings_menu, menu);
 
         MenuItem backItem = menu.findItem(R.id.action_cancel);
+        assert backItem != null;
         backItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -50,6 +51,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
             }
         });
         MenuItem applyMenuItem = menu.findItem(R.id.action_apply);
+        assert applyMenuItem != null;
         applyMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -166,7 +168,9 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
 
         // get initial values
         Bundle runSettings = null;
-        Bundle analysisSpecificData = intent.getExtras().getBundle("analysisSpecificData");
+        Bundle extras = intent.getExtras();
+        assert extras != null;
+        Bundle analysisSpecificData = extras.getBundle("analysisSpecificData");
         if (analysisSpecificData != null)
             runSettings = analysisSpecificData.getBundle("run_settings");
         if (runSettings != null) {
@@ -313,10 +317,5 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
 
     public void seekTo(int time) {
         videoFrameView.seekToFrame(time * 1000);
-    }
-
-    protected void toastMessage(String message) {
-        Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
-        toast.show();
     }
 }

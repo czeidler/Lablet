@@ -66,10 +66,6 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
         markerView.addXYCalibrationMarkers(data);
     }
 
-    public boolean removeMarkerData(MarkersDataModel data) {
-        return markerView.removeMarkers(data);
-    }
-
     public void release() {
         markerView.release();
     }

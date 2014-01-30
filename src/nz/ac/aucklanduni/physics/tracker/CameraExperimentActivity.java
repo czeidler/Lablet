@@ -4,8 +4,7 @@
  *
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
- */
-package nz.ac.aucklanduni.physics.tracker;
+ */package nz.ac.aucklanduni.physics.tracker;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -42,7 +41,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
     static final int CAMERA_FACE = Camera.CameraInfo.CAMERA_FACING_BACK;
 
-    static private String videoFileName = "video.mp4";
+    static final String videoFileName = "video.mp4";
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -50,6 +49,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
         getMenuInflater().inflate(R.menu.perform_experiment_activity_actions, menu);
 
         MenuItem backItem = menu.findItem(R.id.action_back);
+        assert backItem != null;
         backItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -58,6 +58,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
             }
         });
         analyseMenuItem = menu.findItem(R.id.action_analyse);
+        assert analyseMenuItem != null;
         analyseMenuItem.setEnabled(false);
         analyseMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -79,6 +80,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
         preview = (RatioSurfaceView)findViewById(R.id.surfaceView);
         previewHolder = preview.getHolder();
+        assert previewHolder != null;
         previewHolder.addCallback(surfaceCallback);
 
         videoView = (VideoView)findViewById(R.id.videoView);
@@ -145,6 +147,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
             camera = Camera.open();
 
         Camera.Size size = camera.getParameters().getPictureSize();
+        assert size != null;
         preview.setRatio((float)size.width / (float)size.height);
 
         if (previewHolder.getSurface() != null)
@@ -213,9 +216,12 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
             File outputDir = getStorageDir();
             videoFile = new File(outputDir, getVideoFileName());
-            videoFile.createNewFile();
-            recorder.setOutputFile(videoFile.getPath());
+            if (!videoFile.exists()) {
+                if (!videoFile.createNewFile())
+                    return;
+            }
 
+            recorder.setOutputFile(videoFile.getPath());
             recorder.prepare();
         } catch (Exception e) {
             e.printStackTrace();

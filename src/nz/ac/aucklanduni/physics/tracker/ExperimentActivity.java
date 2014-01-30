@@ -40,8 +40,8 @@ abstract public class ExperimentActivity extends FragmentActivity {
     }
 
     protected Bundle loadBundleFromFile(File file) {
-        Bundle bundle = null;
-        InputStream inStream = null;
+        Bundle bundle;
+        InputStream inStream;
         try {
             inStream = new FileInputStream(file);
         } catch (FileNotFoundException e) {
@@ -97,7 +97,6 @@ abstract public class ExperimentActivity extends FragmentActivity {
             return false;
         }
 
-        assert bundle != null;
         Bundle experimentData = bundle.getBundle("data");
         if (experimentData == null) {
             showErrorAndFinish("failed to load experiment data");
@@ -148,15 +147,17 @@ abstract public class ExperimentActivity extends FragmentActivity {
         File path = Experiment.getMainExperimentDir(this);
         if (path != null) {
             File file = new File(path, directoryName);
-            if (!file.exists())
-                file.mkdir();
+            if (!file.exists()) {
+                if (!file.mkdir())
+                    throw new IOException();
+            }
             return file;
         }
         throw new IOException();
     }
 
     protected boolean deleteStorageDir() {
-        File file = null;
+        File file;
         try {
             file = getStorageDir();
         } catch (IOException e) {

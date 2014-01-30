@@ -16,7 +16,6 @@ import java.io.File;
 
 public class CameraExperimentRunView extends VideoFrameView implements IExperimentRunView {
     private CameraExperiment experiment;
-    private int positionMicroSeconds = 0;
 
     public CameraExperimentRunView(Context context, Experiment experiment) {
         super(context);
@@ -38,15 +37,10 @@ public class CameraExperimentRunView extends VideoFrameView implements IExperime
             toastMessage("can't get run information!");
             return;
         }
-        positionMicroSeconds = bundle.getInt("frame_position");
+        int positionMicroSeconds = bundle.getInt("frame_position");
         positionMicroSeconds *= 1000;
 
         seekToFrame(positionMicroSeconds);
-    }
-
-    @Override
-    public int getNumberOfRuns() {
-        return experiment.getNumberOfRuns();
     }
 
     @Override

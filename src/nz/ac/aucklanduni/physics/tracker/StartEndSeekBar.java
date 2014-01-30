@@ -14,8 +14,8 @@ import android.view.View;
 
 
 class StartEndMarker extends DragableMarker {
-    private final float WIDTH = 30;
-    private final float HEIGHT = 35;
+    final float WIDTH = 30;
+    final float HEIGHT = 35;
 
     Paint lightColor = new Paint();
     Paint darkenColor = new Paint();
@@ -96,10 +96,8 @@ class StartEndPainter extends AbstractMarkersPainter {
 
     @Override
     public void draw(Canvas canvas, float priority) {
-        for (int i = 0; i < markerList.size(); i++) {
-            IMarker marker = markerList.get(i);
+        for (IMarker marker : markerList)
             marker.onDraw(canvas, priority);
-        }
     }
 
     @Override
@@ -171,7 +169,9 @@ public class StartEndSeekBar extends MarkerView implements IExperimentRunView {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        setMeasuredDimension(getLayoutParams().width, 35);
+        LayoutParams params = getLayoutParams();
+        assert params != null;
+        setMeasuredDimension(params.width, 35);
     }
 
     public MarkersDataModel getMarkersDataModel() {
@@ -181,11 +181,6 @@ public class StartEndSeekBar extends MarkerView implements IExperimentRunView {
     @Override
     public void setCurrentRun(int run) {
 
-    }
-
-    @Override
-    public int getNumberOfRuns() {
-        return 0;
     }
 
     @Override

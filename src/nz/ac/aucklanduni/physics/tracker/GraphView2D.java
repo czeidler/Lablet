@@ -201,4 +201,4 @@ class MarkerGraphAdapter implements IGraphAdapter, MarkersDataModel.IMarkersData
         for (IGraphAdapterListener listener : listeners)
             listener.onDataPointSelected(this, index);
     }
-};
+}

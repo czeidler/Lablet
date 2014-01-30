@@ -84,7 +84,7 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
         MarkerData data = getRow(row - 1);
 
         PointF position = model.getCalibratedMarkerPositionAt(row - 1);
-        String text = new String();
+        String text = "";
         if (column == 0)
             text += data.getRunId();
         else if (column == 1)
@@ -108,7 +108,7 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
     }
 
     private void populateHeaderView(TextView textView, int column) {
-        String text = null;
+        String text;
         if (column == 0)
             text = "id";
         else if (column == 1)

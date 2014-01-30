@@ -66,7 +66,6 @@ public class AndroidPhysicsTracker extends Activity {
     private CheckBox selectAllCheckBox = null;
     private MenuItem deleteItem = null;
     private AlertDialog deleteExperimentAlertBox = null;
-    private ListView experimentListView = null;
     private ExperimentDirObserver experimentDirObserver = null;
 
     static final int PERFORM_EXPERIMENT = 0;
@@ -169,7 +168,7 @@ public class AndroidPhysicsTracker extends Activity {
         });
 
         // experiment list
-        experimentListView = (ListView)findViewById(R.id.existingExperimentListView);
+        ListView experimentListView = (ListView) findViewById(R.id.existingExperimentListView);
         experimentListView.setBackgroundColor(listBackgroundColor);
         experimentList = new ArrayList<ExperimentDirectoryEntry>();
         experimentListAdaptor = new CheckBoxAdapter(this, R.layout.check_box_list_item, experimentList);

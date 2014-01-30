@@ -254,7 +254,7 @@ public class PersistentBundle {
     abstract class HandlerHelper<T> {
         abstract public T parseValue(String string);
         public String toString(T value) {
-            String string = new String();
+            String string = "";
             string += value;
             return string;
         }
@@ -295,6 +295,7 @@ public class PersistentBundle {
         @Override
         public Float[] getArray(Bundle bundle, String key) {
             float[] array = bundle.getFloatArray(key);
+            assert array != null;
             Float[] outArray = new Float[array.length];
             for (int i = 0; i < outArray.length; i++)
                 outArray[i] = array[i];
@@ -334,6 +335,7 @@ public class PersistentBundle {
         @Override
         public Integer[] getArray(Bundle bundle, String key) {
             int[] array = bundle.getIntArray(key);
+            assert array != null;
             Integer[] outArray = new Integer[array.length];
             for (int i = 0; i < outArray.length; i++)
                 outArray[i] = array[i];
@@ -373,6 +375,7 @@ public class PersistentBundle {
         @Override
         public Boolean[] getArray(Bundle bundle, String key) {
             boolean[] array = bundle.getBooleanArray(key);
+            assert array != null;
             Boolean[] outArray = new Boolean[array.length];
             for (int i = 0; i < outArray.length; i++)
                 outArray[i] = array[i];
@@ -412,6 +415,7 @@ public class PersistentBundle {
         @Override
         public Double[] getArray(Bundle bundle, String key) {
             double[] array = bundle.getDoubleArray(key);
+            assert array != null;
             Double[] outArray = new Double[array.length];
             for (int i = 0; i < outArray.length; i++)
                 outArray[i] = array[i];

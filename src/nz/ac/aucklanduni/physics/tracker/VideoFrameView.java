@@ -64,7 +64,6 @@ class RatioSurfaceView extends SurfaceView {
         }
 
         setMeasuredDimension(width, height);
-        return;
     }
 }
 
@@ -128,13 +127,8 @@ public class VideoFrameView extends RatioSurfaceView {
         }
     };
 
-    public String getVideoFilePath() {
-        return videoFilePath;
-    }
-
     public void setVideoFilePath(String path) {
         videoFilePath = path;
-
 
         MediaExtractor extractor = new MediaExtractor();
         try {

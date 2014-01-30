@@ -12,6 +12,7 @@ import android.graphics.PointF;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class Calibration {
     interface ICalibrationListener {
         public void onCalibrationChanged();
