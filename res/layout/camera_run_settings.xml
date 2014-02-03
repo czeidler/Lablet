@@ -29,29 +29,6 @@
           class="nz.ac.aucklanduni.physics.tracker.StartEndSeekBar" android:id="@+id/startEndSeekBar"
           android:layout_alignParentLeft="true"
           android:layout_above="@+id/editStart" android:layout_alignRight="@+id/seekBar"/>
-    <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:id="@+id/editStart"
-            android:editable="false" android:enabled="true"
-            android:layout_alignParentBottom="true" android:layout_toRightOf="@+id/textView2" android:focusable="false"/>
-    <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:id="@+id/editEnd"
-            android:editable="false" android:enabled="true"
-            android:layout_alignParentBottom="true" android:layout_toRightOf="@+id/textView3" android:focusable="false"/>
-    <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:id="@+id/editFrames"
-            android:editable="false" android:enabled="true"
-            android:layout_alignParentBottom="true"
-            android:layout_alignRight="@+id/frameRateLayout"
-            android:layout_alignTop="@+id/editEnd"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -59,6 +36,13 @@
             android:text="Analysis Start Position [ms]:"
             android:id="@+id/textView2"
             android:layout_alignParentBottom="true" android:layout_alignParentLeft="true"/>
+    <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:id="@+id/editStart"
+            android:editable="false" android:enabled="true"
+            android:layout_alignParentBottom="true" android:layout_toRightOf="@+id/textView2" android:focusable="false"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -66,6 +50,31 @@
             android:text="Analysis End Position [ms]:"
             android:id="@+id/textView3"
             android:layout_alignParentBottom="true" android:layout_toRightOf="@+id/editStart"/>
+    <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:id="@+id/editEnd"
+            android:editable="false" android:enabled="true"
+            android:layout_alignParentBottom="true" android:layout_toRightOf="@+id/textView3" android:focusable="false"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Frames:"
+            android:layout_toRightOf="@+id/editEnd"
+            android:layout_alignParentBottom="true" android:layout_alignTop="@+id/textView3"
+            android:id="@+id/textView5"/>
+    <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:id="@+id/editFrames"
+            android:editable="false" android:enabled="true"
+            android:layout_alignRight="@+id/frameRateLayout"
+            android:layout_alignTop="@+id/editEnd" android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/textView5"/>
+
     <LinearLayout
             android:id="@+id/frameRateLayout"
             android:orientation="vertical"
@@ -102,12 +111,5 @@
                     android:minWidth="100dp"/>
         </LinearLayout>
     </LinearLayout>
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Frames:"
-            android:layout_toRightOf="@+id/editEnd"
-            android:layout_alignParentBottom="true" android:layout_alignTop="@+id/textView3"/>
 
 </RelativeLayout>
