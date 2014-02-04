@@ -157,7 +157,7 @@ public class StartEndSeekBar extends MarkerView implements IExperimentRunView {
         markersDataModel.addMarkerData(new MarkerData(1));
 
         startEndPainter = new StartEndPainter(this, this, markersDataModel);
-        addPainter(startEndPainter);
+        addMarkerPainter(startEndPainter);
         invalidate();
     }
 

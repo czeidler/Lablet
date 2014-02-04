@@ -530,11 +530,11 @@ class CalibrationMarkerPainter extends AbstractMarkersPainter {
 
 
 class OriginMarker extends SimpleMarker {
-    private Paint paint = null;
+    private OriginMarkerPainter originMarkerPainter;
 
-    public OriginMarker(AbstractMarkersPainter parentContainer) {
+    public OriginMarker(OriginMarkerPainter parentContainer) {
         super(parentContainer);
-        paint = new Paint();
+        originMarkerPainter = parentContainer;
     }
 
     @Override
@@ -543,14 +543,11 @@ class OriginMarker extends SimpleMarker {
             super.onDraw(canvas, priority);
             return;
         }
-
-        paint.setColor(Color.argb(100, 0, 255, 0));
-        canvas.drawCircle(position.x, position.y, 7, paint);
     }
 
     @Override
     protected void onDraggedTo(PointF point) {
-        parent.markerMoveRequest(this, point);
+        originMarkerPainter.onDraggedTo(this, point);
     }
 }
 
@@ -564,36 +561,6 @@ class OriginMarkerPainter extends AbstractMarkersPainter {
         super(parent, runView, model);
         this.angle = angle;
         this.swapAxis = swapAxis;
-    }
-
-    private float getScreenAxisLength() {
-        final PointF axisLengthPoint = new PointF(15, 0);
-        PointF screen = new PointF();
-        experimentRunView.toScreen(axisLengthPoint, screen);
-        return screen.x;
-    }
-
-    public void setTo(PointF origin, float angle) {
-        this.angle = angle;
-        markerData.setMarkerPosition(origin, 0);
-
-        PointF screenOrigin = new PointF();
-        experimentRunView.toScreen(origin, screenOrigin);
-
-        float axisLength = getScreenAxisLength();
-
-        PointF xAxisScreen = new PointF(screenOrigin.x + axisLength, screenOrigin.y);
-        transform(xAxisScreen);
-        PointF yAxisScreen = new PointF(screenOrigin.x, screenOrigin.y - axisLength);
-        transform(yAxisScreen);
-
-        PointF xAxis = new PointF();
-        PointF yAxis = new PointF();
-        experimentRunView.fromScreen(xAxisScreen, xAxis);
-        experimentRunView.fromScreen(yAxisScreen, yAxis);
-
-        markerData.setMarkerPosition(xAxis, 1);
-        markerData.setMarkerPosition(yAxis, 2);
     }
 
     @Override
@@ -663,6 +630,21 @@ class OriginMarkerPainter extends AbstractMarkersPainter {
 
     @Override
     public void markerMoveRequest(DragableMarker marker, PointF newPosition) {
+        onDraggedTo(marker, newPosition);
+
+        PointF origin = new PointF();
+        PointF xAxis = new PointF();
+        PointF yAxis = new PointF();
+        experimentRunView.fromScreen(getScreenPos(0), origin);
+        experimentRunView.fromScreen(getScreenPos(1), xAxis);
+        experimentRunView.fromScreen(getScreenPos(2), yAxis);
+
+        markerData.setMarkerPosition(origin, 0);
+        markerData.setMarkerPosition(xAxis, 1);
+        markerData.setMarkerPosition(yAxis, 2);
+    }
+
+    protected void onDraggedTo(DragableMarker marker, PointF newPosition) {
         int row = markerList.lastIndexOf(marker);
         if (row < 0)
             return;
@@ -678,25 +660,45 @@ class OriginMarkerPainter extends AbstractMarkersPainter {
             // x rotation
             PointF origin = new PointF();
             origin.set(markerData.getMarkerDataAt(0).getPosition());
-            PointF relative = new PointF();
-            relative.x = newReal.x - origin.x;
-            relative.y = newReal.y - origin.y;
-            float angle = 90;
-            if (relative.x != 0)
-                angle = (float)Math.atan(relative.y / relative.x);
-            angle = (float)Math.toDegrees((double)angle);
-            // choose the right quadrant
-            if (relative.x < 0)
-                angle = 180 + angle;
-
+            float angle = OriginCalibrationSetter.getAngle(origin, newReal);
             if (row == 2)
                 angle -= 90;
+
             setTo(origin, angle);
         }
     }
 
+    private void setTo(PointF origin, float angle) {
+        this.angle = angle;
+
+        PointF screenOrigin = new PointF();
+        experimentRunView.toScreen(origin, screenOrigin);
+
+        float axisLength = getScreenAxisLength();
+
+        PointF xAxisScreen = new PointF(screenOrigin.x + axisLength, screenOrigin.y);
+        transform(xAxisScreen);
+        PointF yAxisScreen = new PointF(screenOrigin.x, screenOrigin.y - axisLength);
+        transform(yAxisScreen);
+
+        setScreenPos(0, screenOrigin);
+        setScreenPos(1, xAxisScreen);
+        setScreenPos(2, yAxisScreen);
+    }
+
+    private float getScreenAxisLength() {
+        final PointF axisLengthPoint = new PointF(15, 0);
+        PointF screen = new PointF();
+        experimentRunView.toScreen(axisLengthPoint, screen);
+        return screen.x;
+    }
+
     private PointF getScreenPos(int markerIndex) {
         return markerList.get(markerIndex).getPosition();
+    }
+
+    private void setScreenPos(int markerIndex, PointF point) {
+        markerList.get(markerIndex).setPosition(point);
     }
 }
 
@@ -739,28 +741,15 @@ public class MarkerView extends ViewGroup {
         markerPainterList.clear();
     }
 
-    public void addXYCalibrationMarkers(MarkersDataModel marker) {
-        markerPainterList.add(new CalibrationMarkerPainter(this, experimentRunView, marker));
-    }
-
-    public OriginMarkerPainter addOriginMarkers(MarkersDataModel marker, float angle, boolean swapAxis) {
-        OriginMarkerPainter painter = new OriginMarkerPainter(this, experimentRunView, marker, angle, swapAxis);
+    public void addMarkerPainter(IMarkerDataModelPainter painter) {
         markerPainterList.add(painter);
-        return painter;
+        invalidate();
     }
 
     public boolean removeMarkerPainter(IMarkerDataModelPainter painter) {
         boolean removed = markerPainterList.remove(painter);
         invalidate();
         return removed;
-    }
-
-    public void addTagMarkers(MarkersDataModel marker) {
-        addPainter(new TagMarkerDataModelPainter(this, experimentRunView, marker));
-    }
-
-    protected void addPainter(IMarkerDataModelPainter painter) {
-        markerPainterList.add(painter);
     }
 
     public void setCurrentRun(int run) {

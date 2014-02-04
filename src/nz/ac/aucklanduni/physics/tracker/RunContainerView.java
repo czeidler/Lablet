@@ -59,17 +59,27 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
     }
 
     public void addTagMarkerData(MarkersDataModel data) {
-        markerView.addTagMarkers(data);
+        IMarkerDataModelPainter painter = new TagMarkerDataModelPainter(markerView,
+                (IExperimentRunView)experimentRunView, data);
+        markerView.addMarkerPainter(painter);
+
         onRunChanged(runDataModel.getCurrentRun());
     }
 
     public void addXYCalibrationData(MarkersDataModel data) {
-        markerView.addXYCalibrationMarkers(data);
+        IMarkerDataModelPainter painter = new CalibrationMarkerPainter(markerView,
+                (IExperimentRunView)experimentRunView, data);
+        markerView.addMarkerPainter(painter);
     }
 
-    public void setOriginData(MarkersDataModel data, boolean swapAxis)
-    public void addOriginData(MarkersDataModel data) {
-        markerView.addOriginMarkers(data);
+    public void removeOriginData() {
+        markerView.removeMarkerPainter(originMarkerPainter);
+    }
+
+    public void addOriginData(MarkersDataModel data, Calibration calibration) {
+        originMarkerPainter = new OriginMarkerPainter(markerView, (IExperimentRunView)experimentRunView, data,
+                calibration.getRotation(), calibration.getSwapAxis());
+        markerView.addMarkerPainter(originMarkerPainter);
     }
 
     public void release() {
