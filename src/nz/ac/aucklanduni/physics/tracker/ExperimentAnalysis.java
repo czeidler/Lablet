@@ -33,6 +33,7 @@ public class ExperimentAnalysis {
     private MarkersDataModel originMarkers;
 
     private LengthCalibrationSetter lengthCalibrationSetter;
+    private OriginCalibrationSetter originCalibrationSetter;
 
     private Bundle experimentSpecificData = null;
 
@@ -60,14 +61,13 @@ public class ExperimentAnalysis {
 
         originMarkers = new MarkersDataModel();
         point1 = new MarkerData(-1);
-        point1.setPosition(new PointF(10, 20));
         originMarkers.addMarkerData(point1);
         point2 = new MarkerData(-2);
-        point2.setPosition(new PointF(20, 10));
         originMarkers.addMarkerData(point2);
         MarkerData point3 = new MarkerData(-3);
-        point3.setPosition(new PointF(10, 10));
+        point3.setPosition(calibration.getOrigin());
         originMarkers.addMarkerData(point3);
+        originCalibrationSetter = new OriginCalibrationSetter(calibration, originMarkers);
     }
 
     public Experiment getExperiment() { return  experiment; }

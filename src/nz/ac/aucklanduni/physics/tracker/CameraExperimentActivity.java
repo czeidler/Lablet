@@ -9,6 +9,7 @@
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
@@ -202,7 +203,6 @@ public class CameraExperimentActivity extends ExperimentActivity {
         try {
             camera.unlock();
             recorder.setCamera(camera);
-
             recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
             recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);

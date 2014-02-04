@@ -22,7 +22,8 @@ public class Calibration {
     private float yCalibration;
 
     private PointF origin = new PointF();
-    private double rotation;
+    private float rotation;
+    private boolean swapAxis = false;
 
     private List<ICalibrationListener> listeners;
 
@@ -82,14 +83,23 @@ public class Calibration {
         notifyCalibrationChanged();
     }
 
-    public void setOrigin(PointF origin) {
+    public void setOrigin(PointF origin, float rotation, boolean swapAxis) {
         this.origin.set(origin);
+        this.rotation = rotation;
+        this.swapAxis = swapAxis;
         notifyCalibrationChanged();
     }
 
-    public void setRotation(double rotation) {
-        this.rotation = rotation;
-        notifyCalibrationChanged();
+    public PointF getOrigin() {
+        return origin;
+    }
+
+    public float getRotation() {
+        return rotation;
+    }
+
+    public boolean getSwapAxis() {
+        return swapAxis;
     }
 
     private void notifyCalibrationChanged() {
@@ -98,6 +108,69 @@ public class Calibration {
     }
 }
 
+
+class OriginCalibrationSetter implements MarkersDataModel.IMarkersDataModelListener {
+    private Calibration calibration;
+    private MarkersDataModel calibrationMarkers;
+
+    public OriginCalibrationSetter(Calibration calibration, MarkersDataModel data) {
+        this.calibration = calibration;
+        this.calibrationMarkers = data;
+        this.calibrationMarkers.addListener(this);
+
+        calibrate();
+    }
+
+    static public float getAngle(PointF origin, PointF point) {
+        PointF relative = new PointF();
+        relative.x = point.x - origin.x;
+        relative.y = point.y - origin.y;
+        float angle = 90;
+        if (relative.x != 0)
+            angle = (float)Math.atan(relative.y / relative.x);
+        angle = (float)Math.toDegrees((double)angle);
+        // choose the right quadrant
+        if (relative.x < 0)
+            angle = 180 + angle;
+        return angle;
+    }
+
+    private void calibrate() {
+        if (calibrationMarkers.getMarkerCount() != 3)
+            return;
+        PointF origin = calibrationMarkers.getMarkerDataAt(0).getPosition();
+        PointF axis1 = calibrationMarkers.getMarkerDataAt(1).getPosition();
+
+        float angle = getAngle(origin, axis1);
+
+        calibration.setOrigin(origin, angle, false);
+    }
+
+    @Override
+    public void onDataAdded(MarkersDataModel model, int index) {
+        calibrate();
+    }
+
+    @Override
+    public void onDataRemoved(MarkersDataModel model, int index, MarkerData data) {
+        calibrate();
+    }
+
+    @Override
+    public void onDataChanged(MarkersDataModel model, int index, int number) {
+        calibrate();
+    }
+
+    @Override
+    public void onAllDataChanged(MarkersDataModel model) {
+        calibrate();
+    }
+
+    @Override
+    public void onDataSelected(MarkersDataModel model, int index) {
+
+    }
+}
 
 class LengthCalibrationSetter implements MarkersDataModel.IMarkersDataModelListener {
     private Calibration calibration;

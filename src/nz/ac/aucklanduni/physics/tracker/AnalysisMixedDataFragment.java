@@ -38,7 +38,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         runContainerView.setTo(experimentRunView, experimentAnalysis.getRunDataModel());
         runContainerView.addTagMarkerData(experimentAnalysis.getTagMarkers());
         runContainerView.addXYCalibrationData(experimentAnalysis.getXYCalibrationMarkers());
-        runContainerView.addOriginData(experimentAnalysis.getOriginMarkers());
+        runContainerView.addOriginData(experimentAnalysis.getOriginMarkers(), experimentAnalysis.getCalibration());
 
         // marker table view
         tableView = (TableView)view.findViewById(R.id.tagMarkerTableView);
