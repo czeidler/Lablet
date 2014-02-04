@@ -21,7 +21,7 @@ public class Calibration {
     private float xCalibration;
     private float yCalibration;
 
-    private PointF origin = new PointF();
+    private PointF origin = new PointF(10, 10);
     private float rotation;
     private boolean swapAxis = false;
 
@@ -52,7 +52,7 @@ public class Calibration {
     public PointF fromRaw(PointF raw) {
         PointF point = new PointF();
         // translation
-        point.x = raw.x - origin.y;
+        point.x = raw.x - origin.x;
         point.y = raw.y - origin.y;
 
         // rotation
@@ -133,6 +133,19 @@ class OriginCalibrationSetter implements MarkersDataModel.IMarkersDataModelListe
         if (relative.x < 0)
             angle = 180 + angle;
         return angle;
+    }
+
+    public void setOrigin(PointF origin, float angle, boolean swapAxis) {
+        PointF xAxis = new PointF();
+        float length = 10;
+        xAxis.x = (float)Math.cos(Math.toRadians(angle)) * length;
+        xAxis.y = (float)Math.sin(Math.toRadians(angle)) * length;
+        xAxis.x += origin.x;
+        xAxis.y += origin.y;
+
+        calibration.setOrigin(origin, angle, swapAxis);
+        calibrationMarkers.setMarkerPosition(origin, 0);
+        calibrationMarkers.setMarkerPosition(xAxis, 1);
     }
 
     private void calibrate() {

@@ -78,7 +78,7 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
 
     public void addOriginData(MarkersDataModel data, Calibration calibration) {
         originMarkerPainter = new OriginMarkerPainter(markerView, (IExperimentRunView)experimentRunView, data,
-                calibration.getRotation(), calibration.getSwapAxis());
+                calibration);
         markerView.addMarkerPainter(originMarkerPainter);
     }
 

@@ -552,15 +552,15 @@ class OriginMarker extends SimpleMarker {
 }
 
 class OriginMarkerPainter extends AbstractMarkersPainter {
+    private Calibration calibration;
     private float angle;
-    private boolean swapAxis;
     private boolean firstDraw = true;
 
-    public OriginMarkerPainter(View parent, IExperimentRunView runView, MarkersDataModel model, float angle,
-                               boolean swapAxis) {
+    public OriginMarkerPainter(View parent, IExperimentRunView runView, MarkersDataModel model,
+                               Calibration calibration) {
         super(parent, runView, model);
-        this.angle = angle;
-        this.swapAxis = swapAxis;
+        this.calibration = calibration;
+        angle = calibration.getRotation();
     }
 
     @Override
@@ -593,7 +593,7 @@ class OriginMarkerPainter extends AbstractMarkersPainter {
 
         String label1;
         String label2;
-        if (swapAxis) {
+        if (calibration.getSwapAxis()) {
             label1 = "y";
             label2 = "x";
         } else {
