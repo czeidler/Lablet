@@ -76,7 +76,7 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
         PointF raw = data.getPosition();
         if (calibration == null)
             return raw;
-        return new PointF(calibration.fromXRaw(raw.x), calibration.fromYRaw(raw.y));
+        return calibration.fromRaw(raw);
     }
 
     public void selectMarkerData(int index) {

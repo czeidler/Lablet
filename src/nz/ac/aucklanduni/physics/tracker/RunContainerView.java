@@ -17,6 +17,7 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
     private View experimentRunView = null;
     private MarkerView markerView = null;
     private RunDataModel runDataModel = null;
+    private OriginMarkerPainter originMarkerPainter = null;
 
     public RunContainerView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -64,6 +65,11 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
 
     public void addXYCalibrationData(MarkersDataModel data) {
         markerView.addXYCalibrationMarkers(data);
+    }
+
+    public void setOriginData(MarkersDataModel data, boolean swapAxis)
+    public void addOriginData(MarkersDataModel data) {
+        markerView.addOriginMarkers(data);
     }
 
     public void release() {

@@ -21,6 +21,9 @@ public class Calibration {
     private float xCalibration;
     private float yCalibration;
 
+    private PointF origin = new PointF();
+    private double rotation;
+
     private List<ICalibrationListener> listeners;
 
     public Calibration() {
@@ -45,12 +48,22 @@ public class Calibration {
         return yCalibration;
     }
 
-    public float fromXRaw(float rawX) {
-        return rawX * xCalibration;
-    }
+    public PointF fromRaw(PointF raw) {
+        PointF point = new PointF();
+        // translation
+        point.x = raw.x - origin.y;
+        point.y = raw.y - origin.y;
 
-    public float fromYRaw(float rawY) {
-        return rawY * yCalibration;
+        // rotation
+        float x = point.x;
+        float y = point.y;
+        point.x = (float)Math.cos(rotation) * x + (float)Math.sin(rotation) * y;
+        point.y = (float)Math.cos(rotation) * y - (float)Math.sin(rotation) * x;
+
+        // scale
+        point.x *= xCalibration;
+        point.y *= yCalibration;
+        return point;
     }
 
     public void setXCalibration(float xCalibration) {
@@ -66,6 +79,16 @@ public class Calibration {
     public void setCalibration(float xCalibration, float yCalibration) {
         this.xCalibration = xCalibration;
         this.yCalibration = yCalibration;
+        notifyCalibrationChanged();
+    }
+
+    public void setOrigin(PointF origin) {
+        this.origin.set(origin);
+        notifyCalibrationChanged();
+    }
+
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
         notifyCalibrationChanged();
     }
 

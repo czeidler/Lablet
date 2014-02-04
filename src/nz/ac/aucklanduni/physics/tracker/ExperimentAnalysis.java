@@ -30,6 +30,7 @@ public class ExperimentAnalysis {
 
     private MarkersDataModel tagMarkers;
     private MarkersDataModel lengthCalibrationMarkers;
+    private MarkersDataModel originMarkers;
 
     private LengthCalibrationSetter lengthCalibrationSetter;
 
@@ -56,6 +57,17 @@ public class ExperimentAnalysis {
         point2.setPosition(new PointF(30, 90));
         lengthCalibrationMarkers.addMarkerData(point2);
         lengthCalibrationSetter = new LengthCalibrationSetter(calibration, lengthCalibrationMarkers);
+
+        originMarkers = new MarkersDataModel();
+        point1 = new MarkerData(-1);
+        point1.setPosition(new PointF(10, 20));
+        originMarkers.addMarkerData(point1);
+        point2 = new MarkerData(-2);
+        point2.setPosition(new PointF(20, 10));
+        originMarkers.addMarkerData(point2);
+        MarkerData point3 = new MarkerData(-3);
+        point3.setPosition(new PointF(10, 10));
+        originMarkers.addMarkerData(point3);
     }
 
     public Experiment getExperiment() { return  experiment; }
@@ -72,6 +84,9 @@ public class ExperimentAnalysis {
         return tagMarkers;
     }
     public MarkersDataModel getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
+    public MarkersDataModel getOriginMarkers(){
+        return originMarkers;
+    }
     public Bundle getExperimentSpecificData() { return experimentSpecificData; }
     public void setExperimentSpecificData(Bundle data) {
         experimentSpecificData = data;

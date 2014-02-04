@@ -85,20 +85,24 @@ abstract class DragableMarker implements IMarker {
         isDragging = false;
 
         if (wasDragging)
-            parent.markerMoveRequest(this, position);
+            parent.markerMoveRequest(this, getDragPoint(event));
 
         return wasDragging;
     }
 
     public boolean handleActionMove(MotionEvent event) {
         if (isDragging) {
-            PointF point = new PointF(event.getX(), event.getY());
-            point.x -= dragOffset.x;
-            point.y -= dragOffset.y;
-            onDraggedTo(point);
+            onDraggedTo(getDragPoint(event));
             return true;
         }
         return false;
+    }
+
+    private PointF getDragPoint(MotionEvent event) {
+        PointF point = new PointF(event.getX(), event.getY());
+        point.x -= dragOffset.x;
+        point.y -= dragOffset.y;
+        return point;
     }
 
     public void setSelected(boolean selected) {
@@ -524,6 +528,179 @@ class CalibrationMarkerPainter extends AbstractMarkersPainter {
     }
 }
 
+
+class OriginMarker extends SimpleMarker {
+    private Paint paint = null;
+
+    public OriginMarker(AbstractMarkersPainter parentContainer) {
+        super(parentContainer);
+        paint = new Paint();
+    }
+
+    @Override
+    public void onDraw(Canvas canvas, float priority) {
+        if (isSelected()) {
+            super.onDraw(canvas, priority);
+            return;
+        }
+
+        paint.setColor(Color.argb(100, 0, 255, 0));
+        canvas.drawCircle(position.x, position.y, 7, paint);
+    }
+
+    @Override
+    protected void onDraggedTo(PointF point) {
+        parent.markerMoveRequest(this, point);
+    }
+}
+
+class OriginMarkerPainter extends AbstractMarkersPainter {
+    private float angle;
+    private boolean swapAxis;
+    private boolean firstDraw = true;
+
+    public OriginMarkerPainter(View parent, IExperimentRunView runView, MarkersDataModel model, float angle,
+                               boolean swapAxis) {
+        super(parent, runView, model);
+        this.angle = angle;
+        this.swapAxis = swapAxis;
+    }
+
+    private float getScreenAxisLength() {
+        final PointF axisLengthPoint = new PointF(15, 0);
+        PointF screen = new PointF();
+        experimentRunView.toScreen(axisLengthPoint, screen);
+        return screen.x;
+    }
+
+    public void setTo(PointF origin, float angle) {
+        this.angle = angle;
+        markerData.setMarkerPosition(origin, 0);
+
+        PointF screenOrigin = new PointF();
+        experimentRunView.toScreen(origin, screenOrigin);
+
+        float axisLength = getScreenAxisLength();
+
+        PointF xAxisScreen = new PointF(screenOrigin.x + axisLength, screenOrigin.y);
+        transform(xAxisScreen);
+        PointF yAxisScreen = new PointF(screenOrigin.x, screenOrigin.y - axisLength);
+        transform(yAxisScreen);
+
+        PointF xAxis = new PointF();
+        PointF yAxis = new PointF();
+        experimentRunView.fromScreen(xAxisScreen, xAxis);
+        experimentRunView.fromScreen(yAxisScreen, yAxis);
+
+        markerData.setMarkerPosition(xAxis, 1);
+        markerData.setMarkerPosition(yAxis, 2);
+    }
+
+    @Override
+    protected DragableMarker createMarkerForRow(int row) {
+        return new OriginMarker(this);
+    }
+
+    @Override
+    public void draw(Canvas canvas, float priority) {
+        if (firstDraw) {
+            firstDraw = false;
+            setTo(markerData.getMarkerDataAt(0).getPosition(), angle);
+        }
+
+        for (IMarker marker : markerList)
+            marker.onDraw(canvas, priority);
+
+        if (markerData.getMarkerCount() != 3)
+            return;
+
+        PointF origin = getScreenPos(0);
+        PointF xAxis = getScreenPos(1);
+        PointF yAxis = getScreenPos(2);
+
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(Color.GREEN);
+        canvas.drawLine(origin.x, origin.y, xAxis.x, xAxis.y, paint);
+        canvas.drawLine(origin.x, origin.y, yAxis.x, yAxis.y, paint);
+
+        String label1;
+        String label2;
+        if (swapAxis) {
+            label1 = "y";
+            label2 = "x";
+        } else {
+            label1 = "x";
+            label2 = "y";
+        }
+        paint.setTextSize(15);
+        canvas.save();
+        canvas.translate(xAxis.x, xAxis.y);
+        canvas.rotate(-angle);
+        canvas.drawText(label1, 0, 0, paint);
+        canvas.restore();
+        canvas.save();
+        canvas.translate(yAxis.x, yAxis.y);
+        canvas.rotate(-angle);
+        canvas.drawText(label2, 0, 0, paint);
+        canvas.restore();
+    }
+
+    private void transform(PointF point) {
+        PointF origin = getScreenPos(0);
+        PointF diff = new PointF();
+        diff.x = point.x - origin.x;
+        diff.y = point.y - origin.y;
+
+        float x = diff.x;
+        float y = diff.y;
+        point.x = (float)Math.cos(Math.toRadians(angle)) * x + (float)Math.sin(Math.toRadians(angle)) * y;
+        point.y = (float)Math.cos(Math.toRadians(angle)) * y - (float)Math.sin(Math.toRadians(angle)) * x;
+
+        point.x += origin.x;
+        point.y += origin.y;
+    }
+
+    @Override
+    public void markerMoveRequest(DragableMarker marker, PointF newPosition) {
+        int row = markerList.lastIndexOf(marker);
+        if (row < 0)
+            return;
+
+        sanitizeScreenPoint(newPosition);
+        PointF newReal = new PointF();
+        experimentRunView.fromScreen(newPosition, newReal);
+
+        if (row == 0) {
+            // translation
+            setTo(newReal, angle);
+        } else {
+            // x rotation
+            PointF origin = new PointF();
+            origin.set(markerData.getMarkerDataAt(0).getPosition());
+            PointF relative = new PointF();
+            relative.x = newReal.x - origin.x;
+            relative.y = newReal.y - origin.y;
+            float angle = 90;
+            if (relative.x != 0)
+                angle = (float)Math.atan(relative.y / relative.x);
+            angle = (float)Math.toDegrees((double)angle);
+            // choose the right quadrant
+            if (relative.x < 0)
+                angle = 180 + angle;
+
+            if (row == 2)
+                angle -= 90;
+            setTo(origin, angle);
+        }
+    }
+
+    private PointF getScreenPos(int markerIndex) {
+        return markerList.get(markerIndex).getPosition();
+    }
+}
+
+
 public class MarkerView extends ViewGroup {
     private IMarker selectedMarker = null;
     protected List<IMarkerDataModelPainter> markerPainterList;
@@ -564,6 +741,18 @@ public class MarkerView extends ViewGroup {
 
     public void addXYCalibrationMarkers(MarkersDataModel marker) {
         markerPainterList.add(new CalibrationMarkerPainter(this, experimentRunView, marker));
+    }
+
+    public OriginMarkerPainter addOriginMarkers(MarkersDataModel marker, float angle, boolean swapAxis) {
+        OriginMarkerPainter painter = new OriginMarkerPainter(this, experimentRunView, marker, angle, swapAxis);
+        markerPainterList.add(painter);
+        return painter;
+    }
+
+    public boolean removeMarkerPainter(IMarkerDataModelPainter painter) {
+        boolean removed = markerPainterList.remove(painter);
+        invalidate();
+        return removed;
     }
 
     public void addTagMarkers(MarkersDataModel marker) {

@@ -100,7 +100,6 @@ public class VideoFrameView extends RatioSurfaceView {
 
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             getDrawingRect(frame);
-
             File videoFile = new File(videoFilePath);
             try {
                 if (seekToFrameExtractor != null) {
