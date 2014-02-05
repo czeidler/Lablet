@@ -8,4 +8,5 @@
     <string name="action_calibration">Calibration</string>
     <string name="action_delete">Delete</string>
     <string name="action_mail">Export</string>
+    <string name="action_info">Info</string>
 </resources>

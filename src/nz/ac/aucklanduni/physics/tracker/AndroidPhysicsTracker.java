@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.FileObserver;
@@ -65,18 +66,75 @@ public class AndroidPhysicsTracker extends Activity {
     private CheckBoxAdapter experimentListAdaptor = null;
     private CheckBox selectAllCheckBox = null;
     private MenuItem deleteItem = null;
+    private AlertDialog infoAlertBox = null;
     private AlertDialog deleteExperimentAlertBox = null;
     private ExperimentDirObserver experimentDirObserver = null;
 
     static final int PERFORM_EXPERIMENT = 0;
     static final int ANALYSE_EXPERIMENT = 1;
 
+    private String getAuthorList() {
+        String authors = "Authors:\n";
+        authors += "\tClemens Zeidler <czei002@aucklanduni.ac.nz> (2013, 2014)\n";
+        return authors;
+    }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
         getMenuInflater().inflate(R.menu.main_activity_actions, menu);
 
+        // info item
+        MenuItem infoItem = menu.findItem(R.id.action_info);
+        String versionString = "Ver. ";
+        try {
+            versionString += this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            versionString = "?";
+            e.printStackTrace();
+        }
+        infoItem.setTitle(versionString);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Physics Tracker " + versionString);
+        builder.setNeutralButton("leave me alone", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        builder.setNegativeButton("physics sucks", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast toast = Toast.makeText(getApplicationContext(), "$%#@*!?", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
+        builder.setPositiveButton("love it", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast toast = Toast.makeText(getApplicationContext(), "+1", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
+        infoAlertBox = builder.create();
+        final ScrollView scrollView = new ScrollView(getApplicationContext());
+        final TextView textView = new TextView(getApplicationContext());
+        textView.setPadding(10, 10, 10, 10);
+        textView.setText(getAuthorList());
+        textView.setTextSize(15);
+        scrollView.addView(textView);
+        infoAlertBox.setView(scrollView);
+        infoItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                infoAlertBox.show();
+                return true;
+            }
+        });
+
+        // delete item
+        builder = new AlertDialog.Builder(this);
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
