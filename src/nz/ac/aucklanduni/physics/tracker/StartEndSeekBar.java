@@ -210,6 +210,16 @@ public class StartEndSeekBar extends MarkerView implements IExperimentRunView {
         screen.y = 0;
     }
 
+    @Override
+    public float getMaxRawX() {
+        return 100;
+    }
+
+    @Override
+    public float getMaxRawY() {
+        return 100;
+    }
+
     public void setMax(int max) {
         startEndPainter.setNumberOfSteps(max + 1);
     }
