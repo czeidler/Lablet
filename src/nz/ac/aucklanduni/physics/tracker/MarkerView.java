@@ -600,7 +600,7 @@ class OriginMarkerPainter extends AbstractMarkersPainter {
             label1 = "x";
             label2 = "y";
         }
-        paint.setTextSize(15);
+        paint.setTextSize(20);
         canvas.save();
         canvas.translate(xAxis.x, xAxis.y);
         canvas.rotate(-angle);
@@ -687,7 +687,7 @@ class OriginMarkerPainter extends AbstractMarkersPainter {
     }
 
     private float getScreenAxisLength() {
-        final PointF axisLengthPoint = new PointF(15, 0);
+        final PointF axisLengthPoint = new PointF(25, 0);
         PointF screen = new PointF();
         experimentRunView.toScreen(axisLengthPoint, screen);
         return screen.x;
@@ -707,7 +707,6 @@ public class MarkerView extends ViewGroup {
     private IMarker selectedMarker = null;
     protected List<IMarkerDataModelPainter> markerPainterList;
     protected Rect viewFrame = null;
-    private IExperimentRunView experimentRunView = null;
 
     private int parentWidth;
     private int parentHeight;
@@ -718,9 +717,8 @@ public class MarkerView extends ViewGroup {
         init();
     }
 
-    public MarkerView(Context context, View target) {
+    public MarkerView(Context context) {
         super(context);
-        experimentRunView = (IExperimentRunView)target;
 
         init();
     }

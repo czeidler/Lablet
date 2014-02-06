@@ -54,7 +54,7 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
         makerViewParams.addRule(RelativeLayout.ALIGN_RIGHT, experimentRunView.getId());
         makerViewParams.addRule(RelativeLayout.ALIGN_BOTTOM, experimentRunView.getId());
 
-        markerView = new MarkerView(getContext(), experimentRunView);
+        markerView = new MarkerView(getContext());
         addView(markerView, makerViewParams);
     }
 
