@@ -503,7 +503,9 @@ class CalibrationMarkerPainter extends AbstractMarkersPainter {
                 + Math.pow(screenPos1.y - screenPos2.y, 2));
         String text = "Scale length [pixel]: ";
         text += scaleLength;
-        PointF textPosition = new PointF(1f, 96f);
+        float marginPercent = 0.02f;
+        PointF textPosition = new PointF(experimentRunView.getMaxRawX() * marginPercent,
+                experimentRunView.getMaxRawY() - experimentRunView.getMaxRawX() * marginPercent);
         PointF screenTextPosition = new PointF();
         experimentRunView.toScreen(textPosition, screenTextPosition);
 
