@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.*;
+import android.widget.PopupMenu;
 
 import java.io.*;
 
@@ -68,7 +69,17 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         calibrationMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                startCalibrationMenu();
+                showCalibrationMenu();
+                return true;
+            }
+        });
+
+        MenuItem originMenu = menu.findItem(R.id.action_origin_settings);
+        assert originMenu != null;
+        originMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                showOriginPopup();
                 return true;
             }
         });
@@ -76,9 +87,32 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-    private void startCalibrationMenu() {
+    private void showCalibrationMenu() {
         CalibrationView calibrationView = new CalibrationView(this, experimentAnalysis);
         calibrationView.show();
+    }
+
+    private void showOriginPopup() {
+        View menuView = findViewById(R.id.action_origin_settings);
+        PopupMenu popup = new PopupMenu(this, menuView);
+        popup.inflate(R.menu.origin_popup);
+        popup.setOnMenuItemClickListener(new OriginMenuClickListener());
+        popup.getMenu().getItem(0).setChecked(experimentAnalysis.getShowCoordinateSystem());
+        popup.getMenu().getItem(1).setChecked(experimentAnalysis.getCalibration().getSwapAxis());
+        popup.show();
+    }
+
+    private class OriginMenuClickListener implements PopupMenu.OnMenuItemClickListener {
+        @Override
+        public boolean onMenuItemClick(MenuItem menuItem) {
+            int item = menuItem.getItemId();
+            if (item == R.id.showCoordinateSystem) {
+                experimentAnalysis.setShowCoordinateSystem(!menuItem.isChecked());
+            } else if (item == R.id.swapAxis) {
+                experimentAnalysis.getCalibration().setSwapAxis(!menuItem.isChecked());
+            }
+            return false;
+        }
     }
 
     private void startRunSettingsActivity(Bundle analysisSpecificData) {
@@ -128,6 +162,8 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
 
         experimentAnalysis = plugin.loadExperimentAnalysis(experiment);
         loadAnalysisDataToFile();
+
+        // gui stuff:
 
         setContentView(R.layout.experiment_analyser);
         // Instantiate a ViewPager and a PagerAdapter.
@@ -237,7 +273,6 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             return 2;
         }
     }
-
 }
 
 

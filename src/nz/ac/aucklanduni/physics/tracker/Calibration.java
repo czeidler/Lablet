@@ -62,6 +62,15 @@ public class Calibration {
         point.x = (float)Math.cos(Math.toRadians(angle)) * x + (float)Math.sin(Math.toRadians(angle)) * y;
         point.y = (float)Math.cos(Math.toRadians(angle)) * y - (float)Math.sin(Math.toRadians(angle)) * x;
 
+        // swap axis
+        if (swapAxis) {
+            // mirror at x and turn 90 degree to the right
+            x = -point.x;
+            y = point.y;
+            point.x = (float)Math.cos(Math.toRadians(90)) * x + (float)Math.sin(Math.toRadians(90)) * y;
+            point.y = (float)Math.cos(Math.toRadians(90)) * y - (float)Math.sin(Math.toRadians(90)) * x;
+        }
+
         // scale
         point.x *= xCalibration;
         point.y *= yCalibration;
@@ -84,11 +93,15 @@ public class Calibration {
         notifyCalibrationChanged();
     }
 
-    public void setOrigin(PointF origin, PointF axis1, boolean swapAxis) {
+    public void setSwapAxis(boolean swap) {
+        swapAxis = swap;
+        notifyCalibrationChanged();
+    }
+
+    public void setOrigin(PointF origin, PointF axis1) {
         this.origin.set(origin);
         this.axis1 = axis1;
         this.angle = getAngle(origin, axis1);
-        this.swapAxis = swapAxis;
         notifyCalibrationChanged();
     }
 
@@ -135,8 +148,8 @@ class OriginCalibrationSetter implements MarkersDataModel.IMarkersDataModelListe
         calibrate();
     }
 
-    public void setOrigin(PointF origin, PointF axis1, boolean swapAxis) {
-        calibration.setOrigin(origin, axis1, swapAxis);
+    public void setOrigin(PointF origin, PointF axis1) {
+        calibration.setOrigin(origin, axis1);
         calibrationMarkers.setMarkerPosition(origin, 0);
         calibrationMarkers.setMarkerPosition(axis1, 1);
     }
@@ -147,7 +160,7 @@ class OriginCalibrationSetter implements MarkersDataModel.IMarkersDataModelListe
         PointF origin = calibrationMarkers.getMarkerDataAt(0).getPosition();
         PointF axis1 = calibrationMarkers.getMarkerDataAt(1).getPosition();
 
-        calibration.setOrigin(origin, axis1, false);
+        calibration.setOrigin(origin, axis1);
     }
 
     @Override

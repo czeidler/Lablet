@@ -18,6 +18,7 @@ import java.util.List;
 public class ExperimentAnalysis {
     interface IExperimentAnalysisListener {
         void onUnitPrefixChanged();
+        void onShowCoordinateSystem(boolean show);
     }
 
     private Experiment experiment;
@@ -34,6 +35,7 @@ public class ExperimentAnalysis {
 
     private LengthCalibrationSetter lengthCalibrationSetter;
     private OriginCalibrationSetter originCalibrationSetter;
+    private boolean showCoordinateSystem = false;
 
     private Bundle experimentSpecificData = null;
 
@@ -91,6 +93,13 @@ public class ExperimentAnalysis {
         return originMarkers;
     }
     public Bundle getExperimentSpecificData() { return experimentSpecificData; }
+    public void setShowCoordinateSystem(boolean show) {
+        showCoordinateSystem = show;
+        notifyShowCoordinateSystem(show);
+    }
+    public boolean getShowCoordinateSystem() {
+        return showCoordinateSystem;
+    }
     public void setExperimentSpecificData(Bundle data) {
         experimentSpecificData = data;
         onRunSpecificDataChanged();
@@ -105,6 +114,10 @@ public class ExperimentAnalysis {
 
     public void addListener(IExperimentAnalysisListener listener) {
         listenerList.add(listener);
+    }
+
+    public boolean removeListener(IExperimentAnalysisListener listener) {
+        return listenerList.remove(listener);
     }
 
     public void setXUnitPrefix(String xUnitPrefix) {
@@ -161,6 +174,7 @@ public class ExperimentAnalysis {
         analysisDataBundle.putFloat("originAxis1x", calibration.getAxis1().x);
         analysisDataBundle.putFloat("originAxis1y", calibration.getAxis1().y);
         analysisDataBundle.putBoolean("originSwapAxis", calibration.getSwapAxis());
+        analysisDataBundle.putBoolean("showCoordinateSystem", showCoordinateSystem);
 
         analysisDataBundle.putString("xUnitPrefix", getXUnitPrefix());
         analysisDataBundle.putString("yUnitPrefix", getYUnitPrefix());
@@ -219,7 +233,10 @@ public class ExperimentAnalysis {
             axis1.y = bundle.getFloat("originAxis1y");
         if (bundle.containsKey("originSwapAxis"))
             swapAxis = bundle.getBoolean("originSwapAxis");
-        originCalibrationSetter.setOrigin(origin, axis1, swapAxis);
+        if (bundle.containsKey("showCoordinateSystem"))
+            showCoordinateSystem = bundle.getBoolean("showCoordinateSystem");
+        originCalibrationSetter.setOrigin(origin, axis1);
+        calibration.setSwapAxis(swapAxis);
 
         if (bundle.containsKey("xUnitPrefix"))
             setXUnitPrefix(bundle.getString("xUnitPrefix"));
@@ -269,5 +286,10 @@ public class ExperimentAnalysis {
     private void notifyUnitPrefixChanged() {
         for (IExperimentAnalysisListener listener : listenerList)
             listener.onUnitPrefixChanged();
+    }
+
+    private void notifyShowCoordinateSystem(boolean show) {
+        for (IExperimentAnalysisListener listener : listenerList)
+            listener.onShowCoordinateSystem(show);
     }
 }

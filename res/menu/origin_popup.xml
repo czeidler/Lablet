@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="all">
+        <item android:id="@+id/showCoordinateSystem"
+              android:title="Show coordinate system" />
+        <item android:id="@+id/swapAxis"
+              android:title="Swap x and y axis" />
+    </group>
+</menu>

@@ -553,7 +553,7 @@ class OriginMarker extends SimpleMarker {
     }
 }
 
-class OriginMarkerPainter extends AbstractMarkersPainter {
+class OriginMarkerPainter extends AbstractMarkersPainter implements Calibration.ICalibrationListener {
     private Calibration calibration;
     private float angleScreen;
     private boolean firstDraw = true;
@@ -562,6 +562,11 @@ class OriginMarkerPainter extends AbstractMarkersPainter {
                                Calibration calibration) {
         super(parent, runView, model);
         this.calibration = calibration;
+        this.calibration.addListener(this);
+    }
+
+    protected void finalize() {
+        calibration.removeListener(this);
     }
 
     @Override
@@ -718,6 +723,12 @@ class OriginMarkerPainter extends AbstractMarkersPainter {
     private void setScreenPos(int markerIndex, PointF point) {
         markerList.get(markerIndex).setPosition(point);
     }
+
+    @Override
+    public void onCalibrationChanged() {
+        // just trigger a redraw
+        markerView.invalidate();
+    }
 }
 
 
@@ -759,6 +770,7 @@ public class MarkerView extends ViewGroup {
 
     public void addMarkerPainter(IMarkerDataModelPainter painter) {
         markerPainterList.add(painter);
+        painter.onViewSizeChanged();
         invalidate();
     }
 

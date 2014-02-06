@@ -193,4 +193,9 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
         for (ITableAdapterListener listener : listeners)
             listener.onRowUpdated(this, 0, 1);
     }
+
+    @Override
+    public void onShowCoordinateSystem(boolean show) {
+
+    }
 }

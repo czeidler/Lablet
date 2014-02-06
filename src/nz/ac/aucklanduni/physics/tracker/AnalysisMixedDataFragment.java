@@ -35,7 +35,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         runViewControl.setTo(experimentAnalysis.getRunDataModel());
 
         runContainerView = (RunContainerView)view.findViewById(R.id.experimentRunContainer);
-        runContainerView.setTo(experimentRunView, experimentAnalysis.getRunDataModel());
+        runContainerView.setTo(experimentRunView, experimentAnalysis);
         runContainerView.addTagMarkerData(experimentAnalysis.getTagMarkers());
         runContainerView.addXYCalibrationData(experimentAnalysis.getXYCalibrationMarkers());
         runContainerView.addOriginData(experimentAnalysis.getOriginMarkers(), experimentAnalysis.getCalibration());

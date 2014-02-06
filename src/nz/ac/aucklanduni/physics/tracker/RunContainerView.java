@@ -13,10 +13,12 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 
-public class RunContainerView extends RelativeLayout implements RunDataModel.IRunDataModelListener{
+public class RunContainerView extends RelativeLayout implements RunDataModel.IRunDataModelListener,
+        ExperimentAnalysis.IExperimentAnalysisListener {
     private View experimentRunView = null;
     private MarkerView markerView = null;
     private RunDataModel runDataModel = null;
+    private ExperimentAnalysis experimentAnalysis = null;
     private OriginMarkerPainter originMarkerPainter = null;
 
     public RunContainerView(Context context, AttributeSet attrs) {
@@ -24,7 +26,22 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
 
     }
 
-    public void setTo(View runView, RunDataModel model) {
+    protected void finalize() {
+        experimentAnalysis.removeListener(this);
+        runDataModel.removeListener(this);
+    }
+
+    public void setTo(View runView, ExperimentAnalysis analysis) {
+        if (experimentAnalysis != null)
+            experimentAnalysis.removeListener(this);
+        experimentAnalysis = analysis;
+        experimentAnalysis.addListener(this);
+
+        if (runDataModel != null)
+            runDataModel.removeListener(this);
+        runDataModel = experimentAnalysis.getRunDataModel();
+        runDataModel.addListener(this);
+
         experimentRunView = runView;
 
         experimentRunView.addOnLayoutChangeListener(new OnLayoutChangeListener() {
@@ -35,11 +52,6 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
                 markerView.setSize(parentWidth, parentHeight);
             }
         });
-
-        if (runDataModel != null)
-            runDataModel.removeListener(this);
-        runDataModel = model;
-        runDataModel.addListener(this);
 
         // run view
         RelativeLayout.LayoutParams runViewParams = new RelativeLayout.LayoutParams(
@@ -79,7 +91,8 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
     public void addOriginData(MarkersDataModel data, Calibration calibration) {
         originMarkerPainter = new OriginMarkerPainter(markerView, (IExperimentRunView)experimentRunView, data,
                 calibration);
-        markerView.addMarkerPainter(originMarkerPainter);
+        if (experimentAnalysis.getShowCoordinateSystem())
+            markerView.addMarkerPainter(originMarkerPainter);
     }
 
     public void release() {
@@ -96,5 +109,18 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
     @Override
     public void onNumberOfRunsChanged() {
 
+    }
+
+    @Override
+    public void onUnitPrefixChanged() {
+
+    }
+
+    @Override
+    public void onShowCoordinateSystem(boolean show) {
+        if (show)
+            markerView.addMarkerPainter(originMarkerPainter);
+        else
+            markerView.removeMarkerPainter(originMarkerPainter);
     }
 }
