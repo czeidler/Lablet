@@ -9,7 +9,6 @@ package nz.ac.aucklanduni.physics.tracker;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -23,46 +22,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-
-class ExperimentDirectoryEntry {
-    private boolean selected = false;
-    private String name;
-
-    public interface OnDirectoryListener {
-        public void onSelected(ExperimentDirectoryEntry entry);
-    }
-    static private OnDirectoryListener listener = null;
-    static void setListener(OnDirectoryListener l) {
-        listener = l;
-    }
-
-    ExperimentDirectoryEntry(String name) {
-        this.name = name;
-    }
-
-    void setName(String name) {
-        this.name = name;
-    }
-
-    String getName() {
-        return name;
-    }
-
-    void setSelected(boolean selected) {
-        this.selected = selected;
-        if (listener != null)
-            listener.onSelected(this);
-    }
-
-    boolean getSelected() {
-        return selected;
-    }
-}
-
-
 public class AndroidPhysicsTracker extends Activity {
     private List<ExperimentPlugin> experimentPluginList = null;
-    private ArrayList<ExperimentDirectoryEntry> experimentList = null;
+    private ArrayList<CheckBoxListEntry> experimentList = null;
     private CheckBoxAdapter experimentListAdaptor = null;
     private CheckBox selectAllCheckBox = null;
     private MenuItem deleteItem = null;
@@ -164,9 +126,9 @@ public class AndroidPhysicsTracker extends Activity {
             }
         });
 
-        ExperimentDirectoryEntry.setListener(new ExperimentDirectoryEntry.OnDirectoryListener() {
+        CheckBoxListEntry.setListener(new CheckBoxListEntry.OnCheckBoxListEntryListener() {
             @Override
-            public void onSelected(ExperimentDirectoryEntry entry) {
+            public void onSelected(CheckBoxListEntry entry) {
                 if (isAtLeastOneExperimentSelected())
                     deleteItem.setVisible(true);
                 else
@@ -179,7 +141,7 @@ public class AndroidPhysicsTracker extends Activity {
 
     private boolean isAtLeastOneExperimentSelected() {
         boolean itemSelected = false;
-        for (ExperimentDirectoryEntry entry : experimentList) {
+        for (CheckBoxListEntry entry : experimentList) {
             if (entry.getSelected()) {
                 itemSelected = true;
                 break;
@@ -190,7 +152,7 @@ public class AndroidPhysicsTracker extends Activity {
 
     private void deleteSelectedExperiments() {
         File experimentDir = Experiment.getMainExperimentDir(this);
-        for (ExperimentDirectoryEntry entry : experimentList) {
+        for (CheckBoxListEntry entry : experimentList) {
             if (!entry.getSelected())
                 continue;
             File experimentFile = new File(experimentDir, entry.getName());
@@ -226,9 +188,9 @@ public class AndroidPhysicsTracker extends Activity {
         });
 
         // experiment list
-        ListView experimentListView = (ListView) findViewById(R.id.existingExperimentListView);
+        ListView experimentListView = (ListView)findViewById(R.id.existingExperimentListView);
         experimentListView.setBackgroundColor(listBackgroundColor);
-        experimentList = new ArrayList<ExperimentDirectoryEntry>();
+        experimentList = new ArrayList<CheckBoxListEntry>();
         experimentListAdaptor = new CheckBoxAdapter(this, R.layout.check_box_list_item, experimentList);
         experimentListView.setAdapter(experimentListAdaptor);
 
@@ -244,7 +206,7 @@ public class AndroidPhysicsTracker extends Activity {
         selectAllCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                for (ExperimentDirectoryEntry entry : experimentList)
+                for (CheckBoxListEntry entry : experimentList)
                     entry.setSelected(b);
                 experimentListAdaptor.notifyDataSetChanged();
             }
@@ -317,7 +279,7 @@ public class AndroidPhysicsTracker extends Activity {
         if (experimentDir.isDirectory()) {
             File[] children = experimentDir.listFiles();
             for (File child : children != null ? children : new File[0])
-                experimentList.add(new ExperimentDirectoryEntry(child.getName()));
+                experimentList.add(new CheckBoxListEntry(child.getName()));
         }
 
         experimentListAdaptor.notifyDataSetChanged();
@@ -340,44 +302,4 @@ public class AndroidPhysicsTracker extends Activity {
             }
         }
     }
-
-    private class CheckBoxAdapter extends ArrayAdapter<ExperimentDirectoryEntry> {
-        private ArrayList<ExperimentDirectoryEntry> listItems;
-        private int layoutId;
-
-        public CheckBoxAdapter(Context context, int textViewResourceId, ArrayList<ExperimentDirectoryEntry> items) {
-            super(context, textViewResourceId, items);
-
-            listItems = items;
-            layoutId = textViewResourceId;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-                convertView = layoutInflater.inflate(layoutId, null);
-            }
-            assert convertView != null;
-            ExperimentDirectoryEntry entry = listItems.get(position);
-
-            CheckBox checkBox = (CheckBox)convertView.findViewById(R.id.checkBox);
-            assert checkBox != null;
-            checkBox.setTag(entry);
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    ExperimentDirectoryEntry cookie = (ExperimentDirectoryEntry)compoundButton.getTag();
-                    cookie.setSelected(b);
-                }
-            });
-            TextView textView = (TextView)convertView.findViewById(android.R.id.text1);
-            assert textView != null;
-            checkBox.setChecked(entry.getSelected());
-            textView.setText(entry.getName());
-            return convertView;
-        }
-    }
-
 }
