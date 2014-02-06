@@ -158,7 +158,8 @@ public class ExperimentAnalysis {
 
         analysisDataBundle.putFloat("originX", calibration.getOrigin().x);
         analysisDataBundle.putFloat("originY", calibration.getOrigin().y);
-        analysisDataBundle.putFloat("originRotation", calibration.getRotation());
+        analysisDataBundle.putFloat("originAxis1x", calibration.getAxis1().x);
+        analysisDataBundle.putFloat("originAxis1y", calibration.getAxis1().y);
         analysisDataBundle.putBoolean("originSwapAxis", calibration.getSwapAxis());
 
         analysisDataBundle.putString("xUnitPrefix", getXUnitPrefix());
@@ -206,17 +207,19 @@ public class ExperimentAnalysis {
             lengthCalibrationSetter.setCalibrationValue(bundle.getFloat("lengthCalibrationValue"));
 
         PointF origin = new PointF();
-        float originRotation = 0;
+        PointF axis1 = new PointF();
         boolean swapAxis = false;
         if (bundle.containsKey("originX"))
             origin.x = bundle.getFloat("originX");
         if (bundle.containsKey("originY"))
             origin.y = bundle.getFloat("originY");
-        if (bundle.containsKey("originRotation"))
-            originRotation = bundle.getFloat("originRotation");
+        if (bundle.containsKey("originAxis1x"))
+            axis1.x = bundle.getFloat("originAxis1x");
+        if (bundle.containsKey("originAxis1y"))
+            axis1.y = bundle.getFloat("originAxis1y");
         if (bundle.containsKey("originSwapAxis"))
             swapAxis = bundle.getBoolean("originSwapAxis");
-        originCalibrationSetter.setOrigin(origin, originRotation, swapAxis);
+        originCalibrationSetter.setOrigin(origin, axis1, swapAxis);
 
         if (bundle.containsKey("xUnitPrefix"))
             setXUnitPrefix(bundle.getString("xUnitPrefix"));

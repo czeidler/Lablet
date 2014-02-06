@@ -45,13 +45,19 @@ public class CameraExperimentRunView extends VideoFrameView implements IExperime
 
     @Override
     public void fromScreen(PointF screen, PointF real) {
-        real.x = screen.x / frame.width() * 100;
-        real.y = 100 - screen.y / frame.height() * 100;
+        float xToYRatio = (float)getVideoWidth() / getVideoHeight();
+        float xMax = 100.f;
+        float yMax = xMax / xToYRatio;
+        real.x = screen.x / frame.width() * xMax;
+        real.y = yMax - screen.y / frame.height() * yMax;
     }
 
     @Override
     public void toScreen(PointF real, PointF screen) {
-        screen.x = real.x * frame.width() / 100;
-        screen.y = (100 - real.y) * frame.height() / 100;
+        float xToYRatio = (float)getVideoWidth() / getVideoHeight();
+        float xMax = 100.f;
+        float yMax = xMax / xToYRatio;
+        screen.x = real.x * frame.width() / xMax;
+        screen.y = (yMax - real.y) * frame.height() / yMax;
     }
 }

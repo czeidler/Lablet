@@ -553,14 +553,13 @@ class OriginMarker extends SimpleMarker {
 
 class OriginMarkerPainter extends AbstractMarkersPainter {
     private Calibration calibration;
-    private float angle;
+    private float angleScreen;
     private boolean firstDraw = true;
 
     public OriginMarkerPainter(View parent, IExperimentRunView runView, MarkersDataModel model,
                                Calibration calibration) {
         super(parent, runView, model);
         this.calibration = calibration;
-        angle = calibration.getRotation();
     }
 
     @Override
@@ -572,7 +571,13 @@ class OriginMarkerPainter extends AbstractMarkersPainter {
     public void draw(Canvas canvas, float priority) {
         if (firstDraw) {
             firstDraw = false;
-            setTo(markerData.getMarkerDataAt(0).getPosition(), angle);
+            setToScreenFromReal(markerData.getMarkerDataAt(0).getPosition(),
+                    markerData.getMarkerDataAt(1).getPosition());
+
+            // also init the correct y axis marker position
+            PointF yAxis = new PointF();
+            experimentRunView.fromScreen(getScreenPos(2), yAxis);
+            markerData.setMarkerPosition(yAxis, 2);
         }
 
         for (IMarker marker : markerList)
@@ -603,12 +608,12 @@ class OriginMarkerPainter extends AbstractMarkersPainter {
         paint.setTextSize(20);
         canvas.save();
         canvas.translate(xAxis.x, xAxis.y);
-        canvas.rotate(-angle);
+        canvas.rotate(angleScreen);
         canvas.drawText(label1, 0, 0, paint);
         canvas.restore();
         canvas.save();
         canvas.translate(yAxis.x, yAxis.y);
-        canvas.rotate(-angle);
+        canvas.rotate(angleScreen);
         canvas.drawText(label2, 0, 0, paint);
         canvas.restore();
     }
@@ -621,8 +626,8 @@ class OriginMarkerPainter extends AbstractMarkersPainter {
 
         float x = diff.x;
         float y = diff.y;
-        point.x = (float)Math.cos(Math.toRadians(angle)) * x + (float)Math.sin(Math.toRadians(angle)) * y;
-        point.y = (float)Math.cos(Math.toRadians(angle)) * y - (float)Math.sin(Math.toRadians(angle)) * x;
+        point.x = (float)Math.cos(Math.toRadians(angleScreen)) * x - (float)Math.sin(Math.toRadians(angleScreen)) * y;
+        point.y = (float)Math.cos(Math.toRadians(angleScreen)) * y + (float)Math.sin(Math.toRadians(angleScreen)) * x;
 
         point.x += origin.x;
         point.y += origin.y;
@@ -649,41 +654,51 @@ class OriginMarkerPainter extends AbstractMarkersPainter {
         if (row < 0)
             return;
 
-        sanitizeScreenPoint(newPosition);
-        PointF newReal = new PointF();
-        experimentRunView.fromScreen(newPosition, newReal);
-
         if (row == 0) {
             // translation
-            setTo(newReal, angle);
+            sanitizeScreenPoint(newPosition);
+            setToScreenFromScreen(newPosition);
         } else {
             // x rotation
             PointF origin = new PointF();
             origin.set(markerData.getMarkerDataAt(0).getPosition());
-            float angle = OriginCalibrationSetter.getAngle(origin, newReal);
+            PointF originScreen = new PointF();
+            experimentRunView.toScreen(origin, originScreen);
+            float angle = Calibration.getAngle(originScreen, newPosition);
             if (row == 2)
-                angle -= 90;
+                angle += 90;
 
-            setTo(origin, angle);
+            setToScreenFromScreen(originScreen, angle);
         }
     }
 
-    private void setTo(PointF origin, float angle) {
-        this.angle = angle;
+    private void setToScreenFromScreen(PointF originScreen, float angleScreen) {
+        this.angleScreen = angleScreen;
 
-        PointF screenOrigin = new PointF();
-        experimentRunView.toScreen(origin, screenOrigin);
+        setToScreenFromScreen(originScreen);
+    }
+
+    private void setToScreenFromScreen(PointF originScreen) {
 
         float axisLength = getScreenAxisLength();
-
-        PointF xAxisScreen = new PointF(screenOrigin.x + axisLength, screenOrigin.y);
+        PointF xAxisScreen = new PointF(originScreen.x + axisLength, originScreen.y);
         transform(xAxisScreen);
-        PointF yAxisScreen = new PointF(screenOrigin.x, screenOrigin.y - axisLength);
+        PointF yAxisScreen = new PointF(originScreen.x, originScreen.y - axisLength);
         transform(yAxisScreen);
 
-        setScreenPos(0, screenOrigin);
+        setScreenPos(0, originScreen);
         setScreenPos(1, xAxisScreen);
         setScreenPos(2, yAxisScreen);
+    }
+
+    private void setToScreenFromReal(PointF origin, PointF axis1) {
+        PointF originScreen = new PointF();
+        experimentRunView.toScreen(origin, originScreen);
+        PointF xAxisScreen = new PointF();
+        experimentRunView.toScreen(axis1, xAxisScreen);
+        angleScreen = Calibration.getAngle(originScreen, xAxisScreen);
+
+        setToScreenFromScreen(originScreen, angleScreen);
     }
 
     private float getScreenAxisLength() {
@@ -692,6 +707,7 @@ class OriginMarkerPainter extends AbstractMarkersPainter {
         experimentRunView.toScreen(axisLengthPoint, screen);
         return screen.x;
     }
+
 
     private PointF getScreenPos(int markerIndex) {
         return markerList.get(markerIndex).getPosition();

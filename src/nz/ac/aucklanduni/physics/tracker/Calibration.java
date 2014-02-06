@@ -22,7 +22,8 @@ public class Calibration {
     private float yCalibration;
 
     private PointF origin = new PointF(10, 10);
-    private float rotation;
+    private PointF axis1 = new PointF(20, 10);
+    private float angle;
     private boolean swapAxis = false;
 
     private List<ICalibrationListener> listeners;
@@ -58,8 +59,8 @@ public class Calibration {
         // rotation
         float x = point.x;
         float y = point.y;
-        point.x = (float)Math.cos(rotation) * x + (float)Math.sin(rotation) * y;
-        point.y = (float)Math.cos(rotation) * y - (float)Math.sin(rotation) * x;
+        point.x = (float)Math.cos(Math.toRadians(angle)) * x + (float)Math.sin(Math.toRadians(angle)) * y;
+        point.y = (float)Math.cos(Math.toRadians(angle)) * y - (float)Math.sin(Math.toRadians(angle)) * x;
 
         // scale
         point.x *= xCalibration;
@@ -83,9 +84,10 @@ public class Calibration {
         notifyCalibrationChanged();
     }
 
-    public void setOrigin(PointF origin, float rotation, boolean swapAxis) {
+    public void setOrigin(PointF origin, PointF axis1, boolean swapAxis) {
         this.origin.set(origin);
-        this.rotation = rotation;
+        this.axis1 = axis1;
+        this.angle = getAngle(origin, axis1);
         this.swapAxis = swapAxis;
         notifyCalibrationChanged();
     }
@@ -93,11 +95,9 @@ public class Calibration {
     public PointF getOrigin() {
         return origin;
     }
-
-    public float getRotation() {
-        return rotation;
+    public PointF getAxis1() {
+        return axis1;
     }
-
     public boolean getSwapAxis() {
         return swapAxis;
     }
@@ -105,6 +105,20 @@ public class Calibration {
     private void notifyCalibrationChanged() {
         for (ICalibrationListener listener : listeners)
             listener.onCalibrationChanged();
+    }
+
+    static public float getAngle(PointF origin, PointF point) {
+        PointF relative = new PointF();
+        relative.x = point.x - origin.x;
+        relative.y = point.y - origin.y;
+        float angle = 90;
+        if (relative.x != 0)
+            angle = (float)Math.atan(relative.y / relative.x);
+        angle = (float)Math.toDegrees((double)angle);
+        // choose the right quadrant
+        if (relative.x < 0)
+            angle = 180 + angle;
+        return angle;
     }
 }
 
@@ -121,31 +135,10 @@ class OriginCalibrationSetter implements MarkersDataModel.IMarkersDataModelListe
         calibrate();
     }
 
-    static public float getAngle(PointF origin, PointF point) {
-        PointF relative = new PointF();
-        relative.x = point.x - origin.x;
-        relative.y = point.y - origin.y;
-        float angle = 90;
-        if (relative.x != 0)
-            angle = (float)Math.atan(relative.y / relative.x);
-        angle = (float)Math.toDegrees((double)angle);
-        // choose the right quadrant
-        if (relative.x < 0)
-            angle = 180 + angle;
-        return angle;
-    }
-
-    public void setOrigin(PointF origin, float angle, boolean swapAxis) {
-        PointF xAxis = new PointF();
-        float length = 10;
-        xAxis.x = (float)Math.cos(Math.toRadians(angle)) * length;
-        xAxis.y = (float)Math.sin(Math.toRadians(angle)) * length;
-        xAxis.x += origin.x;
-        xAxis.y += origin.y;
-
-        calibration.setOrigin(origin, angle, swapAxis);
+    public void setOrigin(PointF origin, PointF axis1, boolean swapAxis) {
+        calibration.setOrigin(origin, axis1, swapAxis);
         calibrationMarkers.setMarkerPosition(origin, 0);
-        calibrationMarkers.setMarkerPosition(xAxis, 1);
+        calibrationMarkers.setMarkerPosition(axis1, 1);
     }
 
     private void calibrate() {
@@ -154,9 +147,7 @@ class OriginCalibrationSetter implements MarkersDataModel.IMarkersDataModelListe
         PointF origin = calibrationMarkers.getMarkerDataAt(0).getPosition();
         PointF axis1 = calibrationMarkers.getMarkerDataAt(1).getPosition();
 
-        float angle = getAngle(origin, axis1);
-
-        calibration.setOrigin(origin, angle, false);
+        calibration.setOrigin(origin, axis1, false);
     }
 
     @Override
