@@ -603,24 +603,54 @@ class OriginMarkerPainter extends AbstractMarkersPainter implements Calibration.
         canvas.drawLine(origin.x, origin.y, xAxis.x, xAxis.y, paint);
         canvas.drawLine(origin.x, origin.y, yAxis.x, yAxis.y, paint);
 
+        // draw labels
+        paint.setTextSize(20);
         String label1;
         String label2;
+        float textAngle = angleScreen;
+        PointF label1Position = new PointF();
+        PointF label2Position = new PointF();
+        // text height from baseline to top:
+        float textHeight = -paint.ascent() - paint.descent();
         if (calibration.getSwapAxis()) {
             label1 = "y";
             label2 = "x";
+            textAngle += 90;
+         float test = paint.measureText(label1);
+            label1Position.set(origin);
+            label1Position.x += getScreenAxisLength();
+            label1Position.x -= textHeight + 1;
+            label1Position.y += 1;
+            transform(label1Position);
+
+            label2Position.set(origin);
+            label2Position.y -= getScreenAxisLength();
+            label2Position.x -= textHeight + 1;
+            label2Position.y += 1;
+            transform(label2Position);
         } else {
             label1 = "x";
             label2 = "y";
+            label1Position.set(origin);
+            label1Position.x += getScreenAxisLength();
+            label1Position.x -= paint.measureText(label1);
+            label1Position.y += textHeight + 1;
+            transform(label1Position);
+
+            label2Position.set(origin);
+            label2Position.y -= getScreenAxisLength();
+            label2Position.x -= paint.measureText(label2);
+            label2Position.y += textHeight + 1;
+            transform(label2Position);
         }
-        paint.setTextSize(20);
         canvas.save();
-        canvas.translate(xAxis.x, xAxis.y);
-        canvas.rotate(angleScreen);
+        canvas.translate(label1Position.x, label1Position.y);
+        canvas.rotate(textAngle);
         canvas.drawText(label1, 0, 0, paint);
         canvas.restore();
         canvas.save();
-        canvas.translate(yAxis.x, yAxis.y);
-        canvas.rotate(angleScreen);
+        canvas.translate(label2Position.x, label2Position.y);
+        canvas.rotate(textAngle);
         canvas.drawText(label2, 0, 0, paint);
         canvas.restore();
     }
