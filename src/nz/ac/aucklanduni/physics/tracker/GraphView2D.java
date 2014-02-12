@@ -14,6 +14,8 @@ import com.jjoe64.graphview.GraphViewSeries;
 import com.jjoe64.graphview.LineGraphView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -100,6 +102,15 @@ public class GraphView2D extends LineGraphView implements IGraphAdapter.IGraphAd
             IGraphAdapter.IGraphDataPoint dataPoint = adapter.getDataPoint(i);
             values[i] = new GraphViewData(dataPoint.getX(), dataPoint.getY());
         }
+
+        // sort data by x values
+        Arrays.sort(values, new Comparator<GraphViewDataInterface>() {
+            @Override
+            public int compare(GraphViewDataInterface data1, GraphViewDataInterface data2) {
+                return ((Double)data1.getX()).compareTo(data2.getX());
+            }
+            });
+        
         graphViewSeries.resetData(values);
     }
 }
