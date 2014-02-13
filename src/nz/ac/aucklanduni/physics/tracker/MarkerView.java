@@ -450,11 +450,8 @@ class TagMarkerDataModelPainter extends AbstractMarkersPainter {
 }
 
 class CalibrationMarker extends SimpleMarker {
-    private Paint paint = null;
-
     public CalibrationMarker(AbstractMarkersPainter parentContainer) {
         super(parentContainer);
-        paint = new Paint();
     }
 
     @Override
@@ -463,9 +460,6 @@ class CalibrationMarker extends SimpleMarker {
             super.onDraw(canvas, priority);
             return;
         }
-
-        paint.setColor(Color.argb(100, 0, 255, 0));
-        canvas.drawCircle(position.x, position.y, 7, paint);
     }
 }
 
@@ -479,6 +473,15 @@ class CalibrationMarkerPainter extends AbstractMarkersPainter {
         return new CalibrationMarker(this);
     }
 
+    private void rotate(PointF point, PointF origin, float angleScreen) {
+        float x = point.x - origin.x;
+        float y = point.y - origin.y;
+        point.x = (float)Math.cos(Math.toRadians(angleScreen)) * x - (float)Math.sin(Math.toRadians(angleScreen)) * y;
+        point.y = (float)Math.cos(Math.toRadians(angleScreen)) * y + (float)Math.sin(Math.toRadians(angleScreen)) * x;
+        point.x += origin.x;
+        point.y += origin.y;
+    }
+
     @Override
     public void draw(Canvas canvas, float priority) {
         for (IMarker marker : markerList)
@@ -487,12 +490,26 @@ class CalibrationMarkerPainter extends AbstractMarkersPainter {
         if (markerData.getMarkerCount() != 2)
             return;
 
+        // draw scale
         PointF screenPos1 = getScreenPos(0);
         PointF screenPos2 = getScreenPos(1);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setColor(Color.GREEN);
         canvas.drawLine(screenPos1.x, screenPos1.y, screenPos2.x, screenPos2.y, paint);
+        // draw ends
+        final float wingLength = 8;
+        float angleScreen = Calibration.getAngle(screenPos1, screenPos2);
+        PointF wingTop = new PointF(screenPos1.x, screenPos1.y + wingLength / 2);
+        rotate(wingTop, screenPos1, angleScreen);
+        PointF wingBottom = new PointF(screenPos1.x, screenPos1.y - wingLength / 2);
+        rotate(wingBottom, screenPos1, angleScreen);
+        canvas.drawLine(wingTop.x, wingTop.y, wingBottom.x, wingBottom.y, paint);
+        wingTop = new PointF(screenPos2.x, screenPos2.y + wingLength / 2);
+        rotate(wingTop, screenPos2, angleScreen);
+        wingBottom = new PointF(screenPos2.x, screenPos2.y - wingLength / 2);
+        rotate(wingBottom, screenPos2, angleScreen);
+        canvas.drawLine(wingTop.x, wingTop.y, wingBottom.x, wingBottom.y, paint);
 
         if (markerData.getSelectedMarkerData() < 0)
             return;

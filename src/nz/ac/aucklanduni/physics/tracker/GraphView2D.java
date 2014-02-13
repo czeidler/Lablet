@@ -110,7 +110,7 @@ public class GraphView2D extends LineGraphView implements IGraphAdapter.IGraphAd
                 return ((Double)data1.getX()).compareTo(data2.getX());
             }
             });
-        
+
         graphViewSeries.resetData(values);
     }
 }
