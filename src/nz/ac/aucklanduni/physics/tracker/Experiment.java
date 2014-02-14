@@ -22,9 +22,6 @@ interface IExperimentRunView {
     public void fromScreen(PointF screen, PointF real);
     public void toScreen(PointF real, PointF screen);
 
-    /** The raw data is stored in internal units starting at (0,0). These methods return the max values.
-     * The max values ratio should be the same as the screen ratio.
-     */
     public float getMaxRawX();
     public float getMaxRawY();
 }
@@ -54,6 +51,12 @@ abstract public class Experiment {
     public String getYUnit() {
         return "";
     }
+
+    /** The raw data is stored in internal units starting at (0,0). These methods return the max values.
+     * The max values ratio should be the same as the screen ratio.
+     */
+    abstract public float getMaxRawX();
+    abstract public float getMaxRawY();
 
     protected boolean loadExperiment(Bundle bundle, File storageDir) {
         uid = bundle.getString("uid");
@@ -88,7 +91,6 @@ abstract public class Experiment {
     protected String getIdentifier() {
         return this.getClass().getSimpleName();
     }
-
 
     abstract public int getNumberOfRuns();
     abstract public Bundle getRunAt(int i);

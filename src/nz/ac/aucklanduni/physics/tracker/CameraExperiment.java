@@ -21,6 +21,8 @@ public class CameraExperiment extends Experiment {
 
     // milli seconds
     private int videoDuration;
+    private int videoWidth;
+    private int videoHeight;
 
     private int analysisFrameRate;
     // milli seconds
@@ -44,6 +46,18 @@ public class CameraExperiment extends Experiment {
     @Override
     public String getYUnit() {
         return "m";
+    }
+
+    @Override
+    public float getMaxRawX() {
+        return 100.f;
+    }
+
+    @Override
+    public float getMaxRawY() {
+        float xToYRatio = (float)videoWidth / videoHeight;
+        float xMax = getMaxRawX();
+        return xMax / xToYRatio;
     }
 
     @Override
@@ -112,6 +126,8 @@ public class CameraExperiment extends Experiment {
         MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.parse(file.getPath()));
 
         videoDuration = mediaPlayer.getDuration();
+        videoWidth = mediaPlayer.getVideoWidth();
+        videoHeight = mediaPlayer.getVideoHeight();
 
         mediaPlayer.release();
     }

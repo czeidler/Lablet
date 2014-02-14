@@ -61,13 +61,11 @@ public class CameraExperimentRunView extends VideoFrameView implements IExperime
 
     @Override
     public float getMaxRawX() {
-        return 100.f;
+        return experiment.getMaxRawX();
     }
 
     @Override
     public float getMaxRawY() {
-        float xToYRatio = (float)getVideoWidth() / getVideoHeight();
-        float xMax = getMaxRawX();
-        return xMax / xToYRatio;
+        return experiment.getMaxRawY();
     }
 }
