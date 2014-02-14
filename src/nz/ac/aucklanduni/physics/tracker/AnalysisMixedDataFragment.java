@@ -48,7 +48,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
 
         // marker graph view
         graphView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
-        graphView.setAdapter(new MarkerGraphAdapter(experimentAnalysis.getTagMarkers()));
+        graphView.setAdapter(new MarkerGraphAdapter(experimentAnalysis));
         return view;
     }
 

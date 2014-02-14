@@ -8,23 +8,20 @@
 package nz.ac.aucklanduni.physics.tracker;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.util.AttributeSet;
-import com.jjoe64.graphview.GraphViewDataInterface;
-import com.jjoe64.graphview.GraphViewSeries;
-import com.jjoe64.graphview.LineGraphView;
+import com.androidplot.ui.XLayoutStyle;
+import com.androidplot.ui.YLayoutStyle;
+import com.androidplot.xy.LineAndPointFormatter;
+import com.androidplot.xy.PointLabelFormatter;
+import com.androidplot.xy.XYPlot;
+import com.androidplot.xy.XYSeries;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 
 interface IGraphAdapter {
-    interface IGraphDataPoint {
-        public double getX();
-        public double getY();
-    }
-
     interface IGraphAdapterListener {
         public void onDataPointAdded(IGraphAdapter graph, int index);
         public void onDataPointRemoved(IGraphAdapter graph, int index);
@@ -34,22 +31,22 @@ interface IGraphAdapter {
     }
 
     public void addListener(IGraphAdapterListener listener);
-    public int getDataPointCount();
-    public IGraphDataPoint getDataPoint(int index);
+    public int size();
+    public Number getX(int index);
+    public Number getY(int index);
+    public String getXLabel();
+    public String getYLabel();
+    public String getTitle();
     public void release();
 }
 
 
-public class GraphView2D extends LineGraphView implements IGraphAdapter.IGraphAdapterListener {
+public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterListener {
     private IGraphAdapter adapter;
-    private GraphViewSeries graphViewSeries = null;
 
     public GraphView2D(Context context, AttributeSet attrs) {
         super(context, attrs);
-        GraphViewDataInterface[] values = new GraphViewData[0];
-        graphViewSeries = new GraphViewSeries(values);
-        addSeries(graphViewSeries);
-        getGraphViewStyle().setTextSize(15);
+
     }
 
     public void setAdapter(IGraphAdapter adapter) {
@@ -58,22 +55,37 @@ public class GraphView2D extends LineGraphView implements IGraphAdapter.IGraphAd
         this.adapter = adapter;
 
         if (this.adapter == null) {
-            graphViewSeries.resetData(new GraphViewData[0]);
+            clear();
             return;
         }
 
         this.adapter.addListener(this);
+
+        // init graph
+        clear();
+
+        setTitle(adapter.getTitle());
+        setDomainLabel(this.adapter.getXLabel());
+        setRangeLabel(this.adapter.getYLabel());
+        getLegendWidget().setVisible(false);
+        setTicksPerDomainLabel(2);
+
+        LineAndPointFormatter seriesFormat = new LineAndPointFormatter();
+        seriesFormat.setPointLabelFormatter(new PointLabelFormatter());
+        Paint paint = new Paint();
+        paint.setARGB(0, 0, 0, 0);
+        seriesFormat.setFillPaint(paint);
+        seriesFormat.setPointLabeler(null);
+
+        addSeries(new XYSeriesAdapter(adapter), seriesFormat);
+
 
         refillGraph();
     }
 
     @Override
     public void onDataPointAdded(IGraphAdapter graph, int index) {
-        if (index == adapter.getDataPointCount()) {
-            IGraphAdapter.IGraphDataPoint dataPoint = adapter.getDataPoint(index);
-            graphViewSeries.appendData(new GraphViewData(dataPoint.getX(), dataPoint.getY()), true, 1);
-        } else
-            refillGraph();
+        refillGraph();
     }
 
     @Override
@@ -96,33 +108,46 @@ public class GraphView2D extends LineGraphView implements IGraphAdapter.IGraphAd
 
     }
 
-    private void refillGraph() {
-        GraphViewDataInterface[] values = new GraphViewData[adapter.getDataPointCount()];
-        for (int i = 0; i < values.length; i++) {
-            IGraphAdapter.IGraphDataPoint dataPoint = adapter.getDataPoint(i);
-            values[i] = new GraphViewData(dataPoint.getX(), dataPoint.getY());
+    private class XYSeriesAdapter implements XYSeries {
+        private IGraphAdapter adapter = null;
+
+        public XYSeriesAdapter(IGraphAdapter adapter) {
+            this.adapter = adapter;
         }
 
-        // sort data by x values
-        Arrays.sort(values, new Comparator<GraphViewDataInterface>() {
-            @Override
-            public int compare(GraphViewDataInterface data1, GraphViewDataInterface data2) {
-                return ((Double)data1.getX()).compareTo(data2.getX());
-            }
-            });
+        public int size() {
+            return adapter.size();
+        }
 
-        graphViewSeries.resetData(values);
+        public Number getX(int i) {
+            return adapter.getX(i);
+        }
+
+        public Number getY(int i) {
+            return adapter.getY(i);
+        }
+
+        @Override
+        public String getTitle() {
+            return adapter.getTitle();
+        }
+    }
+
+    private void refillGraph() {
+        redraw();
     }
 }
 
 
 class MarkerGraphAdapter implements IGraphAdapter, MarkersDataModel.IMarkersDataModelListener {
     private List<IGraphAdapterListener> listeners;
-    private MarkersDataModel data;
+    protected MarkersDataModel data;
+    protected ExperimentAnalysis experimentAnalysis;
 
-    public MarkerGraphAdapter(MarkersDataModel markersDataModel) {
+    public MarkerGraphAdapter(ExperimentAnalysis experimentAnalysis) {
         listeners = new ArrayList<IGraphAdapterListener>();
-        data = markersDataModel;
+        this.experimentAnalysis = experimentAnalysis;
+        data = experimentAnalysis.getTagMarkers();
         data.addListener(this);
     }
 
@@ -137,30 +162,33 @@ class MarkerGraphAdapter implements IGraphAdapter, MarkersDataModel.IMarkersData
     }
 
     @Override
-    public int getDataPointCount() {
+    public int size() {
         return data.getMarkerCount();
     }
 
     @Override
-    public IGraphDataPoint getDataPoint(int index) {
-        return new DataPointAdapter(index);
+    public Number getX(int index) {
+        return data.getCalibratedMarkerPositionAt(index).x;
     }
 
-    class DataPointAdapter implements IGraphDataPoint {
-        int index;
-        public DataPointAdapter(int index) {
-            this.index = index;
-        }
+    @Override
+    public Number getY(int index) {
+        return data.getCalibratedMarkerPositionAt(index).y;
+    }
 
-        @Override
-        public double getX() {
-            return data.getCalibratedMarkerPositionAt(index).x;
-        }
+    @Override
+    public String getXLabel() {
+        return "x [" + experimentAnalysis.getXUnit() + "]";
+    }
 
-        @Override
-        public double getY() {
-            return data.getCalibratedMarkerPositionAt(index).y;
-        }
+    @Override
+    public String getYLabel() {
+        return "y [" + experimentAnalysis.getYUnit() + "]";
+    }
+
+    @Override
+    public String getTitle() {
+        return "Position Plot";
     }
 
     @Override
@@ -211,5 +239,89 @@ class MarkerGraphAdapter implements IGraphAdapter, MarkersDataModel.IMarkersData
     private void notifyDataSelected(int index) {
         for (IGraphAdapterListener listener : listeners)
             listener.onDataPointSelected(this, index);
+    }
+}
+
+
+class YVelocityMarkerGraphAdapter extends MarkerGraphAdapter {
+    public YVelocityMarkerGraphAdapter(ExperimentAnalysis experimentAnalysis) {
+        super(experimentAnalysis);
+    }
+
+    @Override
+    public int size() {
+        return data.getMarkerCount() - 1;
+    }
+
+    @Override
+    public Number getX(int index) {
+        return experimentAnalysis.getExperiment().getRunValueAt(index);
+    }
+
+    @Override
+    public Number getY(int index) {
+        Experiment experiment = experimentAnalysis.getExperiment();
+        float deltaX = data.getCalibratedMarkerPositionAt(index + 1).y - data.getCalibratedMarkerPositionAt(index).y;
+        float deltaT = experiment.getRunValueAt(index + 1) - experiment.getRunValueAt(index);
+        if (experimentAnalysis.getExperiment().getRunValueUnitPrefix() == "m")
+            deltaT /= 1000;
+        return deltaX / deltaT;
+    }
+
+    @Override
+    public String getXLabel() {
+        return "time [" + experimentAnalysis.getExperiment().getRunValueUnit() + "]";
+    }
+
+    @Override
+    public String getYLabel() {
+        return "speed [" + experimentAnalysis.getXUnit() + "/" + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
+    }
+
+    @Override
+    public String getTitle() {
+        return "y-Speed Plot";
+    }
+}
+
+
+class XVelocityMarkerGraphAdapter extends MarkerGraphAdapter {
+    public XVelocityMarkerGraphAdapter(ExperimentAnalysis experimentAnalysis) {
+        super(experimentAnalysis);
+    }
+
+    @Override
+    public int size() {
+        return data.getMarkerCount() - 1;
+    }
+
+    @Override
+    public Number getX(int index) {
+        return experimentAnalysis.getExperiment().getRunValueAt(index);
+    }
+
+    @Override
+    public Number getY(int index) {
+        Experiment experiment = experimentAnalysis.getExperiment();
+        float deltaX = data.getCalibratedMarkerPositionAt(index + 1).x - data.getCalibratedMarkerPositionAt(index).x;
+        float deltaT = experiment.getRunValueAt(index + 1) - experiment.getRunValueAt(index);
+        if (experimentAnalysis.getExperiment().getRunValueUnitPrefix() == "m")
+            deltaT /= 1000;
+        return deltaX / deltaT;
+    }
+
+    @Override
+    public String getXLabel() {
+        return "time [" + experimentAnalysis.getExperiment().getRunValueUnit() + "]";
+    }
+
+    @Override
+    public String getYLabel() {
+        return "speed [" + experimentAnalysis.getXUnit() + "/" + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
+    }
+
+    @Override
+    public String getTitle() {
+        return "x-Speed Plot";
     }
 }

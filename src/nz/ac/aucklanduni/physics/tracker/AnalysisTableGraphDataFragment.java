@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 public class AnalysisTableGraphDataFragment extends android.support.v4.app.Fragment {
     private TableView tableView = null;
     private GraphView2D graphView = null;
+    private GraphView2D xSpeedGraphView = null;
+    private GraphView2D ySpeedGraphView = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -34,8 +36,17 @@ public class AnalysisTableGraphDataFragment extends android.support.v4.app.Fragm
         // marker graph view
         graphView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
         assert graphView != null;
-        graphView.setAdapter(new MarkerGraphAdapter(experimentAnalysis.getTagMarkers()));
+        graphView.setAdapter(new MarkerGraphAdapter(experimentAnalysis));
 
+        // velocity graph
+        ySpeedGraphView = (GraphView2D)view.findViewById(R.id.yVelocityGraphView);
+        assert ySpeedGraphView != null;
+        ySpeedGraphView.setAdapter(new YVelocityMarkerGraphAdapter(experimentAnalysis));
+
+        // velocity graph
+        xSpeedGraphView = (GraphView2D)view.findViewById(R.id.xVelocityGraphView);
+        assert xSpeedGraphView != null;
+        xSpeedGraphView.setAdapter(new XVelocityMarkerGraphAdapter(experimentAnalysis));
         return view;
     }
 
@@ -43,6 +54,7 @@ public class AnalysisTableGraphDataFragment extends android.support.v4.app.Fragm
     public void onDestroyView() {
         tableView.setAdapter(null);
         graphView.setAdapter(null);
+        ySpeedGraphView.setAdapter(null);
 
         super.onDestroyView();
     }

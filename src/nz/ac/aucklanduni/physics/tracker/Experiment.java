@@ -93,6 +93,12 @@ abstract public class Experiment {
     abstract public int getNumberOfRuns();
     abstract public Bundle getRunAt(int i);
     abstract public float getRunValueAt(int i);
+    abstract public String getRunValueBaseUnit();
+    abstract public String getRunValueUnitPrefix();
+    public String getRunValueUnit() {
+        return getRunValueUnitPrefix() + getRunValueBaseUnit();
+    }
+    abstract public String getRunValueLabel();
 
     protected String generateNewUid() {
         String identifier = getIdentifier();

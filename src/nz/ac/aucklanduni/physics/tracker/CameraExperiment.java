@@ -69,6 +69,21 @@ public class CameraExperiment extends Experiment {
         return analysisVideoStart + (float)1000 / analysisFrameRate * i;
     }
 
+    @Override
+    public String getRunValueBaseUnit() {
+        return "s";
+    }
+
+    @Override
+    public String getRunValueUnitPrefix() {
+        return "m";
+    }
+
+    @Override
+    public String getRunValueLabel() {
+        return "time [" + getRunValueUnitPrefix() + getRunValueUnit() + "]";
+    }
+
     protected boolean loadExperiment(Bundle bundle, File storageDir) {
         if (!super.loadExperiment(bundle, storageDir))
             return false;

@@ -249,7 +249,7 @@ public class ExperimentAnalysis {
     public void exportTagMarkerCSVData(OutputStream outputStream) {
         try {
             String header = "id, x [" + getXUnit() + "], y [" + getYUnit()
-                    + "], runValue\n";
+                    + "], " + experiment.getRunValueLabel() + "\n";
             outputStream.write(header.getBytes());
             for (int i = 0; i < tagMarkers.getMarkerCount(); i++) {
                 MarkerData markerData = tagMarkers.getMarkerDataAt(i);

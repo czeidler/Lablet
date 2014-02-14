@@ -1,24 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
+<LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="horizontal" android:baselineAligned="false">
 
-    <view android:layout_width="1000dp"
-          android:layout_height="480dp"
-          class="nz.ac.aucklanduni.physics.tracker.GraphView2D" android:id="@+id/tagMarkerGraphView"
-          android:layout_alignParentTop="true" android:layout_alignParentRight="true"/>
     <ScrollView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/scrollView" android:layout_gravity="center_vertical"
-            android:layout_alignParentStart="true" android:layout_toLeftOf="@+id/tagMarkerGraphView"
-            android:layout_alignParentEnd="false" android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true" android:layout_marginLeft="40px">
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              class="nz.ac.aucklanduni.physics.tracker.TableView" android:id="@+id/tagMarkerTableView"
+            android:layout_height="fill_parent"
+            android:id="@+id/scrollView"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="0.1">
+
+        <view class="nz.ac.aucklanduni.physics.tracker.TableView"
+              android:id="@+id/tagMarkerTableView"
+              android:layout_width="wrap_content"
+              android:layout_height="fill_parent"
               android:gravity="center_horizontal"/>
     </ScrollView>
-</RelativeLayout>
+
+    <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" android:layout_weight="1">
+        <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+            <view class="nz.ac.aucklanduni.physics.tracker.GraphView2D"
+                  android:id="@+id/tagMarkerGraphView"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:layout_weight="1"/>
+            <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+        </TableRow>
+        <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+            <view class="nz.ac.aucklanduni.physics.tracker.GraphView2D"
+                  android:id="@+id/yVelocityGraphView"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:layout_weight="1"/>
+            <view class="nz.ac.aucklanduni.physics.tracker.GraphView2D"
+                  android:id="@+id/xVelocityGraphView"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:layout_weight="1"/>
+        </TableRow>
+    </TableLayout>
+
+
+</LinearLayout>

@@ -15,7 +15,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="GraphView" level="project" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -25,6 +24,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="androidplot-core-0.6.0" level="project" />
   </component>
 </module>
 

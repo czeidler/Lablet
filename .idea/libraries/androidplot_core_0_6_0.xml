@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="GraphView">
+  <library name="androidplot-core-0.6.0">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/libs/GraphView.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/androidplot-core-0.6.0.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

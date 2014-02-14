@@ -116,7 +116,7 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
         else if (column == 2)
             text = "y [" + experimentAnalysis.getYUnit() + "]";
         else if (column == 3)
-            text = "run value";
+            text = experimentAnalysis.getExperiment().getRunValueLabel();
         else
             throw new IndexOutOfBoundsException();
 
