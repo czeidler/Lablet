@@ -9,9 +9,8 @@ package nz.ac.aucklanduni.physics.tracker;
 
 import android.content.Context;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.util.AttributeSet;
-import com.androidplot.ui.XLayoutStyle;
-import com.androidplot.ui.YLayoutStyle;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.PointLabelFormatter;
 import com.androidplot.xy.XYPlot;
@@ -37,6 +36,8 @@ interface IGraphAdapter {
     public String getXLabel();
     public String getYLabel();
     public String getTitle();
+    public Number getMinXRange();
+    public Number getMinYRange();
     public void release();
 }
 
@@ -134,6 +135,46 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
     }
 
     private void refillGraph() {
+        float minXRange = adapter.getMinXRange().floatValue();
+        // ensure min x range
+        if (minXRange > 0.f) {
+            float max = Float.MIN_VALUE;
+            float min = Float.MAX_VALUE;
+            for (int i = 0; i < adapter.size(); i++) {
+                float value = adapter.getX(i).floatValue();
+                if (value > max)
+                    max = value;
+                if (value < min)
+                    min = value;
+            }
+            float currentRange = max - min;
+            if (currentRange < minXRange) {
+                float increase = (minXRange - currentRange) / 2;
+                setDomainLeftMax(min - increase);
+                setDomainRightMin(max + increase);
+            }
+        }
+
+        float minYRange = adapter.getMinYRange().floatValue();
+        // ensure min y range
+        if (minYRange > 0.f) {
+            float max = Float.MIN_VALUE;
+            float min = Float.MAX_VALUE;
+            for (int i = 0; i < adapter.size(); i++) {
+                float value = adapter.getY(i).floatValue();
+                if (value > max)
+                    max = value;
+                if (value < min)
+                    min = value;
+            }
+            float currentRange = max - min;
+            if (currentRange < minYRange) {
+                float increase = (minYRange - currentRange) / 2;
+                setRangeBottomMax(min - increase);
+                setRangeTopMin(max + increase);
+            }
+        }
+
         redraw();
     }
 }
@@ -189,6 +230,22 @@ class MarkerGraphAdapter implements IGraphAdapter, MarkersDataModel.IMarkersData
     @Override
     public String getTitle() {
         return "Position Plot";
+    }
+
+    @Override
+    public Number getMinXRange() {
+        Calibration calibration = experimentAnalysis.getCalibration();
+        PointF point = new PointF(experimentAnalysis.getExperiment().getMaxRawX(), 0);
+        point = calibration.fromRaw(point);
+        return point.x * 0.2f;
+    }
+
+    @Override
+    public Number getMinYRange() {
+        Calibration calibration = experimentAnalysis.getCalibration();
+        PointF point = new PointF(experimentAnalysis.getExperiment().getMaxRawY(), 0);
+        point = calibration.fromRaw(point);
+        return point.y * 0.2f;
     }
 
     @Override
@@ -269,6 +326,16 @@ class YVelocityMarkerGraphAdapter extends MarkerGraphAdapter {
     }
 
     @Override
+    public Number getMinXRange() {
+        return -1;
+    }
+
+    @Override
+    public Number getMinYRange() {
+        return -1;
+    }
+
+    @Override
     public String getXLabel() {
         return "time [" + experimentAnalysis.getExperiment().getRunValueUnit() + "]";
     }
@@ -308,6 +375,16 @@ class XVelocityMarkerGraphAdapter extends MarkerGraphAdapter {
         if (experimentAnalysis.getExperiment().getRunValueUnitPrefix() == "m")
             deltaT /= 1000;
         return deltaX / deltaT;
+    }
+
+    @Override
+    public Number getMinXRange() {
+        return -1;
+    }
+
+    @Override
+    public Number getMinYRange() {
+        return -1;
     }
 
     @Override
