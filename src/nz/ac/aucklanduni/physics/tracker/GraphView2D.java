@@ -11,10 +11,7 @@ import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.AttributeSet;
-import com.androidplot.xy.LineAndPointFormatter;
-import com.androidplot.xy.PointLabelFormatter;
-import com.androidplot.xy.XYPlot;
-import com.androidplot.xy.XYSeries;
+import com.androidplot.xy.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,43 +132,54 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
     }
 
     private void refillGraph() {
+        setDomainLeftMax(null);
+        setDomainRightMin(null);
+        setRangeBottomMax(null);
+        setRangeTopMin(null);
+
         float minXRange = adapter.getMinXRange().floatValue();
         // ensure min x range
         if (minXRange > 0.f) {
-            float max = Float.MIN_VALUE;
+            float average = 0;
+            float max = -Float.MAX_VALUE;
             float min = Float.MAX_VALUE;
             for (int i = 0; i < adapter.size(); i++) {
                 float value = adapter.getX(i).floatValue();
+                average += value;
                 if (value > max)
                     max = value;
                 if (value < min)
                     min = value;
             }
+            if (adapter.size() > 0)
+                average /= adapter.size();
             float currentRange = max - min;
             if (currentRange < minXRange) {
-                float increase = (minXRange - currentRange) / 2;
-                setDomainLeftMax(min - increase);
-                setDomainRightMin(max + increase);
+                setDomainLeftMax(average - minXRange / 2);
+                setDomainRightMin(average + minXRange / 2);
             }
         }
 
         float minYRange = adapter.getMinYRange().floatValue();
         // ensure min y range
         if (minYRange > 0.f) {
-            float max = Float.MIN_VALUE;
+            float average = 0;
+            float max = -Float.MAX_VALUE;
             float min = Float.MAX_VALUE;
             for (int i = 0; i < adapter.size(); i++) {
                 float value = adapter.getY(i).floatValue();
+                average += value;
                 if (value > max)
                     max = value;
                 if (value < min)
                     min = value;
             }
+            if (adapter.size() > 0)
+                average /= adapter.size();
             float currentRange = max - min;
             if (currentRange < minYRange) {
-                float increase = (minYRange - currentRange) / 2;
-                setRangeBottomMax(min - increase);
-                setRangeTopMin(max + increase);
+                setRangeBottomMax(average - minYRange / 2);
+                setRangeTopMin(average + minYRange / 2);
             }
         }
 
@@ -235,7 +243,7 @@ class MarkerGraphAdapter implements IGraphAdapter, MarkersDataModel.IMarkersData
     @Override
     public Number getMinXRange() {
         Calibration calibration = experimentAnalysis.getCalibration();
-        PointF point = new PointF(experimentAnalysis.getExperiment().getMaxRawX(), 0);
+        PointF point = new PointF(calibration.getOrigin().x + experimentAnalysis.getExperiment().getMaxRawX(), 0);
         point = calibration.fromRaw(point);
         return point.x * 0.2f;
     }
@@ -243,7 +251,7 @@ class MarkerGraphAdapter implements IGraphAdapter, MarkersDataModel.IMarkersData
     @Override
     public Number getMinYRange() {
         Calibration calibration = experimentAnalysis.getCalibration();
-        PointF point = new PointF(experimentAnalysis.getExperiment().getMaxRawY(), 0);
+        PointF point = new PointF(0, calibration.getOrigin().y + experimentAnalysis.getExperiment().getMaxRawY());
         point = calibration.fromRaw(point);
         return point.y * 0.2f;
     }
@@ -320,7 +328,7 @@ class YVelocityMarkerGraphAdapter extends MarkerGraphAdapter {
         Experiment experiment = experimentAnalysis.getExperiment();
         float deltaX = data.getCalibratedMarkerPositionAt(index + 1).y - data.getCalibratedMarkerPositionAt(index).y;
         float deltaT = experiment.getRunValueAt(index + 1) - experiment.getRunValueAt(index);
-        if (experimentAnalysis.getExperiment().getRunValueUnitPrefix() == "m")
+        if (experimentAnalysis.getExperiment().getRunValueUnitPrefix().equals("m"))
             deltaT /= 1000;
         return deltaX / deltaT;
     }
@@ -372,7 +380,7 @@ class XVelocityMarkerGraphAdapter extends MarkerGraphAdapter {
         Experiment experiment = experimentAnalysis.getExperiment();
         float deltaX = data.getCalibratedMarkerPositionAt(index + 1).x - data.getCalibratedMarkerPositionAt(index).x;
         float deltaT = experiment.getRunValueAt(index + 1) - experiment.getRunValueAt(index);
-        if (experimentAnalysis.getExperiment().getRunValueUnitPrefix() == "m")
+        if (experimentAnalysis.getExperiment().getRunValueUnitPrefix().equals("m"))
             deltaT /= 1000;
         return deltaX / deltaT;
     }
