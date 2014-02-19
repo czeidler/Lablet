@@ -65,7 +65,11 @@ abstract public class Experiment {
     }
 
     static public File getMainExperimentDir(Context context) {
-        return context.getExternalFilesDir(null);
+        File baseDir = context.getExternalFilesDir(null);
+        File experimentDir = new File(baseDir, "experiments");
+        if (!experimentDir.exists())
+            experimentDir.mkdir();
+        return experimentDir;
     }
 
     public void setStorageDir(File dir) {
