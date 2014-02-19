@@ -10,44 +10,125 @@ package nz.ac.aucklanduni.physics.tracker;
 
 import android.os.Bundle;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-abstract class ScriptComponent {
-    abstract public void start();
-    abstract Bundle getResults();
+class ScriptComponent {
+    final static public int SCRIPT_STATE_INACTIVE = -2;
+    final static public int SCRIPT_STATE_ONGOING = -1;
+    final static public int SCRIPT_STATE_DONE = 0;
+
+    private Bundle stateData = null;
+    private ScriptComponent parent = null;
+    private int state = SCRIPT_STATE_INACTIVE;
+    private Map<Integer, ScriptComponent> connections = new HashMap<Integer, ScriptComponent>();
+
+
+    public void setNextComponent(int state, ScriptComponent component) {
+        connections.put(state, component);
+        component.setParent(this);
+    }
+
+    public ScriptComponent getNext() {
+        if (state < 0)
+            return null;
+        return connections.get(state);
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
+    public void setState(int state, Bundle stateData) {
+        this.state = state;
+        this.stateData = stateData;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setStateData(Bundle data) {
+        stateData = data;
+    }
+
+    public Bundle getStateData() {
+        return stateData;
+    }
+
+    public ScriptComponent getParent() {
+        return parent;
+    }
+
+    private void setParent(ScriptComponent parent) {
+        this.parent = parent;
+    }
 }
 
 public class Script {
-    private List<ScriptComponent> components = new ArrayList<ScriptComponent>();
+    private ScriptComponent root = null;
+    private ScriptComponent currentComponent = null;
 
-
-    public void addComponent(ScriptComponent component) {
-        components.add(component);
+    public void setRoot(ScriptComponent component) {
+        root = component;
     }
 
-    public void start(int componentIndex) {
-        for (ScriptComponent component : components) {
-            component.start();
-
-        }
+    public ScriptComponent getRoot() {
+        return root;
     }
 
-    public void onComponentFinished(ScriptComponent component) {
-        int index = components.indexOf(component);
-        if (index < 0)
-            return;
+    public boolean start() {
+        if (currentComponent != null)
+            return false;
 
-        Bundle bundle = component.getResults();
-        if (bundle == null) {
+        setCurrentComponent(root);
+        return true;
+    }
 
-        }
+    private void setCurrentComponent(ScriptComponent component) {
+        if (currentComponent != null)
+            currentComponent.setState(ScriptComponent.SCRIPT_STATE_INACTIVE);
+        currentComponent = component;
+        currentComponent.setState(ScriptComponent.SCRIPT_STATE_ONGOING);
 
-        index ++;
-        if (index == components.size())
-            return;
-        components.get(index).start();
-        return;
+        //notifyCurrentComponentChanged(currentComponent);
+    }
+
+    private boolean cancelCurrent() {
+        if (currentComponent == null)
+            return false;
+
+        ScriptComponent parent = currentComponent.getParent();
+        if (parent == null)
+            return false;
+
+        currentComponent.setStateData(null);
+        setCurrentComponent(parent);
+        return true;
+    }
+
+    private boolean backToParent() {
+        if (currentComponent == null)
+            return false;
+
+        ScriptComponent parent = currentComponent.getParent();
+        if (parent == null)
+            return false;
+
+        setCurrentComponent(parent);
+        return true;
+    }
+
+    private boolean next() {
+        if (currentComponent == null)
+            return false;
+
+        ScriptComponent next = currentComponent.getNext();
+        if (next == null)
+            return false;
+
+        setCurrentComponent(next);
+        return true;
     }
 }
 
