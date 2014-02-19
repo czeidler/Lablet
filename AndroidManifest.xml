@@ -13,14 +13,18 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".ExperimentAnalyserActivity"
+                  android:icon="@drawable/ic_tracker"/>
 
         <activity android:name=".CameraExperimentActivity"
                   android:icon="@drawable/ic_video"/>
         <activity android:name=".CameraRunSettingsActivity"
                   android:icon="@drawable/ic_cut" />
-        <activity android:name=".ExperimentAnalyserActivity"
-                  android:icon="@drawable/ic_tracker"
-                />
+
+        <activity android:name=".ScriptActivity"
+                  android:icon="@drawable/ic_console" />
+        <activity android:name=".ScriptRunnerActivity"
+                  android:icon="@drawable/ic_console" />
     </application>
 
     <uses-permission android:name="android.permission.CAMERA" />
