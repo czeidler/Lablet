@@ -40,7 +40,7 @@ public class ScriptRunner {
         }
 
 
-        script.start(0);
+        script.start();
         return true;
     }
 
