@@ -29,6 +29,12 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
     protected void finalize() {
         experimentAnalysis.removeListener(this);
         runDataModel.removeListener(this);
+
+        try {
+            super.finalize();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
 
     public void setTo(View runView, ExperimentAnalysis analysis) {
