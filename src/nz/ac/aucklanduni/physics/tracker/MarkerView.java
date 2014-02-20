@@ -456,10 +456,8 @@ class CalibrationMarker extends SimpleMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
-        if (isSelected()) {
+        if (isSelected())
             super.onDraw(canvas, priority);
-            return;
-        }
     }
 }
 
@@ -558,10 +556,8 @@ class OriginMarker extends SimpleMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
-        if (isSelected()) {
+        if (isSelected())
             super.onDraw(canvas, priority);
-            return;
-        }
     }
 
     @Override
@@ -584,6 +580,11 @@ class OriginMarkerPainter extends AbstractMarkersPainter implements Calibration.
 
     protected void finalize() {
         calibration.removeListener(this);
+        try {
+            super.finalize();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
 
     @Override
@@ -633,7 +634,6 @@ class OriginMarkerPainter extends AbstractMarkersPainter implements Calibration.
             label1 = "y";
             label2 = "x";
             textAngle += 90;
-         float test = paint.measureText(label1);
             label1Position.set(origin);
             label1Position.x += getScreenAxisLength();
             label1Position.x -= textHeight + 1;
