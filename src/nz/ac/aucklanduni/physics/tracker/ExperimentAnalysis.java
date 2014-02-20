@@ -52,12 +52,14 @@ public class ExperimentAnalysis {
         tagMarkers = new MarkersDataModel();
         tagMarkers.setCalibration(calibration);
 
+        float maxXValue = experiment.getMaxRawX();
+        float maxYValue = experiment.getMaxRawY();
         lengthCalibrationMarkers = new MarkersDataModel();
         MarkerData point1 = new MarkerData(-1);
-        point1.setPosition(new PointF(10, 90));
+        point1.setPosition(new PointF(maxXValue * 0.1f, maxYValue * 0.9f));
         lengthCalibrationMarkers.addMarkerData(point1);
         MarkerData point2 = new MarkerData(-2);
-        point2.setPosition(new PointF(30, 90));
+        point2.setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.9f));
         lengthCalibrationMarkers.addMarkerData(point2);
         lengthCalibrationSetter = new LengthCalibrationSetter(calibration, lengthCalibrationMarkers);
 
