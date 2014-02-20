@@ -65,7 +65,7 @@ public class AndroidPhysicsTracker extends Activity {
 
             }
         });
-        builder.setNegativeButton("physics sucks", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("no thanks", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Toast toast = Toast.makeText(getApplicationContext(), "$%#@*!?", Toast.LENGTH_SHORT);
