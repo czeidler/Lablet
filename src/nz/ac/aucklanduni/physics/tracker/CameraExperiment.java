@@ -95,7 +95,7 @@ public class CameraExperiment extends Experiment {
 
     @Override
     public String getRunValueLabel() {
-        return "time [" + getRunValueUnitPrefix() + getRunValueUnit() + "]";
+        return "time [" + getRunValueUnit() + "]";
     }
 
     protected boolean loadExperiment(Bundle bundle, File storageDir) {
