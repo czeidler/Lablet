@@ -340,7 +340,7 @@ class YVelocityMarkerGraphAdapter extends MarkerGraphAdapter {
 
     @Override
     public Number getMinYRange() {
-        return -1;
+        return 3;
     }
 
     @Override
@@ -392,7 +392,7 @@ class XVelocityMarkerGraphAdapter extends MarkerGraphAdapter {
 
     @Override
     public Number getMinYRange() {
-        return -1;
+        return 3;
     }
 
     @Override
