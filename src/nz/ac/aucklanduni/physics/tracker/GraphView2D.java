@@ -137,6 +137,11 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
         setRangeBottomMax(null);
         setRangeTopMin(null);
 
+        if (adapter.size() == 0) {
+            redraw();
+            return;
+        }
+
         float minXRange = adapter.getMinXRange().floatValue();
         // ensure min x range
         if (minXRange > 0.f) {
@@ -151,8 +156,7 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
                 if (value < min)
                     min = value;
             }
-            if (adapter.size() > 0)
-                average /= adapter.size();
+            average /= adapter.size();
             float currentRange = max - min;
             if (currentRange < minXRange) {
                 setDomainLeftMax(average - minXRange / 2);
@@ -174,8 +178,7 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
                 if (value < min)
                     min = value;
             }
-            if (adapter.size() > 0)
-                average /= adapter.size();
+            average /= adapter.size();
             float currentRange = max - min;
             if (currentRange < minYRange) {
                 setRangeBottomMax(average - minYRange / 2);
