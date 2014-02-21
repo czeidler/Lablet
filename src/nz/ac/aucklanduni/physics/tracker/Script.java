@@ -13,6 +13,7 @@ import android.os.Bundle;
 import java.util.HashMap;
 import java.util.Map;
 
+
 class ScriptComponent {
     final static public int SCRIPT_STATE_INACTIVE = -2;
     final static public int SCRIPT_STATE_ONGOING = -1;
@@ -42,6 +43,11 @@ class ScriptComponent {
     public void setState(int state, Bundle stateData) {
         this.state = state;
         this.stateData = stateData;
+        onStateChanged(state);
+    }
+
+    protected void onStateChanged(int state) {
+
     }
 
     public int getState() {
@@ -78,11 +84,19 @@ public class Script {
     }
 
     public boolean start() {
+        // already started?
         if (currentComponent != null)
+            return false;
+
+        if (root == null)
             return false;
 
         setCurrentComponent(root);
         return true;
+    }
+
+    public ScriptComponent getCurrentComponent() {
+        return currentComponent;
     }
 
     private void setCurrentComponent(ScriptComponent component) {
