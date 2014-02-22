@@ -1,16 +1,15 @@
 package nz.ac.aucklanduni.physics.tracker;
 
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaError;
-import org.luaj.vm2.LuaValue;
+
+import org.luaj.vm2.*;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
-import org.luaj.vm2.lib.jse.CoerceLuaToJava;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
 import java.io.File;
 
+
 interface IScriptComponentFactory {
-    public ScriptComponent create(String componentName);
+    public ScriptComponent create(String componentName, Script script);
 }
 
 class LuaScriptLoader {
@@ -27,12 +26,12 @@ class LuaScriptLoader {
 
         try {
             Globals globals = JsePlatform.standardGlobals();
-            LuaValue chunk = globals.loadFile(scriptFile.getPath());
+            LuaValue chunk = globals.loadfile(scriptFile.getPath());
             chunk.call();
 
             LuaValue hookFunction = globals.get("onBuildExperimentScript");
-            hookFunction.call(CoerceJavaToLua.coerce(builder));
-
+            LuaValue arg = CoerceJavaToLua.coerce(builder);
+            hookFunction.call(arg);
         } catch (LuaError e) {
             lastError = e.getMessage() + "\n";
             return null;
@@ -55,8 +54,7 @@ public class ScriptBuilderLua {
         this.factory = factory;
     }
 
-    public void add(LuaValue componentLua) {
-        ScriptComponent component = (ScriptComponent)CoerceLuaToJava.coerce(componentLua, ScriptComponent.class);
+    public void add(ScriptComponent component) {
         add(ScriptComponent.SCRIPT_STATE_DONE, component);
     }
 
@@ -74,9 +72,7 @@ public class ScriptBuilderLua {
         return script;
     }
 
-    public LuaValue create(String componentName) {
-        ScriptComponent component = factory.create(componentName);
-        LuaValue componentLua = CoerceJavaToLua.coerce(component);
-        return componentLua;
+    public ScriptComponent create(String componentName) {
+        return factory.create(componentName, script);
     }
 }

@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-class ScriptComponent {
+public class ScriptComponent {
     final static public int SCRIPT_STATE_INACTIVE = -2;
     final static public int SCRIPT_STATE_ONGOING = -1;
     final static public int SCRIPT_STATE_DONE = 0;
@@ -66,14 +66,33 @@ class ScriptComponent {
         return parent;
     }
 
+    public int getStepsToRoot() {
+        int stepsToRoot = 1;
+        ScriptComponent currentParent = parent;
+        while (currentParent != null) {
+            stepsToRoot++;
+            currentParent = parent.getParent();
+        }
+        return stepsToRoot;
+    }
+
     private void setParent(ScriptComponent parent) {
         this.parent = parent;
     }
 }
 
-public class Script {
+class Script {
+    public interface IScriptListener {
+        public void onCurrentComponentChanged(ScriptComponent current);
+    }
+
     private ScriptComponent root = null;
     private ScriptComponent currentComponent = null;
+    private IScriptListener listener = null;
+
+    public void setListener(IScriptListener listener) {
+        this.listener = listener;
+    }
 
     public void setRoot(ScriptComponent component) {
         root = component;
@@ -99,16 +118,15 @@ public class Script {
         return currentComponent;
     }
 
-    private void setCurrentComponent(ScriptComponent component) {
-        if (currentComponent != null)
-            currentComponent.setState(ScriptComponent.SCRIPT_STATE_INACTIVE);
+    public void setCurrentComponent(ScriptComponent component) {
         currentComponent = component;
         currentComponent.setState(ScriptComponent.SCRIPT_STATE_ONGOING);
 
-        //notifyCurrentComponentChanged(currentComponent);
+        if (listener != null)
+            listener.onCurrentComponentChanged(currentComponent);
     }
 
-    private boolean cancelCurrent() {
+    public boolean cancelCurrent() {
         if (currentComponent == null)
             return false;
 
@@ -121,7 +139,7 @@ public class Script {
         return true;
     }
 
-    private boolean backToParent() {
+    public boolean backToParent() {
         if (currentComponent == null)
             return false;
 
@@ -133,7 +151,7 @@ public class Script {
         return true;
     }
 
-    private boolean next() {
+    public boolean next() {
         if (currentComponent == null)
             return false;
 

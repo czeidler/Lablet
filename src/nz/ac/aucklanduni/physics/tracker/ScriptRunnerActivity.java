@@ -18,22 +18,21 @@ import android.support.v4.view.ViewPager;
 
 import java.io.File;
 
-public class ScriptRunnerActivity extends FragmentActivity {
+public class ScriptRunnerActivity extends FragmentActivity implements Script.IScriptListener {
     private Script script = null;
+    private ViewPager pager = null;
     private ScriptFragmentPagerAdapter pagerAdapter = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.experiment_analyser);
-        // Instantiate a ViewPager and a PagerAdapter.
-
-        script = new Script();
         if (!loadScript(getIntent()))
             return;
 
-        ViewPager pager = (ViewPager)findViewById(R.id.pager);
+        setContentView(R.layout.experiment_analyser);
+        // Instantiate a ViewPager and a PagerAdapter.
+        pager = (ViewPager)findViewById(R.id.pager);
         pagerAdapter = new ScriptFragmentPagerAdapter(getSupportFragmentManager(), script);
         pager.setAdapter(pagerAdapter);
     }
@@ -49,6 +48,7 @@ public class ScriptRunnerActivity extends FragmentActivity {
             ScriptComponentFragmentFactory factory = new ScriptComponentFragmentFactory();
             LuaScriptLoader loader = new LuaScriptLoader(factory);
             script = loader.load(new File(scriptPath));
+            script.setListener(this);
             if (script == null) {
                 showErrorAndFinish("Error in script: ", loader.getLastError());
                 return false;
@@ -80,6 +80,14 @@ public class ScriptRunnerActivity extends FragmentActivity {
         dialog.show();
     }
 
+    @Override
+    public void onCurrentComponentChanged(ScriptComponent current) {
+        if (pagerAdapter == null)
+            return;
+        pagerAdapter.notifyDataSetChanged();
+        pager.setCurrentItem(current.getStepsToRoot() - 1);
+    }
+
     private class ScriptFragmentPagerAdapter extends FragmentStatePagerAdapter {
         private Script script;
 
@@ -91,18 +99,20 @@ public class ScriptRunnerActivity extends FragmentActivity {
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            if (position == 0) {
-                ScriptComponentFragment fragmentCreator = (ScriptComponentFragment)script.getCurrentComponent();
-                return fragmentCreator.createFragment();
+            int i = 0;
+            ScriptComponent component = script.getRoot();
+            while (i != position) {
+                i++;
+                component = component.getNext();
             }
-
-            return null;
+            ScriptComponentFragment fragmentCreator = (ScriptComponentFragment)component;
+            return fragmentCreator.createFragment();
         }
 
         @Override
         public int getCount() {
             if (script.getCurrentComponent() != null)
-                return 1;
+                return script.getCurrentComponent().getStepsToRoot();
             return 0;
         }
 

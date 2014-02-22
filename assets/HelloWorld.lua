@@ -1,8 +1,10 @@
 
 function onBuildExperimentScript(scriptBuilder)
-	questions1 = scriptBuilder:create("QuestionsComponent");
-	scriptBuilder:add(questions1);
+	questions1 = scriptBuilder:create("QuestionsComponent")
+	questions1:setTitle("Q1:")
+	scriptBuilder:add(questions1)
 	
-	questions2 = scriptBuilder:create("QuestionsComponent");
-	scriptBuilder:add(questions2);
+	local questions2 = scriptBuilder:create("QuestionsComponent")
+	questions2:setTitle("Q2:")
+	scriptBuilder:add(questions2)
 end

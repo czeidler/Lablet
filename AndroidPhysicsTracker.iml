@@ -25,7 +25,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="androidplot-core-0.6.0" level="project" />
-    <orderEntry type="library" name="org.luaj:luaj-jse:3.0-beta1" level="project" />
+    <orderEntry type="library" name="org.luaj:luaj-jse:3.0-beta2" level="project" />
   </component>
 </module>
 
