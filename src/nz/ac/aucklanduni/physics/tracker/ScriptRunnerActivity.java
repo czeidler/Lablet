@@ -105,7 +105,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
                 i++;
                 component = component.getNext();
             }
-            ScriptComponentFragment fragmentCreator = (ScriptComponentFragment)component;
+            ScriptComponentFragmentHolder fragmentCreator = (ScriptComponentFragmentHolder)component;
             return fragmentCreator.createFragment();
         }
 

@@ -7,10 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.jse.CoerceLuaToJava;
 
-public class ScriptComponentQuestions extends ScriptComponentFragment {
+public class ScriptComponentQuestions extends ScriptComponentFragmentHolder {
     private String title = "Questions:";
 
     public ScriptComponentQuestions(Script script) {
