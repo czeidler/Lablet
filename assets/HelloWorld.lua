@@ -7,4 +7,7 @@ function onBuildExperimentScript(scriptBuilder)
 	local questions2 = scriptBuilder:create("QuestionsComponent")
 	questions2:setTitle("Q2:")
 	scriptBuilder:add(questions2)
+	
+	local takeCameraExperiment = scriptBuilder:create("CameraExperiment")
+	scriptBuilder:add(takeCameraExperiment)
 end
