@@ -8,11 +8,14 @@
 package nz.ac.aucklanduni.physics.tracker;
 
 
+import android.content.Context;
 import android.os.Bundle;
+import android.text.format.Time;
 
+import java.io.File;
 import java.security.MessageDigest;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 
@@ -44,7 +47,7 @@ class Hash {
     }
 }
 
-public class ScriptComponent {
+public class ScriptComponent implements Iterable<ScriptComponent> {
     final static public int SCRIPT_STATE_INACTIVE = -2;
     final static public int SCRIPT_STATE_ONGOING = -1;
     final static public int SCRIPT_STATE_DONE = 0;
@@ -54,32 +57,46 @@ public class ScriptComponent {
     private int state = SCRIPT_STATE_INACTIVE;
     private Map<Integer, ScriptComponent> connections = new HashMap<Integer, ScriptComponent>();
 
-    static class Iterator {
+    @Override
+    public java.util.Iterator<ScriptComponent> iterator() {
+        return new Iterator(this);
+    }
+
+    static private class Iterator implements java.util.Iterator<ScriptComponent> {
         private ScriptComponent currentComponent;
         private java.util.Iterator<ScriptComponent> currentComponentIterator;
-        private ScriptComponent.Iterator childIterator;
+        private java.util.Iterator<ScriptComponent> childIterator;
 
         Iterator(ScriptComponent root) {
             currentComponent = root;
             currentComponentIterator = currentComponent.connections.values().iterator();
         }
 
-        ScriptComponent next() {
-            ScriptComponent child = currentComponentIterator.next();
-            if (child == null)
-                return null;
-
+        @Override
+        public ScriptComponent next() {
             if (childIterator == null) {
-                childIterator = new Iterator(child);
+                ScriptComponent child = currentComponentIterator.next();
+                childIterator = child.iterator();
                 return child;
             } else {
-                child = childIterator.next();
-                if (child == null) {
+                ScriptComponent child = childIterator.next();
+                if (!childIterator.hasNext())
                     childIterator = null;
-                    return next();
-                } else
-                    return child;
+
+                return child;
             }
+        }
+
+        @Override
+        public void remove() {
+
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (childIterator != null && childIterator.hasNext())
+                return true;
+            return currentComponentIterator.hasNext();
         }
     }
 
@@ -88,9 +105,9 @@ public class ScriptComponent {
         java.util.Iterator<ScriptComponent> iterator = component.connections.values().iterator();
         int childId = -1;
         while (true) {
-            ScriptComponent child = iterator.next();
-            if (child == null)
+            if (!iterator.hasNext())
                 break;
+            ScriptComponent child = iterator.next();
             childId++;
 
             hashData += childId;
@@ -192,6 +209,36 @@ class Script {
         return root;
     }
 
+    static public File getScriptDirectory(Context context) {
+        File baseDir = context.getExternalFilesDir(null);
+        File scriptDir = new File(baseDir, "scripts");
+        if (!scriptDir.exists())
+            scriptDir.mkdir();
+        return scriptDir;
+    }
+
+    static public File getScriptUserDataDir(Context context) {
+        File baseDir = context.getExternalFilesDir(null);
+        File scriptDir = new File(baseDir, "script_user_data");
+        if (!scriptDir.exists())
+            scriptDir.mkdir();
+        return scriptDir;
+    }
+
+    static public String generateScriptUid(String scriptName) {
+        Time now = new Time(Time.getCurrentTimezone());
+        CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", new java.util.Date());
+
+        now.setToNow();
+        String newUid = "";
+        if (!scriptName.equals("")) {
+            newUid += scriptName;
+            newUid += "_";
+        }
+        newUid += dateString;
+        return newUid;
+    }
+
     public boolean start() {
         // already started?
         if (currentComponent != null)
@@ -204,15 +251,15 @@ class Script {
         return true;
     }
 
-    public void saveScript(Bundle bundle) {
+    public boolean saveScript(Bundle bundle) {
         bundle.putString("scriptId", ScriptComponent.getChainHash(root));
 
         int componentId = -1;
-        ScriptComponent.Iterator iterator = new ScriptComponent.Iterator(root);
+        java.util.Iterator<ScriptComponent> iterator = root.iterator();
         while (true) {
-            ScriptComponent component = iterator.next();
-            if (component == null)
+            if (!iterator.hasNext())
                 break;
+            ScriptComponent component = iterator.next();
             componentId++;
 
             Bundle componentBundle = new Bundle();
@@ -221,6 +268,7 @@ class Script {
             String bundleKey = Integer.toString(componentId);
             bundle.putBundle(bundleKey, componentBundle);
         }
+        return true;
     }
 
     public boolean loadScript(Bundle bundle) {
@@ -230,11 +278,11 @@ class Script {
         }
 
         int componentId = -1;
-        ScriptComponent.Iterator iterator = new ScriptComponent.Iterator(root);
+        java.util.Iterator<ScriptComponent> iterator = root.iterator();
         while (true) {
-            ScriptComponent component = iterator.next();
-            if (component == null)
+            if (!iterator.hasNext())
                 break;
+            ScriptComponent component = iterator.next();
             componentId++;
 
             String bundleKey = Integer.toString(componentId);

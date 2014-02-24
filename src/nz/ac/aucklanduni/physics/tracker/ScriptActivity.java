@@ -22,6 +22,8 @@ import java.util.List;
 public class ScriptActivity extends Activity {
     private List<String> scriptList = null;
     private ArrayAdapter<String> scriptListAdaptor = null;
+    private ArrayList<CheckBoxListEntry> existingScriptList = null;
+    private CheckBoxAdapter existingScriptListAdaptor = null;
 
     final int START_SCRIPT = 1;
 
@@ -47,8 +49,22 @@ public class ScriptActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String id = scriptList.get(i);
-                id += ".lua";
                 startScript(id);
+            }
+        });
+
+        // experiment list
+        ListView existingScriptListView = (ListView)findViewById(R.id.existingScriptListView);
+        existingScriptListView.setBackgroundColor(listBackgroundColor);
+        existingScriptList = new ArrayList<CheckBoxListEntry>();
+        existingScriptListAdaptor = new CheckBoxAdapter(this, R.layout.check_box_list_item, existingScriptList);
+        existingScriptListView.setAdapter(existingScriptListAdaptor);
+
+        existingScriptListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String id = existingScriptList.get(i).getName();
+                loadPreviousScript(id);
             }
         });
 
@@ -60,23 +76,28 @@ public class ScriptActivity extends Activity {
         super.onResume();
 
         updateScriptList();
+        updateExistingScriptList();
     }
 
     private void startScript(String id) {
-        File scriptDir = getScriptDirectory();
-        File scriptPath = new File(scriptDir, id);
-        startAnalyzeActivity(scriptPath.getPath());
+        String fileName = id + ".lua";
+
+        Intent intent = new Intent(this, ScriptRunnerActivity.class);
+        intent.putExtra("script_name", fileName);
+        intent.putExtra("script_user_data_dir", Script.generateScriptUid(id));
+        startActivityForResult(intent, START_SCRIPT);
     }
 
-    private void startAnalyzeActivity(String scriptPath) {
+    private boolean loadPreviousScript(String scriptDir) {
         Intent intent = new Intent(this, ScriptRunnerActivity.class);
-        intent.putExtra("script_path", scriptPath);
+        intent.putExtra("script_user_data_dir", scriptDir);
         startActivityForResult(intent, START_SCRIPT);
+        return true;
     }
 
     private void updateScriptList() {
         scriptList.clear();
-        File scriptDir = getScriptDirectory();
+        File scriptDir = Script.getScriptDirectory(this);
         if (scriptDir.isDirectory()) {
             File[] children = scriptDir.listFiles();
             for (File child : children != null ? children : new File[0]) {
@@ -91,13 +112,8 @@ public class ScriptActivity extends Activity {
         scriptListAdaptor.notifyDataSetChanged();
     }
 
-    private File getScriptDirectory() {
-        File baseDir = getExternalFilesDir(null);
-        return new File(baseDir, "scripts");
-    }
-
     private void copyResourceScripts(boolean overwriteExisting) {
-        File scriptDir = getScriptDirectory();
+        File scriptDir = Script.getScriptDirectory(this);
         if (!scriptDir.exists()) {
             if (!scriptDir.mkdir())
                 return;
@@ -132,5 +148,17 @@ public class ScriptActivity extends Activity {
 
     private boolean isLuaFile(String name) {
         return name.lastIndexOf(".lua") == name.length() - 4;
+    }
+
+    private void updateExistingScriptList() {
+        existingScriptList.clear();
+        File experimentDir = Script.getScriptUserDataDir(this);
+        if (experimentDir.isDirectory()) {
+            File[] children = experimentDir.listFiles();
+            for (File child : children != null ? children : new File[0])
+                existingScriptList.add(new CheckBoxListEntry(child.getName()));
+        }
+
+        existingScriptListAdaptor.notifyDataSetChanged();
     }
 }

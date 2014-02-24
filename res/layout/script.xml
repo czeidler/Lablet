@@ -1,23 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Start Experiment Script:"
-            android:id="@+id/textView"/>
-    <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/scrollView">
-        <ListView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/scriptList"/>
-    </ScrollView>
-</LinearLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools" android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                tools:context=".AndroidPhysicsTracker">
+<TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Start Experiment Script:"
+        android:id="@+id/textView" android:layout_alignParentTop="true" android:layout_alignParentLeft="true"/>
+<ListView
+        android:layout_width="wrap_content"
+        android:layout_height="151dp"
+        android:id="@+id/scriptList" android:choiceMode="singleChoice"
+        android:layout_alignParentLeft="true" android:layout_marginLeft="0dp"
+        android:layout_below="@+id/textView"/>
+<TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Continue an experiment script:"
+        android:id="@+id/textView2"
+        android:layout_below="@+id/scriptList" android:layout_alignParentLeft="true"/>
+<CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="All"
+        android:id="@+id/checkBoxSelectAll"
+        android:layout_below="@+id/textView2"
+        android:layout_alignParentLeft="true"/>
+<ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/existingScriptListView"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" android:layout_below="@+id/checkBoxSelectAll"/>
+</RelativeLayout>
