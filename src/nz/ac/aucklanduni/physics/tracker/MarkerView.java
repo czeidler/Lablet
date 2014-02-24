@@ -153,7 +153,7 @@ class SimpleMarker extends DragableMarker {
         canvas.drawLine(position.x + crossR, position.y - crossR, position.x - crossR, position.y + crossR, paint);
 
         if (priority == 1.)
-            paint.setColor(makeColor(Color.BLUE));
+            paint.setColor(ExperimentAnalyserActivity.MARKER_COLOR);
         else
             paint.setColor(makeColor(255, 200, 200, 200));
         paint.setStyle(Paint.Style.STROKE);

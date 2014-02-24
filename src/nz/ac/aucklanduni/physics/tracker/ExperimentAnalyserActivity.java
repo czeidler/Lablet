@@ -10,6 +10,7 @@ package nz.ac.aucklanduni.physics.tracker;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -23,6 +24,8 @@ import java.io.*;
 public class ExperimentAnalyserActivity extends ExperimentActivity {
     static final int PERFORM_RUN_SETTINGS = 0;
     final String EXPERIMENT_ANALYSIS_FILE_NAME = "experiment_analysis.xml";
+
+    final public static int MARKER_COLOR = Color.argb(255, 100, 200, 20);
 
     ExperimentAnalysis experimentAnalysis;
 
