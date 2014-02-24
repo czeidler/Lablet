@@ -8,6 +8,7 @@
 package nz.ac.aucklanduni.physics.tracker;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.AttributeSet;
@@ -68,15 +69,11 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
         getLegendWidget().setVisible(false);
         setTicksPerDomainLabel(2);
 
-        LineAndPointFormatter seriesFormat = new LineAndPointFormatter();
-        seriesFormat.setPointLabelFormatter(new PointLabelFormatter());
-        Paint paint = new Paint();
-        paint.setARGB(0, 0, 0, 0);
-        seriesFormat.setFillPaint(paint);
+        LineAndPointFormatter seriesFormat = new LineAndPointFormatter(Color.GREEN, Color.BLUE, Color.argb(0, 0, 0, 0),
+                new PointLabelFormatter());
         seriesFormat.setPointLabeler(null);
 
         addSeries(new XYSeriesAdapter(adapter), seriesFormat);
-
 
         refillGraph();
     }
