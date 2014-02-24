@@ -436,11 +436,19 @@ class TagMarkerDataModelPainter extends AbstractMarkersPainter {
                 data.setPosition(prevData.getPosition());
                 data.getPosition().x += 5;
 
+                // sanatize the new marker position
                 PointF screenPos = new PointF();
                 experimentRunView.toScreen(data.getPosition(), screenPos);
                 sanitizeScreenPoint(screenPos);
                 experimentRunView.fromScreen(screenPos, data.getPosition());
+            } else {
+                // center the first marker
+                PointF initPosition = new PointF();
+                initPosition.x = experimentRunView.getMaxRawX() * 0.5f;
+                initPosition.y = experimentRunView.getMaxRawY() * 0.5f;
+                data.setPosition(initPosition);
             }
+
             int newIndex = markerData.addMarkerData(data);
             markerData.selectMarkerData(newIndex);
 
