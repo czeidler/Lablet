@@ -21,8 +21,10 @@ class LuaScriptLoader {
     }
 
     public Script load(File scriptFile) {
-        if (!scriptFile.exists())
+        if (!scriptFile.exists()) {
+            lastError = "Script file does not exist!";
             return null;
+        }
 
         try {
             Globals globals = JsePlatform.standardGlobals();
@@ -33,7 +35,7 @@ class LuaScriptLoader {
             LuaValue arg = CoerceJavaToLua.coerce(builder);
             hookFunction.call(arg);
         } catch (LuaError e) {
-            lastError = e.getMessage() + "\n";
+            lastError = e.getMessage();
             return null;
         }
 

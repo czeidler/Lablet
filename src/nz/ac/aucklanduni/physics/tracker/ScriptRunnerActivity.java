@@ -97,11 +97,11 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
         ScriptComponentFragmentFactory factory = new ScriptComponentFragmentFactory();
         LuaScriptLoader loader = new LuaScriptLoader(factory);
         script = loader.load(scriptFile);
-        script.setListener(this);
         if (script == null) {
             showErrorAndFinish("Error in script: ", loader.getLastError());
             return false;
         }
+        script.setListener(this);
         script.start();
         return true;
     }
