@@ -16,33 +16,35 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
+public class ScriptComponentExperimentAnalysis extends ScriptComponentFragmentHolder {
+    private ScriptComponentExperiment experiment;
 
-public class ScriptComponentCameraExperiment extends ScriptComponentFragmentHolder {
-    private ScriptComponentExperiment experiment = new ScriptComponentExperiment();
-
-    public ScriptComponentCameraExperiment(Script script) {
+    public ScriptComponentExperimentAnalysis(Script script) {
         super(script);
     }
 
     @Override
     public Fragment createFragment() {
-        return new ScriptComponentCameraExperimentFragment(this, script);
+        return new ScriptComponentExperimentAnalyisisFragment(this, script);
+    }
+
+    public void setExperiment(ScriptComponentExperiment experiment) {
+        this.experiment = experiment;
     }
 
     public ScriptComponentExperiment getExperiment() {
         return experiment;
     }
+
 }
 
-
-class ScriptComponentCameraExperimentFragment extends android.support.v4.app.Fragment {
-    private ScriptComponentCameraExperiment component;
+class ScriptComponentExperimentAnalyisisFragment extends android.support.v4.app.Fragment {
+    private ScriptComponentExperimentAnalysis component;
     private Script script;
-    static final int PERFORM_EXPERIMENT = 0;
+    static final int ANALYSE_EXPERIMENT = 0;
 
-    public ScriptComponentCameraExperimentFragment(ScriptComponentCameraExperiment component, Script script) {
+    public ScriptComponentExperimentAnalyisisFragment(ScriptComponentExperimentAnalysis component, Script script) {
         this.component = component;
         this.script = script;
     }
@@ -59,8 +61,9 @@ class ScriptComponentCameraExperimentFragment extends android.support.v4.app.Fra
         takeExperiment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), CameraExperimentActivity.class);
-                startActivityForResult(intent, PERFORM_EXPERIMENT);
+                Intent intent = new Intent(getActivity(), ExperimentAnalyserActivity.class);
+                intent.putExtra("experiment_path", component.getExperiment().getExperimentPath());
+                startActivityForResult(intent, ANALYSE_EXPERIMENT);
             }
         });
 
@@ -80,14 +83,6 @@ class ScriptComponentCameraExperimentFragment extends android.support.v4.app.Fra
         if (resultCode != Activity.RESULT_OK)
             return;
 
-        if (requestCode == PERFORM_EXPERIMENT) {
-            if (data == null)
-                return;
-            if (data.hasExtra("experiment_path")) {
-                String experimentPath = data.getStringExtra("experiment_path");
-                component.getExperiment().setExperimentPath(experimentPath);
-            }
-            return;
-        }
+
     }
 }

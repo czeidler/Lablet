@@ -18,6 +18,8 @@ class ScriptComponentFragmentFactory implements IScriptComponentFactory {
             return new ScriptComponentQuestions(script);
         if (componentName.equals("CameraExperiment"))
             return new ScriptComponentCameraExperiment(script);
+        if (componentName.equals("ExperimentAnalysis"))
+            return new ScriptComponentExperimentAnalysis(script);
 
         return null;
     }
