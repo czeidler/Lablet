@@ -204,7 +204,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
 
     protected boolean loadAnalysisDataToFile() {
         File projectFile = new File(experiment.getStorageDir(), EXPERIMENT_ANALYSIS_FILE_NAME);
-        Bundle bundle = loadBundleFromFile(projectFile);
+        Bundle bundle = ExperimentLoader.loadBundleFromFile(projectFile);
         if (bundle == null)
             return false;
 

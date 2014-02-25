@@ -8,6 +8,7 @@
 package nz.ac.aucklanduni.physics.tracker;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,29 +18,15 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.*;
 
 
-abstract public class ExperimentActivity extends FragmentActivity {
-    protected Experiment experiment = null;
-    protected ExperimentPlugin plugin = null;
+class ExperimentLoaderResult {
+    public ExperimentPlugin plugin;
+    public Experiment experiment;
+    public String loadError;
+}
 
-    final String EXPERIMENT_DATA_FILE_NAME = "experiment_data.xml";
+class ExperimentLoader {
 
-    protected void setExperiment(Experiment experiment) {
-        this.experiment = experiment;
-        try {
-            experiment.setStorageDir(getStorageDir());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public Experiment getExperiment() {
-        return experiment;
-    }
-    public ExperimentPlugin getExperimentPlugin() {
-        return plugin;
-    }
-
-    protected Bundle loadBundleFromFile(File file) {
+    static public Bundle loadBundleFromFile(File file) {
         Bundle bundle;
         InputStream inStream;
         try {
@@ -63,51 +50,87 @@ abstract public class ExperimentActivity extends FragmentActivity {
         return bundle;
     }
 
+    static protected boolean loadExperiment(Context context, String experimentPath, ExperimentLoaderResult result) {
+        File storageDir = null;
+        Bundle bundle = null;
+
+        if (experimentPath != null) {
+            storageDir = new File(experimentPath);
+            File file = new File(storageDir, ExperimentActivity.EXPERIMENT_DATA_FILE_NAME);
+            bundle = ExperimentLoader.loadBundleFromFile(file);
+        }
+
+        if (bundle == null) {
+            result.loadError = "can't read experiment file";
+            return false;
+        }
+
+        String experimentIdentifier = bundle.getString("experiment_identifier");
+        if (experimentIdentifier == null) {
+            result.loadError = "invalid experiment data";
+            return false;
+        }
+
+        ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
+        result.plugin = factory.findExperimentPlugin(experimentIdentifier);
+        if (result.plugin == null) {
+            result.loadError = "unknown experiment type";
+            return false;
+        }
+
+        Bundle experimentData = bundle.getBundle("data");
+        if (experimentData == null) {
+            result.loadError = "failed to load experiment data";
+            return false;
+        }
+        result.experiment = result.plugin.loadExperiment(context, experimentData, storageDir);
+        if (result.experiment == null) {
+            result.loadError = "can't load experiment";
+            return false;
+        }
+
+        return true;
+    }
+}
+
+abstract public class ExperimentActivity extends FragmentActivity {
+    protected Experiment experiment = null;
+    protected ExperimentPlugin plugin = null;
+
+    final static public String EXPERIMENT_DATA_FILE_NAME = "experiment_data.xml";
+
+    protected void setExperiment(Experiment experiment) {
+        this.experiment = experiment;
+        try {
+            experiment.setStorageDir(getStorageDir());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Experiment getExperiment() {
+        return experiment;
+    }
+    public ExperimentPlugin getExperimentPlugin() {
+        return plugin;
+    }
+
     protected boolean loadExperiment(Intent intent) {
         if (intent == null) {
             showErrorAndFinish("can't load experiment (Intent is null)");
             return false;
         }
 
-        File storageDir = null;
-        Bundle bundle = null;
-
         String experimentPath = intent.getStringExtra("experiment_path");
-        if (experimentPath != null) {
-            storageDir = new File(experimentPath);
-            File file = new File(storageDir, EXPERIMENT_DATA_FILE_NAME);
-            bundle = loadBundleFromFile(file);
-        }
 
-        if (bundle == null) {
-            showErrorAndFinish("can't read experiment file");
+        ExperimentLoaderResult result = new ExperimentLoaderResult();
+        if (!ExperimentLoader.loadExperiment(this, experimentPath, result)) {
+            showErrorAndFinish(result.loadError);
             return false;
         }
 
-        String experimentIdentifier = bundle.getString("experiment_identifier");
-        if (experimentIdentifier == null) {
-            showErrorAndFinish("invalid experiment data");
-            return false;
-        }
-
-        ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
-        plugin = factory.findExperimentPlugin(experimentIdentifier);
-        if (plugin == null) {
-            showErrorAndFinish("unknown experiment type");
-            return false;
-        }
-
-        Bundle experimentData = bundle.getBundle("data");
-        if (experimentData == null) {
-            showErrorAndFinish("failed to load experiment data");
-            return false;
-        }
-        experiment = plugin.loadExperiment(this, experimentData, storageDir);
-
-        if (experiment == null) {
-            showErrorAndFinish("can't load experiment");
-            return false;
-        }
+        plugin = result.plugin;
+        experiment = result.experiment;
 
         return true;
     }
