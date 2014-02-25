@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="nz.ac.aucklanduni.physics.tracker"
-          android:versionCode="105"
-          android:versionName="1.0.5">
+          android:versionCode="110"
+          android:versionName="1.1 dev">
     <uses-sdk android:minSdkVersion="16"/>
     <application android:label="@string/app_name" android:icon="@drawable/ic_tracker">
         <activity android:name="AndroidPhysicsTracker"
@@ -13,14 +13,18 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".ExperimentAnalyserActivity"
+                  android:icon="@drawable/ic_tracker"/>
 
         <activity android:name=".CameraExperimentActivity"
                   android:icon="@drawable/ic_video"/>
         <activity android:name=".CameraRunSettingsActivity"
                   android:icon="@drawable/ic_cut" />
-        <activity android:name=".ExperimentAnalyserActivity"
-                  android:icon="@drawable/ic_tracker"
-                />
+
+        <activity android:name=".ScriptActivity"
+                  android:icon="@drawable/ic_console" />
+        <activity android:name=".ScriptRunnerActivity"
+                  android:icon="@drawable/ic_console" />
     </application>
 
     <uses-permission android:name="android.permission.CAMERA" />

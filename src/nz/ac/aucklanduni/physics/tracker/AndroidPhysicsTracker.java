@@ -46,8 +46,19 @@ public class AndroidPhysicsTracker extends Activity {
         menu.clear();
         getMenuInflater().inflate(R.menu.main_activity_actions, menu);
 
+        MenuItem scriptItem = menu.findItem(R.id.action_scripts);
+        assert(scriptItem != null);
+        scriptItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                startScriptActivity();
+                return true;
+            }
+        });
+
         // info item
         MenuItem infoItem = menu.findItem(R.id.action_info);
+        assert(infoItem != null);
         String versionString = "Ver. ";
         try {
             versionString += this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName;
@@ -273,6 +284,11 @@ public class AndroidPhysicsTracker extends Activity {
         plugin.startExperimentActivity(this, PERFORM_EXPERIMENT);
     }
 
+    private void startScriptActivity() {
+        Intent intent = new Intent(this, ScriptActivity.class);
+        startActivity(intent);
+    }
+
     private void updateExperimentList() {
         experimentList.clear();
         File experimentDir = Experiment.getMainExperimentDir(this);
@@ -302,4 +318,5 @@ public class AndroidPhysicsTracker extends Activity {
             }
         }
     }
+
 }

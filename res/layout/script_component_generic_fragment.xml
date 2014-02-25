@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Title"
+            android:id="@+id/titleTextView" android:layout_alignParentLeft="true" android:layout_marginLeft="0dp"
+            android:layout_alignParentTop="true" android:layout_marginTop="0dp"/>
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next"
+            android:id="@+id/finishComponentButton" android:layout_gravity="center_horizontal"
+            android:layout_alignParentBottom="true" android:layout_alignParentRight="true"/>
+    <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/childContainer"
+            android:layout_below="@+id/titleTextView"
+            android:layout_alignParentLeft="true" android:layout_above="@+id/finishComponentButton"
+            android:layout_alignRight="@+id/finishComponentButton" android:fillViewport="false"/>
+</RelativeLayout>
