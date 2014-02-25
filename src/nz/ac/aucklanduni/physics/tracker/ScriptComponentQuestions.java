@@ -1,3 +1,10 @@
+/*
+ * Copyright 2013-2014.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
 package nz.ac.aucklanduni.physics.tracker;
 
 import android.os.Bundle;
@@ -8,57 +15,41 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class ScriptComponentQuestions extends ScriptComponentFragmentHolder {
-    private String title = "Questions:";
 
+public class ScriptComponentQuestions extends ScriptComponentFragmentHolder {
     public ScriptComponentQuestions(Script script) {
         super(script);
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     @Override
     public Fragment createFragment() {
         ScriptComponentQuestionsFragment fragment = new ScriptComponentQuestionsFragment(this);
-        fragment.setTitle(title);
-
         return fragment;
     }
 }
 
-class ScriptComponentQuestionsFragment extends android.support.v4.app.Fragment {
-    private ScriptComponentQuestions component;
-
-    private String title = "";
+class ScriptComponentQuestionsFragment extends ScriptComponentGenericFragment {
 
     public ScriptComponentQuestionsFragment(ScriptComponentQuestions component) {
-        this.component = component;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+        super(component);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        View view = inflater.inflate(R.layout.script_component_questions_fragment, container, false);
-        assert view != null;
+        View child = setChild(R.layout.script_component_questions_fragment);
+        assert child != null;
 
-        TextView titleView = (TextView)view.findViewById(R.id.titleLabel);
-        titleView.setText(title);
-
-        Button okButton = (Button)view.findViewById(R.id.button);
+        Button okButton = (Button)child.findViewById(R.id.button);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                component.setState(ScriptComponent.SCRIPT_STATE_DONE);
-                component.getScript().notifyGoToComponent(component.getNext());
+                setState(ScriptComponent.SCRIPT_STATE_DONE);
             }
         });
+
         return view;
     }
 

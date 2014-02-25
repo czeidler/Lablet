@@ -26,7 +26,7 @@ public class ScriptComponentExperimentAnalysis extends ScriptComponentFragmentHo
 
     @Override
     public Fragment createFragment() {
-        return new ScriptComponentExperimentAnalyisisFragment(this);
+        return new ScriptComponentExperimentAnalysisFragment(this);
     }
 
     public void setExperiment(ScriptComponentExperiment experiment) {
@@ -39,41 +39,41 @@ public class ScriptComponentExperimentAnalysis extends ScriptComponentFragmentHo
 
 }
 
-class ScriptComponentExperimentAnalyisisFragment extends android.support.v4.app.Fragment {
-    private ScriptComponentExperimentAnalysis component;
+class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFragment {
     static final int ANALYSE_EXPERIMENT = 0;
 
-    public ScriptComponentExperimentAnalyisisFragment(ScriptComponentExperimentAnalysis component) {
-        this.component = component;
+    public ScriptComponentExperimentAnalysisFragment(ScriptComponentExperimentAnalysis component) {
+        super(component);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        View view = inflater.inflate(R.layout.script_component_camera_experiment, container, false);
-        assert view != null;
+        View child = setChild(R.layout.script_component_camera_experiment);
+        assert child != null;
 
-        Button takeExperiment = (Button)view.findViewById(R.id.takeExperimentButton);
+        Button takeExperiment = (Button)child.findViewById(R.id.takeExperimentButton);
         assert(takeExperiment != null);
         takeExperiment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), ExperimentAnalyserActivity.class);
-                intent.putExtra("experiment_path", component.getExperiment().getExperimentPath());
+                intent.putExtra("experiment_path",
+                        ((ScriptComponentExperimentAnalysis)component).getExperiment().getExperimentPath());
                 startActivityForResult(intent, ANALYSE_EXPERIMENT);
             }
         });
 
-        Button okButton = (Button)view.findViewById(R.id.doneButton);
+        Button okButton = (Button)child.findViewById(R.id.doneButton);
         assert(okButton != null);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                component.setState(ScriptComponent.SCRIPT_STATE_DONE);
-                component.getScript().notifyGoToComponent(component.getNext());
-            }
+                setState(ScriptComponent.SCRIPT_STATE_DONE);            }
         });
+
         return view;
     }
 

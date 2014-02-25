@@ -37,22 +37,22 @@ public class ScriptComponentCameraExperiment extends ScriptComponentFragmentHold
 }
 
 
-class ScriptComponentCameraExperimentFragment extends android.support.v4.app.Fragment {
-    private ScriptComponentCameraExperiment component;
+class ScriptComponentCameraExperimentFragment extends ScriptComponentGenericFragment {
     static final int PERFORM_EXPERIMENT = 0;
 
     public ScriptComponentCameraExperimentFragment(ScriptComponentCameraExperiment component) {
-        this.component = component;
+        super(component);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        View view = inflater.inflate(R.layout.script_component_camera_experiment, container, false);
-        assert view != null;
+        View child = setChild(R.layout.script_component_camera_experiment);
+        assert child != null;
 
-        Button takeExperiment = (Button)view.findViewById(R.id.takeExperimentButton);
+        Button takeExperiment = (Button)child.findViewById(R.id.takeExperimentButton);
         assert(takeExperiment != null);
         takeExperiment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,15 +62,15 @@ class ScriptComponentCameraExperimentFragment extends android.support.v4.app.Fra
             }
         });
 
-        Button okButton = (Button)view.findViewById(R.id.doneButton);
+        Button okButton = (Button)child.findViewById(R.id.doneButton);
         assert(okButton != null);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                component.setState(ScriptComponent.SCRIPT_STATE_DONE);
-                component.getScript().notifyGoToComponent(component.getNext());
+                setState(ScriptComponent.SCRIPT_STATE_DONE);
             }
         });
+
         return view;
     }
 
@@ -83,7 +83,7 @@ class ScriptComponentCameraExperimentFragment extends android.support.v4.app.Fra
                 return;
             if (data.hasExtra("experiment_path")) {
                 String experimentPath = data.getStringExtra("experiment_path");
-                component.getExperiment().setExperimentPath(experimentPath);
+                ((ScriptComponentCameraExperiment)component).getExperiment().setExperimentPath(experimentPath);
             }
             return;
         }

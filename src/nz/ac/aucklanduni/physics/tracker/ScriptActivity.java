@@ -7,7 +7,6 @@
  */
 package nz.ac.aucklanduni.physics.tracker;
 
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -18,6 +17,7 @@ import android.widget.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class ScriptActivity extends Activity {
     private List<String> scriptList = null;
