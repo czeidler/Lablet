@@ -26,7 +26,7 @@ public class ScriptComponentExperimentAnalysis extends ScriptComponentFragmentHo
 
     @Override
     public Fragment createFragment() {
-        return new ScriptComponentExperimentAnalyisisFragment(this, script);
+        return new ScriptComponentExperimentAnalyisisFragment(this);
     }
 
     public void setExperiment(ScriptComponentExperiment experiment) {
@@ -41,12 +41,10 @@ public class ScriptComponentExperimentAnalysis extends ScriptComponentFragmentHo
 
 class ScriptComponentExperimentAnalyisisFragment extends android.support.v4.app.Fragment {
     private ScriptComponentExperimentAnalysis component;
-    private Script script;
     static final int ANALYSE_EXPERIMENT = 0;
 
-    public ScriptComponentExperimentAnalyisisFragment(ScriptComponentExperimentAnalysis component, Script script) {
+    public ScriptComponentExperimentAnalyisisFragment(ScriptComponentExperimentAnalysis component) {
         this.component = component;
-        this.script = script;
     }
 
     @Override
@@ -72,8 +70,8 @@ class ScriptComponentExperimentAnalyisisFragment extends android.support.v4.app.
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                script.getCurrentComponent().setState(ScriptComponent.SCRIPT_STATE_DONE);
-                script.next();
+                component.setState(ScriptComponent.SCRIPT_STATE_DONE);
+                component.getScript().notifyGoToComponent(component.getNext());
             }
         });
         return view;

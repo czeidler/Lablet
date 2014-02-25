@@ -14,9 +14,7 @@ import android.text.format.Time;
 
 import java.io.File;
 import java.security.MessageDigest;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 
 class Hash {
@@ -52,14 +50,107 @@ public class ScriptComponent implements Iterable<ScriptComponent> {
     final static public int SCRIPT_STATE_ONGOING = -1;
     final static public int SCRIPT_STATE_DONE = 0;
 
-    private Bundle stateData = null;
+    private Script script = null;
     private ScriptComponent parent = null;
     private int state = SCRIPT_STATE_INACTIVE;
     private Map<Integer, ScriptComponent> connections = new HashMap<Integer, ScriptComponent>();
 
+    public ScriptComponent(Script script) {
+        this.script = script;
+    }
+
+    public Script getScript() {
+        return script;
+    }
+
     @Override
     public java.util.Iterator<ScriptComponent> iterator() {
         return new Iterator(this);
+    }
+
+    static String getChainHash(ScriptComponent component) {
+        String hashData = component.getName();
+        java.util.Iterator<ScriptComponent> iterator = component.connections.values().iterator();
+        int childId = -1;
+        while (true) {
+            if (!iterator.hasNext())
+                break;
+            ScriptComponent child = iterator.next();
+            childId++;
+
+            hashData += childId;
+            hashData += getChainHash(child);
+        }
+
+        return Hash.sha1Hex(hashData);
+    }
+
+    public List<ScriptComponent> getActiveChain() {
+        List<ScriptComponent> list = new ArrayList<ScriptComponent>();
+        if (state == SCRIPT_STATE_INACTIVE)
+            return list;
+        list.add(this);
+        ScriptComponent current = this;
+        while (true) {
+            current = current.connections.get(current.getState());
+            if (current == null)
+                break;
+            list.add(current);
+        }
+        return list;
+    }
+
+    public String getName() {
+        return this.getClass().getSimpleName();
+    }
+
+    public void toBundle(Bundle bundle) {
+        bundle.putInt("state", state);
+    }
+
+    public boolean fromBundle(Bundle bundle) {
+        if (!bundle.containsKey("state"))
+            return false;
+        state = bundle.getInt("state");
+        return true;
+    }
+
+    public void setNextComponent(int state, ScriptComponent component) {
+        connections.put(state, component);
+        component.setParent(this);
+    }
+
+    public ScriptComponent getNext() {
+        if (state < 0)
+            return null;
+        return connections.get(state);
+    }
+
+    public void setState(int state) {
+        this.state = state;
+        script.onComponentStateChanged(this, state);
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public ScriptComponent getParent() {
+        return parent;
+    }
+
+    public int getStepsToRoot() {
+        int stepsToRoot = 1;
+        ScriptComponent currentParent = parent;
+        while (currentParent != null) {
+            stepsToRoot++;
+            currentParent = currentParent.getParent();
+        }
+        return stepsToRoot;
+    }
+
+    private void setParent(ScriptComponent parent) {
+        this.parent = parent;
     }
 
     static private class Iterator implements java.util.Iterator<ScriptComponent> {
@@ -99,106 +190,25 @@ public class ScriptComponent implements Iterable<ScriptComponent> {
             return currentComponentIterator.hasNext();
         }
     }
-
-    static String getChainHash(ScriptComponent component) {
-        String hashData = component.getName();
-        java.util.Iterator<ScriptComponent> iterator = component.connections.values().iterator();
-        int childId = -1;
-        while (true) {
-            if (!iterator.hasNext())
-                break;
-            ScriptComponent child = iterator.next();
-            childId++;
-
-            hashData += childId;
-            hashData += getChainHash(child);
-        }
-
-        return Hash.sha1Hex(hashData);
-    }
-
-    public String getName() {
-        return this.getClass().getSimpleName();
-    }
-
-    public void toBundle(Bundle bundle) {
-        bundle.putInt("state", state);
-    }
-
-    public boolean fromBundle(Bundle bundle) {
-        if (!bundle.containsKey("state"))
-            return false;
-        state = bundle.getInt("state");
-        return true;
-    }
-
-    public void setNextComponent(int state, ScriptComponent component) {
-        connections.put(state, component);
-        component.setParent(this);
-    }
-
-    public ScriptComponent getNext() {
-        if (state < 0)
-            return null;
-        return connections.get(state);
-    }
-
-    public void setState(int state) {
-        this.state = state;
-    }
-
-    public void setState(int state, Bundle stateData) {
-        this.state = state;
-        this.stateData = stateData;
-        onStateChanged(state);
-    }
-
-    protected void onStateChanged(int state) {
-
-    }
-
-    public int getState() {
-        return state;
-    }
-
-    public void setStateData(Bundle data) {
-        stateData = data;
-    }
-
-    public Bundle getStateData() {
-        return stateData;
-    }
-
-    public ScriptComponent getParent() {
-        return parent;
-    }
-
-    public int getStepsToRoot() {
-        int stepsToRoot = 1;
-        ScriptComponent currentParent = parent;
-        while (currentParent != null) {
-            stepsToRoot++;
-            currentParent = currentParent.getParent();
-        }
-        return stepsToRoot;
-    }
-
-    private void setParent(ScriptComponent parent) {
-        this.parent = parent;
-    }
 }
 
 class Script {
     public interface IScriptListener {
-        public void onCurrentComponentChanged(ScriptComponent current);
+        public void onComponentStateChanged(ScriptComponent current, int state);
+        public void onGoToComponent(ScriptComponent next);
     }
 
     private ScriptComponent root = null;
-    private ScriptComponent currentComponent = null;
     private IScriptListener listener = null;
 
     public void setListener(IScriptListener listener) {
         this.listener = listener;
+    }
+
+    public void notifyGoToComponent(ScriptComponent next) {
+        if (listener == null || next == null)
+            return;
+        listener.onGoToComponent(next);
     }
 
     public void setRoot(ScriptComponent component) {
@@ -207,6 +217,13 @@ class Script {
 
     public ScriptComponent getRoot() {
         return root;
+    }
+
+    public List<ScriptComponent> getActiveChain() {
+        if (root == null)
+            return new ArrayList<ScriptComponent>();
+
+        return root.getActiveChain();
     }
 
     static public File getScriptDirectory(Context context) {
@@ -240,15 +257,17 @@ class Script {
     }
 
     public boolean start() {
-        // already started?
-        if (currentComponent != null)
-            return false;
-
         if (root == null)
             return false;
-
-        setCurrentComponent(root);
+        if (root.getState() >= ScriptComponent.SCRIPT_STATE_ONGOING)
+            return false;
+        root.setState(ScriptComponent.SCRIPT_STATE_ONGOING);
         return true;
+    }
+
+    public void onComponentStateChanged(ScriptComponent component, int state) {
+        if (listener != null)
+            listener.onComponentStateChanged(component, state);
     }
 
     public boolean saveScript(Bundle bundle) {
@@ -292,55 +311,6 @@ class Script {
                 return false;
         }
 
-        return true;
-    }
-
-    public ScriptComponent getCurrentComponent() {
-        return currentComponent;
-    }
-
-    public void setCurrentComponent(ScriptComponent component) {
-        currentComponent = component;
-        currentComponent.setState(ScriptComponent.SCRIPT_STATE_ONGOING);
-
-        if (listener != null)
-            listener.onCurrentComponentChanged(currentComponent);
-    }
-
-    public boolean cancelCurrent() {
-        if (currentComponent == null)
-            return false;
-
-        ScriptComponent parent = currentComponent.getParent();
-        if (parent == null)
-            return false;
-
-        currentComponent.setStateData(null);
-        setCurrentComponent(parent);
-        return true;
-    }
-
-    public boolean backToParent() {
-        if (currentComponent == null)
-            return false;
-
-        ScriptComponent parent = currentComponent.getParent();
-        if (parent == null)
-            return false;
-
-        setCurrentComponent(parent);
-        return true;
-    }
-
-    public boolean next() {
-        if (currentComponent == null)
-            return false;
-
-        ScriptComponent next = currentComponent.getNext();
-        if (next == null)
-            return false;
-
-        setCurrentComponent(next);
         return true;
     }
 }

@@ -17,11 +17,14 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ScriptRunnerActivity extends FragmentActivity implements Script.IScriptListener {
     private Script script = null;
     private ViewPager pager = null;
     private ScriptFragmentPagerAdapter pagerAdapter = null;
+    private List<ScriptComponent> activeChain = null;
     private File scriptUserDataDir = null;
     private File scriptFile = null;
 
@@ -44,11 +47,12 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
         } else if (!createFormIntent())
             return;
 
+        activeChain = script.getActiveChain();
 
         setContentView(R.layout.experiment_analyser);
         // Instantiate a ViewPager and a PagerAdapter.
         pager = (ViewPager)findViewById(R.id.pager);
-        pagerAdapter = new ScriptFragmentPagerAdapter(getSupportFragmentManager(), script);
+        pagerAdapter = new ScriptFragmentPagerAdapter(getSupportFragmentManager(), activeChain);
         pager.setAdapter(pagerAdapter);
     }
 
@@ -88,9 +92,9 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
 
     @Override
     protected void onPause() {
-        super.onPause();
-
         saveScriptDataToFile();
+
+        super.onPause();
     }
 
     protected boolean loadScript(File scriptFile) {
@@ -136,6 +140,9 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
     }
 
     protected boolean saveScriptDataToFile() {
+        if (scriptFile == null || scriptUserDataDir == null)
+            return false;
+
         Bundle bundle = new Bundle();
         bundle.putString("script_name", scriptFile.getName());
         if (!script.saveScript(bundle))
@@ -176,39 +183,51 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
     }
 
     @Override
-    public void onCurrentComponentChanged(ScriptComponent current) {
+    public void onComponentStateChanged(ScriptComponent current, int state) {
         if (pagerAdapter == null)
             return;
+
+        ScriptComponent lastSelectedComponent = activeChain.get(pager.getCurrentItem());
+        activeChain = script.getActiveChain();
+        pagerAdapter.setComponents(activeChain);
         pagerAdapter.notifyDataSetChanged();
-        pager.setCurrentItem(current.getStepsToRoot() - 1);
+
+        int index = activeChain.indexOf(lastSelectedComponent);
+        if (index < 0)
+            index = activeChain.size() - 1;
+        pager.setCurrentItem(index);
+    }
+
+    @Override
+    public void onGoToComponent(ScriptComponent next) {
+        int index = activeChain.indexOf(next);
+        if (index >0)
+            pager.setCurrentItem(index);
     }
 
     private class ScriptFragmentPagerAdapter extends FragmentStatePagerAdapter {
-        private Script script;
+        private List<ScriptComponent> components;
 
-        public ScriptFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager, Script script) {
+        public ScriptFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager,
+                                          List<ScriptComponent> components) {
             super(fragmentManager);
 
-            this.script = script;
+            this.components = components;
+        }
+
+        public void setComponents(List<ScriptComponent> components) {
+            this.components = components;
         }
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            int i = 0;
-            ScriptComponent component = script.getRoot();
-            while (i != position) {
-                i++;
-                component = component.getNext();
-            }
-            ScriptComponentFragmentHolder fragmentCreator = (ScriptComponentFragmentHolder)component;
+            ScriptComponentFragmentHolder fragmentCreator = (ScriptComponentFragmentHolder)components.get(position);
             return fragmentCreator.createFragment();
         }
 
         @Override
         public int getCount() {
-            if (script.getCurrentComponent() != null)
-                return script.getCurrentComponent().getStepsToRoot();
-            return 0;
+            return components.size();
         }
 
         /*
@@ -222,7 +241,6 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
             else
                 return index;
             return POSITION_NONE;
-        }
-        */
+        }*/
     }
 }

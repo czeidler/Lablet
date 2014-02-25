@@ -28,7 +28,7 @@ public class ScriptComponentCameraExperiment extends ScriptComponentFragmentHold
 
     @Override
     public Fragment createFragment() {
-        return new ScriptComponentCameraExperimentFragment(this, script);
+        return new ScriptComponentCameraExperimentFragment(this);
     }
 
     public ScriptComponentExperiment getExperiment() {
@@ -39,12 +39,10 @@ public class ScriptComponentCameraExperiment extends ScriptComponentFragmentHold
 
 class ScriptComponentCameraExperimentFragment extends android.support.v4.app.Fragment {
     private ScriptComponentCameraExperiment component;
-    private Script script;
     static final int PERFORM_EXPERIMENT = 0;
 
-    public ScriptComponentCameraExperimentFragment(ScriptComponentCameraExperiment component, Script script) {
+    public ScriptComponentCameraExperimentFragment(ScriptComponentCameraExperiment component) {
         this.component = component;
-        this.script = script;
     }
 
     @Override
@@ -69,8 +67,8 @@ class ScriptComponentCameraExperimentFragment extends android.support.v4.app.Fra
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                script.getCurrentComponent().setState(ScriptComponent.SCRIPT_STATE_DONE);
-                script.next();
+                component.setState(ScriptComponent.SCRIPT_STATE_DONE);
+                component.getScript().notifyGoToComponent(component.getNext());
             }
         });
         return view;

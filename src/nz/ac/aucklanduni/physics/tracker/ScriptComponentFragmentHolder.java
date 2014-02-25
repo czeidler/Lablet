@@ -2,10 +2,9 @@ package nz.ac.aucklanduni.physics.tracker;
 
 
 abstract public class ScriptComponentFragmentHolder extends ScriptComponent {
-    protected Script script;
 
     public ScriptComponentFragmentHolder(Script script) {
-        this.script = script;
+        super(script);
     }
 
     abstract public android.support.v4.app.Fragment createFragment();

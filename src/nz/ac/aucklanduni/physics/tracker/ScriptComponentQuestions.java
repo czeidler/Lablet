@@ -21,7 +21,7 @@ public class ScriptComponentQuestions extends ScriptComponentFragmentHolder {
 
     @Override
     public Fragment createFragment() {
-        ScriptComponentQuestionsFragment fragment = new ScriptComponentQuestionsFragment(script);
+        ScriptComponentQuestionsFragment fragment = new ScriptComponentQuestionsFragment(this);
         fragment.setTitle(title);
 
         return fragment;
@@ -29,12 +29,12 @@ public class ScriptComponentQuestions extends ScriptComponentFragmentHolder {
 }
 
 class ScriptComponentQuestionsFragment extends android.support.v4.app.Fragment {
-    private Script script;
+    private ScriptComponentQuestions component;
 
     private String title = "";
 
-    public ScriptComponentQuestionsFragment(Script script) {
-        this.script = script;
+    public ScriptComponentQuestionsFragment(ScriptComponentQuestions component) {
+        this.component = component;
     }
 
     public void setTitle(String title) {
@@ -55,8 +55,8 @@ class ScriptComponentQuestionsFragment extends android.support.v4.app.Fragment {
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                script.getCurrentComponent().setState(ScriptComponent.SCRIPT_STATE_DONE);
-                script.next();
+                component.setState(ScriptComponent.SCRIPT_STATE_DONE);
+                component.getScript().notifyGoToComponent(component.getNext());
             }
         });
         return view;
