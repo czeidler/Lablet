@@ -24,7 +24,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
     private Script script = null;
     private ViewPager pager = null;
     private ScriptFragmentPagerAdapter pagerAdapter = null;
-    private List<ScriptComponent> activeChain = null;
+    private List<ScriptComponent> activeChain = new ArrayList<ScriptComponent>();
     private File scriptUserDataDir = null;
     private File scriptFile = null;
 
@@ -33,6 +33,12 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.experiment_analyser);
+        // Instantiate a ViewPager and a PagerAdapter.
+        pager = (ViewPager)findViewById(R.id.pager);
+        pagerAdapter = new ScriptFragmentPagerAdapter(getSupportFragmentManager(), activeChain);
+        pager.setAdapter(pagerAdapter);
 
         if (savedInstanceState != null) {
             String userDataDir = savedInstanceState.getString("script_user_data_dir");
@@ -44,16 +50,10 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
             if (!scriptUserDataDir.exists())
                 scriptUserDataDir.mkdir();
             loadExistingScript(scriptUserDataDir);
-        } else if (!createFormIntent())
-            return;
-
-        activeChain = script.getActiveChain();
-
-        setContentView(R.layout.experiment_analyser);
-        // Instantiate a ViewPager and a PagerAdapter.
-        pager = (ViewPager)findViewById(R.id.pager);
-        pagerAdapter = new ScriptFragmentPagerAdapter(getSupportFragmentManager(), activeChain);
-        pager.setAdapter(pagerAdapter);
+        } else if (!createFormIntent()) {
+            showErrorAndFinish("invalid intent");
+        }
+        script.start();
     }
 
     private boolean createFormIntent() {
@@ -82,6 +82,9 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
             showErrorAndFinish("can't load existing script");
             return false;
         }
+
+        activeChain = script.getActiveChain();
+        pagerAdapter.setComponents(activeChain);
         return true;
     }
 
@@ -106,7 +109,6 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
             return false;
         }
         script.setListener(this);
-        script.start();
         return true;
     }
 
@@ -133,10 +135,21 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
         String scriptPath = bundle.getString("script_name");
         if (scriptPath == null)
             return false;
+
         scriptFile = new File(Script.getScriptDirectory(this), scriptPath);
         if (!loadScript(scriptFile))
             return false;
-        return script.loadScript(bundle);
+
+        if (!script.loadScript(bundle))
+            return false;
+
+        activeChain = script.getActiveChain();
+        pagerAdapter.setComponents(activeChain);
+
+        int lastSelectedFragment = bundle.getInt("current_fragment", 0);
+        pager.setCurrentItem(lastSelectedFragment);
+
+        return true;
     }
 
     protected boolean saveScriptDataToFile() {
@@ -145,6 +158,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
 
         Bundle bundle = new Bundle();
         bundle.putString("script_name", scriptFile.getName());
+        bundle.putInt("current_fragment", pager.getCurrentItem());
         if (!script.saveScript(bundle))
             return false;
 
@@ -187,7 +201,9 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
         if (pagerAdapter == null)
             return;
 
-        ScriptComponent lastSelectedComponent = activeChain.get(pager.getCurrentItem());
+        ScriptComponent lastSelectedComponent = null;
+        if (activeChain.size() > 0)
+            lastSelectedComponent = activeChain.get(pager.getCurrentItem());
         activeChain = script.getActiveChain();
         pagerAdapter.setComponents(activeChain);
         pagerAdapter.notifyDataSetChanged();
@@ -195,7 +211,8 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
         int index = activeChain.indexOf(lastSelectedComponent);
         if (index < 0)
             index = activeChain.size() - 1;
-        pager.setCurrentItem(index);
+        if (index >= 0)
+            pager.setCurrentItem(index);
     }
 
     @Override
@@ -217,6 +234,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
 
         public void setComponents(List<ScriptComponent> components) {
             this.components = components;
+            notifyDataSetChanged();
         }
 
         @Override

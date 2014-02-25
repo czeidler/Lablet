@@ -270,9 +270,15 @@ class Script {
     }
 
     public boolean saveScript(Bundle bundle) {
+        if (root == null)
+            return false;
+
         bundle.putString("scriptId", ScriptComponent.getChainHash(root));
 
-        int componentId = -1;
+        if (!saveScriptComponent(root, 0, bundle))
+            return false;
+
+        int componentId = 0;
         java.util.Iterator<ScriptComponent> iterator = root.iterator();
         while (true) {
             if (!iterator.hasNext())
@@ -280,22 +286,33 @@ class Script {
             ScriptComponent component = iterator.next();
             componentId++;
 
-            Bundle componentBundle = new Bundle();
-            component.toBundle(componentBundle);
-
-            String bundleKey = Integer.toString(componentId);
-            bundle.putBundle(bundleKey, componentBundle);
+            if (!saveScriptComponent(component, componentId, bundle))
+                return false;
         }
         return true;
     }
 
-    public boolean loadScript(Bundle bundle) {
-        String scriptId = ScriptComponent.getChainHash(root);
-        if (!bundle.get("scriptId").equals(scriptId)) {
-            return false;
-        }
+    private boolean saveScriptComponent(ScriptComponent component, int componentId, Bundle bundle) {
+        Bundle componentBundle = new Bundle();
+        component.toBundle(componentBundle);
 
-        int componentId = -1;
+        String bundleKey = Integer.toString(componentId);
+        bundle.putBundle(bundleKey, componentBundle);
+        return true;
+    }
+
+    public boolean loadScript(Bundle bundle) {
+        if (root == null)
+            return false;
+
+        String scriptId = ScriptComponent.getChainHash(root);
+        if (!bundle.get("scriptId").equals(scriptId))
+            return false;
+
+        if (!loadScriptComponent(root, 0, bundle))
+            return false;
+
+        int componentId = 0;
         java.util.Iterator<ScriptComponent> iterator = root.iterator();
         while (true) {
             if (!iterator.hasNext())
@@ -303,14 +320,18 @@ class Script {
             ScriptComponent component = iterator.next();
             componentId++;
 
-            String bundleKey = Integer.toString(componentId);
-            if (!bundle.containsKey(bundleKey))
-                return false;
-            if (!component.fromBundle(bundle.getBundle(bundleKey)))
+            if (!loadScriptComponent(component, componentId, bundle))
                 return false;
         }
 
         return true;
+    }
+
+    private boolean loadScriptComponent(ScriptComponent component, int componentId, Bundle bundle) {
+        String bundleKey = Integer.toString(componentId);
+        if (!bundle.containsKey(bundleKey))
+            return false;
+        return component.fromBundle(bundle.getBundle(bundleKey));
     }
 }
 
