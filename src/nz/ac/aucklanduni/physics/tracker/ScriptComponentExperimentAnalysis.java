@@ -66,14 +66,6 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
             }
         });
 
-        Button okButton = (Button)child.findViewById(R.id.doneButton);
-        assert(okButton != null);
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setState(ScriptComponent.SCRIPT_STATE_DONE);            }
-        });
-
         return view;
     }
 
@@ -81,6 +73,6 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
         if (resultCode != Activity.RESULT_OK)
             return;
 
-
+        setState(ScriptComponent.SCRIPT_STATE_DONE);
     }
 }

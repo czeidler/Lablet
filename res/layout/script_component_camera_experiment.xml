@@ -5,14 +5,25 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please take a video:"
+            android:id="@+id/textView"/>
+    <CheckedTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+            android:text="no video taken"
+            android:id="@+id/takenExperimentInfo" android:checked="false"
+            />
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="takeExperiment"
-            android:id="@+id/takeExperimentButton" android:layout_gravity="center_horizontal"/>
-    <Button
+            android:text="Take Video"
+            android:id="@+id/takeExperimentButton"/>
+    <VideoView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="done"
-            android:id="@+id/doneButton" android:layout_gravity="center_horizontal"/>
+            android:id="@+id/videoView" android:layout_gravity="center_horizontal"/>
 </LinearLayout>

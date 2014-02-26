@@ -10,13 +10,15 @@ package nz.ac.aucklanduni.physics.tracker;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.*;
+
+import java.io.File;
 
 
 public class ScriptComponentCameraExperiment extends ScriptComponentFragmentHolder {
@@ -34,14 +36,32 @@ public class ScriptComponentCameraExperiment extends ScriptComponentFragmentHold
     public ScriptComponentExperiment getExperiment() {
         return experiment;
     }
+
+    public void toBundle(Bundle bundle) {
+        super.toBundle(bundle);
+
+        bundle.putString("experiment_path", experiment.getExperimentPath());
+    }
+
+    public boolean fromBundle(Bundle bundle) {
+        if (!super.fromBundle(bundle))
+            return false;
+
+        experiment.setExperimentPath(bundle.getString("experiment_path"));
+        return true;
+    }
 }
 
 
 class ScriptComponentCameraExperimentFragment extends ScriptComponentGenericFragment {
     static final int PERFORM_EXPERIMENT = 0;
 
+    private CheckedTextView takenExperimentInfo = null;
+    private VideoView videoView = null;
+
     public ScriptComponentCameraExperimentFragment(ScriptComponentCameraExperiment component) {
         super(component);
+
     }
 
     @Override
@@ -62,14 +82,16 @@ class ScriptComponentCameraExperimentFragment extends ScriptComponentGenericFrag
             }
         });
 
-        Button okButton = (Button)child.findViewById(R.id.doneButton);
-        assert(okButton != null);
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setState(ScriptComponent.SCRIPT_STATE_DONE);
-            }
-        });
+        takenExperimentInfo = (CheckedTextView)view.findViewById(R.id.takenExperimentInfo);
+        assert takenExperimentInfo != null;
+
+        videoView = (VideoView)view.findViewById(R.id.videoView);
+        assert videoView != null;
+        MediaController mediaController = new MediaController(getActivity());
+        mediaController.setAnchorView(videoView);
+        videoView.setMediaController(mediaController);
+
+        updateExperimentPath();
 
         return view;
     }
@@ -84,8 +106,34 @@ class ScriptComponentCameraExperimentFragment extends ScriptComponentGenericFrag
             if (data.hasExtra("experiment_path")) {
                 String experimentPath = data.getStringExtra("experiment_path");
                 ((ScriptComponentCameraExperiment)component).getExperiment().setExperimentPath(experimentPath);
+                setState(ScriptComponent.SCRIPT_STATE_DONE);
+
+                setExperimentPath(experimentPath);
             }
             return;
+        }
+    }
+
+    private void setExperimentPath(String experimentPath) {
+        ScriptComponentCameraExperiment cameraComponent = (ScriptComponentCameraExperiment)this.component;
+        cameraComponent.getExperiment().setExperimentPath(experimentPath);
+        updateExperimentPath();
+    }
+
+    private void updateExperimentPath() {
+        ScriptComponentCameraExperiment cameraComponent = (ScriptComponentCameraExperiment)this.component;
+        String experimentPath = cameraComponent.getExperiment().getExperimentPath();
+
+        ExperimentLoaderResult result = new ExperimentLoaderResult();
+        if (ExperimentLoader.loadExperiment(getActivity(), experimentPath, result)) {
+            takenExperimentInfo.setChecked(true);
+            File experimentPathFile = new File(experimentPath);
+            takenExperimentInfo.setText(experimentPathFile.getName());
+
+            CameraExperiment experiment = (CameraExperiment)result.experiment;
+            File videoFile = new File(experiment.getStorageDir(), experiment.getVideoFileName());
+            videoView.setVideoURI(Uri.parse(videoFile.getPath()));
+            videoView.start();
         }
     }
 }
