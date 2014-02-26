@@ -49,7 +49,7 @@ class ImprovedPointAndLineRenderer<FormatterType extends LineAndPointFormatter> 
     }
 
     public class CircleRenderer extends PointRenderer {
-        private float circleWidth = 3;
+        private float circleWidth = 3.5f;
 
         @Override
         public void drawPoint(Canvas canvas, PointF position, LineAndPointFormatter formatter) {
