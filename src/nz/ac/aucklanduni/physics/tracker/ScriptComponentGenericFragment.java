@@ -56,6 +56,8 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
         containerView = (ScrollView)view.findViewById(R.id.childContainer);
         assert containerView != null;
 
+        setState(component.getState());
+
         return view;
     }
 
