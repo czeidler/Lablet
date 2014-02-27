@@ -16,9 +16,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckedTextView;
+import android.widget.TextView;
+
+import java.io.File;
 
 public class ScriptComponentExperimentAnalysis extends ScriptComponentFragmentHolder {
     private ScriptComponentExperiment experiment;
+    private String descriptionText = "";
 
     public ScriptComponentExperimentAnalysis(Script script) {
         super(script);
@@ -37,10 +42,19 @@ public class ScriptComponentExperimentAnalysis extends ScriptComponentFragmentHo
         return experiment;
     }
 
+    public void setDescriptionText(String text) {
+        descriptionText = text;
+    }
+
+    public String getDescriptionText() {
+        return descriptionText;
+    }
 }
 
 class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFragment {
     static final int ANALYSE_EXPERIMENT = 0;
+
+    private CheckedTextView takenExperimentInfo = null;
 
     public ScriptComponentExperimentAnalysisFragment(ScriptComponentExperimentAnalysis component) {
         super(component);
@@ -51,11 +65,18 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
                              Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        View child = setChild(R.layout.script_component_camera_experiment);
+        View child = setChild(R.layout.script_component_analyze_experiment);
         assert child != null;
 
-        Button takeExperiment = (Button)child.findViewById(R.id.takeExperimentButton);
-        assert(takeExperiment != null);
+        ScriptComponentExperimentAnalysis analysisComponent = (ScriptComponentExperimentAnalysis)this.component;
+
+        TextView descriptionTextView = (TextView)child.findViewById(R.id.descriptionText);
+        assert descriptionTextView != null;
+        if (!analysisComponent.getDescriptionText().equals(""))
+            descriptionTextView.setText(analysisComponent.getDescriptionText());
+
+        Button takeExperiment = (Button)child.findViewById(R.id.analyzeExperimentButton);
+        assert takeExperiment != null;
         takeExperiment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -65,6 +86,12 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
                 startActivityForResult(intent, ANALYSE_EXPERIMENT);
             }
         });
+
+        takenExperimentInfo = (CheckedTextView)view.findViewById(R.id.takenExperimentInfo);
+        assert takenExperimentInfo != null;
+
+        File experimentPathFile = new File(analysisComponent.getExperiment().getExperimentPath());
+        takenExperimentInfo.setText(experimentPathFile.getName());
 
         return view;
     }
