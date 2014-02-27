@@ -7,18 +7,50 @@
  */
 package nz.ac.aucklanduni.physics.tracker;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.List;
+
+
+class TextOnlyQuestion extends ScriptComponentItemViewHolder {
+    private String text = "";
+    public TextOnlyQuestion(String text) {
+        this.text = text;
+        setState(ScriptComponent.SCRIPT_STATE_DONE);
+    }
+
+    @Override
+    public View createView(Context context) {
+        TextView textView = new TextView(context);
+        textView.setText(text);
+        return textView;
+    }
+}
 
 public class ScriptComponentQuestions extends ScriptComponentFragmentHolder {
+    private ScriptComponentItemContainer<ScriptComponentItemViewHolder> itemContainer
+            = new ScriptComponentItemContainer<ScriptComponentItemViewHolder>();
+
     public ScriptComponentQuestions(Script script) {
         super(script);
+
+        itemContainer.setListener(new ScriptComponentItemContainer.IItemContainerListener() {
+            @Override
+            public void onAllItemStatusChanged(boolean allDone) {
+                if (allDone)
+                    setState(ScriptComponent.SCRIPT_STATE_DONE);
+                else
+                    setState(ScriptComponent.SCRIPT_STATE_ONGOING);
+            }
+        });
     }
 
     @Override
@@ -26,9 +58,19 @@ public class ScriptComponentQuestions extends ScriptComponentFragmentHolder {
         ScriptComponentQuestionsFragment fragment = new ScriptComponentQuestionsFragment(this);
         return fragment;
     }
+
+    public ScriptComponentItemContainer<ScriptComponentItemViewHolder> getItemContainer() {
+        return itemContainer;
+    }
+
+    public void addTextOnlyQuestion(String text) {
+        TextOnlyQuestion textOnlyQuestion = new TextOnlyQuestion(text);
+        itemContainer.addItem(textOnlyQuestion);
+    }
 }
 
 class ScriptComponentQuestionsFragment extends ScriptComponentGenericFragment {
+    private LinearLayout questionLayout = null;
 
     public ScriptComponentQuestionsFragment(ScriptComponentQuestions component) {
         super(component);
@@ -42,15 +84,14 @@ class ScriptComponentQuestionsFragment extends ScriptComponentGenericFragment {
         View child = setChild(R.layout.script_component_questions_fragment);
         assert child != null;
 
-        Button okButton = (Button)child.findViewById(R.id.button);
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setState(ScriptComponent.SCRIPT_STATE_DONE);
-            }
-        });
+        questionLayout = (LinearLayout)child.findViewById(R.id.questionLayout);
+        assert questionLayout != null;
+
+        ScriptComponentQuestions questionsComponent = (ScriptComponentQuestions)component;
+        List<ScriptComponentItemViewHolder> itemList = questionsComponent.getItemContainer().getItems();
+        for (ScriptComponentItemViewHolder item : itemList)
+            questionLayout.addView(item.createView(getActivity()));
 
         return view;
     }
-
 }
