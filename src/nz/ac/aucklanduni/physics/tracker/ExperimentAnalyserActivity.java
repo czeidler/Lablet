@@ -46,7 +46,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         backItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                setResult(RESULT_CANCELED);
+                setResult(RESULT_OK);
                 finish();
                 return true;
             }
@@ -88,6 +88,12 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         });
 
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(RESULT_OK);
+        super.onBackPressed();
     }
 
     private void showCalibrationMenu() {
