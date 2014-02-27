@@ -51,7 +51,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
                 scriptUserDataDir.mkdir();
             loadExistingScript(scriptUserDataDir);
         } else if (!createFormIntent()) {
-            showErrorAndFinish("invalid intent");
+            return;
         }
         script.start();
     }
