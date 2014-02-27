@@ -7,7 +7,6 @@
  */
 package nz.ac.aucklanduni.physics.tracker;
 
-
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -23,6 +22,7 @@ import java.io.File;
 
 public class ScriptComponentCameraExperiment extends ScriptComponentFragmentHolder {
     private ScriptComponentExperiment experiment = new ScriptComponentExperiment();
+    private String descriptionText = "";
 
     public ScriptComponentCameraExperiment(Script script) {
         super(script);
@@ -35,6 +35,14 @@ public class ScriptComponentCameraExperiment extends ScriptComponentFragmentHold
 
     public ScriptComponentExperiment getExperiment() {
         return experiment;
+    }
+
+    public String getDescriptionText() {
+        return descriptionText;
+    }
+
+    public void setDescriptionText(String descriptionText) {
+        this.descriptionText = descriptionText;
     }
 
     public void toBundle(Bundle bundle) {
@@ -72,6 +80,12 @@ class ScriptComponentCameraExperimentFragment extends ScriptComponentGenericFrag
         View child = setChild(R.layout.script_component_camera_experiment);
         assert child != null;
 
+        TextView descriptionTextView = (TextView)child.findViewById(R.id.descriptionText);
+        assert descriptionTextView != null;
+        ScriptComponentCameraExperiment cameraComponent = (ScriptComponentCameraExperiment)this.component;
+        if (!cameraComponent.getDescriptionText().equals(""))
+            descriptionTextView.setText(cameraComponent.getDescriptionText());
+
         Button takeExperiment = (Button)child.findViewById(R.id.takeExperimentButton);
         assert(takeExperiment != null);
         takeExperiment.setOnClickListener(new View.OnClickListener() {
@@ -82,14 +96,14 @@ class ScriptComponentCameraExperimentFragment extends ScriptComponentGenericFrag
             }
         });
 
-        takenExperimentInfo = (CheckedTextView)view.findViewById(R.id.takenExperimentInfo);
-        assert takenExperimentInfo != null;
-
         videoView = (VideoView)view.findViewById(R.id.videoView);
         assert videoView != null;
         MediaController mediaController = new MediaController(getActivity());
         mediaController.setAnchorView(videoView);
         videoView.setMediaController(mediaController);
+
+        takenExperimentInfo = (CheckedTextView)view.findViewById(R.id.takenExperimentInfo);
+        assert takenExperimentInfo != null;
 
         updateExperimentPath();
 
@@ -126,6 +140,7 @@ class ScriptComponentCameraExperimentFragment extends ScriptComponentGenericFrag
 
         ExperimentLoaderResult result = new ExperimentLoaderResult();
         if (ExperimentLoader.loadExperiment(getActivity(), experimentPath, result)) {
+            takenExperimentInfo.setVisibility(View.VISIBLE);
             takenExperimentInfo.setChecked(true);
             File experimentPathFile = new File(experimentPath);
             takenExperimentInfo.setText(experimentPathFile.getName());
@@ -134,6 +149,7 @@ class ScriptComponentCameraExperimentFragment extends ScriptComponentGenericFrag
             File videoFile = new File(experiment.getStorageDir(), experiment.getVideoFileName());
             videoView.setVideoURI(Uri.parse(videoFile.getPath()));
             videoView.start();
-        }
+        } else
+            takenExperimentInfo.setVisibility(View.INVISIBLE);
     }
 }
