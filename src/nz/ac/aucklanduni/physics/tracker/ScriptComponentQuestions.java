@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Space;
 import android.widget.TextView;
 
 import java.util.List;
@@ -30,6 +31,7 @@ class TextOnlyQuestion extends ScriptComponentItemViewHolder {
     @Override
     public View createView(Context context) {
         TextView textView = new TextView(context);
+        textView.setTextAppearance(context, android.R.style.TextAppearance_Medium);
         textView.setText(text);
         return textView;
     }
@@ -89,9 +91,17 @@ class ScriptComponentQuestionsFragment extends ScriptComponentGenericFragment {
 
         ScriptComponentQuestions questionsComponent = (ScriptComponentQuestions)component;
         List<ScriptComponentItemViewHolder> itemList = questionsComponent.getItemContainer().getItems();
-        for (ScriptComponentItemViewHolder item : itemList)
+        for (ScriptComponentItemViewHolder item : itemList) {
             questionLayout.addView(item.createView(getActivity()));
+            addSpace();
+        }
 
         return view;
+    }
+
+    private void addSpace() {
+        Space space = new Space(getActivity());
+        space.setMinimumHeight(20);
+        questionLayout.addView(space);
     }
 }

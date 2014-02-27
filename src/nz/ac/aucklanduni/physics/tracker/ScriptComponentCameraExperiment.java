@@ -87,7 +87,7 @@ class ScriptComponentCameraExperimentFragment extends ScriptComponentGenericFrag
             descriptionTextView.setText(cameraComponent.getDescriptionText());
 
         Button takeExperiment = (Button)child.findViewById(R.id.takeExperimentButton);
-        assert(takeExperiment != null);
+        assert takeExperiment != null;
         takeExperiment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
