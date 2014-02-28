@@ -19,9 +19,9 @@ import java.util.List;
 
 public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, MarkersDataModel.IMarkersDataModelListener,
         ExperimentAnalysis.IExperimentAnalysisListener {
-    private MarkersDataModel model;
+    protected MarkersDataModel model;
+    protected ExperimentAnalysis experimentAnalysis;
     private List<ITableAdapterListener> listeners;
-    private ExperimentAnalysis experimentAnalysis;
 
     public MarkerDataTableAdapter(MarkersDataModel model, ExperimentAnalysis experimentAnalysis) {
         this.model = model;
@@ -80,7 +80,7 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
         populateTextView((TextView)view, row, column);
     }
 
-    private void populateTextView(TextView textView, int row, int column) {
+    protected void populateTextView(TextView textView, int row, int column) {
         MarkerData data = getRow(row - 1);
 
         PointF position = model.getCalibratedMarkerPositionAt(row - 1);
@@ -107,7 +107,7 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
         return textView;
     }
 
-    private void populateHeaderView(TextView textView, int column) {
+    protected void populateHeaderView(TextView textView, int column) {
         String text;
         if (column == 0)
             text = "id";
@@ -197,5 +197,61 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
     @Override
     public void onShowCoordinateSystem(boolean show) {
 
+    }
+}
+
+class MarkerDataYSpeedTableAdapter extends MarkerDataTableAdapter {
+
+    public MarkerDataYSpeedTableAdapter(MarkersDataModel model, ExperimentAnalysis experimentAnalysis) {
+        super(model, experimentAnalysis);
+    }
+
+    @Override
+    public int getRowCount() {
+        return super.getRowCount() - 1;
+    }
+
+    @Override
+    public int getColumnCount() {
+        return 2;
+    }
+
+    @Override
+    protected void populateTextView(TextView textView, int row, int column) {
+        int index = row - 1;
+
+        PointF position = model.getCalibratedMarkerPositionAt(index);
+        String text = "";
+        if (column == 0) {
+            MarkerData runValueData = getRow(index + 1);
+            text += String.format("%.1f", experimentAnalysis.getExperiment().getRunValueAt(runValueData.getRunId()));
+        } else if (column == 1)
+            text += String.format("%.2f", getYSpeed(index));
+        else
+            throw new IndexOutOfBoundsException();
+
+        textView.setText(text);
+    }
+
+    @Override
+    protected void populateHeaderView(TextView textView, int column) {
+        String text;
+        if (column == 0)
+            text = experimentAnalysis.getExperiment().getRunValueLabel();
+        else if (column == 1)
+            text = "speed [" + experimentAnalysis.getXUnit() + "/" + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
+        else
+            throw new IndexOutOfBoundsException();
+
+        textView.setText(text);
+    }
+
+    public float getYSpeed(int index) {
+        Experiment experiment = experimentAnalysis.getExperiment();
+        float deltaX = model.getCalibratedMarkerPositionAt(index + 1).y - model.getCalibratedMarkerPositionAt(index).y;
+        float deltaT = experiment.getRunValueAt(index + 1) - experiment.getRunValueAt(index);
+        if (experimentAnalysis.getExperiment().getRunValueUnitPrefix().equals("m"))
+            deltaT /= 1000;
+        return deltaX / deltaT;
     }
 }
