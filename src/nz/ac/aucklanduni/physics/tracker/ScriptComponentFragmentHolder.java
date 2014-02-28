@@ -34,6 +34,8 @@ class ScriptComponentFragmentFactory implements IScriptComponentFactory {
             return new ScriptComponentCameraExperiment(script);
         if (componentName.equals("ExperimentAnalysis"))
             return new ScriptComponentExperimentAnalysis(script);
+        if (componentName.equals("CalculateYSpeed"))
+            return new ScriptComponentCalculateYSpeed(script);
 
         return null;
     }

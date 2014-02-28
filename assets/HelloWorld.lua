@@ -16,6 +16,10 @@ function onBuildExperimentScript(scriptBuilder)
 	experimentAnalysis:setExperiment(experiment)
 	experimentAnalysis:setDescriptionText("Please analyze the free fall video:")
 	scriptBuilder:add(experimentAnalysis)
+	
+	local calculateYSpeed = scriptBuilder:create("CalculateYSpeed")
+	calculateYSpeed:setExperiment(experiment)
+	scriptBuilder:add(calculateYSpeed)
 
 	local questions2 = scriptBuilder:create("QuestionsComponent")
 	questions2:setTitle("Q2:")
