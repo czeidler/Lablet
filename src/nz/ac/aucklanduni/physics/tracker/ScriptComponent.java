@@ -199,6 +199,7 @@ class Script {
 
     private ScriptComponent root = null;
     private IScriptListener listener = null;
+    private String lastError = "";
 
     public void setListener(IScriptListener listener) {
         this.listener = listener;
@@ -216,6 +217,10 @@ class Script {
 
     public ScriptComponent getRoot() {
         return root;
+    }
+
+    public String getLastError() {
+        return lastError;
     }
 
     public List<ScriptComponent> getActiveChain() {
@@ -306,8 +311,10 @@ class Script {
             return false;
 
         String scriptId = ScriptComponent.getChainHash(root);
-        if (!bundle.get("scriptId").equals(scriptId))
+        if (!bundle.get("scriptId").equals(scriptId)) {
+            lastError = "Script has been updated and is now incompatible to the saved state.";
             return false;
+        }
 
         if (!loadScriptComponent(root, 0, bundle))
             return false;
@@ -329,8 +336,10 @@ class Script {
 
     private boolean loadScriptComponent(ScriptComponent component, int componentId, Bundle bundle) {
         String bundleKey = Integer.toString(componentId);
-        if (!bundle.containsKey(bundleKey))
+        if (!bundle.containsKey(bundleKey)) {
+            lastError = "Script component state can't be restored.";
             return false;
+        }
         return component.fromBundle(bundle.getBundle(bundleKey));
     }
 }

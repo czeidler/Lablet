@@ -95,9 +95,9 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
 
     @Override
     protected void onPause() {
-        saveScriptDataToFile();
-
         super.onPause();
+
+        saveScriptDataToFile();
     }
 
     protected boolean loadScript(File scriptFile) {
@@ -140,8 +140,10 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
         if (!loadScript(scriptFile))
             return false;
 
-        if (!script.loadScript(bundle))
+        if (!script.loadScript(bundle)) {
+            showError("Can't continue script!", script.getLastError());
             return false;
+        }
 
         activeChain = script.getActiveChain();
         pagerAdapter.setComponents(activeChain);
@@ -154,6 +156,8 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
 
     protected boolean saveScriptDataToFile() {
         if (scriptFile == null || scriptUserDataDir == null)
+            return false;
+        if (script == null)
             return false;
 
         Bundle bundle = new Bundle();
@@ -193,6 +197,16 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
                 finish();
             }
         });
+        dialog.show();
+    }
+
+    protected void showError(String error, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(error);
+        if (message != null)
+            builder.setMessage(message);
+        builder.setNeutralButton("Ok", null);
+        AlertDialog dialog = builder.create();
         dialog.show();
     }
 
