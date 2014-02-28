@@ -91,6 +91,31 @@ class ExperimentLoader {
 
         return true;
     }
+
+    public static ExperimentAnalysis loadExperimentAnalysis(Experiment experiment, ExperimentPlugin plugin) {
+        File projectFile = new File(experiment.getStorageDir(), ExperimentAnalyserActivity.EXPERIMENT_ANALYSIS_FILE_NAME);
+        Bundle bundle = ExperimentLoader.loadBundleFromFile(projectFile);
+        if (bundle == null)
+            return null;
+
+        Bundle analysisDataBundle = bundle.getBundle("analysis_data");
+        if (analysisDataBundle == null)
+            return null;
+
+        ExperimentAnalysis experimentAnalysis = plugin.loadExperimentAnalysis(experiment);
+        if (!experimentAnalysis.loadAnalysisData(analysisDataBundle, experiment.getStorageDir()))
+            return null;
+
+        return experimentAnalysis;
+    }
+
+    public static ExperimentAnalysis loadExperimentAnalysis(Context context, String experimentPath) {
+        ExperimentLoaderResult result = new ExperimentLoaderResult();
+        if (!loadExperiment(context, experimentPath, result))
+            return null;
+
+        return loadExperimentAnalysis(result.experiment, result.plugin);
+    }
 }
 
 abstract public class ExperimentActivity extends FragmentActivity {

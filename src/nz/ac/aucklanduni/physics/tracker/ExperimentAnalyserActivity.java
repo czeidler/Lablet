@@ -23,7 +23,7 @@ import java.io.*;
 
 public class ExperimentAnalyserActivity extends ExperimentActivity {
     static final int PERFORM_RUN_SETTINGS = 0;
-    final String EXPERIMENT_ANALYSIS_FILE_NAME = "experiment_analysis.xml";
+    final public static String EXPERIMENT_ANALYSIS_FILE_NAME = "experiment_analysis.xml";
 
     final public static int MARKER_COLOR = Color.argb(255, 100, 200, 20);
 
@@ -169,8 +169,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             return;
         }
 
-        experimentAnalysis = plugin.loadExperimentAnalysis(experiment);
-        loadAnalysisDataToFile();
+        experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(experiment, plugin);
 
         // gui stuff:
 
@@ -206,19 +205,6 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         }
 
         exportTagMarkerCSVData();
-    }
-
-    protected boolean loadAnalysisDataToFile() {
-        File projectFile = new File(experiment.getStorageDir(), EXPERIMENT_ANALYSIS_FILE_NAME);
-        Bundle bundle = ExperimentLoader.loadBundleFromFile(projectFile);
-        if (bundle == null)
-            return false;
-
-        Bundle analysisDataBundle = bundle.getBundle("analysis_data");
-        if (analysisDataBundle == null)
-            return false;
-
-        return experimentAnalysis.loadAnalysisData(analysisDataBundle, experiment.getStorageDir());
     }
 
     protected void saveAnalysisDataToFile() throws IOException {
