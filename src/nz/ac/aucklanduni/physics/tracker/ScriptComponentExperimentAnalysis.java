@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -100,6 +101,25 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
         if (resultCode != Activity.RESULT_OK)
             return;
 
+        if (!validateAnalysis())
+            return;
+
         setState(ScriptComponent.SCRIPT_STATE_DONE);
+    }
+
+    private boolean validateAnalysis() {
+        ExperimentAnalysis experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(getActivity(),
+                ((ScriptComponentExperimentAnalysis)component).getExperiment().getExperimentPath());
+        if (experimentAnalysis == null)
+            return false;
+
+        if (experimentAnalysis.getTagMarkers().getMarkerCount() < 3) {
+            Toast toast = new Toast(getActivity());
+            toast.setText("Mark more data points!");
+            toast.show();
+            return false;
+        }
+
+        return true;
     }
 }
