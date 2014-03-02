@@ -75,13 +75,14 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
             scriptUserDataDir.mkdir();
 
         if (scriptName != null) {
+            // start new script
             scriptFile = new File(Script.getScriptDirectory(this), scriptName);
-            if (!loadScript(scriptFile))
+            if (!loadScript(scriptFile)) {
+                ExperimentActivity.recursiveDeleteFile(scriptUserDataDir);
                 return false;
-        } else if (!loadExistingScript(scriptUserDataDir)) {
-            showErrorAndFinish("can't load existing script");
+            }
+        } else if (!loadExistingScript(scriptUserDataDir))
             return false;
-        }
 
         activeChain = script.getActiveChain();
         pagerAdapter.setComponents(activeChain);
@@ -141,7 +142,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
             return false;
 
         if (!script.loadScript(bundle)) {
-            showError("Can't continue script!", script.getLastError());
+            showErrorAndFinish("Can't continue script!", script.getLastError());
             return false;
         }
 
@@ -197,16 +198,6 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
                 finish();
             }
         });
-        dialog.show();
-    }
-
-    protected void showError(String error, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(error);
-        if (message != null)
-            builder.setMessage(message);
-        builder.setNeutralButton("Ok", null);
-        AlertDialog dialog = builder.create();
         dialog.show();
     }
 

@@ -45,7 +45,12 @@ class LuaScriptLoader {
             return null;
         }
 
-        return builder.getScript();
+        Script script = builder.getScript();
+        if (!script.initCheck()) {
+            lastError = script.getLastError();
+            return null;
+        }
+        return script;
     }
 
     public String getLastError() {

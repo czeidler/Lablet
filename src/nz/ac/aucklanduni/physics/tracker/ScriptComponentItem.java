@@ -6,9 +6,15 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
-class ScriptComponentItem {
+abstract class ScriptComponentItem {
     protected ScriptComponentItemContainer container = null;
     private int state = ScriptComponent.SCRIPT_STATE_ONGOING;
+    protected String lastErrorMessage = "";
+
+    abstract public boolean initCheck();
+    public String getLastErrorMessage() {
+        return lastErrorMessage;
+    }
 
     public void setContainer(ScriptComponentItemContainer container) {
         this.container = container;
@@ -30,9 +36,20 @@ class ScriptComponentItemContainer<ItemType extends ScriptComponentItem> {
     private List<ItemType> items = new ArrayList<ItemType>();
     private IItemContainerListener listener = null;
     private boolean allItemsDone = false;
+    private String lastErrorMessage = "";
 
     public interface IItemContainerListener {
         public void onAllItemStatusChanged(boolean allDone);
+    }
+
+    public boolean initCheck() {
+        for (ItemType item : items) {
+            if (!item.initCheck()) {
+                lastErrorMessage = item.getLastErrorMessage();
+                return false;
+            }
+        }
+        return true;
     }
 
     public void setListener(IItemContainerListener listener) {

@@ -31,6 +31,15 @@ public class ScriptComponentExperimentAnalysis extends ScriptComponentFragmentHo
     }
 
     @Override
+    public boolean initCheck() {
+        if (experiment == null) {
+            lastErrorMessage = "no experiment given";
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public Fragment createFragment() {
         return new ScriptComponentExperimentAnalysisFragment(this);
     }

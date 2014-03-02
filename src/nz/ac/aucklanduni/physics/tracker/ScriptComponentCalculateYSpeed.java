@@ -28,6 +28,15 @@ public class ScriptComponentCalculateYSpeed extends ScriptComponentFragmentHolde
     }
 
     @Override
+    public boolean initCheck() {
+        if (experiment == null) {
+            lastErrorMessage = "no experiment given";
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public Fragment createFragment() {
         ScriptComponentCalculateYSpeedFragment fragment = new ScriptComponentCalculateYSpeedFragment(this);
         return fragment;

@@ -44,7 +44,7 @@ class Hash {
     }
 }
 
-public class ScriptComponent implements Iterable<ScriptComponent> {
+abstract public class ScriptComponent implements Iterable<ScriptComponent> {
     final static public int SCRIPT_STATE_INACTIVE = -2;
     final static public int SCRIPT_STATE_ONGOING = -1;
     final static public int SCRIPT_STATE_DONE = 0;
@@ -54,12 +54,19 @@ public class ScriptComponent implements Iterable<ScriptComponent> {
     private int state = SCRIPT_STATE_INACTIVE;
     private Map<Integer, ScriptComponent> connections = new HashMap<Integer, ScriptComponent>();
 
+    protected String lastErrorMessage = "";
+
     public ScriptComponent(Script script) {
         this.script = script;
     }
 
     public Script getScript() {
         return script;
+    }
+
+    abstract public boolean initCheck();
+    public String getLastErrorMessage() {
+        return lastErrorMessage;
     }
 
     @Override
@@ -217,6 +224,26 @@ class Script {
 
     public ScriptComponent getRoot() {
         return root;
+    }
+
+    /**
+     * Check if all components are initialized correctly.
+     *
+     * @return true if script is ok
+     */
+    public boolean initCheck() {
+        java.util.Iterator<ScriptComponent> iterator = root.iterator();
+        while (true) {
+            if (!iterator.hasNext())
+                break;
+            ScriptComponent component = iterator.next();
+            if (!component.initCheck()) {
+                lastError = "In Component \"" + component.getName() + "\": ";
+                lastError += component.getLastErrorMessage();
+                return false;
+            }
+        }
+        return true;
     }
 
     public String getLastError() {

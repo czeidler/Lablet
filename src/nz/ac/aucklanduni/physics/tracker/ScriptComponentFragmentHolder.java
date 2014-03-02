@@ -28,8 +28,8 @@ abstract public class ScriptComponentFragmentHolder extends ScriptComponent {
 
 class ScriptComponentFragmentFactory implements IScriptComponentFactory {
     public ScriptComponent create(String componentName, Script script) {
-        if (componentName.equals("QuestionsComponent"))
-            return new ScriptComponentQuestions(script);
+        if (componentName.equals("Sheet"))
+            return new ScriptComponentSheet(script);
         if (componentName.equals("CameraExperiment"))
             return new ScriptComponentCameraExperiment(script);
         if (componentName.equals("ExperimentAnalysis"))

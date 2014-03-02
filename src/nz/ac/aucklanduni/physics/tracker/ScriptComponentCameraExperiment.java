@@ -29,6 +29,11 @@ public class ScriptComponentCameraExperiment extends ScriptComponentFragmentHold
     }
 
     @Override
+    public boolean initCheck() {
+        return true;
+    }
+
+    @Override
     public Fragment createFragment() {
         return new ScriptComponentCameraExperimentFragment(this);
     }

@@ -10,7 +10,6 @@ package nz.ac.aucklanduni.physics.tracker;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,13 +34,18 @@ class TextOnlyQuestion extends ScriptComponentItemViewHolder {
         textView.setText(text);
         return textView;
     }
+
+    @Override
+    public boolean initCheck() {
+        return true;
+    }
 }
 
-public class ScriptComponentQuestions extends ScriptComponentFragmentHolder {
+public class ScriptComponentSheet extends ScriptComponentFragmentHolder {
     private ScriptComponentItemContainer<ScriptComponentItemViewHolder> itemContainer
             = new ScriptComponentItemContainer<ScriptComponentItemViewHolder>();
 
-    public ScriptComponentQuestions(Script script) {
+    public ScriptComponentSheet(Script script) {
         super(script);
 
         itemContainer.setListener(new ScriptComponentItemContainer.IItemContainerListener() {
@@ -56,8 +60,13 @@ public class ScriptComponentQuestions extends ScriptComponentFragmentHolder {
     }
 
     @Override
+    public boolean initCheck() {
+        return itemContainer.initCheck();
+    }
+
+    @Override
     public Fragment createFragment() {
-        ScriptComponentQuestionsFragment fragment = new ScriptComponentQuestionsFragment(this);
+        ScriptComponentSheetFragment fragment = new ScriptComponentSheetFragment(this);
         return fragment;
     }
 
@@ -71,10 +80,10 @@ public class ScriptComponentQuestions extends ScriptComponentFragmentHolder {
     }
 }
 
-class ScriptComponentQuestionsFragment extends ScriptComponentGenericFragment {
+class ScriptComponentSheetFragment extends ScriptComponentGenericFragment {
     private LinearLayout questionLayout = null;
 
-    public ScriptComponentQuestionsFragment(ScriptComponentQuestions component) {
+    public ScriptComponentSheetFragment(ScriptComponentSheet component) {
         super(component);
     }
 
@@ -89,7 +98,7 @@ class ScriptComponentQuestionsFragment extends ScriptComponentGenericFragment {
         questionLayout = (LinearLayout)child.findViewById(R.id.questionLayout);
         assert questionLayout != null;
 
-        ScriptComponentQuestions questionsComponent = (ScriptComponentQuestions)component;
+        ScriptComponentSheet questionsComponent = (ScriptComponentSheet)component;
         List<ScriptComponentItemViewHolder> itemList = questionsComponent.getItemContainer().getItems();
         for (ScriptComponentItemViewHolder item : itemList) {
             questionLayout.addView(item.createView(getActivity()));
