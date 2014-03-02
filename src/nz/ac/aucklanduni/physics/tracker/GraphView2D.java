@@ -29,18 +29,51 @@ interface IGraphAdapter {
         public void onDataPointSelected(IGraphAdapter graph, int index);
     }
 
+    interface IGraphAxis {
+        public int size();
+        public Number getValue(int index);
+        public String getLabel();
+        public Number getMinRange();
+    }
+
     public void addListener(IGraphAdapterListener listener);
     public int size();
-    public Number getX(int index);
-    public Number getY(int index);
-    public String getXLabel();
-    public String getYLabel();
+    public void setTitle(String title);
     public String getTitle();
-    public Number getMinXRange();
-    public Number getMinYRange();
     public void release();
+
+    public IGraphAxis getXAxis();
+    public IGraphAxis getYAxis();
 }
 
+
+abstract class AbstractGraphAdapter implements IGraphAdapter {
+    protected IGraphAxis xAxis;
+    protected IGraphAxis yAxis;
+
+    @Override
+    public int size() {
+        return Math.min(getXAxis().size(), getYAxis().size());
+    }
+
+    @Override
+    public IGraphAxis getXAxis() {
+        return xAxis;
+    }
+
+    @Override
+    public IGraphAxis getYAxis() {
+        return yAxis;
+    }
+
+    public void setXAxis(IGraphAxis axis) {
+        xAxis = axis;
+    }
+
+    public void setYAxis(IGraphAxis axis) {
+        yAxis = axis;
+    }
+}
 
 // basically a copy from XYSeriesRenderer
 class ImprovedPointAndLineRenderer<FormatterType extends LineAndPointFormatter> extends LineAndPointRenderer {
@@ -293,8 +326,8 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
         clear();
 
         setTitle(adapter.getTitle());
-        setDomainLabel(this.adapter.getXLabel());
-        setRangeLabel(this.adapter.getYLabel());
+        setDomainLabel(this.adapter.getXAxis().getLabel());
+        setRangeLabel(this.adapter.getYAxis().getLabel());
         getLegendWidget().setVisible(false);
         setTicksPerDomainLabel(2);
 
@@ -344,11 +377,11 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
         }
 
         public Number getX(int i) {
-            return adapter.getX(i);
+            return adapter.getXAxis().getValue(i);
         }
 
         public Number getY(int i) {
-            return adapter.getY(i);
+            return adapter.getYAxis().getValue(i);
         }
 
         @Override
@@ -368,14 +401,14 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
             return;
         }
 
-        float minXRange = adapter.getMinXRange().floatValue();
+        float minXRange = adapter.getXAxis().getMinRange().floatValue();
         // ensure min x range
         if (minXRange > 0.f) {
             float average = 0;
             float max = -Float.MAX_VALUE;
             float min = Float.MAX_VALUE;
             for (int i = 0; i < adapter.size(); i++) {
-                float value = adapter.getX(i).floatValue();
+                float value = adapter.getXAxis().getValue(i).floatValue();
                 average += value;
                 if (value > max)
                     max = value;
@@ -390,14 +423,14 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
             }
         }
 
-        float minYRange = adapter.getMinYRange().floatValue();
+        float minYRange = adapter.getYAxis().getMinRange().floatValue();
         // ensure min y range
         if (minYRange > 0.f) {
             float average = 0;
             float max = -Float.MAX_VALUE;
             float min = Float.MAX_VALUE;
             for (int i = 0; i < adapter.size(); i++) {
-                float value = adapter.getY(i).floatValue();
+                float value = adapter.getYAxis().getValue(i).floatValue();
                 average += value;
                 if (value > max)
                     max = value;
@@ -416,22 +449,53 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
     }
 }
 
+abstract class MarkerGraphAxis implements IGraphAdapter.IGraphAxis {
+    protected MarkerGraphAdapter markerGraphAdapter;
 
-class MarkerGraphAdapter implements IGraphAdapter, MarkersDataModel.IMarkersDataModelListener {
+    public void setMarkerGraphAdapter(MarkerGraphAdapter adapter) {
+        markerGraphAdapter = adapter;
+    }
+
+    public MarkersDataModel getData() {
+        return markerGraphAdapter.getData();
+    }
+
+    public ExperimentAnalysis getExperimentAnalysis() {
+        return markerGraphAdapter.getExperimentAnalysis();
+    }
+}
+
+class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkersDataModel.IMarkersDataModelListener {
     private List<IGraphAdapterListener> listeners;
+    protected String title;
     protected MarkersDataModel data;
     protected ExperimentAnalysis experimentAnalysis;
 
-    public MarkerGraphAdapter(ExperimentAnalysis experimentAnalysis) {
+    public MarkerGraphAdapter(ExperimentAnalysis experimentAnalysis, String title, MarkerGraphAxis xAxis,
+                              MarkerGraphAxis yAxis) {
         listeners = new ArrayList<IGraphAdapterListener>();
         this.experimentAnalysis = experimentAnalysis;
+        this.title = title;
         data = experimentAnalysis.getTagMarkers();
         data.addListener(this);
+
+        xAxis.setMarkerGraphAdapter(this);
+        yAxis.setMarkerGraphAdapter(this);
+        setXAxis(xAxis);
+        setYAxis(yAxis);
     }
 
     public void release() {
         data.removeListener(this);
         listeners.clear();
+    }
+
+    public MarkersDataModel getData() {
+        return data;
+    }
+
+    public ExperimentAnalysis getExperimentAnalysis() {
+        return experimentAnalysis;
     }
 
     @Override
@@ -440,49 +504,12 @@ class MarkerGraphAdapter implements IGraphAdapter, MarkersDataModel.IMarkersData
     }
 
     @Override
-    public int size() {
-        return data.getMarkerCount();
+    public void setTitle(String title) {
+        this.title = title;
     }
-
-    @Override
-    public Number getX(int index) {
-        return data.getCalibratedMarkerPositionAt(index).x;
-    }
-
-    @Override
-    public Number getY(int index) {
-        return data.getCalibratedMarkerPositionAt(index).y;
-    }
-
-    @Override
-    public String getXLabel() {
-        return "x [" + experimentAnalysis.getXUnit() + "]";
-    }
-
-    @Override
-    public String getYLabel() {
-        return "y [" + experimentAnalysis.getYUnit() + "]";
-    }
-
     @Override
     public String getTitle() {
-        return "Position Plot";
-    }
-
-    @Override
-    public Number getMinXRange() {
-        Calibration calibration = experimentAnalysis.getCalibration();
-        PointF point = new PointF(calibration.getOrigin().x + experimentAnalysis.getExperiment().getMaxRawX(), 0);
-        point = calibration.fromRaw(point);
-        return point.x * 0.2f;
-    }
-
-    @Override
-    public Number getMinYRange() {
-        Calibration calibration = experimentAnalysis.getCalibration();
-        PointF point = new PointF(0, calibration.getOrigin().y + experimentAnalysis.getExperiment().getMaxRawY());
-        point = calibration.fromRaw(point);
-        return point.y * 0.2f;
+        return title;
     }
 
     @Override
@@ -536,24 +563,68 @@ class MarkerGraphAdapter implements IGraphAdapter, MarkersDataModel.IMarkersData
     }
 }
 
-
-class YVelocityMarkerGraphAdapter extends MarkerGraphAdapter {
-    public YVelocityMarkerGraphAdapter(ExperimentAnalysis experimentAnalysis) {
-        super(experimentAnalysis);
-    }
-
+class XPositionMarkerGraphAxis extends MarkerGraphAxis {
     @Override
     public int size() {
-        return data.getMarkerCount() - 1;
+        return getData().getMarkerCount();
     }
 
     @Override
-    public Number getX(int index) {
-        return experimentAnalysis.getExperiment().getRunValueAt(index);
+    public Number getValue(int index) {
+        return getData().getCalibratedMarkerPositionAt(index).x;
     }
 
     @Override
-    public Number getY(int index) {
+    public String getLabel() {
+        return "x [" + getExperimentAnalysis().getXUnit() + "]";
+    }
+
+    @Override
+    public Number getMinRange() {
+        Calibration calibration = getExperimentAnalysis().getCalibration();
+        PointF point = new PointF(calibration.getOrigin().x + getExperimentAnalysis().getExperiment().getMaxRawX(), 0);
+        point = calibration.fromRaw(point);
+        return point.x * 0.2f;
+    }
+}
+
+class YPositionMarkerGraphAxis extends MarkerGraphAxis {
+    @Override
+    public int size() {
+        return getData().getMarkerCount();
+    }
+
+    @Override
+    public Number getValue(int index) {
+        return getData().getCalibratedMarkerPositionAt(index).y;
+    }
+
+    @Override
+    public String getLabel() {
+        return "y [" + getExperimentAnalysis().getYUnit() + "]";
+    }
+
+    @Override
+    public Number getMinRange() {
+        Calibration calibration = getExperimentAnalysis().getCalibration();
+        PointF point = new PointF(0, calibration.getOrigin().y + getExperimentAnalysis().getExperiment().getMaxRawY());
+        point = calibration.fromRaw(point);
+        return point.y * 0.2f;
+    }
+}
+
+
+class YSpeedMarkerGraphAxis extends MarkerGraphAxis {
+    @Override
+    public int size() {
+        return getData().getMarkerCount() - 1;
+    }
+
+    @Override
+    public Number getValue(int index) {
+        ExperimentAnalysis experimentAnalysis = getExperimentAnalysis();
+        MarkersDataModel data = getData();
+
         Experiment experiment = experimentAnalysis.getExperiment();
         float deltaX = data.getCalibratedMarkerPositionAt(index + 1).y - data.getCalibratedMarkerPositionAt(index).y;
         float deltaT = experiment.getRunValueAt(index + 1) - experiment.getRunValueAt(index);
@@ -563,49 +634,29 @@ class YVelocityMarkerGraphAdapter extends MarkerGraphAdapter {
     }
 
     @Override
-    public Number getMinXRange() {
-        return -1;
+    public String getLabel() {
+        ExperimentAnalysis experimentAnalysis = getExperimentAnalysis();
+        return "speed [" + experimentAnalysis.getXUnit() + "/"
+                + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
     }
 
     @Override
-    public Number getMinYRange() {
+    public Number getMinRange() {
         return 3;
-    }
-
-    @Override
-    public String getXLabel() {
-        return "time [" + experimentAnalysis.getExperiment().getRunValueUnit() + "]";
-    }
-
-    @Override
-    public String getYLabel() {
-        return "speed [" + experimentAnalysis.getXUnit() + "/" + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
-    }
-
-    @Override
-    public String getTitle() {
-        return "y-Speed Plot";
     }
 }
 
-
-class XVelocityMarkerGraphAdapter extends MarkerGraphAdapter {
-    public XVelocityMarkerGraphAdapter(ExperimentAnalysis experimentAnalysis) {
-        super(experimentAnalysis);
-    }
-
+class XSpeedMarkerGraphAxis extends MarkerGraphAxis {
     @Override
     public int size() {
-        return data.getMarkerCount() - 1;
+        return getData().getMarkerCount() - 1;
     }
 
     @Override
-    public Number getX(int index) {
-        return experimentAnalysis.getExperiment().getRunValueAt(index);
-    }
+    public Number getValue(int index) {
+        ExperimentAnalysis experimentAnalysis = getExperimentAnalysis();
+        MarkersDataModel data = getData();
 
-    @Override
-    public Number getY(int index) {
         Experiment experiment = experimentAnalysis.getExperiment();
         float deltaX = data.getCalibratedMarkerPositionAt(index + 1).x - data.getCalibratedMarkerPositionAt(index).x;
         float deltaT = experiment.getRunValueAt(index + 1) - experiment.getRunValueAt(index);
@@ -615,27 +666,37 @@ class XVelocityMarkerGraphAdapter extends MarkerGraphAdapter {
     }
 
     @Override
-    public Number getMinXRange() {
-        return -1;
+    public String getLabel() {
+        ExperimentAnalysis experimentAnalysis = getExperimentAnalysis();
+        return "speed [" + experimentAnalysis.getXUnit() + "/"
+                + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
     }
 
     @Override
-    public Number getMinYRange() {
+    public Number getMinRange() {
         return 3;
     }
+}
+
+class TimeMarkerGraphAxis extends MarkerGraphAxis {
+    @Override
+    public int size() {
+        return getData().getMarkerCount();
+    }
 
     @Override
-    public String getXLabel() {
+    public Number getValue(int index) {
+        return getExperimentAnalysis().getExperiment().getRunValueAt(index);
+    }
+
+    @Override
+    public String getLabel() {
+        ExperimentAnalysis experimentAnalysis = getExperimentAnalysis();
         return "time [" + experimentAnalysis.getExperiment().getRunValueUnit() + "]";
     }
 
     @Override
-    public String getYLabel() {
-        return "speed [" + experimentAnalysis.getXUnit() + "/" + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
-    }
-
-    @Override
-    public String getTitle() {
-        return "x-Speed Plot";
+    public Number getMinRange() {
+        return -1;
     }
 }

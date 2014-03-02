@@ -36,17 +36,20 @@ public class AnalysisTableGraphDataFragment extends android.support.v4.app.Fragm
         // marker graph view
         graphView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
         assert graphView != null;
-        graphView.setAdapter(new MarkerGraphAdapter(experimentAnalysis));
+        graphView.setAdapter(new MarkerGraphAdapter(experimentAnalysis, "Position Data", new XPositionMarkerGraphAxis(),
+                new YPositionMarkerGraphAxis()));
 
         // velocity graph
         ySpeedGraphView = (GraphView2D)view.findViewById(R.id.yVelocityGraphView);
         assert ySpeedGraphView != null;
-        ySpeedGraphView.setAdapter(new YVelocityMarkerGraphAdapter(experimentAnalysis));
+        ySpeedGraphView.setAdapter(new MarkerGraphAdapter(experimentAnalysis, "y-Speed", new TimeMarkerGraphAxis(),
+                new YSpeedMarkerGraphAxis()));
 
         // velocity graph
         xSpeedGraphView = (GraphView2D)view.findViewById(R.id.xVelocityGraphView);
         assert xSpeedGraphView != null;
-        xSpeedGraphView.setAdapter(new XVelocityMarkerGraphAdapter(experimentAnalysis));
+        xSpeedGraphView.setAdapter(new MarkerGraphAdapter(experimentAnalysis, "x-Speed", new TimeMarkerGraphAxis(),
+                new XSpeedMarkerGraphAxis()));
         return view;
     }
 
