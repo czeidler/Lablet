@@ -8,9 +8,14 @@
 package nz.ac.aucklanduni.physics.tracker;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 
@@ -24,8 +29,60 @@ public class ScriptActivity extends Activity {
     private ArrayAdapter<String> scriptListAdaptor = null;
     private ArrayList<CheckBoxListEntry> existingScriptList = null;
     private CheckBoxAdapter existingScriptListAdaptor = null;
+    private MenuItem deleteItem = null;
+    private AlertDialog deleteScriptDataAlertBox = null;
+    private CheckBox selectAllCheckBox = null;
 
     final int START_SCRIPT = 1;
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
+        getMenuInflater().inflate(R.menu.script_activity_actions, menu);
+
+        // delete item
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        builder.setTitle("Really delete the selected script data?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                deleteSelectedExistingScript();
+            }
+        });
+
+        deleteScriptDataAlertBox = builder.create();
+
+        deleteItem = menu.findItem(R.id.action_delete);
+        assert deleteItem != null;
+        deleteItem.setVisible(false);
+        deleteItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if (!isAtLeastOneExistingScriptSelected())
+                    return false;
+                deleteScriptDataAlertBox.show();
+                return true;
+            }
+        });
+
+        CheckBoxListEntry.setListener(new CheckBoxListEntry.OnCheckBoxListEntryListener() {
+            @Override
+            public void onSelected(CheckBoxListEntry entry) {
+                if (isAtLeastOneExistingScriptSelected())
+                    deleteItem.setVisible(true);
+                else
+                    deleteItem.setVisible(false);
+            }
+        });
+
+        return super.onPrepareOptionsMenu(menu);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,7 +110,17 @@ public class ScriptActivity extends Activity {
             }
         });
 
-        // experiment list
+        // existing experiment list
+        selectAllCheckBox = (CheckBox)findViewById(R.id.checkBoxSelectAll);
+        selectAllCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                for (CheckBoxListEntry entry : existingScriptList)
+                    entry.setSelected(b);
+                existingScriptListAdaptor.notifyDataSetChanged();
+            }
+        });
+
         ListView existingScriptListView = (ListView)findViewById(R.id.existingScriptListView);
         existingScriptListView.setBackgroundColor(listBackgroundColor);
         existingScriptList = new ArrayList<CheckBoxListEntry>();
@@ -76,6 +143,30 @@ public class ScriptActivity extends Activity {
         super.onResume();
 
         updateScriptList();
+        updateExistingScriptList();
+    }
+
+    private boolean isAtLeastOneExistingScriptSelected() {
+        boolean itemSelected = false;
+        for (CheckBoxListEntry entry : existingScriptList) {
+            if (entry.getSelected()) {
+                itemSelected = true;
+                break;
+            }
+        }
+        return itemSelected;
+    }
+
+    private void deleteSelectedExistingScript() {
+        File scriptDir = Script.getScriptUserDataDir(this);
+        for (CheckBoxListEntry entry : existingScriptList) {
+            if (!entry.getSelected())
+                continue;
+            File file = new File(scriptDir, entry.getName());
+            ExperimentActivity.recursiveDeleteFile(file);
+        }
+        selectAllCheckBox.setChecked(false);
+        deleteItem.setVisible(false);
         updateExistingScriptList();
     }
 
@@ -152,9 +243,9 @@ public class ScriptActivity extends Activity {
 
     private void updateExistingScriptList() {
         existingScriptList.clear();
-        File experimentDir = Script.getScriptUserDataDir(this);
-        if (experimentDir.isDirectory()) {
-            File[] children = experimentDir.listFiles();
+        File scriptDir = Script.getScriptUserDataDir(this);
+        if (scriptDir.isDirectory()) {
+            File[] children = scriptDir.listFiles();
             for (File child : children != null ? children : new File[0])
                 existingScriptList.add(new CheckBoxListEntry(child.getName()));
         }
