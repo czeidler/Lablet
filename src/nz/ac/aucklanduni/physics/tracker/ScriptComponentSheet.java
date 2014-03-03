@@ -13,9 +13,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.Space;
-import android.widget.TextView;
+import android.widget.*;
 
 import java.util.List;
 
@@ -42,6 +40,8 @@ class TextOnlyQuestion extends ScriptComponentItemViewHolder {
 }
 
 public class ScriptComponentSheet extends ScriptComponentFragmentHolder {
+    private String layoutType = "vertical";
+
     private ScriptComponentItemContainer<ScriptComponentItemViewHolder> itemContainer
             = new ScriptComponentItemContainer<ScriptComponentItemViewHolder>();
 
@@ -74,14 +74,27 @@ public class ScriptComponentSheet extends ScriptComponentFragmentHolder {
         return itemContainer;
     }
 
+    public void setLayoutType(String layout) {
+        layoutType = layout;
+    }
+
+    public String getLayoutType() {
+        return layoutType;
+    }
+
     public void addTextOnlyQuestion(String text) {
         TextOnlyQuestion textOnlyQuestion = new TextOnlyQuestion(text);
-        itemContainer.addItem(textOnlyQuestion);
+        addItemViewHolder(textOnlyQuestion);
+    }
+
+    protected void addItemViewHolder(ScriptComponentItemViewHolder item) {
+        itemContainer.addItem(item);
     }
 }
 
 class ScriptComponentSheetFragment extends ScriptComponentGenericFragment {
-    private LinearLayout questionLayout = null;
+    private TableLayout sheetLayout = null;
+    TableRow row;
 
     public ScriptComponentSheetFragment(ScriptComponentSheet component) {
         super(component);
@@ -92,25 +105,45 @@ class ScriptComponentSheetFragment extends ScriptComponentGenericFragment {
                              Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        View child = setChild(R.layout.script_component_questions_fragment);
+        View child = setChild(R.layout.script_component_sheet_fragment);
         assert child != null;
 
-        questionLayout = (LinearLayout)child.findViewById(R.id.questionLayout);
-        assert questionLayout != null;
+        sheetLayout = (TableLayout)child.findViewById(R.id.sheetLayout);
+        assert sheetLayout != null;
 
-        ScriptComponentSheet questionsComponent = (ScriptComponentSheet)component;
-        List<ScriptComponentItemViewHolder> itemList = questionsComponent.getItemContainer().getItems();
-        for (ScriptComponentItemViewHolder item : itemList) {
-            questionLayout.addView(item.createView(getActivity()));
-            addSpace();
+        row = new TableRow(getActivity());
+        sheetLayout.addView(row);
+
+        ScriptComponentSheet sheetComponent = (ScriptComponentSheet)component;
+
+        List<ScriptComponentItemViewHolder> itemList = sheetComponent.getItemContainer().getItems();
+        for (int i = 0; i < itemList.size(); i++) {
+            ScriptComponentItemViewHolder item = itemList.get(i);
+            add(item.createView(getActivity()), i == itemList.size() - 1);
         }
+
+        sheetLayout.setStretchAllColumns(true);
 
         return view;
     }
 
-    private void addSpace() {
-        Space space = new Space(getActivity());
-        space.setMinimumHeight(20);
-        questionLayout.addView(space);
+    private void add(View view, boolean isLast) {
+        view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.MATCH_PARENT, 1f));
+        row.addView(view);
+
+        int xPadding = 20;
+        int yPadding = 20;
+        ScriptComponentSheet sheetComponent = (ScriptComponentSheet)component;
+        if (!sheetComponent.getLayoutType().equalsIgnoreCase("horizontal")) {
+            row = new TableRow(getActivity());
+            sheetLayout.addView(row);
+
+            if (isLast)
+                yPadding = 0;
+        } else if (isLast)
+            xPadding = 0;
+
+        view.setPadding(0, 0, xPadding, yPadding);
     }
 }
