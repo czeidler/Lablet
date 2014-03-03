@@ -18,9 +18,9 @@ import android.widget.*;
 import java.util.List;
 
 
-class TextOnlyQuestion extends ScriptComponentItemViewHolder {
+class TextComponentItem extends ScriptComponentItemViewHolder {
     private String text = "";
-    public TextOnlyQuestion(String text) {
+    public TextComponentItem (String text) {
         this.text = text;
         setState(ScriptComponent.SCRIPT_STATE_DONE);
     }
@@ -31,6 +31,40 @@ class TextOnlyQuestion extends ScriptComponentItemViewHolder {
         textView.setTextAppearance(context, android.R.style.TextAppearance_Medium);
         textView.setText(text);
         return textView;
+    }
+
+    @Override
+    public boolean initCheck() {
+        return true;
+    }
+}
+
+class CheckBoxQuestion extends ScriptComponentItemViewHolder {
+    private String text = "";
+    public CheckBoxQuestion(String text) {
+        this.text = text;
+        setState(ScriptComponent.SCRIPT_STATE_ONGOING);
+    }
+
+    @Override
+    public View createView(Context context) {
+        CheckBox view = new CheckBox(context);
+        view.setTextAppearance(context, android.R.style.TextAppearance_Medium);
+        view.setText(text);
+
+        if (getState() == ScriptComponent.SCRIPT_STATE_DONE)
+            view.setChecked(true);
+        
+        view.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                if (checked)
+                    setState(ScriptComponent.SCRIPT_STATE_DONE);
+                else
+                    setState(ScriptComponent.SCRIPT_STATE_ONGOING);
+            }
+        });
+        return view;
     }
 
     @Override
@@ -70,6 +104,21 @@ public class ScriptComponentSheet extends ScriptComponentFragmentHolder {
         return fragment;
     }
 
+    @Override
+    public void toBundle(Bundle bundle) {
+        super.toBundle(bundle);
+
+        itemContainer.toBundle(bundle);
+    }
+
+    @Override
+    public boolean fromBundle(Bundle bundle) {
+        if (!super.fromBundle(bundle))
+            return false;
+
+        return itemContainer.fromBundle(bundle);
+    }
+
     public ScriptComponentItemContainer<ScriptComponentItemViewHolder> getItemContainer() {
         return itemContainer;
     }
@@ -82,9 +131,14 @@ public class ScriptComponentSheet extends ScriptComponentFragmentHolder {
         return layoutType;
     }
 
-    public void addTextOnlyQuestion(String text) {
-        TextOnlyQuestion textOnlyQuestion = new TextOnlyQuestion(text);
+    public void addText(String text) {
+        TextComponentItem textOnlyQuestion = new TextComponentItem(text);
         addItemViewHolder(textOnlyQuestion);
+    }
+
+    public void addCheckQuestion(String text) {
+        CheckBoxQuestion question = new CheckBoxQuestion(text);
+        addItemViewHolder(question);
     }
 
     protected void addItemViewHolder(ScriptComponentItemViewHolder item) {
