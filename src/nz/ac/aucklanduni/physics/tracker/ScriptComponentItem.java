@@ -1,6 +1,7 @@
 package nz.ac.aucklanduni.physics.tracker;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -29,6 +30,17 @@ abstract class ScriptComponentItem {
         this.state = state;
         if (container != null)
             container.onItemStateChanged(this, state);
+    }
+
+    public void toBundle(Bundle bundle) {
+        bundle.putInt("state", state);
+    }
+
+    public boolean fromBundle(Bundle bundle) {
+        if (!bundle.containsKey("state"))
+            return false;
+        state = bundle.getInt("state");
+        return true;
     }
 }
 
@@ -89,6 +101,36 @@ class ScriptComponentItemContainer<ItemType extends ScriptComponentItem> {
         for (ScriptComponentItem item : items) {
             if (item.getState() < 0)
                 return false;
+        }
+        return true;
+    }
+
+    public void toBundle(Bundle bundle) {
+        int i = 0;
+        for (ScriptComponentItem item : items) {
+            Bundle childBundle = new Bundle();
+            item.toBundle(childBundle);
+            String key = "child";
+            key += i;
+
+            bundle.putBundle(key, childBundle);
+            i++;
+        }
+    }
+
+    public boolean fromBundle(Bundle bundle) {
+        int i = 0;
+        for (ScriptComponentItem item : items) {
+            String key = "child";
+            key += i;
+
+            Bundle childBundle = bundle.getBundle(key);
+            if (childBundle == null)
+                return false;
+            if (!item.fromBundle(childBundle))
+                return false;
+
+            i++;
         }
         return true;
     }
