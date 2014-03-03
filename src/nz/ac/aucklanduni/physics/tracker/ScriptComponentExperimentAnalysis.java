@@ -123,8 +123,7 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
             return false;
 
         if (experimentAnalysis.getTagMarkers().getMarkerCount() < 3) {
-            Toast toast = new Toast(getActivity());
-            toast.setText("Mark more data points!");
+            Toast toast = Toast.makeText(getActivity(), "Mark more data points!", Toast.LENGTH_LONG);
             toast.show();
             return false;
         }
