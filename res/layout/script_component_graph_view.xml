@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <view android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          class="nz.ac.aucklanduni.physics.tracker.GraphView2D" android:id="@+id/graphView" android:layout_gravity="right"
+          android:minHeight="300dp" android:minWidth="200dp"/>
+</LinearLayout>
