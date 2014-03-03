@@ -17,7 +17,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 
-public class ScriptComponentGenericFragment extends android.support.v4.app.Fragment {
+public class ScriptComponentGenericFragment extends android.support.v4.app.Fragment
+        implements ScriptComponent.IScriptComponentListener{
     protected ScriptComponent component;
     protected TextView titleView = null;
     protected Button finishComponentButton = null;
@@ -25,6 +26,7 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
 
     ScriptComponentGenericFragment(ScriptComponent component) {
         this.component = component;
+        component.setListener(this);
     }
 
     @Override
@@ -67,11 +69,6 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
 
     protected void setState(int state) {
         component.setState(state);
-
-        if (state >= 0)
-            finishComponentButton.setEnabled(true);
-        else
-            finishComponentButton.setEnabled(false);
     }
 
     protected View setChild(int layoutId) {
@@ -81,5 +78,13 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
         assert view != null;
 
         return view;
+    }
+
+    @Override
+    public void onStateChanged(int state) {
+        if (state >= 0)
+            finishComponentButton.setEnabled(true);
+        else
+            finishComponentButton.setEnabled(false);
     }
 }

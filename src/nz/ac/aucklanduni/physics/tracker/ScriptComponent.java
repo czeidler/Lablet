@@ -49,7 +49,12 @@ abstract public class ScriptComponent implements Iterable<ScriptComponent> {
     final static public int SCRIPT_STATE_ONGOING = -1;
     final static public int SCRIPT_STATE_DONE = 0;
 
+    public interface IScriptComponentListener {
+        public void onStateChanged(int state);
+    }
+
     private Script script = null;
+    private IScriptComponentListener listener = null;
     private ScriptComponent parent = null;
     private int state = SCRIPT_STATE_INACTIVE;
     private Map<Integer, ScriptComponent> connections = new HashMap<Integer, ScriptComponent>();
@@ -58,6 +63,10 @@ abstract public class ScriptComponent implements Iterable<ScriptComponent> {
 
     public ScriptComponent(Script script) {
         this.script = script;
+    }
+
+    public void setListener(IScriptComponentListener listener) {
+        this.listener = listener;
     }
 
     public Script getScript() {
@@ -134,6 +143,8 @@ abstract public class ScriptComponent implements Iterable<ScriptComponent> {
 
     public void setState(int state) {
         this.state = state;
+        if (listener != null)
+            listener.onStateChanged(state);
         script.onComponentStateChanged(this, state);
     }
 
