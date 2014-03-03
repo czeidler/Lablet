@@ -169,7 +169,11 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             return;
         }
 
-        experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(experiment, plugin);
+        experimentAnalysis = ExperimentLoader.getExperimentAnalysis(experiment, plugin);
+        if (experimentAnalysis == null) {
+            showErrorAndFinish("Unable to load experiment analysis");
+            return;
+        }
 
         // gui stuff:
 

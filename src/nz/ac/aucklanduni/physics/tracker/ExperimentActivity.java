@@ -92,19 +92,21 @@ class ExperimentLoader {
         return true;
     }
 
-    public static ExperimentAnalysis loadExperimentAnalysis(Experiment experiment, ExperimentPlugin plugin) {
+    // Creates a new ExperimentAnalysis and tries to load an existing analysis.
+    public static ExperimentAnalysis getExperimentAnalysis(Experiment experiment, ExperimentPlugin plugin) {
+        ExperimentAnalysis experimentAnalysis = plugin.loadExperimentAnalysis(experiment);
+
+        // try to load old analysis
         File projectFile = new File(experiment.getStorageDir(), ExperimentAnalyserActivity.EXPERIMENT_ANALYSIS_FILE_NAME);
         Bundle bundle = ExperimentLoader.loadBundleFromFile(projectFile);
         if (bundle == null)
-            return null;
+            return experimentAnalysis;
 
         Bundle analysisDataBundle = bundle.getBundle("analysis_data");
         if (analysisDataBundle == null)
-            return null;
+            return experimentAnalysis;
 
-        ExperimentAnalysis experimentAnalysis = plugin.loadExperimentAnalysis(experiment);
-        if (!experimentAnalysis.loadAnalysisData(analysisDataBundle, experiment.getStorageDir()))
-            return null;
+        experimentAnalysis.loadAnalysisData(analysisDataBundle, experiment.getStorageDir());
 
         return experimentAnalysis;
     }
@@ -114,7 +116,7 @@ class ExperimentLoader {
         if (!loadExperiment(context, experimentPath, result))
             return null;
 
-        return loadExperimentAnalysis(result.experiment, result.plugin);
+        return getExperimentAnalysis(result.experiment, result.plugin);
     }
 }
 
