@@ -13,7 +13,11 @@ import android.view.View;
 
 
 class GraphItemViewHolder extends ScriptComponentItemViewHolder {
-    ScriptComponentExperimentSheet experimentSheet;
+    private ScriptComponentExperimentSheet experimentSheet;
+    private MarkerGraphAdapter adapter;
+    private String xAxisContentId = "x-position";
+    private String yAxisContentId = "y-position";
+    private String title = "Position Data";
 
     public GraphItemViewHolder(ScriptComponentExperimentSheet experimentSheet) {
         this.experimentSheet = experimentSheet;
@@ -31,11 +35,53 @@ class GraphItemViewHolder extends ScriptComponentItemViewHolder {
 
         ExperimentAnalysis experimentAnalysis = experimentSheet.getExperimentAnalysis(context);
         if (experimentAnalysis != null) {
-            MarkerGraphAdapter adapter = new MarkerGraphAdapter(experimentAnalysis, "Position Data",
-                    new XPositionMarkerGraphAxis(), new YPositionMarkerGraphAxis());
+            MarkerGraphAxis xAxis = createAxis(xAxisContentId);
+            if (xAxis == null)
+                xAxis = new XPositionMarkerGraphAxis();
+            MarkerGraphAxis yAxis = createAxis(yAxisContentId);
+            if (yAxis == null)
+                yAxis = new XPositionMarkerGraphAxis();
+
+            adapter = new MarkerGraphAdapter(experimentAnalysis, title, xAxis, yAxis);
             graphView2D.setAdapter(adapter);
         }
         return view;
+    }
+
+    public boolean setXAxisContent(String axis) {
+        if (createAxis(axis) == null)
+            return false;
+        xAxisContentId = axis;
+        return true;
+    }
+
+    public boolean setYAxisContent(String axis) {
+        if (createAxis(axis) == null)
+            return false;
+        yAxisContentId = axis;
+        return true;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    private MarkerGraphAxis createAxis(String id) {
+        if (id.equalsIgnoreCase("x-position"))
+            return new XPositionMarkerGraphAxis();
+        if (id.equalsIgnoreCase("y-position"))
+            return new YPositionMarkerGraphAxis();
+        if (id.equalsIgnoreCase("x-speed"))
+            return new XSpeedMarkerGraphAxis();
+        if (id.equalsIgnoreCase("y-speed"))
+            return new YSpeedMarkerGraphAxis();
+        if (id.equalsIgnoreCase("time"))
+            return new TimeMarkerGraphAxis();
+        return null;
+    }
+
+    public MarkerGraphAdapter getAdapter() {
+        return adapter;
     }
 
     @Override
@@ -68,8 +114,30 @@ public class ScriptComponentExperimentSheet extends ScriptComponentSheet {
         return experiment;
     }
 
+    public GraphItemViewHolder addGraph() {
+        GraphItemViewHolder item = new GraphItemViewHolder(this);
+        addItemViewHolder(item);
+        return item;
+    }
+
     public void addPositionGraph() {
         GraphItemViewHolder item = new GraphItemViewHolder(this);
+        addItemViewHolder(item);
+    }
+
+    public void addXSpeedGraph() {
+        GraphItemViewHolder item = new GraphItemViewHolder(this);
+        item.setTitle("X-Speed vs. Time");
+        item.setXAxisContent("time");
+        item.setYAxisContent("x-speed");
+        addItemViewHolder(item);
+    }
+
+    public void addYSpeedGraph() {
+        GraphItemViewHolder item = new GraphItemViewHolder(this);
+        item.setTitle("Y-Speed vs. Time");
+        item.setXAxisContent("time");
+        item.setYAxisContent("y-speed");
         addItemViewHolder(item);
     }
 
