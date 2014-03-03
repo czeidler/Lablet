@@ -27,6 +27,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
     private List<ScriptComponent> activeChain = new ArrayList<ScriptComponent>();
     private File scriptUserDataDir = null;
     private File scriptFile = null;
+    private String lastErrorMessage = "";
 
     final String SCRIPT_USER_DATA_FILENAME = "user_data.xml";
 
@@ -43,14 +44,18 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
         if (savedInstanceState != null) {
             String userDataDir = savedInstanceState.getString("script_user_data_dir");
             if (userDataDir == null) {
-                showErrorAndFinish("can't start script from saved instance state (user data directory is null)");
+                showErrorAndFinish("Can't start script from saved instance state (user data directory is null)");
                 return;
             }
             scriptUserDataDir = new File(Script.getScriptUserDataDir(this), userDataDir);
             if (!scriptUserDataDir.exists())
                 scriptUserDataDir.mkdir();
-            loadExistingScript(scriptUserDataDir);
+            if (!loadExistingScript(scriptUserDataDir)) {
+                showErrorAndFinish("Can't continue script:", lastErrorMessage);
+                return;
+            }
         } else if (!createFormIntent()) {
+            showErrorAndFinish("Can't start script", lastErrorMessage);
             return;
         }
         script.start();
@@ -59,7 +64,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
     private boolean createFormIntent() {
         Intent intent = getIntent();
         if (intent == null) {
-            showErrorAndFinish("can't start script (intent is null)");
+            lastErrorMessage = "intent is null";
             return false;
         }
 
@@ -67,7 +72,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
         String userDataDir = intent.getStringExtra("script_user_data_dir");
 
         if (userDataDir == null) {
-            showErrorAndFinish("can't start script (user data directory is null)");
+            lastErrorMessage = "user data directory is missing";
             return false;
         }
         scriptUserDataDir = new File(Script.getScriptUserDataDir(this), userDataDir);
@@ -106,7 +111,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
         LuaScriptLoader loader = new LuaScriptLoader(factory);
         script = loader.load(scriptFile);
         if (script == null) {
-            showErrorAndFinish("Error in script: ", loader.getLastError());
+            lastErrorMessage = loader.getLastError();
             return false;
         }
         script.setListener(this);
@@ -122,6 +127,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
             inStream = new FileInputStream(userDataFile);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            lastErrorMessage = "can't open script file \"" + userDataFile.getPath() + "\"";
             return false;
         }
 
@@ -130,19 +136,22 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
             bundle = persistentBundle.unflattenBundle(inStream);
         } catch (Exception e) {
             e.printStackTrace();
+            lastErrorMessage = "can't read bundle from \"" + userDataFile.getPath() + "\"";
             return false;
         }
 
         String scriptPath = bundle.getString("script_name");
-        if (scriptPath == null)
+        if (scriptPath == null) {
+            lastErrorMessage = "bundle contains no script_name";
             return false;
+        }
 
         scriptFile = new File(Script.getScriptDirectory(this), scriptPath);
         if (!loadScript(scriptFile))
             return false;
 
         if (!script.loadScript(bundle)) {
-            showErrorAndFinish("Can't continue script!", script.getLastError());
+            lastErrorMessage = script.getLastError();
             return false;
         }
 
