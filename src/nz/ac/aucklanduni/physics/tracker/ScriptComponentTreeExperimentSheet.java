@@ -11,21 +11,26 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import java.util.HashMap;
+import java.util.Map;
 
-class GraphItemViewHolder extends ScriptComponentItemViewHolder {
-    private ScriptComponentExperimentSheet experimentSheet;
+
+class GraphViewHolder extends ScriptComponentViewHolder {
+    private ScriptComponentTreeExperimentSheet experimentSheet;
+    private ScriptComponentExperiment experiment;
     private MarkerGraphAdapter adapter;
     private String xAxisContentId = "x-position";
     private String yAxisContentId = "y-position";
     private String title = "Position Data";
 
-    public GraphItemViewHolder(ScriptComponentExperimentSheet experimentSheet) {
+    public GraphViewHolder(ScriptComponentTreeExperimentSheet experimentSheet, ScriptComponentExperiment experiment) {
         this.experimentSheet = experimentSheet;
-        setState(ScriptComponent.SCRIPT_STATE_DONE);
+        this.experiment = experiment;
+        setState(ScriptComponentTree.SCRIPT_STATE_DONE);
     }
 
     @Override
-    public View createView(Context context) {
+    public View createView(Context context, android.support.v4.app.Fragment parentFragment) {
         LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.script_component_graph_view, null);
         assert view != null;
@@ -33,7 +38,7 @@ class GraphItemViewHolder extends ScriptComponentItemViewHolder {
         GraphView2D graphView2D = (GraphView2D)view.findViewById(R.id.graphView);
         assert graphView2D != null;
 
-        ExperimentAnalysis experimentAnalysis = experimentSheet.getExperimentAnalysis(context);
+        ExperimentAnalysis experimentAnalysis = experimentSheet.getExperimentAnalysis(context, experiment);
         if (experimentAnalysis != null) {
             MarkerGraphAxis xAxis = createAxis(xAxisContentId);
             if (xAxis == null)
@@ -86,66 +91,55 @@ class GraphItemViewHolder extends ScriptComponentItemViewHolder {
 
     @Override
     public boolean initCheck() {
+        if (experiment == null) {
+            lastErrorMessage = "no experiment data";
+            return false;
+        }
         return true;
     }
 }
 
-public class ScriptComponentExperimentSheet extends ScriptComponentSheet {
-    private ScriptComponentExperiment experiment;
-    private ExperimentAnalysis experimentAnalysis;
+public class ScriptComponentTreeExperimentSheet extends ScriptComponentTreeSheet {
+    private Map<String, ExperimentAnalysis> experimentAnalysisMap = new HashMap<String, ExperimentAnalysis>();
 
-    public ScriptComponentExperimentSheet(Script script) {
+    public ScriptComponentTreeExperimentSheet(Script script) {
         super(script);
     }
 
-    @Override
-    public boolean initCheck() {
-        if (experiment == null) {
-            lastErrorMessage = "no experiment given";
-            return false;
-        }
-        return super.initCheck();
-    }
-
-    public void setExperiment(ScriptComponentExperiment experiment) {
-        this.experiment = experiment;
-    }
-    public ScriptComponentExperiment getExperiment() {
-        return experiment;
-    }
-
-    public GraphItemViewHolder addGraph() {
-        GraphItemViewHolder item = new GraphItemViewHolder(this);
+    public GraphViewHolder addGraph(ScriptComponentExperiment experiment) {
+        GraphViewHolder item = new GraphViewHolder(this, experiment);
         addItemViewHolder(item);
         return item;
     }
 
-    public void addPositionGraph() {
-        GraphItemViewHolder item = new GraphItemViewHolder(this);
+    public void addPositionGraph(ScriptComponentExperiment experiment) {
+        GraphViewHolder item = new GraphViewHolder(this, experiment);
         addItemViewHolder(item);
     }
 
-    public void addXSpeedGraph() {
-        GraphItemViewHolder item = new GraphItemViewHolder(this);
+    public void addXSpeedGraph(ScriptComponentExperiment experiment) {
+        GraphViewHolder item = new GraphViewHolder(this, experiment);
         item.setTitle("X-Speed vs. Time");
         item.setXAxisContent("time");
         item.setYAxisContent("x-speed");
         addItemViewHolder(item);
     }
 
-    public void addYSpeedGraph() {
-        GraphItemViewHolder item = new GraphItemViewHolder(this);
+    public void addYSpeedGraph(ScriptComponentExperiment experiment) {
+        GraphViewHolder item = new GraphViewHolder(this, experiment);
         item.setTitle("Y-Speed vs. Time");
         item.setXAxisContent("time");
         item.setYAxisContent("y-speed");
         addItemViewHolder(item);
     }
 
-    public ExperimentAnalysis getExperimentAnalysis(Context context) {
+    public ExperimentAnalysis getExperimentAnalysis(Context context, ScriptComponentExperiment experiment) {
+        ExperimentAnalysis experimentAnalysis = experimentAnalysisMap.get(experiment.getExperimentPath());
         if (experimentAnalysis != null)
             return experimentAnalysis;
         experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(context,
                 experiment.getExperimentPath());
+        experimentAnalysisMap.put(experiment.getExperimentPath(), experimentAnalysis);
         return experimentAnalysis;
     }
 }

@@ -1,50 +1,17 @@
 package nz.ac.aucklanduni.physics.tracker;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 import java.util.List;
 
-abstract class ScriptComponentItem {
-    protected ScriptComponentItemContainer container = null;
-    private int state = ScriptComponent.SCRIPT_STATE_ONGOING;
-    protected String lastErrorMessage = "";
 
-    abstract public boolean initCheck();
-    public String getLastErrorMessage() {
-        return lastErrorMessage;
-    }
-
-    public void setContainer(ScriptComponentItemContainer container) {
-        this.container = container;
-    }
-
-    // state < 0 means item is not done yet
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int state) {
-        this.state = state;
-        if (container != null)
-            container.onItemStateChanged(this, state);
-    }
-
-    public void toBundle(Bundle bundle) {
-        bundle.putInt("state", state);
-    }
-
-    public boolean fromBundle(Bundle bundle) {
-        if (!bundle.containsKey("state"))
-            return false;
-        state = bundle.getInt("state");
-        return true;
-    }
-}
-
-class ScriptComponentItemContainer<ItemType extends ScriptComponentItem> {
+class ScriptComponentContainer<ItemType extends ScriptComponent>
+        implements ScriptComponent.IScriptComponentListener {
     private List<ItemType> items = new ArrayList<ItemType>();
     private IItemContainerListener listener = null;
     private boolean allItemsDone = false;
@@ -68,7 +35,8 @@ class ScriptComponentItemContainer<ItemType extends ScriptComponentItem> {
         this.listener = listener;
     }
 
-    public void onItemStateChanged(ScriptComponentItem item, int state) {
+    @Override
+    public void onStateChanged(ScriptComponent item, int state) {
         boolean allItemsWereDone = allItemsDone;
 
         if (state < 0)
@@ -84,9 +52,9 @@ class ScriptComponentItemContainer<ItemType extends ScriptComponentItem> {
 
     public void addItem(ItemType item) {
         items.add(item);
-        item.setContainer(this);
+        item.setListener(this);
 
-        onItemStateChanged(item, item.getState());
+        onStateChanged(item, item.getState());
     }
 
     public List<ItemType> getItems() {
@@ -98,7 +66,7 @@ class ScriptComponentItemContainer<ItemType extends ScriptComponentItem> {
     }
 
     private boolean calculateAllItemsDone() {
-        for (ScriptComponentItem item : items) {
+        for (ScriptComponent item : items) {
             if (item.getState() < 0)
                 return false;
         }
@@ -107,7 +75,7 @@ class ScriptComponentItemContainer<ItemType extends ScriptComponentItem> {
 
     public void toBundle(Bundle bundle) {
         int i = 0;
-        for (ScriptComponentItem item : items) {
+        for (ScriptComponent item : items) {
             Bundle childBundle = new Bundle();
             item.toBundle(childBundle);
             String key = "child";
@@ -120,7 +88,7 @@ class ScriptComponentItemContainer<ItemType extends ScriptComponentItem> {
 
     public boolean fromBundle(Bundle bundle) {
         int i = 0;
-        for (ScriptComponentItem item : items) {
+        for (ScriptComponent item : items) {
             String key = "child";
             key += i;
 
@@ -136,6 +104,22 @@ class ScriptComponentItemContainer<ItemType extends ScriptComponentItem> {
     }
 }
 
-abstract class ScriptComponentItemViewHolder extends ScriptComponentItem {
-    abstract public View createView(Context context);
+abstract class ScriptComponentViewHolder extends ScriptComponent {
+    abstract public View createView(Context context, android.support.v4.app.Fragment parent);
+}
+
+abstract class ScriptComponentFragmentHolder extends ScriptComponentViewHolder {
+
+    @Override
+    public View createView(Context context, android.support.v4.app.Fragment parentFragment) {
+        LinearLayout fragmentView = new LinearLayout(context);
+        int viewId = View.generateViewId();
+        fragmentView.setId(viewId);
+        android.support.v4.app.Fragment fragment = createFragment();
+        parentFragment.getChildFragmentManager().beginTransaction().add(fragmentView.getId(), fragment).commit();
+        return fragmentView;
+    }
+
+    abstract public android.support.v4.app.Fragment createFragment();
+
 }

@@ -18,13 +18,13 @@ import android.widget.TextView;
 
 
 public class ScriptComponentGenericFragment extends android.support.v4.app.Fragment
-        implements ScriptComponent.IScriptComponentListener{
-    protected ScriptComponent component;
+        implements ScriptComponentTree.IScriptComponentListener{
+    protected ScriptComponentTree component;
     protected TextView titleView = null;
     protected Button finishComponentButton = null;
     protected ScrollView containerView = null;
 
-    ScriptComponentGenericFragment(ScriptComponent component) {
+    ScriptComponentGenericFragment(ScriptComponentTree component) {
         this.component = component;
         component.setListener(this);
     }
@@ -37,7 +37,7 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
         assert view != null;
 
         titleView = (TextView)view.findViewById(R.id.titleTextView);
-        String title = ((ScriptComponentFragmentHolder)component).getTitle();
+        String title = ((ScriptComponentTreeFragmentHolder)component).getTitle();
         if (title.equals(""))
             setTitle(this.getClass().getSimpleName());
         else
@@ -81,7 +81,9 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
     }
 
     @Override
-    public void onStateChanged(int state) {
+    public void onStateChanged(ScriptComponent item, int state) {
+        assert item == component;
+
         if (state >= 0)
             finishComponentButton.setEnabled(true);
         else

@@ -8,6 +8,7 @@
 package nz.ac.aucklanduni.physics.tracker;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,22 +21,18 @@ import android.widget.*;
 import java.io.File;
 
 
-public class ScriptComponentCameraExperiment extends ScriptComponentFragmentHolder {
+class ScriptComponentCameraExperiment extends ScriptComponentFragmentHolder {
     private ScriptComponentExperiment experiment = new ScriptComponentExperiment();
-    private String descriptionText = "";
+    private String descriptionText = "Please take a video:";
 
-    public ScriptComponentCameraExperiment(Script script) {
-        super(script);
+    @Override
+    public android.support.v4.app.Fragment createFragment() {
+        return new ScriptComponentCameraExperimentFragment(this);
     }
 
     @Override
     public boolean initCheck() {
         return true;
-    }
-
-    @Override
-    public Fragment createFragment() {
-        return new ScriptComponentCameraExperimentFragment(this);
     }
 
     public ScriptComponentExperiment getExperiment() {
@@ -65,39 +62,34 @@ public class ScriptComponentCameraExperiment extends ScriptComponentFragmentHold
     }
 }
 
-
-class ScriptComponentCameraExperimentFragment extends ScriptComponentGenericFragment {
+class ScriptComponentCameraExperimentFragment extends android.support.v4.app.Fragment {
     static final int PERFORM_EXPERIMENT = 0;
 
+    private ScriptComponentCameraExperiment cameraComponent;
     private CheckedTextView takenExperimentInfo = null;
     private VideoView videoView = null;
 
     public ScriptComponentCameraExperimentFragment(ScriptComponentCameraExperiment component) {
-        super(component);
-
+        this.cameraComponent = component;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
+        View view = inflater.inflate(R.layout.script_component_camera_experiment, container, false);
+        assert view != null;
 
-        View child = setChild(R.layout.script_component_camera_experiment);
-        assert child != null;
-
-        TextView descriptionTextView = (TextView)child.findViewById(R.id.descriptionText);
+        TextView descriptionTextView = (TextView)view.findViewById(R.id.descriptionText);
         assert descriptionTextView != null;
-        ScriptComponentCameraExperiment cameraComponent = (ScriptComponentCameraExperiment)this.component;
         if (!cameraComponent.getDescriptionText().equals(""))
             descriptionTextView.setText(cameraComponent.getDescriptionText());
 
-        Button takeExperiment = (Button)child.findViewById(R.id.takeExperimentButton);
+        Button takeExperiment = (Button)view.findViewById(R.id.takeExperimentButton);
         assert takeExperiment != null;
         takeExperiment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), CameraExperimentActivity.class);
-                startActivityForResult(intent, PERFORM_EXPERIMENT);
+                startExperimentActivity();
             }
         });
 
@@ -115,7 +107,28 @@ class ScriptComponentCameraExperimentFragment extends ScriptComponentGenericFrag
         return view;
     }
 
-    public void onActivityResult (int requestCode, int resultCode, Intent data) {
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        videoView.start();
+    }
+
+    private void startExperimentActivity() {
+        Intent intent = new Intent(getActivity(), CameraExperimentActivity.class);
+        // workaround for nested fragment bug:
+        ScriptComponentSheetFragment parentFragment = (ScriptComponentSheetFragment)getParentFragment();
+        if (parentFragment != null) {
+            parentFragment.setChildFragmentThatHasStartedAnActivity(this);
+            parentFragment.startActivityForResult(intent, PERFORM_EXPERIMENT);
+            return;
+        }
+
+        startActivityForResult(intent, PERFORM_EXPERIMENT);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != Activity.RESULT_OK)
             return;
 
@@ -124,8 +137,8 @@ class ScriptComponentCameraExperimentFragment extends ScriptComponentGenericFrag
                 return;
             if (data.hasExtra("experiment_path")) {
                 String experimentPath = data.getStringExtra("experiment_path");
-                ((ScriptComponentCameraExperiment)component).getExperiment().setExperimentPath(experimentPath);
-                setState(ScriptComponent.SCRIPT_STATE_DONE);
+                cameraComponent.getExperiment().setExperimentPath(experimentPath);
+                cameraComponent.setState(ScriptComponentTree.SCRIPT_STATE_DONE);
 
                 setExperimentPath(experimentPath);
             }
@@ -134,13 +147,11 @@ class ScriptComponentCameraExperimentFragment extends ScriptComponentGenericFrag
     }
 
     private void setExperimentPath(String experimentPath) {
-        ScriptComponentCameraExperiment cameraComponent = (ScriptComponentCameraExperiment)this.component;
         cameraComponent.getExperiment().setExperimentPath(experimentPath);
         updateExperimentPath();
     }
 
     private void updateExperimentPath() {
-        ScriptComponentCameraExperiment cameraComponent = (ScriptComponentCameraExperiment)this.component;
         String experimentPath = cameraComponent.getExperiment().getExperimentPath();
 
         ExperimentLoaderResult result = new ExperimentLoaderResult();

@@ -8,7 +8,6 @@
 package nz.ac.aucklanduni.physics.tracker;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 
-public class ScriptComponentCalculateSpeed extends ScriptComponentFragmentHolder {
+public class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragmentHolder {
     private ScriptComponentExperiment experiment;
 
     private boolean isXSpeed;
@@ -25,7 +24,7 @@ public class ScriptComponentCalculateSpeed extends ScriptComponentFragmentHolder
     private float speed1 = 0.f;
     private float speed2 = 0.f;
 
-    public ScriptComponentCalculateSpeed(Script script, boolean xSpeed) {
+    public ScriptComponentTreeCalculateSpeed(Script script, boolean xSpeed) {
         super(script);
 
         isXSpeed = xSpeed;
@@ -41,7 +40,7 @@ public class ScriptComponentCalculateSpeed extends ScriptComponentFragmentHolder
     }
 
     @Override
-    public Fragment createFragment() {
+    public android.support.v4.app.Fragment createFragment() {
         if (isXSpeed)
             return new ScriptComponentCalculateXSpeedFragment(this);
         else
@@ -99,7 +98,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     private TableView speedTable = null;
     protected MarkersDataModel tagMarker = null;
 
-    public ScriptComponentCalculateSpeedFragment(ScriptComponentCalculateSpeed component) {
+    public ScriptComponentCalculateSpeedFragment(ScriptComponentTreeCalculateSpeed component) {
         super(component);
     }
 
@@ -134,10 +133,10 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
             public void onClick(View view) {
                 if (checkInput()) {
                     speedTable.setVisibility(View.VISIBLE);
-                    setState(ScriptComponent.SCRIPT_STATE_DONE);
+                    setState(ScriptComponentTree.SCRIPT_STATE_DONE);
                 } else {
                     speedTable.setVisibility(View.INVISIBLE);
-                    setState(ScriptComponent.SCRIPT_STATE_ONGOING);
+                    setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
                 }
             }
         });
@@ -150,7 +149,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
 
     @Override
     public void onPause() {
-        ScriptComponentCalculateSpeed speedComponent = (ScriptComponentCalculateSpeed)component;
+        ScriptComponentTreeCalculateSpeed speedComponent = (ScriptComponentTreeCalculateSpeed)component;
 
         float speed1 = Float.parseFloat(String.valueOf(editTextTime1.getText()));
         float speed2 = Float.parseFloat(String.valueOf(editTextTime2.getText()));
@@ -165,7 +164,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     public void onResume() {
         super.onResume();
 
-        ScriptComponentCalculateSpeed speedComponent = (ScriptComponentCalculateSpeed)component;
+        ScriptComponentTreeCalculateSpeed speedComponent = (ScriptComponentTreeCalculateSpeed)component;
 
         ExperimentAnalysis experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(getActivity(),
                 speedComponent.getExperiment().getExperimentPath());
@@ -201,7 +200,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         text += speedComponent.getSpeed2();
         editTextTime2.setText(text);
 
-        if (speedComponent.getState() != ScriptComponent.SCRIPT_STATE_DONE)
+        if (speedComponent.getState() != ScriptComponentTree.SCRIPT_STATE_DONE)
             speedTable.setVisibility(View.INVISIBLE);
     }
 
@@ -232,7 +231,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
 class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalculateSpeedFragment {
     private MarkerDataYSpeedTableAdapter speedData;
 
-    public ScriptComponentCalculateYSpeedFragment(ScriptComponentCalculateSpeed component) {
+    public ScriptComponentCalculateYSpeedFragment(ScriptComponentTreeCalculateSpeed component) {
         super(component);
     }
 
@@ -256,7 +255,7 @@ class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalculateSpe
 class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpeedFragment {
     private MarkerDataXSpeedTableAdapter speedData;
 
-    public ScriptComponentCalculateXSpeedFragment(ScriptComponentCalculateSpeed component) {
+    public ScriptComponentCalculateXSpeedFragment(ScriptComponentTreeCalculateSpeed component) {
         super(component);
     }
 

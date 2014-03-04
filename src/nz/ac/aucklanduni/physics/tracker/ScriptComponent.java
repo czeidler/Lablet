@@ -16,6 +16,51 @@ import java.security.MessageDigest;
 import java.util.*;
 
 
+abstract public class ScriptComponent {
+    final static public int SCRIPT_STATE_INACTIVE = -2;
+    final static public int SCRIPT_STATE_ONGOING = -1;
+    final static public int SCRIPT_STATE_DONE = 0;
+
+    public interface IScriptComponentListener {
+        public void onStateChanged(ScriptComponent item, int state);
+    }
+
+    private IScriptComponentListener listener = null;
+    private int state = SCRIPT_STATE_ONGOING;
+    protected String lastErrorMessage = "";
+
+    abstract public boolean initCheck();
+    public String getLastErrorMessage() {
+        return lastErrorMessage;
+    }
+
+    public void setListener(IScriptComponentListener listener) {
+        this.listener = listener;
+    }
+
+    // state < 0 means item is not done yet
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+        if (listener != null)
+            listener.onStateChanged(this, state);
+    }
+
+    public void toBundle(Bundle bundle) {
+        bundle.putInt("state", state);
+    }
+
+    public boolean fromBundle(Bundle bundle) {
+        if (!bundle.containsKey("state"))
+            return false;
+        state = bundle.getInt("state");
+        return true;
+    }
+}
+
 class Hash {
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
     public static String bytesToHex(byte[] bytes) {
@@ -44,53 +89,32 @@ class Hash {
     }
 }
 
-abstract public class ScriptComponent implements Iterable<ScriptComponent> {
-    final static public int SCRIPT_STATE_INACTIVE = -2;
-    final static public int SCRIPT_STATE_ONGOING = -1;
-    final static public int SCRIPT_STATE_DONE = 0;
-
-    public interface IScriptComponentListener {
-        public void onStateChanged(int state);
-    }
-
+abstract class ScriptComponentTree extends ScriptComponent implements Iterable<ScriptComponentTree> {
     private Script script = null;
-    private IScriptComponentListener listener = null;
-    private ScriptComponent parent = null;
-    private int state = SCRIPT_STATE_INACTIVE;
-    private Map<Integer, ScriptComponent> connections = new HashMap<Integer, ScriptComponent>();
+    private ScriptComponentTree parent = null;
+    private Map<Integer, ScriptComponentTree> connections = new HashMap<Integer, ScriptComponentTree>();
 
-    protected String lastErrorMessage = "";
-
-    public ScriptComponent(Script script) {
+    public ScriptComponentTree(Script script) {
         this.script = script;
-    }
-
-    public void setListener(IScriptComponentListener listener) {
-        this.listener = listener;
     }
 
     public Script getScript() {
         return script;
     }
 
-    abstract public boolean initCheck();
-    public String getLastErrorMessage() {
-        return lastErrorMessage;
-    }
-
     @Override
-    public java.util.Iterator<ScriptComponent> iterator() {
+    public java.util.Iterator<ScriptComponentTree> iterator() {
         return new Iterator(this);
     }
 
-    static String getChainHash(ScriptComponent component) {
+    static String getChainHash(ScriptComponentTree component) {
         String hashData = component.getName();
-        java.util.Iterator<ScriptComponent> iterator = component.connections.values().iterator();
+        java.util.Iterator<ScriptComponentTree> iterator = component.connections.values().iterator();
         int childId = -1;
         while (true) {
             if (!iterator.hasNext())
                 break;
-            ScriptComponent child = iterator.next();
+            ScriptComponentTree child = iterator.next();
             childId++;
 
             hashData += childId;
@@ -100,12 +124,12 @@ abstract public class ScriptComponent implements Iterable<ScriptComponent> {
         return Hash.sha1Hex(hashData);
     }
 
-    public List<ScriptComponent> getActiveChain() {
-        List<ScriptComponent> list = new ArrayList<ScriptComponent>();
-        if (state == SCRIPT_STATE_INACTIVE)
+    public List<ScriptComponentTree> getActiveChain() {
+        List<ScriptComponentTree> list = new ArrayList<ScriptComponentTree>();
+        if (getState() == SCRIPT_STATE_INACTIVE)
             return list;
         list.add(this);
-        ScriptComponent current = this;
+        ScriptComponentTree current = this;
         while (true) {
             current = current.connections.get(current.getState());
             if (current == null)
@@ -119,46 +143,31 @@ abstract public class ScriptComponent implements Iterable<ScriptComponent> {
         return this.getClass().getSimpleName();
     }
 
-    public void toBundle(Bundle bundle) {
-        bundle.putInt("state", state);
-    }
-
-    public boolean fromBundle(Bundle bundle) {
-        if (!bundle.containsKey("state"))
-            return false;
-        state = bundle.getInt("state");
-        return true;
-    }
-
-    public void setNextComponent(int state, ScriptComponent component) {
+    public void setNextComponent(int state, ScriptComponentTree component) {
         connections.put(state, component);
         component.setParent(this);
     }
 
-    public ScriptComponent getNext() {
+    public ScriptComponentTree getNext() {
+        int state = getState();
         if (state < 0)
             return null;
         return connections.get(state);
     }
 
+    @Override
     public void setState(int state) {
-        this.state = state;
-        if (listener != null)
-            listener.onStateChanged(state);
+        super.setState(state);
         script.onComponentStateChanged(this, state);
     }
 
-    public int getState() {
-        return state;
-    }
-
-    public ScriptComponent getParent() {
+    public ScriptComponentTree getParent() {
         return parent;
     }
 
     public int getStepsToRoot() {
         int stepsToRoot = 1;
-        ScriptComponent currentParent = parent;
+        ScriptComponentTree currentParent = parent;
         while (currentParent != null) {
             stepsToRoot++;
             currentParent = currentParent.getParent();
@@ -166,28 +175,28 @@ abstract public class ScriptComponent implements Iterable<ScriptComponent> {
         return stepsToRoot;
     }
 
-    private void setParent(ScriptComponent parent) {
+    private void setParent(ScriptComponentTree parent) {
         this.parent = parent;
     }
 
-    static private class Iterator implements java.util.Iterator<ScriptComponent> {
-        private ScriptComponent currentComponent;
-        private java.util.Iterator<ScriptComponent> currentComponentIterator;
-        private java.util.Iterator<ScriptComponent> childIterator;
+    static private class Iterator implements java.util.Iterator<ScriptComponentTree> {
+        private ScriptComponentTree currentComponent;
+        private java.util.Iterator<ScriptComponentTree> currentComponentIterator;
+        private java.util.Iterator<ScriptComponentTree> childIterator;
 
-        Iterator(ScriptComponent root) {
+        Iterator(ScriptComponentTree root) {
             currentComponent = root;
             currentComponentIterator = currentComponent.connections.values().iterator();
         }
 
         @Override
-        public ScriptComponent next() {
+        public ScriptComponentTree next() {
             if (childIterator == null) {
-                ScriptComponent child = currentComponentIterator.next();
+                ScriptComponentTree child = currentComponentIterator.next();
                 childIterator = child.iterator();
                 return child;
             } else {
-                ScriptComponent child = childIterator.next();
+                ScriptComponentTree child = childIterator.next();
                 if (!childIterator.hasNext())
                     childIterator = null;
 
@@ -211,11 +220,11 @@ abstract public class ScriptComponent implements Iterable<ScriptComponent> {
 
 class Script {
     public interface IScriptListener {
-        public void onComponentStateChanged(ScriptComponent current, int state);
-        public void onGoToComponent(ScriptComponent next);
+        public void onComponentStateChanged(ScriptComponentTree current, int state);
+        public void onGoToComponent(ScriptComponentTree next);
     }
 
-    private ScriptComponent root = null;
+    private ScriptComponentTree root = null;
     private IScriptListener listener = null;
     private String lastError = "";
 
@@ -223,17 +232,17 @@ class Script {
         this.listener = listener;
     }
 
-    public void notifyGoToComponent(ScriptComponent next) {
+    public void notifyGoToComponent(ScriptComponentTree next) {
         if (listener == null || next == null)
             return;
         listener.onGoToComponent(next);
     }
 
-    public void setRoot(ScriptComponent component) {
+    public void setRoot(ScriptComponentTree component) {
         root = component;
     }
 
-    public ScriptComponent getRoot() {
+    public ScriptComponentTree getRoot() {
         return root;
     }
 
@@ -243,11 +252,11 @@ class Script {
      * @return true if script is ok
      */
     public boolean initCheck() {
-        java.util.Iterator<ScriptComponent> iterator = root.iterator();
+        java.util.Iterator<ScriptComponentTree> iterator = root.iterator();
         while (true) {
             if (!iterator.hasNext())
                 break;
-            ScriptComponent component = iterator.next();
+            ScriptComponentTree component = iterator.next();
             if (!component.initCheck()) {
                 lastError = "In Component \"" + component.getName() + "\": ";
                 lastError += component.getLastErrorMessage();
@@ -261,9 +270,9 @@ class Script {
         return lastError;
     }
 
-    public List<ScriptComponent> getActiveChain() {
+    public List<ScriptComponentTree> getActiveChain() {
         if (root == null)
-            return new ArrayList<ScriptComponent>();
+            return new ArrayList<ScriptComponentTree>();
 
         return root.getActiveChain();
     }
@@ -301,13 +310,13 @@ class Script {
     public boolean start() {
         if (root == null)
             return false;
-        if (root.getState() >= ScriptComponent.SCRIPT_STATE_ONGOING)
+        if (root.getState() >= ScriptComponentTree.SCRIPT_STATE_ONGOING)
             return false;
-        root.setState(ScriptComponent.SCRIPT_STATE_ONGOING);
+        root.setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
         return true;
     }
 
-    public void onComponentStateChanged(ScriptComponent component, int state) {
+    public void onComponentStateChanged(ScriptComponentTree component, int state) {
         if (listener != null)
             listener.onComponentStateChanged(component, state);
     }
@@ -316,17 +325,17 @@ class Script {
         if (root == null)
             return false;
 
-        bundle.putString("scriptId", ScriptComponent.getChainHash(root));
+        bundle.putString("scriptId", ScriptComponentTree.getChainHash(root));
 
         if (!saveScriptComponent(root, 0, bundle))
             return false;
 
         int componentId = 0;
-        java.util.Iterator<ScriptComponent> iterator = root.iterator();
+        java.util.Iterator<ScriptComponentTree> iterator = root.iterator();
         while (true) {
             if (!iterator.hasNext())
                 break;
-            ScriptComponent component = iterator.next();
+            ScriptComponentTree component = iterator.next();
             componentId++;
 
             if (!saveScriptComponent(component, componentId, bundle))
@@ -335,7 +344,7 @@ class Script {
         return true;
     }
 
-    private boolean saveScriptComponent(ScriptComponent component, int componentId, Bundle bundle) {
+    private boolean saveScriptComponent(ScriptComponentTree component, int componentId, Bundle bundle) {
         Bundle componentBundle = new Bundle();
         component.toBundle(componentBundle);
 
@@ -348,7 +357,7 @@ class Script {
         if (root == null)
             return false;
 
-        String scriptId = ScriptComponent.getChainHash(root);
+        String scriptId = ScriptComponentTree.getChainHash(root);
         if (!bundle.get("scriptId").equals(scriptId)) {
             lastError = "Script has been updated and is now incompatible to the saved state.";
             return false;
@@ -358,11 +367,11 @@ class Script {
             return false;
 
         int componentId = 0;
-        java.util.Iterator<ScriptComponent> iterator = root.iterator();
+        java.util.Iterator<ScriptComponentTree> iterator = root.iterator();
         while (true) {
             if (!iterator.hasNext())
                 break;
-            ScriptComponent component = iterator.next();
+            ScriptComponentTree component = iterator.next();
             componentId++;
 
             if (!loadScriptComponent(component, componentId, bundle))
@@ -372,7 +381,7 @@ class Script {
         return true;
     }
 
-    private boolean loadScriptComponent(ScriptComponent component, int componentId, Bundle bundle) {
+    private boolean loadScriptComponent(ScriptComponentTree component, int componentId, Bundle bundle) {
         String bundleKey = Integer.toString(componentId);
         if (!bundle.containsKey(bundleKey)) {
             lastError = "Script component state can't be restored.";

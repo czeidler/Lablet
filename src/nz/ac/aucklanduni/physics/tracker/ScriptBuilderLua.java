@@ -15,7 +15,7 @@ import java.io.File;
 
 
 interface IScriptComponentFactory {
-    public ScriptComponent create(String componentName, Script script);
+    public ScriptComponentTree create(String componentName, Script script);
 }
 
 class LuaScriptLoader {
@@ -61,17 +61,17 @@ class LuaScriptLoader {
 public class ScriptBuilderLua {
     private IScriptComponentFactory factory;
     private Script script = new Script();
-    private ScriptComponent lastComponent;
+    private ScriptComponentTree lastComponent;
 
     public ScriptBuilderLua(IScriptComponentFactory factory) {
         this.factory = factory;
     }
 
-    public void add(ScriptComponent component) {
-        add(ScriptComponent.SCRIPT_STATE_DONE, component);
+    public void add(ScriptComponentTree component) {
+        add(ScriptComponentTree.SCRIPT_STATE_DONE, component);
     }
 
-    public void add(int state, ScriptComponent component) {
+    public void add(int state, ScriptComponentTree component) {
         if (lastComponent == null) {
             script.setRoot(component);
             lastComponent = component;
@@ -85,7 +85,7 @@ public class ScriptBuilderLua {
         return script;
     }
 
-    public ScriptComponent create(String componentName) {
+    public ScriptComponentTree create(String componentName) {
         return factory.create(componentName, script);
     }
 }

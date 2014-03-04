@@ -7,9 +7,10 @@
  */
 package nz.ac.aucklanduni.physics.tracker;
 
+import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,15 +19,15 @@ import android.widget.*;
 import java.util.List;
 
 
-class TextComponentItem extends ScriptComponentItemViewHolder {
+class TextComponent extends ScriptComponentViewHolder {
     private String text = "";
-    public TextComponentItem (String text) {
+    public TextComponent(String text) {
         this.text = text;
-        setState(ScriptComponent.SCRIPT_STATE_DONE);
+        setState(ScriptComponentTree.SCRIPT_STATE_DONE);
     }
 
     @Override
-    public View createView(Context context) {
+    public View createView(Context context, android.support.v4.app.Fragment parent) {
         TextView textView = new TextView(context);
         textView.setTextAppearance(context, android.R.style.TextAppearance_Medium);
         textView.setText(text);
@@ -39,29 +40,29 @@ class TextComponentItem extends ScriptComponentItemViewHolder {
     }
 }
 
-class CheckBoxQuestion extends ScriptComponentItemViewHolder {
+class CheckBoxQuestion extends ScriptComponentViewHolder {
     private String text = "";
     public CheckBoxQuestion(String text) {
         this.text = text;
-        setState(ScriptComponent.SCRIPT_STATE_ONGOING);
+        setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
     }
 
     @Override
-    public View createView(Context context) {
+    public View createView(Context context, android.support.v4.app.Fragment parent) {
         CheckBox view = new CheckBox(context);
         view.setTextAppearance(context, android.R.style.TextAppearance_Medium);
         view.setText(text);
 
-        if (getState() == ScriptComponent.SCRIPT_STATE_DONE)
+        if (getState() == ScriptComponentTree.SCRIPT_STATE_DONE)
             view.setChecked(true);
-        
+
         view.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
                 if (checked)
-                    setState(ScriptComponent.SCRIPT_STATE_DONE);
+                    setState(ScriptComponentTree.SCRIPT_STATE_DONE);
                 else
-                    setState(ScriptComponent.SCRIPT_STATE_ONGOING);
+                    setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
             }
         });
         return view;
@@ -73,22 +74,22 @@ class CheckBoxQuestion extends ScriptComponentItemViewHolder {
     }
 }
 
-public class ScriptComponentSheet extends ScriptComponentFragmentHolder {
+public class ScriptComponentTreeSheet extends ScriptComponentTreeFragmentHolder {
     private String layoutType = "vertical";
 
-    private ScriptComponentItemContainer<ScriptComponentItemViewHolder> itemContainer
-            = new ScriptComponentItemContainer<ScriptComponentItemViewHolder>();
+    private ScriptComponentContainer<ScriptComponentViewHolder> itemContainer
+            = new ScriptComponentContainer<ScriptComponentViewHolder>();
 
-    public ScriptComponentSheet(Script script) {
+    public ScriptComponentTreeSheet(Script script) {
         super(script);
 
-        itemContainer.setListener(new ScriptComponentItemContainer.IItemContainerListener() {
+        itemContainer.setListener(new ScriptComponentContainer.IItemContainerListener() {
             @Override
             public void onAllItemStatusChanged(boolean allDone) {
                 if (allDone)
-                    setState(ScriptComponent.SCRIPT_STATE_DONE);
+                    setState(ScriptComponentTree.SCRIPT_STATE_DONE);
                 else
-                    setState(ScriptComponent.SCRIPT_STATE_ONGOING);
+                    setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
             }
         });
     }
@@ -99,7 +100,7 @@ public class ScriptComponentSheet extends ScriptComponentFragmentHolder {
     }
 
     @Override
-    public Fragment createFragment() {
+    public android.support.v4.app.Fragment createFragment() {
         ScriptComponentSheetFragment fragment = new ScriptComponentSheetFragment(this);
         return fragment;
     }
@@ -119,7 +120,7 @@ public class ScriptComponentSheet extends ScriptComponentFragmentHolder {
         return itemContainer.fromBundle(bundle);
     }
 
-    public ScriptComponentItemContainer<ScriptComponentItemViewHolder> getItemContainer() {
+    public ScriptComponentContainer<ScriptComponentViewHolder> getItemContainer() {
         return itemContainer;
     }
 
@@ -132,7 +133,7 @@ public class ScriptComponentSheet extends ScriptComponentFragmentHolder {
     }
 
     public void addText(String text) {
-        TextComponentItem textOnlyQuestion = new TextComponentItem(text);
+        TextComponent textOnlyQuestion = new TextComponent(text);
         addItemViewHolder(textOnlyQuestion);
     }
 
@@ -141,16 +142,23 @@ public class ScriptComponentSheet extends ScriptComponentFragmentHolder {
         addItemViewHolder(question);
     }
 
-    protected void addItemViewHolder(ScriptComponentItemViewHolder item) {
+    public ScriptComponentCameraExperiment addCameraExperiment() {
+        ScriptComponentCameraExperiment cameraExperiment = new ScriptComponentCameraExperiment();
+        addItemViewHolder(cameraExperiment);
+        return cameraExperiment;
+    }
+
+    protected void addItemViewHolder(ScriptComponentViewHolder item) {
         itemContainer.addItem(item);
     }
 }
 
 class ScriptComponentSheetFragment extends ScriptComponentGenericFragment {
     private TableLayout sheetLayout = null;
+    private int childFragmentThatHasStartedAnActivity = -1;
     TableRow row;
 
-    public ScriptComponentSheetFragment(ScriptComponentSheet component) {
+    public ScriptComponentSheetFragment(ScriptComponentTreeSheet component) {
         super(component);
     }
 
@@ -168,17 +176,57 @@ class ScriptComponentSheetFragment extends ScriptComponentGenericFragment {
         row = new TableRow(getActivity());
         sheetLayout.addView(row);
 
-        ScriptComponentSheet sheetComponent = (ScriptComponentSheet)component;
+        ScriptComponentTreeSheet sheetComponent = (ScriptComponentTreeSheet)component;
 
-        List<ScriptComponentItemViewHolder> itemList = sheetComponent.getItemContainer().getItems();
+        List<ScriptComponentViewHolder> itemList = sheetComponent.getItemContainer().getItems();
         for (int i = 0; i < itemList.size(); i++) {
-            ScriptComponentItemViewHolder item = itemList.get(i);
-            add(item.createView(getActivity()), i == itemList.size() - 1);
+            ScriptComponentViewHolder item = itemList.get(i);
+            add(item.createView(getActivity(), this), i == itemList.size() - 1);
         }
 
         sheetLayout.setStretchAllColumns(true);
 
         return view;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            childFragmentThatHasStartedAnActivity
+                    = savedInstanceState.getInt("childFragmentThatHasStartedAnActivity", -1);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt("childFragmentThatHasStartedAnActivity", childFragmentThatHasStartedAnActivity);
+    }
+
+    public void setChildFragmentThatHasStartedAnActivity(android.support.v4.app.Fragment fragment) {
+        List<android.support.v4.app.Fragment> fragments = getChildFragmentManager().getFragments();
+        childFragmentThatHasStartedAnActivity = fragments.indexOf(fragment);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // workaround for nested fragments android bug
+        if (childFragmentThatHasStartedAnActivity >= 0) {
+            List<android.support.v4.app.Fragment> fragments = getChildFragmentManager().getFragments();
+            if (fragments.size() <= childFragmentThatHasStartedAnActivity) {
+                super.onActivityResult(requestCode, resultCode, data);
+                childFragmentThatHasStartedAnActivity = -1;
+                return;
+            }
+            android.support.v4.app.Fragment fragment = fragments.get(childFragmentThatHasStartedAnActivity);
+            fragment.onActivityResult(requestCode, resultCode, data);
+            childFragmentThatHasStartedAnActivity = -1;
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void add(View view, boolean isLast) {
@@ -188,7 +236,7 @@ class ScriptComponentSheetFragment extends ScriptComponentGenericFragment {
 
         int xPadding = 20;
         int yPadding = 20;
-        ScriptComponentSheet sheetComponent = (ScriptComponentSheet)component;
+        ScriptComponentTreeSheet sheetComponent = (ScriptComponentTreeSheet)component;
         if (!sheetComponent.getLayoutType().equalsIgnoreCase("horizontal")) {
             row = new TableRow(getActivity());
             sheetLayout.addView(row);

@@ -8,10 +8,12 @@
 package nz.ac.aucklanduni.physics.tracker;
 
 
-abstract public class ScriptComponentFragmentHolder extends ScriptComponent {
+import android.app.Fragment;
+
+abstract public class ScriptComponentTreeFragmentHolder extends ScriptComponentTree {
     protected String title = "";
 
-    public ScriptComponentFragmentHolder(Script script) {
+    public ScriptComponentTreeFragmentHolder(Script script) {
         super(script);
     }
 
@@ -27,19 +29,19 @@ abstract public class ScriptComponentFragmentHolder extends ScriptComponent {
 
 
 class ScriptComponentFragmentFactory implements IScriptComponentFactory {
-    public ScriptComponent create(String componentName, Script script) {
+    public ScriptComponentTree create(String componentName, Script script) {
         if (componentName.equals("Sheet"))
-            return new ScriptComponentSheet(script);
-        if (componentName.equals("CameraExperiment"))
-            return new ScriptComponentCameraExperiment(script);
+            return new ScriptComponentTreeSheet(script);
+        //if (componentName.equals("CameraExperiment"))
+          //  return new ScriptComponentTreeCameraExperiment(script);
         if (componentName.equals("ExperimentSheet"))
-            return new ScriptComponentExperimentSheet(script);
+            return new ScriptComponentTreeExperimentSheet(script);
         if (componentName.equals("ExperimentAnalysis"))
-            return new ScriptComponentExperimentAnalysis(script);
+            return new ScriptComponentTreeExperimentAnalysis(script);
         if (componentName.equals("CalculateXSpeed"))
-            return new ScriptComponentCalculateSpeed(script, true);
+            return new ScriptComponentTreeCalculateSpeed(script, true);
         if (componentName.equals("CalculateYSpeed"))
-            return new ScriptComponentCalculateSpeed(script, false);
+            return new ScriptComponentTreeCalculateSpeed(script, false);
 
         return null;
     }

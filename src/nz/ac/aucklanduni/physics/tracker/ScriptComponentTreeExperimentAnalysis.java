@@ -11,7 +11,6 @@ package nz.ac.aucklanduni.physics.tracker;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,11 +21,11 @@ import android.widget.Toast;
 
 import java.io.File;
 
-public class ScriptComponentExperimentAnalysis extends ScriptComponentFragmentHolder {
+public class ScriptComponentTreeExperimentAnalysis extends ScriptComponentTreeFragmentHolder {
     private ScriptComponentExperiment experiment;
     private String descriptionText = "";
 
-    public ScriptComponentExperimentAnalysis(Script script) {
+    public ScriptComponentTreeExperimentAnalysis(Script script) {
         super(script);
     }
 
@@ -40,7 +39,7 @@ public class ScriptComponentExperimentAnalysis extends ScriptComponentFragmentHo
     }
 
     @Override
-    public Fragment createFragment() {
+    public android.support.v4.app.Fragment createFragment() {
         return new ScriptComponentExperimentAnalysisFragment(this);
     }
 
@@ -66,7 +65,7 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
 
     private CheckedTextView takenExperimentInfo = null;
 
-    public ScriptComponentExperimentAnalysisFragment(ScriptComponentExperimentAnalysis component) {
+    public ScriptComponentExperimentAnalysisFragment(ScriptComponentTreeExperimentAnalysis component) {
         super(component);
     }
 
@@ -78,7 +77,7 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
         View child = setChild(R.layout.script_component_analyze_experiment);
         assert child != null;
 
-        ScriptComponentExperimentAnalysis analysisComponent = (ScriptComponentExperimentAnalysis)this.component;
+        ScriptComponentTreeExperimentAnalysis analysisComponent = (ScriptComponentTreeExperimentAnalysis)this.component;
 
         TextView descriptionTextView = (TextView)child.findViewById(R.id.descriptionText);
         assert descriptionTextView != null;
@@ -92,7 +91,7 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), ExperimentAnalyserActivity.class);
                 intent.putExtra("experiment_path",
-                        ((ScriptComponentExperimentAnalysis)component).getExperiment().getExperimentPath());
+                        ((ScriptComponentTreeExperimentAnalysis)component).getExperiment().getExperimentPath());
                 startActivityForResult(intent, ANALYSE_EXPERIMENT);
             }
         });
@@ -113,12 +112,12 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
         if (!validateAnalysis())
             return;
 
-        setState(ScriptComponent.SCRIPT_STATE_DONE);
+        setState(ScriptComponentTree.SCRIPT_STATE_DONE);
     }
 
     private boolean validateAnalysis() {
         ExperimentAnalysis experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(getActivity(),
-                ((ScriptComponentExperimentAnalysis)component).getExperiment().getExperimentPath());
+                ((ScriptComponentTreeExperimentAnalysis)component).getExperiment().getExperimentPath());
         if (experimentAnalysis == null)
             return false;
 

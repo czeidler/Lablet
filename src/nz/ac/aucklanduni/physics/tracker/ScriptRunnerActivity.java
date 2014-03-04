@@ -9,6 +9,7 @@ package nz.ac.aucklanduni.physics.tracker;
 
 
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,7 +25,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
     private Script script = null;
     private ViewPager pager = null;
     private ScriptFragmentPagerAdapter pagerAdapter = null;
-    private List<ScriptComponent> activeChain = new ArrayList<ScriptComponent>();
+    private List<ScriptComponentTree> activeChain = new ArrayList<ScriptComponentTree>();
     private File scriptUserDataDir = null;
     private File scriptFile = null;
     private String lastErrorMessage = "";
@@ -211,11 +212,11 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
     }
 
     @Override
-    public void onComponentStateChanged(ScriptComponent current, int state) {
+    public void onComponentStateChanged(ScriptComponentTree current, int state) {
         if (pagerAdapter == null)
             return;
 
-        ScriptComponent lastSelectedComponent = null;
+        ScriptComponentTree lastSelectedComponent = null;
         if (activeChain.size() > 0)
             lastSelectedComponent = activeChain.get(pager.getCurrentItem());
         activeChain = script.getActiveChain();
@@ -230,30 +231,30 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
     }
 
     @Override
-    public void onGoToComponent(ScriptComponent next) {
+    public void onGoToComponent(ScriptComponentTree next) {
         int index = activeChain.indexOf(next);
         if (index >0)
             pager.setCurrentItem(index);
     }
 
     private class ScriptFragmentPagerAdapter extends FragmentStatePagerAdapter {
-        private List<ScriptComponent> components;
+        private List<ScriptComponentTree> components;
 
         public ScriptFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager,
-                                          List<ScriptComponent> components) {
+                                          List<ScriptComponentTree> components) {
             super(fragmentManager);
 
             this.components = components;
         }
 
-        public void setComponents(List<ScriptComponent> components) {
+        public void setComponents(List<ScriptComponentTree> components) {
             this.components = components;
             notifyDataSetChanged();
         }
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            ScriptComponentFragmentHolder fragmentCreator = (ScriptComponentFragmentHolder)components.get(position);
+            ScriptComponentTreeFragmentHolder fragmentCreator = (ScriptComponentTreeFragmentHolder)components.get(position);
             return fragmentCreator.createFragment();
         }
 
