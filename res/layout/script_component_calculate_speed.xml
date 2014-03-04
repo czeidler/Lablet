@@ -16,8 +16,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Enter y speed [m/s]:"
-            android:id="@+id/textView" android:layout_row="0" android:layout_column="1"/>
+            android:text="Enter speed [m/s]:"
+            android:id="@+id/enterSpeedTextView" android:layout_row="0" android:layout_column="1"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

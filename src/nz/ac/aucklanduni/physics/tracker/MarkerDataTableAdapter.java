@@ -200,9 +200,9 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
     }
 }
 
-class MarkerDataYSpeedTableAdapter extends MarkerDataTableAdapter {
+abstract class MarkerDataSpeedTableAdapter extends MarkerDataTableAdapter {
 
-    public MarkerDataYSpeedTableAdapter(MarkersDataModel model, ExperimentAnalysis experimentAnalysis) {
+    public MarkerDataSpeedTableAdapter(MarkersDataModel model, ExperimentAnalysis experimentAnalysis) {
         super(model, experimentAnalysis);
     }
 
@@ -226,7 +226,7 @@ class MarkerDataYSpeedTableAdapter extends MarkerDataTableAdapter {
             MarkerData runValueData = getRow(index + 1);
             text += String.format("%.1f", experimentAnalysis.getExperiment().getRunValueAt(runValueData.getRunId()));
         } else if (column == 1)
-            text += String.format("%.2f", getYSpeed(index));
+            text += String.format("%.2f", getSpeed(index));
         else
             throw new IndexOutOfBoundsException();
 
@@ -239,19 +239,53 @@ class MarkerDataYSpeedTableAdapter extends MarkerDataTableAdapter {
         if (column == 0)
             text = experimentAnalysis.getExperiment().getRunValueLabel();
         else if (column == 1)
-            text = "speed [" + experimentAnalysis.getXUnit() + "/" + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
+            text = "speed [" + getUnit() + "/" + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
         else
             throw new IndexOutOfBoundsException();
 
         textView.setText(text);
     }
 
-    public float getYSpeed(int index) {
+    abstract public float getSpeed(int index);
+    abstract public String getUnit();
+}
+
+class MarkerDataYSpeedTableAdapter extends MarkerDataSpeedTableAdapter {
+    public MarkerDataYSpeedTableAdapter(MarkersDataModel model, ExperimentAnalysis experimentAnalysis) {
+        super(model, experimentAnalysis);
+    }
+
+    public float getSpeed(int index) {
         Experiment experiment = experimentAnalysis.getExperiment();
-        float deltaX = model.getCalibratedMarkerPositionAt(index + 1).y - model.getCalibratedMarkerPositionAt(index).y;
+        float delta = model.getCalibratedMarkerPositionAt(index + 1).y - model.getCalibratedMarkerPositionAt(index).y;
         float deltaT = experiment.getRunValueAt(index + 1) - experiment.getRunValueAt(index);
         if (experimentAnalysis.getExperiment().getRunValueUnitPrefix().equals("m"))
             deltaT /= 1000;
-        return deltaX / deltaT;
+        return delta / deltaT;
+    }
+
+    public String getUnit() {
+        return experimentAnalysis.getYUnit();
+    }
+}
+
+class MarkerDataXSpeedTableAdapter extends MarkerDataSpeedTableAdapter {
+    public MarkerDataXSpeedTableAdapter(MarkersDataModel model, ExperimentAnalysis experimentAnalysis) {
+        super(model, experimentAnalysis);
+    }
+
+    @Override
+    public float getSpeed(int index) {
+        Experiment experiment = experimentAnalysis.getExperiment();
+        float delta = model.getCalibratedMarkerPositionAt(index + 1).x - model.getCalibratedMarkerPositionAt(index).x;
+        float deltaT = experiment.getRunValueAt(index + 1) - experiment.getRunValueAt(index);
+        if (experimentAnalysis.getExperiment().getRunValueUnitPrefix().equals("m"))
+            deltaT /= 1000;
+        return delta / deltaT;
+    }
+
+    @Override
+    public String getUnit() {
+        return experimentAnalysis.getXUnit();
     }
 }

@@ -17,14 +17,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 
-public class ScriptComponentCalculateYSpeed extends ScriptComponentFragmentHolder {
+public class ScriptComponentCalculateSpeed extends ScriptComponentFragmentHolder {
     private ScriptComponentExperiment experiment;
+
+    private boolean isXSpeed;
 
     private float speed1 = 0.f;
     private float speed2 = 0.f;
 
-    public ScriptComponentCalculateYSpeed(Script script) {
+    public ScriptComponentCalculateSpeed(Script script, boolean xSpeed) {
         super(script);
+
+        isXSpeed = xSpeed;
     }
 
     @Override
@@ -38,8 +42,10 @@ public class ScriptComponentCalculateYSpeed extends ScriptComponentFragmentHolde
 
     @Override
     public Fragment createFragment() {
-        ScriptComponentCalculateYSpeedFragment fragment = new ScriptComponentCalculateYSpeedFragment(this);
-        return fragment;
+        if (isXSpeed)
+            return new ScriptComponentCalculateXSpeedFragment(this);
+        else
+            return new ScriptComponentCalculateYSpeedFragment(this);
     }
 
     public void setExperiment(ScriptComponentExperiment experiment) {
@@ -84,17 +90,16 @@ public class ScriptComponentCalculateYSpeed extends ScriptComponentFragmentHolde
     }
 }
 
-class ScriptComponentCalculateYSpeedFragment extends ScriptComponentGenericFragment {
+abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGenericFragment {
     private TextView textViewTime1 = null;
     private TextView textViewTime2 = null;
     private EditText editTextTime1 = null;
     private EditText editTextTime2 = null;
     private TableView rawDataTable = null;
-    private TableView ySpeedTable = null;
-    private MarkersDataModel tagMarker = null;
-    private MarkerDataYSpeedTableAdapter speedData = null;
+    private TableView speedTable = null;
+    protected MarkersDataModel tagMarker = null;
 
-    public ScriptComponentCalculateYSpeedFragment(ScriptComponentCalculateYSpeed component) {
+    public ScriptComponentCalculateSpeedFragment(ScriptComponentCalculateSpeed component) {
         super(component);
     }
 
@@ -103,11 +108,15 @@ class ScriptComponentCalculateYSpeedFragment extends ScriptComponentGenericFragm
                              Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        View child = setChild(R.layout.script_component_calculate_yspeed);
+        View child = setChild(R.layout.script_component_calculate_speed);
         assert child != null;
 
         rawDataTable = (TableView)child.findViewById(R.id.dataTable);
         assert rawDataTable != null;
+
+        TextView enterSpeedTextView = (TextView)child.findViewById(R.id.enterSpeedTextView);
+        assert enterSpeedTextView != null;
+        enterSpeedTextView.setText(getEnterSpeedLabel());
 
         textViewTime1 = (TextView)child.findViewById(R.id.textViewTime1);
         assert textViewTime1 != null;
@@ -124,24 +133,24 @@ class ScriptComponentCalculateYSpeedFragment extends ScriptComponentGenericFragm
             @Override
             public void onClick(View view) {
                 if (checkInput()) {
-                    ySpeedTable.setVisibility(View.VISIBLE);
+                    speedTable.setVisibility(View.VISIBLE);
                     setState(ScriptComponent.SCRIPT_STATE_DONE);
                 } else {
-                    ySpeedTable.setVisibility(View.INVISIBLE);
+                    speedTable.setVisibility(View.INVISIBLE);
                     setState(ScriptComponent.SCRIPT_STATE_ONGOING);
                 }
             }
         });
 
-        ySpeedTable = (TableView)child.findViewById(R.id.speedTable);
-        assert ySpeedTable != null;
+        speedTable = (TableView)child.findViewById(R.id.speedTable);
+        assert speedTable != null;
 
         return view;
     }
 
     @Override
     public void onPause() {
-        ScriptComponentCalculateYSpeed speedComponent = (ScriptComponentCalculateYSpeed)component;
+        ScriptComponentCalculateSpeed speedComponent = (ScriptComponentCalculateSpeed)component;
 
         float speed1 = Float.parseFloat(String.valueOf(editTextTime1.getText()));
         float speed2 = Float.parseFloat(String.valueOf(editTextTime2.getText()));
@@ -156,7 +165,7 @@ class ScriptComponentCalculateYSpeedFragment extends ScriptComponentGenericFragm
     public void onResume() {
         super.onResume();
 
-        ScriptComponentCalculateYSpeed speedComponent = (ScriptComponentCalculateYSpeed)component;
+        ScriptComponentCalculateSpeed speedComponent = (ScriptComponentCalculateSpeed)component;
 
         ExperimentAnalysis experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(getActivity(),
                 speedComponent.getExperiment().getExperimentPath());
@@ -183,8 +192,7 @@ class ScriptComponentCalculateYSpeedFragment extends ScriptComponentGenericFragm
         text += "]:";
         textViewTime2.setText(text);
 
-        speedData = new MarkerDataYSpeedTableAdapter(tagMarker, experimentAnalysis);
-        ySpeedTable.setAdapter(speedData);
+        speedTable.setAdapter(createSpeedTableAdapter(experimentAnalysis));
 
         text = "";
         text += speedComponent.getSpeed1();
@@ -194,15 +202,15 @@ class ScriptComponentCalculateYSpeedFragment extends ScriptComponentGenericFragm
         editTextTime2.setText(text);
 
         if (speedComponent.getState() != ScriptComponent.SCRIPT_STATE_DONE)
-            ySpeedTable.setVisibility(View.INVISIBLE);
+            speedTable.setVisibility(View.INVISIBLE);
     }
 
     private boolean checkInput() {
         float speed1 = Float.parseFloat(String.valueOf(editTextTime1.getText()));
         float speed2 = Float.parseFloat(String.valueOf(editTextTime2.getText()));
         // round value to one decimal, this fixes some problem with small speeds values
-        float correctSpeed1 = ((float)Math.round(speedData.getYSpeed(0) * 10)) / 10;
-        float correctSpeed2 = ((float)Math.round(speedData.getYSpeed(1) * 10)) / 10;
+        float correctSpeed1 = ((float)Math.round(getSpeed(0) * 10)) / 10;
+        float correctSpeed2 = ((float)Math.round(getSpeed(1) * 10)) / 10;
 
         float correctMargin = 0.1f;
         if (Math.abs(speed1 - correctSpeed1) > Math.abs(correctSpeed1 * correctMargin)
@@ -213,5 +221,58 @@ class ScriptComponentCalculateYSpeedFragment extends ScriptComponentGenericFragm
             return false;
 
         return true;
+    }
+
+    abstract String getEnterSpeedLabel();
+    abstract float getSpeed(int index);
+    abstract MarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis);
+}
+
+
+class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalculateSpeedFragment {
+    private MarkerDataYSpeedTableAdapter speedData;
+
+    public ScriptComponentCalculateYSpeedFragment(ScriptComponentCalculateSpeed component) {
+        super(component);
+    }
+
+    @Override
+    String getEnterSpeedLabel() {
+        return "Enter y speed [m/s]:";
+    }
+
+    @Override
+    float getSpeed(int index) {
+        return speedData.getSpeed(index);
+    }
+
+    @Override
+    MarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis) {
+        speedData = new MarkerDataYSpeedTableAdapter(tagMarker, experimentAnalysis);
+        return speedData;
+    }
+}
+
+class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpeedFragment {
+    private MarkerDataXSpeedTableAdapter speedData;
+
+    public ScriptComponentCalculateXSpeedFragment(ScriptComponentCalculateSpeed component) {
+        super(component);
+    }
+
+    @Override
+    String getEnterSpeedLabel() {
+        return "Enter x speed [m/s]:";
+    }
+
+    @Override
+    float getSpeed(int index) {
+        return speedData.getSpeed(index);
+    }
+
+    @Override
+    MarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis) {
+        speedData = new MarkerDataXSpeedTableAdapter(tagMarker, experimentAnalysis);
+        return speedData;
     }
 }
