@@ -12,22 +12,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.*;
 
 import java.io.File;
 
 
-class ScriptComponentCameraExperiment extends ScriptComponentFragmentHolder {
+public class ScriptComponentCameraExperiment extends ScriptComponentViewHolder {
     private ScriptComponentExperiment experiment = new ScriptComponentExperiment();
     private String descriptionText = "Please take a video:";
 
     @Override
-    public android.support.v4.app.Fragment createFragment() {
-        return new ScriptComponentCameraExperimentFragment(this);
+    public View createView(Context context, android.support.v4.app.Fragment parent) {
+        return new ScriptComponentCameraExperimentView(context, (ScriptComponentSheetFragment)parent, this);
     }
 
     @Override
@@ -62,22 +60,23 @@ class ScriptComponentCameraExperiment extends ScriptComponentFragmentHolder {
     }
 }
 
-class ScriptComponentCameraExperimentFragment extends android.support.v4.app.Fragment {
+class ScriptComponentCameraExperimentView extends ActivityStarterView {
     static final int PERFORM_EXPERIMENT = 0;
 
     private ScriptComponentCameraExperiment cameraComponent;
     private CheckedTextView takenExperimentInfo = null;
     private VideoView videoView = null;
 
-    public ScriptComponentCameraExperimentFragment(ScriptComponentCameraExperiment component) {
-        this.cameraComponent = component;
-    }
+    public ScriptComponentCameraExperimentView(Context context, ScriptComponentSheetFragment sheetFragment,
+                                               ScriptComponentCameraExperiment cameraComponent) {
+        super(context, sheetFragment);
+        this.cameraComponent = cameraComponent;
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.script_component_camera_experiment, container, false);
+        LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.script_component_camera_experiment, null, false);
         assert view != null;
+
+        addView(view);
 
         TextView descriptionTextView = (TextView)view.findViewById(R.id.descriptionText);
         assert descriptionTextView != null;
@@ -95,35 +94,19 @@ class ScriptComponentCameraExperimentFragment extends android.support.v4.app.Fra
 
         videoView = (VideoView)view.findViewById(R.id.videoView);
         assert videoView != null;
-        MediaController mediaController = new MediaController(getActivity());
+        MediaController mediaController = new MediaController(context);
         mediaController.setAnchorView(videoView);
         videoView.setMediaController(mediaController);
+        videoView.start();
 
         takenExperimentInfo = (CheckedTextView)view.findViewById(R.id.takenExperimentInfo);
         assert takenExperimentInfo != null;
 
         updateExperimentPath();
-
-        return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        videoView.start();
     }
 
     private void startExperimentActivity() {
-        Intent intent = new Intent(getActivity(), CameraExperimentActivity.class);
-        // workaround for nested fragment bug:
-        ScriptComponentSheetFragment parentFragment = (ScriptComponentSheetFragment)getParentFragment();
-        if (parentFragment != null) {
-            parentFragment.setChildFragmentThatHasStartedAnActivity(this);
-            parentFragment.startActivityForResult(intent, PERFORM_EXPERIMENT);
-            return;
-        }
-
+        Intent intent = new Intent(getContext(), CameraExperimentActivity.class);
         startActivityForResult(intent, PERFORM_EXPERIMENT);
     }
 
@@ -155,7 +138,7 @@ class ScriptComponentCameraExperimentFragment extends android.support.v4.app.Fra
         String experimentPath = cameraComponent.getExperiment().getExperimentPath();
 
         ExperimentLoaderResult result = new ExperimentLoaderResult();
-        if (ExperimentLoader.loadExperiment(getActivity(), experimentPath, result)) {
+        if (ExperimentLoader.loadExperiment(getContext(), experimentPath, result)) {
             takenExperimentInfo.setVisibility(View.VISIBLE);
             takenExperimentInfo.setChecked(true);
             File experimentPathFile = new File(experimentPath);

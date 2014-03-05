@@ -9,7 +9,6 @@ package nz.ac.aucklanduni.physics.tracker;
 
 
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -254,8 +253,10 @@ public class ScriptRunnerActivity extends FragmentActivity implements Script.ISc
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            ScriptComponentTreeFragmentHolder fragmentCreator = (ScriptComponentTreeFragmentHolder)components.get(position);
-            return fragmentCreator.createFragment();
+            ScriptComponentTreeFragmentHolder fragmentCreator
+                    = (ScriptComponentTreeFragmentHolder)components.get(position);
+            android.support.v4.app.Fragment fragment = fragmentCreator.createFragment();
+            return fragment;
         }
 
         @Override

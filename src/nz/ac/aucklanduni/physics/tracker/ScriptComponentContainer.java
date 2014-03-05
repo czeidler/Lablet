@@ -107,19 +107,3 @@ class ScriptComponentContainer<ItemType extends ScriptComponent>
 abstract class ScriptComponentViewHolder extends ScriptComponent {
     abstract public View createView(Context context, android.support.v4.app.Fragment parent);
 }
-
-abstract class ScriptComponentFragmentHolder extends ScriptComponentViewHolder {
-
-    @Override
-    public View createView(Context context, android.support.v4.app.Fragment parentFragment) {
-        LinearLayout fragmentView = new LinearLayout(context);
-        int viewId = View.generateViewId();
-        fragmentView.setId(viewId);
-        android.support.v4.app.Fragment fragment = createFragment();
-        parentFragment.getChildFragmentManager().beginTransaction().add(fragmentView.getId(), fragment).commit();
-        return fragmentView;
-    }
-
-    abstract public android.support.v4.app.Fragment createFragment();
-
-}

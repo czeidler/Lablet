@@ -7,7 +7,6 @@
  */
 package nz.ac.aucklanduni.physics.tracker;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -153,9 +152,28 @@ public class ScriptComponentTreeSheet extends ScriptComponentTreeFragmentHolder 
     }
 }
 
+abstract class ActivityStarterView extends FrameLayout {
+    protected ScriptComponentSheetFragment sheetFragment;
+
+    public ActivityStarterView(Context context, ScriptComponentSheetFragment sheetFragment) {
+        super(context);
+
+        setId(View.generateViewId());
+
+        this.sheetFragment = sheetFragment;
+    }
+
+    public void startActivityForResult(android.content.Intent intent, int requestCode) {
+        sheetFragment.startActivityForResultFromView(this, intent, requestCode);
+    }
+
+    abstract public void onActivityResult(int requestCode, int resultCode, Intent data);
+}
+
+
 class ScriptComponentSheetFragment extends ScriptComponentGenericFragment {
     private TableLayout sheetLayout = null;
-    private int childFragmentThatHasStartedAnActivity = -1;
+    private int childViewThatHasStartedAnActivity = -1;
     TableRow row;
 
     public ScriptComponentSheetFragment(ScriptComponentTreeSheet component) {
@@ -194,8 +212,8 @@ class ScriptComponentSheetFragment extends ScriptComponentGenericFragment {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            childFragmentThatHasStartedAnActivity
-                    = savedInstanceState.getInt("childFragmentThatHasStartedAnActivity", -1);
+            childViewThatHasStartedAnActivity
+                    = savedInstanceState.getInt("childViewThatHasStartedAnActivity", -1);
         }
     }
 
@@ -203,27 +221,26 @@ class ScriptComponentSheetFragment extends ScriptComponentGenericFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putInt("childFragmentThatHasStartedAnActivity", childFragmentThatHasStartedAnActivity);
+        outState.putInt("childViewThatHasStartedAnActivity", childViewThatHasStartedAnActivity);
     }
 
-    public void setChildFragmentThatHasStartedAnActivity(android.support.v4.app.Fragment fragment) {
-        List<android.support.v4.app.Fragment> fragments = getChildFragmentManager().getFragments();
-        childFragmentThatHasStartedAnActivity = fragments.indexOf(fragment);
+    public void startActivityForResultFromView(ActivityStarterView view, Intent intent, int requestCode) {
+        childViewThatHasStartedAnActivity = view.getId();
+        startActivityForResult(intent, requestCode);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // workaround for nested fragments android bug
-        if (childFragmentThatHasStartedAnActivity >= 0) {
-            List<android.support.v4.app.Fragment> fragments = getChildFragmentManager().getFragments();
-            if (fragments.size() <= childFragmentThatHasStartedAnActivity) {
+        View view = getView();
+        if (childViewThatHasStartedAnActivity >= 0 && view != null) {
+            ActivityStarterView starterView = (ActivityStarterView)view.findViewById(childViewThatHasStartedAnActivity);
+            if (starterView == null) {
                 super.onActivityResult(requestCode, resultCode, data);
-                childFragmentThatHasStartedAnActivity = -1;
+                childViewThatHasStartedAnActivity = -1;
                 return;
             }
-            android.support.v4.app.Fragment fragment = fragments.get(childFragmentThatHasStartedAnActivity);
-            fragment.onActivityResult(requestCode, resultCode, data);
-            childFragmentThatHasStartedAnActivity = -1;
+            starterView.onActivityResult(requestCode, resultCode, data);
+            childViewThatHasStartedAnActivity = -1;
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);
