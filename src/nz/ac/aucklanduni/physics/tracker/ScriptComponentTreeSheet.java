@@ -10,11 +10,13 @@ package nz.ac.aucklanduni.physics.tracker;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -73,9 +75,111 @@ class CheckBoxQuestion extends ScriptComponentViewHolder {
     }
 }
 
-public class ScriptComponentTreeSheet extends ScriptComponentTreeFragmentHolder {
-    private String layoutType = "vertical";
+abstract class SheetLayout {
+    public abstract View buildLayout(Context context, android.support.v4.app.Fragment parentFragment);
+}
 
+class SheetGroupLayout extends SheetLayout {
+    private List<GroupLayoutItem> items = new ArrayList<GroupLayoutItem>();
+    protected TableRow row;
+    TableLayout layout;
+    boolean isVertical;
+
+    public SheetGroupLayout(boolean isVertical) {
+        this.isVertical = isVertical;
+    }
+
+    public void setOrientation(boolean vertical) {
+        this.isVertical = vertical;
+    }
+
+    abstract public class GroupLayoutItem extends SheetLayout {
+        private float weight = 1.f;
+
+        public float getWeight() {
+            return weight;
+        }
+
+        public void setWeight(float weight) {
+            this.weight = weight;
+        }
+    }
+
+    public class LayoutGroupLayoutItem extends GroupLayoutItem {
+        private SheetLayout layout;
+
+        public LayoutGroupLayoutItem(SheetLayout layout) {
+            this.layout = layout;
+        }
+
+        @Override
+        public View buildLayout(Context context, android.support.v4.app.Fragment parentFragment) {
+            return layout.buildLayout(context, parentFragment);
+        }
+    }
+
+    public class ViewGroupLayoutItem extends GroupLayoutItem {
+        private ScriptComponentViewHolder viewHolder;
+
+        public ViewGroupLayoutItem(ScriptComponentViewHolder viewHolder) {
+            this.viewHolder = viewHolder;
+        }
+
+        @Override
+        public View buildLayout(Context context, android.support.v4.app.Fragment parentFragment) {
+            return viewHolder.createView(context, parentFragment);
+        }
+    }
+
+    public GroupLayoutItem addView(ScriptComponentViewHolder viewHolder) {
+        GroupLayoutItem layoutItem = new ViewGroupLayoutItem(viewHolder);
+        items.add(layoutItem);
+        return layoutItem;
+    }
+
+    public GroupLayoutItem addLayout(SheetLayout layout) {
+        GroupLayoutItem layoutItem = new LayoutGroupLayoutItem(layout);
+        items.add(layoutItem);
+        return layoutItem;
+    }
+
+    @Override
+    public View buildLayout(Context context, Fragment parentFragment) {
+        layout = new TableLayout(context);
+        layout.setStretchAllColumns(true);
+        row = new TableRow(context);
+        layout.addView(row);
+
+        for (int i = 0; i < items.size(); i++)
+            add(context, parentFragment, items.get(i), i == items.size() - 1);
+
+        return layout;
+    }
+
+    protected void add(Context context, Fragment parentFragment, GroupLayoutItem item, boolean isLast) {
+        View view = item.buildLayout(context, parentFragment);
+
+        view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.MATCH_PARENT, item.getWeight()));
+        row.addView(view);
+
+        int xPadding = 20;
+        int yPadding = 20;
+        if (isVertical) {
+            row = new TableRow(context);
+            layout.addView(row);
+
+            if (isLast)
+                yPadding = 0;
+        } else if (isLast)
+            xPadding = 0;
+
+        view.setPadding(0, 0, xPadding, yPadding);
+    }
+}
+
+public class ScriptComponentTreeSheet extends ScriptComponentTreeFragmentHolder {
+    private SheetGroupLayout sheetGroupLayout = new SheetGroupLayout(true);
     private ScriptComponentContainer<ScriptComponentViewHolder> itemContainer
             = new ScriptComponentContainer<ScriptComponentViewHolder>();
 
@@ -91,6 +195,10 @@ public class ScriptComponentTreeSheet extends ScriptComponentTreeFragmentHolder 
                     setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
             }
         });
+    }
+
+    public SheetLayout getSheetLayout() {
+        return sheetGroupLayout;
     }
 
     @Override
@@ -119,16 +227,11 @@ public class ScriptComponentTreeSheet extends ScriptComponentTreeFragmentHolder 
         return itemContainer.fromBundle(bundle);
     }
 
-    public ScriptComponentContainer<ScriptComponentViewHolder> getItemContainer() {
-        return itemContainer;
-    }
-
-    public void setLayoutType(String layout) {
-        layoutType = layout;
-    }
-
-    public String getLayoutType() {
-        return layoutType;
+    public void setLayoutType(String layoutType) {
+        if (layoutType.equalsIgnoreCase("horizontal"))
+            sheetGroupLayout.setOrientation(false);
+        else
+            sheetGroupLayout.setOrientation(true);
     }
 
     public void addText(String text) {
@@ -149,6 +252,7 @@ public class ScriptComponentTreeSheet extends ScriptComponentTreeFragmentHolder 
 
     protected void addItemViewHolder(ScriptComponentViewHolder item) {
         itemContainer.addItem(item);
+        sheetGroupLayout.addView(item);
     }
 }
 
@@ -172,9 +276,8 @@ abstract class ActivityStarterView extends FrameLayout {
 
 
 class ScriptComponentSheetFragment extends ScriptComponentGenericFragment {
-    private TableLayout sheetLayout = null;
+    private FrameLayout sheetLayout = null;
     private int childViewThatHasStartedAnActivity = -1;
-    TableRow row;
 
     public ScriptComponentSheetFragment(ScriptComponentTreeSheet component) {
         super(component);
@@ -188,21 +291,12 @@ class ScriptComponentSheetFragment extends ScriptComponentGenericFragment {
         View child = setChild(R.layout.script_component_sheet_fragment);
         assert child != null;
 
-        sheetLayout = (TableLayout)child.findViewById(R.id.sheetLayout);
+        sheetLayout = (FrameLayout)child.findViewById(R.id.sheetLayout);
         assert sheetLayout != null;
 
-        row = new TableRow(getActivity());
-        sheetLayout.addView(row);
-
         ScriptComponentTreeSheet sheetComponent = (ScriptComponentTreeSheet)component;
-
-        List<ScriptComponentViewHolder> itemList = sheetComponent.getItemContainer().getItems();
-        for (int i = 0; i < itemList.size(); i++) {
-            ScriptComponentViewHolder item = itemList.get(i);
-            add(item.createView(getActivity(), this), i == itemList.size() - 1);
-        }
-
-        sheetLayout.setStretchAllColumns(true);
+        View sheetView = sheetComponent.getSheetLayout().buildLayout(getActivity(), this);
+        sheetLayout.addView(sheetView);
 
         return view;
     }
@@ -244,25 +338,5 @@ class ScriptComponentSheetFragment extends ScriptComponentGenericFragment {
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void add(View view, boolean isLast) {
-        view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
-                TableRow.LayoutParams.MATCH_PARENT, 1f));
-        row.addView(view);
-
-        int xPadding = 20;
-        int yPadding = 20;
-        ScriptComponentTreeSheet sheetComponent = (ScriptComponentTreeSheet)component;
-        if (!sheetComponent.getLayoutType().equalsIgnoreCase("horizontal")) {
-            row = new TableRow(getActivity());
-            sheetLayout.addView(row);
-
-            if (isLast)
-                yPadding = 0;
-        } else if (isLast)
-            xPadding = 0;
-
-        view.setPadding(0, 0, xPadding, yPadding);
     }
 }
