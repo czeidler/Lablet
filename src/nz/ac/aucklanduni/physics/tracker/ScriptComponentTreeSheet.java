@@ -10,14 +10,10 @@ package nz.ac.aucklanduni.physics.tracker;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 class TextComponent extends ScriptComponentViewHolder {
@@ -76,107 +72,23 @@ class CheckBoxQuestion extends ScriptComponentViewHolder {
 }
 
 abstract class SheetLayout {
+    protected ISheetLayoutItemParameters parameters;
+
+    public SheetLayout() {
+        this.parameters = new SheetGroupLayoutParameters();
+    }
+
+    public SheetLayout(ISheetLayoutItemParameters parameters) {
+        this.parameters = parameters;
+    }
+
+    public ISheetLayoutItemParameters getParameters() {
+        return parameters;
+    }
+
     public abstract View buildLayout(Context context, android.support.v4.app.Fragment parentFragment);
 }
 
-class SheetGroupLayout extends SheetLayout {
-    private List<GroupLayoutItem> items = new ArrayList<GroupLayoutItem>();
-    protected TableRow row;
-    TableLayout layout;
-    boolean isVertical;
-
-    public SheetGroupLayout(boolean isVertical) {
-        this.isVertical = isVertical;
-    }
-
-    public void setOrientation(boolean vertical) {
-        this.isVertical = vertical;
-    }
-
-    abstract public class GroupLayoutItem extends SheetLayout {
-        private float weight = 1.f;
-
-        public float getWeight() {
-            return weight;
-        }
-
-        public void setWeight(float weight) {
-            this.weight = weight;
-        }
-    }
-
-    public class LayoutGroupLayoutItem extends GroupLayoutItem {
-        private SheetLayout layout;
-
-        public LayoutGroupLayoutItem(SheetLayout layout) {
-            this.layout = layout;
-        }
-
-        @Override
-        public View buildLayout(Context context, android.support.v4.app.Fragment parentFragment) {
-            return layout.buildLayout(context, parentFragment);
-        }
-    }
-
-    public class ViewGroupLayoutItem extends GroupLayoutItem {
-        private ScriptComponentViewHolder viewHolder;
-
-        public ViewGroupLayoutItem(ScriptComponentViewHolder viewHolder) {
-            this.viewHolder = viewHolder;
-        }
-
-        @Override
-        public View buildLayout(Context context, android.support.v4.app.Fragment parentFragment) {
-            return viewHolder.createView(context, parentFragment);
-        }
-    }
-
-    public GroupLayoutItem addView(ScriptComponentViewHolder viewHolder) {
-        GroupLayoutItem layoutItem = new ViewGroupLayoutItem(viewHolder);
-        items.add(layoutItem);
-        return layoutItem;
-    }
-
-    public GroupLayoutItem addLayout(SheetLayout layout) {
-        GroupLayoutItem layoutItem = new LayoutGroupLayoutItem(layout);
-        items.add(layoutItem);
-        return layoutItem;
-    }
-
-    @Override
-    public View buildLayout(Context context, Fragment parentFragment) {
-        layout = new TableLayout(context);
-        layout.setStretchAllColumns(true);
-        row = new TableRow(context);
-        layout.addView(row);
-
-        for (int i = 0; i < items.size(); i++)
-            add(context, parentFragment, items.get(i), i == items.size() - 1);
-
-        return layout;
-    }
-
-    protected void add(Context context, Fragment parentFragment, GroupLayoutItem item, boolean isLast) {
-        View view = item.buildLayout(context, parentFragment);
-
-        view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
-                TableRow.LayoutParams.MATCH_PARENT, item.getWeight()));
-        row.addView(view);
-
-        int xPadding = 20;
-        int yPadding = 20;
-        if (isVertical) {
-            row = new TableRow(context);
-            layout.addView(row);
-
-            if (isLast)
-                yPadding = 0;
-        } else if (isLast)
-            xPadding = 0;
-
-        view.setPadding(0, 0, xPadding, yPadding);
-    }
-}
 
 public class ScriptComponentTreeSheet extends ScriptComponentTreeFragmentHolder {
     private SheetGroupLayout sheetGroupLayout = new SheetGroupLayout(true);
@@ -234,25 +146,42 @@ public class ScriptComponentTreeSheet extends ScriptComponentTreeFragmentHolder 
             sheetGroupLayout.setOrientation(true);
     }
 
-    public void addText(String text) {
+    public ScriptComponentViewHolder addText(String text, SheetGroupLayout parent) {
         TextComponent textOnlyQuestion = new TextComponent(text);
-        addItemViewHolder(textOnlyQuestion);
+        addItemViewHolder(textOnlyQuestion, parent);
+        return textOnlyQuestion;
     }
 
-    public void addCheckQuestion(String text) {
+    public ScriptComponentViewHolder addCheckQuestion(String text, SheetGroupLayout parent) {
         CheckBoxQuestion question = new CheckBoxQuestion(text);
-        addItemViewHolder(question);
+        addItemViewHolder(question, parent);
+        return question;
     }
 
-    public ScriptComponentCameraExperiment addCameraExperiment() {
+    public ScriptComponentCameraExperiment addCameraExperiment(SheetGroupLayout parent) {
         ScriptComponentCameraExperiment cameraExperiment = new ScriptComponentCameraExperiment();
-        addItemViewHolder(cameraExperiment);
+        addItemViewHolder(cameraExperiment, parent);
         return cameraExperiment;
     }
 
-    protected void addItemViewHolder(ScriptComponentViewHolder item) {
+    public SheetGroupLayout addGroupLayout(boolean vertical, SheetGroupLayout parent) {
+        SheetGroupLayout layout = new SheetGroupLayout(vertical);
+        if (parent == null)
+            sheetGroupLayout.addLayout(layout);
+        else
+            parent.addLayout(layout);
+        return layout;
+    }
+
+    protected SheetLayout addItemViewHolder(ScriptComponentViewHolder item,
+                                                                 SheetGroupLayout parent) {
         itemContainer.addItem(item);
-        sheetGroupLayout.addView(item);
+        SheetLayout layoutItem;
+        if (parent == null)
+            layoutItem = sheetGroupLayout.addView(item);
+        else
+            layoutItem = parent.addView(item);
+        return layoutItem;
     }
 }
 

@@ -106,31 +106,31 @@ public class ScriptComponentTreeExperimentSheet extends ScriptComponentTreeSheet
         super(script);
     }
 
-    public GraphViewHolder addGraph(ScriptComponentExperiment experiment) {
+    public GraphViewHolder addGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
         GraphViewHolder item = new GraphViewHolder(this, experiment);
-        addItemViewHolder(item);
+        addItemViewHolder(item, parent);
         return item;
     }
 
-    public void addPositionGraph(ScriptComponentExperiment experiment) {
+    public void addPositionGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
         GraphViewHolder item = new GraphViewHolder(this, experiment);
-        addItemViewHolder(item);
+        addItemViewHolder(item, parent);
     }
 
-    public void addXSpeedGraph(ScriptComponentExperiment experiment) {
+    public void addXSpeedGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
         GraphViewHolder item = new GraphViewHolder(this, experiment);
         item.setTitle("X-Speed vs. Time");
         item.setXAxisContent("time");
         item.setYAxisContent("x-speed");
-        addItemViewHolder(item);
+        addItemViewHolder(item, parent);
     }
 
-    public void addYSpeedGraph(ScriptComponentExperiment experiment) {
+    public void addYSpeedGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
         GraphViewHolder item = new GraphViewHolder(this, experiment);
         item.setTitle("Y-Speed vs. Time");
         item.setXAxisContent("time");
         item.setYAxisContent("y-speed");
-        addItemViewHolder(item);
+        addItemViewHolder(item, parent);
     }
 
     public ExperimentAnalysis getExperimentAnalysis(Context context, ScriptComponentExperiment experiment) {

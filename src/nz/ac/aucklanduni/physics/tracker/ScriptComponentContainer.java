@@ -104,6 +104,16 @@ class ScriptComponentContainer<ItemType extends ScriptComponent>
     }
 }
 
-abstract class ScriptComponentViewHolder extends ScriptComponent {
+abstract class ScriptComponentViewHolder extends ScriptComponent implements ISheetLayoutItemParameters {
+    private float weight = 1.f;
+
     abstract public View createView(Context context, android.support.v4.app.Fragment parent);
+
+    public void setWeight(float weight) {
+        this.weight = weight;
+    }
+
+    public float getWeight() {
+        return weight;
+    }
 }
