@@ -112,6 +112,8 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
 
         if (!validateAnalysis()) {
             setState(ScriptComponent.SCRIPT_STATE_ONGOING);
+            Toast toast = Toast.makeText(getActivity(), "Mark more data points!", Toast.LENGTH_LONG);
+            toast.show();
             return;
         }
 
@@ -122,7 +124,7 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
     public void onResume() {
         super.onResume();
 
-        if (!validateAnalysis())
+        if (component.getState() >= ScriptComponent.SCRIPT_STATE_DONE && !validateAnalysis())
             setState(ScriptComponent.SCRIPT_STATE_ONGOING);
     }
 
@@ -132,11 +134,8 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
         if (experimentAnalysis == null)
             return false;
 
-        if (experimentAnalysis.getTagMarkers().getMarkerCount() < 3) {
-            Toast toast = Toast.makeText(getActivity(), "Mark more data points!", Toast.LENGTH_LONG);
-            toast.show();
+        if (experimentAnalysis.getTagMarkers().getMarkerCount() < 3)
             return false;
-        }
 
         return true;
     }
