@@ -34,7 +34,7 @@
         <FrameLayout
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent" android:layout_gravity="center">
-            <view class="nz.ac.aucklanduni.physics.tracker.RatioSurfaceView"
+            <view class="nz.ac.aucklanduni.physics.tracker.views.RatioSurfaceView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/surfaceView"

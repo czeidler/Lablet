@@ -17,6 +17,8 @@ import android.os.Bundle;
 import android.os.FileObserver;
 import android.view.*;
 import android.widget.*;
+import nz.ac.aucklanduni.physics.tracker.views.CheckBoxAdapter;
+import nz.ac.aucklanduni.physics.tracker.views.CheckBoxListEntry;
 
 import java.io.File;
 import java.util.ArrayList;

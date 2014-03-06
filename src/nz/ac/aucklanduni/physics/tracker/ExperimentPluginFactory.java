@@ -7,6 +7,8 @@
  */
 package nz.ac.aucklanduni.physics.tracker;
 
+import nz.ac.aucklanduni.physics.tracker.camera.CameraExperimentPlugin;
+
 import java.util.ArrayList;
 import java.util.List;
 

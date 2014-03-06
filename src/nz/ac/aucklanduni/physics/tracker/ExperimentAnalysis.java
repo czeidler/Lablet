@@ -16,7 +16,7 @@ import java.util.List;
 
 
 public class ExperimentAnalysis {
-    interface IExperimentAnalysisListener {
+    public interface IExperimentAnalysisListener {
         void onUnitPrefixChanged();
         void onShowCoordinateSystem(boolean show);
     }

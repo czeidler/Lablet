@@ -15,18 +15,6 @@ import android.text.format.Time;
 import java.io.File;
 
 
-interface IExperimentRunView {
-    public void setCurrentRun(int run);
-
-    // convert a coordinate on the screen to the real value of the measurement
-    public void fromScreen(PointF screen, PointF real);
-    public void toScreen(PointF real, PointF screen);
-
-    public float getMaxRawX();
-    public float getMaxRawY();
-}
-
-
 abstract public class Experiment {
     private String uid;
     private File storageDir;

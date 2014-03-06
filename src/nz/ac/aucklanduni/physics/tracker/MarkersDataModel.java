@@ -13,30 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-class MarkerData {
-    private int runId;
-    private PointF positionReal;
-
-    public MarkerData(int run) {
-        runId = run;
-        positionReal = new PointF();
-    }
-
-    public int getRunId() {
-        return runId;
-    }
-
-    public PointF getPosition() {
-        return positionReal;
-    }
-
-    public void setPosition(PointF positionReal) {
-        this.positionReal.set(positionReal);
-    }
-}
-
 public class MarkersDataModel implements Calibration.ICalibrationListener {
-    interface IMarkersDataModelListener {
+    public interface IMarkersDataModelListener {
         public void onDataAdded(MarkersDataModel model, int index);
         public void onDataRemoved(MarkersDataModel model, int index, MarkerData data);
         public void onDataChanged(MarkersDataModel model, int index, int number);

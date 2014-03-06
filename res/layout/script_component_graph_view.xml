@@ -7,6 +7,6 @@
 
     <view android:layout_width="match_parent"
           android:layout_height="match_parent"
-          class="nz.ac.aucklanduni.physics.tracker.GraphView2D" android:id="@+id/graphView" android:layout_gravity="right"
+          class="nz.ac.aucklanduni.physics.tracker.views.graph.GraphView2D" android:id="@+id/graphView" android:layout_gravity="right"
           android:minHeight="300dp" android:minWidth="200dp"/>
 </LinearLayout>

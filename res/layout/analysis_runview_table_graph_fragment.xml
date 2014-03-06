@@ -19,7 +19,7 @@
               android:layout_alignParentBottom="true"/>
         <view android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              class="nz.ac.aucklanduni.physics.tracker.RunContainerView" android:id="@+id/experimentRunContainer"
+              class="nz.ac.aucklanduni.physics.tracker.views.RunContainerView" android:id="@+id/experimentRunContainer"
               android:layout_alignParentLeft="true" android:layout_alignParentRight="true"
               android:layout_alignParentTop="true"
               android:layout_marginLeft="0dp" android:layout_marginTop="0dp"/>
@@ -31,7 +31,7 @@
             android:layout_height="fill_parent">
         <view android:layout_width="wrap_content"
               android:layout_height="268dp"
-              class="nz.ac.aucklanduni.physics.tracker.GraphView2D" android:id="@+id/tagMarkerGraphView"
+              class="nz.ac.aucklanduni.physics.tracker.views.graph.GraphView2D" android:id="@+id/tagMarkerGraphView"
               android:layout_gravity="center_horizontal"/>
         <ScrollView
                 android:layout_width="wrap_content"
@@ -39,7 +39,7 @@
                 android:id="@+id/scrollView" android:layout_gravity="center_horizontal">
             <view android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  class="nz.ac.aucklanduni.physics.tracker.TableView" android:id="@+id/tagMarkerTableView"/>
+                  class="nz.ac.aucklanduni.physics.tracker.views.table.TableView" android:id="@+id/tagMarkerTableView"/>
         </ScrollView>
     </LinearLayout>
 </LinearLayout>

@@ -15,7 +15,7 @@ import android.view.View;
 import java.io.File;
 
 
-interface ExperimentPlugin {
+public interface ExperimentPlugin {
     public String getName();
     public void startExperimentActivity(Activity parentActivity, int requestCode);
 

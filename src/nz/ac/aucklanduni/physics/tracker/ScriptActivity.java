@@ -11,13 +11,16 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
+import nz.ac.aucklanduni.physics.tracker.views.CheckBoxAdapter;
+import nz.ac.aucklanduni.physics.tracker.script.Script;
+import nz.ac.aucklanduni.physics.tracker.script.ScriptRunnerActivity;
+import nz.ac.aucklanduni.physics.tracker.views.CheckBoxListEntry;
 
 import java.io.*;
 import java.util.ArrayList;

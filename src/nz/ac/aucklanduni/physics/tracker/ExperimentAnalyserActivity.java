@@ -7,7 +7,6 @@
  */
 package nz.ac.aucklanduni.physics.tracker;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
@@ -17,6 +16,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.*;
 import android.widget.PopupMenu;
+import nz.ac.aucklanduni.physics.tracker.views.CalibrationView;
 
 import java.io.*;
 
@@ -145,7 +145,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode != Activity.RESULT_OK)
+        if (resultCode != RESULT_OK)
             return;
 
         if (requestCode == PERFORM_RUN_SETTINGS) {

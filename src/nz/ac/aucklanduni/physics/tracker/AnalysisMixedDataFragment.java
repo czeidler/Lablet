@@ -11,6 +11,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import nz.ac.aucklanduni.physics.tracker.*;
+import nz.ac.aucklanduni.physics.tracker.views.RunContainerView;
+import nz.ac.aucklanduni.physics.tracker.views.graph.GraphView2D;
+import nz.ac.aucklanduni.physics.tracker.views.graph.MarkerGraphAdapter;
+import nz.ac.aucklanduni.physics.tracker.views.graph.XPositionMarkerGraphAxis;
+import nz.ac.aucklanduni.physics.tracker.views.graph.YPositionMarkerGraphAxis;
+import nz.ac.aucklanduni.physics.tracker.views.table.MarkerDataTableAdapter;
+import nz.ac.aucklanduni.physics.tracker.views.table.TableView;
 
 public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
     private RunContainerView runContainerView = null;

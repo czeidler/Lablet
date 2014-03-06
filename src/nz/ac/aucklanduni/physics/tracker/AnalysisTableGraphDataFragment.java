@@ -11,6 +11,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import nz.ac.aucklanduni.physics.tracker.ExperimentAnalyserActivity;
+import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
+import nz.ac.aucklanduni.physics.tracker.R;
+import nz.ac.aucklanduni.physics.tracker.views.graph.*;
+import nz.ac.aucklanduni.physics.tracker.views.table.MarkerDataTableAdapter;
+import nz.ac.aucklanduni.physics.tracker.views.table.TableView;
 
 public class AnalysisTableGraphDataFragment extends android.support.v4.app.Fragment {
     private TableView tableView = null;

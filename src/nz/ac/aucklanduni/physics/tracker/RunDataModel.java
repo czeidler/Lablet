@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-class RunDataModel {
-    interface IRunDataModelListener {
+public class RunDataModel {
+    public interface IRunDataModelListener {
         public void onRunChanged(int newRun);
         public void onNumberOfRunsChanged();
     }
