@@ -105,14 +105,25 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
         return view;
     }
 
+    @Override
     public void onActivityResult (int requestCode, int resultCode, Intent data) {
         if (resultCode != Activity.RESULT_OK)
             return;
 
-        if (!validateAnalysis())
+        if (!validateAnalysis()) {
+            setState(ScriptComponent.SCRIPT_STATE_ONGOING);
             return;
+        }
 
-        setState(ScriptComponentTree.SCRIPT_STATE_DONE);
+        setState(ScriptComponent.SCRIPT_STATE_DONE);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (!validateAnalysis())
+            setState(ScriptComponent.SCRIPT_STATE_ONGOING);
     }
 
     private boolean validateAnalysis() {
