@@ -17,8 +17,7 @@ import nz.ac.aucklanduni.physics.tracker.views.graph.GraphView2D;
 import nz.ac.aucklanduni.physics.tracker.views.graph.MarkerGraphAdapter;
 import nz.ac.aucklanduni.physics.tracker.views.graph.XPositionMarkerGraphAxis;
 import nz.ac.aucklanduni.physics.tracker.views.graph.YPositionMarkerGraphAxis;
-import nz.ac.aucklanduni.physics.tracker.views.table.MarkerDataTableAdapter;
-import nz.ac.aucklanduni.physics.tracker.views.table.TableView;
+import nz.ac.aucklanduni.physics.tracker.views.table.*;
 
 public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
     private RunContainerView runContainerView = null;
@@ -51,8 +50,13 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         // marker table view
         tableView = (TableView)view.findViewById(R.id.tagMarkerTableView);
         assert tableView != null;
-        tableView.setAdapter(new MarkerDataTableAdapter(experimentAnalysis.getTagMarkers(),
-                experimentAnalysis));
+        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(experimentAnalysis.getTagMarkers(),
+                experimentAnalysis);
+        adapter.addColumn(new RunIdDataTableColumn());
+        adapter.addColumn(new TimeDataTableColumn());
+        adapter.addColumn(new XPositionDataTableColumn());
+        adapter.addColumn(new YPositionDataTableColumn());
+        tableView.setAdapter(adapter);
 
         // marker graph view
         graphView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);

@@ -11,12 +11,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import nz.ac.aucklanduni.physics.tracker.ExperimentAnalyserActivity;
-import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.tracker.R;
 import nz.ac.aucklanduni.physics.tracker.views.graph.*;
-import nz.ac.aucklanduni.physics.tracker.views.table.MarkerDataTableAdapter;
-import nz.ac.aucklanduni.physics.tracker.views.table.TableView;
+import nz.ac.aucklanduni.physics.tracker.views.table.*;
+
 
 public class AnalysisTableGraphDataFragment extends android.support.v4.app.Fragment {
     private TableView tableView = null;
@@ -36,8 +33,13 @@ public class AnalysisTableGraphDataFragment extends android.support.v4.app.Fragm
         // marker table view
         tableView = (TableView)view.findViewById(R.id.tagMarkerTableView);
         assert tableView != null;
-        tableView.setAdapter(new MarkerDataTableAdapter(experimentAnalysis.getTagMarkers(),
-                experimentAnalysis));
+        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(experimentAnalysis.getTagMarkers(),
+                experimentAnalysis);
+        adapter.addColumn(new RunIdDataTableColumn());
+        adapter.addColumn(new TimeDataTableColumn());
+        adapter.addColumn(new XPositionDataTableColumn());
+        adapter.addColumn(new YPositionDataTableColumn());
+        tableView.setAdapter(adapter);
 
         // marker graph view
         graphView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);

@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.view.View;
 import android.widget.TextView;
+import nz.ac.aucklanduni.physics.tracker.Experiment;
 import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.tracker.MarkerData;
 import nz.ac.aucklanduni.physics.tracker.MarkersDataModel;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, MarkersDataModel.IMarkersDataModelListener,
+abstract class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, MarkersDataModel.IMarkersDataModelListener,
         ExperimentAnalysis.IExperimentAnalysisListener {
     protected MarkersDataModel model;
     protected ExperimentAnalysis experimentAnalysis;
@@ -40,19 +41,8 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
     }
 
     @Override
-    public int getRowCount() {
-        // markers plus header
-        return model.getMarkerCount() + 1;
-    }
-
-    @Override
     public int getColumnWeight(int column) {
         return 1;
-    }
-
-    @Override
-    public int getColumnCount() {
-        return 4;
     }
 
     @Override
@@ -69,7 +59,7 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
         textView.setTextColor(Color.BLACK);
         textView.setBackgroundColor(Color.WHITE);
 
-        populateTextView(textView, row, column);
+        populateTextView(textView, row - 1, column);
 
         return textView;
     }
@@ -80,27 +70,10 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
             populateHeaderView((TextView)view, column);
             return;
         }
-        populateTextView((TextView)view, row, column);
+        populateTextView((TextView)view, row - 1, column);
     }
 
-    protected void populateTextView(TextView textView, int row, int column) {
-        MarkerData data = getRow(row - 1);
-
-        PointF position = model.getCalibratedMarkerPositionAt(row - 1);
-        String text = "";
-        if (column == 0)
-            text += data.getRunId();
-        else if (column == 1)
-            text += String.format("%.2f", position.x);
-        else if (column == 2)
-            text += String.format("%.2f", position.y);
-        else if (column == 3)
-            text += String.format("%.1f", experimentAnalysis.getExperiment().getRunValueAt(data.getRunId()));
-        else
-            throw new IndexOutOfBoundsException();
-
-        textView.setText(text);
-    }
+    abstract protected void populateTextView(TextView textView, int index, int column);
 
     private View makeHeaderCell(Context context, int column) {
         TextView textView = new TextView(context);
@@ -110,21 +83,7 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
         return textView;
     }
 
-    protected void populateHeaderView(TextView textView, int column) {
-        String text;
-        if (column == 0)
-            text = "id";
-        else if (column == 1)
-            text = "x [" + experimentAnalysis.getXUnit() + "]";
-        else if (column == 2)
-            text = "y [" + experimentAnalysis.getYUnit() + "]";
-        else if (column == 3)
-            text = experimentAnalysis.getExperiment().getRunValueLabel();
-        else
-            throw new IndexOutOfBoundsException();
-
-        textView.setText(text);
-    }
+    abstract protected void populateHeaderView(TextView textView, int column);
 
     @Override
     public void selectRow(int row) {
@@ -203,53 +162,79 @@ public class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Marker
     }
 }
 
-abstract class MarkerDataSpeedTableAdapter extends MarkerDataTableAdapter {
+abstract class DataTableColumn {
+    protected MarkersDataModel markersDataModel;
+    protected ExperimentAnalysis experimentAnalysis;
 
-    public MarkerDataSpeedTableAdapter(MarkersDataModel model, ExperimentAnalysis experimentAnalysis) {
+    public void setMarkersDataModel(MarkersDataModel model) {
+        this.markersDataModel = model;
+    }
+
+    public void setExperimentAnalysis(ExperimentAnalysis experimentAnalysis) {
+        this.experimentAnalysis = experimentAnalysis;
+    }
+
+    abstract public int size();
+    abstract public Number getValue(int index);
+    public String getStringValue(int index) {
+        Number number = getValue(index);
+        return String.format("%.2f", number.floatValue());
+    }
+    abstract public String getHeader();
+}
+
+public class ColumnMarkerDataTableAdapter extends MarkerDataTableAdapter {
+    private List<DataTableColumn> columns = new ArrayList<DataTableColumn>();
+
+    public ColumnMarkerDataTableAdapter(MarkersDataModel model, ExperimentAnalysis experimentAnalysis) {
         super(model, experimentAnalysis);
+    }
+
+    public void addColumn(DataTableColumn column) {
+        column.setMarkersDataModel(model);
+        column.setExperimentAnalysis(experimentAnalysis);
+        columns.add(column);
     }
 
     @Override
     public int getRowCount() {
-        return super.getRowCount() - 1;
+        if (columns.size() == 0)
+            return 0;
+
+        int rowCount = Integer.MAX_VALUE;
+        for (DataTableColumn column : columns) {
+            int currentRowCount = column.size();
+            if (currentRowCount < rowCount)
+                rowCount = currentRowCount;
+
+        }
+
+        return rowCount + 1;
     }
 
     @Override
     public int getColumnCount() {
-        return 2;
+        return columns.size();
     }
 
     @Override
-    protected void populateTextView(TextView textView, int row, int column) {
-        int index = row - 1;
-
-        PointF position = model.getCalibratedMarkerPositionAt(index);
-        String text = "";
-        if (column == 0) {
-            MarkerData runValueData = getRow(index + 1);
-            text += String.format("%.1f", experimentAnalysis.getExperiment().getRunValueAt(runValueData.getRunId()));
-        } else if (column == 1)
-            text += String.format("%.2f", getSpeed(index));
-        else
+    protected void populateTextView(TextView textView, int index, int columnNumber) {
+        DataTableColumn column = columns.get(columnNumber);
+        if (column == null)
             throw new IndexOutOfBoundsException();
 
+        String text = column.getStringValue(index);
         textView.setText(text);
     }
 
     @Override
-    protected void populateHeaderView(TextView textView, int column) {
-        String text;
-        if (column == 0)
-            text = experimentAnalysis.getExperiment().getRunValueLabel();
-        else if (column == 1)
-            text = "speed [" + getUnit() + "/" + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
-        else
+    protected void populateHeaderView(TextView textView, int columnNumber) {
+        DataTableColumn column = columns.get(columnNumber);
+        if (column == null)
             throw new IndexOutOfBoundsException();
 
-        textView.setText(text);
+        textView.setText(column.getHeader());
     }
-
-    abstract public float getSpeed(int index);
-    abstract public String getUnit();
 }
+
 
