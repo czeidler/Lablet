@@ -15,10 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import nz.ac.aucklanduni.physics.tracker.*;
-import nz.ac.aucklanduni.physics.tracker.views.table.MarkerDataTableAdapter;
-import nz.ac.aucklanduni.physics.tracker.views.table.MarkerDataXSpeedTableAdapter;
-import nz.ac.aucklanduni.physics.tracker.views.table.MarkerDataYSpeedTableAdapter;
-import nz.ac.aucklanduni.physics.tracker.views.table.TableView;
+import nz.ac.aucklanduni.physics.tracker.views.table.*;
 
 
 public class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragmentHolder {
@@ -26,8 +23,12 @@ public class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragme
 
     private boolean isXSpeed;
 
+    private float position1 = 0.f;
+    private float position2 = 0.f;
+    private float position3 = 0.f;
     private float speed1 = 0.f;
     private float speed2 = 0.f;
+    private float acceleration1 = 0.f;
 
     public ScriptComponentTreeCalculateSpeed(Script script, boolean xSpeed) {
         super(script);
@@ -60,6 +61,30 @@ public class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragme
         return experiment;
     }
 
+    public float getPosition1() {
+        return position1;
+    }
+
+    public void setPosition1(float position1) {
+        this.position1 = position1;
+    }
+
+    public float getPosition2() {
+        return position2;
+    }
+
+    public void setPosition2(float position2) {
+        this.position2 = position2;
+    }
+
+    public float getPosition3() {
+        return position3;
+    }
+
+    public void setPosition3(float position3) {
+        this.position3 = position3;
+    }
+
     public float getSpeed1() {
         return speed1;
     }
@@ -76,31 +101,52 @@ public class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragme
         this.speed2 = speed2;
     }
 
+    public float getAcceleration1() {
+        return acceleration1;
+    }
+
+    public void setAcceleration1(float acceleration1) {
+        this.acceleration1 = acceleration1;
+    }
 
     public void toBundle(Bundle bundle) {
         super.toBundle(bundle);
 
+        bundle.putFloat("position1", position1);
+        bundle.putFloat("position2", position2);
+        bundle.putFloat("position3", position3);
         bundle.putFloat("speed1", speed1);
         bundle.putFloat("speed2", speed2);
+        bundle.putFloat("acceleration1", acceleration1);
     }
 
     public boolean fromBundle(Bundle bundle) {
         if (!super.fromBundle(bundle))
             return false;
 
+        position1 = bundle.getFloat("position1", 0.0f);
+        position2 = bundle.getFloat("position2", 0.0f);
+        position3 = bundle.getFloat("position3", 0.0f);
         speed1 = bundle.getFloat("speed1", 0.0f);
         speed2 = bundle.getFloat("speed2", 0.0f);
+        acceleration1 = bundle.getFloat("acceleration1", 0.0f);
         return true;
     }
 }
 
 abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGenericFragment {
-    private TextView textViewTime1 = null;
-    private TextView textViewTime2 = null;
-    private EditText editTextTime1 = null;
-    private EditText editTextTime2 = null;
+    private EditText time1EditText = null;
+    private EditText time2EditText = null;
+    private EditText time3EditText = null;
+    private EditText position1EditText = null;
+    private EditText position2EditText = null;
+    private EditText position3EditText = null;
+    private EditText speed1EditText = null;
+    private EditText speed2EditText = null;
+    private EditText acceleration1EditText = null;
     private TableView rawDataTable = null;
     private TableView speedTable = null;
+    private TableView accelerationTable = null;
     protected MarkersDataModel tagMarker = null;
 
     public ScriptComponentCalculateSpeedFragment(ScriptComponentTreeCalculateSpeed component) {
@@ -120,34 +166,43 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
 
         TextView enterSpeedTextView = (TextView)child.findViewById(R.id.enterSpeedTextView);
         assert enterSpeedTextView != null;
-        enterSpeedTextView.setText(getEnterSpeedLabel());
+        enterSpeedTextView.setText(getDescriptionLabel());
 
-        textViewTime1 = (TextView)child.findViewById(R.id.textViewTime1);
-        assert textViewTime1 != null;
-        textViewTime2 = (TextView)child.findViewById(R.id.textViewTime2);
-        assert textViewTime2 != null;
-        editTextTime1 = (EditText)child.findViewById(R.id.editTextTime1);
-        assert editTextTime1 != null;
-        editTextTime2 = (EditText)child.findViewById(R.id.editTextTime2);
-        assert editTextTime2 != null;
+        time1EditText = (EditText)child.findViewById(R.id.time1EditText);
+        assert time1EditText != null;
+        time2EditText = (EditText)child.findViewById(R.id.time2EditText);
+        assert time2EditText != null;
+        time3EditText = (EditText)child.findViewById(R.id.time3EditText);
+        assert time3EditText != null;
+
+        position1EditText = (EditText)child.findViewById(R.id.position1EditText);
+        assert position1EditText != null;
+        position2EditText = (EditText)child.findViewById(R.id.position2EditText);
+        assert position2EditText != null;
+        position3EditText = (EditText)child.findViewById(R.id.position3EditText);
+        assert position3EditText != null;
+
+        speed1EditText = (EditText)child.findViewById(R.id.speed1EditText);
+        assert speed1EditText != null;
+        speed2EditText = (EditText)child.findViewById(R.id.speed2EditText);
+        assert speed2EditText != null;
+        acceleration1EditText = (EditText)child.findViewById(R.id.acceleration1EditText);
+        assert acceleration1EditText != null;
 
         Button okButton = (Button)child.findViewById(R.id.buttonOk);
         assert okButton != null;
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkInput()) {
-                    speedTable.setVisibility(View.VISIBLE);
-                    setState(ScriptComponentTree.SCRIPT_STATE_DONE);
-                } else {
-                    speedTable.setVisibility(View.INVISIBLE);
-                    setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
-                }
+                setDone(checkInput());
             }
         });
 
         speedTable = (TableView)child.findViewById(R.id.speedTable);
         assert speedTable != null;
+
+        accelerationTable = (TableView)child.findViewById(R.id.accelerationTable);
+        assert accelerationTable != null;
 
         return view;
     }
@@ -156,11 +211,19 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     public void onPause() {
         ScriptComponentTreeCalculateSpeed speedComponent = (ScriptComponentTreeCalculateSpeed)component;
 
-        float speed1 = Float.parseFloat(String.valueOf(editTextTime1.getText()));
-        float speed2 = Float.parseFloat(String.valueOf(editTextTime2.getText()));
+        float position1 = Float.parseFloat(String.valueOf(position1EditText.getText()));
+        float position2 = Float.parseFloat(String.valueOf(position2EditText.getText()));
+        float position3 = Float.parseFloat(String.valueOf(position3EditText.getText()));
+        float speed1 = Float.parseFloat(String.valueOf(speed1EditText.getText()));
+        float speed2 = Float.parseFloat(String.valueOf(speed1EditText.getText()));
+        float acceleration1 = Float.parseFloat(String.valueOf(acceleration1EditText.getText()));
 
+        speedComponent.setPosition1(position1);
+        speedComponent.setPosition2(position2);
+        speedComponent.setPosition3(position3);
         speedComponent.setSpeed1(speed1);
         speedComponent.setSpeed2(speed2);
+        speedComponent.setAcceleration1(acceleration1);
 
         super.onPause();
     }
@@ -177,41 +240,68 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
             return;
 
         tagMarker = experimentAnalysis.getTagMarkers();
-        rawDataTable.setAdapter(new MarkerDataTableAdapter(tagMarker, experimentAnalysis));
+        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
+        adapter.addColumn(new TimeDataTableColumn());
+        adapter.addColumn(new XPositionDataTableColumn());
+        adapter.addColumn(new YPositionDataTableColumn());
+        rawDataTable.setAdapter(adapter);
 
         Experiment experiment = experimentAnalysis.getExperiment();
         if (tagMarker.getMarkerCount() < 3)
             return;
 
         String text = "";
+        text += experiment.getRunValueAt(tagMarker.getMarkerDataAt(0).getRunId());
+        time1EditText.setText(text);
+        text = "";
         text += experiment.getRunValueAt(tagMarker.getMarkerDataAt(1).getRunId());
-        text += " [";
-        text += experiment.getRunValueUnit();
-        text += "]:";
-        textViewTime1.setText(text);
+        time2EditText.setText(text);
         text = "";
         text += experiment.getRunValueAt(tagMarker.getMarkerDataAt(2).getRunId());
-        text += " [";
-        text += experiment.getRunValueUnit();
-        text += "]:";
-        textViewTime2.setText(text);
+        time3EditText.setText(text);
 
-        speedTable.setAdapter(createSpeedTableAdapter(experimentAnalysis));
+        text = "";
+        text += speedComponent.getPosition1();
+        position1EditText.setText(text);
+        text = "";
+        text += speedComponent.getPosition2();
+        position2EditText.setText(text);
+        text = "";
+        text += speedComponent.getPosition3();
+        position3EditText.setText(text);
 
         text = "";
         text += speedComponent.getSpeed1();
-        editTextTime1.setText(text);
+        speed1EditText.setText(text);
         text = "";
         text += speedComponent.getSpeed2();
-        editTextTime2.setText(text);
+        speed2EditText.setText(text);
+        text = "";
+        text += speedComponent.getAcceleration1();
+        acceleration1EditText.setText(text);
 
+        speedTable.setAdapter(createSpeedTableAdapter(experimentAnalysis));
+        accelerationTable.setAdapter(createAccelerationTableAdapter(experimentAnalysis));
         if (speedComponent.getState() != ScriptComponentTree.SCRIPT_STATE_DONE)
+            setDone(false);
+
+    }
+
+    private void setDone(boolean done) {
+        if (done) {
+            speedTable.setVisibility(View.VISIBLE);
+            accelerationTable.setVisibility(View.VISIBLE);
+            setState(ScriptComponentTree.SCRIPT_STATE_DONE);
+        } else {
             speedTable.setVisibility(View.INVISIBLE);
+            accelerationTable.setVisibility(View.INVISIBLE);
+            setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
+        }
     }
 
     private boolean checkInput() {
-        float speed1 = Float.parseFloat(String.valueOf(editTextTime1.getText()));
-        float speed2 = Float.parseFloat(String.valueOf(editTextTime2.getText()));
+        float speed1 = Float.parseFloat(String.valueOf(speed1EditText.getText()));
+        float speed2 = Float.parseFloat(String.valueOf(speed2EditText.getText()));
         // round value to one decimal, this fixes some problem with small speeds values
         float correctSpeed1 = ((float)Math.round(getSpeed(0) * 10)) / 10;
         float correctSpeed2 = ((float)Math.round(getSpeed(1) * 10)) / 10;
@@ -224,59 +314,105 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
                 && Math.abs(speed2 - correctSpeed2) > 0.11)
             return false;
 
+        float acceleration1 = Float.parseFloat(String.valueOf(acceleration1EditText.getText()));
+        float correctAcceleration1 = ((float)Math.round(getAcceleration(0) * 10)) / 10;
+        if (Math.abs(acceleration1 - correctAcceleration1) > Math.abs(correctAcceleration1 * correctMargin)
+                && Math.abs(acceleration1 - correctAcceleration1) > 0.11)
+            return false;
+
         return true;
     }
 
-    abstract String getEnterSpeedLabel();
+    abstract String getDescriptionLabel();
     abstract float getSpeed(int index);
-    abstract MarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis);
+    abstract float getAcceleration(int index);
+    abstract ColumnMarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis);
+    abstract ColumnMarkerDataTableAdapter createAccelerationTableAdapter(ExperimentAnalysis experimentAnalysis);
 }
 
-
-class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalculateSpeedFragment {
-    private MarkerDataYSpeedTableAdapter speedData;
-
-    public ScriptComponentCalculateYSpeedFragment(ScriptComponentTreeCalculateSpeed component) {
-        super(component);
-    }
-
-    @Override
-    String getEnterSpeedLabel() {
-        return "Enter y speed [m/s]:";
-    }
-
-    @Override
-    float getSpeed(int index) {
-        return speedData.getSpeed(index);
-    }
-
-    @Override
-    MarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis) {
-        speedData = new MarkerDataYSpeedTableAdapter(tagMarker, experimentAnalysis);
-        return speedData;
-    }
-}
 
 class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpeedFragment {
-    private MarkerDataXSpeedTableAdapter speedData;
+    private XSpeedDataTableColumn speedDataTableColumn;
+    private XAccelerationDataTableColumn accelerationDataTableColumn;
 
     public ScriptComponentCalculateXSpeedFragment(ScriptComponentTreeCalculateSpeed component) {
         super(component);
     }
 
     @Override
-    String getEnterSpeedLabel() {
-        return "Enter x speed [m/s]:";
+    String getDescriptionLabel() {
+        return "Fill table for the x-direction:";
     }
 
     @Override
     float getSpeed(int index) {
-        return speedData.getSpeed(index);
+        return speedDataTableColumn.getValue(index).floatValue();
     }
 
     @Override
-    MarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis) {
-        speedData = new MarkerDataXSpeedTableAdapter(tagMarker, experimentAnalysis);
-        return speedData;
+    float getAcceleration(int index) {
+        return accelerationDataTableColumn.getValue(index).floatValue();
+    }
+
+    @Override
+    ColumnMarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis) {
+        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
+        speedDataTableColumn = new XSpeedDataTableColumn();
+        adapter.addColumn(new TimeDataTableColumn());
+        adapter.addColumn(speedDataTableColumn);
+
+        return adapter;
+    }
+
+    @Override
+    ColumnMarkerDataTableAdapter createAccelerationTableAdapter(ExperimentAnalysis experimentAnalysis) {
+        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
+        accelerationDataTableColumn = new XAccelerationDataTableColumn();
+        adapter.addColumn(new TimeDataTableColumn());
+        adapter.addColumn(accelerationDataTableColumn);
+        return adapter;
+    }
+}
+
+class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalculateSpeedFragment {
+    private YSpeedDataTableColumn speedDataTableColumn;
+    private YAccelerationDataTableColumn accelerationDataTableColumn;
+
+    public ScriptComponentCalculateYSpeedFragment(ScriptComponentTreeCalculateSpeed component) {
+        super(component);
+    }
+
+    @Override
+    String getDescriptionLabel() {
+        return "Fill table for the y-direction:";
+    }
+
+    @Override
+    float getSpeed(int index) {
+        return speedDataTableColumn.getValue(index).floatValue();
+    }
+
+    @Override
+    float getAcceleration(int index) {
+        return accelerationDataTableColumn.getValue(index).floatValue();
+    }
+
+    @Override
+    ColumnMarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis) {
+        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
+        speedDataTableColumn = new YSpeedDataTableColumn();
+        adapter.addColumn(new TimeDataTableColumn());
+        adapter.addColumn(speedDataTableColumn);
+
+        return adapter;
+    }
+
+    @Override
+    ColumnMarkerDataTableAdapter createAccelerationTableAdapter(ExperimentAnalysis experimentAnalysis) {
+        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
+        accelerationDataTableColumn = new YAccelerationDataTableColumn();
+        adapter.addColumn(new TimeDataTableColumn());
+        adapter.addColumn(accelerationDataTableColumn);
+        return adapter;
     }
 }
