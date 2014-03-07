@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import nz.ac.aucklanduni.physics.tracker.*;
 import nz.ac.aucklanduni.physics.tracker.views.table.*;
 
@@ -194,7 +195,9 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setDone(checkInput());
+                boolean validInput = checkInput();
+                inputResponse(validInput);
+                setDone(validInput);
             }
         });
 
@@ -207,6 +210,17 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         return view;
     }
 
+    private void inputResponse(boolean validInput) {
+        if (validInput) {
+            Toast toast = Toast.makeText(getActivity(), "Well done!", Toast.LENGTH_LONG);
+            toast.show();
+        } else {
+            Toast toast = Toast.makeText(getActivity(), "Some values are wrong! please check again.",
+                    Toast.LENGTH_LONG);
+            toast.show();
+        }
+    }
+
     @Override
     public void onPause() {
         ScriptComponentTreeCalculateSpeed speedComponent = (ScriptComponentTreeCalculateSpeed)component;
@@ -215,7 +229,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         float position2 = Float.parseFloat(String.valueOf(position2EditText.getText()));
         float position3 = Float.parseFloat(String.valueOf(position3EditText.getText()));
         float speed1 = Float.parseFloat(String.valueOf(speed1EditText.getText()));
-        float speed2 = Float.parseFloat(String.valueOf(speed1EditText.getText()));
+        float speed2 = Float.parseFloat(String.valueOf(speed2EditText.getText()));
         float acceleration1 = Float.parseFloat(String.valueOf(acceleration1EditText.getText()));
 
         speedComponent.setPosition1(position1);
@@ -299,31 +313,47 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         }
     }
 
+    private boolean fuzzyEqual(float value, float correctValue) {
+        float correctMargin = 0.1f;
+        if (Math.abs(value - correctValue) > Math.abs(correctValue * correctMargin)
+                && Math.abs(value - correctValue) > 0.11)
+            return false;
+        return true;
+    }
+
     private boolean checkInput() {
+        float position1 = Float.parseFloat(String.valueOf(position1EditText.getText()));
+        float position2 = Float.parseFloat(String.valueOf(position2EditText.getText()));
+        float position3 = Float.parseFloat(String.valueOf(position3EditText.getText()));
+
+        if (!fuzzyEqual(position1, getPosition(0)))
+            return false;
+        if (!fuzzyEqual(position2, getPosition(1)))
+            return false;
+        if (!fuzzyEqual(position3, getPosition(2)))
+            return false;
+
         float speed1 = Float.parseFloat(String.valueOf(speed1EditText.getText()));
         float speed2 = Float.parseFloat(String.valueOf(speed2EditText.getText()));
         // round value to one decimal, this fixes some problem with small speeds values
         float correctSpeed1 = ((float)Math.round(getSpeed(0) * 10)) / 10;
         float correctSpeed2 = ((float)Math.round(getSpeed(1) * 10)) / 10;
 
-        float correctMargin = 0.1f;
-        if (Math.abs(speed1 - correctSpeed1) > Math.abs(correctSpeed1 * correctMargin)
-                && Math.abs(speed1 - correctSpeed1) > 0.11)
+        if (!fuzzyEqual(speed1, correctSpeed1))
             return false;
-        if (Math.abs(speed2 - correctSpeed2) > Math.abs(correctSpeed2 * correctMargin)
-                && Math.abs(speed2 - correctSpeed2) > 0.11)
+        if (!fuzzyEqual(speed2, correctSpeed2))
             return false;
 
         float acceleration1 = Float.parseFloat(String.valueOf(acceleration1EditText.getText()));
         float correctAcceleration1 = ((float)Math.round(getAcceleration(0) * 10)) / 10;
-        if (Math.abs(acceleration1 - correctAcceleration1) > Math.abs(correctAcceleration1 * correctMargin)
-                && Math.abs(acceleration1 - correctAcceleration1) > 0.11)
+        if (!fuzzyEqual(acceleration1, correctAcceleration1))
             return false;
 
         return true;
     }
 
     abstract String getDescriptionLabel();
+    abstract float getPosition(int index);
     abstract float getSpeed(int index);
     abstract float getAcceleration(int index);
     abstract ColumnMarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis);
@@ -342,6 +372,11 @@ class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpe
     @Override
     String getDescriptionLabel() {
         return "Fill table for the x-direction:";
+    }
+
+    @Override
+    float getPosition(int index) {
+        return tagMarker.getCalibratedMarkerPositionAt(index).x;
     }
 
     @Override
@@ -385,6 +420,11 @@ class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalculateSpe
     @Override
     String getDescriptionLabel() {
         return "Fill table for the y-direction:";
+    }
+
+    @Override
+    float getPosition(int index) {
+        return tagMarker.getCalibratedMarkerPositionAt(index).y;
     }
 
     @Override

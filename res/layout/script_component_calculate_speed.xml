@@ -111,6 +111,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="number|numberDecimal|numberSigned"
                     android:ems="10"
+                    android:imeOptions="actionDone"
                     android:id="@+id/acceleration1EditText"/>
         </TableRow>
         <TableRow
