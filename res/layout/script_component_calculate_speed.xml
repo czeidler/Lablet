@@ -58,14 +58,14 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:editable="false" android:enabled="true" android:focusable="false"
-                    android:id="@+id/time1EditText"/>
+                    android:id="@+id/time1EditText" android:selectAllOnFocus="false"/>
             <EditText
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:inputType="number|numberDecimal|numberSigned"
                     android:ems="10"
                     android:nextFocusDown="@+id/position2EditText"
-                    android:id="@+id/position1EditText"/>
+                    android:id="@+id/position1EditText" android:selectAllOnFocus="true"/>
             <Space
                     android:layout_width="0dp" android:layout_height="20dp"/>
             <Space
@@ -83,7 +83,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="number|numberDecimal|numberSigned"
                     android:nextFocusDown="@+id/speed2EditText"
-                    android:id="@+id/speed1EditText"/>
+                    android:id="@+id/speed1EditText" android:selectAllOnFocus="true"/>
             <Space
                     android:layout_width="0dp" android:layout_height="20dp"/>
         </TableRow>
@@ -103,7 +103,7 @@
                     android:inputType="number|numberDecimal|numberSigned"
                     android:ems="10"
                     android:nextFocusDown="@+id/position3EditText"
-                    android:id="@+id/position2EditText"/>
+                    android:id="@+id/position2EditText" android:selectAllOnFocus="true"/>
             <Space
                     android:layout_width="0dp" android:layout_height="20dp"/>
             <EditText
@@ -112,7 +112,7 @@
                     android:inputType="number|numberDecimal|numberSigned"
                     android:ems="10"
                     android:imeOptions="actionDone"
-                    android:id="@+id/acceleration1EditText"/>
+                    android:id="@+id/acceleration1EditText" android:selectAllOnFocus="true"/>
         </TableRow>
         <TableRow
                 android:layout_width="wrap_content"
@@ -126,7 +126,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="number|numberDecimal|numberSigned"
                     android:nextFocusDown="@+id/acceleration1EditText"
-                    android:id="@+id/speed2EditText"/>
+                    android:id="@+id/speed2EditText" android:selectAllOnFocus="true"/>
             <Space
                     android:layout_width="0dp" android:layout_height="20dp"/>
         </TableRow>
@@ -145,7 +145,7 @@
                     android:inputType="number|numberDecimal|numberSigned"
                     android:ems="10"
                     android:nextFocusDown="@+id/speed1EditText"
-                    android:id="@+id/position3EditText"/>
+                    android:id="@+id/position3EditText" android:selectAllOnFocus="true"/>
             <Space
                     android:layout_width="0dp" android:layout_height="20dp"/>
             <Space
