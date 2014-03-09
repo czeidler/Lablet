@@ -165,6 +165,12 @@ public class ScriptComponentTreeSheet extends ScriptComponentTreeFragmentHolder 
         return cameraExperiment;
     }
 
+    public ScriptComponentPotentialEnergy1 addPotentialEnergy1Question(SheetGroupLayout parent) {
+        ScriptComponentPotentialEnergy1 question = new ScriptComponentPotentialEnergy1();
+        addItemViewHolder(question, parent);
+        return question;
+    }
+
     public SheetGroupLayout addGroupLayout(boolean vertical, SheetGroupLayout parent) {
         SheetGroupLayout layout = new SheetGroupLayout(vertical);
         if (parent == null)
