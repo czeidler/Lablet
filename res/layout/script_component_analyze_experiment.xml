@@ -5,22 +5,31 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Create position dataset:"
-            android:id="@+id/descriptionText"/>
-    <CheckedTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-            android:text="no video taken"
-            android:id="@+id/takenExperimentInfo" android:checked="true"/>
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Create position dataset:"
+                android:id="@+id/descriptionText"/>
+        <CheckedTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+                android:text="experiment id"
+                android:id="@+id/takenExperimentInfo" android:checked="false" android:layout_marginLeft="10dp"/>
+    </LinearLayout>
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Analyze Experiment"
             android:id="@+id/analyzeExperimentButton"/>
+    <view android:layout_width="706dp"
+          android:layout_height="410dp"
+          class="nz.ac.aucklanduni.physics.tracker.views.graph.GraphView2D" android:id="@+id/graphView"
+          android:visibility="visible" android:layout_gravity="center"/>
 
 </LinearLayout>

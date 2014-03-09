@@ -22,6 +22,10 @@ import nz.ac.aucklanduni.physics.tracker.ExperimentAnalyserActivity;
 import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.tracker.ExperimentLoader;
 import nz.ac.aucklanduni.physics.tracker.R;
+import nz.ac.aucklanduni.physics.tracker.views.graph.GraphView2D;
+import nz.ac.aucklanduni.physics.tracker.views.graph.MarkerGraphAdapter;
+import nz.ac.aucklanduni.physics.tracker.views.graph.XPositionMarkerGraphAxis;
+import nz.ac.aucklanduni.physics.tracker.views.graph.YPositionMarkerGraphAxis;
 
 import java.io.File;
 
@@ -68,6 +72,7 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
     static final int ANALYSE_EXPERIMENT = 0;
 
     private CheckedTextView takenExperimentInfo = null;
+    private GraphView2D graphView = null;
 
     public ScriptComponentExperimentAnalysisFragment(ScriptComponentTreeExperimentAnalysis component) {
         super(component);
@@ -106,6 +111,11 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
         File experimentPathFile = new File(analysisComponent.getExperiment().getExperimentPath());
         takenExperimentInfo.setText(experimentPathFile.getName());
 
+        graphView = (GraphView2D)view.findViewById(R.id.graphView);
+        assert graphView != null;
+
+        updateViews();
+
         return view;
     }
 
@@ -116,6 +126,7 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
 
         if (!validateAnalysis()) {
             setState(ScriptComponent.SCRIPT_STATE_ONGOING);
+
             Toast toast = Toast.makeText(getActivity(), "Mark more data points!", Toast.LENGTH_LONG);
             toast.show();
             return;
@@ -142,5 +153,33 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
             return false;
 
         return true;
+    }
+
+    @Override
+    protected void setState(int state) {
+        super.setState(state);
+        updateViews();
+    }
+
+    private void updateViews() {
+        // is view already init?
+        if (takenExperimentInfo == null || graphView == null)
+            return;
+
+        if (component.getState() == ScriptComponent.SCRIPT_STATE_DONE) {
+            takenExperimentInfo.setChecked(true);
+            ExperimentAnalysis experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(getActivity(),
+                    ((ScriptComponentTreeExperimentAnalysis) component).getExperiment().getExperimentPath());
+            if (experimentAnalysis == null)
+                return;
+            MarkerGraphAdapter adapter = new MarkerGraphAdapter(experimentAnalysis, "Position Data:",
+                    new XPositionMarkerGraphAxis(), new YPositionMarkerGraphAxis());
+            graphView.setAdapter(adapter);
+            graphView.setVisibility(View.VISIBLE);
+        } else {
+            takenExperimentInfo.setChecked(false);
+            graphView.setVisibility(View.INVISIBLE);
+            graphView.setAdapter(null);
+        }
     }
 }
