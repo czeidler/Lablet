@@ -8,8 +8,10 @@
 package nz.ac.aucklanduni.physics.tracker.script;
 
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.support.v4.app.Fragment;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 
@@ -40,20 +42,20 @@ class SheetGroupLayout extends SheetLayout {
     private List<SheetLayout> items = new ArrayList<SheetLayout>();
     protected TableRow row;
     TableLayout layout;
-    boolean isVertical;
+    int orientation;
 
-    public SheetGroupLayout(boolean isVertical) {
-        this.isVertical = isVertical;
+    public SheetGroupLayout(int orientation) {
+        this.orientation = orientation;
     }
 
-    public SheetGroupLayout(ISheetLayoutItemParameters parameters, boolean isVertical) {
+    public SheetGroupLayout(ISheetLayoutItemParameters parameters, int orientation) {
         super(parameters);
 
-        this.isVertical = isVertical;
+        this.orientation = orientation;
     }
 
-    public void setOrientation(boolean vertical) {
-        this.isVertical = vertical;
+    public void setOrientation(int orientation) {
+        this.orientation = orientation;
     }
 
     public class LayoutGroupLayoutItem extends SheetLayout implements ISheetLayoutItemParameters {
@@ -127,7 +129,7 @@ class SheetGroupLayout extends SheetLayout {
 
         int xPadding = 20;
         int yPadding = 20;
-        if (isVertical) {
+        if (orientation == LinearLayout.VERTICAL) {
             row = new TableRow(context);
             layout.addView(row);
 
