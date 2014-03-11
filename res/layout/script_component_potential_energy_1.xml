@@ -9,7 +9,30 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Height of the of a mass with on 1kg."
+            android:text="Enter the mass:"
+            android:id="@+id/massQuestionTextView"/>
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number|numberDecimal"
+                android:ems="10"
+                android:id="@+id/massEditText" android:numeric="decimal" android:selectAllOnFocus="true"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="[g]"
+                android:id="@+id/massUnitTextView"/>
+    </LinearLayout>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Enter height of the of a mass:"
             android:id="@+id/heightQuestionTextView"/>
     <LinearLayout
             android:orientation="horizontal"

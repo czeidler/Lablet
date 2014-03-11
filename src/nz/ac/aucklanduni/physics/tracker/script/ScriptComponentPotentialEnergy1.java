@@ -19,8 +19,10 @@ import nz.ac.aucklanduni.physics.tracker.R;
 
 class ScriptComponentPotentialEnergy1View extends FrameLayout {
     private ScriptComponentPotentialEnergy1 component;
+    private TextView massQuestionTextView;
     private TextView heightQuestionTextView;
     private TextView energyQuestionTextView;
+    private EditText massEditText;
     private EditText heightEditText;
     private EditText energyEditText;
     private EditText pbjEditText;
@@ -35,11 +37,15 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
         assert view != null;
         addView(view);
 
+        massQuestionTextView = (TextView)view.findViewById(R.id.massQuestionTextView);
+        assert massQuestionTextView != null;
         heightQuestionTextView = (TextView)view.findViewById(R.id.heightQuestionTextView);
         assert heightQuestionTextView != null;
         energyQuestionTextView = (TextView)view.findViewById(R.id.energyQuestionTextView);
         assert energyQuestionTextView != null;
 
+        massEditText = (EditText)view.findViewById(R.id.massEditText);
+        assert massEditText != null;
         heightEditText = (EditText)view.findViewById(R.id.heightEditText);
         assert heightEditText != null;
         energyEditText = (EditText)view.findViewById(R.id.energyEditText);
@@ -50,16 +56,38 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
         doneCheckBox = (CheckBox)view.findViewById(R.id.doneCheckBox);
         assert doneCheckBox != null;
 
+        massQuestionTextView.setText(component.getMassQuestionText());
         heightQuestionTextView.setText(component.getHeightQuestionText());
         energyQuestionTextView.setText(component.getEnergyQuestionTextView());
 
         if (component.getState() == ScriptComponentTree.SCRIPT_STATE_DONE)
             doneCheckBox.setChecked(true);
 
+        massEditText.setText(Float.toString(component.getMass()));
         heightEditText.setText(Float.toString(component.getHeight()));
         energyEditText.setText(Float.toString(component.getEnergy()));
         pbjEditText.setText(Float.toString(component.getPbjValue()));
 
+        massEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                try {
+                    setMass(Float.parseFloat(editable.toString()));
+                } catch (NumberFormatException e) {
+
+                }
+            }
+        });
         heightEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
@@ -122,6 +150,11 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
         });
     }
 
+    private void setMass(float height) {
+        component.setMass(height / 1000.f);
+        update();
+    }
+
     private void setHeight(float height) {
         component.setHeight(height);
         update();
@@ -181,10 +214,11 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
 
 
 public class ScriptComponentPotentialEnergy1 extends ScriptComponentViewHolder {
-    private String heightQuestionText = "Height of the of a mass with on 1kg.";
+    private String massQuestionText = "Mass:";
+    private String heightQuestionText = "Height of the of the mass:";
     private String energyQuestionTextView = "What is its energy?";
 
-    private float mass = 1.f;
+    private float mass = 0.1f;
     private float height = 0.0f;
     private float energy = 0.0f;
     private float pbjValue = 0.0f;
@@ -193,6 +227,12 @@ public class ScriptComponentPotentialEnergy1 extends ScriptComponentViewHolder {
         setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
     }
 
+    public String getMassQuestionText() {
+        return massQuestionText;
+    }
+    public void setMassQuestionText(String massQuestionText) {
+        this.massQuestionText = massQuestionText;
+    }
     public String getHeightQuestionText() {
         return heightQuestionText;
     }

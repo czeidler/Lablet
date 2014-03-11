@@ -83,7 +83,7 @@ function onBuildExperimentScript(scriptBuilder)
 	upDownMotionQuestions:addHeader("Estimating Energy Input")
 	upDownMotionQuestions:addText("Complete the following questions and discuss with your demonstrator:")
 	pbjQuestion = upDownMotionQuestions:addPotentialEnergy1Question();
-	pbjQuestion:setMass(1);
+	pbjQuestion:setMassQuestionText("Please enter the mass of the ball:")
 	pbjQuestion:setHeightQuestionText("What was the height of the ball at its peak?")
 	pbjQuestion:setEnergyQuestionTextView("How much energy input enabled the ball to reach this height?")
 
