@@ -9,12 +9,14 @@ package nz.ac.aucklanduni.physics.tracker.script;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.androidplot.LineRegion;
 import nz.ac.aucklanduni.physics.tracker.R;
 
 import java.util.HashMap;
@@ -25,15 +27,22 @@ import static nz.ac.aucklanduni.physics.tracker.R.*;
 
 class TextComponent extends ScriptComponentViewHolder {
     private String text = "";
+    private int typeface = Typeface.NORMAL;
+
     public TextComponent(String text) {
         this.text = text;
         setState(ScriptComponentTree.SCRIPT_STATE_DONE);
+    }
+
+    public void setTypeface(int typeface) {
+        this.typeface = typeface;
     }
 
     @Override
     public View createView(Context context, android.support.v4.app.Fragment parent) {
         TextView textView = new TextView(context);
         textView.setTextAppearance(context, android.R.style.TextAppearance_Medium);
+        textView.setTypeface(null, typeface);
         textView.setText(text);
         return textView;
     }
@@ -141,7 +150,7 @@ class ScriptComponentTreeSheetBase extends ScriptComponentTreeFragmentHolder {
         }
     }
 
-    private SheetGroupLayout sheetGroupLayout = new SheetGroupLayout(true);
+    private SheetGroupLayout sheetGroupLayout = new SheetGroupLayout(LinearLayout.VERTICAL);
     private ScriptComponentContainer<ScriptComponentViewHolder> itemContainer
             = new ScriptComponentContainer<ScriptComponentViewHolder>();
     private Map<String, Counter> mapOfCounter = new HashMap<String, Counter>();
@@ -190,15 +199,23 @@ class ScriptComponentTreeSheetBase extends ScriptComponentTreeFragmentHolder {
         return itemContainer.fromBundle(bundle);
     }
 
-    public void setLayoutType(String layoutType) {
-        if (layoutType.equalsIgnoreCase("horizontal"))
-            sheetGroupLayout.setOrientation(false);
+    public void setMainLayoutOrientation(String orientation) {
+        if (orientation.equalsIgnoreCase("horizontal"))
+            sheetGroupLayout.setOrientation(LinearLayout.HORIZONTAL);
         else
-            sheetGroupLayout.setOrientation(true);
+            sheetGroupLayout.setOrientation(LinearLayout.VERTICAL);
     }
 
-    public SheetGroupLayout addGroupLayout(boolean vertical, SheetGroupLayout parent) {
-        SheetGroupLayout layout = new SheetGroupLayout(vertical);
+    public SheetGroupLayout addHorizontalGroupLayout(SheetGroupLayout parent) {
+        return addGroupLayout(LinearLayout.HORIZONTAL, parent);
+    }
+
+    public SheetGroupLayout addVerticalGroupLayout(SheetGroupLayout parent) {
+        return addGroupLayout(LinearLayout.VERTICAL, parent);
+    }
+
+    protected SheetGroupLayout addGroupLayout(int orientation, SheetGroupLayout parent) {
+        SheetGroupLayout layout = new SheetGroupLayout(orientation);
         if (parent == null)
             sheetGroupLayout.addLayout(layout);
         else
@@ -248,6 +265,13 @@ public class ScriptComponentTreeSheet extends ScriptComponentTreeSheetBase {
         TextComponent textOnlyQuestion = new TextComponent(text);
         addItemViewHolder(textOnlyQuestion, parent);
         return textOnlyQuestion;
+    }
+
+    public ScriptComponentViewHolder addHeader(String text, SheetGroupLayout parent) {
+        TextComponent component = new TextComponent(text);
+        component.setTypeface(Typeface.BOLD);
+        addItemViewHolder(component, parent);
+        return component;
     }
 
     public ScriptComponentViewHolder addQuestion(String text, SheetGroupLayout parent) {
