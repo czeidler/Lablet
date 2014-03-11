@@ -25,7 +25,7 @@ public class YAccelerationDataTableColumn extends DataTableColumn {
         float delta = speed1 - speed0;
 
         Experiment experiment = experimentAnalysis.getExperiment();
-        float deltaT = experiment.getRunValueAt(index + 2) - experiment.getRunValueAt(index);
+        float deltaT = (experiment.getRunValueAt(index + 2) - experiment.getRunValueAt(index)) / 2;
         if (experimentAnalysis.getExperiment().getRunValueUnitPrefix().equals("m"))
             deltaT /= 1000;
 
