@@ -25,7 +25,7 @@
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Analyze Experiment"
+            android:text="Analyse Experiment"
             android:id="@+id/analyzeExperimentButton"/>
     <view android:layout_width="706dp"
           android:layout_height="410dp"
