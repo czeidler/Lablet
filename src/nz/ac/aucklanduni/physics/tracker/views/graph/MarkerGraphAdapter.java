@@ -35,6 +35,21 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkersD
         setYAxis(yAxis);
     }
 
+    public static MarkerGraphAdapter createPositionAdapter(ExperimentAnalysis experimentAnalysis, String title) {
+        return new MarkerGraphAdapter(experimentAnalysis, title, new XPositionMarkerGraphAxis(),
+                new YPositionMarkerGraphAxis());
+    }
+
+    public static MarkerGraphAdapter createXSpeedAdapter(ExperimentAnalysis experimentAnalysis, String title) {
+        return new MarkerGraphAdapter(experimentAnalysis, title, new SpeedTimeMarkerGraphAxis(),
+                new XSpeedMarkerGraphAxis());
+    }
+
+    public static MarkerGraphAdapter createYSpeedAdapter(ExperimentAnalysis experimentAnalysis, String title) {
+        return new MarkerGraphAdapter(experimentAnalysis, title, new SpeedTimeMarkerGraphAxis(),
+                new YSpeedMarkerGraphAxis());
+    }
+
     public void release() {
         data.removeListener(this);
         listeners.clear();

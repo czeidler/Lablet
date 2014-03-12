@@ -393,7 +393,7 @@ class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpe
     ColumnMarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis) {
         ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
         speedDataTableColumn = new XSpeedDataTableColumn();
-        adapter.addColumn(new TimeDataTableColumn());
+        adapter.addColumn(new SpeedTimeDataTableColumn());
         adapter.addColumn(speedDataTableColumn);
 
         return adapter;
@@ -403,7 +403,7 @@ class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpe
     ColumnMarkerDataTableAdapter createAccelerationTableAdapter(ExperimentAnalysis experimentAnalysis) {
         ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
         accelerationDataTableColumn = new XAccelerationDataTableColumn();
-        adapter.addColumn(new TimeDataTableColumn());
+        adapter.addColumn(new AccelerationTimeDataTableColumn());
         adapter.addColumn(accelerationDataTableColumn);
         return adapter;
     }
@@ -441,7 +441,7 @@ class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalculateSpe
     ColumnMarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis) {
         ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
         speedDataTableColumn = new YSpeedDataTableColumn();
-        adapter.addColumn(new TimeDataTableColumn());
+        adapter.addColumn(new SpeedTimeDataTableColumn());
         adapter.addColumn(speedDataTableColumn);
 
         return adapter;
@@ -451,7 +451,7 @@ class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalculateSpe
     ColumnMarkerDataTableAdapter createAccelerationTableAdapter(ExperimentAnalysis experimentAnalysis) {
         ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
         accelerationDataTableColumn = new YAccelerationDataTableColumn();
-        adapter.addColumn(new TimeDataTableColumn());
+        adapter.addColumn(new AccelerationTimeDataTableColumn());
         adapter.addColumn(accelerationDataTableColumn);
         return adapter;
     }

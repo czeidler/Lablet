@@ -84,6 +84,8 @@ class GraphViewHolder extends ScriptComponentViewHolder {
             return new YSpeedMarkerGraphAxis();
         if (id.equalsIgnoreCase("time"))
             return new TimeMarkerGraphAxis();
+        if (id.equalsIgnoreCase("time-speed"))
+            return new SpeedTimeMarkerGraphAxis();
         return null;
     }
 
@@ -122,7 +124,7 @@ public class ScriptComponentTreeExperimentSheet extends ScriptComponentTreeSheet
     public void addXSpeedGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
         GraphViewHolder item = new GraphViewHolder(this, experiment);
         item.setTitle("X-Speed vs. Time");
-        item.setXAxisContent("time");
+        item.setXAxisContent("time-speed");
         item.setYAxisContent("x-speed");
         addItemViewHolder(item, parent);
     }
@@ -130,7 +132,7 @@ public class ScriptComponentTreeExperimentSheet extends ScriptComponentTreeSheet
     public void addYSpeedGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
         GraphViewHolder item = new GraphViewHolder(this, experiment);
         item.setTitle("Y-Speed vs. Time");
-        item.setXAxisContent("time");
+        item.setXAxisContent("time-speed");
         item.setYAxisContent("y-speed");
         addItemViewHolder(item, parent);
     }
