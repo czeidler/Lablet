@@ -172,6 +172,12 @@ abstract class ScriptComponentTree extends ScriptComponent implements Iterable<S
         return stepsToRoot;
     }
 
+    public boolean hasChild() {
+        if (connections.size() > 0)
+            return true;
+        return false;
+    }
+
     private void setParent(ScriptComponentTree parent) {
         this.parent = parent;
     }
