@@ -91,12 +91,25 @@ class ImprovedPointAndLineRenderer<FormatterType extends LineAndPointFormatter> 
         }
     }
 
+    public class CrossRenderer extends PointRenderer {
+        private final float size = 3f;
+
+        @Override
+        public void drawPoint(Canvas canvas, PointF position, LineAndPointFormatter formatter) {
+
+            canvas.drawLine(position.x - size, position.y - size, position.x + size, position.y + size,
+                    formatter.getVertexPaint());
+            canvas.drawLine(position.x - size, position.y + size, position.x + size, position.y - size,
+                    formatter.getVertexPaint());
+        }
+    }
+
     private PointRenderer pointRenderer = null;
 
     public ImprovedPointAndLineRenderer(XYPlot plot) {
         super(plot);
 
-        pointRenderer = new CircleRenderer();
+        pointRenderer = new CrossRenderer();
     }
 
     @Override
@@ -290,6 +303,10 @@ class ImprovedPointAndLineRenderer<FormatterType extends LineAndPointFormatter> 
 class ImprovedLineAndPointFormatter extends LineAndPointFormatter {
     public ImprovedLineAndPointFormatter(int lineColor, int markerColor, int fillColor) {
         super(lineColor, markerColor, fillColor, new PointLabelFormatter());
+
+        Paint paint = getVertexPaint();
+        paint.setStrokeWidth(2.f);
+        setVertexPaint(paint);
     }
 
     @Override
