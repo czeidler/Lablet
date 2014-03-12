@@ -27,6 +27,7 @@ import java.util.List;
 public class AndroidPhysicsTracker extends Activity {
     private List<ExperimentPlugin> experimentPluginList = null;
     private ArrayList<CheckBoxListEntry> experimentList = null;
+    private CheckBoxListEntry.OnCheckBoxListEntryListener checkBoxListEntryListener;
     private CheckBoxAdapter experimentListAdaptor = null;
     private CheckBox selectAllCheckBox = null;
     private MenuItem deleteItem = null;
@@ -36,6 +37,10 @@ public class AndroidPhysicsTracker extends Activity {
 
     static final int PERFORM_EXPERIMENT = 0;
     static final int ANALYSE_EXPERIMENT = 1;
+
+    public AndroidPhysicsTracker() {
+
+    }
 
     private String getAuthorList() {
         String authors = "Authors:\n";
@@ -139,16 +144,6 @@ public class AndroidPhysicsTracker extends Activity {
             }
         });
 
-        CheckBoxListEntry.setListener(new CheckBoxListEntry.OnCheckBoxListEntryListener() {
-            @Override
-            public void onSelected(CheckBoxListEntry entry) {
-                if (isAtLeastOneExperimentSelected())
-                    deleteItem.setVisible(true);
-                else
-                    deleteItem.setVisible(false);
-            }
-        });
-
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -225,6 +220,19 @@ public class AndroidPhysicsTracker extends Activity {
             }
         });
 
+        checkBoxListEntryListener = new CheckBoxListEntry.OnCheckBoxListEntryListener() {
+            @Override
+            public void onSelected(CheckBoxListEntry entry) {
+                if (deleteItem == null)
+                    return;
+
+                if (isAtLeastOneExperimentSelected())
+                    deleteItem.setVisible(true);
+                else
+                    deleteItem.setVisible(false);
+            }
+        };
+
         File experimentDir = Experiment.getMainExperimentDir(this);
         if (experimentDir.exists()) {
             // TODO: Events are never received, check why. Manually call updateExperimentList in onResume for now.
@@ -297,7 +305,7 @@ public class AndroidPhysicsTracker extends Activity {
         if (experimentDir.isDirectory()) {
             File[] children = experimentDir.listFiles();
             for (File child : children != null ? children : new File[0])
-                experimentList.add(new CheckBoxListEntry(child.getName()));
+                experimentList.add(new CheckBoxListEntry(child.getName(), checkBoxListEntryListener));
         }
 
         experimentListAdaptor.notifyDataSetChanged();

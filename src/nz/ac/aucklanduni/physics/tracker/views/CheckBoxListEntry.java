@@ -11,17 +11,15 @@ package nz.ac.aucklanduni.physics.tracker.views;
 public class CheckBoxListEntry {
     private boolean selected = false;
     private String name;
+    private OnCheckBoxListEntryListener listener = null;
 
     public interface OnCheckBoxListEntryListener {
         public void onSelected(CheckBoxListEntry entry);
     }
-    static private OnCheckBoxListEntryListener listener = null;
-    public static void setListener(OnCheckBoxListEntryListener l) {
-        listener = l;
-    }
 
-    public CheckBoxListEntry(String name) {
+    public CheckBoxListEntry(String name, OnCheckBoxListEntryListener listener) {
         this.name = name;
+        this.listener = listener;
     }
 
     void setName(String name) {

@@ -31,6 +31,7 @@ public class ScriptActivity extends Activity {
     private List<String> scriptList = null;
     private ArrayAdapter<String> scriptListAdaptor = null;
     private ArrayList<CheckBoxListEntry> existingScriptList = null;
+    private CheckBoxListEntry.OnCheckBoxListEntryListener checkBoxListEntryListener;
     private CheckBoxAdapter existingScriptListAdaptor = null;
     private MenuItem deleteItem = null;
     private AlertDialog deleteScriptDataAlertBox = null;
@@ -71,16 +72,6 @@ public class ScriptActivity extends Activity {
                     return false;
                 deleteScriptDataAlertBox.show();
                 return true;
-            }
-        });
-
-        CheckBoxListEntry.setListener(new CheckBoxListEntry.OnCheckBoxListEntryListener() {
-            @Override
-            public void onSelected(CheckBoxListEntry entry) {
-                if (isAtLeastOneExistingScriptSelected())
-                    deleteItem.setVisible(true);
-                else
-                    deleteItem.setVisible(false);
             }
         });
 
@@ -137,6 +128,19 @@ public class ScriptActivity extends Activity {
                 loadPreviousScript(id);
             }
         });
+
+        checkBoxListEntryListener = new CheckBoxListEntry.OnCheckBoxListEntryListener() {
+            @Override
+            public void onSelected(CheckBoxListEntry entry) {
+                if (deleteItem == null)
+                    return;
+
+                if (isAtLeastOneExistingScriptSelected())
+                    deleteItem.setVisible(true);
+                else
+                    deleteItem.setVisible(false);
+            }
+        };
 
         copyResourceScripts(true);
     }
@@ -250,7 +254,7 @@ public class ScriptActivity extends Activity {
         if (scriptDir.isDirectory()) {
             File[] children = scriptDir.listFiles();
             for (File child : children != null ? children : new File[0])
-                existingScriptList.add(new CheckBoxListEntry(child.getName()));
+                existingScriptList.add(new CheckBoxListEntry(child.getName(), checkBoxListEntryListener));
         }
 
         existingScriptListAdaptor.notifyDataSetChanged();
