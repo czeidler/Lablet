@@ -24,7 +24,8 @@
         <activity android:name=".ScriptActivity"
                   android:icon="@drawable/ic_console" />
         <activity android:name=".script.ScriptRunnerActivity"
-                  android:icon="@drawable/ic_console" />
+                  android:icon="@drawable/ic_console"
+                  android:windowSoftInputMode="stateHidden" />
     </application>
 
     <uses-permission android:name="android.permission.CAMERA" />

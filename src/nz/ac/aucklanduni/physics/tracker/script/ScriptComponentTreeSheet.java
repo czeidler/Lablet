@@ -11,10 +11,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.*;
 import android.widget.*;
 import com.androidplot.LineRegion;
 import nz.ac.aucklanduni.physics.tracker.R;
@@ -91,18 +90,20 @@ class CheckBoxQuestion extends ScriptComponentViewHolder {
 class ScriptComponentQuestion extends ScriptComponentViewHolder {
     private String text = "";
     private ScriptComponentTreeSheetBase component;
-    private ScriptComponentTreeSheetBase.Counter counter;
 
     public ScriptComponentQuestion(String text, ScriptComponentTreeSheetBase component) {
         this.text = text;
         this.component = component;
-        counter = this.component.getCounter("QuestionCounter");
 
         setState(ScriptComponentTree.SCRIPT_STATE_DONE);
     }
 
     @Override
     public View createView(Context context, android.support.v4.app.Fragment parent) {
+        // we have to get a fresh counter here, if we cache it we will miss that it has been deleted in the sheet
+        // component
+        ScriptComponentTreeSheetBase.Counter counter = this.component.getCounter("QuestionCounter");
+
         TextView textView = new TextView(context);
         textView.setTextAppearance(context, android.R.style.TextAppearance_Medium);
         textView.setBackgroundColor(context.getResources().getColor(color.sc_question_background_color));
@@ -114,6 +115,88 @@ class ScriptComponentQuestion extends ScriptComponentViewHolder {
     @Override
     public boolean initCheck() {
         return true;
+    }
+}
+
+class ScriptComponentTextQuestion extends ScriptComponentViewHolder {
+    private String text = "";
+    private String answer = "";
+    private boolean optional = false;
+    private ScriptComponentTreeSheetBase component;
+
+    public ScriptComponentTextQuestion(String text, ScriptComponentTreeSheetBase component) {
+        this.text = text;
+        this.component = component;
+
+        setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
+    }
+
+    public void setOptional(boolean optional) {
+        this.optional = optional;
+        update();
+    }
+
+    @Override
+    public View createView(Context context, android.support.v4.app.Fragment parent) {
+        ScriptComponentTreeSheetBase.Counter counter = this.component.getCounter("QuestionCounter");
+
+        LayoutInflater inflater = (LayoutInflater)context.getSystemService
+                (Context.LAYOUT_INFLATER_SERVICE);
+
+        View view = inflater.inflate(layout.script_component_text_question, null, false);
+        assert view != null;
+
+        TextView textView = (TextView)view.findViewById(id.questionTextView);
+        assert textView != null;
+        textView.setTextAppearance(context, android.R.style.TextAppearance_Medium);
+        textView.setText("Q" + counter.increaseValue() + ": " + text);
+
+        EditText editText = (EditText)view.findViewById(id.questionEditText);
+        assert editText != null;
+        editText.setText(answer);
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                answer = editable.toString();
+                update();
+            }
+        });
+
+        return view;
+    }
+
+    @Override
+    public boolean initCheck() {
+        return true;
+    }
+
+    public void toBundle(Bundle bundle) {
+        bundle.putString("answer", answer);
+        super.toBundle(bundle);
+    }
+
+    public boolean fromBundle(Bundle bundle) {
+        answer = bundle.getString("answer", "");
+        return super.fromBundle(bundle);
+    }
+
+    private void update() {
+        if (optional)
+            setState(ScriptComponentTree.SCRIPT_STATE_DONE);
+        else if (!answer.equals(""))
+            setState(ScriptComponentTree.SCRIPT_STATE_DONE);
+        else
+            setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
     }
 }
 
@@ -276,6 +359,12 @@ public class ScriptComponentTreeSheet extends ScriptComponentTreeSheetBase {
 
     public ScriptComponentViewHolder addQuestion(String text, SheetGroupLayout parent) {
         ScriptComponentQuestion component = new ScriptComponentQuestion(text, this);
+        addItemViewHolder(component, parent);
+        return component;
+    }
+
+    public ScriptComponentViewHolder addTextQuestion(String text, SheetGroupLayout parent) {
+        ScriptComponentTextQuestion component = new ScriptComponentTextQuestion(text, this);
         addItemViewHolder(component, parent);
         return component;
     }
