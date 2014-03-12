@@ -52,8 +52,6 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
                 return;
             }
             scriptUserDataDir = new File(Script.getScriptUserDataDir(this), userDataDir);
-            if (!scriptUserDataDir.exists())
-                scriptUserDataDir.mkdir();
             if (!loadExistingScript(scriptUserDataDir)) {
                 showErrorAndFinish("Can't continue script:", lastErrorMessage);
                 return;
@@ -80,8 +78,12 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             return false;
         }
         scriptUserDataDir = new File(Script.getScriptUserDataDir(this), userDataDir);
-        if (!scriptUserDataDir.exists())
-            scriptUserDataDir.mkdir();
+        if (!scriptUserDataDir.exists()) {
+            if (!scriptUserDataDir.mkdir()) {
+                lastErrorMessage = "can't create user data directory";
+                return false;
+            }
+        }
 
         if (scriptName != null) {
             // start new script
@@ -181,7 +183,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             return false;
 
         File projectFile = new File(scriptUserDataDir, SCRIPT_USER_DATA_FILENAME);
-        FileWriter fileWriter = null;
+        FileWriter fileWriter;
         try {
             fileWriter = new FileWriter(projectFile);
 
@@ -259,8 +261,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
         public android.support.v4.app.Fragment getItem(int position) {
             ScriptComponentTreeFragmentHolder fragmentCreator
                     = (ScriptComponentTreeFragmentHolder)components.get(position);
-            android.support.v4.app.Fragment fragment = fragmentCreator.createFragment();
-            return fragment;
+            return fragmentCreator.createFragment();
         }
 
         @Override
