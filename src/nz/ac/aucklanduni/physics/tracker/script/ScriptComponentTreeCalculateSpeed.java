@@ -8,15 +8,17 @@
 package nz.ac.aucklanduni.physics.tracker.script;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import nz.ac.aucklanduni.physics.tracker.*;
 import nz.ac.aucklanduni.physics.tracker.views.table.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragmentHolder {
@@ -30,6 +32,24 @@ public class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragme
     private float speed1 = 0.f;
     private float speed2 = 0.f;
     private float acceleration1 = 0.f;
+    private int selectedSpeedUnitIndex = 0;
+    private int selectedAccelerationUnitIndex = 0;
+
+    public int getSelectedSpeedUnitIndex() {
+        return selectedSpeedUnitIndex;
+    }
+
+    public void setSelectedSpeedUnitIndex(int selectedSpeedUnitIndex) {
+        this.selectedSpeedUnitIndex = selectedSpeedUnitIndex;
+    }
+
+    public int getSelectedAccelerationUnitIndex() {
+        return selectedAccelerationUnitIndex;
+    }
+
+    public void setSelectedAccelerationUnitIndex(int selectedAccelerationUnitIndex) {
+        this.selectedAccelerationUnitIndex = selectedAccelerationUnitIndex;
+    }
 
     public ScriptComponentTreeCalculateSpeed(Script script, boolean xSpeed) {
         super(script);
@@ -119,6 +139,8 @@ public class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragme
         bundle.putFloat("speed1", speed1);
         bundle.putFloat("speed2", speed2);
         bundle.putFloat("acceleration1", acceleration1);
+        bundle.putInt("selectedSpeedUnitIndex", selectedSpeedUnitIndex);
+        bundle.putInt("selectedAccelerationUnitIndex", selectedAccelerationUnitIndex);
     }
 
     public boolean fromBundle(Bundle bundle) {
@@ -131,6 +153,8 @@ public class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragme
         speed1 = bundle.getFloat("speed1", 0.0f);
         speed2 = bundle.getFloat("speed2", 0.0f);
         acceleration1 = bundle.getFloat("acceleration1", 0.0f);
+        selectedSpeedUnitIndex = bundle.getInt("selectedSpeedUnitIndex", 0);
+        selectedAccelerationUnitIndex = bundle.getInt("selectedAccelerationUnitIndex", 0);
         return true;
     }
 }
@@ -148,7 +172,20 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     private TableView rawDataTable = null;
     private TableView speedTable = null;
     private TableView accelerationTable = null;
+    private CheckBox positionCheckBox = null;
+    private CheckBox speedCheckBox = null;
+    private CheckBox accelerationCheckBox = null;
+    private Spinner speedUnitSpinner = null;
+    private Spinner accelerationUnitSpinner = null;
+    private TextView positionUnitTextView = null;
+
+    private List<String> unitList = new ArrayList<String>();
+    private String correctSpeedUnit = "[m/s]";
+    private String correctAccelerationUnit = "[m/s^2]";
+    private float unitFactor = 1f;
+
     protected MarkersDataModel tagMarker = null;
+
 
     public ScriptComponentCalculateSpeedFragment(ScriptComponentTreeCalculateSpeed component) {
         super(component);
@@ -190,16 +227,14 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         acceleration1EditText = (EditText)child.findViewById(R.id.acceleration1EditText);
         assert acceleration1EditText != null;
 
-        Button okButton = (Button)child.findViewById(R.id.buttonOk);
-        assert okButton != null;
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                boolean validInput = checkInput();
-                inputResponse(validInput);
-                setDone(validInput);
-            }
-        });
+        positionCheckBox = (CheckBox)child.findViewById(R.id.positionCheckBox);
+        assert positionCheckBox != null;
+        speedCheckBox = (CheckBox)child.findViewById(R.id.speedCheckBox);
+        assert speedCheckBox != null;
+        accelerationCheckBox = (CheckBox)child.findViewById(R.id.accelerationCheckBox);
+        assert accelerationCheckBox != null;
+
+        positionUnitTextView = (TextView)child.findViewById(R.id.positionUnitTextView);
 
         speedTable = (TableView)child.findViewById(R.id.speedTable);
         assert speedTable != null;
@@ -207,18 +242,51 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         accelerationTable = (TableView)child.findViewById(R.id.accelerationTable);
         assert accelerationTable != null;
 
-        return view;
-    }
+        speedUnitSpinner = (Spinner)child.findViewById(R.id.speedUnitSpinner);
+        assert speedUnitSpinner != null;
+        accelerationUnitSpinner = (Spinner)child.findViewById(R.id.accelerationUnitSpinner);
+        assert accelerationUnitSpinner != null;
 
-    private void inputResponse(boolean validInput) {
-        if (validInput) {
-            Toast toast = Toast.makeText(getActivity(), "Well done!", Toast.LENGTH_LONG);
-            toast.show();
-        } else {
-            Toast toast = Toast.makeText(getActivity(), "Some values are wrong! please check again.",
-                    Toast.LENGTH_LONG);
-            toast.show();
-        }
+        unitList.add("select unit");
+        unitList.add("[s/m]");
+        unitList.add("[m]");
+        unitList.add(correctSpeedUnit);
+        unitList.add("[apples/s]");
+        unitList.add("[s^2/m]");
+        unitList.add(correctAccelerationUnit);
+        unitList.add("[m^2/s^2]");
+        unitList.add("[s]");
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_dropdown_item, unitList);
+
+        speedUnitSpinner.setAdapter(adapter);
+        accelerationUnitSpinner.setAdapter(adapter);
+
+        speedUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                update();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        accelerationUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                update();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        return view;
     }
 
     @Override
@@ -238,6 +306,8 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         speedComponent.setSpeed1(speed1);
         speedComponent.setSpeed2(speed2);
         speedComponent.setAcceleration1(acceleration1);
+        speedComponent.setSelectedSpeedUnitIndex(speedUnitSpinner.getSelectedItemPosition());
+        speedComponent.setSelectedAccelerationUnitIndex(accelerationUnitSpinner.getSelectedItemPosition());
 
         super.onPause();
     }
@@ -252,6 +322,8 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
                 speedComponent.getExperiment().getExperimentPath());
         if (experimentAnalysis == null)
             return;
+
+        positionUnitTextView.setText("[" + getPositionUnit() + "]");
 
         tagMarker = experimentAnalysis.getTagMarkers();
         ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
@@ -294,11 +366,105 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         text += speedComponent.getAcceleration1();
         acceleration1EditText.setText(text);
 
+        installEditTextListener();
+
+        speedUnitSpinner.setSelection(speedComponent.getSelectedSpeedUnitIndex());
+        accelerationUnitSpinner.setSelection(speedComponent.getSelectedAccelerationUnitIndex());
+
         speedTable.setAdapter(createSpeedTableAdapter(experimentAnalysis));
         accelerationTable.setAdapter(createAccelerationTableAdapter(experimentAnalysis));
-        if (speedComponent.getState() != ScriptComponentTree.SCRIPT_STATE_DONE)
-            setDone(false);
 
+        update();
+    }
+
+    private
+    void installEditTextListener() {
+        position1EditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                update();
+            }
+        });
+        position2EditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                update();
+            }
+        });
+        position3EditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                update();
+            }
+        });
+
+        speed1EditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                update();
+            }
+        });
+        speed2EditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                update();
+            }
+        });
+
+        acceleration1EditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                update();
+            }
+        });
     }
 
     private void setDone(boolean done) {
@@ -321,10 +487,17 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         return true;
     }
 
-    private boolean checkInput() {
-        float position1 = Float.parseFloat(String.valueOf(position1EditText.getText()));
-        float position2 = Float.parseFloat(String.valueOf(position2EditText.getText()));
-        float position3 = Float.parseFloat(String.valueOf(position3EditText.getText()));
+    private boolean checkPositionInput() {
+        float position1;
+        float position2;
+        float position3;
+        try {
+            position1 = Float.parseFloat(String.valueOf(position1EditText.getText()));
+            position2 = Float.parseFloat(String.valueOf(position2EditText.getText()));
+            position3 = Float.parseFloat(String.valueOf(position3EditText.getText()));
+        } catch (NumberFormatException e) {
+            return false;
+        }
 
         if (!fuzzyEqual(position1, getPosition(0)))
             return false;
@@ -333,27 +506,94 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         if (!fuzzyEqual(position3, getPosition(2)))
             return false;
 
-        float speed1 = Float.parseFloat(String.valueOf(speed1EditText.getText()));
-        float speed2 = Float.parseFloat(String.valueOf(speed2EditText.getText()));
+        return true;
+    }
+
+    private boolean checkSpeedInput() {
+        float speed1;
+        float speed2;
+        try {
+            speed1 = Float.parseFloat(String.valueOf(speed1EditText.getText()));
+            speed2 = Float.parseFloat(String.valueOf(speed2EditText.getText()));
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+        String unit = unitList.get(speedUnitSpinner.getSelectedItemPosition());
+        if (!unit.equals(correctSpeedUnit))
+            return false;
+
         // round value to one decimal, this fixes some problem with small speeds values
         float correctSpeed1 = ((float)Math.round(getSpeed(0) * 10)) / 10;
         float correctSpeed2 = ((float)Math.round(getSpeed(1) * 10)) / 10;
+
+        correctSpeed1 *= getUnitToMeterFactor();
+        correctSpeed2 *= getUnitToMeterFactor();
 
         if (!fuzzyEqual(speed1, correctSpeed1))
             return false;
         if (!fuzzyEqual(speed2, correctSpeed2))
             return false;
 
-        float acceleration1 = Float.parseFloat(String.valueOf(acceleration1EditText.getText()));
-        float correctAcceleration1 = ((float)Math.round(getAcceleration(0) * 10)) / 10;
-        if (!fuzzyEqual(acceleration1, correctAcceleration1))
+        return true;
+    }
+
+    private boolean checkAccelerationInput() {
+        float acceleration1;
+        try {
+            acceleration1 = Float.parseFloat(String.valueOf(acceleration1EditText.getText()));
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+        String unit = unitList.get(accelerationUnitSpinner.getSelectedItemPosition());
+        if (!unit.equals(correctAccelerationUnit))
             return false;
 
-        return true;
+        float correctAcceleration1 = ((float)Math.round(getAcceleration(0) * 10)) / 10;
+        correctAcceleration1 *= getUnitToMeterFactor();
+
+        return fuzzyEqual(acceleration1, correctAcceleration1);
+    }
+
+    private void update() {
+        boolean allDone = true;
+        if (checkPositionInput())
+            positionCheckBox.setChecked(true);
+        else {
+            allDone = false;
+            positionCheckBox.setChecked(false);
+        }
+        if (checkSpeedInput())
+            speedCheckBox.setChecked(true);
+        else {
+            allDone = false;
+            speedCheckBox.setChecked(false);
+        }
+        if (checkAccelerationInput())
+            accelerationCheckBox.setChecked(true);
+        else {
+            allDone = false;
+            accelerationCheckBox.setChecked(false);
+        }
+
+        setDone(allDone);
+    }
+
+    private float getUnitToMeterFactor() {
+        String unit = getPositionUnit();
+        if (unit.equals("mm"))
+            return 0.001f;
+        if (unit.equals("cm"))
+            return 0.01f;
+        if (unit.equals("m"))
+            return 1f;
+        return 1f;
     }
 
     abstract String getDescriptionLabel();
     abstract float getPosition(int index);
+    abstract String getPositionUnit();
     abstract float getSpeed(int index);
     abstract float getAcceleration(int index);
     abstract ColumnMarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis);
@@ -377,6 +617,16 @@ class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpe
     @Override
     float getPosition(int index) {
         return tagMarker.getCalibratedMarkerPositionAt(index).x;
+    }
+
+    @Override
+    String getPositionUnit() {
+        ScriptComponentTreeCalculateSpeed speedComponent = (ScriptComponentTreeCalculateSpeed)component;
+        ExperimentAnalysis experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(getActivity(),
+                speedComponent.getExperiment().getExperimentPath());
+        if (experimentAnalysis == null)
+            return "";
+        return experimentAnalysis.getXUnit();
     }
 
     @Override
@@ -425,6 +675,16 @@ class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalculateSpe
     @Override
     float getPosition(int index) {
         return tagMarker.getCalibratedMarkerPositionAt(index).y;
+    }
+
+    @Override
+    String getPositionUnit() {
+        ScriptComponentTreeCalculateSpeed speedComponent = (ScriptComponentTreeCalculateSpeed)component;
+        ExperimentAnalysis experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(getActivity(),
+                speedComponent.getExperiment().getExperimentPath());
+        if (experimentAnalysis == null)
+            return "";
+        return experimentAnalysis.getYUnit();
     }
 
     @Override

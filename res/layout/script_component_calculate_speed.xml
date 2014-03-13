@@ -29,26 +29,50 @@
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="time [ms]"
+                    android:text="time"
                     android:id="@+id/textView"/>
             <TextView
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="position [m]"
-                    android:id="@+id/postionLabel"/>
+                    android:text="position"
+                    android:id="@+id/textView2"/>
             <TextView
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="speed [m/s]"
+                    android:text="average speed"
                     android:id="@+id/textView3"/>
             <TextView
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="acceleration [m/s^2]"
+                    android:text="avg. acceleration"
                     android:id="@+id/textView4"/>
+        </TableRow>
+        <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent" android:layout_column="0">
+            <TextView
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="[ms]"
+                    android:id="@+id/textView5"/>
+            <TextView
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="[m]"
+                    android:id="@+id/positionUnitTextView"/>
+            <Spinner
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/speedUnitSpinner"/>
+            <Spinner
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/accelerationUnitSpinner"/>
         </TableRow>
         <TableRow
                 android:layout_width="wrap_content"
@@ -151,12 +175,29 @@
             <Space
                     android:layout_width="0dp" android:layout_height="20dp"/>
         </TableRow>
+        <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent">
+            <Space
+                    android:layout_width="0dp" android:layout_height="20dp"/>
+            <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="" android:checked="false" android:clickable="false"
+                    android:id="@+id/positionCheckBox"/>
+            <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="" android:checked="false" android:clickable="false"
+                    android:id="@+id/speedCheckBox"/>
+            <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="" android:checked="false" android:clickable="false"
+                    android:id="@+id/accelerationCheckBox"/>
+        </TableRow>
+
     </TableLayout>
-    <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ok"
-            android:id="@+id/buttonOk" android:layout_row="6" android:layout_column="5"/>
     <ScrollView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -175,6 +216,4 @@
               android:layout_height="wrap_content"
               class="nz.ac.aucklanduni.physics.tracker.views.table.TableView" android:id="@+id/accelerationTable" android:focusable="false"/>
     </ScrollView>
-
-
 </GridLayout>
