@@ -140,18 +140,27 @@ class ScriptComponentTextQuestion extends ScriptComponentViewHolder {
     public View createView(Context context, android.support.v4.app.Fragment parent) {
         ScriptComponentTreeSheetBase.Counter counter = this.component.getCounter("QuestionCounter");
 
+        // Note: we have to do this programmatically cause findViewById would find the wrong child items if there are
+        // more than one text question.
         LayoutInflater inflater = (LayoutInflater)context.getSystemService
                 (Context.LAYOUT_INFLATER_SERVICE);
 
-        View view = inflater.inflate(layout.script_component_text_question, null, false);
-        assert view != null;
+        LinearLayout layout = new LinearLayout(context);
+        layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setBackgroundColor(context.getResources().getColor(color.sc_question_background_color));
 
-        TextView textView = (TextView)view.findViewById(id.questionTextView);
-        assert textView != null;
+
+        TextView textView = new TextView(context);
+        textView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
         textView.setTextAppearance(context, android.R.style.TextAppearance_Medium);
         textView.setText("Q" + counter.increaseValue() + ": " + text);
 
-        EditText editText = (EditText)view.findViewById(id.questionEditText);
+        EditText editText = new EditText(context);
+        editText.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
         assert editText != null;
         editText.setText(answer);
         editText.addTextChangedListener(new TextWatcher() {
@@ -172,7 +181,9 @@ class ScriptComponentTextQuestion extends ScriptComponentViewHolder {
             }
         });
 
-        return view;
+        layout.addView(textView);
+        layout.addView(editText);
+        return layout;
     }
 
     @Override
