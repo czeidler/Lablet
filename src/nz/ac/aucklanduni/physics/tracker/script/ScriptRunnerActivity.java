@@ -12,16 +12,18 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.View;
+import android.view.ViewGroup;
 import nz.ac.aucklanduni.physics.tracker.ExperimentActivity;
 import nz.ac.aucklanduni.physics.tracker.PersistentBundle;
 import nz.ac.aucklanduni.physics.tracker.R;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 public class ScriptRunnerActivity extends FragmentActivity implements IScriptListener {
@@ -226,7 +228,6 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             lastSelectedComponent = activeChain.get(pager.getCurrentItem());
         activeChain = script.getActiveChain();
         pagerAdapter.setComponents(activeChain);
-        pagerAdapter.notifyDataSetChanged();
 
         int index = activeChain.indexOf(lastSelectedComponent);
         if (index < 0)
@@ -244,6 +245,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
 
     private class ScriptFragmentPagerAdapter extends FragmentStatePagerAdapter {
         private List<ScriptComponentTree> components;
+        private Map<ScriptComponentTree, Fragment> fragmentMap = new HashMap<ScriptComponentTree, Fragment>();
 
         public ScriptFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager,
                                           List<ScriptComponentTree> components) {
@@ -261,7 +263,9 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
         public android.support.v4.app.Fragment getItem(int position) {
             ScriptComponentTreeFragmentHolder fragmentCreator
                     = (ScriptComponentTreeFragmentHolder)components.get(position);
-            return fragmentCreator.createFragment();
+            Fragment fragment = fragmentCreator.createFragment();
+            fragmentMap.put(components.get(position), fragment);
+            return fragment;
         }
 
         @Override
@@ -269,17 +273,39 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             return components.size();
         }
 
-        /*
         @Override
-        public int getItemPosition(Object object)
-        {
-            View o = (View)object;
-            int index = mMessages.indexOf(o.getTag());
-            if (index == -1)
+        public int getItemPosition(Object object) {
+            Fragment fragment = (Fragment)object;
+            ScriptComponentTree component = findComponentFor(fragment);
+            if (component == null)
                 return POSITION_NONE;
-            else
-                return index;
-            return POSITION_NONE;
-        }*/
+
+            int index = components.indexOf(component);
+            assert index >= 0;
+
+            // For some reasons old fragment views are sometimes not automatically invalidated. Do it manually:
+            View fragmentView = fragment.getView();
+            if (fragmentView != null)
+                fragmentView.invalidate();
+
+            return index;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            Fragment fragment = (Fragment)object;
+            ScriptComponentTree component = findComponentFor(fragment);
+            if (component == null)
+                return;
+            fragmentMap.remove(components.indexOf(component));
+        }
+
+        private ScriptComponentTree findComponentFor(Fragment fragment) {
+            for (Map.Entry<ScriptComponentTree, Fragment> entry : fragmentMap.entrySet()) {
+                if (entry.getValue() == fragment)
+                    return entry.getKey();
+            }
+            return null;
+        }
     }
 }
