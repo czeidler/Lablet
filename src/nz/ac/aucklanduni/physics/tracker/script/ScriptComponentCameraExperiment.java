@@ -52,14 +52,15 @@ public class ScriptComponentCameraExperiment extends ScriptComponentViewHolder {
     public void toBundle(Bundle bundle) {
         super.toBundle(bundle);
 
-        bundle.putString("experiment_path", experiment.getExperimentPath());
+        if (experiment.getExperimentPath() != null)
+            bundle.putString("experiment_path", experiment.getExperimentPath());
     }
 
     public boolean fromBundle(Bundle bundle) {
         if (!super.fromBundle(bundle))
             return false;
 
-        experiment.setExperimentPath(bundle.getString("experiment_path"));
+        experiment.setExperimentPath(bundle.getString("experiment_path", ""));
         return true;
     }
 }
