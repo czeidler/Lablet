@@ -78,7 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="A typical peanut butter jam (PBJ) sandwich contains 432 Calories. How many throws could you perform with one PBJ sandwiches?\n(1 Calorie = 4.184 J)"
+            android:text="A typical peanut butter jam (PBJ) sandwich contains 432 Calories. How many throws could you perform with one PBJ sandwich?\n(1 Calorie = 4.184 J)"
             android:id="@+id/pbjSandwichQuestionTextView"/>
     <RelativeLayout
             android:orientation="horizontal"
