@@ -48,7 +48,7 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
         assert finishComponentButton != null;
 
         if (!component.hasChild())
-            finishComponentButton.setText("Exist");
+            finishComponentButton.setText("Exit");
         finishComponentButton.setEnabled(false);
         finishComponentButton.setOnClickListener(new View.OnClickListener() {
             @Override
