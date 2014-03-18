@@ -112,6 +112,9 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
 
     private void startExperimentActivity() {
         Intent intent = new Intent(getContext(), CameraExperimentActivity.class);
+        Bundle options = new Bundle();
+        options.putBoolean("showAnalyseMenu", false);
+        intent.putExtras(options);
         startActivityForResult(intent, PERFORM_EXPERIMENT);
     }
 

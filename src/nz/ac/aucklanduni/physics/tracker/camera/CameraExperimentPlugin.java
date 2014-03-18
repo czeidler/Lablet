@@ -30,8 +30,10 @@ public class CameraExperimentPlugin implements ExperimentPlugin {
     }
 
     @Override
-    public void startExperimentActivity(Activity parentActivity, int requestCode) {
+    public void startExperimentActivity(Activity parentActivity, int requestCode, Bundle options) {
         Intent intent = new Intent(parentActivity, CameraExperimentActivity.class);
+        if (options != null)
+            intent.putExtras(options);
         parentActivity.startActivityForResult(intent, requestCode);
     }
 

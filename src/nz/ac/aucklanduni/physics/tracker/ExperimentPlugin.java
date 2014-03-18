@@ -17,7 +17,7 @@ import java.io.File;
 
 public interface ExperimentPlugin {
     public String getName();
-    public void startExperimentActivity(Activity parentActivity, int requestCode);
+    public void startExperimentActivity(Activity parentActivity, int requestCode, Bundle options);
 
     /**
      *

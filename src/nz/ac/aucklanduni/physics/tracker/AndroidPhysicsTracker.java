@@ -291,7 +291,7 @@ public class AndroidPhysicsTracker extends Activity {
     }
 
     private void startExperiment(ExperimentPlugin plugin) {
-        plugin.startExperimentActivity(this, PERFORM_EXPERIMENT);
+        plugin.startExperimentActivity(this, PERFORM_EXPERIMENT, null);
     }
 
     private void startScriptActivity() {

@@ -70,6 +70,15 @@ public class CameraExperimentActivity extends ExperimentActivity {
                 return true;
             }
         });
+        Intent intent = getIntent();
+        if (intent != null) {
+            Bundle options = intent.getExtras();
+            if (options != null) {
+                boolean showAnalyseMenu = options.getBoolean("showAnalyseMenu", true);
+                analyseMenuItem.setVisible(showAnalyseMenu);
+            }
+        }
+
         return super.onPrepareOptionsMenu(menu);
     }
 
