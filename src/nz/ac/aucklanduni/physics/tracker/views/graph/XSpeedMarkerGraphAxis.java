@@ -34,7 +34,7 @@ public class XSpeedMarkerGraphAxis extends MarkerGraphAxis {
     @Override
     public String getLabel() {
         ExperimentAnalysis experimentAnalysis = getExperimentAnalysis();
-        return "speed [" + experimentAnalysis.getXUnit() + "/"
+        return "velocity [" + experimentAnalysis.getXUnit() + "/"
                 + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
     }
 

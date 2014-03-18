@@ -25,7 +25,7 @@ public class YSpeedDataTableColumn extends DataTableColumn {
 
     @Override
     public String getHeader() {
-        return "speed [" + experimentAnalysis.getYUnit() + "/"
+        return "velocity [" + experimentAnalysis.getYUnit() + "/"
                 + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
     }
 

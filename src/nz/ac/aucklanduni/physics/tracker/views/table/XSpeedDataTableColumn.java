@@ -25,7 +25,7 @@ public class XSpeedDataTableColumn extends DataTableColumn {
 
     @Override
     public String getHeader() {
-        return "speed [" + experimentAnalysis.getXUnit() + "/"
+        return "velocity [" + experimentAnalysis.getXUnit() + "/"
                 + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
     }
 
