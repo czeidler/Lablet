@@ -123,7 +123,7 @@ public class ScriptComponentTreeExperimentSheet extends ScriptComponentTreeSheet
 
     public void addXSpeedGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
         GraphViewHolder item = new GraphViewHolder(this, experiment);
-        item.setTitle("X-Speed vs. Time");
+        item.setTitle("X-Velocity vs. Time");
         item.setXAxisContent("time_v");
         item.setYAxisContent("x-velocity");
         addItemViewHolder(item, parent);
@@ -131,7 +131,7 @@ public class ScriptComponentTreeExperimentSheet extends ScriptComponentTreeSheet
 
     public void addYSpeedGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
         GraphViewHolder item = new GraphViewHolder(this, experiment);
-        item.setTitle("Y-Speed vs. Time");
+        item.setTitle("Y-Velocity vs. Time");
         item.setXAxisContent("time_v");
         item.setYAxisContent("y-velocity");
         addItemViewHolder(item, parent);

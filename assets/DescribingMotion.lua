@@ -51,10 +51,13 @@ function onBuildExperimentScript(scriptBuilder)
 	experimentAnalysisProjectile:setDescriptionText("Please analyse the projectile video:")
 
 	-- analysis
+
+	-- free fall motion
 	local calculateYSpeed = scriptBuilder:create("CalculateYSpeed")
-	calculateYSpeed:setExperiment(experimentFreeFall)
-	calculateYSpeed:setTitle("Free fall: Deriving average y-velocity and y-acceleration from displacement")
 	scriptBuilder:add(calculateYSpeed)
+	calculateYSpeed:setExperiment(experimentFreeFall)
+	calculateYSpeed:setTitle("Free fall")
+	calculateYSpeed:setHeader("Deriving average y-velocity and y-acceleration from displacement")
 
 	local freeFallQuestions = scriptBuilder:create("ExperimentSheet")
 	scriptBuilder:add(freeFallQuestions)
@@ -66,45 +69,43 @@ function onBuildExperimentScript(scriptBuilder)
 	freeFallQuestions:addYSpeedGraph(experimentFreeFall, graphLayout)
 	freeFallQuestions:addTextQuestion("We know that moving objects have kinetic energy and that energy can be transferred from one form to the other. How did the ball gain kinetic energy?")
 	freeFallQuestions:addTextQuestion("Use the “Conservation of Energy” principle to estimate the impact velocity of the ball. How does it compare with your observed final velocity? If there is any difference, suggest the possible causes.")
+	freeFallQuestions:addCheckQuestion("Go to your demonstrator now and verify your results.")
 
 	-- up down motion
 	local upDownMotionQuestions = scriptBuilder:create("ExperimentSheet")
 	scriptBuilder:add(upDownMotionQuestions)
 	upDownMotionQuestions:setTitle("Vertical linear motion")
 	upDownMotionQuestions:addHeader("Analysing graphs:")
-	upDownMotionQuestions:addText("Use the position-time graph and the velocity-time graph to complete the questions below. Go to your demonstrator when you are ready to answer these questions.")
+	upDownMotionQuestions:addText("Use the position-time graph and the velocity-time graph to complete the questions below.")
 	local graphLayout = upDownMotionQuestions:addHorizontalGroupLayout()
 	local graph = upDownMotionQuestions:addGraph(experimentUpDown, graphLayout)
 	graph:setTitle("Position vs. Time")
 	graph:setXAxisContent("time")
 	graph:setYAxisContent("x-position")
 	local graph = upDownMotionQuestions:addGraph(experimentUpDown, graphLayout)
-	graph:setTitle("y-Speed vs. Time")
-	graph:setXAxisContent("time_speed")
-	graph:setYAxisContent("y-speed")
+	graph:setTitle("y-Velocity vs. Time")
+	graph:setXAxisContent("time_v")
+	graph:setYAxisContent("y-velocity")
 	upDownMotionQuestions:addTextQuestion("How does the vertical velocity vary with time?")
 	upDownMotionQuestions:addQuestion("Point out on the height-time graph where the vertical velocity of the ball was the maximum and also where it was zero.")
 	
 	upDownMotionQuestions:addHeader("Estimating Energy Input")
-	upDownMotionQuestions:addText("Complete the following questions and discuss with your demonstrator:")
+	upDownMotionQuestions:addText("Complete the following questions:")
 	pbjQuestion = upDownMotionQuestions:addPotentialEnergy1Question();
 	pbjQuestion:setMassQuestionText("Please enter the mass of the ball:")
 	pbjQuestion:setHeightQuestionText("What was the height of the ball at its peak?")
 	pbjQuestion:setEnergyQuestionTextView("How much energy input enabled the ball to reach this height?")
+	upDownMotionQuestions:addCheckQuestion("Go to your demonstrator now and verify your results.")
 
 	-- projectile motion
-	--local calculateXSpeed = scriptBuilder:create("CalculateXSpeed")
-	--calculateXSpeed:setExperiment(experimentUpDown)
-	--scriptBuilder:add(calculateXSpeed)
-	
 	local projectileMotionQuestions = scriptBuilder:create("ExperimentSheet")
 	scriptBuilder:add(projectileMotionQuestions)
 	projectileMotionQuestions:setTitle("Projectile Motion")
 	projectileMotionQuestions:addHeader("Analysing graphs")
-	projectileMotionQuestions:addText("The position-time graphs and the velocity-time graphs are created from your measurements. Use these graphs to complete the questions below and discuss with your demonstrator.")
+	projectileMotionQuestions:addText("The position-time graphs and the velocity-time graphs are created from your measurements. Use these graphs to complete the questions below.")
 	projectileMotionQuestions:addYSpeedGraph(experimentProjectile)
 	projectileMotionQuestions:addTextQuestion("How does the vertical velocity vary with time?") 
-	projectileMotionQuestions:addQuestion("Show your demonstrator how you would draw a free body diagram of the ball at the peak of the trajectory.")
+	projectileMotionQuestions:addQuestion("How would you draw a free body diagram of the ball at the peak of the trajectory?")
 	projectileMotionQuestions:addTextQuestion("Compare the “vertical velocity-time” graphs of projectile motion, vertical linear motion and free fall. What are the similarities or the differences? (Hint: How does the direction of the moving ball affect the sign of velocity? Does the velocity vary or remain constant? Does the acceleration vary or remain constant?)")
 	
 	projectileMotionQuestions:addHeader("Analysing the horizontal velocity in projectile motion")
@@ -113,13 +114,13 @@ function onBuildExperimentScript(scriptBuilder)
 	projectileMotionQuestions:addTextQuestion("Does the horizontal velocity vary or remain constant? What about the horizontal acceleration?")
 
 	projectileMotionQuestions:addHeader("Estimating the horizontal and vertical accelerations")
-	projectileMotionQuestions:addTextQuestion("Using the velocity-time graphs, estimate the horizontal and vertical accelerations and discuss with your demonstrator how you arrive at your estimates.")
+	projectileMotionQuestions:addTextQuestion("Using the velocity-time graphs, estimate the horizontal and vertical accelerations. How did you arrive to your estimates.")
 	
 	local graphLayout = projectileMotionQuestions:addHorizontalGroupLayout()
 	projectileMotionQuestions:addXSpeedGraph(experimentProjectile, graphLayout)
 	projectileMotionQuestions:addYSpeedGraph(experimentProjectile, graphLayout)
 	
 	projectileMotionQuestions:addHeader("Sources of uncertainties")
-	projectileMotionQuestions:addTextQuestion("How do your estimates of horizontal and vertical accelerations compare with your expected values? Discuss with your demonstrator what your expected values are, and if there is any difference, discuss the sources of uncertainties.")
-		
+	projectileMotionQuestions:addTextQuestion("How do your estimates of horizontal and vertical accelerations compare with your expected values? What are your expected values? If there is any difference, discuss the sources of uncertainties.")
+	projectileMotionQuestions:addCheckQuestion("Go to your demonstrator now and verify your results.")
 end
