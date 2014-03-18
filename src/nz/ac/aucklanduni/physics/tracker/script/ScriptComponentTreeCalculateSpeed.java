@@ -26,6 +26,7 @@ public class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragme
 
     private boolean isXSpeed;
 
+    private String header = "";
     private float position1 = 0.f;
     private float position2 = 0.f;
     private float position3 = 0.f;
@@ -55,6 +56,14 @@ public class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragme
         super(script);
 
         isXSpeed = xSpeed;
+    }
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+    public String getHeader() {
+        return header;
     }
 
     @Override
@@ -194,10 +203,17 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        ScriptComponentTreeCalculateSpeed speedComponent = (ScriptComponentTreeCalculateSpeed)component;
+
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
         View child = setChild(R.layout.script_component_calculate_speed);
         assert child != null;
+
+        TextView headerTextView = (TextView)child.findViewById(R.id.headerTextView);
+        assert headerTextView != null;
+        if (!speedComponent.getHeader().equals(""))
+            headerTextView.setText(speedComponent.getHeader());
 
         rawDataTable = (TableView)child.findViewById(R.id.dataTable);
         assert rawDataTable != null;
