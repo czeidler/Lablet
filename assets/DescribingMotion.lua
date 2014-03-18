@@ -27,7 +27,7 @@ function onBuildExperimentScript(scriptBuilder)
 	info:addText("Check with your demonstrator about your videos and get ticked off before your proceed to video analysis.")
 	
 	info:addText("Video analysis: In this section, you and your lab partner will track the motion of the ball. For all three videos follow these steps:")
-	info:addText("Go to \"Video Settings\". Set the start and end frames. For example, the free-fall video should start shortly before the ball leaves your hand and shortly after the ball hits the ground. Optionally, set the frame rate to 30 or 15 frames per second. Click \"Apply\".")
+	info:addText("Go to \"Video Settings\". Set the start and end frames. For example, the free-fall video should start shortly before the ball leaves your hand and shortly after the ball hits the ground. Optionally, increase the frame rate to 15 or 30 frames per second. Click \"Apply\".")
 	info:addText("Now drag the green length scale to fit your length reference. Click on \"Calibration\" and set scale. Click \"Apply\".")
 	info:addText("You can now tag the positions of the ball from the initial position to the final position. Find the cross-hair with green rings, drag it by the outer ring to tag the ball and advance to the next frame. Repeat until you have finished tagging. Click “Done” to analyse other videos (e.g. vertical linear motion and projectile motion).")
 
