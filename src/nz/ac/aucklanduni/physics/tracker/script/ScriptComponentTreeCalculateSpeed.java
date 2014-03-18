@@ -558,23 +558,29 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
 
     private void update() {
         boolean allDone = true;
-        if (checkPositionInput())
+        if (checkPositionInput()) {
             positionCheckBox.setChecked(true);
-        else {
+            positionCheckBox.setText("Correct!");
+        } else {
             allDone = false;
             positionCheckBox.setChecked(false);
+            positionCheckBox.setText("");
         }
-        if (checkSpeedInput())
+        if (checkSpeedInput()) {
             speedCheckBox.setChecked(true);
-        else {
+            speedCheckBox.setText("Correct!");
+        } else {
             allDone = false;
             speedCheckBox.setChecked(false);
+            speedCheckBox.setText("");
         }
-        if (checkAccelerationInput())
+        if (checkAccelerationInput()) {
             accelerationCheckBox.setChecked(true);
-        else {
+            accelerationCheckBox.setText("Correct!");
+        } else {
             allDone = false;
             accelerationCheckBox.setChecked(false);
+            accelerationCheckBox.setText("");
         }
 
         setDone(allDone);
