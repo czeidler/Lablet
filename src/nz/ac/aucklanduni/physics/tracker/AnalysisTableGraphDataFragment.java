@@ -49,12 +49,12 @@ public class AnalysisTableGraphDataFragment extends android.support.v4.app.Fragm
         // velocity graph
         ySpeedGraphView = (GraphView2D)view.findViewById(R.id.yVelocityGraphView);
         assert ySpeedGraphView != null;
-        ySpeedGraphView.setAdapter(MarkerGraphAdapter.createYSpeedAdapter(experimentAnalysis, "y-Speed"));
+        ySpeedGraphView.setAdapter(MarkerGraphAdapter.createYSpeedAdapter(experimentAnalysis, "y-Velocity"));
 
         // velocity graph
         xSpeedGraphView = (GraphView2D)view.findViewById(R.id.xVelocityGraphView);
         assert xSpeedGraphView != null;
-        xSpeedGraphView.setAdapter(MarkerGraphAdapter.createXSpeedAdapter(experimentAnalysis, "x-Speed"));
+        xSpeedGraphView.setAdapter(MarkerGraphAdapter.createXSpeedAdapter(experimentAnalysis, "x-Velocity"));
         return view;
     }
 
