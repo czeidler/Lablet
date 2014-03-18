@@ -63,7 +63,7 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
         if (component.getState() == ScriptComponentTree.SCRIPT_STATE_DONE)
             doneCheckBox.setChecked(true);
 
-        massEditText.setText(Float.toString(component.getMass()));
+        massEditText.setText(Float.toString(getMass()));
         heightEditText.setText(Float.toString(component.getHeight()));
         energyEditText.setText(Float.toString(component.getEnergy()));
         pbjEditText.setText(Float.toString(component.getPbjValue()));
@@ -148,6 +148,10 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
                 }
             }
         });
+    }
+
+    private float getMass() {
+        return component.getMass() * 1000.f;
     }
 
     private void setMass(float height) {
