@@ -44,8 +44,10 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
         setContentView(R.layout.experiment_analyser);
         // Instantiate a ViewPager and a PagerAdapter.
         pager = (ViewPager)findViewById(R.id.pager);
-        pagerAdapter = new ScriptFragmentPagerAdapter(pager, getSupportFragmentManager(), activeChain);
+        pagerAdapter = new ScriptFragmentPagerAdapter(getSupportFragmentManager(), activeChain);
         pager.setAdapter(pagerAdapter);
+        // there are some performance problems when loading the script fragments on the fly; cache some more
+        pager.setOffscreenPageLimit(10);
 
         if (savedInstanceState != null) {
             String userDataDir = savedInstanceState.getString("script_user_data_dir");
@@ -243,18 +245,14 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             pager.setCurrentItem(index);
     }
 
-    private class ScriptFragmentPagerAdapter extends FragmentStatePagerAdapter
-            implements ViewPager.OnPageChangeListener {
-        private ViewPager pager;
+    private class ScriptFragmentPagerAdapter extends FragmentStatePagerAdapter {
         private List<ScriptComponentTree> components;
         private Map<ScriptComponentTree, Fragment> fragmentMap = new HashMap<ScriptComponentTree, Fragment>();
 
-        public ScriptFragmentPagerAdapter(ViewPager pager, android.support.v4.app.FragmentManager fragmentManager,
+        public ScriptFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager,
                                           List<ScriptComponentTree> components) {
             super(fragmentManager);
 
-            this.pager = pager;
-            pager.setOnPageChangeListener(this);
             this.components = components;
         }
 
@@ -276,7 +274,9 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
         public int getCount() {
             return components.size();
         }
-
+        /*
+        // disable this code since it causes some invalidate problems, e.g., when starting a sub activity and going
+        // going back some pages are not invalidated completely!
         @Override
         public int getItemPosition(Object object) {
             Fragment fragment = (Fragment)object;
@@ -306,29 +306,6 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             }
             return null;
         }
-
-        @Override
-        public void onPageScrolled(int i, float v, int i2) {
-
-        }
-
-        @Override
-        public void onPageSelected(int i) {
-            // For some reasons old fragment views are sometimes not automatically invalidated. Do it manually:
-            ScriptComponentTree component = components.get(i);
-            if (component == null)
-                return;
-            Fragment fragment = fragmentMap.get(component);
-            if (fragment == null)
-                return;
-            View fragmentView = fragment.getView();
-            if (fragmentView != null)
-                fragmentView.invalidate();
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int i) {
-
-        }
+        */
     }
 }
