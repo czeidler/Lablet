@@ -191,7 +191,6 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     private List<String> unitList = new ArrayList<String>();
     private String correctSpeedUnit = "[m/s]";
     private String correctAccelerationUnit = "[m/s^2]";
-    private float unitFactor = 1f;
 
     protected MarkersDataModel tagMarker = null;
 
@@ -493,17 +492,75 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
             accelerationTable.setVisibility(View.INVISIBLE);
             setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
         }
+
+        // always set state to done (in case there is a bug in the calculation and the student can't get further)
+        // TODO: remove again!
+        setState(ScriptComponentTree.SCRIPT_STATE_DONE);
     }
 
-    private boolean fuzzyEqual(float value, float correctValue) {
-        float correctMargin = 0.1f;
-        if (Math.abs(value - correctValue) > Math.abs(correctValue * correctMargin)
-                && Math.abs(value - correctValue) > 0.11)
+    // error propagation
+    private double getSpeedError(double deltaX, double deltaT, double xError, double tError) {
+        return Math.sqrt(Math.pow(1.d / deltaT * xError, 2) + Math.pow(deltaX / deltaT / deltaT * tError, 2));
+    }
+
+    // error propagation
+    private double getAccelerationError(double deltaV, double deltaT, double v0Error, double v1Error,
+                                        double tError) {
+        return Math.sqrt(Math.pow(1.d / deltaT * v0Error, 2) + Math.pow(1.d / deltaT * v1Error, 2)
+                + Math.pow(deltaV / deltaT / deltaT * tError, 2));
+    }
+
+    private boolean fuzzyEqual(float value, float correctValue, float error) {
+        if (Math.abs(value - correctValue) > error)
             return false;
         return true;
     }
 
-    private boolean checkPositionInput() {
+    private class CorrectValues {
+        public float x0;
+        public float x1;
+        public float x2;
+
+        public float v0;
+        public float v1;
+
+        public float a0;
+
+        public float v0Error;
+        public float v1Error;
+
+        public float a0Error;
+
+    }
+
+    final float errorX = 0.02f;
+    final float errorT = 0.002f;
+
+    private CorrectValues getCorrectValues() {
+        CorrectValues values = new CorrectValues();
+        values.x0 = getPosition(0) * getUnitToMeterFactor();
+        values.x1 = getPosition(1) * getUnitToMeterFactor();
+        values.x2 = getPosition(2) * getUnitToMeterFactor();
+
+        values.v0 = getSpeed(0) * getUnitToMeterFactor();
+        values.v1 = getSpeed(1) * getUnitToMeterFactor();
+
+        values.a0 = getAcceleration(0) * getUnitToMeterFactor();
+
+        float deltaT = (Float.parseFloat(String.valueOf(time2EditText.getText()))
+                - Float.parseFloat(String.valueOf(time1EditText.getText()))) / 1000.f;
+
+        // The entered and the correct values can differ quite bit, thus calculate the error here and later check if the
+        // entered values are compatible
+        values.v0Error = (float)getSpeedError(values.x1 - values.x0, deltaT, errorX, errorT);
+        values.v1Error = (float)getSpeedError(values.x2 - values.x1, deltaT, errorX, errorT);
+
+        values.a0Error = (float)getAccelerationError(values.v1 - values.v0, deltaT, values.v0Error, values.v1Error,
+                errorT);
+        return values;
+    }
+
+    private boolean checkPositionInput(CorrectValues correctValues) {
         float position1;
         float position2;
         float position3;
@@ -515,17 +572,17 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
             return false;
         }
 
-        if (!fuzzyEqual(position1, getPosition(0)))
+        if (!fuzzyEqual(position1, correctValues.x0, errorX))
             return false;
-        if (!fuzzyEqual(position2, getPosition(1)))
+        if (!fuzzyEqual(position2, correctValues.x1, errorX))
             return false;
-        if (!fuzzyEqual(position3, getPosition(2)))
+        if (!fuzzyEqual(position3, correctValues.x2, errorX))
             return false;
 
         return true;
     }
 
-    private boolean checkSpeedInput() {
+    private boolean checkSpeedInput(CorrectValues correctValues) {
         float speed1;
         float speed2;
         try {
@@ -539,22 +596,15 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         if (!unit.equals(correctSpeedUnit))
             return false;
 
-        // round value to one decimal, this fixes some problem with small speeds values
-        float correctSpeed1 = ((float)Math.round(getSpeed(0) * 10)) / 10;
-        float correctSpeed2 = ((float)Math.round(getSpeed(1) * 10)) / 10;
-
-        correctSpeed1 *= getUnitToMeterFactor();
-        correctSpeed2 *= getUnitToMeterFactor();
-
-        if (!fuzzyEqual(speed1, correctSpeed1))
+        if (!fuzzyEqual(speed1, correctValues.v0, correctValues.v0Error))
             return false;
-        if (!fuzzyEqual(speed2, correctSpeed2))
+        if (!fuzzyEqual(speed2, correctValues.v1, correctValues.v1Error))
             return false;
 
         return true;
     }
 
-    private boolean checkAccelerationInput() {
+    private boolean checkAccelerationInput(CorrectValues correctValues) {
         float acceleration1;
         try {
             acceleration1 = Float.parseFloat(String.valueOf(acceleration1EditText.getText()));
@@ -566,15 +616,13 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         if (!unit.equals(correctAccelerationUnit))
             return false;
 
-        float correctAcceleration1 = ((float)Math.round(getAcceleration(0) * 10)) / 10;
-        correctAcceleration1 *= getUnitToMeterFactor();
-
-        return fuzzyEqual(acceleration1, correctAcceleration1);
+        return fuzzyEqual(acceleration1, correctValues.a0, correctValues.a0Error);
     }
 
     private void update() {
+        CorrectValues correctValues = getCorrectValues();
         boolean allDone = true;
-        if (checkPositionInput()) {
+        if (checkPositionInput(correctValues)) {
             positionCheckBox.setChecked(true);
             positionCheckBox.setText("Correct!");
         } else {
@@ -582,7 +630,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
             positionCheckBox.setChecked(false);
             positionCheckBox.setText("");
         }
-        if (checkSpeedInput()) {
+        if (checkSpeedInput(correctValues)) {
             speedCheckBox.setChecked(true);
             speedCheckBox.setText("Correct!");
         } else {
@@ -590,7 +638,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
             speedCheckBox.setChecked(false);
             speedCheckBox.setText("");
         }
-        if (checkAccelerationInput()) {
+        if (checkAccelerationInput(correctValues)) {
             accelerationCheckBox.setChecked(true);
             accelerationCheckBox.setText("Correct!");
         } else {
