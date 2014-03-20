@@ -98,7 +98,8 @@ public class VideoFrameView extends RatioSurfaceView {
 
                 videoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
                 videoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
-                videoFrameRate = format.getInteger(MediaFormat.KEY_FRAME_RATE);
+                if (format.containsKey(MediaFormat.KEY_FRAME_RATE))
+                    videoFrameRate = format.getInteger(MediaFormat.KEY_FRAME_RATE);
                 if (videoFrameRate == 0)
                     videoFrameRate = 30;
                 break;
