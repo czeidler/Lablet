@@ -37,7 +37,7 @@ public class RatioSurfaceView extends SurfaceView {
         int width;
         int height;
         if ((float)(specWidth) / specHeight < ratio) {
-            // smaller ratio than the video
+            // smaller ratio than the video / full width
             width = specWidth;
             height = (int)((float)width / ratio);
         } else {

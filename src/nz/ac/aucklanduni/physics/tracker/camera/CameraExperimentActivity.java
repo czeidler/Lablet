@@ -23,6 +23,9 @@ import nz.ac.aucklanduni.physics.tracker.views.RatioSurfaceView;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class CameraExperimentActivity extends ExperimentActivity {
     private RatioSurfaceView preview = null;
@@ -33,6 +36,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
     private SurfaceHolder previewHolder = null;
     private Camera camera = null;
+    private Camera.Size videoSize = null;
     private MediaRecorder recorder = null;
     private AbstractViewState state = null;
 
@@ -158,9 +162,15 @@ public class CameraExperimentActivity extends ExperimentActivity {
         if (camera == null)
             camera = Camera.open();
 
-        Camera.Size size = camera.getParameters().getPictureSize();
-        assert size != null;
-        preview.setRatio((float)size.width / (float)size.height);
+        Camera.Parameters parameters = camera.getParameters();
+        videoSize = getOptimalVideoSize(camera);
+        assert videoSize != null;
+        parameters.setPreviewSize(videoSize.width, videoSize.height);
+        camera.setParameters(parameters);
+
+        float ratio = (float)videoSize.width / videoSize.height;
+
+        preview.setRatio(ratio);
 
         if (previewHolder.getSurface() != null)
             setState(new PreviewState());
@@ -219,9 +229,10 @@ public class CameraExperimentActivity extends ExperimentActivity {
             recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             recorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
 
-            //TODO: the quality may change for different cameras. Find the quality matching with the pref preview size.
-            CamcorderProfile profile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_480P);
-            recorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
+            CamcorderProfile profile = getOptimalCamcorderProfile(cameraId);
+            if (profile == null)
+                throw new Exception("no camcorder profile!");
+            recorder.setVideoSize(videoSize.width, videoSize.height);
             recorder.setVideoFrameRate(profile.videoFrameRate);
             recorder.setVideoEncodingBitRate(profile.videoBitRate);
 
@@ -274,6 +285,48 @@ public class CameraExperimentActivity extends ExperimentActivity {
         }
 
         finish();
+    }
+
+    // Use the actual camera preview and video sizes to find the largest matching size for preview and recording.
+    private Camera.Size getOptimalVideoSize(Camera camera) {
+        List<Camera.Size> videoSizes = camera.getParameters().getSupportedVideoSizes();
+        List<Camera.Size> previewSizes = camera.getParameters().getSupportedPreviewSizes();
+
+        Collections.sort(previewSizes, new Comparator<Camera.Size>() {
+            @Override
+            public int compare(Camera.Size size, Camera.Size size2) {
+                Integer area1 = size.height * size.width;
+                Integer area2 = size2.height * size2.width;
+                return area2.compareTo(area1);
+            }
+        });
+
+        for (Camera.Size previewSize : previewSizes) {
+            for (Camera.Size VideoSize : videoSizes) {
+                if (previewSize.equals(VideoSize))
+                    return previewSize;
+            }
+        }
+        return null;
+    }
+
+    // find a supported camcorder profile with best quality
+    private CamcorderProfile getOptimalCamcorderProfile(int cameraId) {
+        if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_HIGH))
+            return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH);
+        if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_1080P))
+            return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_1080P);
+        if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_720P))
+            return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_720P);
+        if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_480P))
+            return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_480P);
+        if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_CIF))
+            return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_CIF);
+        if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_QVGA))
+            return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_QVGA);
+        if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_QCIF))
+            return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_QCIF);
+        return null;
     }
 
     SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
