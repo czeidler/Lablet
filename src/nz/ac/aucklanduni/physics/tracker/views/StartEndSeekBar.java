@@ -17,11 +17,16 @@ import nz.ac.aucklanduni.physics.tracker.MarkersDataModel;
 
 
 class StartEndMarker extends DragableMarker {
-    final float WIDTH = 30;
-    final float HEIGHT = 35;
+    // dimensions in density-independent  pixels
+    private final float WIDTH_DP = 25;
 
-    Paint lightColor = new Paint();
-    Paint darkenColor = new Paint();
+    // dimensions in pixels, calculated in the constructor; use them for drawing
+    private float WIDTH;
+    private float HEIGHT;
+    private int TRIANGLE_HEIGHT;
+
+    private Paint lightColor = new Paint();
+    private Paint darkenColor = new Paint();
 
     public StartEndMarker(AbstractMarkersPainter parentContainer) {
         super(parentContainer);
@@ -33,18 +38,27 @@ class StartEndMarker extends DragableMarker {
         darkenColor.setColor(Color.rgb(0, 180, 0));
         darkenColor.setAntiAlias(true);
         darkenColor.setStyle(Paint.Style.FILL);
+
+        WIDTH = parent.toPixel(WIDTH_DP);
+        HEIGHT = parent.toPixel(StartEndSeekBar.HEIGHT_DP);
+        TRIANGLE_HEIGHT = parent.toPixel(StartEndSeekBar.HEIGHT_DP * 0.3f);
     }
 
     @Override
     protected boolean isPointOnSelectArea(PointF point) {
-        return getRect().contains(point.x, point.y);
+        // build a marker rect with increased width
+        final float touchWidth = (float)parent.toPixel(60);
+        RectF rect = new RectF();
+        rect.left = position.x - touchWidth / 2;
+        rect.top = position.y;
+        rect.right = position.x + touchWidth / 2;
+        rect.bottom = position.y + HEIGHT;
+
+        return rect.contains(point.x, point.y);
     }
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
-
-
-        final int TRIANGLE_HEIGHT = 10;
         Path path = new Path();
 
         // bright left
@@ -152,6 +166,9 @@ public class StartEndSeekBar extends MarkerView implements IExperimentRunView {
     private MarkersDataModel markersDataModel;
     private StartEndPainter startEndPainter;
 
+    // dimensions in density-independent  pixels
+    public static final float HEIGHT_DP = 35;
+
     public StartEndSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -174,7 +191,7 @@ public class StartEndSeekBar extends MarkerView implements IExperimentRunView {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         LayoutParams params = getLayoutParams();
         assert params != null;
-        setMeasuredDimension(params.width, 35);
+        setMeasuredDimension(params.width, startEndPainter.toPixel(HEIGHT_DP));
     }
 
     public MarkersDataModel getMarkersDataModel() {

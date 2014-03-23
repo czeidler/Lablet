@@ -269,6 +269,11 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
         return markerList.get(row);
     }
 
+    public int toPixel(float densityIndependentPixel) {
+        final float scale = markerView.getResources().getDisplayMetrics().density;
+        return Math.round(densityIndependentPixel * scale);
+    }
+
     protected void sanitizeScreenPoint(PointF point) {
         if (frame.left > point.x)
             point.x = frame.left;

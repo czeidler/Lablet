@@ -33,11 +33,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Analysis Start Position [ms]:"
+            android:text="Analysis Start [ms]:"
             android:id="@+id/textView2"
             android:layout_alignParentBottom="true" android:layout_alignParentLeft="true"/>
     <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:ems="10"
             android:id="@+id/editStart"
@@ -47,11 +47,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Analysis End Position [ms]:"
+            android:text="Analysis End [ms]:"
             android:id="@+id/textView3"
             android:layout_alignParentBottom="true" android:layout_toRightOf="@+id/editStart"/>
     <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:ems="10"
             android:id="@+id/editEnd"
@@ -66,7 +66,7 @@
             android:layout_alignParentBottom="true" android:layout_alignTop="@+id/textView3"
             android:id="@+id/textView5"/>
     <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:ems="10"
             android:id="@+id/editFrames"
@@ -100,7 +100,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Frame length [ms]:"
+                    android:text="Frame Length [ms]:"
                     android:id="@+id/textView4"/>
             <EditText
                     android:layout_width="fill_parent"
