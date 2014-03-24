@@ -129,11 +129,13 @@ abstract class DragableMarker implements IMarker {
 
 class SimpleMarker extends DragableMarker {
     // device independent pixels
-    private final float RADIUS_DP = 30;
+    private final float INNER_RING_RADIUS_DP = 30;
+    private final float INNER_RING_WIDTH_DP = 2;
     private final float RING_RADIUS_DP = 100;
     private final float RING_WIDTH_DP = 40;
 
-    private float RADIUS;
+    private float INNER_RING_RADIUS;
+    private float INNER_RING_WIDTH;
     private float RING_RADIUS;
     private float RING_WIDTH;
 
@@ -145,7 +147,8 @@ class SimpleMarker extends DragableMarker {
         paint = new Paint();
         paint.setAntiAlias(true);
 
-        RADIUS = parent.toPixel(RADIUS_DP);
+        INNER_RING_RADIUS = parent.toPixel(INNER_RING_RADIUS_DP);
+        INNER_RING_WIDTH = parent.toPixel(INNER_RING_WIDTH_DP);
         RING_RADIUS = parent.toPixel(RING_RADIUS_DP);
         RING_WIDTH = parent.toPixel(RING_WIDTH_DP);
     }
@@ -157,7 +160,7 @@ class SimpleMarker extends DragableMarker {
         else
             mainAlpha = 255;
 
-        float crossR = RADIUS / (float)1.41421356237;
+        float crossR = INNER_RING_RADIUS / (float)1.41421356237;
         paint.setColor(makeColor(100, 20, 20, 20));
         paint.setStrokeWidth(1);
         canvas.drawLine(position.x - crossR, position.y - crossR, position.x + crossR, position.y + crossR, paint);
@@ -168,8 +171,8 @@ class SimpleMarker extends DragableMarker {
         else
             paint.setColor(makeColor(255, 200, 200, 200));
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(2);
-        canvas.drawCircle(position.x, position.y, RADIUS, paint);
+        paint.setStrokeWidth(INNER_RING_WIDTH);
+        canvas.drawCircle(position.x, position.y, INNER_RING_RADIUS, paint);
 
         if (isSelected()) {
             paint.setColor(makeColor(100, 0, 200, 100));
@@ -182,7 +185,7 @@ class SimpleMarker extends DragableMarker {
     @Override
     protected boolean isPointOnSelectArea(PointF point) {
         float distance = (float)Math.sqrt(Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2));
-        return distance <= RADIUS;
+        return distance <= INNER_RING_RADIUS;
     }
 
     protected boolean isPointOnDragArea(PointF point) {
