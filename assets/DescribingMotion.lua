@@ -54,7 +54,7 @@ function onBuildExperimentScript(scriptBuilder)
 
 	-- free fall motion
 	local calculateYSpeed = scriptBuilder:create("CalculateYSpeed")
-	scriptBuilder:add(calculateYSpeed-+)
+	scriptBuilder:add(calculateYSpeed)
 	calculateYSpeed:setExperiment(experimentFreeFall)
 	calculateYSpeed:setTitle("Free fall")
 	calculateYSpeed:setHeader("Deriving average y-velocity and y-acceleration from displacement")
