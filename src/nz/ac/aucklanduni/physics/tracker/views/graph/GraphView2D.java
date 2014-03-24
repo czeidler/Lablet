@@ -12,7 +12,7 @@ import android.graphics.*;
 import android.util.AttributeSet;
 import android.util.Pair;
 import com.androidplot.exception.PlotRenderException;
-import com.androidplot.ui.SeriesRenderer;
+import com.androidplot.ui.*;
 import com.androidplot.util.ValPixConverter;
 import com.androidplot.xy.*;
 import nz.ac.aucklanduni.physics.tracker.ExperimentAnalyserActivity;
@@ -323,9 +323,52 @@ class ImprovedLineAndPointFormatter extends LineAndPointFormatter {
 public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterListener {
     private IGraphAdapter adapter;
 
+    // device independent size
+    private float TITLE_TEXT_SIZE_DP = 12;
+    private float LABEL_TEXT_SIZE_DP = 10;
+
+    private float TITLE_TEXT_SIZE;
+    private float LABEL_TEXT_SIZE;
+
     public GraphView2D(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        TITLE_TEXT_SIZE = toPixel(TITLE_TEXT_SIZE_DP);
+        LABEL_TEXT_SIZE = toPixel(LABEL_TEXT_SIZE_DP);
+
+        getTitleWidget().getLabelPaint().setTextSize(TITLE_TEXT_SIZE);
+        getDomainLabelWidget().getLabelPaint().setTextSize(LABEL_TEXT_SIZE);
+        getRangeLabelWidget().getLabelPaint().setTextSize(LABEL_TEXT_SIZE);
+        getGraphWidget().getDomainLabelPaint().setTextSize(LABEL_TEXT_SIZE);
+        getGraphWidget().getRangeLabelPaint().setTextSize(LABEL_TEXT_SIZE);
+        getGraphWidget().getDomainOriginLabelPaint().setTextSize(LABEL_TEXT_SIZE);
+        getGraphWidget().getRangeOriginLabelPaint().setTextSize(LABEL_TEXT_SIZE);
+
+        doGraphLayout();
+    }
+
+    private void doGraphLayout() {
+        float titleBottom = getTitleWidget().getPositionMetrics().getYPositionMetric().getValue()
+                + getTitleWidget().getHeightMetric().getValue();
+        float yAxisLabelRight = getRangeLabelWidget().getPositionMetrics().getXPositionMetric().getValue()
+                + getRangeLabelWidget().getWidthMetric().getValue();
+        float xAxisLabelHeight = getDomainLabelWidget().getPositionMetrics().getYPositionMetric().getValue()
+                + getDomainLabelWidget().getHeightMetric().getValue();
+
+        getGraphWidget().position(yAxisLabelRight, XLayoutStyle.ABSOLUTE_FROM_LEFT, titleBottom,
+                YLayoutStyle.ABSOLUTE_FROM_TOP);
+        getGraphWidget().setWidth(yAxisLabelRight, SizeLayoutType.FILL);
+        getGraphWidget().setHeight(titleBottom + xAxisLabelHeight, SizeLayoutType.FILL);
+
+        float xAxisTextHeight = getGraphWidget().getDomainOriginLabelPaint().descent()
+                - getGraphWidget().getDomainOriginLabelPaint().ascent();
+        // a bit hacky, why "-10"?:
+        getGraphWidget().setPaddingBottom(xAxisTextHeight - 10);
+    }
+
+    private int toPixel(float densityIndependentPixel) {
+        final float scale = getResources().getDisplayMetrics().density;
+        return Math.round(densityIndependentPixel * scale);
     }
 
     public void setAdapter(IGraphAdapter adapter) {
