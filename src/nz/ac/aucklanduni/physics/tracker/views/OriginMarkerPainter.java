@@ -22,11 +22,22 @@ public class OriginMarkerPainter extends AbstractMarkersPainter implements Calib
     private float angleScreen;
     private boolean firstDraw = true;
 
+    // device independent sizes:
+    private final int FONT_SIZE_DP = 20;
+    private final float LINE_WIDTH_DP = 1.5f;
+
+    // pixel sizes, set in the constructor
+    private int FONT_SIZE;
+    private float LINE_WIDTH;
+
     public OriginMarkerPainter(View parent, IExperimentRunView runView, MarkersDataModel model,
                                Calibration calibration) {
         super(parent, runView, model);
         this.calibration = calibration;
         this.calibration.addListener(this);
+
+        FONT_SIZE = toPixel(FONT_SIZE_DP);
+        LINE_WIDTH = toPixel(LINE_WIDTH_DP);
     }
 
     protected void finalize() {
@@ -67,13 +78,14 @@ public class OriginMarkerPainter extends AbstractMarkersPainter implements Calib
         PointF yAxis = getScreenPos(2);
 
         Paint paint = new Paint();
+        paint.setStrokeWidth(LINE_WIDTH);
         paint.setAntiAlias(true);
         paint.setColor(Color.GREEN);
         canvas.drawLine(origin.x, origin.y, xAxis.x, xAxis.y, paint);
         canvas.drawLine(origin.x, origin.y, yAxis.x, yAxis.y, paint);
 
         // draw labels
-        paint.setTextSize(20);
+        paint.setTextSize(FONT_SIZE);
         String label1;
         String label2;
         float textAngle = angleScreen;

@@ -128,9 +128,15 @@ abstract class DragableMarker implements IMarker {
 
 
 class SimpleMarker extends DragableMarker {
-    final static float RADIUS = 30;
-    final static float RING_RADIUS = 100;
-    final static float RING_WIDTH = 40;
+    // device independent pixels
+    private final float RADIUS_DP = 30;
+    private final float RING_RADIUS_DP = 100;
+    private final float RING_WIDTH_DP = 40;
+
+    private float RADIUS;
+    private float RING_RADIUS;
+    private float RING_WIDTH;
+
     private Paint paint = null;
     private int mainAlpha = 255;
 
@@ -138,6 +144,10 @@ class SimpleMarker extends DragableMarker {
         super(parentContainer);
         paint = new Paint();
         paint.setAntiAlias(true);
+
+        RADIUS = parent.toPixel(RADIUS_DP);
+        RING_RADIUS = parent.toPixel(RING_RADIUS_DP);
+        RING_WIDTH = parent.toPixel(RING_WIDTH_DP);
     }
 
     @Override
