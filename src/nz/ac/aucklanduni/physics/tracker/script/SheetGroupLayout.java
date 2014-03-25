@@ -8,7 +8,6 @@
 package nz.ac.aucklanduni.physics.tracker.script;
 
 import android.content.Context;
-import android.graphics.drawable.GradientDrawable;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.LinearLayout;
