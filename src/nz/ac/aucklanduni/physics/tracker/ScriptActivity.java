@@ -35,6 +35,7 @@ public class ScriptActivity extends Activity {
     private CheckBoxAdapter existingScriptListAdaptor = null;
     private MenuItem deleteItem = null;
     private AlertDialog deleteScriptDataAlertBox = null;
+    private AlertDialog infoAlertBox = null;
     private CheckBox selectAllCheckBox = null;
 
     final int START_SCRIPT = 1;
@@ -43,6 +44,20 @@ public class ScriptActivity extends Activity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.clear();
         getMenuInflater().inflate(R.menu.script_activity_actions, menu);
+
+        // info item
+        MenuItem infoItem = menu.findItem(R.id.action_info);
+        assert(infoItem != null);
+        String versionString = AndroidPhysicsTracker.getVersionString(this);
+        infoItem.setTitle(versionString);
+        infoAlertBox = AndroidPhysicsTracker.createAlertInfoBox(this);
+        infoItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                infoAlertBox.show();
+                return true;
+            }
+        });
 
         // delete item
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

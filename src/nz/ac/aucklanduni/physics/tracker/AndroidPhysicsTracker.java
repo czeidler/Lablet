@@ -9,6 +9,7 @@ package nz.ac.aucklanduni.physics.tracker;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -42,10 +43,55 @@ public class AndroidPhysicsTracker extends Activity {
 
     }
 
-    private String getAuthorList() {
+    static private String getAuthorList() {
         String authors = "Authors:\n";
         authors += "\tClemens Zeidler <czei002@aucklanduni.ac.nz> (2013, 2014)\n";
         return authors;
+    }
+
+    static public AlertDialog createAlertInfoBox(final Activity activity) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle("Physics Tracker " + AndroidPhysicsTracker.getVersionString(activity));
+        builder.setNeutralButton("leave me alone", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        builder.setNegativeButton("no thanks", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast toast = Toast.makeText(activity.getApplicationContext(), "$%#@*!?", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
+        builder.setPositiveButton("love it", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast toast = Toast.makeText(activity.getApplicationContext(), "+1", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
+        AlertDialog infoAlertBox = builder.create();
+        final ScrollView scrollView = new ScrollView(activity.getApplicationContext());
+        final TextView textView = new TextView(activity.getApplicationContext());
+        textView.setPadding(10, 10, 10, 10);
+        textView.setText(getAuthorList());
+        textView.setTextSize(15);
+        scrollView.addView(textView);
+        infoAlertBox.setView(scrollView);
+        return infoAlertBox;
+    }
+
+    static public String getVersionString(Activity activity) {
+        String versionString = "Ver. ";
+        try {
+            versionString += activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            versionString = "?";
+            e.printStackTrace();
+        }
+        return versionString;
     }
 
     @Override
@@ -66,45 +112,9 @@ public class AndroidPhysicsTracker extends Activity {
         // info item
         MenuItem infoItem = menu.findItem(R.id.action_info);
         assert(infoItem != null);
-        String versionString = "Ver. ";
-        try {
-            versionString += this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            versionString = "?";
-            e.printStackTrace();
-        }
+        String versionString = getVersionString(this);
         infoItem.setTitle(versionString);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Physics Tracker " + versionString);
-        builder.setNeutralButton("leave me alone", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-            }
-        });
-        builder.setNegativeButton("no thanks", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Toast toast = Toast.makeText(getApplicationContext(), "$%#@*!?", Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        });
-        builder.setPositiveButton("love it", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Toast toast = Toast.makeText(getApplicationContext(), "+1", Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        });
-        infoAlertBox = builder.create();
-        final ScrollView scrollView = new ScrollView(getApplicationContext());
-        final TextView textView = new TextView(getApplicationContext());
-        textView.setPadding(10, 10, 10, 10);
-        textView.setText(getAuthorList());
-        textView.setTextSize(15);
-        scrollView.addView(textView);
-        infoAlertBox.setView(scrollView);
+        infoAlertBox = createAlertInfoBox(this);
         infoItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -114,7 +124,7 @@ public class AndroidPhysicsTracker extends Activity {
         });
 
         // delete item
-        builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
