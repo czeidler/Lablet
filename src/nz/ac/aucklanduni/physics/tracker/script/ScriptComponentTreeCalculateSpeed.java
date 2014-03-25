@@ -187,6 +187,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     private Spinner speedUnitSpinner = null;
     private Spinner accelerationUnitSpinner = null;
     private TextView positionUnitTextView = null;
+    private CorrectValues correctValues = null;
 
     private List<String> unitList = new ArrayList<String>();
     private String correctSpeedUnit = "[m/s]";
@@ -327,6 +328,18 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         super.onPause();
     }
 
+    /**
+     * The first taken data points might not be optimal, e.g,, the ball is still in the hand.
+     * @return the index of the first data point to use for speed/acceleration calculation
+     */
+    private int getFirstDataPointIndex() {
+        int numberOfDataPoints = tagMarker.getMarkerCount();
+        if (numberOfDataPoints >= 5)
+            return 2;
+        else
+            return numberOfDataPoints - 3;
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -337,10 +350,15 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
                 speedComponent.getExperiment().getExperimentPath());
         if (experimentAnalysis == null)
             return;
+        tagMarker = experimentAnalysis.getTagMarkers();
+
+        // first update the tables because otherwise update() can cause a crash when accessing data (an update is
+        // triggered when changing a text view)
+        speedTable.setAdapter(createSpeedTableAdapter(experimentAnalysis));
+        accelerationTable.setAdapter(createAccelerationTableAdapter(experimentAnalysis));
 
         positionUnitTextView.setText("[" + getPositionUnit() + "]");
 
-        tagMarker = experimentAnalysis.getTagMarkers();
         ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
         adapter.addColumn(new TimeDataTableColumn());
         adapter.addColumn(new XPositionDataTableColumn());
@@ -352,13 +370,13 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
             return;
 
         String text = "";
-        text += experiment.getRunValueAt(tagMarker.getMarkerDataAt(0).getRunId());
+        text += experiment.getRunValueAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 0).getRunId());
         time1EditText.setText(text);
         text = "";
-        text += experiment.getRunValueAt(tagMarker.getMarkerDataAt(1).getRunId());
+        text += experiment.getRunValueAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 1).getRunId());
         time2EditText.setText(text);
         text = "";
-        text += experiment.getRunValueAt(tagMarker.getMarkerDataAt(2).getRunId());
+        text += experiment.getRunValueAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 2).getRunId());
         time3EditText.setText(text);
 
         text = "";
@@ -386,8 +404,8 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         speedUnitSpinner.setSelection(speedComponent.getSelectedSpeedUnitIndex());
         accelerationUnitSpinner.setSelection(speedComponent.getSelectedAccelerationUnitIndex());
 
-        speedTable.setAdapter(createSpeedTableAdapter(experimentAnalysis));
-        accelerationTable.setAdapter(createAccelerationTableAdapter(experimentAnalysis));
+        // cache correct values here
+        correctValues = getCorrectValues();
 
         update();
     }
@@ -538,14 +556,14 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
 
     private CorrectValues getCorrectValues() {
         CorrectValues values = new CorrectValues();
-        values.x0 = getPosition(0) * getUnitToMeterFactor();
-        values.x1 = getPosition(1) * getUnitToMeterFactor();
-        values.x2 = getPosition(2) * getUnitToMeterFactor();
+        values.x0 = getPosition(getFirstDataPointIndex() + 0) * getUnitToMeterFactor();
+        values.x1 = getPosition(getFirstDataPointIndex() + 1) * getUnitToMeterFactor();
+        values.x2 = getPosition(getFirstDataPointIndex() + 2) * getUnitToMeterFactor();
 
-        values.v0 = getSpeed(0) * getUnitToMeterFactor();
-        values.v1 = getSpeed(1) * getUnitToMeterFactor();
+        values.v0 = getSpeed(getFirstDataPointIndex() + 0) * getUnitToMeterFactor();
+        values.v1 = getSpeed(getFirstDataPointIndex() + 1) * getUnitToMeterFactor();
 
-        values.a0 = getAcceleration(0) * getUnitToMeterFactor();
+        values.a0 = getAcceleration(getFirstDataPointIndex() + 0) * getUnitToMeterFactor();
 
         float deltaT = (Float.parseFloat(String.valueOf(time2EditText.getText()))
                 - Float.parseFloat(String.valueOf(time1EditText.getText()))) / 1000.f;
@@ -620,7 +638,9 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     }
 
     private void update() {
-        CorrectValues correctValues = getCorrectValues();
+        if (tagMarker.getMarkerCount() < 3 || correctValues == null)
+            return;
+
         boolean allDone = true;
         if (checkPositionInput(correctValues)) {
             positionCheckBox.setChecked(true);
