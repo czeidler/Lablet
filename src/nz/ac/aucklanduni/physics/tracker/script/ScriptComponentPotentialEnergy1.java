@@ -22,6 +22,7 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
     private TextView massQuestionTextView;
     private TextView heightQuestionTextView;
     private TextView energyQuestionTextView;
+    private TextView pbjSandwichQuestionTextView;
     private EditText massEditText;
     private EditText heightEditText;
     private EditText energyEditText;
@@ -43,6 +44,8 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
         assert heightQuestionTextView != null;
         energyQuestionTextView = (TextView)view.findViewById(R.id.energyQuestionTextView);
         assert energyQuestionTextView != null;
+        pbjSandwichQuestionTextView = (TextView)view.findViewById(R.id.pbjSandwichQuestionTextView);
+        assert pbjSandwichQuestionTextView != null;
 
         massEditText = (EditText)view.findViewById(R.id.massEditText);
         assert massEditText != null;
@@ -58,7 +61,8 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
 
         massQuestionTextView.setText(component.getMassQuestionText());
         heightQuestionTextView.setText(component.getHeightQuestionText());
-        energyQuestionTextView.setText(component.getEnergyQuestionTextView());
+        energyQuestionTextView.setText(component.getEnergyQuestionText());
+        pbjSandwichQuestionTextView.setText(component.getPbjSandwichQuestionText());
 
         massEditText.setText(Float.toString(getMass()));
         heightEditText.setText(Float.toString(component.getHeight()));
@@ -221,7 +225,10 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
 public class ScriptComponentPotentialEnergy1 extends ScriptComponentViewHolder {
     private String massQuestionText = "Mass:";
     private String heightQuestionText = "Height of the of the mass:";
-    private String energyQuestionTextView = "What is its energy?";
+    private String energyQuestionText = "What is its energy?";
+
+    private String pbjSandwichQuestionText = "A typical peanut butter jam (PBJ) sandwich contains 432 calories. " +
+            "How many throws could you perform with one PBJ sandwich?\n(1 calorie = 4.184 J)";
 
     private float mass = 0.1f;
     private float height = 0.0f;
@@ -244,12 +251,19 @@ public class ScriptComponentPotentialEnergy1 extends ScriptComponentViewHolder {
     public void setHeightQuestionText(String heightQuestionText) {
         this.heightQuestionText = heightQuestionText;
     }
-    public String getEnergyQuestionTextView() {
-        return energyQuestionTextView;
+    public String getEnergyQuestionText() {
+        return energyQuestionText;
     }
-    public void setEnergyQuestionTextView(String energyQuestionTextView) {
-        this.energyQuestionTextView = energyQuestionTextView;
+    public void setEnergyQuestionText(String energyQuestionTextView) {
+        this.energyQuestionText = energyQuestionTextView;
     }
+    public String getPbjSandwichQuestionText() {
+        return pbjSandwichQuestionText;
+    }
+    public void setPbjSandwichQuestionText(String pbjSandwichQuestionText) {
+        this.pbjSandwichQuestionText = pbjSandwichQuestionText;
+    }
+
 
     public float getMass() {
         return mass;

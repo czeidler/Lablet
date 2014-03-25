@@ -94,7 +94,8 @@ function onBuildExperimentScript(scriptBuilder)
 	pbjQuestion = upDownMotionQuestions:addPotentialEnergy1Question();
 	pbjQuestion:setMassQuestionText("Please enter the mass of the ball:")
 	pbjQuestion:setHeightQuestionText("What was the height of the ball at its peak?")
-	pbjQuestion:setEnergyQuestionTextView("How much energy input enabled the ball to reach this height?")
+	pbjQuestion:setEnergyQuestionText("How much energy input enabled the ball to reach this height?")
+	pbjQuestion:setPbjSandwichQuestionText("A typical peanut butter jam (PBJ) sandwich contains 432 calories. How many throws could you perform with one PBJ sandwich?\n(1 calorie = 4.184 J)");
 	upDownMotionQuestions:addCheckQuestion("Go to your demonstrator now and verify your results.")
 
 	-- projectile motion
