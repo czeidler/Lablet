@@ -40,6 +40,8 @@ class GraphViewHolder extends ScriptComponentViewHolder {
         GraphView2D graphView2D = (GraphView2D)view.findViewById(R.id.graphView);
         assert graphView2D != null;
 
+        graphView2D.setMaxWidth(500);
+
         ExperimentAnalysis experimentAnalysis = experimentSheet.getExperimentAnalysis(context, experiment);
         if (experimentAnalysis != null) {
             MarkerGraphAxis xAxis = createAxis(xAxisContentId);

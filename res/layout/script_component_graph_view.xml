@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <view android:layout_width="600dp"
+    <view android:layout_width="match_parent"
           android:layout_height="match_parent"
           class="nz.ac.aucklanduni.physics.tracker.views.graph.GraphView2D" android:id="@+id/graphView"
-          android:minWidth="350dp" android:layout_gravity="center_horizontal" android:minHeight="300dp"/>
-</LinearLayout>
+          android:minWidth="350dp" android:layout_gravity="center_horizontal" android:minHeight="300dp"
+          android:layout_alignParentStart="true"/>
+</FrameLayout>

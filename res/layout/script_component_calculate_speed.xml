@@ -13,7 +13,7 @@
     <ScrollView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/scrollView" android:layout_row="1" android:layout_column="0" android:layout_rowSpan="8"
+            android:id="@+id/scrollView1" android:layout_row="1" android:layout_column="0" android:layout_rowSpan="8"
             android:paddingRight="10dp" android:minWidth="50dp">
         <view android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -33,25 +33,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent" android:layout_column="0">
             <TextView
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="time"
                     android:id="@+id/textView"/>
             <TextView
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="position"
                     android:id="@+id/textView2"/>
             <TextView
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="average speed"
                     android:id="@+id/textView3"/>
             <TextView
-                    android:layout_width="50dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="avg. acceleration"
@@ -61,23 +61,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent" android:layout_column="0">
             <TextView
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="[ms]"
                     android:id="@+id/textView5"/>
             <TextView
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="[m]"
                     android:id="@+id/positionUnitTextView"/>
             <Spinner
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/speedUnitSpinner"/>
             <Spinner
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/accelerationUnitSpinner"/>
         </TableRow>
@@ -85,13 +85,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent">
             <EditText
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:editable="false" android:enabled="true" android:focusable="false"
                     android:id="@+id/time1EditText" android:selectAllOnFocus="false"/>
             <EditText
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:inputType="number|numberDecimal|numberSigned"
                     android:ems="10"
@@ -110,7 +110,7 @@
             <Space
                     android:layout_width="0dp" android:layout_height="20dp"/>
             <EditText
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:inputType="number|numberDecimal|numberSigned"
                     android:nextFocusDown="@+id/speed2EditText"
@@ -123,13 +123,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent">
             <EditText
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:editable="false" android:enabled="true" android:focusable="false"
                     android:id="@+id/time2EditText"/>
             <EditText
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:inputType="number|numberDecimal|numberSigned"
                     android:ems="10"
@@ -138,7 +138,7 @@
             <Space
                     android:layout_width="0dp" android:layout_height="20dp"/>
             <EditText
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:inputType="number|numberDecimal|numberSigned"
                     android:ems="10"
@@ -153,7 +153,7 @@
             <Space
                     android:layout_width="0dp" android:layout_height="20dp"/>
             <EditText
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:inputType="number|numberDecimal|numberSigned"
                     android:nextFocusDown="@+id/acceleration1EditText"
@@ -165,13 +165,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent">
             <EditText
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:editable="false" android:enabled="true" android:focusable="false"
                     android:id="@+id/time3EditText"/>
             <EditText
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:inputType="number|numberDecimal|numberSigned"
                     android:ems="10"
@@ -208,7 +208,7 @@
     <ScrollView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/scrollView" android:layout_row="1" android:layout_column="6"
+            android:id="@+id/scrollView2" android:layout_row="1" android:layout_column="6"
             android:paddingLeft="10dp" android:minWidth="50dp" android:layout_rowSpan="8">
         <view android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -217,7 +217,7 @@
     <ScrollView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/scrollView" android:layout_row="1" android:layout_column="7"
+            android:id="@+id/scrollView3" android:layout_row="1" android:layout_column="7"
             android:paddingLeft="10dp" android:minWidth="50dp" android:layout_rowSpan="8">
         <view android:layout_width="wrap_content"
               android:layout_height="wrap_content"

@@ -122,7 +122,8 @@ class SheetGroupLayout extends SheetLayout {
     protected void add(Context context, Fragment parentFragment, SheetLayout item, boolean isLast) {
         View view = item.buildLayout(context, parentFragment);
 
-        view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+        // set width to zero so that the table layout stretches all columns evenly
+        view.setLayoutParams(new TableRow.LayoutParams(0,
                 TableRow.LayoutParams.MATCH_PARENT, item.getParameters().getWeight()));
         row.addView(view);
 

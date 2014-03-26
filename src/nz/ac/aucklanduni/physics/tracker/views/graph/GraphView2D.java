@@ -8,6 +8,7 @@
 package nz.ac.aucklanduni.physics.tracker.views.graph;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.*;
 import android.util.AttributeSet;
 import android.util.Pair;
@@ -16,6 +17,7 @@ import com.androidplot.ui.*;
 import com.androidplot.util.ValPixConverter;
 import com.androidplot.xy.*;
 import nz.ac.aucklanduni.physics.tracker.ExperimentAnalyserActivity;
+import nz.ac.aucklanduni.physics.tracker.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -323,12 +325,32 @@ class ImprovedLineAndPointFormatter extends LineAndPointFormatter {
 public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterListener {
     private IGraphAdapter adapter;
 
+    // max layout sizes in dp
+    private int maxWidth = -1;
+    private int maxHeight = -1;
+
     // device independent size
     private float TITLE_TEXT_SIZE_DP = 12;
     private float LABEL_TEXT_SIZE_DP = 10;
 
     private float TITLE_TEXT_SIZE;
     private float LABEL_TEXT_SIZE;
+
+    // in dp
+    public int getMaxWidth() {
+        return maxWidth;
+    }
+    public void setMaxWidth(float maxWidth) {
+        final float scale = getResources().getDisplayMetrics().density;
+        this.maxWidth = (int)(scale * maxWidth);
+    }
+    public int getMaxHeight() {
+        return maxHeight;
+    }
+    public void setMaxHeight(int maxHeight) {
+        final float scale = getResources().getDisplayMetrics().density;
+        this.maxHeight = (int)(scale * maxHeight);
+    }
 
     public GraphView2D(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -399,6 +421,23 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
         addSeries(new XYSeriesAdapter(adapter), seriesFormat);
 
         refillGraph();
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        // Adjust width as necessary
+        int measuredWidth = MeasureSpec.getSize(widthMeasureSpec);
+        if(maxWidth > 0 && maxWidth < measuredWidth) {
+            int measureMode = MeasureSpec.getMode(widthMeasureSpec);
+            widthMeasureSpec = MeasureSpec.makeMeasureSpec(maxWidth, measureMode);
+        }
+        // Adjust height as necessary
+        int measuredHeight = MeasureSpec.getSize(heightMeasureSpec);
+        if(maxHeight > 0 && maxHeight < measuredHeight) {
+            int measureMode = MeasureSpec.getMode(heightMeasureSpec);
+            heightMeasureSpec = MeasureSpec.makeMeasureSpec(maxHeight, measureMode);
+        }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     @Override

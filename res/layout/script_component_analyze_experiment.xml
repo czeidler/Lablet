@@ -27,8 +27,8 @@
             android:layout_height="wrap_content"
             android:text="Analyse Experiment"
             android:id="@+id/analyzeExperimentButton"/>
-    <view android:layout_width="706dp"
-          android:layout_height="410dp"
+    <view android:layout_width="500dp"
+          android:layout_height="350dp"
           class="nz.ac.aucklanduni.physics.tracker.views.graph.GraphView2D" android:id="@+id/graphView"
           android:visibility="visible" android:layout_gravity="center"/>
 
