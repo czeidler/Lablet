@@ -50,6 +50,11 @@ public class Calibration {
         return yCalibration;
     }
 
+    /**
+     * Raw point from the screen is transformed to real coordinates.
+     * @param raw point on the screen
+     * @return point in real coordinates
+     */
     public PointF fromRaw(PointF raw) {
         PointF point = new PointF();
         // translation
@@ -71,6 +76,20 @@ public class Calibration {
             point.y = (float)Math.cos(Math.toRadians(90)) * y - (float)Math.sin(Math.toRadians(90)) * x;
         }
 
+        // scale
+        point.x *= xCalibration;
+        point.y *= yCalibration;
+        return point;
+    }
+
+    /**
+     * A raw length vector is scaled to real length vector. (no rotation or origin are taken into account)
+     * @param rawLength length vector on the screen
+     * @return length vector in real coordinates.
+     */
+    public PointF fromRawLength(PointF rawLength) {
+        PointF point = new PointF();
+        point.set(rawLength);
         // scale
         point.x *= xCalibration;
         point.y *= yCalibration;
