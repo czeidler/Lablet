@@ -21,8 +21,8 @@ public class Calibration {
     private float xCalibration;
     private float yCalibration;
 
-    private PointF origin = new PointF(10, 10);
-    private PointF axis1 = new PointF(20, 10);
+    private PointF origin = new PointF(5, 5);
+    private PointF axis1 = new PointF(15, 5);
     private float angle;
     private boolean swapAxis = false;
 

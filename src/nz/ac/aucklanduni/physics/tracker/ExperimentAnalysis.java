@@ -35,7 +35,7 @@ public class ExperimentAnalysis {
 
     private LengthCalibrationSetter lengthCalibrationSetter;
     private OriginCalibrationSetter originCalibrationSetter;
-    private boolean showCoordinateSystem = false;
+    private boolean showCoordinateSystem = true;
 
     private Bundle experimentSpecificData = null;
 
