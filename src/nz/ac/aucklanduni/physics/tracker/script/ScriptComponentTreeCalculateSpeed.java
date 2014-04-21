@@ -58,6 +58,7 @@ public class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragme
         isXSpeed = xSpeed;
     }
 
+    // To be called from lua, don't remove.
     public void setHeader(String header) {
         this.header = header;
     }
@@ -187,7 +188,8 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     private Spinner speedUnitSpinner = null;
     private Spinner accelerationUnitSpinner = null;
     private TextView positionUnitTextView = null;
-    private CorrectValues correctValues = null;
+    private CorrectPosAndVeloValues correctPosAndVeloValues = null;
+    private CorrectAccelerationValues correctAccelerationValues = null;
 
     private List<String> unitList = new ArrayList<String>();
     private String correctSpeedUnit = "[m/s]";
@@ -405,7 +407,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         accelerationUnitSpinner.setSelection(speedComponent.getSelectedAccelerationUnitIndex());
 
         // cache correct values here
-        correctValues = getCorrectValues();
+        correctPosAndVeloValues = getCorrectValues();
 
         update();
     }
@@ -501,15 +503,10 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     }
 
     private void setDone(boolean done) {
-        if (done) {
-            speedTable.setVisibility(View.VISIBLE);
-            accelerationTable.setVisibility(View.VISIBLE);
+        if (done)
             setState(ScriptComponentTree.SCRIPT_STATE_DONE);
-        } else {
-            speedTable.setVisibility(View.INVISIBLE);
-            accelerationTable.setVisibility(View.INVISIBLE);
+        else
             setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
-        }
 
         // always set state to done (in case there is a bug in the calculation and the student can't get further)
         // TODO: remove again!
@@ -521,20 +518,13 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         return Math.sqrt(Math.pow(1.d / deltaT * xError, 2) + Math.pow(deltaX / deltaT / deltaT * tError, 2));
     }
 
-    // error propagation
-    private double getAccelerationError(double deltaV, double deltaT, double v0Error, double v1Error,
-                                        double tError) {
-        return Math.sqrt(Math.pow(1.d / deltaT * v0Error, 2) + Math.pow(1.d / deltaT * v1Error, 2)
-                + Math.pow(deltaV / deltaT / deltaT * tError, 2));
-    }
-
     private boolean fuzzyEqual(float value, float correctValue, float error) {
         if (Math.abs(value - correctValue) > error)
             return false;
         return true;
     }
 
-    private class CorrectValues {
+    private class CorrectPosAndVeloValues {
         public float x0;
         public float x1;
         public float x2;
@@ -542,28 +532,21 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         public float v0;
         public float v1;
 
-        public float a0;
-
         public float v0Error;
         public float v1Error;
-
-        public float a0Error;
-
     }
 
-    final float errorX = 0.02f;
-    final float errorT = 0.002f;
+    final float errorX = 0.01f;
+    final float errorT = 0.001f;
 
-    private CorrectValues getCorrectValues() {
-        CorrectValues values = new CorrectValues();
-        values.x0 = getPosition(getFirstDataPointIndex() + 0) * getUnitToMeterFactor();
+    private CorrectPosAndVeloValues getCorrectValues() {
+        CorrectPosAndVeloValues values = new CorrectPosAndVeloValues();
+        values.x0 = getPosition(getFirstDataPointIndex()) * getUnitToMeterFactor();
         values.x1 = getPosition(getFirstDataPointIndex() + 1) * getUnitToMeterFactor();
         values.x2 = getPosition(getFirstDataPointIndex() + 2) * getUnitToMeterFactor();
 
-        values.v0 = getSpeed(getFirstDataPointIndex() + 0) * getUnitToMeterFactor();
+        values.v0 = getSpeed(getFirstDataPointIndex()) * getUnitToMeterFactor();
         values.v1 = getSpeed(getFirstDataPointIndex() + 1) * getUnitToMeterFactor();
-
-        values.a0 = getAcceleration(getFirstDataPointIndex() + 0) * getUnitToMeterFactor();
 
         float deltaT = (Float.parseFloat(String.valueOf(time2EditText.getText()))
                 - Float.parseFloat(String.valueOf(time1EditText.getText()))) / 1000.f;
@@ -573,12 +556,35 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         values.v0Error = (float)getSpeedError(values.x1 - values.x0, deltaT, errorX, errorT);
         values.v1Error = (float)getSpeedError(values.x2 - values.x1, deltaT, errorX, errorT);
 
-        values.a0Error = (float)getAccelerationError(values.v1 - values.v0, deltaT, values.v0Error, values.v1Error,
-                errorT);
         return values;
     }
 
-    private boolean checkPositionInput(CorrectValues correctValues) {
+    final float errorV = 0.01f;
+
+    private class CorrectAccelerationValues {
+        public float a0;
+        public float a0Error;
+    }
+
+    /** We take the user input values and check if they did the calculation right. We don't use the original values
+     * since this would lead to a huge error range and we would mark a value as correct even if the calculation was
+     * wrong. For example, the error range for the acceleration can easily be in the order of 10m/s^2.
+     */
+    private CorrectAccelerationValues getCorrectAccelerationValues(float v0Input, float v1Input) {
+        CorrectAccelerationValues values = new CorrectAccelerationValues();
+
+        float deltaT = (Float.parseFloat(String.valueOf(time2EditText.getText()))
+                - Float.parseFloat(String.valueOf(time1EditText.getText()))) / 1000.f;
+
+        values.a0 = (v1Input - v0Input) / deltaT;
+
+        // we can use getSpeedError here since the calculation is the same for the acceleration error
+        values.a0Error = (float)getSpeedError(v1Input - v0Input, deltaT, errorV, errorT);
+
+        return values;
+    }
+
+    private boolean checkPositionInput(CorrectPosAndVeloValues correctPosAndVeloValues) {
         float position1;
         float position2;
         float position3;
@@ -590,17 +596,17 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
             return false;
         }
 
-        if (!fuzzyEqual(position1, correctValues.x0, errorX))
+        if (!fuzzyEqual(position1, correctPosAndVeloValues.x0, errorX))
             return false;
-        if (!fuzzyEqual(position2, correctValues.x1, errorX))
+        if (!fuzzyEqual(position2, correctPosAndVeloValues.x1, errorX))
             return false;
-        if (!fuzzyEqual(position3, correctValues.x2, errorX))
+        if (!fuzzyEqual(position3, correctPosAndVeloValues.x2, errorX))
             return false;
 
         return true;
     }
 
-    private boolean checkSpeedInput(CorrectValues correctValues) {
+    private boolean checkSpeedInput(CorrectPosAndVeloValues correctPosAndVeloValues) {
         float speed1;
         float speed2;
         try {
@@ -614,15 +620,18 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         if (!unit.equals(correctSpeedUnit))
             return false;
 
-        if (!fuzzyEqual(speed1, correctValues.v0, correctValues.v0Error))
+        if (!fuzzyEqual(speed1, correctPosAndVeloValues.v0, correctPosAndVeloValues.v0Error))
             return false;
-        if (!fuzzyEqual(speed2, correctValues.v1, correctValues.v1Error))
+        if (!fuzzyEqual(speed2, correctPosAndVeloValues.v1, correctPosAndVeloValues.v1Error))
             return false;
+
+        // if correct calculate the correct acceleration values from user input
+        correctAccelerationValues = getCorrectAccelerationValues(speed1, speed2);
 
         return true;
     }
 
-    private boolean checkAccelerationInput(CorrectValues correctValues) {
+    private boolean checkAccelerationInput(CorrectAccelerationValues correctValues) {
         float acceleration1;
         try {
             acceleration1 = Float.parseFloat(String.valueOf(acceleration1EditText.getText()));
@@ -638,11 +647,11 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     }
 
     private void update() {
-        if (tagMarker.getMarkerCount() < 3 || correctValues == null)
+        if (tagMarker.getMarkerCount() < 3 || correctPosAndVeloValues == null)
             return;
 
         boolean allDone = true;
-        if (checkPositionInput(correctValues)) {
+        if (checkPositionInput(correctPosAndVeloValues)) {
             positionCheckBox.setChecked(true);
             positionCheckBox.setText("Correct!");
         } else {
@@ -650,21 +659,30 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
             positionCheckBox.setChecked(false);
             positionCheckBox.setText("");
         }
-        if (checkSpeedInput(correctValues)) {
+        if (checkSpeedInput(correctPosAndVeloValues)) {
             speedCheckBox.setChecked(true);
             speedCheckBox.setText("Correct!");
+            speedTable.setVisibility(View.VISIBLE);
+
+            if (checkAccelerationInput(correctAccelerationValues)) {
+                accelerationCheckBox.setChecked(true);
+                accelerationCheckBox.setText("Correct!");
+                accelerationTable.setVisibility(View.VISIBLE);
+            } else {
+                allDone = false;
+                accelerationCheckBox.setChecked(false);
+                accelerationCheckBox.setText("");
+                accelerationTable.setVisibility(View.INVISIBLE);
+            }
         } else {
             allDone = false;
             speedCheckBox.setChecked(false);
             speedCheckBox.setText("");
-        }
-        if (checkAccelerationInput(correctValues)) {
-            accelerationCheckBox.setChecked(true);
-            accelerationCheckBox.setText("Correct!");
-        } else {
-            allDone = false;
+            speedTable.setVisibility(View.INVISIBLE);
+
             accelerationCheckBox.setChecked(false);
             accelerationCheckBox.setText("");
+            accelerationTable.setVisibility(View.INVISIBLE);
         }
 
         setDone(allDone);
@@ -685,7 +703,6 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     abstract float getPosition(int index);
     abstract String getPositionUnit();
     abstract float getSpeed(int index);
-    abstract float getAcceleration(int index);
     abstract ColumnMarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis);
     abstract ColumnMarkerDataTableAdapter createAccelerationTableAdapter(ExperimentAnalysis experimentAnalysis);
 }
@@ -693,7 +710,6 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
 
 class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpeedFragment {
     private XSpeedDataTableColumn speedDataTableColumn;
-    private XAccelerationDataTableColumn accelerationDataTableColumn;
 
     public ScriptComponentCalculateXSpeedFragment(ScriptComponentTreeCalculateSpeed component) {
         super(component);
@@ -725,11 +741,6 @@ class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpe
     }
 
     @Override
-    float getAcceleration(int index) {
-        return accelerationDataTableColumn.getValue(index).floatValue();
-    }
-
-    @Override
     ColumnMarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis) {
         ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
         speedDataTableColumn = new XSpeedDataTableColumn();
@@ -742,7 +753,7 @@ class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpe
     @Override
     ColumnMarkerDataTableAdapter createAccelerationTableAdapter(ExperimentAnalysis experimentAnalysis) {
         ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
-        accelerationDataTableColumn = new XAccelerationDataTableColumn();
+        XAccelerationDataTableColumn accelerationDataTableColumn = new XAccelerationDataTableColumn();
         adapter.addColumn(new AccelerationTimeDataTableColumn());
         adapter.addColumn(accelerationDataTableColumn);
         return adapter;
@@ -751,7 +762,6 @@ class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpe
 
 class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalculateSpeedFragment {
     private YSpeedDataTableColumn speedDataTableColumn;
-    private YAccelerationDataTableColumn accelerationDataTableColumn;
 
     public ScriptComponentCalculateYSpeedFragment(ScriptComponentTreeCalculateSpeed component) {
         super(component);
@@ -783,11 +793,6 @@ class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalculateSpe
     }
 
     @Override
-    float getAcceleration(int index) {
-        return accelerationDataTableColumn.getValue(index).floatValue();
-    }
-
-    @Override
     ColumnMarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis) {
         ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
         speedDataTableColumn = new YSpeedDataTableColumn();
@@ -800,7 +805,7 @@ class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalculateSpe
     @Override
     ColumnMarkerDataTableAdapter createAccelerationTableAdapter(ExperimentAnalysis experimentAnalysis) {
         ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
-        accelerationDataTableColumn = new YAccelerationDataTableColumn();
+        YAccelerationDataTableColumn accelerationDataTableColumn = new YAccelerationDataTableColumn();
         adapter.addColumn(new AccelerationTimeDataTableColumn());
         adapter.addColumn(accelerationDataTableColumn);
         return adapter;
