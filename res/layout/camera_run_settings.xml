@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/seekBar" android:layout_gravity="center_horizontal"
             android:layout_above="@+id/startEndSeekBar" android:layout_alignParentLeft="true"
-            android:layout_alignRight="@+id/relativeLayout"/>
+            android:layout_alignRight="@+id/relativeLayout" android:paddingLeft="25dp" android:paddingRight="25dp"/>
     <view android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           class="nz.ac.aucklanduni.physics.tracker.views.StartEndSeekBar" android:id="@+id/startEndSeekBar"

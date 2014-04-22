@@ -16,32 +16,33 @@ import nz.ac.aucklanduni.physics.tracker.MarkerData;
 import nz.ac.aucklanduni.physics.tracker.MarkersDataModel;
 
 
-class StartEndMarker extends DragableMarker {
+abstract class StartEndMarker extends DragableMarker {
     // dimensions in density-independent  pixels
-    private final float WIDTH_DP = 25;
+    private final float WIDTH_DP = 20;
 
     // dimensions in pixels, calculated in the constructor; use them for drawing
-    private float WIDTH;
-    private float HEIGHT;
-    private int TRIANGLE_HEIGHT;
+    protected float WIDTH;
+    protected float HEIGHT;
+    protected int TRIANGLE_HEIGHT;
 
-    private Paint lightColor = new Paint();
-    private Paint darkenColor = new Paint();
+    protected Paint lightColor = new Paint();
+    protected Paint darkenColor = new Paint();
 
     public StartEndMarker(AbstractMarkersPainter parentContainer) {
         super(parentContainer);
 
-        lightColor.setColor(Color.rgb(0, 200, 0));
+        lightColor.setColor(Color.rgb(97, 204, 238));
         lightColor.setAntiAlias(true);
         lightColor.setStyle(Paint.Style.FILL);
 
-        darkenColor.setColor(Color.rgb(0, 180, 0));
+        darkenColor.setColor(Color.rgb(30, 146, 209));
         darkenColor.setAntiAlias(true);
         darkenColor.setStyle(Paint.Style.FILL);
+        darkenColor.setPathEffect(new CornerPathEffect(2));
 
         WIDTH = parent.toPixel(WIDTH_DP);
         HEIGHT = parent.toPixel(StartEndSeekBar.HEIGHT_DP);
-        TRIANGLE_HEIGHT = parent.toPixel(StartEndSeekBar.HEIGHT_DP * 0.3f);
+        TRIANGLE_HEIGHT = parent.toPixel(StartEndSeekBar.HEIGHT_DP * 0.5f);
     }
 
     @Override
@@ -57,47 +58,65 @@ class StartEndMarker extends DragableMarker {
         return rect.contains(point.x, point.y);
     }
 
-    @Override
-    public void onDraw(Canvas canvas, float priority) {
-        Path path = new Path();
-
-        // bright left
-        path.moveTo(position.x, 0);
-        path.lineTo(position.x - WIDTH / 2, TRIANGLE_HEIGHT);
-        path.lineTo(position.x, TRIANGLE_HEIGHT);
-        canvas.drawPath(path, lightColor);
-
-        RectF rect = getRect();
-        rect.top = TRIANGLE_HEIGHT;
-        rect.right = position.x;
-        canvas.drawRect(rect, lightColor);
-
-        // darken right
-        path = new Path();
-        path.moveTo(position.x - 1, 0);
-        path.lineTo(position.x + WIDTH / 2, TRIANGLE_HEIGHT);
-        path.lineTo(position.x - 1, TRIANGLE_HEIGHT);
-        canvas.drawPath(path, darkenColor);
-
-        rect = getRect();
-        rect.top = TRIANGLE_HEIGHT;
-        rect.left = position.x -1;
-        canvas.drawRect(rect, darkenColor);
-    }
-
-    private RectF getRect() {
-        RectF rect = new RectF();
-        rect.left = position.x - WIDTH / 2;
-        rect.top = position.y;
-        rect.right = position.x + WIDTH / 2;
-        rect.bottom = position.y + HEIGHT;
-        return rect;
-    }
-
     protected void onDraggedTo(PointF point) {
         parent.markerMoveRequest(this, point);
     }
 }
+
+class StartMarker extends StartEndMarker {
+
+    public StartMarker(AbstractMarkersPainter parentContainer) {
+        super(parentContainer);
+    }
+
+    @Override
+    public void onDraw(Canvas canvas, float priority) {
+        // Note: don't use drawRectangle because in some cases it does not align with drawPath for the triangle...
+
+        // darken bottom
+        Path path = new Path();
+        path.moveTo(position.x, TRIANGLE_HEIGHT);
+        path.lineTo(position.x, HEIGHT);
+        path.lineTo(position.x - WIDTH, HEIGHT);
+        path.lineTo(position.x - WIDTH, TRIANGLE_HEIGHT - 2);
+        canvas.drawPath(path, darkenColor);
+
+        // bright triangle
+        path = new Path();
+        path.moveTo(position.x, 0);
+        path.lineTo(position.x, TRIANGLE_HEIGHT);
+        path.lineTo(position.x - WIDTH, TRIANGLE_HEIGHT);
+        canvas.drawPath(path, lightColor);
+    }
+}
+
+class EndMarker extends StartEndMarker {
+
+    public EndMarker(AbstractMarkersPainter parentContainer) {
+        super(parentContainer);
+    }
+
+    @Override
+    public void onDraw(Canvas canvas, float priority) {
+        // Note: don't use drawRectangle because in some cases it does not align with drawPath for the triangle...
+
+        // darken bottom
+        Path path = new Path();
+        path.moveTo(position.x, TRIANGLE_HEIGHT);
+        path.lineTo(position.x, HEIGHT);
+        path.lineTo(position.x + WIDTH, HEIGHT);
+        path.lineTo(position.x + WIDTH, TRIANGLE_HEIGHT - 2);
+        canvas.drawPath(path, darkenColor);
+
+        // bright triangle
+        path = new Path();
+        path.moveTo(position.x, 0);
+        path.lineTo(position.x, TRIANGLE_HEIGHT);
+        path.lineTo(position.x + WIDTH, TRIANGLE_HEIGHT);
+        canvas.drawPath(path, lightColor);
+    }
+}
+
 
 class StartEndPainter extends AbstractMarkersPainter {
     int numberOfSteps = 10;
@@ -108,7 +127,10 @@ class StartEndPainter extends AbstractMarkersPainter {
 
     @Override
     protected DragableMarker createMarkerForRow(int row) {
-        return new StartEndMarker(this);
+        if (row == 0)
+            return new StartMarker(this);
+        else
+            return new EndMarker(this);
     }
 
     @Override
