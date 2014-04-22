@@ -12,12 +12,16 @@ import android.content.res.TypedArray;
 import android.graphics.*;
 import android.util.AttributeSet;
 import android.util.Pair;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import com.androidplot.exception.PlotRenderException;
 import com.androidplot.ui.*;
 import com.androidplot.util.ValPixConverter;
 import com.androidplot.xy.*;
 import nz.ac.aucklanduni.physics.tracker.ExperimentAnalyserActivity;
 import nz.ac.aucklanduni.physics.tracker.R;
+import nz.ac.aucklanduni.physics.tracker.views.ZoomView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -336,6 +340,8 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
     private float TITLE_TEXT_SIZE;
     private float LABEL_TEXT_SIZE;
 
+    private ZoomView zoomView;
+
     // in dp
     public int getMaxWidth() {
         return maxWidth;
@@ -352,9 +358,19 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
         this.maxHeight = (int)(scale * maxHeight);
     }
 
+    public GraphView2D(Context context, String title) {
+        super(context, title);
+
+        init();
+    }
+
     public GraphView2D(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        init();
+    }
+
+    private void init() {
         TITLE_TEXT_SIZE = toPixel(TITLE_TEXT_SIZE_DP);
         LABEL_TEXT_SIZE = toPixel(LABEL_TEXT_SIZE_DP);
 
@@ -367,6 +383,41 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
         getGraphWidget().getRangeOriginLabelPaint().setTextSize(LABEL_TEXT_SIZE);
 
         doGraphLayout();
+    }
+
+    public void setZoomOnClick(ZoomView zoomViewIn) {
+        if (zoomViewIn != null) {
+            this.zoomView = zoomViewIn;
+
+            setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    zoom();
+                }
+            });
+        } else {
+            this.zoomView = null;
+        }
+    }
+
+    private void zoom() {
+        GraphView2D zoomGraphView = new GraphView2D(getContext(), getTitle());
+        zoomGraphView.setAdapter(getAdapter());
+
+        Rect startBounds = new Rect();
+        Rect finalBounds = new Rect();
+        Point globalOffset = new Point();
+
+        getGlobalVisibleRect(startBounds);
+        ViewGroup parent = ((ViewGroup)zoomView.getParent());
+        parent.getDrawingRect(finalBounds);
+        startBounds.offset(-globalOffset.x, -globalOffset.y);
+        finalBounds.offset(-globalOffset.x, -globalOffset.y);
+
+        finalBounds.inset((int)((float)(parent.getPaddingLeft() + parent.getPaddingRight())) / 2,
+                (int)((float)(parent.getPaddingTop() + parent.getPaddingBottom())) / 2);
+
+        zoomView.zoom(zoomGraphView, startBounds, finalBounds, this);
     }
 
     private void doGraphLayout() {
@@ -421,6 +472,10 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
         addSeries(new XYSeriesAdapter(adapter), seriesFormat);
 
         refillGraph();
+    }
+
+    public IGraphAdapter getAdapter() {
+        return adapter;
     }
 
     @Override

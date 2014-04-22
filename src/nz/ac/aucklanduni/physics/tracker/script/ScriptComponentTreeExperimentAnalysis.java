@@ -22,6 +22,7 @@ import nz.ac.aucklanduni.physics.tracker.ExperimentAnalyserActivity;
 import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.tracker.ExperimentLoader;
 import nz.ac.aucklanduni.physics.tracker.R;
+import nz.ac.aucklanduni.physics.tracker.views.ZoomView;
 import nz.ac.aucklanduni.physics.tracker.views.graph.GraphView2D;
 import nz.ac.aucklanduni.physics.tracker.views.graph.MarkerGraphAdapter;
 import nz.ac.aucklanduni.physics.tracker.views.graph.XPositionMarkerGraphAxis;
@@ -113,6 +114,9 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
 
         graphView = (GraphView2D)view.findViewById(R.id.graphView);
         assert graphView != null;
+
+        ZoomView zoomView = (ZoomView)containerView.getRootView().findViewById(R.id.zoomView);
+        graphView.setZoomOnClick(zoomView);
 
         updateViews();
 
