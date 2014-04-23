@@ -1,9 +1,17 @@
+/*
+ * Copyright 2013-2014.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
 package nz.ac.aucklanduni.physics.tracker.views.graph;
 
 import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.tracker.MarkerData;
 import nz.ac.aucklanduni.physics.tracker.MarkersDataModel;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 /*
  * Copyright 2013-2014.
@@ -12,18 +20,20 @@ import java.util.ArrayList;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 
 public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkersDataModel.IMarkersDataModelListener {
-    private List<IGraphAdapterListener> listeners;
+    private List<WeakReference<IGraphAdapterListener>> listeners;
     protected String title;
     protected MarkersDataModel data;
     protected ExperimentAnalysis experimentAnalysis;
 
     public MarkerGraphAdapter(ExperimentAnalysis experimentAnalysis, String title, MarkerGraphAxis xAxis,
                               MarkerGraphAxis yAxis) {
-        listeners = new ArrayList<IGraphAdapterListener>();
+        listeners = new ArrayList<WeakReference<IGraphAdapterListener>>();
         this.experimentAnalysis = experimentAnalysis;
         this.title = title;
         data = experimentAnalysis.getTagMarkers();
@@ -33,6 +43,11 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkersD
         yAxis.setMarkerGraphAdapter(this);
         setXAxis(xAxis);
         setYAxis(yAxis);
+    }
+
+    @Override
+    protected void finalize() {
+        data.removeListener(this);
     }
 
     public static MarkerGraphAdapter createPositionAdapter(ExperimentAnalysis experimentAnalysis, String title) {
@@ -50,11 +65,6 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkersD
                 new YSpeedMarkerGraphAxis());
     }
 
-    public void release() {
-        data.removeListener(this);
-        listeners.clear();
-    }
-
     public MarkersDataModel getData() {
         return data;
     }
@@ -65,7 +75,12 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkersD
 
     @Override
     public void addListener(IGraphAdapterListener listener) {
-        listeners.add(listener);
+        listeners.add(new WeakReference<IGraphAdapterListener>(listener));
+    }
+
+    @Override
+    public boolean removeListener(IGraphAdapterListener listener) {
+        return listeners.remove(listener);
     }
 
     @Override
@@ -103,27 +118,52 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkersD
     }
 
     public void notifyDataAdded(int index) {
-        for (IGraphAdapterListener listener : listeners)
-            listener.onDataPointAdded(this, index);
+        for (ListIterator<WeakReference<IGraphAdapterListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            IGraphAdapterListener listener = it.next().get();
+            if (listener != null)
+                listener.onDataPointAdded(this, index);
+            else
+                it.remove();
+        }
     }
 
     public void notifyDataRemoved(int index) {
-        for (IGraphAdapterListener listener : listeners)
-            listener.onDataPointRemoved(this, index);
+        for (ListIterator<WeakReference<IGraphAdapterListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            IGraphAdapterListener listener = it.next().get();
+            if (listener != null)
+                listener.onDataPointRemoved(this, index);
+            else
+                it.remove();
+        }
     }
 
     public void notifyDataChanged(int index, int number) {
-        for (IGraphAdapterListener listener : listeners)
-            listener.onDataPointChanged(this, index, number);
+        for (ListIterator<WeakReference<IGraphAdapterListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            IGraphAdapterListener listener = it.next().get();
+            if (listener != null)
+                listener.onDataPointChanged(this, index, number);
+            else
+                it.remove();
+        }
     }
 
     public void notifyAllDataChanged() {
-        for (IGraphAdapterListener listener : listeners)
-            listener.onAllDataPointsChanged(this);
+        for (ListIterator<WeakReference<IGraphAdapterListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            IGraphAdapterListener listener = it.next().get();
+            if (listener != null)
+                listener.onAllDataPointsChanged(this);
+            else
+                it.remove();
+        }
     }
 
     private void notifyDataSelected(int index) {
-        for (IGraphAdapterListener listener : listeners)
-            listener.onDataPointSelected(this, index);
+        for (ListIterator<WeakReference<IGraphAdapterListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            IGraphAdapterListener listener = it.next().get();
+            if (listener != null)
+                listener.onDataPointSelected(this, index);
+            else
+                it.remove();
+        }
     }
 }

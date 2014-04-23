@@ -44,10 +44,10 @@ interface IGraphAdapter {
     }
 
     public void addListener(IGraphAdapterListener listener);
+    public boolean removeListener(IGraphAdapterListener listener);
     public int size();
     public void setTitle(String title);
     public String getTitle();
-    public void release();
 
     public IGraphAxis getXAxis();
     public IGraphAxis getYAxis();
@@ -444,9 +444,16 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
         return Math.round(densityIndependentPixel * scale);
     }
 
+    @Override
+    protected void finalize() {
+        if (this.adapter != null)
+            this.adapter.removeListener(this);
+        this.adapter = null;
+    }
+
     public void setAdapter(IGraphAdapter adapter) {
         if (this.adapter != null)
-            this.adapter.release();
+            this.adapter.removeListener(this);
         this.adapter = adapter;
 
         if (this.adapter == null) {

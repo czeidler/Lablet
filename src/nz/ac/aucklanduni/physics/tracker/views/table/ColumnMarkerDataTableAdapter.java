@@ -9,35 +9,35 @@ package nz.ac.aucklanduni.physics.tracker.views.table;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.PointF;
 import android.view.View;
 import android.widget.TextView;
-import nz.ac.aucklanduni.physics.tracker.Experiment;
 import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.tracker.MarkerData;
 import nz.ac.aucklanduni.physics.tracker.MarkersDataModel;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 
 abstract class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, MarkersDataModel.IMarkersDataModelListener,
         ExperimentAnalysis.IExperimentAnalysisListener {
     protected MarkersDataModel model;
     protected ExperimentAnalysis experimentAnalysis;
-    private List<ITableAdapterListener> listeners;
+    private List<WeakReference<ITableAdapterListener>> listeners;
 
     public MarkerDataTableAdapter(MarkersDataModel model, ExperimentAnalysis experimentAnalysis) {
         this.model = model;
         model.addListener(this);
-        listeners = new ArrayList<ITableAdapterListener>();
+        listeners = new ArrayList<WeakReference<ITableAdapterListener>>();
         this.experimentAnalysis = experimentAnalysis;
         this.experimentAnalysis.addListener(this);
     }
 
-    public void release() {
+    @Override
+    protected void finalize() {
         model.removeListener(this);
-        listeners.clear();
     }
 
     @Override
@@ -97,7 +97,12 @@ abstract class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Mark
 
     @Override
     public void addListener(ITableAdapterListener listener) {
-        listeners.add(listener);
+        listeners.add(new WeakReference<ITableAdapterListener>(listener));
+    }
+
+    @Override
+    public boolean removeListener(ITableAdapterListener listener) {
+        return listeners.remove(listener);
     }
 
     @Override
@@ -126,34 +131,64 @@ abstract class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Mark
     }
 
     private void notifyRowAdded(int row) {
-        for (ITableAdapterListener listener : listeners)
-            listener.onRowAdded(this, row);
+        for (ListIterator<WeakReference<ITableAdapterListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            ITableAdapterListener listener = it.next().get();
+            if (listener != null)
+                listener.onRowAdded(this, row);
+            else
+                it.remove();
+        }
     }
 
     private void notifyRowRemoved(int row) {
-        for (ITableAdapterListener listener : listeners)
-            listener.onRowRemoved(this, row);
+        for (ListIterator<WeakReference<ITableAdapterListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            ITableAdapterListener listener = it.next().get();
+            if (listener != null)
+                listener.onRowRemoved(this, row);
+            else
+                it.remove();
+        }
     }
 
     private void notifyRowChanged(int row, int number) {
-        for (ITableAdapterListener listener : listeners)
-            listener.onRowUpdated(this, row + 1, number);
+        for (ListIterator<WeakReference<ITableAdapterListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            ITableAdapterListener listener = it.next().get();
+            if (listener != null)
+                listener.onRowUpdated(this, row + 1, number);
+            else
+                it.remove();
+        }
     }
 
     private void notifyAllRowsChanged() {
-        for (ITableAdapterListener listener : listeners)
-            listener.onAllRowsUpdated(this);
+        for (ListIterator<WeakReference<ITableAdapterListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            ITableAdapterListener listener = it.next().get();
+            if (listener != null)
+                listener.onAllRowsUpdated(this);
+            else
+                it.remove();
+        }
     }
 
     private void notifyRowSelected(int row) {
-        for (ITableAdapterListener listener : listeners)
-            listener.onRowSelected(this, row);
+        for (ListIterator<WeakReference<ITableAdapterListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            ITableAdapterListener listener = it.next().get();
+            if (listener != null)
+                listener.onRowSelected(this, row);
+            else
+                it.remove();
+        }
     }
 
     @Override
     public void onUnitPrefixChanged() {
-        for (ITableAdapterListener listener : listeners)
-            listener.onRowUpdated(this, 0, 1);
+        for (ListIterator<WeakReference<ITableAdapterListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            ITableAdapterListener listener = it.next().get();
+            if (listener != null)
+                listener.onRowUpdated(this, 0, 1);
+            else
+                it.remove();
+        }
     }
 
     @Override

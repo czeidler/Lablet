@@ -25,8 +25,7 @@ public interface ITableAdapter<T> {
     public int getSelectedRow();
 
     public void addListener(ITableAdapterListener listener);
-
-    public void release();
+    public boolean removeListener(ITableAdapterListener listener);
 
     public interface ITableAdapterListener {
         public void onRowAdded(ITableAdapter<?> table, int row);

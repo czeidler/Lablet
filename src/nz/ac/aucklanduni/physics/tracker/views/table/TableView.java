@@ -34,7 +34,7 @@ public class TableView extends TableLayout implements ITableAdapter.ITableAdapte
     public void setAdapter(ITableAdapter<?> tableAdapter) {
         removeAllViews();
         if (adapter != null)
-            adapter.release();
+            adapter.removeListener(this);
         adapter = tableAdapter;
 
         if (adapter == null)

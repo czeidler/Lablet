@@ -9,8 +9,10 @@ package nz.ac.aucklanduni.physics.tracker;
 
 import android.graphics.PointF;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 
 public class MarkersDataModel implements Calibration.ICalibrationListener {
@@ -23,13 +25,13 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
     }
 
     private List<MarkerData> markerDataList;
-    private List<IMarkersDataModelListener> listeners;
+    private List<WeakReference<IMarkersDataModelListener>> listeners;
     private int selectedDataIndex = -1;
     private Calibration calibration = null;
 
     public MarkersDataModel() {
         markerDataList = new ArrayList<MarkerData>();
-        listeners = new ArrayList<IMarkersDataModelListener>();
+        listeners = new ArrayList<WeakReference<IMarkersDataModelListener>>();
     }
 
     /**
@@ -73,7 +75,7 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
     }
 
     public void addListener(IMarkersDataModelListener listener) {
-        listeners.add(listener);
+        listeners.add(new WeakReference<IMarkersDataModelListener>(listener));
     }
 
     public boolean removeListener(IMarkersDataModelListener listener) {
@@ -123,27 +125,52 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
     }
 
     public void notifyDataAdded(int index) {
-        for (IMarkersDataModelListener listener : listeners)
-            listener.onDataAdded(this, index);
+        for (ListIterator<WeakReference<IMarkersDataModelListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            IMarkersDataModelListener listener = it.next().get();
+            if (listener != null)
+                listener.onDataAdded(this, index);
+            else
+                it.remove();
+        }
     }
 
     public void notifyDataRemoved(int index, MarkerData data) {
-        for (IMarkersDataModelListener listener : listeners)
-            listener.onDataRemoved(this, index, data);
+        for (ListIterator<WeakReference<IMarkersDataModelListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            IMarkersDataModelListener listener = it.next().get();
+            if (listener != null)
+                listener.onDataRemoved(this, index, data);
+            else
+                it.remove();
+        }
     }
 
     public void notifyDataChanged(int index, int number) {
-        for (IMarkersDataModelListener listener : listeners)
-            listener.onDataChanged(this, index, number);
+        for (ListIterator<WeakReference<IMarkersDataModelListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            IMarkersDataModelListener listener = it.next().get();
+            if (listener != null)
+                listener.onDataChanged(this, index, number);
+            else
+                it.remove();
+        }
     }
 
     public void notifyAllDataChanged() {
-        for (IMarkersDataModelListener listener : listeners)
-            listener.onAllDataChanged(this);
+        for (ListIterator<WeakReference<IMarkersDataModelListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            IMarkersDataModelListener listener = it.next().get();
+            if (listener != null)
+                listener.onAllDataChanged(this);
+            else
+                it.remove();
+        }
     }
 
     private void notifyDataSelected(int index) {
-        for (IMarkersDataModelListener listener : listeners)
-            listener.onDataSelected(this, index);
+        for (ListIterator<WeakReference<IMarkersDataModelListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            IMarkersDataModelListener listener = it.next().get();
+            if (listener != null)
+                listener.onDataSelected(this, index);
+            else
+                it.remove();
+        }
     }
 }
