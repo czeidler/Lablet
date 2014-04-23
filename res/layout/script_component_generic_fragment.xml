@@ -25,4 +25,9 @@
             android:layout_below="@+id/titleTextView"
             android:layout_alignParentLeft="true" android:layout_above="@+id/finishComponentButton"
             android:layout_alignRight="@+id/finishComponentButton" android:fillViewport="false" android:padding="10dp"/>
+
+    <view android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          class="nz.ac.aucklanduni.physics.tracker.views.ZoomView" android:id="@+id/zoomView"
+          android:layout_gravity="center" android:visibility="invisible" android:layout_centerInParent="true"/>
 </RelativeLayout>
