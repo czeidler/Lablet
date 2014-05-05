@@ -102,6 +102,7 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
                 Intent intent = new Intent(getActivity(), ExperimentAnalyserActivity.class);
                 intent.putExtra("experiment_path",
                         ((ScriptComponentTreeExperimentAnalysis)component).getExperiment().getExperimentPath());
+                intent.putExtra("first_start_with_run_settings", true);
                 startActivityForResult(intent, ANALYSE_EXPERIMENT);
             }
         });

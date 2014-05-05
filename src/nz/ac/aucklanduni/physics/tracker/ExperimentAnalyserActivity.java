@@ -26,7 +26,8 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
 
     final public static int MARKER_COLOR = Color.argb(255, 100, 200, 20);
 
-    ExperimentAnalysis experimentAnalysis;
+    private ExperimentAnalysis experimentAnalysis;
+    private boolean resumeWithRunSettings = false;
 
     public ExperimentAnalysis getExperimentAnalysis() {
         return experimentAnalysis;
@@ -174,6 +175,17 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             return;
         }
 
+        Intent intent = getIntent();
+        if (intent != null) {
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                if (extras.getBoolean("first_start_with_run_settings", false)
+                        && experimentAnalysis.getTagMarkers().getMarkerCount() == 0) {
+                    resumeWithRunSettings = true;
+                }
+            }
+        }
+
         // gui stuff:
 
         setContentView(R.layout.experiment_analyser);
@@ -192,6 +204,11 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
 
         if (experimentAnalysis != null)
             experimentAnalysis.getRunDataModel().setCurrentRun(experimentAnalysis.getRunDataModel().getCurrentRun());
+
+        if (resumeWithRunSettings) {
+            startRunSettingsActivity(experimentAnalysis.getExperimentSpecificData());
+            resumeWithRunSettings = false;
+        }
     }
 
     @Override
