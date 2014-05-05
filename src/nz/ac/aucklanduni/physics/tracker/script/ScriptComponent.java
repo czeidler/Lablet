@@ -9,6 +9,7 @@ package nz.ac.aucklanduni.physics.tracker.script;
 
 import android.os.Bundle;
 
+import java.lang.ref.WeakReference;
 import java.security.MessageDigest;
 import java.util.*;
 
@@ -22,17 +23,22 @@ abstract public class ScriptComponent {
         public void onStateChanged(ScriptComponent item, int state);
     }
 
-    private IScriptComponentListener listener = null;
+    private WeakReference<IScriptComponentListener> listener = null;
     private int state = SCRIPT_STATE_ONGOING;
     protected String lastErrorMessage = "";
 
+    /**
+     * Checks if the component has all information to operate correctly, i.e., everything is setup correctly in the
+     * script.
+     * @return true if status is ok.
+     */
     abstract public boolean initCheck();
     public String getLastErrorMessage() {
         return lastErrorMessage;
     }
 
     public void setListener(IScriptComponentListener listener) {
-        this.listener = listener;
+        this.listener = new WeakReference<IScriptComponentListener>(listener);
     }
 
     // state < 0 means item is not done yet
@@ -42,8 +48,11 @@ abstract public class ScriptComponent {
 
     public void setState(int state) {
         this.state = state;
-        if (listener != null)
-            listener.onStateChanged(this, state);
+        if (listener != null) {
+            IScriptComponentListener listenerHard = listener.get();
+            if (listenerHard != null)
+                listenerHard.onStateChanged(this, state);
+        }
     }
 
     public void toBundle(Bundle bundle) {
