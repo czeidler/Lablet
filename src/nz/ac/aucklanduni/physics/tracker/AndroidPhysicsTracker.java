@@ -9,7 +9,6 @@ package nz.ac.aucklanduni.physics.tracker;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -169,7 +168,7 @@ public class AndroidPhysicsTracker extends Activity {
     }
 
     private void deleteSelectedExperiments() {
-        File experimentDir = Experiment.getMainExperimentDir(this);
+        File experimentDir = ExperimentActivity.getDefaultExperimentBaseDir(this);
         for (CheckBoxListEntry entry : experimentList) {
             if (!entry.getSelected())
                 continue;
@@ -243,7 +242,7 @@ public class AndroidPhysicsTracker extends Activity {
             }
         };
 
-        File experimentDir = Experiment.getMainExperimentDir(this);
+        File experimentDir = ExperimentActivity.getDefaultExperimentBaseDir(this);
         if (experimentDir.exists()) {
             // TODO: Events are never received, check why. Manually call updateExperimentList in onResume for now.
             experimentDirObserver = new ExperimentDirObserver(experimentDir.getPath());
@@ -252,7 +251,7 @@ public class AndroidPhysicsTracker extends Activity {
     }
 
     private void startAnalyzeActivityById(String id) {
-        File experimentDir = Experiment.getMainExperimentDir(this);
+        File experimentDir = ExperimentActivity.getDefaultExperimentBaseDir(this);
         File experimentPath = new File(experimentDir, id);
         startAnalyzeActivity(experimentPath.getPath());
     }
@@ -311,7 +310,7 @@ public class AndroidPhysicsTracker extends Activity {
 
     private void updateExperimentList() {
         experimentList.clear();
-        File experimentDir = Experiment.getMainExperimentDir(this);
+        File experimentDir = ExperimentActivity.getDefaultExperimentBaseDir(this);
         if (experimentDir.isDirectory()) {
             File[] children = experimentDir.listFiles();
             for (File child : children != null ? children : new File[0])

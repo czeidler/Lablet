@@ -21,6 +21,8 @@ public class ExperimentAnalysis {
         void onShowCoordinateSystem(boolean show);
     }
 
+    final public static String EXPERIMENT_ANALYSIS_FILE_NAME = "experiment_analysis.xml";
+
     private Experiment experiment;
 
     private RunDataModel runDataModel;
@@ -246,6 +248,18 @@ public class ExperimentAnalysis {
             setYUnitPrefix(bundle.getString("yUnitPrefix"));
 
         return true;
+    }
+
+    public void saveAnalysisDataToFile() throws IOException {
+        Bundle bundle = new Bundle();
+        Bundle experimentData = analysisDataToBundle();
+        bundle.putBundle("analysis_data", experimentData);
+
+        // save the bundle
+        File projectFile = new File(experiment.getStorageDir(), EXPERIMENT_ANALYSIS_FILE_NAME);
+        FileWriter fileWriter = new FileWriter(projectFile);
+        PersistentBundle persistentBundle = new PersistentBundle();
+        persistentBundle.flattenBundle(bundle, fileWriter);
     }
 
     public void exportTagMarkerCSVData(OutputStream outputStream) {

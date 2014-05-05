@@ -51,7 +51,7 @@ public class ExperimentLoader {
 
         if (experimentPath != null) {
             storageDir = new File(experimentPath);
-            File file = new File(storageDir, ExperimentActivity.EXPERIMENT_DATA_FILE_NAME);
+            File file = new File(storageDir, Experiment.EXPERIMENT_DATA_FILE_NAME);
             bundle = ExperimentLoader.loadBundleFromFile(file);
         }
 
@@ -92,7 +92,7 @@ public class ExperimentLoader {
         ExperimentAnalysis experimentAnalysis = plugin.loadExperimentAnalysis(experiment);
 
         // try to load old analysis
-        File projectFile = new File(experiment.getStorageDir(), ExperimentAnalyserActivity.EXPERIMENT_ANALYSIS_FILE_NAME);
+        File projectFile = new File(experiment.getStorageDir(), ExperimentAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
         Bundle bundle = ExperimentLoader.loadBundleFromFile(projectFile);
         if (bundle == null)
             return experimentAnalysis;

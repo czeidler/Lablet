@@ -23,7 +23,6 @@ import java.io.*;
 
 public class ExperimentAnalyserActivity extends ExperimentActivity {
     static final int PERFORM_RUN_SETTINGS = 0;
-    final public static String EXPERIMENT_ANALYSIS_FILE_NAME = "experiment_analysis.xml";
 
     final public static int MARKER_COLOR = Color.argb(255, 100, 200, 20);
 
@@ -138,7 +137,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         intent.setType("text/html");
         intent.putExtra(Intent.EXTRA_SUBJECT, "Experiment Data");
         intent.putExtra(Intent.EXTRA_TEXT, "Attached is your experiment data.");
-        intent .putExtra(Intent.EXTRA_STREAM, Uri.fromFile(tagMarkerCSVFile));
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(tagMarkerCSVFile));
 
         startActivity(Intent.createChooser(intent, "Send Email"));
     }
@@ -203,24 +202,12 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             return;
 
         try {
-            saveAnalysisDataToFile();
+            experimentAnalysis.saveAnalysisDataToFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         exportTagMarkerCSVData();
-    }
-
-    protected void saveAnalysisDataToFile() throws IOException {
-        Bundle bundle = new Bundle();
-        Bundle experimentData = experimentAnalysis.analysisDataToBundle();
-        bundle.putBundle("analysis_data", experimentData);
-
-        // save the bundle
-        File projectFile = new File(getStorageDir(), EXPERIMENT_ANALYSIS_FILE_NAME);
-        FileWriter fileWriter = new FileWriter(projectFile);
-        PersistentBundle persistentBundle = new PersistentBundle();
-        persistentBundle.flattenBundle(bundle, fileWriter);
     }
 
     private File getTagMarkerCSVFile() {

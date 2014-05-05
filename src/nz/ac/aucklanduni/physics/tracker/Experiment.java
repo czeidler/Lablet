@@ -13,12 +13,16 @@ import android.os.Bundle;
 import android.text.format.Time;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 
 abstract public class Experiment {
     private String uid;
     private File storageDir;
     protected Context context;
+
+    final static public String EXPERIMENT_DATA_FILE_NAME = "experiment_data.xml";
 
     public Experiment(Context experimentContext, Bundle bundle, File storageDir) {
         init(experimentContext);
@@ -52,12 +56,18 @@ abstract public class Experiment {
         return true;
     }
 
-    static public File getMainExperimentDir(Context context) {
-        File baseDir = context.getExternalFilesDir(null);
-        File experimentDir = new File(baseDir, "experiments");
-        if (!experimentDir.exists())
-            experimentDir.mkdir();
-        return experimentDir;
+    public void saveExperimentDataToFile() throws IOException {
+        Bundle bundle = new Bundle();
+        bundle.putString("experiment_identifier", getIdentifier());
+        Bundle experimentData = experimentDataToBundle();
+        bundle.putBundle("data", experimentData);
+        onSaveAdditionalData(getStorageDir());
+
+        // save the bundle
+        File projectFile = new File(getStorageDir(), EXPERIMENT_DATA_FILE_NAME);
+        FileWriter fileWriter = new FileWriter(projectFile);
+        PersistentBundle persistentBundle = new PersistentBundle();
+        persistentBundle.flattenBundle(bundle, fileWriter);
     }
 
     public void setStorageDir(File dir) {

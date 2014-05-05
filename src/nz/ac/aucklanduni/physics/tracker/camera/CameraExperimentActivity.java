@@ -236,7 +236,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
             recorder.setVideoFrameRate(profile.videoFrameRate);
             recorder.setVideoEncodingBitRate(profile.videoBitRate);
 
-            File outputDir = getStorageDir();
+            File outputDir = experiment.getStorageDir();
             videoFile = new File(outputDir, getVideoFileName());
             if (!videoFile.exists()) {
                 if (!videoFile.createNewFile())
@@ -273,9 +273,9 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
         ((CameraExperiment)experiment).setVideoFileName(getVideoFileName());
         try {
-            saveExperimentDataToFile();
+            experiment.saveExperimentDataToFile();
             Intent data = new Intent();
-            File outputDir = getStorageDir();
+            File outputDir = experiment.getStorageDir();
             data.putExtra("experiment_path", outputDir.getPath());
             data.putExtra("start_analysis", startAnalysis);
             setResult(RESULT_OK, data);

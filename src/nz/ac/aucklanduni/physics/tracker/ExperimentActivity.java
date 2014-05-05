@@ -13,11 +13,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import nz.ac.aucklanduni.physics.tracker.Experiment;
-import nz.ac.aucklanduni.physics.tracker.ExperimentLoader;
-import nz.ac.aucklanduni.physics.tracker.ExperimentPlugin;
-import nz.ac.aucklanduni.physics.tracker.PersistentBundle;
-import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.*;
 
@@ -25,15 +20,28 @@ abstract public class ExperimentActivity extends FragmentActivity {
     protected Experiment experiment = null;
     protected ExperimentPlugin plugin = null;
 
-    final static public String EXPERIMENT_DATA_FILE_NAME = "experiment_data.xml";
+    private File baseDirectory = null;
 
     protected void setExperiment(Experiment experiment) {
         this.experiment = experiment;
-        try {
-            experiment.setStorageDir(getStorageDir());
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        baseDirectory = getDefaultExperimentBaseDir(this);
+
+        // set experiment storage dir
+        if (experiment.getStorageDir() != null)
+            return;
+
+        Intent intent = getIntent();
+        if (intent != null) {
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                if (extras.containsKey("experiment_base_directory"))
+                    baseDirectory = new File(extras.getString("experiment_base_directory"));
+            }
         }
+
+        experiment.setStorageDir(getExperimentStorageDir());
+
     }
 
     public Experiment getExperiment() {
@@ -77,44 +85,24 @@ abstract public class ExperimentActivity extends FragmentActivity {
         dialog.show();
     }
 
-    protected void saveExperimentDataToFile() throws IOException {
-        Bundle bundle = new Bundle();
-        bundle.putString("experiment_identifier", experiment.getIdentifier());
-        Bundle experimentData = experiment.experimentDataToBundle();
-        bundle.putBundle("data", experimentData);
-        experiment.onSaveAdditionalData(getStorageDir());
-
-        // save the bundle
-        File projectFile = new File(getStorageDir(), EXPERIMENT_DATA_FILE_NAME);
-        FileWriter fileWriter = new FileWriter(projectFile);
-        PersistentBundle persistentBundle = new PersistentBundle();
-        persistentBundle.flattenBundle(bundle, fileWriter);
+    static public File getDefaultExperimentBaseDir(Context context) {
+        File baseDir = context.getExternalFilesDir(null);
+        File experimentDir = new File(baseDir, "experiments");
+        if (!experimentDir.exists())
+            experimentDir.mkdir();
+        return experimentDir;
     }
 
-
-    protected File getStorageDir() throws IOException {
+    private File getExperimentStorageDir() {
         String directoryName = getExperiment().getUid();
-
-        File path = Experiment.getMainExperimentDir(this);
-        if (path != null) {
-            File file = new File(path, directoryName);
-            if (!file.exists()) {
-                if (!file.mkdir())
-                    throw new IOException();
-            }
-            return file;
-        }
-        throw new IOException();
+        File dir = new File(baseDirectory, directoryName);
+        if (!dir.exists())
+            dir.mkdir();
+        return dir;
     }
 
     protected boolean deleteStorageDir() {
-        File file;
-        try {
-            file = getStorageDir();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
+        File file = getExperimentStorageDir();
         return recursiveDeleteFile(file);
     }
 
