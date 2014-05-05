@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import nz.ac.aucklanduni.physics.tracker.ExperimentActivity;
+import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.tracker.ExperimentLoader;
 import nz.ac.aucklanduni.physics.tracker.R;
 import nz.ac.aucklanduni.physics.tracker.camera.CameraExperiment;
@@ -115,7 +116,6 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
         Intent intent = new Intent(getContext(), CameraExperimentActivity.class);
         Bundle options = new Bundle();
         options.putBoolean("showAnalyseMenu", false);
-
         options.putString("experiment_base_directory", getScriptExperimentsDir().getPath());
         intent.putExtras(options);
         startActivityForResult(intent, PERFORM_EXPERIMENT);
@@ -155,7 +155,9 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
     }
 
     private void setExperimentPath(String experimentPath) {
-        cameraComponent.getExperiment().setExperimentPath(experimentPath);
+        ScriptComponentExperiment experiment = cameraComponent.getExperiment();
+        experiment.setExperimentPath(experimentPath);
+
         updateExperimentPath();
     }
 

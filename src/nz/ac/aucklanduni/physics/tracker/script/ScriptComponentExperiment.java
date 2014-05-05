@@ -8,14 +8,60 @@
 package nz.ac.aucklanduni.physics.tracker.script;
 
 
+import android.content.Context;
+import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
+import nz.ac.aucklanduni.physics.tracker.ExperimentLoader;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
 public class ScriptComponentExperiment {
+    public interface IScriptComponentExperimentListener {
+        public void onExperimentAnalysisUpdated();
+    }
+
+    private List<WeakReference<IScriptComponentExperimentListener>> listeners
+            = new ArrayList<WeakReference<IScriptComponentExperimentListener>>();
     private String experimentPath = "";
+    private ExperimentAnalysis experimentAnalysis;
 
     public String getExperimentPath() {
         return experimentPath;
     }
-
     public void setExperimentPath(String path) {
         experimentPath = path;
+
+    }
+
+    public ExperimentAnalysis getExperimentAnalysis(Context context) {
+        if (experimentAnalysis == null)
+            experimentAnalysis = loadExperimentAnalysis(context);
+        return experimentAnalysis;
+    }
+
+    public void addListener(IScriptComponentExperimentListener listener) {
+        listeners.add(new WeakReference<IScriptComponentExperimentListener>(listener));
+    }
+
+    public boolean removeListener(IScriptComponentExperimentListener listener) {
+        return listeners.remove(listener);
+    }
+
+    public void reloadExperimentAnalysis(Context context) {
+        experimentAnalysis = loadExperimentAnalysis(context);
+        for (ListIterator<WeakReference<IScriptComponentExperimentListener>> it = listeners.listIterator();
+             it.hasNext();) {
+            IScriptComponentExperimentListener listener = it.next().get();
+            if (listener != null)
+                listener.onExperimentAnalysisUpdated();
+            else
+                it.remove();
+        }
+    }
+
+    private ExperimentAnalysis loadExperimentAnalysis(Context context) {
+        return ExperimentLoader.loadExperimentAnalysis(context, getExperimentPath());
     }
 }

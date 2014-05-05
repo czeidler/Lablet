@@ -348,8 +348,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
 
         ScriptComponentTreeCalculateSpeed speedComponent = (ScriptComponentTreeCalculateSpeed)component;
 
-        ExperimentAnalysis experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(getActivity(),
-                speedComponent.getExperiment().getExperimentPath());
+        ExperimentAnalysis experimentAnalysis = speedComponent.getExperiment().getExperimentAnalysis(getActivity());
         if (experimentAnalysis == null)
             return;
         tagMarker = experimentAnalysis.getTagMarkers();
@@ -727,9 +726,8 @@ class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpe
 
     @Override
     String getPositionUnit() {
-        ScriptComponentTreeCalculateSpeed speedComponent = (ScriptComponentTreeCalculateSpeed)component;
-        ExperimentAnalysis experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(getActivity(),
-                speedComponent.getExperiment().getExperimentPath());
+        ScriptComponentExperiment experiment = ((ScriptComponentTreeCalculateSpeed)component).getExperiment();
+        ExperimentAnalysis experimentAnalysis = experiment.getExperimentAnalysis(getActivity());
         if (experimentAnalysis == null)
             return "";
         return experimentAnalysis.getXUnit();
@@ -779,9 +777,8 @@ class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalculateSpe
 
     @Override
     String getPositionUnit() {
-        ScriptComponentTreeCalculateSpeed speedComponent = (ScriptComponentTreeCalculateSpeed)component;
-        ExperimentAnalysis experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(getActivity(),
-                speedComponent.getExperiment().getExperimentPath());
+        ScriptComponentExperiment experiment = ((ScriptComponentTreeCalculateSpeed)component).getExperiment();
+        ExperimentAnalysis experimentAnalysis = experiment.getExperimentAnalysis(getActivity());
         if (experimentAnalysis == null)
             return "";
         return experimentAnalysis.getYUnit();

@@ -128,6 +128,9 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
         if (resultCode != Activity.RESULT_OK)
             return;
 
+        ScriptComponentExperiment experiment = ((ScriptComponentTreeExperimentAnalysis)component).getExperiment();
+        experiment.reloadExperimentAnalysis(getActivity());
+
         if (!validateAnalysis()) {
             setState(ScriptComponent.SCRIPT_STATE_ONGOING);
 
@@ -148,8 +151,8 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
     }
 
     private boolean validateAnalysis() {
-        ExperimentAnalysis experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(getActivity(),
-                ((ScriptComponentTreeExperimentAnalysis) component).getExperiment().getExperimentPath());
+        ScriptComponentExperiment experiment = ((ScriptComponentTreeExperimentAnalysis)component).getExperiment();
+        ExperimentAnalysis experimentAnalysis = experiment.getExperimentAnalysis(getActivity());
         if (experimentAnalysis == null)
             return false;
 
@@ -172,8 +175,8 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
 
         if (component.getState() == ScriptComponent.SCRIPT_STATE_DONE) {
             takenExperimentInfo.setChecked(true);
-            ExperimentAnalysis experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(getActivity(),
-                    ((ScriptComponentTreeExperimentAnalysis) component).getExperiment().getExperimentPath());
+            ScriptComponentExperiment experiment = ((ScriptComponentTreeExperimentAnalysis)component).getExperiment();
+            ExperimentAnalysis experimentAnalysis = experiment.getExperimentAnalysis(getActivity());
             if (experimentAnalysis == null)
                 return;
             MarkerGraphAdapter adapter = new MarkerGraphAdapter(experimentAnalysis, "Position Data:",

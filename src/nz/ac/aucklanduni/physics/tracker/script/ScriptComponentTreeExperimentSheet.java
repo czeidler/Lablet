@@ -24,6 +24,7 @@ class GraphViewHolder extends ScriptComponentViewHolder {
     private String xAxisContentId = "x-position";
     private String yAxisContentId = "y-position";
     private String title = "Position Data";
+    private ScriptComponentExperiment.IScriptComponentExperimentListener experimentListener;
 
     public GraphViewHolder(ScriptComponentTreeExperimentSheet experimentSheet, ScriptComponentExperiment experiment) {
         this.experimentSheet = experimentSheet;
@@ -42,7 +43,7 @@ class GraphViewHolder extends ScriptComponentViewHolder {
 
         graphView2D.setMaxWidth(500);
 
-        ExperimentAnalysis experimentAnalysis = experimentSheet.getExperimentAnalysis(context, experiment);
+        ExperimentAnalysis experimentAnalysis = experiment.getExperimentAnalysis(context);
         if (experimentAnalysis != null) {
             MarkerGraphAxis xAxis = createAxis(xAxisContentId);
             if (xAxis == null)
@@ -54,7 +55,23 @@ class GraphViewHolder extends ScriptComponentViewHolder {
             adapter = new MarkerGraphAdapter(experimentAnalysis, title, xAxis, yAxis);
             graphView2D.setAdapter(adapter);
         }
+
+        // install listener
+        final Context contextFinal = context;
+        experimentListener = new ScriptComponentExperiment.IScriptComponentExperimentListener() {
+            @Override
+            public void onExperimentAnalysisUpdated() {
+                adapter.setExperimentAnalysis(experiment.getExperimentAnalysis(contextFinal));
+            }
+        };
+        experiment.addListener(experimentListener);
+
         return view;
+    }
+
+    @Override
+    protected void finalize() {
+        experiment.removeListener(experimentListener);
     }
 
     public boolean setXAxisContent(String axis) {
@@ -106,8 +123,6 @@ class GraphViewHolder extends ScriptComponentViewHolder {
 }
 
 public class ScriptComponentTreeExperimentSheet extends ScriptComponentTreeSheet {
-    private Map<String, ExperimentAnalysis> experimentAnalysisMap = new HashMap<String, ExperimentAnalysis>();
-
     public ScriptComponentTreeExperimentSheet(Script script) {
         super(script);
     }
@@ -137,15 +152,5 @@ public class ScriptComponentTreeExperimentSheet extends ScriptComponentTreeSheet
         item.setXAxisContent("time_v");
         item.setYAxisContent("y-velocity");
         addItemViewHolder(item, parent);
-    }
-
-    public ExperimentAnalysis getExperimentAnalysis(Context context, ScriptComponentExperiment experiment) {
-        ExperimentAnalysis experimentAnalysis = experimentAnalysisMap.get(experiment.getExperimentPath());
-        if (experimentAnalysis != null)
-            return experimentAnalysis;
-        experimentAnalysis = ExperimentLoader.loadExperimentAnalysis(context,
-                experiment.getExperimentPath());
-        experimentAnalysisMap.put(experiment.getExperimentPath(), experimentAnalysis);
-        return experimentAnalysis;
     }
 }
