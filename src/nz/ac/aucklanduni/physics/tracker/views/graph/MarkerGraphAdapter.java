@@ -34,15 +34,23 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkersD
     public MarkerGraphAdapter(ExperimentAnalysis experimentAnalysis, String title, MarkerGraphAxis xAxis,
                               MarkerGraphAxis yAxis) {
         listeners = new ArrayList<WeakReference<IGraphAdapterListener>>();
-        this.experimentAnalysis = experimentAnalysis;
         this.title = title;
-        data = experimentAnalysis.getTagMarkers();
-        data.addListener(this);
+        setExperimentAnalysis(experimentAnalysis);
 
         xAxis.setMarkerGraphAdapter(this);
         yAxis.setMarkerGraphAdapter(this);
         setXAxis(xAxis);
         setYAxis(yAxis);
+    }
+
+    public void setExperimentAnalysis(ExperimentAnalysis experimentAnalysis) {
+        if (data != null)
+            data.removeListener(this);
+        this.experimentAnalysis = experimentAnalysis;
+        data = experimentAnalysis.getTagMarkers();
+        data.addListener(this);
+
+        notifyAllDataChanged();
     }
 
     @Override
