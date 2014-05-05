@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
+import nz.ac.aucklanduni.physics.tracker.ExperimentActivity;
 import nz.ac.aucklanduni.physics.tracker.ExperimentLoader;
 import nz.ac.aucklanduni.physics.tracker.R;
 import nz.ac.aucklanduni.physics.tracker.camera.CameraExperiment;
@@ -114,8 +115,20 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
         Intent intent = new Intent(getContext(), CameraExperimentActivity.class);
         Bundle options = new Bundle();
         options.putBoolean("showAnalyseMenu", false);
+
+        options.putString("experiment_base_directory", getScriptExperimentsDir().getPath());
         intent.putExtras(options);
         startActivityForResult(intent, PERFORM_EXPERIMENT);
+    }
+
+    private File getScriptExperimentsDir() {
+        ScriptRunnerActivity activity = (ScriptRunnerActivity)sheetFragment.getActivity();
+        File scriptUserDataDir = activity.getScriptUserDataDir();
+
+        File scriptExperimentDir = new File(scriptUserDataDir, "experiments");
+        if (!scriptExperimentDir.exists())
+            scriptExperimentDir.mkdir();
+        return scriptExperimentDir;
     }
 
     @Override
@@ -127,6 +140,10 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
             if (data == null)
                 return;
             if (data.hasExtra("experiment_path")) {
+                String oldExperiment = cameraComponent.getExperiment().getExperimentPath();
+                if (!oldExperiment.equals(""))
+                    ExperimentActivity.recursiveDeleteFile(new File(oldExperiment));
+
                 String experimentPath = data.getStringExtra("experiment_path");
                 cameraComponent.getExperiment().setExperimentPath(experimentPath);
                 cameraComponent.setState(ScriptComponentTree.SCRIPT_STATE_DONE);

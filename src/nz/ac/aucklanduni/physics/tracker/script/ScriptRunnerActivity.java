@@ -31,6 +31,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
     private ViewPager pager = null;
     private ScriptFragmentPagerAdapter pagerAdapter = null;
     private List<ScriptComponentTree> activeChain = new ArrayList<ScriptComponentTree>();
+
     private File scriptUserDataDir = null;
     private File scriptFile = null;
     private String lastErrorMessage = "";
@@ -65,6 +66,10 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             return;
         }
         script.start();
+    }
+
+    public File getScriptUserDataDir() {
+        return scriptUserDataDir;
     }
 
     private boolean createFormIntent() {
