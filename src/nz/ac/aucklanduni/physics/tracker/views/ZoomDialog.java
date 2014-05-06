@@ -56,10 +56,14 @@ public class ZoomDialog extends Dialog {
                 WindowManager.LayoutParams.MATCH_PARENT);
 
 
+        setupZoomAnimation();
+    }
+
+    private void setupZoomAnimation() {
         // Set the pivot point for SCALE_X and SCALE_Y transformations to the top-left corner of the zoomed-in view
         // (the default is the center of the view).
-        content.setPivotX(0f);
-        content.setPivotY(0f);
+        contentView.setPivotX(0f);
+        contentView.setPivotY(0f);
 
         if ((float) finalBounds.width() / finalBounds.height() > (float) startBounds.width() / startBounds.height()) {
             // Extend start bounds horizontally
@@ -76,7 +80,6 @@ public class ZoomDialog extends Dialog {
             this.startBounds.top -= deltaHeight;
             this.startBounds.bottom += deltaHeight;
         }
-
 
         frameLayout.setOnClickListener(new View.OnClickListener() {
             @Override
