@@ -37,6 +37,11 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
     private int videoStartValue;
     private int videoEndValue;
 
+    // cache initial values to check if values have been changed
+    private int initialFrameRate;
+    private int initialVideoStartValue;
+    private int initialVideoEndValue;
+
     private ArrayList<Integer> frameRateList;
 
     @Override
@@ -203,7 +208,12 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         point.x = (float)videoEndValue / duration;
         startEndSeekBar.getMarkersDataModel().getMarkerDataAt(1).setPosition(point);
 
-        setFrameRate(getFrameRateFromPicker());
+        int frameRate = getFrameRateFromPicker();
+        setFrameRate(frameRate);
+
+        initialFrameRate = frameRate;
+        initialVideoStartValue = videoStartValue;
+        initialVideoEndValue = videoEndValue;
     }
 
     @Override
@@ -306,13 +316,27 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
     private void applySettingsAndFinish() {
         Intent intent = new Intent();
 
-        intent.putExtra("analysis_frame_rate", getFrameRateFromPicker());
-        intent.putExtra("analysis_video_start", videoStartValue);
-        intent.putExtra("analysis_video_end", videoEndValue);
+        intent.putExtra("run_settings_changed", settingsChanged());
+
+        Bundle runSettings = new Bundle();
+        runSettings.putInt("analysis_frame_rate", getFrameRateFromPicker());
+        runSettings.putInt("analysis_video_start", videoStartValue);
+        runSettings.putInt("analysis_video_end", videoEndValue);
+        intent.putExtra("run_settings", runSettings);
 
         setResult(RESULT_OK, intent);
 
         finish();
+    }
+
+    private boolean settingsChanged() {
+        if (initialFrameRate != getFrameRateFromPicker())
+            return true;
+        if (initialVideoStartValue != videoStartValue)
+            return true;
+        if (initialVideoEndValue != videoEndValue)
+            return true;
+        return false;
     }
 
     private int getFrameRateFromPicker() {

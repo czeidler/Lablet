@@ -149,13 +149,19 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             return;
 
         if (requestCode == PERFORM_RUN_SETTINGS) {
-            Bundle runSettings = data.getExtras();
-            if (runSettings != null) {
-                Bundle specificData = experimentAnalysis.getExperimentSpecificData();
-                if (specificData == null)
-                    specificData = new Bundle();
-                specificData.putBundle("run_settings", runSettings);
-                experimentAnalysis.setExperimentSpecificData(specificData);
+            Bundle extras = data.getExtras();
+            if (extras != null) {
+                Bundle settings = extras.getBundle("run_settings");
+                if (settings != null) {
+                    Bundle specificData = experimentAnalysis.getExperimentSpecificData();
+                    if (specificData == null)
+                        specificData = new Bundle();
+                    specificData.putBundle("run_settings", settings);
+                    experimentAnalysis.setExperimentSpecificData(specificData);
+                }
+                boolean settingsChanged = extras.getBoolean("run_settings_changed", false);
+                if (settingsChanged)
+                    experimentAnalysis.getTagMarkers().clear();
             }
         }
     }
