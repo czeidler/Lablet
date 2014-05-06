@@ -34,6 +34,8 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
     private EditText editFrames = null;
     private EditText editFrameLength = null;
 
+    private MarkersDataModel.IMarkersDataModelListener startEndSeekBarListener;
+
     private int videoStartValue;
     private int videoEndValue;
 
@@ -117,7 +119,9 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         startEndSeekBar = (StartEndSeekBar)findViewById(R.id.startEndSeekBar);
         startEndSeekBar.setPadding(seekBar.getPaddingLeft(), seekBar.getPaddingTop(), seekBar.getPaddingRight(),
                 seekBar.getPaddingBottom());
-        startEndSeekBar.getMarkersDataModel().addListener(new MarkersDataModel.IMarkersDataModelListener() {
+
+        // The marker data model keeps listeners as weak references. Thus we have to maintain our own a hard reference.
+        startEndSeekBarListener = new MarkersDataModel.IMarkersDataModelListener() {
             @Override
             public void onDataAdded(MarkersDataModel model, int index) {
 
@@ -158,7 +162,8 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
             public void onDataSelected(MarkersDataModel model, int index) {
 
             }
-        });
+        };
+        startEndSeekBar.getMarkersDataModel().addListener(startEndSeekBarListener);
 
         editFrameLength = (EditText)findViewById(R.id.editFrameLength);
 
