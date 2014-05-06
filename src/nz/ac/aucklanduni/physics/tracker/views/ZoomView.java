@@ -72,6 +72,7 @@ public class ZoomView extends FrameLayout {
         }
 
         original.setAlpha(0f);
+        setAlpha(1f);
         setVisibility(View.VISIBLE);
 
         // Set the pivot point for SCALE_X and SCALE_Y transformations
@@ -110,9 +111,8 @@ public class ZoomView extends FrameLayout {
         setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                if (animator != null) {
+                if (animator != null)
                     animator.cancel();
-                }
 
                 // Animate the four positioning/sizing properties in parallel,
                 // back to their original values.
