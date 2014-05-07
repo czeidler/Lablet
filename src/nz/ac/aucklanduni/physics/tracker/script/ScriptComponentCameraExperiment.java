@@ -15,10 +15,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
-import nz.ac.aucklanduni.physics.tracker.ExperimentActivity;
-import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.tracker.ExperimentLoader;
-import nz.ac.aucklanduni.physics.tracker.R;
+import nz.ac.aucklanduni.physics.tracker.*;
 import nz.ac.aucklanduni.physics.tracker.camera.CameraExperiment;
 import nz.ac.aucklanduni.physics.tracker.camera.CameraExperimentActivity;
 
@@ -142,7 +139,7 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
             if (data.hasExtra("experiment_path")) {
                 String oldExperiment = cameraComponent.getExperiment().getExperimentPath();
                 if (!oldExperiment.equals(""))
-                    ExperimentActivity.recursiveDeleteFile(new File(oldExperiment));
+                    StorageLib.recursiveDeleteFile(new File(oldExperiment));
 
                 String experimentPath = data.getStringExtra("experiment_path");
                 cameraComponent.getExperiment().setExperimentPath(experimentPath);

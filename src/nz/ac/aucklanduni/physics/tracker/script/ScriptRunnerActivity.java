@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import nz.ac.aucklanduni.physics.tracker.ExperimentActivity;
 import nz.ac.aucklanduni.physics.tracker.PersistentBundle;
 import nz.ac.aucklanduni.physics.tracker.R;
+import nz.ac.aucklanduni.physics.tracker.StorageLib;
 
 import java.io.*;
 import java.util.*;
@@ -98,7 +99,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             // start new script
             scriptFile = new File(Script.getScriptDirectory(this), scriptName);
             if (!loadScript(scriptFile)) {
-                ExperimentActivity.recursiveDeleteFile(scriptUserDataDir);
+                StorageLib.recursiveDeleteFile(scriptUserDataDir);
                 return false;
             }
         } else if (!loadExistingScript(scriptUserDataDir))

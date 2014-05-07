@@ -103,17 +103,6 @@ abstract public class ExperimentActivity extends FragmentActivity {
 
     protected boolean deleteStorageDir() {
         File file = getExperimentStorageDir();
-        return recursiveDeleteFile(file);
-    }
-
-    static public boolean recursiveDeleteFile(File file) {
-        if (file.isDirectory()) {
-            String[] children = file.list();
-            for (String child : children) {
-                if (!recursiveDeleteFile(new File(file, child)))
-                    return false;
-            }
-        }
-        return file.delete();
+        return StorageLib.recursiveDeleteFile(file);
     }
 }

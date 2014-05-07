@@ -185,7 +185,7 @@ public class ScriptActivity extends Activity {
             if (!entry.getSelected())
                 continue;
             File file = new File(scriptDir, entry.getName());
-            ExperimentActivity.recursiveDeleteFile(file);
+            StorageLib.recursiveDeleteFile(file);
         }
         selectAllCheckBox.setChecked(false);
         deleteItem.setVisible(false);

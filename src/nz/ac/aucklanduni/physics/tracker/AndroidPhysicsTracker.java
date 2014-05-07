@@ -173,7 +173,7 @@ public class AndroidPhysicsTracker extends Activity {
             if (!entry.getSelected())
                 continue;
             File experimentFile = new File(experimentDir, entry.getName());
-            ExperimentActivity.recursiveDeleteFile(experimentFile);
+            StorageLib.recursiveDeleteFile(experimentFile);
         }
         selectAllCheckBox.setChecked(false);
         deleteItem.setVisible(false);
