@@ -4,11 +4,14 @@
  *
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
- */package nz.ac.aucklanduni.physics.tracker.camera;
+ */
+package nz.ac.aucklanduni.physics.tracker.camera;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
@@ -19,6 +22,7 @@ import android.widget.MediaController;
 import android.widget.VideoView;
 import nz.ac.aucklanduni.physics.tracker.ExperimentActivity;
 import nz.ac.aucklanduni.physics.tracker.R;
+import nz.ac.aucklanduni.physics.tracker.StorageLib;
 import nz.ac.aucklanduni.physics.tracker.views.RatioSurfaceView;
 
 import java.io.File;
@@ -42,6 +46,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
     private MenuItem analyseMenuItem = null;
     private int cameraId = 0;
+    private int rotationDegree = 0;
 
     private File videoFile = null;
     private boolean unsavedExperimentData = false;
@@ -80,6 +85,16 @@ public class CameraExperimentActivity extends ExperimentActivity {
             if (options != null) {
                 boolean showAnalyseMenu = options.getBoolean("showAnalyseMenu", true);
                 analyseMenuItem.setVisible(showAnalyseMenu);
+            }
+        }
+
+        // set states after menu has been init
+        if (previewHolder.getSurface() != null) {
+            if (!unsavedExperimentData) {
+                setState(new PreviewState());
+            } else {
+                // we have unsaved experiment data means we are in the PlaybackState state
+                setState(new PlaybackState());
             }
         }
 
@@ -145,6 +160,30 @@ public class CameraExperimentActivity extends ExperimentActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (!unsavedExperimentData)
+            return;
+
+        outState.putString("unsaved_recording", videoFile.getPath());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if (!savedInstanceState.containsKey("unsaved_recording"))
+            return;
+
+        String filePath = savedInstanceState.getString("unsaved_recording");
+        videoFile = new File(filePath);
+
+        // setting unsavedExperimentData here; from this information the correct state is set in onResume (after
+        // everything has been init)
+        unsavedExperimentData = true;
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
@@ -165,15 +204,23 @@ public class CameraExperimentActivity extends ExperimentActivity {
         Camera.Parameters parameters = camera.getParameters();
         videoSize = getOptimalVideoSize(camera);
         assert videoSize != null;
+
         parameters.setPreviewSize(videoSize.width, videoSize.height);
         camera.setParameters(parameters);
 
-        float ratio = (float)videoSize.width / videoSize.height;
+        setCameraDisplayOrientation(cameraId, camera);
 
+        float ratio;
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        switch (rotation) {
+            case Surface.ROTATION_90:
+            case Surface.ROTATION_270:
+                ratio = (float)videoSize.height / videoSize.width;
+                break;
+            default:
+                ratio = (float)videoSize.width / videoSize.height;
+        }
         preview.setRatio(ratio);
-
-        if (previewHolder.getSurface() != null)
-            setState(new PreviewState());
     }
 
     @Override
@@ -205,7 +252,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
             builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    deleteStorageDir();
+                    deleteTempFiles();
                     unsavedExperimentData = false;
                     setResult(RESULT_CANCELED);
                     finish();
@@ -214,10 +261,39 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
             builder.create().show();
         } else {
-            deleteStorageDir();
+            deleteTempFiles();
             setResult(RESULT_CANCELED);
             finish();
         }
+    }
+
+    private boolean deleteTempFiles() {
+        if (videoFile.exists())
+            return videoFile.delete();
+        return true;
+    }
+
+    // copied from android dev page
+    private void setCameraDisplayOrientation(int cameraId, android.hardware.Camera camera) {
+        android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(cameraId, info);
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        rotationDegree = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0: rotationDegree = 0; break;
+            case Surface.ROTATION_90: rotationDegree = 90; break;
+            case Surface.ROTATION_180: rotationDegree = 180; break;
+            case Surface.ROTATION_270: rotationDegree = 270; break;
+        }
+
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + rotationDegree) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (info.orientation - rotationDegree + 360) % 360;
+        }
+        camera.setDisplayOrientation(result);
     }
 
     private void startRecording() {
@@ -229,6 +305,14 @@ public class CameraExperimentActivity extends ExperimentActivity {
             recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             recorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
 
+            // 90 degrees surface is -90 device...
+            int hintRotation = rotationDegree;
+            if (hintRotation == 90)
+                hintRotation = 270;
+            else if (hintRotation == 270)
+                hintRotation = 90;
+            recorder.setOrientationHint(hintRotation);
+
             CamcorderProfile profile = getOptimalCamcorderProfile(cameraId);
             if (profile == null)
                 throw new Exception("no camcorder profile!");
@@ -236,7 +320,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
             recorder.setVideoFrameRate(profile.videoFrameRate);
             recorder.setVideoEncodingBitRate(profile.videoBitRate);
 
-            File outputDir = experiment.getStorageDir();
+            File outputDir = getCacheDir();
             videoFile = new File(outputDir, getVideoFileName());
             if (!videoFile.exists()) {
                 if (!videoFile.createNewFile())
@@ -268,11 +352,18 @@ public class CameraExperimentActivity extends ExperimentActivity {
         return videoFileName;
     }
 
+    private boolean moveTempFilesToExperimentDir() {
+        File target = new File(experiment.getStorageDir(), getVideoFileName());
+        return StorageLib.moveFile(videoFile, target);
+    }
+
     private void finishExperiment(boolean startAnalysis) {
         unsavedExperimentData = false;
 
-        ((CameraExperiment)experiment).setVideoFileName(getVideoFileName());
         try {
+            if (!moveTempFilesToExperimentDir())
+                throw new IOException();
+            ((CameraExperiment)experiment).setVideoFileName(getVideoFileName());
             experiment.saveExperimentDataToFile();
             Intent data = new Intent();
             File outputDir = experiment.getStorageDir();
@@ -290,7 +381,9 @@ public class CameraExperimentActivity extends ExperimentActivity {
     // Use the actual camera preview and video sizes to find the largest matching size for preview and recording.
     private Camera.Size getOptimalVideoSize(Camera camera) {
         List<Camera.Size> videoSizes = camera.getParameters().getSupportedVideoSizes();
+        assert videoSizes != null;
         List<Camera.Size> previewSizes = camera.getParameters().getSupportedPreviewSizes();
+        assert previewSizes != null;
 
         Collections.sort(previewSizes, new Comparator<Camera.Size>() {
             @Override
@@ -340,7 +433,6 @@ public class CameraExperimentActivity extends ExperimentActivity {
             } catch (IOException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
-            setState(new PreviewState());
         }
 
         public void surfaceDestroyed(SurfaceHolder holder) {
@@ -378,8 +470,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
             stopButton.setEnabled(false);
             newButton.setVisibility(View.INVISIBLE);
 
-            if (analyseMenuItem != null)
-                analyseMenuItem.setEnabled(false);
+            analyseMenuItem.setEnabled(false);
 
             preview.setVisibility(View.VISIBLE);
             videoView.setVisibility(View.INVISIBLE);
@@ -396,8 +487,56 @@ public class CameraExperimentActivity extends ExperimentActivity {
         }
     }
 
+    /**
+     * Lock the screen to the current orientation.
+     * @return the previous orientation settings
+     */
+    private int lockScreenOrientation() {
+        int initialRequestedOrientation = getRequestedOrientation();
+
+        // Note: a surface rotation of 90 degrees means a physical device rotation of -90 degrees.
+        final int orientation = getResources().getConfiguration().orientation;
+        final int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                }
+                else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                }
+                break;
+            case Surface.ROTATION_90:
+                if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+                }
+                else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+                }
+                break;
+            case Surface.ROTATION_180:
+                if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+                }
+                else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+                }
+                break;
+            case Surface.ROTATION_270:
+                if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                }
+                else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                }
+                break;
+        }
+        return initialRequestedOrientation;
+    }
+
     class RecordState extends AbstractViewState {
         private boolean isRecording = false;
+        private int initialRequestedOrientation;
         public void enterState() {
             startButton.setEnabled(false);
             stopButton.setEnabled(true);
@@ -410,6 +549,9 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
             startRecording();
             isRecording = true;
+
+            // disable screen rotation during recording
+            initialRequestedOrientation = lockScreenOrientation();
         }
 
         public void leaveState() {
@@ -419,6 +561,8 @@ public class CameraExperimentActivity extends ExperimentActivity {
             }
             unsavedExperimentData = true;
             camera.stopPreview();
+
+            setRequestedOrientation(initialRequestedOrientation);
         }
 
         @Override
