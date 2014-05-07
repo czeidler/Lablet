@@ -413,6 +413,12 @@ class TagMarkerDataModelPainter extends AbstractMarkersPainter {
         private PointF lastMarkerPosition = new PointF();
 
         void onCurrentRunChanging(MarkersDataModel markersDataModel) {
+            // Index could be out of bounds, e.g., when the marker data has been cleared.
+            if (markerInsertedInLastRun >= markerData.getMarkerCount()) {
+                markerInsertedInLastRun =-1;
+                return;
+            }
+
             if (markerInsertedInLastRun >= 0) {
                 MarkerData lastMarkerData = markerData.getMarkerDataAt(markerInsertedInLastRun);
                 if (lastMarkerData.getPosition().equals(lastMarkerPosition)) {

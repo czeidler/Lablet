@@ -160,8 +160,10 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
                     experimentAnalysis.setExperimentSpecificData(specificData);
                 }
                 boolean settingsChanged = extras.getBoolean("run_settings_changed", false);
-                if (settingsChanged)
+                if (settingsChanged) {
                     experimentAnalysis.getTagMarkers().clear();
+                    experimentAnalysis.getRunDataModel().setCurrentRun(0);
+                }
             }
         }
     }
