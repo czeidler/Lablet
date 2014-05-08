@@ -11,12 +11,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.*;
 import android.widget.*;
-import com.androidplot.LineRegion;
-import nz.ac.aucklanduni.physics.tracker.R;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -273,8 +272,9 @@ class ScriptComponentTreeSheetBase extends ScriptComponentTreeFragmentHolder {
     }
 
     @Override
-    public android.support.v4.app.Fragment createFragment() {
-        ScriptComponentSheetFragment fragment = new ScriptComponentSheetFragment(this);
+    public ScriptComponentGenericFragment createFragment() {
+        ScriptComponentSheetFragment fragment = new ScriptComponentSheetFragment();
+        fragment.setScriptComponent(this);
         return fragment;
     }
 
@@ -399,88 +399,25 @@ public class ScriptComponentTreeSheet extends ScriptComponentTreeSheetBase {
     }
 }
 
-abstract class ActivityStarterView extends FrameLayout {
-    protected ScriptComponentSheetFragment sheetFragment;
+interface IActivityStarterViewParent {
+    public void startActivityForResultFromView(ActivityStarterView view, Intent intent, int requestCode);
+    public int getNewChildId();
+}
 
-    public ActivityStarterView(Context context, ScriptComponentSheetFragment sheetFragment) {
+abstract class ActivityStarterView extends FrameLayout {
+    protected IActivityStarterViewParent parent;
+
+    public ActivityStarterView(Context context, IActivityStarterViewParent parent) {
         super(context);
 
-        setId(View.generateViewId());
+        setId(parent.getNewChildId());
 
-        this.sheetFragment = sheetFragment;
+        this.parent = parent;
     }
 
     public void startActivityForResult(android.content.Intent intent, int requestCode) {
-        sheetFragment.startActivityForResultFromView(this, intent, requestCode);
+        parent.startActivityForResultFromView(this, intent, requestCode);
     }
 
     abstract public void onActivityResult(int requestCode, int resultCode, Intent data);
-}
-
-
-class ScriptComponentSheetFragment extends ScriptComponentGenericFragment {
-    private FrameLayout sheetLayout = null;
-    private int childViewThatHasStartedAnActivity = -1;
-
-    public ScriptComponentSheetFragment(ScriptComponentTreeSheetBase component) {
-        super(component);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-
-        View child = setChild(layout.script_component_sheet_fragment);
-        assert child != null;
-
-        sheetLayout = (FrameLayout)child.findViewById(id.sheetLayout);
-        assert sheetLayout != null;
-
-        ScriptComponentTreeSheet sheetComponent = (ScriptComponentTreeSheet)component;
-        sheetComponent.resetCounter();
-        View sheetView = sheetComponent.getSheetLayout().buildLayout(getActivity(), this);
-        sheetLayout.addView(sheetView);
-
-        return view;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (savedInstanceState != null) {
-            childViewThatHasStartedAnActivity
-                    = savedInstanceState.getInt("childViewThatHasStartedAnActivity", -1);
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putInt("childViewThatHasStartedAnActivity", childViewThatHasStartedAnActivity);
-    }
-
-    public void startActivityForResultFromView(ActivityStarterView view, Intent intent, int requestCode) {
-        childViewThatHasStartedAnActivity = view.getId();
-        startActivityForResult(intent, requestCode);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        View view = getView();
-        if (childViewThatHasStartedAnActivity >= 0 && view != null) {
-            ActivityStarterView starterView = (ActivityStarterView)view.findViewById(childViewThatHasStartedAnActivity);
-            if (starterView == null) {
-                super.onActivityResult(requestCode, resultCode, data);
-                childViewThatHasStartedAnActivity = -1;
-                return;
-            }
-            starterView.onActivityResult(requestCode, resultCode, data);
-            childViewThatHasStartedAnActivity = -1;
-            return;
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
 }

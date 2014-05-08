@@ -119,12 +119,13 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
     }
 
     private File getScriptExperimentsDir() {
+        ScriptComponentSheetFragment sheetFragment = (ScriptComponentSheetFragment)parent;
         ScriptRunnerActivity activity = (ScriptRunnerActivity)sheetFragment.getActivity();
         File scriptUserDataDir = activity.getScriptUserDataDir();
 
         File scriptExperimentDir = new File(scriptUserDataDir, "experiments");
         if (!scriptExperimentDir.exists())
-            scriptExperimentDir.mkdir();
+            scriptExperimentDir.mkdirs();
         return scriptExperimentDir;
     }
 

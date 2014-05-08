@@ -19,21 +19,49 @@ import nz.ac.aucklanduni.physics.tracker.R;
 
 
 public class ScriptComponentGenericFragment extends android.support.v4.app.Fragment
-        implements ScriptComponentTree.IScriptComponentListener{
+        implements ScriptComponentTree.IScriptComponentListener {
     protected ScriptComponentTree component;
     protected TextView titleView = null;
     protected Button finishComponentButton = null;
     protected ScrollView containerView = null;
 
-    public ScriptComponentGenericFragment(ScriptComponentTree component) {
+    public void setScriptComponent(ScriptComponentTree component) {
         this.component = component;
         component.setListener(this);
+    }
+
+    private void setScriptComponent(int index) {
+        ScriptRunnerActivity activity = (ScriptRunnerActivity)getActivity();
+
+        this.component = activity.getScriptComponentTreeAt(index);
+        component.setListener(this);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState == null)
+            return;
+
+        setScriptComponent(savedInstanceState.getInt("componentIndex"));
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        ScriptRunnerActivity activity = (ScriptRunnerActivity)getActivity();
+        int componentIndex = activity.getScriptComponentIndex(component);
+        if (componentIndex < 0)
+            return;
+
+        outState.putInt("componentIndex", componentIndex);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.script_component_generic_fragment, container, false);
         assert view != null;
 
@@ -64,7 +92,7 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
         containerView = (ScrollView)view.findViewById(R.id.childContainer);
         assert containerView != null;
 
-        setState(component.getState());
+        onStateChanged(component,component.getState());
 
         return view;
     }

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragmentHolder {
+class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragmentHolder {
     private ScriptComponentExperiment experiment;
 
     private boolean isXSpeed;
@@ -77,11 +77,14 @@ public class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragme
     }
 
     @Override
-    public android.support.v4.app.Fragment createFragment() {
+    public ScriptComponentGenericFragment createFragment() {
+        ScriptComponentGenericFragment fragment;
         if (isXSpeed)
-            return new ScriptComponentCalculateXSpeedFragment(this);
+            fragment = new ScriptComponentCalculateXSpeedFragment();
         else
-            return new ScriptComponentCalculateYSpeedFragment(this);
+            fragment = new ScriptComponentCalculateYSpeedFragment();
+        fragment.setScriptComponent(this);
+        return fragment;
     }
 
     public void setExperiment(ScriptComponentExperiment experiment) {
@@ -196,11 +199,6 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     private String correctAccelerationUnit = "[m/s^2]";
 
     protected MarkersDataModel tagMarker = null;
-
-
-    public ScriptComponentCalculateSpeedFragment(ScriptComponentTreeCalculateSpeed component) {
-        super(component);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -707,104 +705,3 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
 }
 
 
-class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpeedFragment {
-    private XSpeedDataTableColumn speedDataTableColumn;
-
-    public ScriptComponentCalculateXSpeedFragment(ScriptComponentTreeCalculateSpeed component) {
-        super(component);
-    }
-
-    @Override
-    String getDescriptionLabel() {
-        return "Fill table for the x-direction:";
-    }
-
-    @Override
-    float getPosition(int index) {
-        return tagMarker.getCalibratedMarkerPositionAt(index).x;
-    }
-
-    @Override
-    String getPositionUnit() {
-        ScriptComponentExperiment experiment = ((ScriptComponentTreeCalculateSpeed)component).getExperiment();
-        ExperimentAnalysis experimentAnalysis = experiment.getExperimentAnalysis(getActivity());
-        if (experimentAnalysis == null)
-            return "";
-        return experimentAnalysis.getXUnit();
-    }
-
-    @Override
-    float getSpeed(int index) {
-        return speedDataTableColumn.getValue(index).floatValue();
-    }
-
-    @Override
-    ColumnMarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis) {
-        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
-        speedDataTableColumn = new XSpeedDataTableColumn();
-        adapter.addColumn(new SpeedTimeDataTableColumn());
-        adapter.addColumn(speedDataTableColumn);
-
-        return adapter;
-    }
-
-    @Override
-    ColumnMarkerDataTableAdapter createAccelerationTableAdapter(ExperimentAnalysis experimentAnalysis) {
-        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
-        XAccelerationDataTableColumn accelerationDataTableColumn = new XAccelerationDataTableColumn();
-        adapter.addColumn(new AccelerationTimeDataTableColumn());
-        adapter.addColumn(accelerationDataTableColumn);
-        return adapter;
-    }
-}
-
-class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalculateSpeedFragment {
-    private YSpeedDataTableColumn speedDataTableColumn;
-
-    public ScriptComponentCalculateYSpeedFragment(ScriptComponentTreeCalculateSpeed component) {
-        super(component);
-    }
-
-    @Override
-    String getDescriptionLabel() {
-        return "Fill table for the y-direction:";
-    }
-
-    @Override
-    float getPosition(int index) {
-        return tagMarker.getCalibratedMarkerPositionAt(index).y;
-    }
-
-    @Override
-    String getPositionUnit() {
-        ScriptComponentExperiment experiment = ((ScriptComponentTreeCalculateSpeed)component).getExperiment();
-        ExperimentAnalysis experimentAnalysis = experiment.getExperimentAnalysis(getActivity());
-        if (experimentAnalysis == null)
-            return "";
-        return experimentAnalysis.getYUnit();
-    }
-
-    @Override
-    float getSpeed(int index) {
-        return speedDataTableColumn.getValue(index).floatValue();
-    }
-
-    @Override
-    ColumnMarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis) {
-        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
-        speedDataTableColumn = new YSpeedDataTableColumn();
-        adapter.addColumn(new SpeedTimeDataTableColumn());
-        adapter.addColumn(speedDataTableColumn);
-
-        return adapter;
-    }
-
-    @Override
-    ColumnMarkerDataTableAdapter createAccelerationTableAdapter(ExperimentAnalysis experimentAnalysis) {
-        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
-        YAccelerationDataTableColumn accelerationDataTableColumn = new YAccelerationDataTableColumn();
-        adapter.addColumn(new AccelerationTimeDataTableColumn());
-        adapter.addColumn(accelerationDataTableColumn);
-        return adapter;
-    }
-}

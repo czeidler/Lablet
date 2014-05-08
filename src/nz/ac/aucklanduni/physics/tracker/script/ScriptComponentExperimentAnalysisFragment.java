@@ -1,12 +1,11 @@
 /*
- * Copyright 2013-2014.
+ * Copyright 2014.
  * Distributed under the terms of the GPLv3 License.
  *
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
 package nz.ac.aucklanduni.physics.tracker.script;
-
 
 import android.app.Activity;
 import android.content.Intent;
@@ -28,7 +27,8 @@ import nz.ac.aucklanduni.physics.tracker.views.graph.YPositionMarkerGraphAxis;
 
 import java.io.File;
 
-public class ScriptComponentTreeExperimentAnalysis extends ScriptComponentTreeFragmentHolder {
+
+class ScriptComponentTreeExperimentAnalysis extends ScriptComponentTreeFragmentHolder {
     private ScriptComponentExperiment experiment;
     private String descriptionText = "";
 
@@ -46,8 +46,10 @@ public class ScriptComponentTreeExperimentAnalysis extends ScriptComponentTreeFr
     }
 
     @Override
-    public android.support.v4.app.Fragment createFragment() {
-        return new ScriptComponentExperimentAnalysisFragment(this);
+    public ScriptComponentGenericFragment createFragment() {
+        ScriptComponentGenericFragment fragment = new ScriptComponentExperimentAnalysisFragment();
+        fragment.setScriptComponent(this);
+        return fragment;
     }
 
     public void setExperiment(ScriptComponentExperiment experiment) {
@@ -67,15 +69,12 @@ public class ScriptComponentTreeExperimentAnalysis extends ScriptComponentTreeFr
     }
 }
 
-class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFragment {
+
+public class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFragment {
     static final int ANALYSE_EXPERIMENT = 0;
 
     private CheckedTextView takenExperimentInfo = null;
     private GraphView2D graphView = null;
-
-    public ScriptComponentExperimentAnalysisFragment(ScriptComponentTreeExperimentAnalysis component) {
-        super(component);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -124,13 +123,15 @@ class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFr
         if (resultCode != Activity.RESULT_OK)
             return;
 
+        Activity activity = getActivity();
+
         ScriptComponentExperiment experiment = ((ScriptComponentTreeExperimentAnalysis)component).getExperiment();
-        experiment.reloadExperimentAnalysis(getActivity());
+        experiment.reloadExperimentAnalysis(activity);
 
         if (!validateAnalysis()) {
             setState(ScriptComponent.SCRIPT_STATE_ONGOING);
 
-            Toast toast = Toast.makeText(getActivity(), "Mark more data points!", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(activity, "Mark more data points!", Toast.LENGTH_LONG);
             toast.show();
             return;
         }

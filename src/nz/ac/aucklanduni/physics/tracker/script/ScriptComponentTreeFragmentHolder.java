@@ -22,7 +22,7 @@ abstract public class ScriptComponentTreeFragmentHolder extends ScriptComponentT
         return title;
     }
 
-    abstract public android.support.v4.app.Fragment createFragment();
+    abstract public ScriptComponentGenericFragment createFragment();
 }
 
 

@@ -16,9 +16,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.View;
 import android.view.ViewGroup;
-import nz.ac.aucklanduni.physics.tracker.ExperimentActivity;
 import nz.ac.aucklanduni.physics.tracker.PersistentBundle;
 import nz.ac.aucklanduni.physics.tracker.R;
 import nz.ac.aucklanduni.physics.tracker.StorageLib;
@@ -41,6 +39,32 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        int lastSelectedFragment;
+
+        // if we get restored, first of all load the script since the fragments rely on the script components...
+        if (savedInstanceState != null) {
+            String userDataDir = savedInstanceState.getString("script_user_data_dir");
+            if (userDataDir == null) {
+                super.onCreate(savedInstanceState);
+                showErrorAndFinish("Can't start script from saved instance state (user data directory is null)");
+                return;
+            }
+            scriptUserDataDir = new File(Script.getScriptUserDataDir(this), userDataDir);
+            lastSelectedFragment = loadExistingScript(scriptUserDataDir);
+            if (lastSelectedFragment < 0) {
+                super.onCreate(savedInstanceState);
+                showErrorAndFinish("Can't continue script:", lastErrorMessage);
+                return;
+            }
+        } else {
+            lastSelectedFragment = createFormIntent();
+            if (lastSelectedFragment < 0) {
+                super.onCreate(savedInstanceState);
+                showErrorAndFinish("Can't start script", lastErrorMessage);
+                return;
+            }
+        }
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.experiment_analyser);
@@ -48,36 +72,39 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
         pager = (ViewPager)findViewById(R.id.pager);
         pagerAdapter = new ScriptFragmentPagerAdapter(getSupportFragmentManager(), activeChain);
         pager.setAdapter(pagerAdapter);
-        // there are some performance problems when loading the script fragments on the fly; cache some more
+        // there are some performance problems when loading the script fragments on the fly; cache some more pages
         pager.setOffscreenPageLimit(10);
 
-        if (savedInstanceState != null) {
-            String userDataDir = savedInstanceState.getString("script_user_data_dir");
-            if (userDataDir == null) {
-                showErrorAndFinish("Can't start script from saved instance state (user data directory is null)");
-                return;
-            }
-            scriptUserDataDir = new File(Script.getScriptUserDataDir(this), userDataDir);
-            if (!loadExistingScript(scriptUserDataDir)) {
-                showErrorAndFinish("Can't continue script:", lastErrorMessage);
-                return;
-            }
-        } else if (!createFormIntent()) {
-            showErrorAndFinish("Can't start script", lastErrorMessage);
-            return;
-        }
+        pagerAdapter.setComponents(activeChain);
+        pager.setCurrentItem(lastSelectedFragment);
+
         script.start();
+    }
+
+    @Override
+    protected void onSaveInstanceState (Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString("script_user_data_dir", scriptUserDataDir.getName());
+    }
+
+    public ScriptComponentTree getScriptComponentTreeAt(int index) {
+        return activeChain.get(index);
+    }
+
+    public int getScriptComponentIndex(ScriptComponentTree component) {
+        return activeChain.indexOf(component);
     }
 
     public File getScriptUserDataDir() {
         return scriptUserDataDir;
     }
 
-    private boolean createFormIntent() {
+    private int createFormIntent() {
         Intent intent = getIntent();
         if (intent == null) {
             lastErrorMessage = "intent is null";
-            return false;
+            return -1;
         }
 
         String scriptName = intent.getStringExtra("script_name");
@@ -85,13 +112,13 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
 
         if (userDataDir == null) {
             lastErrorMessage = "user data directory is missing";
-            return false;
+            return -1;
         }
         scriptUserDataDir = new File(Script.getScriptUserDataDir(this), userDataDir);
         if (!scriptUserDataDir.exists()) {
             if (!scriptUserDataDir.mkdir()) {
                 lastErrorMessage = "can't create user data directory";
-                return false;
+                return -1;
             }
         }
 
@@ -100,19 +127,12 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             scriptFile = new File(Script.getScriptDirectory(this), scriptName);
             if (!loadScript(scriptFile)) {
                 StorageLib.recursiveDeleteFile(scriptUserDataDir);
-                return false;
+                return -1;
             }
-        } else if (!loadExistingScript(scriptUserDataDir))
-            return false;
-
-        activeChain = script.getActiveChain();
-        pagerAdapter.setComponents(activeChain);
-        return true;
-    }
-
-    @Override
-    protected void onSaveInstanceState (Bundle outState) {
-        outState.putString("script_user_data_dir", scriptUserDataDir.getName());
+            activeChain = script.getActiveChain();
+            return 0;
+        } else
+            return loadExistingScript(scriptUserDataDir);
     }
 
     @Override
@@ -130,11 +150,17 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             lastErrorMessage = loader.getLastError();
             return false;
         }
+
         script.setListener(this);
         return true;
     }
 
-    protected boolean loadExistingScript(File scriptDir) {
+    /**
+     *
+     * @param scriptDir
+     * @return the index of the last selected fragment or -1 if an error occurred
+     */
+    private int loadExistingScript(File scriptDir) {
         File userDataFile = new File(scriptDir, SCRIPT_USER_DATA_FILENAME);
 
         Bundle bundle;
@@ -144,7 +170,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             lastErrorMessage = "can't open script file \"" + userDataFile.getPath() + "\"";
-            return false;
+            return -1;
         }
 
         PersistentBundle persistentBundle = new PersistentBundle();
@@ -153,31 +179,28 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
         } catch (Exception e) {
             e.printStackTrace();
             lastErrorMessage = "can't read bundle from \"" + userDataFile.getPath() + "\"";
-            return false;
+            return -1;
         }
 
         String scriptPath = bundle.getString("script_name");
         if (scriptPath == null) {
             lastErrorMessage = "bundle contains no script_name";
-            return false;
+            return -1;
         }
 
         scriptFile = new File(Script.getScriptDirectory(this), scriptPath);
         if (!loadScript(scriptFile))
-            return false;
+            return -1;
 
         if (!script.loadScript(bundle)) {
             lastErrorMessage = script.getLastError();
-            return false;
+            return -1;
         }
 
         activeChain = script.getActiveChain();
-        pagerAdapter.setComponents(activeChain);
 
         int lastSelectedFragment = bundle.getInt("current_fragment", 0);
-        pager.setCurrentItem(lastSelectedFragment);
-
-        return true;
+        return lastSelectedFragment;
     }
 
     protected boolean saveScriptDataToFile() {
@@ -253,7 +276,8 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
 
     private class ScriptFragmentPagerAdapter extends FragmentStatePagerAdapter {
         private List<ScriptComponentTree> components;
-        private Map<ScriptComponentTree, Fragment> fragmentMap = new HashMap<ScriptComponentTree, Fragment>();
+        private Map<ScriptComponentTree, ScriptComponentGenericFragment> fragmentMap
+                = new HashMap<ScriptComponentTree, ScriptComponentGenericFragment>();
 
         public ScriptFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager,
                                           List<ScriptComponentTree> components) {
@@ -271,7 +295,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
         public android.support.v4.app.Fragment getItem(int position) {
             ScriptComponentTreeFragmentHolder fragmentCreator
                     = (ScriptComponentTreeFragmentHolder)components.get(position);
-            Fragment fragment = fragmentCreator.createFragment();
+            ScriptComponentGenericFragment fragment = fragmentCreator.createFragment();
             fragmentMap.put(components.get(position), fragment);
             return fragment;
         }
@@ -280,10 +304,24 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
         public int getCount() {
             return components.size();
         }
-        /*
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            super.destroyItem(container, position, object);
+            fragmentMap.remove(findComponentFor((Fragment)object));
+        }
+
+        private ScriptComponentTree findComponentFor(Fragment fragment) {
+            for (Map.Entry<ScriptComponentTree, ScriptComponentGenericFragment> entry : fragmentMap.entrySet()) {
+                if (entry.getValue() == fragment)
+                    return entry.getKey();
+            }
+            return null;
+        }
+
         // disable this code since it causes some invalidate problems, e.g., when starting a sub activity and going
         // going back some pages are not invalidated completely!
-        @Override
+        /*@Override
         public int getItemPosition(Object object) {
             Fragment fragment = (Fragment)object;
             ScriptComponentTree component = findComponentFor(fragment);
@@ -294,24 +332,6 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             assert index >= 0;
 
             return index;
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            Fragment fragment = (Fragment)object;
-            ScriptComponentTree component = findComponentFor(fragment);
-            if (component == null)
-                return;
-            fragmentMap.remove(components.indexOf(component));
-        }
-
-        private ScriptComponentTree findComponentFor(Fragment fragment) {
-            for (Map.Entry<ScriptComponentTree, Fragment> entry : fragmentMap.entrySet()) {
-                if (entry.getValue() == fragment)
-                    return entry.getKey();
-            }
-            return null;
-        }
-        */
+        }*/
     }
 }
