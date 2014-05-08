@@ -18,6 +18,14 @@ import android.widget.TextView;
 import nz.ac.aucklanduni.physics.tracker.R;
 
 
+/**
+ * Default script fragment that contains a default frame layout with the basic interface.
+ *
+ * Note: there has to be a default constructor in a fragment so that the system can restart it automatically, for
+ * example when the screen is rotated. Because we need to know the ScriptComponent associated with the fragment we save
+ * the script component index in onSaveInstanceState. However, when loading the script the component is assigned
+ * directly using setScriptComponent.
+ */
 public class ScriptComponentGenericFragment extends android.support.v4.app.Fragment
         implements ScriptComponentTree.IScriptComponentListener {
     protected ScriptComponentTree component;

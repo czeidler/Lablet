@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * Reference to an experiment conducted in the script.
+ * Also caches the experiment analysis and notifies listeners if the experiment has been updated.
+ */
 public class ScriptComponentExperiment {
     public interface IScriptComponentExperimentListener {
         public void onExperimentAnalysisUpdated();

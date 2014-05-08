@@ -401,9 +401,19 @@ public class ScriptComponentTreeSheet extends ScriptComponentTreeSheetBase {
 
 interface IActivityStarterViewParent {
     public void startActivityForResultFromView(ActivityStarterView view, Intent intent, int requestCode);
+
+    /**
+     * The parent has to provide a unique id that stays the same also if the activity has been reloaded. For example,
+     * if views get added in a fix order this should be a normal counter.
+     *
+     * @return a unique id
+     */
     public int getNewChildId();
 }
 
+/**
+ * Base class for a view that can start a child activity and is able to receive the activity response.
+ */
 abstract class ActivityStarterView extends FrameLayout {
     protected IActivityStarterViewParent parent;
 
