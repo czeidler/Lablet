@@ -7,11 +7,10 @@
  */
 package nz.ac.aucklanduni.physics.tracker.camera;
 
+import android.graphics.PointF;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
-import nz.ac.aucklanduni.physics.tracker.Experiment;
-import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.tracker.MarkerData;
-import nz.ac.aucklanduni.physics.tracker.MarkersDataModel;
+import nz.ac.aucklanduni.physics.tracker.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +30,43 @@ public class CameraExperimentAnalysis extends ExperimentAnalysis {
 
     public CameraExperimentAnalysis(Experiment experiment) {
         super(experiment);
+
+        updateOriginFromVideoRotation();
+    }
+
+    private void updateOriginFromVideoRotation() {
+        CameraExperiment cameraExperiment = (CameraExperiment)getExperiment();
+        Calibration calibration = getCalibration();
+
+        // read rotation from video
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        mediaMetadataRetriever.setDataSource(cameraExperiment.getVideoFile().getPath());
+        String rotationString = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
+
+        PointF origin = new PointF();
+        origin.set(calibration.getOrigin());
+        float xOffset = origin.x;
+        float yOffset = origin.y;
+        PointF axis1 = new PointF();
+        axis1.set(calibration.getAxis1());
+        if (rotationString.equals("90")) {
+            origin.x = cameraExperiment.getMaxRawX() - xOffset;
+            origin.y = yOffset;
+            axis1.x = origin.x;
+            axis1.y = origin.y + 10;
+        } else if (rotationString.equals("180")) {
+            origin.x = cameraExperiment.getMaxRawX() - xOffset;
+            origin.y = cameraExperiment.getMaxRawY() - yOffset;
+            axis1.x = origin.x - 10;
+            axis1.y = origin.y;
+        } else if (rotationString.equals("270")) {
+            origin.x = xOffset;
+            origin.y = cameraExperiment.getMaxRawY() - yOffset;
+            axis1.x = origin.x;
+            axis1.y = origin.y - 10;
+        }
+
+        setOrigin(origin, axis1);
     }
 
     @Override

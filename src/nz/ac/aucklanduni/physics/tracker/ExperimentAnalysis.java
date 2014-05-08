@@ -66,17 +66,25 @@ public class ExperimentAnalysis {
         lengthCalibrationSetter = new LengthCalibrationSetter(calibration, lengthCalibrationMarkers);
 
         PointF origin = calibration.getOrigin();
+        PointF axis1 = calibration.getAxis1();
         originMarkers = new MarkersDataModel();
+        // y-axis
         point1 = new MarkerData(-1);
-        point1.setPosition(new PointF(origin.x, origin.y + 10));
+        point1.setPosition(new PointF(10, 10));
         originMarkers.addMarkerData(point1);
+        // x-axis
         point2 = new MarkerData(-2);
-        point2.setPosition(new PointF(origin.x + 10, origin.y));
+        point2.setPosition(new PointF(axis1.x, axis1.y));
         originMarkers.addMarkerData(point2);
+        // origin
         MarkerData point3 = new MarkerData(-3);
         point3.setPosition(origin);
         originMarkers.addMarkerData(point3);
         originCalibrationSetter = new OriginCalibrationSetter(calibration, originMarkers);
+    }
+
+    protected void setOrigin(PointF origin, PointF axis1) {
+        originCalibrationSetter.setOrigin(origin, axis1);
     }
 
     public Experiment getExperiment() { return  experiment; }
@@ -224,8 +232,8 @@ public class ExperimentAnalysis {
         if (bundle.containsKey("lengthCalibrationValue"))
             lengthCalibrationSetter.setCalibrationValue(bundle.getFloat("lengthCalibrationValue"));
 
-        PointF origin = new PointF();
-        PointF axis1 = new PointF();
+        PointF origin = calibration.getOrigin();
+        PointF axis1 = calibration.getAxis1();
         boolean swapAxis = false;
         if (bundle.containsKey("originX"))
             origin.x = bundle.getFloat("originX");

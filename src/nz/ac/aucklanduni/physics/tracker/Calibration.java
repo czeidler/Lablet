@@ -143,13 +143,20 @@ public class Calibration {
         PointF relative = new PointF();
         relative.x = point.x - origin.x;
         relative.y = point.y - origin.y;
-        float angle = 90;
-        if (relative.x != 0)
-            angle = (float)Math.atan(relative.y / relative.x);
-        angle = (float)Math.toDegrees((double)angle);
-        // choose the right quadrant
-        if (relative.x < 0)
-            angle = 180 + angle;
+        float angle = 0;
+        if (relative.x != 0) {
+            angle = (float) Math.atan(relative.y / relative.x);
+            angle = (float) Math.toDegrees((double) angle);
+            // choose the right quadrant
+            if (relative.x < 0)
+                angle = 180 + angle;
+        } else {
+            if (relative.y < 0)
+                angle = 270;
+            else
+                angle = 90;
+        }
+
         return angle;
     }
 }
