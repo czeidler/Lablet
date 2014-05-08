@@ -87,18 +87,12 @@ abstract public class ExperimentActivity extends FragmentActivity {
 
     static public File getDefaultExperimentBaseDir(Context context) {
         File baseDir = context.getExternalFilesDir(null);
-        File experimentDir = new File(baseDir, "experiments");
-        if (!experimentDir.exists())
-            experimentDir.mkdir();
-        return experimentDir;
+        return new File(baseDir, "experiments");
     }
 
     private File getExperimentStorageDir() {
         String directoryName = getExperiment().getUid();
-        File dir = new File(baseDirectory, directoryName);
-        if (!dir.exists())
-            dir.mkdir();
-        return dir;
+        return new File(baseDirectory, directoryName);
     }
 
     protected boolean deleteStorageDir() {

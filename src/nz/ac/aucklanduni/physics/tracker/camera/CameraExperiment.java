@@ -122,9 +122,8 @@ public class CameraExperiment extends Experiment {
 
     public void setVideoFileName(String video) {
         this.videoFileName = video;
-        File file = new File(getStorageDir(), videoFileName);
 
-        MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.parse(file.getPath()));
+        MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.parse(getVideoFile().getPath()));
 
         videoDuration = mediaPlayer.getDuration();
         videoWidth = mediaPlayer.getVideoWidth();
@@ -135,6 +134,9 @@ public class CameraExperiment extends Experiment {
 
     public String getVideoFileName() {
         return videoFileName;
+    }
+    public File getVideoFile() {
+        return new File(getStorageDir(), getVideoFileName());
     }
 
     public int getAnalysisFrameRate() {

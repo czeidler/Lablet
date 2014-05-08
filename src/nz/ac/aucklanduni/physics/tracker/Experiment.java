@@ -61,7 +61,11 @@ abstract public class Experiment {
         bundle.putString("experiment_identifier", getIdentifier());
         Bundle experimentData = experimentDataToBundle();
         bundle.putBundle("data", experimentData);
-        onSaveAdditionalData(getStorageDir());
+
+        File dir = getStorageDir();
+        if (!dir.exists())
+            dir.mkdir();
+        onSaveAdditionalData(dir);
 
         // save the bundle
         File projectFile = new File(getStorageDir(), EXPERIMENT_DATA_FILE_NAME);

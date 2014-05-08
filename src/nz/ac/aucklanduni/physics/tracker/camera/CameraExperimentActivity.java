@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.hardware.Camera;
+import android.hardware.SensorManager;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
@@ -46,7 +47,9 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
     private MenuItem analyseMenuItem = null;
     private int cameraId = 0;
+    private int rotation;
     private int rotationDegree = 0;
+    private OrientationEventListener orientationEventListener;
 
     private File videoFile = null;
     private boolean unsavedExperimentData = false;
@@ -208,10 +211,24 @@ public class CameraExperimentActivity extends ExperimentActivity {
         parameters.setPreviewSize(videoSize.width, videoSize.height);
         camera.setParameters(parameters);
 
+        rotation = getWindowManager().getDefaultDisplay().getRotation();
         setCameraDisplayOrientation(cameraId, camera);
 
+        orientationEventListener = new OrientationEventListener(this, SensorManager.SENSOR_DELAY_NORMAL) {
+            @Override
+            public void onOrientationChanged(int orientation) {
+                int prevRotation = rotation;
+                rotation = getWindowManager().getDefaultDisplay().getRotation();
+                if (prevRotation != rotation) {
+                    if (camera != null)
+                        setCameraDisplayOrientation(cameraId, camera);
+                }
+            }
+        };
+        if (orientationEventListener.canDetectOrientation())
+            orientationEventListener.enable();
+
         float ratio;
-        int rotation = getWindowManager().getDefaultDisplay().getRotation();
         switch (rotation) {
             case Surface.ROTATION_90:
             case Surface.ROTATION_270:
@@ -229,6 +246,8 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
         camera.release();
         camera = null;
+
+        orientationEventListener.disable();
         super.onPause();
     }
 
@@ -268,7 +287,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
     }
 
     private boolean deleteTempFiles() {
-        if (videoFile.exists())
+        if (videoFile != null && videoFile.exists())
             return videoFile.delete();
         return true;
     }
@@ -277,7 +296,6 @@ public class CameraExperimentActivity extends ExperimentActivity {
     private void setCameraDisplayOrientation(int cameraId, android.hardware.Camera camera) {
         android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
         android.hardware.Camera.getCameraInfo(cameraId, info);
-        int rotation = getWindowManager().getDefaultDisplay().getRotation();
         rotationDegree = 0;
         switch (rotation) {
             case Surface.ROTATION_0: rotationDegree = 0; break;
@@ -322,10 +340,6 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
             File outputDir = getCacheDir();
             videoFile = new File(outputDir, getVideoFileName());
-            if (!videoFile.exists()) {
-                if (!videoFile.createNewFile())
-                    return;
-            }
 
             recorder.setOutputFile(videoFile.getPath());
             recorder.prepare();
@@ -353,7 +367,11 @@ public class CameraExperimentActivity extends ExperimentActivity {
     }
 
     private boolean moveTempFilesToExperimentDir() {
-        File target = new File(experiment.getStorageDir(), getVideoFileName());
+        File storageDir = experiment.getStorageDir();
+        if (!storageDir.exists())
+            if (!storageDir.mkdirs())
+                return false;
+        File target = new File(storageDir, getVideoFileName());
         return StorageLib.moveFile(videoFile, target);
     }
 
@@ -365,6 +383,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
                 throw new IOException();
             ((CameraExperiment)experiment).setVideoFileName(getVideoFileName());
             experiment.saveExperimentDataToFile();
+
             Intent data = new Intent();
             File outputDir = experiment.getStorageDir();
             data.putExtra("experiment_path", outputDir.getPath());
@@ -496,7 +515,6 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
         // Note: a surface rotation of 90 degrees means a physical device rotation of -90 degrees.
         final int orientation = getResources().getConfiguration().orientation;
-        final int rotation = getWindowManager().getDefaultDisplay().getRotation();
         switch (rotation) {
             case Surface.ROTATION_0:
                 if (orientation == Configuration.ORIENTATION_PORTRAIT) {
