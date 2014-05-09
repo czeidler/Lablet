@@ -141,8 +141,6 @@ class ScriptComponentTextQuestion extends ScriptComponentViewHolder {
 
         // Note: we have to do this programmatically cause findViewById would find the wrong child items if there are
         // more than one text question.
-        LayoutInflater inflater = (LayoutInflater)context.getSystemService
-                (Context.LAYOUT_INFLATER_SERVICE);
 
         LinearLayout layout = new LinearLayout(context);
         layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
