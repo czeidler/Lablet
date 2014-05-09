@@ -45,6 +45,17 @@ public class ScriptActivity extends Activity {
         menu.clear();
         getMenuInflater().inflate(R.menu.script_activity_actions, menu);
 
+        // to stand alone experiment screen
+        MenuItem standAlone = menu.findItem(R.id.action_stand_alone);
+        assert(standAlone != null);
+        standAlone.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                startStandAloneExperimentActivity();
+                return true;
+            }
+        });
+
         // info item
         MenuItem infoItem = menu.findItem(R.id.action_info);
         assert(infoItem != null);
@@ -93,6 +104,11 @@ public class ScriptActivity extends Activity {
         return super.onPrepareOptionsMenu(menu);
     }
 
+    private void startStandAloneExperimentActivity() {
+        Intent intent = new Intent(this, AndroidPhysicsTracker.class);
+        startActivity(intent);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,6 +116,13 @@ public class ScriptActivity extends Activity {
 
         int grey = 70;
         int listBackgroundColor = Color.rgb(grey, grey, grey);
+
+        // info side bar
+        InfoSideBar infoSideBar = (InfoSideBar)findViewById(R.id.infoSideBar);
+        assert infoSideBar != null;
+        infoSideBar.setIcon(R.drawable.ic_console);
+        infoSideBar.setInfoText("Experiment Scripts");
+        infoSideBar.setBackground(new InfoBarBackgroundDrawable(Color.argb(255, 154, 115, 25)));
 
         // experiment list
         ListView scriptListView = (ListView)findViewById(R.id.scriptList);

@@ -185,6 +185,13 @@ public class AndroidPhysicsTracker extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        // info side bar
+        InfoSideBar infoSideBar = (InfoSideBar)findViewById(R.id.infoSideBar);
+        assert infoSideBar != null;
+        infoSideBar.setIcon(R.drawable.ic_lab_large);
+        infoSideBar.setInfoText("Stand Alone Experiments");
+        infoSideBar.setBackground(new InfoBarBackgroundDrawable(Color.argb(255, 75, 140, 20)));
+
         // plugin list
         experimentPluginList = ExperimentPluginFactory.getFactory().getPluginList();
 
