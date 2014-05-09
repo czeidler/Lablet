@@ -11,12 +11,13 @@ import org.luaj.vm2.*;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
-import java.io.File;
+import java.io.*;
 
 
 interface IScriptComponentFactory {
     public ScriptComponentTree create(String componentName, Script script);
 }
+
 
 class LuaScriptLoader {
     private String lastError = "";
@@ -24,6 +25,16 @@ class LuaScriptLoader {
 
     public LuaScriptLoader(IScriptComponentFactory factory) {
         builder = new ScriptBuilderLua(factory);
+    }
+
+    // this is basically a copy from the luaj code but it uses a BufferedInputStream
+    private LuaValue loadfile(Globals globals, String filename) {
+        try {
+            BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(filename));
+            return globals.load(inputStream, "@" + filename, "bt", globals);
+        } catch (Exception e) {
+            return globals.error("load "+filename+": "+e);
+        }
     }
 
     public Script load(File scriptFile) {
@@ -34,7 +45,8 @@ class LuaScriptLoader {
 
         try {
             Globals globals = JsePlatform.standardGlobals();
-            LuaValue chunk = globals.loadfile(scriptFile.getPath());
+            //LuaValue chunk = globals.loadfile(scriptFile.getPath());
+            LuaValue chunk = loadfile(globals, scriptFile.getPath());
             chunk.call();
 
             LuaValue hookFunction = globals.get("onBuildExperimentScript");
