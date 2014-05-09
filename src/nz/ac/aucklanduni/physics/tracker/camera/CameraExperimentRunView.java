@@ -10,6 +10,7 @@ package nz.ac.aucklanduni.physics.tracker.camera;
 import android.content.Context;
 import android.graphics.*;
 import android.os.Bundle;
+import android.view.View;
 import nz.ac.aucklanduni.physics.tracker.Experiment;
 import nz.ac.aucklanduni.physics.tracker.IExperimentRunView;
 import nz.ac.aucklanduni.physics.tracker.views.VideoFrameView;
@@ -19,6 +20,7 @@ import java.io.File;
 
 public class CameraExperimentRunView extends VideoFrameView implements IExperimentRunView {
     private CameraExperiment experiment;
+    private int currentRun = -1;
 
     public CameraExperimentRunView(Context context, Experiment experiment) {
         super(context);
@@ -35,6 +37,7 @@ public class CameraExperimentRunView extends VideoFrameView implements IExperime
 
     @Override
     public void setCurrentRun(int run) {
+        currentRun = run;
         Bundle bundle = experiment.getRunAt(run);
         if (bundle == null) {
             toastMessage("can't get run information!");
@@ -44,6 +47,16 @@ public class CameraExperimentRunView extends VideoFrameView implements IExperime
         positionMicroSeconds *= 1000;
 
         seekToFrame(positionMicroSeconds);
+    }
+
+    // make sure the view gets redrawn
+    @Override
+    protected void onWindowVisibilityChanged(int visibility) {
+        super.onWindowVisibilityChanged(visibility);
+        if (visibility != View.VISIBLE)
+            return;
+        if (currentRun >= 0)
+            setCurrentRun(currentRun);
     }
 
     @Override

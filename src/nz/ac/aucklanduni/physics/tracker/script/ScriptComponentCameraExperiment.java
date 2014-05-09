@@ -109,6 +109,14 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
         updateExperimentPath();
     }
 
+    @Override
+    protected void onWindowVisibilityChanged(int visibility) {
+        super.onWindowVisibilityChanged(visibility);
+        if (visibility != View.VISIBLE)
+            return;
+        videoView.start();
+    }
+
     private void startExperimentActivity() {
         Intent intent = new Intent(getContext(), CameraExperimentActivity.class);
         Bundle options = new Bundle();

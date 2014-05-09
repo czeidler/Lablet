@@ -91,7 +91,6 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         File storageDir = cameraExperiment.getStorageDir();
         File videoFile = new File(storageDir, cameraExperiment.getVideoFileName());
         videoFrameView.setVideoFilePath(videoFile.getPath());
-        videoFrameView.seekToFrame(0);
 
         seekBar = (SeekBar)findViewById(R.id.seekBar);
         int duration = cameraExperiment.getVideoDuration();
@@ -219,6 +218,13 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         initialFrameRate = frameRate;
         initialVideoStartValue = videoStartValue;
         initialVideoEndValue = videoEndValue;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        videoFrameView.seekToFrame(0);
     }
 
     @Override
