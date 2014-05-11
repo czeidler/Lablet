@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -101,7 +102,6 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
         MediaController mediaController = new MediaController(context);
         mediaController.setAnchorView(videoView);
         videoView.setMediaController(mediaController);
-        videoView.start();
 
         takenExperimentInfo = (CheckedTextView)view.findViewById(R.id.takenExperimentInfo);
         assert takenExperimentInfo != null;
@@ -156,7 +156,6 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
 
                 setExperimentPath(experimentPath);
             }
-            return;
         }
     }
 
@@ -168,20 +167,38 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
     }
 
     private void updateExperimentPath() {
-        String experimentPath = cameraComponent.getExperiment().getExperimentPath();
+        // Loading a fragment page with 3 camera experiments is very slow. Make it more responsive by loading the
+        // experiments asynchronously.
+        final String experimentPath = cameraComponent.getExperiment().getExperimentPath();
+        AsyncTask task = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object... objects) {
+                ExperimentLoader.Result result = new ExperimentLoader.Result();
+                if (!ExperimentLoader.loadExperiment(getContext(), experimentPath, result))
+                    return null;
 
-        ExperimentLoader.Result result = new ExperimentLoader.Result();
-        if (ExperimentLoader.loadExperiment(getContext(), experimentPath, result)) {
-            takenExperimentInfo.setVisibility(View.VISIBLE);
-            takenExperimentInfo.setChecked(true);
-            File experimentPathFile = new File(experimentPath);
-            takenExperimentInfo.setText(experimentPathFile.getName());
+                CameraExperiment experiment = (CameraExperiment)result.experiment;
+                return new File(experiment.getStorageDir(), experiment.getVideoFileName());
+            }
 
-            CameraExperiment experiment = (CameraExperiment)result.experiment;
-            File videoFile = new File(experiment.getStorageDir(), experiment.getVideoFileName());
-            videoView.setVideoURI(Uri.parse(videoFile.getPath()));
-            videoView.start();
-        } else
-            takenExperimentInfo.setVisibility(View.INVISIBLE);
+            @Override
+            protected void onPostExecute(Object result) {
+                if (result == null) {
+                    takenExperimentInfo.setVisibility(View.INVISIBLE);
+                    return;
+                }
+
+                File videoFile = (File)result;
+                takenExperimentInfo.setVisibility(View.VISIBLE);
+                takenExperimentInfo.setChecked(true);
+                File experimentPathFile = new File(experimentPath);
+                takenExperimentInfo.setText(experimentPathFile.getName());
+
+                videoView.setVideoURI(Uri.parse(videoFile.getPath()));
+                videoView.start();
+            }
+        };
+
+        task.execute();
     }
 }

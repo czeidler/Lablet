@@ -72,8 +72,6 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
         pager = (ViewPager)findViewById(R.id.pager);
         pagerAdapter = new ScriptFragmentPagerAdapter(getSupportFragmentManager(), activeChain);
         pager.setAdapter(pagerAdapter);
-        // there are some performance problems when loading the script fragments on the fly; cache some more pages
-        pager.setOffscreenPageLimit(10);
 
         pagerAdapter.setComponents(activeChain);
         pager.setCurrentItem(lastSelectedFragment);
