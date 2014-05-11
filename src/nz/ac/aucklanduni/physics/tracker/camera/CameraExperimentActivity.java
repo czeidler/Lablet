@@ -228,16 +228,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
         if (orientationEventListener.canDetectOrientation())
             orientationEventListener.enable();
 
-        float ratio;
-        switch (rotation) {
-            case Surface.ROTATION_90:
-            case Surface.ROTATION_270:
-                ratio = (float)videoSize.height / videoSize.width;
-                break;
-            default:
-                ratio = (float)videoSize.width / videoSize.height;
-        }
-        preview.setRatio(ratio);
+        preview.setRatio(getPreviewRatio());
     }
 
     @Override
@@ -292,28 +283,6 @@ public class CameraExperimentActivity extends ExperimentActivity {
         return true;
     }
 
-    // copied from android dev page
-    private void setCameraDisplayOrientation(int cameraId, android.hardware.Camera camera) {
-        android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
-        android.hardware.Camera.getCameraInfo(cameraId, info);
-        rotationDegree = 0;
-        switch (rotation) {
-            case Surface.ROTATION_0: rotationDegree = 0; break;
-            case Surface.ROTATION_90: rotationDegree = 90; break;
-            case Surface.ROTATION_180: rotationDegree = 180; break;
-            case Surface.ROTATION_270: rotationDegree = 270; break;
-        }
-
-        int result;
-        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            result = (info.orientation + rotationDegree) % 360;
-            result = (360 - result) % 360;  // compensate the mirror
-        } else {  // back-facing
-            result = (info.orientation - rotationDegree + 360) % 360;
-        }
-        camera.setDisplayOrientation(result);
-    }
-
     private void startRecording() {
         try {
             camera.unlock();
@@ -323,13 +292,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
             recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             recorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
 
-            // 90 degrees surface is -90 device...
-            int hintRotation = rotationDegree;
-            if (hintRotation == 90)
-                hintRotation = 270;
-            else if (hintRotation == 270)
-                hintRotation = 90;
-            recorder.setOrientationHint(hintRotation);
+            recorder.setOrientationHint(getHintRotation());
 
             CamcorderProfile profile = getOptimalCamcorderProfile(cameraId);
             if (profile == null)
@@ -506,6 +469,81 @@ public class CameraExperimentActivity extends ExperimentActivity {
         }
     }
 
+    private float getPreviewRatio() {
+        // get preview ratio
+        int orientation = getResources().getConfiguration().orientation;
+        float ratio;
+        switch (rotation) {
+            case Surface.ROTATION_90:
+            case Surface.ROTATION_270:
+                ratio = (float)videoSize.height / videoSize.width;
+                if (orientation == Configuration.ORIENTATION_LANDSCAPE)
+                    ratio = 1.f / ratio;
+                break;
+            default:
+                ratio = (float)videoSize.width / videoSize.height;
+                if (orientation == Configuration.ORIENTATION_PORTRAIT)
+                    ratio = 1.f / ratio;
+        }
+        return ratio;
+    }
+
+    private int getHintRotation() {
+        int orientation = getResources().getConfiguration().orientation;
+        // 90 degrees surface is -90 device...
+        int hintRotation = rotationDegree;
+        switch (rotationDegree) {
+            case 0:
+                if (orientation == Configuration.ORIENTATION_PORTRAIT)
+                    hintRotation = 90;
+                break;
+
+            case 90:
+                if (orientation == Configuration.ORIENTATION_LANDSCAPE)
+                    hintRotation = 0;
+                else
+                    hintRotation = 270;
+                break;
+
+            case 180:
+                if (orientation == Configuration.ORIENTATION_PORTRAIT)
+                    hintRotation = 270;
+                break;
+
+            case 270:
+                if (orientation == Configuration.ORIENTATION_LANDSCAPE)
+                    hintRotation = 180;
+                else
+                    hintRotation = 90;
+                break;
+        }
+
+        return hintRotation;
+    }
+
+    // partly copied from android dev page
+    private void setCameraDisplayOrientation(int cameraId, android.hardware.Camera camera) {
+        int orientation = getResources().getConfiguration().orientation;
+        android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(cameraId, info);
+        rotationDegree = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0: rotationDegree = 0; break;
+            case Surface.ROTATION_90: rotationDegree = 90; break;
+            case Surface.ROTATION_180: rotationDegree = 180; break;
+            case Surface.ROTATION_270: rotationDegree = 270; break;
+        }
+
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + rotationDegree) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (info.orientation - rotationDegree + 360) % 360;
+        }
+        camera.setDisplayOrientation(result);
+    }
+
     /**
      * Lock the screen to the current orientation.
      * @return the previous orientation settings
@@ -514,39 +552,31 @@ public class CameraExperimentActivity extends ExperimentActivity {
         int initialRequestedOrientation = getRequestedOrientation();
 
         // Note: a surface rotation of 90 degrees means a physical device rotation of -90 degrees.
-        final int orientation = getResources().getConfiguration().orientation;
+        int orientation = getResources().getConfiguration().orientation;
         switch (rotation) {
             case Surface.ROTATION_0:
-                if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                if (orientation == Configuration.ORIENTATION_PORTRAIT)
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                }
-                else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                else if (orientation == Configuration.ORIENTATION_LANDSCAPE)
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                }
                 break;
             case Surface.ROTATION_90:
-                if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                if (orientation == Configuration.ORIENTATION_PORTRAIT)
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
-                }
-                else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
-                }
+                else if (orientation == Configuration.ORIENTATION_LANDSCAPE)
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 break;
             case Surface.ROTATION_180:
-                if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                if (orientation == Configuration.ORIENTATION_PORTRAIT)
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
-                }
-                else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                else if (orientation == Configuration.ORIENTATION_LANDSCAPE)
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
-                }
                 break;
             case Surface.ROTATION_270:
-                if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                if (orientation == Configuration.ORIENTATION_PORTRAIT)
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                }
-                else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                }
+                else if (orientation == Configuration.ORIENTATION_LANDSCAPE)
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
                 break;
         }
         return initialRequestedOrientation;
