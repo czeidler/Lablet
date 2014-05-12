@@ -2,6 +2,10 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:yourapp="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/action_help"
+        android:icon="@drawable/ic_help"
+        android:title="@string/action_help"
+        yourapp:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/action_cancel"
           android:icon="@drawable/ic_action_cancel"
           android:title="@string/action_cancel"

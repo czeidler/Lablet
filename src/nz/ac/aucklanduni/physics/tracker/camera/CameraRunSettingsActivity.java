@@ -9,9 +9,11 @@ package nz.ac.aucklanduni.physics.tracker.camera;
 
 import android.content.Intent;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.*;
 import nz.ac.aucklanduni.physics.tracker.*;
 import nz.ac.aucklanduni.physics.tracker.ExperimentActivity;
@@ -33,6 +35,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
     private EditText editVideoEnd = null;
     private EditText editFrames = null;
     private EditText editFrameLength = null;
+    private CameraRunSettingsHelpView helpView = null;
 
     private MarkersDataModel.IMarkersDataModelListener startEndSeekBarListener;
 
@@ -51,6 +54,18 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         menu.clear();
         getMenuInflater().inflate(R.menu.simpel_settings_menu, menu);
 
+        MenuItem helpItem = menu.findItem(R.id.action_help);
+        assert helpItem != null;
+        final CameraRunSettingsActivity that = this;
+        helpItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                // after layout is calculated
+                helpView.setParent(that);
+                helpView.setVisibility(View.VISIBLE);
+                return false;
+            }
+        });
         MenuItem backItem = menu.findItem(R.id.action_cancel);
         assert backItem != null;
         backItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -73,6 +88,32 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
+    public Rect getFramePickerRect() {
+        return getViewRect(frameRatePicker);
+    }
+
+    public Rect getRangeSeekBarRect() {
+        return getViewRect(startEndSeekBar);
+    }
+
+    private Rect getViewRect(View view) {
+        Rect rect = new Rect();
+        view.getDrawingRect(rect);
+
+        View contentView = getWindow().getDecorView().findViewById(android.R.id.content);
+        int[] contentViewOffset = new int[2];
+        contentView.getLocationInWindow(contentViewOffset);
+
+        int[] viewOffset = new int[2];
+        view.getLocationInWindow(viewOffset);
+
+        int offsetX = viewOffset[0] - contentViewOffset[0];
+        int offsetY = viewOffset[1] - contentViewOffset[1];
+
+        rect.offset(offsetX, offsetY);
+        return rect;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,11 +129,13 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         setContentView(R.layout.camera_run_settings);
 
         videoFrameView = (VideoFrameView)findViewById(R.id.videoFrameView);
+        assert videoFrameView != null;
         File storageDir = cameraExperiment.getStorageDir();
         File videoFile = new File(storageDir, cameraExperiment.getVideoFileName());
         videoFrameView.setVideoFilePath(videoFile.getPath());
 
         seekBar = (SeekBar)findViewById(R.id.seekBar);
+        assert seekBar != null;
         int duration = cameraExperiment.getVideoDuration();
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -116,6 +159,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         });
 
         startEndSeekBar = (StartEndSeekBar)findViewById(R.id.startEndSeekBar);
+        assert startEndSeekBar != null;
         startEndSeekBar.setPadding(seekBar.getPaddingLeft(), seekBar.getPaddingTop(), seekBar.getPaddingRight(),
                 seekBar.getPaddingBottom());
 
@@ -165,7 +209,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         startEndSeekBar.getMarkersDataModel().addListener(startEndSeekBarListener);
 
         editFrameLength = (EditText)findViewById(R.id.editFrameLength);
-
+        assert editFrameLength != null;
         frameRatePicker = (NumberPicker)findViewById(R.id.frameRatePicker);
         frameRatePicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
@@ -176,8 +220,11 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         });
 
         editVideoStart = (EditText)findViewById(R.id.editStart);
+        assert editVideoStart != null;
         editVideoEnd = (EditText)findViewById(R.id.editEnd);
+        assert editVideoEnd != null;
         editFrames = (EditText)findViewById(R.id.editFrames);
+        assert editFrames != null;
 
         // get initial values
         Bundle runSettings = null;
@@ -212,6 +259,10 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         point.x = (float)videoEndValue / duration;
         startEndSeekBar.getMarkersDataModel().getMarkerDataAt(1).setPosition(point);
 
+        helpView = (CameraRunSettingsHelpView)findViewById(R.id.cameraSettingsHelp);
+        assert helpView != null;
+
+        // init some values:
         int frameRate = getFrameRateFromPicker();
         setFrameRate(frameRate);
 

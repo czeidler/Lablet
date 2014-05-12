@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:id="@+id/editFrames"
-            android:editable="false" android:enabled="true"
+            android:editable="false" android:enabled="true" android:focusable="false"
             android:layout_alignRight="@+id/frameRateLayout"
             android:layout_alignTop="@+id/editEnd" android:layout_alignParentBottom="true"
             android:layout_toRightOf="@+id/textView5"/>
@@ -112,4 +112,8 @@
         </LinearLayout>
     </LinearLayout>
 
+    <view android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        class="nz.ac.aucklanduni.physics.tracker.camera.CameraRunSettingsHelpView" android:id="@+id/cameraSettingsHelp"
+        android:visibility="invisible" />
 </RelativeLayout>
