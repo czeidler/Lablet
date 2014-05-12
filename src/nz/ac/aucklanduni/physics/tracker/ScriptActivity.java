@@ -106,6 +106,8 @@ public class ScriptActivity extends Activity {
 
     private void startStandAloneExperimentActivity() {
         Intent intent = new Intent(this, AndroidPhysicsTracker.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 

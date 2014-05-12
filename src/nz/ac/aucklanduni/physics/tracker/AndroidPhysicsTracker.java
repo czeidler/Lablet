@@ -98,6 +98,7 @@ public class AndroidPhysicsTracker extends Activity {
         menu.clear();
         getMenuInflater().inflate(R.menu.main_activity_actions, menu);
 
+        // script item
         MenuItem scriptItem = menu.findItem(R.id.action_scripts);
         assert(scriptItem != null);
         scriptItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -312,6 +313,8 @@ public class AndroidPhysicsTracker extends Activity {
 
     private void startScriptActivity() {
         Intent intent = new Intent(this, ScriptActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 
