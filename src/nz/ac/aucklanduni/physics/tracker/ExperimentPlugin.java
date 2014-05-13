@@ -21,9 +21,11 @@ public interface ExperimentPlugin {
 
     /**
      *
-     * Can be used config the experiment runs, e.g., the camera experiment uses it to set framerate and video start and end point.
+     * Can be used config the experiment runs, e.g., the camera experiment uses it to set framerate and video start and
+     * end point.
      */
-    public void startRunSettingsActivity(Experiment experiment, Bundle runSpecificData, Activity parentActivity, int requestCode);
+    public void startRunSettingsActivity(Experiment experiment, Bundle analysisSpecificData, Bundle options,
+                                         Activity parentActivity, int requestCode);
     /** If an run edit activity exist.
      *
      * @param menuName optional if not null the activity name is stored.

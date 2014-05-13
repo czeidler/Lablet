@@ -38,12 +38,14 @@ public class CameraExperimentPlugin implements ExperimentPlugin {
     }
 
     @Override
-    public void startRunSettingsActivity(Experiment experiment, Bundle analysisSpecificData, Activity parentActivity,
-                                         int requestCode) {
+    public void startRunSettingsActivity(Experiment experiment, Bundle analysisSpecificData, Bundle options,
+                                         Activity parentActivity, int requestCode) {
         Intent intent = new Intent(parentActivity, CameraRunSettingsActivity.class);
         intent.putExtra("experiment_path", experiment.getStorageDir().getPath());
         if (analysisSpecificData != null)
             intent.putExtra("analysisSpecificData", analysisSpecificData);
+        if (options != null)
+            intent.putExtra("options", options);
         parentActivity.startActivityForResult(intent, requestCode);
     }
 

@@ -38,6 +38,11 @@ public class CameraRunSettingsHelpView extends FrameLayout {
         });
     }
 
+    /**
+     * This function updates the help view item to be aligned with the layout of the activity. For example, to move
+     * help text to the right position. Thus the layout of the activity layout must be ready when calling this function.
+     * @param parent activity with the layout that should be annotated with help items
+     */
     public void setParent(CameraRunSettingsActivity parent) {
         Rect framePickerRect = parent.getFramePickerRect();
         Rect rangeSeekBarRect = parent.getRangeSeekBarRect();

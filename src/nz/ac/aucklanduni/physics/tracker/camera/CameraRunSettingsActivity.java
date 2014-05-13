@@ -37,8 +37,6 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
     private EditText editFrameLength = null;
     private CameraRunSettingsHelpView helpView = null;
 
-    private MarkersDataModel.IMarkersDataModelListener startEndSeekBarListener;
-
     private int videoStartValue;
     private int videoEndValue;
 
@@ -60,12 +58,18 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         helpItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                // after layout is calculated
-                helpView.setParent(that);
                 helpView.setVisibility(View.VISIBLE);
+                // call it just in case onPrepareOptionsMenu got called to late...
+                helpView.setParent(that);
                 return false;
             }
         });
+        // We need to set the parent when the layout of the parent is ready. It seems to be ready here. However, as far
+        // as I know there is not guaranteed for that; thus a bit hacky. We only call it here for the case that the help
+        // screen should be open on start. Otherwise we would just call it in the on help item clicked listener (as we
+        // do anyway...).
+        helpView.setParent(that);
+
         MenuItem backItem = menu.findItem(R.id.action_cancel);
         assert backItem != null;
         backItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -164,7 +168,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
                 seekBar.getPaddingBottom());
 
         // The marker data model keeps listeners as weak references. Thus we have to maintain our own a hard reference.
-        startEndSeekBarListener = new MarkersDataModel.IMarkersDataModelListener() {
+        MarkersDataModel.IMarkersDataModelListener startEndSeekBarListener = new MarkersDataModel.IMarkersDataModelListener() {
             @Override
             public void onDataAdded(MarkersDataModel model, int index) {
 
@@ -185,7 +189,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
                     if (i == 0) {
                         progress = Math.round(model.getMarkerDataAt(i).getPosition().x * duration);
                         setVideoStart(progress);
-                    } else if (i == 1){
+                    } else if (i == 1) {
                         progress = Math.round(model.getMarkerDataAt(i).getPosition().x * duration);
                         setVideoEnd(progress);
                     }
@@ -261,6 +265,11 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
 
         helpView = (CameraRunSettingsHelpView)findViewById(R.id.cameraSettingsHelp);
         assert helpView != null;
+        if (intent != null) {
+            Bundle options = intent.getBundleExtra("options");
+            if (options != null && options.getBoolean("start_with_help", false))
+                helpView.setVisibility(View.VISIBLE);
+        }
 
         // init some values:
         int frameRate = getFrameRateFromPicker();

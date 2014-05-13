@@ -28,6 +28,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
 
     private ExperimentAnalysis experimentAnalysis;
     private boolean resumeWithRunSettings = false;
+    private boolean resumeWithRunSettingsHelp = false;
 
     public ExperimentAnalysis getExperimentAnalysis() {
         return experimentAnalysis;
@@ -59,7 +60,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             settingsItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
-                    startRunSettingsActivity(experimentAnalysis.getExperimentSpecificData());
+                    startRunSettingsActivity(experimentAnalysis.getExperimentSpecificData(), null);
                     return true;
                 }
             });
@@ -124,8 +125,8 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         }
     }
 
-    private void startRunSettingsActivity(Bundle analysisSpecificData) {
-        plugin.startRunSettingsActivity(experiment, analysisSpecificData, this, PERFORM_RUN_SETTINGS);
+    private void startRunSettingsActivity(Bundle analysisSpecificData, Bundle options) {
+        plugin.startRunSettingsActivity(experiment, analysisSpecificData, options, this, PERFORM_RUN_SETTINGS);
     }
 
     private void mailData() {
@@ -191,6 +192,8 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
                         && experimentAnalysis.getTagMarkers().getMarkerCount() == 0) {
                     resumeWithRunSettings = true;
                 }
+                if (extras.getBoolean("first_start_with_run_settings_help", false))
+                    resumeWithRunSettingsHelp = true;
             }
         }
 
@@ -214,7 +217,12 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             experimentAnalysis.getRunDataModel().setCurrentRun(experimentAnalysis.getRunDataModel().getCurrentRun());
 
         if (resumeWithRunSettings) {
-            startRunSettingsActivity(experimentAnalysis.getExperimentSpecificData());
+            Bundle options = null;
+            if (resumeWithRunSettingsHelp) {
+                options = new Bundle();
+                options.putBoolean("start_with_help", true);
+            }
+            startRunSettingsActivity(experimentAnalysis.getExperimentSpecificData(), options);
             resumeWithRunSettings = false;
         }
     }
