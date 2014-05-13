@@ -110,7 +110,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
         setExperiment(new CameraExperiment(this));
 
-        setContentView(R.layout.perform_camera_experiment);
+        setContentView(R.layout.camera_experiment);
 
         preview = (RatioSurfaceView)findViewById(R.id.surfaceView);
         previewHolder = preview.getHolder();
@@ -124,9 +124,9 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
         recorder = new MediaRecorder();
 
-        startButton = (Button) findViewById(R.id.recordButton);
-        stopButton = (Button) findViewById(R.id.stopButton);
-        newButton = (Button) findViewById(R.id.newButton);
+        startButton = (Button)findViewById(R.id.recordButton);
+        stopButton = (Button)findViewById(R.id.stopButton);
+        newButton = (Button)findViewById(R.id.newButton);
 
         setState(null);
 
