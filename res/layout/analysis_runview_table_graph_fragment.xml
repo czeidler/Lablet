@@ -29,10 +29,33 @@
             android:orientation="vertical"
             android:layout_width="120dp"
             android:layout_height="fill_parent">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Show in graph:"
+                android:id="@+id/textView"
+                android:layout_gravity="center_vertical" />
+
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/graphSpinner"
+                android:spinnerMode="dropdown" />
+        </LinearLayout>
+
         <view android:layout_width="wrap_content"
-              android:layout_height="268dp"
+              android:layout_height="250dp"
               class="nz.ac.aucklanduni.physics.tracker.views.graph.GraphView2D" android:id="@+id/tagMarkerGraphView"
               android:layout_gravity="center_horizontal"/>
+
         <ScrollView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
