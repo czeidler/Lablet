@@ -22,9 +22,12 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
     private ExperimentAnalysis experimentAnalysis = null;
     private OriginMarkerPainter originMarkerPainter = null;
 
+    public RunContainerView(Context context) {
+        super(context);
+    }
+
     public RunContainerView(Context context, AttributeSet attrs) {
         super(context, attrs);
-
     }
 
     protected void finalize() {
@@ -129,5 +132,22 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
             markerView.addMarkerPainter(originMarkerPainter);
         else
             markerView.removeMarkerPainter(originMarkerPainter);
+    }
+
+    /**
+     * Copy resize behaviour of the experimentRunView.
+     */
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int specWidthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int specHeightMode = MeasureSpec.getMode(heightMeasureSpec);
+
+        experimentRunView.measure(widthMeasureSpec, heightMeasureSpec);
+
+        int width = experimentRunView.getMeasuredWidth();
+        int height = experimentRunView.getMeasuredHeight();
+
+        super.onMeasure(MeasureSpec.makeMeasureSpec(width, specWidthMode),
+                MeasureSpec.makeMeasureSpec(height, specHeightMode));
     }
 }

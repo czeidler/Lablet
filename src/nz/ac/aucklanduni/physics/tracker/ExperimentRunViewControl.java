@@ -30,6 +30,12 @@ public class ExperimentRunViewControl extends LinearLayout implements RunDataMod
         updateViews();
     }
 
+    public ExperimentRunViewControl(Context context) {
+        super(context);
+
+        init(context);
+    }
+
     public ExperimentRunViewControl(Context context, AttributeSet attrs) {
         super(context, attrs);
 

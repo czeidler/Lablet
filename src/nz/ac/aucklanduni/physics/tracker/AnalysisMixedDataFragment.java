@@ -7,16 +7,12 @@
  */
 package nz.ac.aucklanduni.physics.tracker;
 
-import android.database.DataSetObserver;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
-import nz.ac.aucklanduni.physics.tracker.*;
+import android.widget.*;
 import nz.ac.aucklanduni.physics.tracker.views.RunContainerView;
 import nz.ac.aucklanduni.physics.tracker.views.graph.*;
 import nz.ac.aucklanduni.physics.tracker.views.table.*;
@@ -25,6 +21,65 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
+    class Layout extends ViewGroup {
+        private ExperimentRunViewControl runViewControl = null;
+        private RunContainerView runContainerView = null;
+        private ViewGroup experimentDataView = null;
+
+        /**
+         * After a long time of trying I was not able to create the desired layout using Androids layout classes. This
+         * layout class builds the layout manually.
+         * @param context
+         */
+        public Layout(Context context) {
+            super(context);
+
+            runViewControl = new ExperimentRunViewControl(context);
+            runContainerView = new RunContainerView(context);
+
+            LayoutInflater inflater = (LayoutInflater)context.getSystemService
+                    (Context.LAYOUT_INFLATER_SERVICE);
+            experimentDataView = (ViewGroup)inflater.inflate(R.layout.analysis_data_side_bar, null, false);
+
+            addView(runViewControl);
+            addView(runContainerView);
+            addView(experimentDataView);
+        }
+
+        public ExperimentRunViewControl getRunViewControl() {
+            return runViewControl;
+        }
+
+        public RunContainerView getRunContainerView() {
+            return runContainerView;
+        }
+
+        @Override
+        protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+            int width = right -left;
+            int height = bottom - top;
+
+            runViewControl.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST),
+                    MeasureSpec.makeMeasureSpec(height, MeasureSpec.AT_MOST));
+            int controlHeight = runViewControl.getMeasuredHeight();
+
+            int containerHeight = height - controlHeight;
+            runContainerView.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(containerHeight, MeasureSpec.EXACTLY));
+            int containerWidth = runContainerView.getMeasuredWidth();
+
+            // the child's measure methods have to be called with the final sizes, Android ^^...
+            experimentDataView.measure(MeasureSpec.makeMeasureSpec(width - containerWidth, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
+            runViewControl.measure(MeasureSpec.makeMeasureSpec(containerWidth, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(height - containerHeight, MeasureSpec.EXACTLY));
+
+            runContainerView.layout(0, 0, containerWidth, containerHeight);
+            runViewControl.layout(0, containerHeight, containerWidth, height);
+            experimentDataView.layout(containerWidth, 0, width, height);
+        }
+    }
+
     private RunContainerView runContainerView = null;
     private TableView tableView = null;
     private GraphView2D graphView = null;
@@ -56,17 +111,15 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         ExperimentPlugin plugin = activity.getExperimentPlugin();
         ExperimentAnalysis experimentAnalysis = activity.getExperimentAnalysis();
 
-        View view = inflater.inflate(R.layout.analysis_runview_table_graph_fragment, container, false);
+        Layout view = new Layout(getActivity());
         assert view != null;
 
         View experimentRunView = plugin.createExperimentRunView(activity, experimentAnalysis.getExperiment());
 
-        ExperimentRunViewControl runViewControl = (ExperimentRunViewControl)view.findViewById(
-            R.id.experimentRunViewControl);
-        assert runViewControl != null;
+        ExperimentRunViewControl runViewControl = view.getRunViewControl();
         runViewControl.setTo(experimentAnalysis.getRunDataModel());
 
-        runContainerView = (RunContainerView)view.findViewById(R.id.experimentRunContainer);
+        runContainerView = view.getRunContainerView();
         runContainerView.setTo(experimentRunView, experimentAnalysis);
         runContainerView.addTagMarkerData(experimentAnalysis.getTagMarkers());
         runContainerView.addXYCalibrationData(experimentAnalysis.getXYCalibrationMarkers());
