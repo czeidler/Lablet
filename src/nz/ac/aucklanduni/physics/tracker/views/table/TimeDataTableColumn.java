@@ -9,6 +9,7 @@ package nz.ac.aucklanduni.physics.tracker.views.table;
 
 import nz.ac.aucklanduni.physics.tracker.Experiment;
 import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
+import nz.ac.aucklanduni.physics.tracker.MarkerData;
 import nz.ac.aucklanduni.physics.tracker.MarkersDataModel;
 
 
@@ -21,7 +22,9 @@ public class TimeDataTableColumn extends DataTableColumn {
     @Override
     public Number getValue(int index) {
         Experiment experiment = experimentAnalysis.getExperiment();
-        return experiment.getRunValueAt(index);
+        MarkersDataModel markerData = experimentAnalysis.getTagMarkers();
+        int runId = markerData.getMarkerDataAt(index).getRunId();
+        return experiment.getRunValueAt(runId);
     }
 
     @Override

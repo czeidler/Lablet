@@ -9,6 +9,7 @@ package nz.ac.aucklanduni.physics.tracker.views.graph;
 
 
 import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
+import nz.ac.aucklanduni.physics.tracker.MarkersDataModel;
 
 public class TimeMarkerGraphAxis extends MarkerGraphAxis {
     @Override
@@ -18,7 +19,9 @@ public class TimeMarkerGraphAxis extends MarkerGraphAxis {
 
     @Override
     public Number getValue(int index) {
-        return getExperimentAnalysis().getExperiment().getRunValueAt(index);
+        MarkersDataModel markerData = getExperimentAnalysis().getTagMarkers();
+        int runId = markerData.getMarkerDataAt(index).getRunId();
+        return getExperimentAnalysis().getExperiment().getRunValueAt(runId);
     }
 
     @Override
