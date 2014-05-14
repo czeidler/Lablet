@@ -19,6 +19,7 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.MediaController;
 import android.widget.VideoView;
 import nz.ac.aucklanduni.physics.tracker.ExperimentActivity;
@@ -35,9 +36,9 @@ import java.util.List;
 public class CameraExperimentActivity extends ExperimentActivity {
     private RatioSurfaceView preview = null;
     private VideoView videoView = null;
-    private Button startButton = null;
-    private Button stopButton = null;
-    private Button newButton = null;
+    private ImageButton startButton = null;
+    private ImageButton stopButton = null;
+    private ImageButton newButton = null;
 
     private SurfaceHolder previewHolder = null;
     private Camera camera = null;
@@ -124,9 +125,9 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
         recorder = new MediaRecorder();
 
-        startButton = (Button)findViewById(R.id.recordButton);
-        stopButton = (Button)findViewById(R.id.stopButton);
-        newButton = (Button)findViewById(R.id.newButton);
+        startButton = (ImageButton)findViewById(R.id.recordButton);
+        stopButton = (ImageButton)findViewById(R.id.stopButton);
+        newButton = (ImageButton)findViewById(R.id.newButton);
 
         setState(null);
 
@@ -229,6 +230,9 @@ public class CameraExperimentActivity extends ExperimentActivity {
             orientationEventListener.enable();
 
         preview.setRatio(getPreviewRatio());
+
+        // called because we set the state there (we might return from a pause where the menu is not recreated)
+        invalidateOptionsMenu();
     }
 
     @Override
@@ -411,7 +415,8 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             try {
-                camera.setPreviewDisplay(previewHolder);
+                if (camera != null)
+                    camera.setPreviewDisplay(previewHolder);
             } catch (IOException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
