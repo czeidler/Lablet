@@ -13,6 +13,6 @@
     <string name="action_delete">Delete</string>
     <string name="action_mail">Export</string>
     <string name="action_info">Info</string>
-    <string name="action_scripts">Scripts</string>
+    <string name="action_scripts">Lab Activities</string>
     <string name="standalone_experiments">Single Experiments</string>
 </resources>
