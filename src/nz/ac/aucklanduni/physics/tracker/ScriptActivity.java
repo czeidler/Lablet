@@ -123,8 +123,8 @@ public class ScriptActivity extends Activity {
         InfoSideBar infoSideBar = (InfoSideBar)findViewById(R.id.infoSideBar);
         assert infoSideBar != null;
         infoSideBar.setIcon(R.drawable.ic_console);
-        infoSideBar.setInfoText("Experiment Scripts");
-        infoSideBar.setBackground(new InfoBarBackgroundDrawable(Color.argb(255, 154, 115, 25)));
+        infoSideBar.setInfoText("Lab Activities");
+        infoSideBar.setBackground(new InfoBarBackgroundDrawable(Color.argb(255, 22, 115, 155)));
 
         // experiment list
         ListView scriptListView = (ListView)findViewById(R.id.scriptList);
