@@ -26,21 +26,3 @@ abstract public class ScriptComponentTreeFragmentHolder extends ScriptComponentT
 }
 
 
-class ScriptComponentFragmentFactory implements IScriptComponentFactory {
-    public ScriptComponentTree create(String componentName, Script script) {
-        if (componentName.equals("Sheet"))
-            return new ScriptComponentTreeSheet(script);
-        //if (componentName.equals("CameraExperiment"))
-          //  return new ScriptComponentTreeCameraExperiment(script);
-        if (componentName.equals("ExperimentSheet"))
-            return new ScriptComponentTreeExperimentSheet(script);
-        if (componentName.equals("ExperimentAnalysis"))
-            return new ScriptComponentTreeExperimentAnalysis(script);
-        if (componentName.equals("CalculateXSpeed"))
-            return new ScriptComponentTreeCalculateSpeed(script, true);
-        if (componentName.equals("CalculateYSpeed"))
-            return new ScriptComponentTreeCalculateSpeed(script, false);
-
-        return null;
-    }
-}
