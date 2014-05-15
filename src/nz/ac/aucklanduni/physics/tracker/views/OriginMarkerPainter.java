@@ -25,10 +25,17 @@ public class OriginMarkerPainter extends AbstractMarkersPainter implements Calib
     // device independent sizes:
     private final int FONT_SIZE_DP = 20;
     private final float LINE_WIDTH_DP = 1.5f;
+    private final float ARROW_WIDTH_DP = 3f;
+    private final float ARROW_LENGTH_DP = 12f;
+    private final float ARROW_AXIS_OVERLAP_DP = 10f;
 
     // pixel sizes, set in the constructor
-    private int FONT_SIZE;
-    private float LINE_WIDTH;
+    private final int FONT_SIZE;
+    private final float LINE_WIDTH;
+    private final float ARROW_WIDTH;
+    private final float ARROW_LENGTH;
+    private final float ARROW_AXIS_OVERLAP;
+    private final float LABEL_TO_AXIS_END_DISTANCE;
 
     public OriginMarkerPainter(View parent, IExperimentRunView runView, MarkersDataModel model,
                                Calibration calibration) {
@@ -38,6 +45,10 @@ public class OriginMarkerPainter extends AbstractMarkersPainter implements Calib
 
         FONT_SIZE = toPixel(FONT_SIZE_DP);
         LINE_WIDTH = toPixel(LINE_WIDTH_DP);
+        ARROW_WIDTH = toPixel(ARROW_WIDTH_DP);
+        ARROW_LENGTH = toPixel(ARROW_LENGTH_DP);
+        ARROW_AXIS_OVERLAP = toPixel(ARROW_AXIS_OVERLAP_DP);
+        LABEL_TO_AXIS_END_DISTANCE = toPixel(ARROW_AXIS_OVERLAP_DP);
     }
 
     protected void finalize() {
@@ -88,50 +99,104 @@ public class OriginMarkerPainter extends AbstractMarkersPainter implements Calib
         paint.setTextSize(FONT_SIZE);
         String label1;
         String label2;
+        String labelOrigin = "0";
         float textAngle = angleScreen;
+        PointF originPosition = new PointF();
         PointF label1Position = new PointF();
         PointF label2Position = new PointF();
         // text height from baseline to top:
-        float textHeight = -paint.ascent() - paint.descent();
+        final float textHeight = -paint.ascent();
+        final float textXOffset = 1;
+        final float textYOffset = 0;
+        final float labelAxisLength = getScreenAxisLength() - LABEL_TO_AXIS_END_DISTANCE;
         if (calibration.getSwapAxis()) {
-            label1 = "y";
-            label2 = "x";
+            label1 = "Y";
+            label2 = "X";
             textAngle += 90;
+
+            originPosition.set(origin);
+            originPosition.x -= textHeight + textYOffset;
+            originPosition.y -= paint.measureText(labelOrigin) / 2;
+
             label1Position.set(origin);
-            label1Position.x += getScreenAxisLength();
-            label1Position.x -= textHeight + 1;
+            label1Position.x += labelAxisLength;
+            label1Position.x -= textHeight + textYOffset;
             label1Position.y += 1;
-            transform(label1Position);
 
             label2Position.set(origin);
-            label2Position.y -= getScreenAxisLength();
-            label2Position.x -= textHeight + 1;
+            label2Position.y -= labelAxisLength;
+            label2Position.x -= textHeight + textYOffset;
             label2Position.y += 1;
-            transform(label2Position);
         } else {
-            label1 = "x";
-            label2 = "y";
+            label1 = "X";
+            label2 = "Y";
+
+            originPosition.set(origin);
+            originPosition.x -= paint.measureText(labelOrigin) / 2;
+            originPosition.y += textHeight + textYOffset;
+
             label1Position.set(origin);
-            label1Position.x += getScreenAxisLength();
+            label1Position.x += labelAxisLength;
             label1Position.x -= paint.measureText(label1);
-            label1Position.y += textHeight + 1;
-            transform(label1Position);
+            label1Position.y += textHeight + textYOffset;
 
             label2Position.set(origin);
-            label2Position.y -= getScreenAxisLength();
-            label2Position.x -= paint.measureText(label2);
-            label2Position.y += textHeight + 1;
-            transform(label2Position);
+            label2Position.y -= labelAxisLength;
+            label2Position.x -= paint.measureText(label2) + textXOffset;
+            label2Position.y += textHeight;
         }
+
+        transform(originPosition);
+        transform(label1Position);
+        transform(label2Position);
+
+        // 0-label
+        drawLabel(canvas, paint, labelOrigin, originPosition, textAngle);
+        // x-label
+        drawLabel(canvas, paint, label1, label1Position, textAngle);
+        // y-label
+        drawLabel(canvas, paint, label2, label2Position, textAngle);
+
+        drawArrows(canvas, paint);
+    }
+
+    private void drawLabel(Canvas canvas, Paint paint, String label, PointF position, float textAngle) {
         canvas.save();
-        canvas.translate(label1Position.x, label1Position.y);
+        canvas.translate(position.x, position.y);
         canvas.rotate(textAngle);
-        canvas.drawText(label1, 0, 0, paint);
+        canvas.drawText(label, 0, 0, paint);
         canvas.restore();
+    }
+
+    private void drawArrows(Canvas canvas, Paint paint) {
+        // do a prototype arrow in x direction
+        PointF xArrowTip = new PointF();
+        xArrowTip.x += getScreenAxisLength() + ARROW_LENGTH - ARROW_AXIS_OVERLAP;
+
+        PointF xArrowTopEnd = new PointF();
+        xArrowTopEnd.set(xArrowTip);
+        xArrowTopEnd.x -= ARROW_LENGTH;
+        xArrowTopEnd.y += ARROW_WIDTH;
+        PointF xArrowBottomEnd = new PointF();
+        xArrowBottomEnd.set(xArrowTip);
+        xArrowBottomEnd.x -= ARROW_LENGTH;
+        xArrowBottomEnd.y -= ARROW_WIDTH;
+
+        // draw the prototype at the x and the y axises.
+        PointF origin = getScreenPos(0);
+
         canvas.save();
-        canvas.translate(label2Position.x, label2Position.y);
-        canvas.rotate(textAngle);
-        canvas.drawText(label2, 0, 0, paint);
+        canvas.translate(origin.x, origin.y);
+        canvas.rotate(angleScreen);
+        canvas.drawLine(xArrowTopEnd.x, xArrowTopEnd.y, xArrowTip.x, xArrowTip.y, paint);
+        canvas.drawLine(xArrowTip.x, xArrowTip.y, xArrowBottomEnd.x, xArrowBottomEnd.y, paint);
+        canvas.restore();
+
+        canvas.save();
+        canvas.translate(origin.x, origin.y);
+        canvas.rotate(angleScreen - 90);
+        canvas.drawLine(xArrowTopEnd.x, xArrowTopEnd.y, xArrowTip.x, xArrowTip.y, paint);
+        canvas.drawLine(xArrowTip.x, xArrowTip.y, xArrowBottomEnd.x, xArrowBottomEnd.y, paint);
         canvas.restore();
     }
 
@@ -196,6 +261,8 @@ public class OriginMarkerPainter extends AbstractMarkersPainter implements Calib
     }
 
     private void setToScreenFromScreen(PointF originScreen) {
+        // we have to set the origin before calculating the axis since the origin is used in transform
+        setScreenPos(0, originScreen);
 
         float axisLength = getScreenAxisLength();
         PointF xAxisScreen = new PointF(originScreen.x + axisLength, originScreen.y);
@@ -203,7 +270,6 @@ public class OriginMarkerPainter extends AbstractMarkersPainter implements Calib
         PointF yAxisScreen = new PointF(originScreen.x, originScreen.y - axisLength);
         transform(yAxisScreen);
 
-        setScreenPos(0, originScreen);
         setScreenPos(1, xAxisScreen);
         setScreenPos(2, yAxisScreen);
     }
