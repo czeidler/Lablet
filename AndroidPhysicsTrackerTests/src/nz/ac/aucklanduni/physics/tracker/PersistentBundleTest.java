@@ -1,3 +1,10 @@
+/*
+ * Copyright 2014.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
 package nz.ac.aucklanduni.physics.tracker;
 
 import android.os.Bundle;
@@ -69,19 +76,19 @@ public class PersistentBundleTest extends TestCase {
     }
 
     public void testPrimitiveBundle() throws Exception {
-        assertEquals(true, testBundle(primitiveBundle));
+        assertTrue(testBundle(primitiveBundle));
     }
 
     public void testArrayBundle() throws Exception {
-        assertEquals(true, testBundle(arrayBundle));
+        assertTrue(testBundle(arrayBundle));
     }
 
     public void testBundleBundle() throws Exception {
-        assertEquals(true, testBundle(bundleBundle));
+        assertTrue(testBundle(bundleBundle));
     }
 
     public void testMixedBundle() throws Exception {
-        assertEquals(true, testBundle(mixedBundle));
+        assertTrue(testBundle(mixedBundle));
     }
 
     private boolean testBundle(Bundle bundle) throws Exception {
