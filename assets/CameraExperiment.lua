@@ -43,6 +43,6 @@ function onBuildExperimentScript(scriptBuilder)
 	pbjQuestion = question:addPotentialEnergy1Question();
 	pbjQuestion:setMass(1);
 	pbjQuestion:setHeightQuestionText("What was the height of the ball at its peak?")
-	pbjQuestion:setEnergyQuestionTextView("How much energy input enabled the ball to reach this height?")
+	pbjQuestion:setEnergyQuestionText("How much energy input enabled the ball to reach this height?")
 		
 end
