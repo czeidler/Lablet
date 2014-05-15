@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AndroidPhysicsTracker.iml" filepath="$PROJECT_DIR$/AndroidPhysicsTracker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AndroidPhysicsTrackerTests/AndroidPhysicsTrackerTests.iml" filepath="$PROJECT_DIR$/AndroidPhysicsTrackerTests/AndroidPhysicsTrackerTests.iml" />
     </modules>
   </component>
 </project>
