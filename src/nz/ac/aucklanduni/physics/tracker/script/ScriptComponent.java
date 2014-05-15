@@ -15,7 +15,6 @@ import java.util.*;
 
 
 abstract public class ScriptComponent {
-    final static public int SCRIPT_STATE_INACTIVE = -2;
     final static public int SCRIPT_STATE_ONGOING = -1;
     final static public int SCRIPT_STATE_DONE = 0;
 
@@ -132,8 +131,6 @@ abstract class ScriptComponentTree extends ScriptComponent implements Iterable<S
 
     public List<ScriptComponentTree> getActiveChain() {
         List<ScriptComponentTree> list = new ArrayList<ScriptComponentTree>();
-        if (getState() == SCRIPT_STATE_INACTIVE)
-            return list;
         list.add(this);
         ScriptComponentTree current = this;
         while (true) {

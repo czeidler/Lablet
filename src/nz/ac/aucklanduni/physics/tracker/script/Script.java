@@ -103,7 +103,7 @@ public class Script {
     public boolean start() {
         if (root == null)
             return false;
-        if (root.getState() >= ScriptComponentTree.SCRIPT_STATE_ONGOING)
+        if (root.getState() > ScriptComponentTree.SCRIPT_STATE_ONGOING)
             return false;
         root.setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
         return true;
