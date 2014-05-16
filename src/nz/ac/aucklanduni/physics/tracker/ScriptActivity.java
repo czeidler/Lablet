@@ -9,6 +9,7 @@ package nz.ac.aucklanduni.physics.tracker;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -193,6 +194,32 @@ public class ScriptActivity extends Activity {
         updateExistingScriptList();
     }
 
+    /**
+     * The script directory is the directory the stores the script files, i.e., the lua files.
+     * @param context
+     * @return
+     */
+    static public File getScriptDirectory(Context context) {
+        File baseDir = context.getExternalFilesDir(null);
+        File scriptDir = new File(baseDir, "scripts");
+        if (!scriptDir.exists())
+            scriptDir.mkdir();
+        return scriptDir;
+    }
+
+    /**
+     * The script user data is the directory that contains the stored script state, i.e., the results.
+     * @param context
+     * @return the script user data
+     */
+    private File getScriptUserDataDir(Context context) {
+        File baseDir = context.getExternalFilesDir(null);
+        File scriptDir = new File(baseDir, "script_user_data");
+        if (!scriptDir.exists())
+            scriptDir.mkdir();
+        return scriptDir;
+    }
+
     private boolean isAtLeastOneExistingScriptSelected() {
         boolean itemSelected = false;
         for (CheckBoxListEntry entry : existingScriptList) {
@@ -205,7 +232,7 @@ public class ScriptActivity extends Activity {
     }
 
     private void deleteSelectedExistingScript() {
-        File scriptDir = Script.getScriptUserDataDir(this);
+        File scriptDir = getScriptUserDataDir(this);
         for (CheckBoxListEntry entry : existingScriptList) {
             if (!entry.getSelected())
                 continue;
@@ -217,25 +244,29 @@ public class ScriptActivity extends Activity {
         updateExistingScriptList();
     }
 
-    private void startScript(String id) {
-        String fileName = id + ".lua";
+    private void startScript(String scriptId) {
+        String fileName = scriptId + ".lua";
 
+        File scriptPath = new File(getScriptDirectory(this), fileName);
+        File scriptUserDataDir = new File(getScriptUserDataDir(this), Script.generateScriptUid(scriptId));
         Intent intent = new Intent(this, ScriptRunnerActivity.class);
-        intent.putExtra("script_name", fileName);
-        intent.putExtra("script_user_data_dir", Script.generateScriptUid(id));
+        intent.putExtra("script_path", scriptPath.getPath());
+        intent.putExtra("script_user_data_dir", scriptUserDataDir.getPath());
         startActivityForResult(intent, START_SCRIPT);
     }
 
     private boolean loadPreviousScript(String scriptDir) {
+        File scriptUserDataDir = new File(getScriptUserDataDir(this), scriptDir);
+
         Intent intent = new Intent(this, ScriptRunnerActivity.class);
-        intent.putExtra("script_user_data_dir", scriptDir);
+        intent.putExtra("script_user_data_dir", scriptUserDataDir.getPath());
         startActivityForResult(intent, START_SCRIPT);
         return true;
     }
 
     private void updateScriptList() {
         scriptList.clear();
-        File scriptDir = Script.getScriptDirectory(this);
+        File scriptDir = getScriptDirectory(this);
         if (scriptDir.isDirectory()) {
             File[] children = scriptDir.listFiles();
             for (File child : children != null ? children : new File[0]) {
@@ -251,7 +282,7 @@ public class ScriptActivity extends Activity {
     }
 
     private void copyResourceScripts(boolean overwriteExisting) {
-        File scriptDir = Script.getScriptDirectory(this);
+        File scriptDir = getScriptDirectory(this);
         if (!scriptDir.exists()) {
             if (!scriptDir.mkdir())
                 return;
@@ -290,7 +321,7 @@ public class ScriptActivity extends Activity {
 
     private void updateExistingScriptList() {
         existingScriptList.clear();
-        File scriptDir = Script.getScriptUserDataDir(this);
+        File scriptDir = getScriptUserDataDir(this);
         if (scriptDir.isDirectory()) {
             File[] children = scriptDir.listFiles();
             for (File child : children != null ? children : new File[0])

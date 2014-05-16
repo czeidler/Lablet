@@ -41,8 +41,7 @@ public class LuaScriptTest extends ActivityInstrumentationTestCase2<ScriptActivi
      * Load a script and check its initial state.
      */
     public void testScriptLoading() {
-        Script script = new Script();
-        File dir = script.getScriptDirectory(activity);
+        File dir = ScriptActivity.getScriptDirectory(activity);
         assertNotNull(dir);
 
         Context testContext = getInstrumentation().getContext();
@@ -51,7 +50,7 @@ public class LuaScriptTest extends ActivityInstrumentationTestCase2<ScriptActivi
 
         ScriptComponentFragmentFactory factory = new ScriptComponentFragmentFactory();
         LuaScriptLoader loader = new LuaScriptLoader(factory);
-        script = loader.load(scriptFile);
+        Script script = loader.load(scriptFile);
         assertNotNull(script);
 
         assertTrue(script.start());
@@ -69,7 +68,7 @@ public class LuaScriptTest extends ActivityInstrumentationTestCase2<ScriptActivi
     }
 
     private void copyResourceScripts(boolean overwriteExisting) {
-        File scriptDir = Script.getScriptDirectory(getInstrumentation().getContext());
+        File scriptDir = ScriptActivity.getScriptDirectory(getInstrumentation().getContext());
         if (!scriptDir.exists()) {
             if (!scriptDir.mkdir())
                 return;

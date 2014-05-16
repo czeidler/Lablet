@@ -7,7 +7,6 @@
  */
 package nz.ac.aucklanduni.physics.tracker.script;
 
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -43,14 +42,14 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
 
         // if we get restored, first of all load the script since the fragments rely on the script components...
         if (savedInstanceState != null) {
-            String userDataDir = savedInstanceState.getString("script_user_data_dir");
+            final String userDataDir = savedInstanceState.getString("script_user_data_dir");
             if (userDataDir == null) {
                 super.onCreate(savedInstanceState);
                 showErrorAndFinish("Can't start script from saved instance state (user data directory is null)");
                 return;
             }
-            scriptUserDataDir = new File(Script.getScriptUserDataDir(this), userDataDir);
-            lastSelectedFragment = loadExistingScript(scriptUserDataDir);
+            scriptUserDataDir = new File(userDataDir);
+            lastSelectedFragment = loadScriptStateFromFile(scriptUserDataDir);
             if (lastSelectedFragment < 0) {
                 super.onCreate(savedInstanceState);
                 showErrorAndFinish("Can't continue script:", lastErrorMessage);
@@ -105,14 +104,14 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             return -1;
         }
 
-        String scriptName = intent.getStringExtra("script_name");
-        String userDataDir = intent.getStringExtra("script_user_data_dir");
+        final String scriptPath = intent.getStringExtra("script_path");
+        final String userDataDir = intent.getStringExtra("script_user_data_dir");
 
         if (userDataDir == null) {
             lastErrorMessage = "user data directory is missing";
             return -1;
         }
-        scriptUserDataDir = new File(Script.getScriptUserDataDir(this), userDataDir);
+        scriptUserDataDir = new File(userDataDir);
         if (!scriptUserDataDir.exists()) {
             if (!scriptUserDataDir.mkdir()) {
                 lastErrorMessage = "can't create user data directory";
@@ -120,9 +119,9 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             }
         }
 
-        if (scriptName != null) {
+        if (scriptPath != null) {
             // start new script
-            scriptFile = new File(Script.getScriptDirectory(this), scriptName);
+            scriptFile = new File(scriptPath);
             if (!loadScript(scriptFile)) {
                 StorageLib.recursiveDeleteFile(scriptUserDataDir);
                 return -1;
@@ -130,14 +129,14 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             activeChain = script.getActiveChain();
             return 0;
         } else
-            return loadExistingScript(scriptUserDataDir);
+            return loadScriptStateFromFile(scriptUserDataDir);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        saveScriptDataToFile();
+        saveScriptStateToFile();
     }
 
     protected boolean loadScript(File scriptFile) {
@@ -154,12 +153,13 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
     }
 
     /**
+     * Load a script that has bin stored in the given directory.
      *
-     * @param scriptDir
+     * @param scriptUserDataDir directory where the user data is stored
      * @return the index of the last selected fragment or -1 if an error occurred
      */
-    private int loadExistingScript(File scriptDir) {
-        File userDataFile = new File(scriptDir, SCRIPT_USER_DATA_FILENAME);
+    private int loadScriptStateFromFile(File scriptUserDataDir) {
+        File userDataFile = new File(scriptUserDataDir, SCRIPT_USER_DATA_FILENAME);
 
         Bundle bundle;
         InputStream inStream;
@@ -180,17 +180,17 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             return -1;
         }
 
-        String scriptPath = bundle.getString("script_name");
+        String scriptPath = bundle.getString("script_path");
         if (scriptPath == null) {
             lastErrorMessage = "bundle contains no script_name";
             return -1;
         }
 
-        scriptFile = new File(Script.getScriptDirectory(this), scriptPath);
+        scriptFile = new File(scriptPath);
         if (!loadScript(scriptFile))
             return -1;
 
-        if (!script.loadScript(bundle)) {
+        if (!script.loadScriptState(bundle)) {
             lastErrorMessage = script.getLastError();
             return -1;
         }
@@ -201,16 +201,20 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
         return lastSelectedFragment;
     }
 
-    protected boolean saveScriptDataToFile() {
+    /**
+     * Saves the state of the current script to the current {@link #scriptUserDataDir}.
+     * @return false if an error occurred.
+     */
+    protected boolean saveScriptStateToFile() {
         if (scriptFile == null || scriptUserDataDir == null)
             return false;
         if (script == null)
             return false;
 
         Bundle bundle = new Bundle();
-        bundle.putString("script_name", scriptFile.getName());
+        bundle.putString("script_path", scriptFile.getPath());
         bundle.putInt("current_fragment", pager.getCurrentItem());
-        if (!script.saveScript(bundle))
+        if (!script.saveScriptState(bundle))
             return false;
 
         File projectFile = new File(scriptUserDataDir, SCRIPT_USER_DATA_FILENAME);
@@ -265,8 +269,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             pager.setCurrentItem(index);
     }
 
-    @Override
-    public void onGoToComponent(ScriptComponentTree next) {
+    public void setNextComponent(ScriptComponentTree next) {
         int index = activeChain.indexOf(next);
         if (index >0)
             pager.setCurrentItem(index);

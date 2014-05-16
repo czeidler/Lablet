@@ -93,7 +93,9 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
                     getActivity().finish();
                     return;
                 }
-                component.getScript().notifyGoToComponent(component.getNext());
+                ScriptRunnerActivity activity = (ScriptRunnerActivity)getActivity();
+                if (activity != null)
+                    activity.setNextComponent(component.getNext());
             }
         });
 

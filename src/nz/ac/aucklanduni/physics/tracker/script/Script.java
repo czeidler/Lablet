@@ -7,11 +7,9 @@
  */
 package nz.ac.aucklanduni.physics.tracker.script;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.text.format.Time;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,16 +23,20 @@ public class Script {
         this.listener = listener;
     }
 
-    public void notifyGoToComponent(ScriptComponentTree next) {
-        if (listener == null || next == null)
-            return;
-        listener.onGoToComponent(next);
-    }
-
+    /**
+     * The root component tree is first page/ sheet in the script.
+     *
+     * @param component root component tree
+     */
     public void setRoot(ScriptComponentTree component) {
         root = component;
     }
 
+    /**
+     * The root component tree is first page/ sheet in the script.
+     *
+     * @return root component tree
+     */
     public ScriptComponentTree getRoot() {
         return root;
     }
@@ -59,10 +61,22 @@ public class Script {
         return true;
     }
 
+    /**
+     * If there was an error the message can be retrieved here.
+     *
+     * @return last error message
+     */
     public String getLastError() {
         return lastError;
     }
 
+    /**
+     * Returns the list of components that are currently available starting from the root tree component
+     *
+     * A active chain is the chain that can be created by following the SCRIPT_STATE_DONE state links.
+     *
+     * @return returns the active chain of the root tree component
+     */
     public List<ScriptComponentTree> getActiveChain() {
         if (root == null)
             return new ArrayList<ScriptComponentTree>();
@@ -70,22 +84,12 @@ public class Script {
         return root.getActiveChain();
     }
 
-    static public File getScriptDirectory(Context context) {
-        File baseDir = context.getExternalFilesDir(null);
-        File scriptDir = new File(baseDir, "scripts");
-        if (!scriptDir.exists())
-            scriptDir.mkdir();
-        return scriptDir;
-    }
-
-    static public File getScriptUserDataDir(Context context) {
-        File baseDir = context.getExternalFilesDir(null);
-        File scriptDir = new File(baseDir, "script_user_data");
-        if (!scriptDir.exists())
-            scriptDir.mkdir();
-        return scriptDir;
-    }
-
+    /**
+     * Generates a new unique id depending on the script name.
+     *
+     * @param scriptName
+     * @return unique script id
+     */
     static public String generateScriptUid(String scriptName) {
         Time now = new Time(Time.getCurrentTimezone());
         CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", new java.util.Date());
@@ -100,6 +104,12 @@ public class Script {
         return newUid;
     }
 
+    /**
+     * This method does not do much at the moment. However, in case this changes in the future the user should call it
+     * anyway.
+     *
+     * @return false if the root component was already in done state
+     */
     public boolean start() {
         if (root == null)
             return false;
@@ -109,18 +119,28 @@ public class Script {
         return true;
     }
 
+    /**
+     * Is called whenever a child component changes it state.
+     * @param component the component that changed its state
+     * @param state new state
+     */
     public void onComponentStateChanged(ScriptComponentTree component, int state) {
         if (listener != null)
             listener.onComponentStateChanged(component, state);
     }
 
-    public boolean saveScript(Bundle bundle) {
+    /**
+     * Save the current script state into a bundle.
+     * @param bundle archive the script should be stored in
+     * @return
+     */
+    public boolean saveScriptState(Bundle bundle) {
         if (root == null)
             return false;
 
         bundle.putString("scriptId", ScriptComponentTree.getChainHash(root));
 
-        if (!saveScriptComponent(root, 0, bundle))
+        if (!saveScriptComponentState(root, 0, bundle))
             return false;
 
         int componentId = 0;
@@ -131,22 +151,19 @@ public class Script {
             ScriptComponentTree component = iterator.next();
             componentId++;
 
-            if (!saveScriptComponent(component, componentId, bundle))
+            if (!saveScriptComponentState(component, componentId, bundle))
                 return false;
         }
         return true;
     }
 
-    private boolean saveScriptComponent(ScriptComponentTree component, int componentId, Bundle bundle) {
-        Bundle componentBundle = new Bundle();
-        component.toBundle(componentBundle);
-
-        String bundleKey = Integer.toString(componentId);
-        bundle.putBundle(bundleKey, componentBundle);
-        return true;
-    }
-
-    public boolean loadScript(Bundle bundle) {
+    /**
+     * Restores a previously saved state of a script (also see {@link #saveScriptState}).
+     *
+     * @param bundle saved state of the script
+     * @return true if the state has been restored otherwise the error message is stored in {@link #lastError}
+     */
+    public boolean loadScriptState(Bundle bundle) {
         if (root == null)
             return false;
 
@@ -156,7 +173,7 @@ public class Script {
             return false;
         }
 
-        if (!loadScriptComponent(root, 0, bundle))
+        if (!loadScriptComponentState(root, 0, bundle))
             return false;
 
         int componentId = 0;
@@ -167,14 +184,23 @@ public class Script {
             ScriptComponentTree component = iterator.next();
             componentId++;
 
-            if (!loadScriptComponent(component, componentId, bundle))
+            if (!loadScriptComponentState(component, componentId, bundle))
                 return false;
         }
 
         return true;
     }
 
-    private boolean loadScriptComponent(ScriptComponentTree component, int componentId, Bundle bundle) {
+    private boolean saveScriptComponentState(ScriptComponentTree component, int componentId, Bundle bundle) {
+        Bundle componentBundle = new Bundle();
+        component.toBundle(componentBundle);
+
+        String bundleKey = Integer.toString(componentId);
+        bundle.putBundle(bundleKey, componentBundle);
+        return true;
+    }
+
+    private boolean loadScriptComponentState(ScriptComponentTree component, int componentId, Bundle bundle) {
         String bundleKey = Integer.toString(componentId);
         if (!bundle.containsKey(bundleKey)) {
             lastError = "Script component state can't be restored.";

@@ -10,5 +10,4 @@ package nz.ac.aucklanduni.physics.tracker.script;
 
 public interface IScriptListener {
     public void onComponentStateChanged(ScriptComponentTree current, int state);
-    public void onGoToComponent(ScriptComponentTree next);
 }
