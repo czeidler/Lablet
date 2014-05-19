@@ -1,6 +1,7 @@
 # build files
 out/*
 gen/*
+LabletTests/gen/*
 
 # IDEA project files
 workspace.xml
