@@ -5,16 +5,14 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.aucklanduni.physics.tracker.script;
+package nz.ac.aucklanduni.physics.tracker.script.components;
+
+import nz.ac.aucklanduni.physics.tracker.script.*;
 
 public class ScriptComponentFragmentFactory implements IScriptComponentFactory {
     public ScriptComponentTree create(String componentName, Script script) {
         if (componentName.equals("Sheet"))
             return new ScriptComponentTreeSheet(script);
-        //if (componentName.equals("CameraExperiment"))
-          //  return new ScriptComponentTreeCameraExperiment(script);
-        if (componentName.equals("ExperimentSheet"))
-            return new ScriptComponentTreeExperimentSheet(script);
         if (componentName.equals("ExperimentAnalysis"))
             return new ScriptComponentTreeExperimentAnalysis(script);
         if (componentName.equals("CalculateXSpeed"))

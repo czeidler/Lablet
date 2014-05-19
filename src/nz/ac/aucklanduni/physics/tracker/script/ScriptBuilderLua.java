@@ -8,11 +8,6 @@
 package nz.ac.aucklanduni.physics.tracker.script;
 
 
-interface IScriptComponentFactory {
-    public ScriptComponentTree create(String componentName, Script script);
-}
-
-
 public class ScriptBuilderLua {
     private IScriptComponentFactory factory;
     private Script script = new Script();
@@ -31,7 +26,7 @@ public class ScriptBuilderLua {
             script.setRoot(component);
             lastComponent = component;
         } else {
-            lastComponent.setNextComponent(state, component);
+            lastComponent.setChildComponent(state, component);
             lastComponent = component;
         }
     }

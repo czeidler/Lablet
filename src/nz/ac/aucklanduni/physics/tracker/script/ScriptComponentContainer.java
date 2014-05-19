@@ -1,14 +1,27 @@
+/*
+ * Copyright 2013-2014.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
 package nz.ac.aucklanduni.physics.tracker.script;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-class ScriptComponentContainer<ItemType extends ScriptComponent>
+/**
+ * Manages a set of script components.
+ *
+ * ScriptComponentContainer listen to all its sub components for state changes. If the states of all sub components
+ * changed from or to >= 0 an installed IItemContainerListener is notified.
+ *
+ * @param <ItemType> derived class from {@link ScriptComponent}
+ */
+public class ScriptComponentContainer<ItemType extends ScriptComponent>
         implements ScriptComponent.IScriptComponentListener {
     private List<ItemType> items = new ArrayList<ItemType>();
     private IItemContainerListener listener = null;
@@ -59,10 +72,6 @@ class ScriptComponentContainer<ItemType extends ScriptComponent>
         return items;
     }
 
-    public boolean allItemsDone() {
-        return allItemsDone;
-    }
-
     private boolean calculateAllItemsDone() {
         for (ScriptComponent item : items) {
             if (item.getState() < 0)
@@ -102,16 +111,3 @@ class ScriptComponentContainer<ItemType extends ScriptComponent>
     }
 }
 
-abstract class ScriptComponentViewHolder extends ScriptComponent implements ISheetLayoutItemParameters {
-    private float weight = 1.f;
-
-    abstract public View createView(Context context, android.support.v4.app.Fragment parent);
-
-    public void setWeight(float weight) {
-        this.weight = weight;
-    }
-
-    public float getWeight() {
-        return weight;
-    }
-}

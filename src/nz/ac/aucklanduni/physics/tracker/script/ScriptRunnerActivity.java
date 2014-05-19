@@ -19,6 +19,8 @@ import android.view.ViewGroup;
 import nz.ac.aucklanduni.physics.tracker.PersistentBundle;
 import nz.ac.aucklanduni.physics.tracker.R;
 import nz.ac.aucklanduni.physics.tracker.StorageLib;
+import nz.ac.aucklanduni.physics.tracker.script.components.ScriptComponentFragmentFactory;
+import nz.ac.aucklanduni.physics.tracker.script.components.ScriptComponentGenericFragment;
 
 import java.io.*;
 import java.util.*;

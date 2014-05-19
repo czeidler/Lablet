@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.aucklanduni.physics.tracker.script;
+package nz.ac.aucklanduni.physics.tracker.script.components;
 
 
 import android.content.Context;
@@ -16,17 +16,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import nz.ac.aucklanduni.physics.tracker.R;
+import nz.ac.aucklanduni.physics.tracker.script.ScriptComponent;
+import nz.ac.aucklanduni.physics.tracker.script.ScriptComponentTree;
+import nz.ac.aucklanduni.physics.tracker.script.ScriptComponentViewHolder;
 
+
+/**
+ * View for the peanut butter jelly question (PotentialEnergy1).
+ */
 class ScriptComponentPotentialEnergy1View extends FrameLayout {
     private ScriptComponentPotentialEnergy1 component;
-    private TextView massQuestionTextView;
-    private TextView heightQuestionTextView;
-    private TextView energyQuestionTextView;
-    private TextView pbjSandwichQuestionTextView;
-    private EditText massEditText;
-    private EditText heightEditText;
-    private EditText energyEditText;
-    private EditText pbjEditText;
     private CheckBox doneCheckBox;
 
     public ScriptComponentPotentialEnergy1View(Context context, ScriptComponentPotentialEnergy1 component) {
@@ -38,22 +37,22 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
         assert view != null;
         addView(view);
 
-        massQuestionTextView = (TextView)view.findViewById(R.id.massQuestionTextView);
+        TextView massQuestionTextView = (TextView) view.findViewById(R.id.massQuestionTextView);
         assert massQuestionTextView != null;
-        heightQuestionTextView = (TextView)view.findViewById(R.id.heightQuestionTextView);
+        TextView heightQuestionTextView = (TextView) view.findViewById(R.id.heightQuestionTextView);
         assert heightQuestionTextView != null;
-        energyQuestionTextView = (TextView)view.findViewById(R.id.energyQuestionTextView);
+        TextView energyQuestionTextView = (TextView) view.findViewById(R.id.energyQuestionTextView);
         assert energyQuestionTextView != null;
-        pbjSandwichQuestionTextView = (TextView)view.findViewById(R.id.pbjSandwichQuestionTextView);
+        TextView pbjSandwichQuestionTextView = (TextView) view.findViewById(R.id.pbjSandwichQuestionTextView);
         assert pbjSandwichQuestionTextView != null;
 
-        massEditText = (EditText)view.findViewById(R.id.massEditText);
+        EditText massEditText = (EditText) view.findViewById(R.id.massEditText);
         assert massEditText != null;
-        heightEditText = (EditText)view.findViewById(R.id.heightEditText);
+        EditText heightEditText = (EditText) view.findViewById(R.id.heightEditText);
         assert heightEditText != null;
-        energyEditText = (EditText)view.findViewById(R.id.energyEditText);
+        EditText energyEditText = (EditText) view.findViewById(R.id.energyEditText);
         assert energyEditText != null;
-        pbjEditText = (EditText)view.findViewById(R.id.pbjEditText);
+        EditText pbjEditText = (EditText) view.findViewById(R.id.pbjEditText);
         assert pbjEditText != null;
 
         doneCheckBox = (CheckBox)view.findViewById(R.id.doneCheckBox);
@@ -85,7 +84,7 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
                 try {
                     setMass(Float.parseFloat(editable.toString()));
                 } catch (NumberFormatException e) {
-
+                    System.out.println(e.getMessage());
                 }
             }
         });
@@ -105,7 +104,7 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
                 try {
                     setHeight(Float.parseFloat(editable.toString()));
                 } catch (NumberFormatException e) {
-
+                    System.out.println(e.getMessage());
                 }
             }
         });
@@ -125,7 +124,7 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
                 try {
                     setEnergy(Float.parseFloat(editable.toString()));
                 } catch (NumberFormatException e) {
-
+                    System.out.println(e.getMessage());
                 }
             }
         });
@@ -145,7 +144,7 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
                 try {
                     setPbjValue(Float.parseFloat(editable.toString()));
                 } catch (NumberFormatException e) {
-
+                    System.out.println(e.getMessage());
                 }
             }
         });
@@ -221,7 +220,11 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
     }
 }
 
-
+/**
+ * View holder for the peanut butter jelly question (PotentialEnergy1).
+ *
+ * Loads the {@link ScriptComponentPotentialEnergy1View}.
+ */
 public class ScriptComponentPotentialEnergy1 extends ScriptComponentViewHolder {
     private String massQuestionText = "Mass:";
     private String heightQuestionText = "Height of the of the mass:";

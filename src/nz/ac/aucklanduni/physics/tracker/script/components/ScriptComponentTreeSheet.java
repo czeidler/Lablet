@@ -5,17 +5,20 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.aucklanduni.physics.tracker.script;
+package nz.ac.aucklanduni.physics.tracker.script.components;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.*;
 import android.widget.*;
+import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
+import nz.ac.aucklanduni.physics.tracker.R;
+import nz.ac.aucklanduni.physics.tracker.script.*;
+import nz.ac.aucklanduni.physics.tracker.views.graph.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -208,24 +211,111 @@ class ScriptComponentTextQuestion extends ScriptComponentViewHolder {
     }
 }
 
-abstract class SheetLayout {
-    protected ISheetLayoutItemParameters parameters;
 
-    public SheetLayout() {
-        this.parameters = new SheetGroupLayoutParameters();
+class GraphViewHolder extends ScriptComponentViewHolder {
+    private ScriptComponentTreeSheet experimentSheet;
+    private ScriptComponentExperiment experiment;
+    private MarkerGraphAdapter adapter;
+    private String xAxisContentId = "x-position";
+    private String yAxisContentId = "y-position";
+    private String title = "Position Data";
+    private ScriptComponentExperiment.IScriptComponentExperimentListener experimentListener;
+
+    public GraphViewHolder(ScriptComponentTreeSheet experimentSheet, ScriptComponentExperiment experiment) {
+        this.experimentSheet = experimentSheet;
+        this.experiment = experiment;
+        setState(ScriptComponentTree.SCRIPT_STATE_DONE);
     }
 
-    public SheetLayout(ISheetLayoutItemParameters parameters) {
-        this.parameters = parameters;
+    @Override
+    public View createView(Context context, android.support.v4.app.Fragment parentFragment) {
+        LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = layoutInflater.inflate(R.layout.script_component_graph_view, null);
+        assert view != null;
+
+        GraphView2D graphView2D = (GraphView2D)view.findViewById(R.id.graphView);
+        assert graphView2D != null;
+
+        graphView2D.setMaxWidth(500);
+
+        ExperimentAnalysis experimentAnalysis = experiment.getExperimentAnalysis(context);
+        if (experimentAnalysis != null) {
+            MarkerGraphAxis xAxis = createAxis(xAxisContentId);
+            if (xAxis == null)
+                xAxis = new XPositionMarkerGraphAxis();
+            MarkerGraphAxis yAxis = createAxis(yAxisContentId);
+            if (yAxis == null)
+                yAxis = new XPositionMarkerGraphAxis();
+
+            adapter = new MarkerGraphAdapter(experimentAnalysis, title, xAxis, yAxis);
+            graphView2D.setAdapter(adapter);
+        }
+
+        // install listener
+        final Context contextFinal = context;
+        experimentListener = new ScriptComponentExperiment.IScriptComponentExperimentListener() {
+            @Override
+            public void onExperimentAnalysisUpdated() {
+                adapter.setExperimentAnalysis(experiment.getExperimentAnalysis(contextFinal));
+            }
+        };
+        experiment.addListener(experimentListener);
+
+        return view;
     }
 
-    public ISheetLayoutItemParameters getParameters() {
-        return parameters;
+    @Override
+    protected void finalize() {
+        experiment.removeListener(experimentListener);
     }
 
-    public abstract View buildLayout(Context context, android.support.v4.app.Fragment parentFragment);
+    public boolean setXAxisContent(String axis) {
+        if (createAxis(axis) == null)
+            return false;
+        xAxisContentId = axis;
+        return true;
+    }
+
+    public boolean setYAxisContent(String axis) {
+        if (createAxis(axis) == null)
+            return false;
+        yAxisContentId = axis;
+        return true;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    private MarkerGraphAxis createAxis(String id) {
+        if (id.equalsIgnoreCase("x-position"))
+            return new XPositionMarkerGraphAxis();
+        if (id.equalsIgnoreCase("y-position"))
+            return new YPositionMarkerGraphAxis();
+        if (id.equalsIgnoreCase("x-velocity"))
+            return new XSpeedMarkerGraphAxis();
+        if (id.equalsIgnoreCase("y-velocity"))
+            return new YSpeedMarkerGraphAxis();
+        if (id.equalsIgnoreCase("time"))
+            return new TimeMarkerGraphAxis();
+        if (id.equalsIgnoreCase("time_v"))
+            return new SpeedTimeMarkerGraphAxis();
+        return null;
+    }
+
+    public MarkerGraphAdapter getAdapter() {
+        return adapter;
+    }
+
+    @Override
+    public boolean initCheck() {
+        if (experiment == null) {
+            lastErrorMessage = "no experiment data";
+            return false;
+        }
+        return true;
+    }
 }
-
 
 class ScriptComponentTreeSheetBase extends ScriptComponentTreeFragmentHolder {
     public class Counter {
@@ -394,6 +484,33 @@ public class ScriptComponentTreeSheet extends ScriptComponentTreeSheetBase {
         ScriptComponentPotentialEnergy1 question = new ScriptComponentPotentialEnergy1();
         addItemViewHolder(question, parent);
         return question;
+    }
+
+    public GraphViewHolder addGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
+        GraphViewHolder item = new GraphViewHolder(this, experiment);
+        addItemViewHolder(item, parent);
+        return item;
+    }
+
+    public void addPositionGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
+        GraphViewHolder item = new GraphViewHolder(this, experiment);
+        addItemViewHolder(item, parent);
+    }
+
+    public void addXSpeedGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
+        GraphViewHolder item = new GraphViewHolder(this, experiment);
+        item.setTitle("X-Velocity vs. Time");
+        item.setXAxisContent("time_v");
+        item.setYAxisContent("x-velocity");
+        addItemViewHolder(item, parent);
+    }
+
+    public void addYSpeedGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
+        GraphViewHolder item = new GraphViewHolder(this, experiment);
+        item.setTitle("Y-Velocity vs. Time");
+        item.setXAxisContent("time_v");
+        item.setYAxisContent("y-velocity");
+        addItemViewHolder(item, parent);
     }
 }
 

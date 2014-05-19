@@ -59,7 +59,7 @@ function onBuildExperimentScript(scriptBuilder)
 	calculateYSpeed:setTitle("Free fall")
 	calculateYSpeed:setHeader("Deriving average y-velocity and y-acceleration from displacement")
 
-	local freeFallQuestions = scriptBuilder:create("ExperimentSheet")
+	local freeFallQuestions = scriptBuilder:create("Sheet")
 	scriptBuilder:add(freeFallQuestions)
 	freeFallQuestions:setTitle("Free Fall")
 	freeFallQuestions:addHeader("Estimating impact velocity")
@@ -72,7 +72,7 @@ function onBuildExperimentScript(scriptBuilder)
 	freeFallQuestions:addCheckQuestion("Go to your demonstrator now and verify your results.")
 
 	-- up down motion
-	local upDownMotionQuestions = scriptBuilder:create("ExperimentSheet")
+	local upDownMotionQuestions = scriptBuilder:create("Sheet")
 	scriptBuilder:add(upDownMotionQuestions)
 	upDownMotionQuestions:setTitle("Vertical linear motion")
 	upDownMotionQuestions:addHeader("Analysing graphs:")
@@ -99,7 +99,7 @@ function onBuildExperimentScript(scriptBuilder)
 	upDownMotionQuestions:addCheckQuestion("Go to your demonstrator now and verify your results.")
 
 	-- projectile motion
-	local projectileMotionQuestions = scriptBuilder:create("ExperimentSheet")
+	local projectileMotionQuestions = scriptBuilder:create("Sheet")
 	scriptBuilder:add(projectileMotionQuestions)
 	projectileMotionQuestions:setTitle("Projectile Motion")
 	projectileMotionQuestions:addHeader("Analysing graphs")

@@ -37,7 +37,7 @@ class SheetGroupLayoutParameters implements ISheetLayoutItemParameters {
     }
 }
 
-class SheetGroupLayout extends SheetLayout {
+public class SheetGroupLayout extends SheetLayout {
     private List<SheetLayout> items = new ArrayList<SheetLayout>();
     protected TableRow row;
     TableLayout layout;

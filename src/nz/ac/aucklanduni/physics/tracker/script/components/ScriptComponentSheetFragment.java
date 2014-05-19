@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.aucklanduni.physics.tracker.script;
+package nz.ac.aucklanduni.physics.tracker.script.components;
 
 import android.content.Intent;
 import android.os.Bundle;

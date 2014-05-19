@@ -87,7 +87,7 @@ public class Script {
     /**
      * Generates a new unique id depending on the script name.
      *
-     * @param scriptName
+     * @param scriptName a seed value for the uid, e.g., the script name
      * @return unique script id
      */
     static public String generateScriptUid(String scriptName) {
@@ -132,13 +132,13 @@ public class Script {
     /**
      * Save the current script state into a bundle.
      * @param bundle archive the script should be stored in
-     * @return
+     * @return false if an error occurred
      */
     public boolean saveScriptState(Bundle bundle) {
         if (root == null)
             return false;
 
-        bundle.putString("scriptId", ScriptComponentTree.getChainHash(root));
+        bundle.putString("scriptId", ScriptComponentTree.getTreeHash(root));
 
         if (!saveScriptComponentState(root, 0, bundle))
             return false;
@@ -167,7 +167,7 @@ public class Script {
         if (root == null)
             return false;
 
-        String scriptId = ScriptComponentTree.getChainHash(root);
+        String scriptId = ScriptComponentTree.getTreeHash(root);
         if (!bundle.get("scriptId").equals(scriptId)) {
             lastError = "Script has been updated and is now incompatible to the saved state.";
             return false;

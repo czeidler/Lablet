@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.aucklanduni.physics.tracker.script;
+package nz.ac.aucklanduni.physics.tracker.script.components;
 
 import android.os.Bundle;
 import android.text.Editable;
@@ -15,6 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import nz.ac.aucklanduni.physics.tracker.*;
+import nz.ac.aucklanduni.physics.tracker.script.Script;
+import nz.ac.aucklanduni.physics.tracker.script.ScriptComponent;
+import nz.ac.aucklanduni.physics.tracker.script.ScriptComponentTreeFragmentHolder;
 import nz.ac.aucklanduni.physics.tracker.views.table.*;
 
 import java.util.ArrayList;
@@ -369,7 +372,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
             return;
 
         String text = "";
-        text += experiment.getRunValueAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 0).getRunId());
+        text += experiment.getRunValueAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex()).getRunId());
         time1EditText.setText(text);
         text = "";
         text += experiment.getRunValueAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 1).getRunId());
@@ -501,13 +504,13 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
 
     private void setDone(boolean done) {
         if (done)
-            setState(ScriptComponentTree.SCRIPT_STATE_DONE);
+            setState(ScriptComponent.SCRIPT_STATE_DONE);
         else
-            setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
+            setState(ScriptComponent.SCRIPT_STATE_ONGOING);
 
         // always set state to done (in case there is a bug in the calculation and the student can't get further)
         // TODO: remove again!
-        setState(ScriptComponentTree.SCRIPT_STATE_DONE);
+        setState(ScriptComponent.SCRIPT_STATE_DONE);
     }
 
     // error propagation

@@ -18,6 +18,9 @@ import java.io.File;
 import java.io.FileInputStream;
 
 
+/**
+ * Load a lua script file from disk.
+ */
 public class LuaScriptLoader {
     private String lastError = "";
     private ScriptBuilderLua builder;
@@ -32,10 +35,15 @@ public class LuaScriptLoader {
             BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(filename));
             return globals.load(inputStream, "@" + filename, "bt", globals);
         } catch (Exception e) {
-            return globals.error("load "+filename+": "+e);
+            return LuaValue.error("load " + filename + ": " + e);
         }
     }
 
+    /**
+     * Opens a script file and load it into a {@link Script}.
+     * @param scriptFile the script location
+     * @return a new script or null on failure
+     */
     public Script load(File scriptFile) {
         if (!scriptFile.exists()) {
             lastError = "Script file does not exist!";
@@ -64,6 +72,10 @@ public class LuaScriptLoader {
         return script;
     }
 
+    /**
+     * Returns the error message in case an error occurred in load.
+     * @return error message string
+     */
     public String getLastError() {
         return lastError;
     }

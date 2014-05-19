@@ -5,22 +5,22 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.aucklanduni.physics.tracker.script;
+package nz.ac.aucklanduni.physics.tracker.script.components;
 
 import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.tracker.views.table.*;
 
-public class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpeedFragment {
-    private XSpeedDataTableColumn speedDataTableColumn;
+public class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalculateSpeedFragment {
+    private YSpeedDataTableColumn speedDataTableColumn;
 
     @Override
     String getDescriptionLabel() {
-        return "Fill table for the x-direction:";
+        return "Fill table for the y-direction:";
     }
 
     @Override
     float getPosition(int index) {
-        return tagMarker.getCalibratedMarkerPositionAt(index).x;
+        return tagMarker.getCalibratedMarkerPositionAt(index).y;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalcu
         ExperimentAnalysis experimentAnalysis = experiment.getExperimentAnalysis(getActivity());
         if (experimentAnalysis == null)
             return "";
-        return experimentAnalysis.getXUnit();
+        return experimentAnalysis.getYUnit();
     }
 
     @Override
@@ -40,7 +40,7 @@ public class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalcu
     @Override
     ColumnMarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis) {
         ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
-        speedDataTableColumn = new XSpeedDataTableColumn();
+        speedDataTableColumn = new YSpeedDataTableColumn();
         adapter.addColumn(new SpeedTimeDataTableColumn());
         adapter.addColumn(speedDataTableColumn);
 
@@ -50,7 +50,7 @@ public class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalcu
     @Override
     ColumnMarkerDataTableAdapter createAccelerationTableAdapter(ExperimentAnalysis experimentAnalysis) {
         ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
-        XAccelerationDataTableColumn accelerationDataTableColumn = new XAccelerationDataTableColumn();
+        YAccelerationDataTableColumn accelerationDataTableColumn = new YAccelerationDataTableColumn();
         adapter.addColumn(new AccelerationTimeDataTableColumn());
         adapter.addColumn(accelerationDataTableColumn);
         return adapter;

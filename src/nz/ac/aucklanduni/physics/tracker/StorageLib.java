@@ -41,6 +41,12 @@ public class StorageLib {
         return file.delete();
     }
 
+    /**
+     * Move one single file. Note: if the file is on a different hd this could take a while.
+     * @param source
+     * @param destination
+     * @return
+     */
     static public boolean moveFile(File source, File destination) {
         if (source.isDirectory())
             return false;

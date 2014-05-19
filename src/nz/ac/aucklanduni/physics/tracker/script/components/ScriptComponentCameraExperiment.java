@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.aucklanduni.physics.tracker.script;
+package nz.ac.aucklanduni.physics.tracker.script.components;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,6 +19,9 @@ import android.widget.*;
 import nz.ac.aucklanduni.physics.tracker.*;
 import nz.ac.aucklanduni.physics.tracker.camera.CameraExperiment;
 import nz.ac.aucklanduni.physics.tracker.camera.CameraExperimentActivity;
+import nz.ac.aucklanduni.physics.tracker.script.ScriptComponentTree;
+import nz.ac.aucklanduni.physics.tracker.script.ScriptComponentViewHolder;
+import nz.ac.aucklanduni.physics.tracker.script.ScriptRunnerActivity;
 
 import java.io.File;
 

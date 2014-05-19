@@ -14,7 +14,7 @@ import android.os.Build;
 import android.test.ActivityInstrumentationTestCase2;
 import nz.ac.aucklanduni.physics.tracker.script.LuaScriptLoader;
 import nz.ac.aucklanduni.physics.tracker.script.Script;
-import nz.ac.aucklanduni.physics.tracker.script.ScriptComponentFragmentFactory;
+import nz.ac.aucklanduni.physics.tracker.script.components.ScriptComponentFragmentFactory;
 
 import java.io.*;
 

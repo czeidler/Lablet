@@ -18,7 +18,7 @@ function onBuildExperimentScript(scriptBuilder)
 	calculateYSpeed:setExperiment(cameraExperiment)
 	scriptBuilder:add(calculateYSpeed)
 
-	local graphSheet = scriptBuilder:create("ExperimentSheet")
+	local graphSheet = scriptBuilder:create("Sheet")
 	scriptBuilder:add(graphSheet)
 	graphSheet:setTitle("Graphs")
 	-- some standard graphs:
@@ -33,7 +33,7 @@ function onBuildExperimentScript(scriptBuilder)
 	graph:setXAxisContent("time")
 	graph:setYAxisContent("y-position")
 	
-	local question = scriptBuilder:create("ExperimentSheet")
+	local question = scriptBuilder:create("Sheet")
 	scriptBuilder:add(question)
 	question:setTitle("Potential Energy Question")
 	local graph = question:addGraph(cameraExperiment)

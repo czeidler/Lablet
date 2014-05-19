@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.aucklanduni.physics.tracker.script;
+package nz.ac.aucklanduni.physics.tracker.script.components;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -16,6 +16,10 @@ import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import nz.ac.aucklanduni.physics.tracker.R;
+import nz.ac.aucklanduni.physics.tracker.script.ScriptComponent;
+import nz.ac.aucklanduni.physics.tracker.script.ScriptComponentTree;
+import nz.ac.aucklanduni.physics.tracker.script.ScriptComponentTreeFragmentHolder;
+import nz.ac.aucklanduni.physics.tracker.script.ScriptRunnerActivity;
 
 
 /**
@@ -27,7 +31,7 @@ import nz.ac.aucklanduni.physics.tracker.R;
  * directly using setScriptComponent.
  */
 public class ScriptComponentGenericFragment extends android.support.v4.app.Fragment
-        implements ScriptComponentTree.IScriptComponentListener {
+        implements ScriptComponent.IScriptComponentListener {
     protected ScriptComponentTree component;
     protected TextView titleView = null;
     protected Button finishComponentButton = null;
@@ -95,7 +99,7 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
                 }
                 ScriptRunnerActivity activity = (ScriptRunnerActivity)getActivity();
                 if (activity != null)
-                    activity.setNextComponent(component.getNext());
+                    activity.setNextComponent(component.getActiveChild());
             }
         });
 

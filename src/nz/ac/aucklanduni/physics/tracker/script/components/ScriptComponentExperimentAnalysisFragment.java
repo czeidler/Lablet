@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.aucklanduni.physics.tracker.script;
+package nz.ac.aucklanduni.physics.tracker.script.components;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -20,6 +20,9 @@ import android.widget.Toast;
 import nz.ac.aucklanduni.physics.tracker.ExperimentAnalyserActivity;
 import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.tracker.R;
+import nz.ac.aucklanduni.physics.tracker.script.Script;
+import nz.ac.aucklanduni.physics.tracker.script.ScriptComponent;
+import nz.ac.aucklanduni.physics.tracker.script.ScriptComponentTreeFragmentHolder;
 import nz.ac.aucklanduni.physics.tracker.views.graph.GraphView2D;
 import nz.ac.aucklanduni.physics.tracker.views.graph.MarkerGraphAdapter;
 import nz.ac.aucklanduni.physics.tracker.views.graph.XPositionMarkerGraphAxis;

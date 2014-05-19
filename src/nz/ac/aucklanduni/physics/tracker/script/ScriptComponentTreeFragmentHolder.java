@@ -8,6 +8,8 @@
 package nz.ac.aucklanduni.physics.tracker.script;
 
 
+import nz.ac.aucklanduni.physics.tracker.script.components.ScriptComponentGenericFragment;
+
 abstract public class ScriptComponentTreeFragmentHolder extends ScriptComponentTree {
     protected String title = "";
 
