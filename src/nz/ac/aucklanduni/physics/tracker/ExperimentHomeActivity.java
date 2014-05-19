@@ -29,7 +29,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AndroidPhysicsTracker extends Activity {
+public class ExperimentHomeActivity extends Activity {
     private List<ExperimentPlugin> experimentPluginList = null;
     private ArrayList<CheckBoxListEntry> experimentList = null;
     private CheckBoxListEntry.OnCheckBoxListEntryListener checkBoxListEntryListener;
@@ -43,7 +43,7 @@ public class AndroidPhysicsTracker extends Activity {
     static final int PERFORM_EXPERIMENT = 0;
     static final int ANALYSE_EXPERIMENT = 1;
 
-    public AndroidPhysicsTracker() {
+    public ExperimentHomeActivity() {
 
     }
 
@@ -55,7 +55,7 @@ public class AndroidPhysicsTracker extends Activity {
 
     static public AlertDialog createAlertInfoBox(final Activity activity) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("Physics Tracker " + AndroidPhysicsTracker.getVersionString(activity));
+        builder.setTitle("Physics Tracker " + ExperimentHomeActivity.getVersionString(activity));
         builder.setNeutralButton("leave me alone", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -317,7 +317,7 @@ public class AndroidPhysicsTracker extends Activity {
     }
 
     private void startScriptActivity() {
-        Intent intent = new Intent(this, ScriptActivity.class);
+        Intent intent = new Intent(this, ScriptHomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);

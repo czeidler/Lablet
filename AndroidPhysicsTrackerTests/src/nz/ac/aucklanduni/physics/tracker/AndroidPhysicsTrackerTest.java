@@ -12,10 +12,10 @@ import android.test.ActivityInstrumentationTestCase2;
  * -e class nz.ac.aucklanduni.physics.tracker.AndroidPhysicsTrackerTest \
  * nz.ac.aucklanduni.physics.tracker.tests/android.test.InstrumentationTestRunner
  */
-public class AndroidPhysicsTrackerTest extends ActivityInstrumentationTestCase2<AndroidPhysicsTracker> {
+public class AndroidPhysicsTrackerTest extends ActivityInstrumentationTestCase2<ExperimentHomeActivity> {
 
     public AndroidPhysicsTrackerTest() {
-        super("nz.ac.aucklanduni.physics.tracker", AndroidPhysicsTracker.class);
+        super("nz.ac.aucklanduni.physics.tracker", ExperimentHomeActivity.class);
     }
 
 }

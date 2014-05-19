@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ScriptActivity extends Activity {
+public class ScriptHomeActivity extends Activity {
     private List<String> scriptList = null;
     private ArrayAdapter<String> scriptListAdaptor = null;
     private ArrayList<CheckBoxListEntry> existingScriptList = null;
@@ -63,9 +63,9 @@ public class ScriptActivity extends Activity {
         // info item
         MenuItem infoItem = menu.findItem(R.id.action_info);
         assert(infoItem != null);
-        String versionString = AndroidPhysicsTracker.getVersionString(this);
+        String versionString = ExperimentHomeActivity.getVersionString(this);
         infoItem.setTitle(versionString);
-        infoAlertBox = AndroidPhysicsTracker.createAlertInfoBox(this);
+        infoAlertBox = ExperimentHomeActivity.createAlertInfoBox(this);
         infoItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -109,7 +109,7 @@ public class ScriptActivity extends Activity {
     }
 
     private void startStandAloneExperimentActivity() {
-        Intent intent = new Intent(this, AndroidPhysicsTracker.class);
+        Intent intent = new Intent(this, ExperimentHomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);

@@ -20,12 +20,12 @@ import java.io.*;
 
 
 @TargetApi(Build.VERSION_CODES.CUPCAKE)
-public class LuaScriptTest extends ActivityInstrumentationTestCase2<ScriptActivity> {
+public class LuaScriptTest extends ActivityInstrumentationTestCase2<ScriptHomeActivity> {
     private Activity activity;
 
     @TargetApi(Build.VERSION_CODES.FROYO)
     public LuaScriptTest() {
-        super(ScriptActivity.class);
+        super(ScriptHomeActivity.class);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class LuaScriptTest extends ActivityInstrumentationTestCase2<ScriptActivi
      * Load a script and check its initial state.
      */
     public void testScriptLoading() {
-        File dir = ScriptActivity.getScriptDirectory(activity);
+        File dir = ScriptHomeActivity.getScriptDirectory(activity);
         assertNotNull(dir);
 
         Context testContext = getInstrumentation().getContext();
@@ -68,7 +68,7 @@ public class LuaScriptTest extends ActivityInstrumentationTestCase2<ScriptActivi
     }
 
     private void copyResourceScripts(boolean overwriteExisting) {
-        File scriptDir = ScriptActivity.getScriptDirectory(getInstrumentation().getContext());
+        File scriptDir = ScriptHomeActivity.getScriptDirectory(getInstrumentation().getContext());
         if (!scriptDir.exists()) {
             if (!scriptDir.mkdir())
                 return;
