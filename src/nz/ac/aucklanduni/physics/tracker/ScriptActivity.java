@@ -197,7 +197,7 @@ public class ScriptActivity extends Activity {
     /**
      * The script directory is the directory the stores the script files, i.e., the lua files.
      * @param context
-     * @return
+     * @return the script directory File
      */
     static public File getScriptDirectory(Context context) {
         File baseDir = context.getExternalFilesDir(null);

@@ -45,7 +45,7 @@ public class StorageLib {
      * Move one single file. Note: if the file is on a different hd this could take a while.
      * @param source
      * @param destination
-     * @return
+     * @return false on failure
      */
     static public boolean moveFile(File source, File destination) {
         if (source.isDirectory())
@@ -64,7 +64,7 @@ public class StorageLib {
      * Copies a file (not a directory) from source to destination
      * @param source
      * @param destination
-     * @return
+     * @return false on failure
      */
     static public boolean copyFile(File source, File destination) {
         try {

@@ -71,7 +71,7 @@ abstract public class ScriptComponentTree extends ScriptComponent implements Ite
      * Starting from the given component a hash is calculated that identifies the whole tree. The tree hash is dependent
      * from the child and their child components.
      * @param component
-     * @return
+     * @return the hash of the whole tree
      */
     static public String getTreeHash(ScriptComponentTree component) {
         String hashData = component.getName();
