@@ -18,11 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-interface ISheetLayoutItemParameters {
-    public void setWeight(float weight);
-    public float getWeight();
-}
-
+/**
+ * Layout parameter for the SheetGroupLayout class.
+ */
 class SheetGroupLayoutParameters implements ISheetLayoutItemParameters {
     private float weight = 1.f;
 
@@ -37,6 +35,9 @@ class SheetGroupLayoutParameters implements ISheetLayoutItemParameters {
     }
 }
 
+/**
+ * Simple group layout. Supports horizontal and vertical, nested layouts.
+ */
 public class SheetGroupLayout extends SheetLayout {
     private List<SheetLayout> items = new ArrayList<SheetLayout>();
     protected TableRow row;
@@ -47,17 +48,22 @@ public class SheetGroupLayout extends SheetLayout {
         this.orientation = orientation;
     }
 
-    public SheetGroupLayout(ISheetLayoutItemParameters parameters, int orientation) {
+    public SheetGroupLayout(SheetGroupLayoutParameters parameters, int orientation) {
         super(parameters);
 
         this.orientation = orientation;
     }
 
+    /**
+     * Set the orientation of the layout.
+     *
+     * @param orientation either LinearLayout.HORIZONTAL or LinearLayout.VERTICAL
+     */
     public void setOrientation(int orientation) {
         this.orientation = orientation;
     }
 
-    public class LayoutGroupLayoutItem extends SheetLayout implements ISheetLayoutItemParameters {
+    private class LayoutGroupLayoutItem extends SheetLayout implements ISheetLayoutItemParameters {
         private SheetLayout layout;
 
         public LayoutGroupLayoutItem(SheetLayout layout) {
@@ -80,7 +86,7 @@ public class SheetGroupLayout extends SheetLayout {
         }
     }
 
-    public class ViewGroupLayoutItem extends SheetLayout {
+    private class ViewGroupLayoutItem extends SheetLayout {
         private ScriptComponentViewHolder viewHolder;
 
         public ViewGroupLayoutItem(ISheetLayoutItemParameters parameters, ScriptComponentViewHolder viewHolder) {
@@ -94,12 +100,28 @@ public class SheetGroupLayout extends SheetLayout {
         }
     }
 
+    /**
+     * Adds a view holder script component to the layout.
+     * <p>
+     * When the layout is build the view holder's createView method is called. The holder is wrapped into a new
+     * SheetLayout layout item that is then returned.
+     * </p>
+     *
+     * @param viewHolder the new child item
+     * @return the new layout item for the holder
+     */
     public SheetLayout addView(ScriptComponentViewHolder viewHolder) {
         SheetLayout layoutItem = new ViewGroupLayoutItem(viewHolder, viewHolder);
         items.add(layoutItem);
         return layoutItem;
     }
 
+    /**
+     * Adds a nested layout
+     *
+     * @param layout the new child layout
+     * @return the new layout item for the layout
+     */
     public LayoutGroupLayoutItem addLayout(SheetLayout layout) {
         LayoutGroupLayoutItem layoutItem = new LayoutGroupLayoutItem(layout);
         items.add(layoutItem);

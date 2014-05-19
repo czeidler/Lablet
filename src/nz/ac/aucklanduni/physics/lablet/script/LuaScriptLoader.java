@@ -22,11 +22,58 @@ import java.io.FileInputStream;
  * Load a lua script file from disk.
  */
 public class LuaScriptLoader {
+    /**
+     * Simple script builder. Only supports components with one child.
+     */
+    private class ScriptBuilder {
+        private IScriptComponentFactory factory;
+        private Script script = new Script();
+        private ScriptComponentTree lastComponent;
+
+        public ScriptBuilder(IScriptComponentFactory factory) {
+            this.factory = factory;
+        }
+
+        /**
+         * Adds the component at the SCRIPT_STATE_DONE slot.
+         *
+         * @param component to be added
+         */
+        public void add(ScriptComponentTree component) {
+            add(ScriptComponentTree.SCRIPT_STATE_DONE, component);
+        }
+
+        /**
+         * Adds a component to the state slot and make it the current component (Successive components will be added to
+         * the new component).
+         *
+         * @param state the slot where the component will be inserted
+         * @param component to be added
+         */
+        public void add(int state, ScriptComponentTree component) {
+            if (lastComponent == null) {
+                script.setRoot(component);
+                lastComponent = component;
+            } else {
+                lastComponent.setChildComponent(state, component);
+                lastComponent = component;
+            }
+        }
+
+        public Script getScript() {
+            return script;
+        }
+
+        public ScriptComponentTree create(String componentName) {
+            return factory.create(componentName, script);
+        }
+    }
+
     private String lastError = "";
-    private ScriptBuilderLua builder;
+    private ScriptBuilder builder;
 
     public LuaScriptLoader(IScriptComponentFactory factory) {
-        builder = new ScriptBuilderLua(factory);
+        builder = new ScriptBuilder(factory);
     }
 
     // this is basically a copy from the luaj code but it uses a BufferedInputStream
@@ -41,6 +88,7 @@ public class LuaScriptLoader {
 
     /**
      * Opens a script file and load it into a {@link Script}.
+     *
      * @param scriptFile the script location
      * @return a new script or null on failure
      */

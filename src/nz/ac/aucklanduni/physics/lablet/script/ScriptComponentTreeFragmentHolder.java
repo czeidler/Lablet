@@ -10,6 +10,9 @@ package nz.ac.aucklanduni.physics.lablet.script;
 
 import nz.ac.aucklanduni.physics.lablet.script.components.ScriptComponentGenericFragment;
 
+/**
+ * Abstract base class for a component that is visualized by a Fragment.
+ */
 abstract public class ScriptComponentTreeFragmentHolder extends ScriptComponentTree {
     protected String title = "";
 
@@ -24,6 +27,11 @@ abstract public class ScriptComponentTreeFragmentHolder extends ScriptComponentT
         return title;
     }
 
+    /**
+     * Creates the fragment that displays the component.
+     *
+     * @return the fragment of the component.
+     */
     abstract public ScriptComponentGenericFragment createFragment();
 }
 

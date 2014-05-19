@@ -7,6 +7,9 @@
  */
 package nz.ac.aucklanduni.physics.lablet.script;
 
+/**
+ * Interface to create script component by name.
+ */
 public interface IScriptComponentFactory {
     public ScriptComponentTree create(String componentName, Script script);
 }

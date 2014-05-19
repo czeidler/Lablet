@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Representation of the script, holds all script components.
+ */
 public class Script {
     private ScriptComponentTree root = null;
     private IScriptListener listener = null;

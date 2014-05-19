@@ -26,6 +26,9 @@ import java.io.*;
 import java.util.*;
 
 
+/**
+ * Activity that host one running script.
+ */
 public class ScriptRunnerActivity extends FragmentActivity implements IScriptListener {
     private Script script = null;
     private ViewPager pager = null;
