@@ -7,9 +7,9 @@
  */
 package nz.ac.aucklanduni.physics.tracker.views.graph;
 
-import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.tracker.MarkerData;
-import nz.ac.aucklanduni.physics.tracker.MarkersDataModel;
+import nz.ac.aucklanduni.physics.tracker.experiment.ExperimentAnalysis;
+import nz.ac.aucklanduni.physics.tracker.experiment.MarkerData;
+import nz.ac.aucklanduni.physics.tracker.experiment.MarkersDataModel;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -20,7 +20,6 @@ import java.util.ArrayList;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 

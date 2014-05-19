@@ -7,9 +7,7 @@
  */
 package nz.ac.aucklanduni.physics.tracker.views.table;
 
-import nz.ac.aucklanduni.physics.tracker.Experiment;
-import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.tracker.MarkersDataModel;
+import nz.ac.aucklanduni.physics.tracker.experiment.Experiment;
 
 
 public class XAccelerationDataTableColumn extends DataTableColumn {

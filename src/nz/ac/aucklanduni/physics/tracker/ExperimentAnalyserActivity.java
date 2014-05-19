@@ -16,6 +16,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.*;
 import android.widget.PopupMenu;
+import nz.ac.aucklanduni.physics.tracker.experiment.ExperimentAnalysis;
+import nz.ac.aucklanduni.physics.tracker.experiment.ExperimentLoader;
 import nz.ac.aucklanduni.physics.tracker.views.CalibrationView;
 
 import java.io.*;

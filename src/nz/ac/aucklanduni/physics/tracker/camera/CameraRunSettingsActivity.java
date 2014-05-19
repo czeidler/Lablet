@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.*;
 import nz.ac.aucklanduni.physics.tracker.*;
 import nz.ac.aucklanduni.physics.tracker.ExperimentActivity;
+import nz.ac.aucklanduni.physics.tracker.experiment.MarkerData;
+import nz.ac.aucklanduni.physics.tracker.experiment.MarkersDataModel;
 import nz.ac.aucklanduni.physics.tracker.views.StartEndSeekBar;
 import nz.ac.aucklanduni.physics.tracker.views.VideoFrameView;
 

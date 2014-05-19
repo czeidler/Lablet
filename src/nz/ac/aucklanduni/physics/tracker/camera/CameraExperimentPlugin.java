@@ -12,9 +12,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import nz.ac.aucklanduni.physics.tracker.Experiment;
-import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.tracker.ExperimentPlugin;
+import nz.ac.aucklanduni.physics.tracker.experiment.Experiment;
+import nz.ac.aucklanduni.physics.tracker.experiment.ExperimentAnalysis;
+import nz.ac.aucklanduni.physics.tracker.experiment.ExperimentPlugin;
 
 import java.io.File;
 

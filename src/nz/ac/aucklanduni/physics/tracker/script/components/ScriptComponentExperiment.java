@@ -9,8 +9,8 @@ package nz.ac.aucklanduni.physics.tracker.script.components;
 
 
 import android.content.Context;
-import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.tracker.ExperimentLoader;
+import nz.ac.aucklanduni.physics.tracker.experiment.ExperimentAnalysis;
+import nz.ac.aucklanduni.physics.tracker.experiment.ExperimentLoader;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

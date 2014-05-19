@@ -8,8 +8,8 @@
 package nz.ac.aucklanduni.physics.tracker.views.graph;
 
 
-import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.tracker.MarkersDataModel;
+import nz.ac.aucklanduni.physics.tracker.experiment.ExperimentAnalysis;
+import nz.ac.aucklanduni.physics.tracker.experiment.MarkersDataModel;
 
 public abstract class MarkerGraphAxis implements IGraphAdapter.IGraphAxis {
     protected MarkerGraphAdapter markerGraphAdapter;

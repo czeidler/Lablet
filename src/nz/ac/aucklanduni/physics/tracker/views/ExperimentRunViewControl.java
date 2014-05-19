@@ -5,13 +5,15 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.aucklanduni.physics.tracker;
+package nz.ac.aucklanduni.physics.tracker.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
+import nz.ac.aucklanduni.physics.tracker.R;
+import nz.ac.aucklanduni.physics.tracker.experiment.RunDataModel;
 
 
 public class ExperimentRunViewControl extends LinearLayout implements RunDataModel.IRunDataModelListener {

@@ -11,9 +11,8 @@ import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.View;
-import nz.ac.aucklanduni.physics.tracker.IExperimentRunView;
-import nz.ac.aucklanduni.physics.tracker.MarkerData;
-import nz.ac.aucklanduni.physics.tracker.MarkersDataModel;
+import nz.ac.aucklanduni.physics.tracker.experiment.MarkerData;
+import nz.ac.aucklanduni.physics.tracker.experiment.MarkersDataModel;
 
 
 abstract class StartEndMarker extends DragableMarker {

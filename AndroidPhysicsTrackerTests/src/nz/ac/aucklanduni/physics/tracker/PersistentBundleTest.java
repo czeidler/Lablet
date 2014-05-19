@@ -9,6 +9,7 @@ package nz.ac.aucklanduni.physics.tracker;
 
 import android.os.Bundle;
 import junit.framework.TestCase;
+import nz.ac.aucklanduni.physics.tracker.misc.PersistentBundle;
 
 import java.io.*;
 import java.util.Arrays;

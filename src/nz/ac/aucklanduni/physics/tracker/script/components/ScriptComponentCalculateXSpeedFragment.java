@@ -7,7 +7,7 @@
  */
 package nz.ac.aucklanduni.physics.tracker.script.components;
 
-import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
+import nz.ac.aucklanduni.physics.tracker.experiment.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.tracker.views.table.*;
 
 public class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpeedFragment {

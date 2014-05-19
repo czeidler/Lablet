@@ -5,10 +5,11 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.aucklanduni.physics.tracker;
+package nz.ac.aucklanduni.physics.tracker.experiment;
 
 import android.content.Context;
 import android.os.Bundle;
+import nz.ac.aucklanduni.physics.tracker.misc.PersistentBundle;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.*;

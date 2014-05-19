@@ -14,8 +14,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
-import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.tracker.LengthCalibrationSetter;
+import nz.ac.aucklanduni.physics.tracker.experiment.ExperimentAnalysis;
+import nz.ac.aucklanduni.physics.tracker.experiment.LengthCalibrationSetter;
 import nz.ac.aucklanduni.physics.tracker.R;
 
 import java.util.ArrayList;

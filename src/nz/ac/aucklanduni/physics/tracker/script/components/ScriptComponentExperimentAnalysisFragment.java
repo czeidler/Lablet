@@ -18,7 +18,7 @@ import android.widget.CheckedTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 import nz.ac.aucklanduni.physics.tracker.ExperimentAnalyserActivity;
-import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
+import nz.ac.aucklanduni.physics.tracker.experiment.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.tracker.R;
 import nz.ac.aucklanduni.physics.tracker.script.Script;
 import nz.ac.aucklanduni.physics.tracker.script.ScriptComponent;

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import nz.ac.aucklanduni.physics.tracker.experiment.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.tracker.views.graph.*;
 import nz.ac.aucklanduni.physics.tracker.views.table.*;
 

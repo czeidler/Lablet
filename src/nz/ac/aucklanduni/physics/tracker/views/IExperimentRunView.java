@@ -1,4 +1,4 @@
-package nz.ac.aucklanduni.physics.tracker;
+package nz.ac.aucklanduni.physics.tracker.views;
 
 import android.graphics.PointF;
 

@@ -10,7 +10,7 @@ package nz.ac.aucklanduni.physics.tracker.camera;
 import android.graphics.PointF;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
-import nz.ac.aucklanduni.physics.tracker.*;
+import nz.ac.aucklanduni.physics.tracker.experiment.*;
 
 import java.util.ArrayList;
 import java.util.List;

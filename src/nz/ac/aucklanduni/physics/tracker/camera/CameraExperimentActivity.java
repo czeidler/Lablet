@@ -18,13 +18,12 @@ import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.view.*;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.MediaController;
 import android.widget.VideoView;
 import nz.ac.aucklanduni.physics.tracker.ExperimentActivity;
 import nz.ac.aucklanduni.physics.tracker.R;
-import nz.ac.aucklanduni.physics.tracker.StorageLib;
+import nz.ac.aucklanduni.physics.tracker.misc.StorageLib;
 import nz.ac.aucklanduni.physics.tracker.views.RatioSurfaceView;
 
 import java.io.File;

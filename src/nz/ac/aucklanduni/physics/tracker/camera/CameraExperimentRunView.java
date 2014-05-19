@@ -11,8 +11,8 @@ import android.content.Context;
 import android.graphics.*;
 import android.os.Bundle;
 import android.view.View;
-import nz.ac.aucklanduni.physics.tracker.Experiment;
-import nz.ac.aucklanduni.physics.tracker.IExperimentRunView;
+import nz.ac.aucklanduni.physics.tracker.experiment.Experiment;
+import nz.ac.aucklanduni.physics.tracker.views.IExperimentRunView;
 import nz.ac.aucklanduni.physics.tracker.views.VideoFrameView;
 
 import java.io.File;

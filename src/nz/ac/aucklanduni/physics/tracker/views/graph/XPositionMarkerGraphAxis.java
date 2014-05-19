@@ -8,7 +8,7 @@
 package nz.ac.aucklanduni.physics.tracker.views.graph;
 
 import android.graphics.PointF;
-import nz.ac.aucklanduni.physics.tracker.Calibration;
+import nz.ac.aucklanduni.physics.tracker.experiment.Calibration;
 
 
 public class XPositionMarkerGraphAxis extends MarkerGraphAxis {

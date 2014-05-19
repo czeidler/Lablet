@@ -18,10 +18,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
+import nz.ac.aucklanduni.physics.tracker.misc.StorageLib;
 import nz.ac.aucklanduni.physics.tracker.views.CheckBoxAdapter;
 import nz.ac.aucklanduni.physics.tracker.script.Script;
 import nz.ac.aucklanduni.physics.tracker.script.ScriptRunnerActivity;
 import nz.ac.aucklanduni.physics.tracker.views.CheckBoxListEntry;
+import nz.ac.aucklanduni.physics.tracker.views.InfoBarBackgroundDrawable;
+import nz.ac.aucklanduni.physics.tracker.views.InfoSideBar;
 
 import java.io.*;
 import java.util.ArrayList;

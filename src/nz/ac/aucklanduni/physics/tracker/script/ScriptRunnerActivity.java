@@ -16,9 +16,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.ViewGroup;
-import nz.ac.aucklanduni.physics.tracker.PersistentBundle;
+import nz.ac.aucklanduni.physics.tracker.misc.PersistentBundle;
 import nz.ac.aucklanduni.physics.tracker.R;
-import nz.ac.aucklanduni.physics.tracker.StorageLib;
+import nz.ac.aucklanduni.physics.tracker.misc.StorageLib;
 import nz.ac.aucklanduni.physics.tracker.script.components.ScriptComponentFragmentFactory;
 import nz.ac.aucklanduni.physics.tracker.script.components.ScriptComponentGenericFragment;
 

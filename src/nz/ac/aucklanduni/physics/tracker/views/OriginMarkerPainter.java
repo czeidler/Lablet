@@ -5,8 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.view.View;
-import nz.ac.aucklanduni.physics.tracker.Calibration;
-import nz.ac.aucklanduni.physics.tracker.IExperimentRunView;
+import nz.ac.aucklanduni.physics.tracker.experiment.Calibration;
 /*
  * Copyright 2013-2014.
  * Distributed under the terms of the GPLv3 License.
@@ -14,7 +13,7 @@ import nz.ac.aucklanduni.physics.tracker.IExperimentRunView;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-import nz.ac.aucklanduni.physics.tracker.MarkersDataModel;
+import nz.ac.aucklanduni.physics.tracker.experiment.MarkersDataModel;
 
 
 public class OriginMarkerPainter extends AbstractMarkersPainter implements Calibration.ICalibrationListener {

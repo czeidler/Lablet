@@ -15,7 +15,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.*;
 import android.widget.*;
-import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
+import nz.ac.aucklanduni.physics.tracker.experiment.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.tracker.R;
 import nz.ac.aucklanduni.physics.tracker.script.*;
 import nz.ac.aucklanduni.physics.tracker.views.graph.*;

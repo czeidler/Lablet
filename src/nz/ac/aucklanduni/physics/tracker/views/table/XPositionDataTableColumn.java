@@ -7,9 +7,6 @@
  */
 package nz.ac.aucklanduni.physics.tracker.views.table;
 
-import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.tracker.MarkersDataModel;
-
 
 public class XPositionDataTableColumn extends DataTableColumn {
     @Override

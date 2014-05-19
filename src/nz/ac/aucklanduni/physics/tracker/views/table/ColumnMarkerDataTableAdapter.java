@@ -11,9 +11,9 @@ import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.TextView;
-import nz.ac.aucklanduni.physics.tracker.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.tracker.MarkerData;
-import nz.ac.aucklanduni.physics.tracker.MarkersDataModel;
+import nz.ac.aucklanduni.physics.tracker.experiment.ExperimentAnalysis;
+import nz.ac.aucklanduni.physics.tracker.experiment.MarkerData;
+import nz.ac.aucklanduni.physics.tracker.experiment.MarkersDataModel;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
