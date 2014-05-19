@@ -14,7 +14,7 @@
             <view android:layout_width="wrap_content"
                   android:layout_height="match_parent"
                   android:layout_gravity="center_horizontal"
-                  class="nz.ac.aucklanduni.physics.tracker.views.VideoFrameView" android:id="@+id/videoFrameView"
+                  class="nz.ac.aucklanduni.physics.lablet.views.VideoFrameView" android:id="@+id/videoFrameView"
                   android:layout_centerHorizontal="true" android:layout_alignParentBottom="true"
                   android:layout_alignParentTop="true"/>
     </RelativeLayout>
@@ -26,7 +26,7 @@
             android:layout_alignRight="@+id/relativeLayout" android:paddingLeft="25dp" android:paddingRight="25dp"/>
     <view android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          class="nz.ac.aucklanduni.physics.tracker.views.StartEndSeekBar" android:id="@+id/startEndSeekBar"
+          class="nz.ac.aucklanduni.physics.lablet.views.StartEndSeekBar" android:id="@+id/startEndSeekBar"
           android:layout_alignParentLeft="true"
           android:layout_above="@+id/editStart" android:layout_alignRight="@+id/seekBar"/>
     <TextView
@@ -114,6 +114,6 @@
 
     <view android:layout_width="match_parent"
         android:layout_height="match_parent"
-        class="nz.ac.aucklanduni.physics.tracker.camera.CameraRunSettingsHelpView" android:id="@+id/cameraSettingsHelp"
+        class="nz.ac.aucklanduni.physics.lablet.camera.CameraRunSettingsHelpView" android:id="@+id/cameraSettingsHelp"
         android:visibility="invisible" />
 </RelativeLayout>

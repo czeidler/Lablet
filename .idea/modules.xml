@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AndroidPhysicsTracker.iml" filepath="$PROJECT_DIR$/AndroidPhysicsTracker.iml" />
-      <module fileurl="file://$PROJECT_DIR$/AndroidPhysicsTrackerTests/AndroidPhysicsTrackerTests.iml" filepath="$PROJECT_DIR$/AndroidPhysicsTrackerTests/AndroidPhysicsTrackerTests.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Lablet.iml" filepath="$PROJECT_DIR$/Lablet.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LabletTests/LabletTests.iml" filepath="$PROJECT_DIR$/LabletTests/LabletTests.iml" />
     </modules>
   </component>
 </project>

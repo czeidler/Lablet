@@ -12,7 +12,7 @@
             android:layout_gravity="center_vertical"
             android:layout_weight="0.1">
 
-        <view class="nz.ac.aucklanduni.physics.tracker.views.table.TableView"
+        <view class="nz.ac.aucklanduni.physics.lablet.views.table.TableView"
               android:id="@+id/tagMarkerTableView"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
@@ -26,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
-            <view class="nz.ac.aucklanduni.physics.tracker.views.graph.GraphView2D"
+            <view class="nz.ac.aucklanduni.physics.lablet.views.graph.GraphView2D"
                   android:id="@+id/tagMarkerGraphView"
                   android:layout_width="match_parent"
                   android:layout_height="match_parent"
@@ -40,12 +40,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
-            <view class="nz.ac.aucklanduni.physics.tracker.views.graph.GraphView2D"
+            <view class="nz.ac.aucklanduni.physics.lablet.views.graph.GraphView2D"
                   android:id="@+id/yVelocityGraphView"
                   android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   android:layout_weight="1"/>
-            <view class="nz.ac.aucklanduni.physics.tracker.views.graph.GraphView2D"
+            <view class="nz.ac.aucklanduni.physics.lablet.views.graph.GraphView2D"
                   android:id="@+id/xVelocityGraphView"
                   android:layout_width="match_parent"
                   android:layout_height="match_parent"

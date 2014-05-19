@@ -17,7 +17,7 @@
             android:paddingRight="10dp" android:minWidth="50dp">
         <view android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              class="nz.ac.aucklanduni.physics.tracker.views.table.TableView" android:id="@+id/dataTable" android:focusable="false"/>
+              class="nz.ac.aucklanduni.physics.lablet.views.table.TableView" android:id="@+id/dataTable" android:focusable="false"/>
     </ScrollView>
     <TextView
             android:layout_width="wrap_content"
@@ -212,7 +212,7 @@
             android:paddingLeft="10dp" android:minWidth="50dp" android:layout_rowSpan="8">
         <view android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              class="nz.ac.aucklanduni.physics.tracker.views.table.TableView" android:id="@+id/speedTable" android:focusable="false"/>
+              class="nz.ac.aucklanduni.physics.lablet.views.table.TableView" android:id="@+id/speedTable" android:focusable="false"/>
     </ScrollView>
     <ScrollView
             android:layout_width="wrap_content"
@@ -221,6 +221,6 @@
             android:paddingLeft="10dp" android:minWidth="50dp" android:layout_rowSpan="8">
         <view android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              class="nz.ac.aucklanduni.physics.tracker.views.table.TableView" android:id="@+id/accelerationTable" android:focusable="false"/>
+              class="nz.ac.aucklanduni.physics.lablet.views.table.TableView" android:id="@+id/accelerationTable" android:focusable="false"/>
     </ScrollView>
 </GridLayout>

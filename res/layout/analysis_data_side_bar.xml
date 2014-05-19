@@ -29,7 +29,7 @@
 
     <view android:layout_width="wrap_content"
           android:layout_height="250dp"
-          class="nz.ac.aucklanduni.physics.tracker.views.graph.GraphView2D" android:id="@+id/tagMarkerGraphView"
+          class="nz.ac.aucklanduni.physics.lablet.views.graph.GraphView2D" android:id="@+id/tagMarkerGraphView"
           android:layout_gravity="center_horizontal"/>
 
     <ScrollView
@@ -38,7 +38,7 @@
         android:id="@+id/scrollView" android:layout_gravity="center_horizontal">
         <view android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              class="nz.ac.aucklanduni.physics.tracker.views.table.TableView" android:id="@+id/tagMarkerTableView"/>
+              class="nz.ac.aucklanduni.physics.lablet.views.table.TableView" android:id="@+id/tagMarkerTableView"/>
     </ScrollView>
 
 </LinearLayout>
