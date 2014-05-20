@@ -38,6 +38,8 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
 
     private SeekBar seekBar = null;
     private StartEndSeekBar startEndSeekBar = null;
+    // The marker data model keeps listeners as weak references. Thus we have to maintain our own hard reference.
+    private MarkerDataModel.IMarkerDataModelListener startEndSeekBarListener = null;
     private NumberPicker frameRatePicker = null;
     private EditText editVideoStart = null;
     private EditText editVideoEnd = null;
@@ -133,7 +135,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         frameRateList = new ArrayList<Integer>();
 
         Intent intent = getIntent();
-        if (!loadExperiment(getIntent()))
+        if (!loadExperiment(intent))
             return;
 
         cameraExperiment = (CameraExperiment)getExperiment();
@@ -175,8 +177,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         startEndSeekBar.setPadding(seekBar.getPaddingLeft(), seekBar.getPaddingTop(), seekBar.getPaddingRight(),
                 seekBar.getPaddingBottom());
 
-        // The marker data model keeps listeners as weak references. Thus we have to maintain our own a hard reference.
-        MarkerDataModel.IMarkerDataModelListener startEndSeekBarListener = new MarkerDataModel.IMarkerDataModelListener() {
+        startEndSeekBarListener = new MarkerDataModel.IMarkerDataModelListener() {
             @Override
             public void onDataAdded(MarkerDataModel model, int index) {
 
@@ -273,11 +274,9 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
 
         helpView = (CameraRunSettingsHelpView)findViewById(R.id.cameraSettingsHelp);
         assert helpView != null;
-        if (intent != null) {
-            Bundle options = intent.getBundleExtra("options");
-            if (options != null && options.getBoolean("start_with_help", false))
-                helpView.setVisibility(View.VISIBLE);
-        }
+        Bundle options = intent.getBundleExtra("options");
+        if (options != null && options.getBoolean("start_with_help", false))
+            helpView.setVisibility(View.VISIBLE);
 
         // init some values:
         int frameRate = getFrameRateFromPicker();
