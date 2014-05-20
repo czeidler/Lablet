@@ -99,10 +99,6 @@ abstract class DraggableMarker implements IMarker {
 
     /**
      * Handle action up events.
-     * <p>
-     * The default implementation calls {@see markerMoveRequest} only here. When calling it while dragging it, it can
-     * result in performance problems when a lot of data has to be update.
-     * </p>
      *
      * @param event from the system
      * @return return true if the event has been handled, i.e., when the marker has been dragged
@@ -113,7 +109,7 @@ abstract class DraggableMarker implements IMarker {
         isDragging = false;
 
         if (wasDragging)
-            parent.markerMoveRequest(this, getDragPoint(event));
+            parent.markerMoveRequest(this, getDragPoint(event), isDragging);
 
         return wasDragging;
     }
@@ -155,6 +151,7 @@ abstract class DraggableMarker implements IMarker {
      */
     protected void onDraggedTo(PointF point) {
         setPosition(point);
+        parent.markerMoveRequest(this, point, true);
     }
 
     /**
@@ -324,11 +321,18 @@ abstract class AbstractMarkerPainter implements IMarkerDataModelPainter, MarkerD
 
     /**
      * Is called by a child marker.
+     * <p>
+     * Default implementation directly returns if marker is still be dragged, i.e., only on touch up events the marker
+     * is moved. This circumvents some performance problems.
+     * </p>
      *
      * @param marker that has been moved
      * @param newPosition the marker has been moved too
      */
-    public void markerMoveRequest(DraggableMarker marker, PointF newPosition) {
+    public void markerMoveRequest(DraggableMarker marker, PointF newPosition, boolean isDragging) {
+        if (isDragging)
+            return;
+
         int row = markerList.lastIndexOf(marker);
         if (row < 0)
             return;

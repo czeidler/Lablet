@@ -221,7 +221,11 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
     }
 
     @Override
-    public void markerMoveRequest(DraggableMarker marker, PointF newPosition) {
+    public void markerMoveRequest(DraggableMarker marker, PointF newPosition, boolean isDragging) {
+        // don't update all the time
+        if (isDragging)
+            return;
+
         onDraggedTo(marker, newPosition);
 
         PointF origin = new PointF();

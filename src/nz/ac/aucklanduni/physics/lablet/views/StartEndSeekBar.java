@@ -59,15 +59,6 @@ abstract class StartEndMarker extends DraggableMarker {
 
         return rect.contains(point.x, point.y);
     }
-
-    /**
-     * Update the underlying data model while dragging the marker.
-     *
-     * @param point the new position the marker was dragged to
-     */
-    protected void onDraggedTo(PointF point) {
-        parent.markerMoveRequest(this, point);
-    }
 }
 
 
@@ -168,7 +159,7 @@ class StartEndPainter extends AbstractMarkerPainter {
     }
 
     @Override
-    public void markerMoveRequest(DraggableMarker marker, PointF newPosition) {
+    public void markerMoveRequest(DraggableMarker marker, PointF newPosition, boolean isDragging) {
         int row = markerList.lastIndexOf(marker);
         if (row < 0)
             return;
