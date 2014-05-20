@@ -12,10 +12,13 @@ import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.View;
 import nz.ac.aucklanduni.physics.lablet.experiment.MarkerData;
-import nz.ac.aucklanduni.physics.lablet.experiment.MarkersDataModel;
+import nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel;
 
 
-abstract class StartEndMarker extends DragableMarker {
+/**
+ * Abstract base class that shares code for the start and the end marker.
+ */
+abstract class StartEndMarker extends DraggableMarker {
     // dimensions in density-independent  pixels
     private final float WIDTH_DP = 20;
 
@@ -27,7 +30,7 @@ abstract class StartEndMarker extends DragableMarker {
     protected Paint lightColor = new Paint();
     protected Paint darkenColor = new Paint();
 
-    public StartEndMarker(AbstractMarkersPainter parentContainer) {
+    public StartEndMarker(AbstractMarkerPainter parentContainer) {
         super(parentContainer);
 
         lightColor.setColor(Color.rgb(97, 204, 238));
@@ -57,14 +60,23 @@ abstract class StartEndMarker extends DragableMarker {
         return rect.contains(point.x, point.y);
     }
 
+    /**
+     * Update the underlying data model while dragging the marker.
+     *
+     * @param point the new position the marker was dragged to
+     */
     protected void onDraggedTo(PointF point) {
         parent.markerMoveRequest(this, point);
     }
 }
 
+
+/**
+ * Implementation of a "start" marker. (Copies the google text select markers.)
+ */
 class StartMarker extends StartEndMarker {
 
-    public StartMarker(AbstractMarkersPainter parentContainer) {
+    public StartMarker(AbstractMarkerPainter parentContainer) {
         super(parentContainer);
     }
 
@@ -89,9 +101,13 @@ class StartMarker extends StartEndMarker {
     }
 }
 
+
+/**
+ * Implementation of a "end" marker. (Copies the google text select markers.)
+ */
 class EndMarker extends StartEndMarker {
 
-    public EndMarker(AbstractMarkersPainter parentContainer) {
+    public EndMarker(AbstractMarkerPainter parentContainer) {
         super(parentContainer);
     }
 
@@ -117,15 +133,28 @@ class EndMarker extends StartEndMarker {
 }
 
 
-class StartEndPainter extends AbstractMarkersPainter {
+/**
+ * Painter for the start and end marker.
+ * <p>
+ * The used data model should contain exactly two data points.
+ * </p>
+ */
+class StartEndPainter extends AbstractMarkerPainter {
     int numberOfSteps = 10;
 
-    public StartEndPainter(View parent, IExperimentRunView runView, MarkersDataModel data) {
+    /**
+     * Constructor.
+     *
+     * @param parent view
+     * @param runView run view interface
+     * @param data should contain exactly two data points, one for the start and one for the end marker
+     */
+    public StartEndPainter(View parent, IExperimentRunView runView, MarkerDataModel data) {
         super(parent, runView, data);
     }
 
     @Override
-    protected DragableMarker createMarkerForRow(int row) {
+    protected DraggableMarker createMarkerForRow(int row) {
         if (row == 0)
             return new StartMarker(this);
         else
@@ -139,7 +168,7 @@ class StartEndPainter extends AbstractMarkersPainter {
     }
 
     @Override
-    public void markerMoveRequest(DragableMarker marker, PointF newPosition) {
+    public void markerMoveRequest(DraggableMarker marker, PointF newPosition) {
         int row = markerList.lastIndexOf(marker);
         if (row < 0)
             return;
@@ -183,8 +212,11 @@ class StartEndPainter extends AbstractMarkersPainter {
 }
 
 
+/**
+ * A seek bar with a start and an end marker. For example, used to select video start and end point.
+ */
 public class StartEndSeekBar extends MarkerView implements IExperimentRunView {
-    private MarkersDataModel markersDataModel;
+    private MarkerDataModel markerDataModel;
     private StartEndPainter startEndPainter;
 
     // dimensions in density-independent  pixels
@@ -193,11 +225,11 @@ public class StartEndSeekBar extends MarkerView implements IExperimentRunView {
     public StartEndSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        markersDataModel = new MarkersDataModel();
-        markersDataModel.addMarkerData(new MarkerData(0));
-        markersDataModel.addMarkerData(new MarkerData(1));
+        markerDataModel = new MarkerDataModel();
+        markerDataModel.addMarkerData(new MarkerData(0));
+        markerDataModel.addMarkerData(new MarkerData(1));
 
-        startEndPainter = new StartEndPainter(this, this, markersDataModel);
+        startEndPainter = new StartEndPainter(this, this, markerDataModel);
         addMarkerPainter(startEndPainter);
         invalidate();
     }
@@ -215,8 +247,8 @@ public class StartEndSeekBar extends MarkerView implements IExperimentRunView {
         setMeasuredDimension(params.width, startEndPainter.toPixel(HEIGHT_DP));
     }
 
-    public MarkersDataModel getMarkersDataModel() {
-        return markersDataModel;
+    public MarkerDataModel getMarkerDataModel() {
+        return markerDataModel;
     }
 
     @Override

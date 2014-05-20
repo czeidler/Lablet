@@ -8,15 +8,18 @@
 package nz.ac.aucklanduni.physics.lablet.views.table;
 
 
+/**
+ * Table column for the marker data table adapter. Provides the x-position.
+ */
 public class XPositionDataTableColumn extends DataTableColumn {
     @Override
     public int size() {
-        return markersDataModel.getMarkerCount();
+        return markerDataModel.getMarkerCount();
     }
 
     @Override
     public Number getValue(int index) {
-        return markersDataModel.getCalibratedMarkerPositionAt(index).x;
+        return markerDataModel.getCalibratedMarkerPositionAt(index).x;
     }
 
     @Override

@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.TextView;
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.lablet.experiment.MarkerData;
-import nz.ac.aucklanduni.physics.lablet.experiment.MarkersDataModel;
+import nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -21,13 +21,19 @@ import java.util.List;
 import java.util.ListIterator;
 
 
-abstract class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, MarkersDataModel.IMarkersDataModelListener,
+/**
+ * Abstract base class for marker data table adapters.
+ * <p>
+ * See {@link nz.ac.aucklanduni.physics.lablet.views.table.ColumnMarkerDataTableAdapter} for an example.
+ * </p>
+ */
+abstract class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, MarkerDataModel.IMarkerDataModelListener,
         ExperimentAnalysis.IExperimentAnalysisListener {
-    protected MarkersDataModel model;
+    protected MarkerDataModel model;
     protected ExperimentAnalysis experimentAnalysis;
     private List<WeakReference<ITableAdapterListener>> listeners;
 
-    public MarkerDataTableAdapter(MarkersDataModel model, ExperimentAnalysis experimentAnalysis) {
+    public MarkerDataTableAdapter(MarkerDataModel model, ExperimentAnalysis experimentAnalysis) {
         this.model = model;
         model.addListener(this);
         listeners = new ArrayList<WeakReference<ITableAdapterListener>>();
@@ -106,27 +112,27 @@ abstract class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Mark
     }
 
     @Override
-    public void onDataAdded(MarkersDataModel model, int index) {
+    public void onDataAdded(MarkerDataModel model, int index) {
         notifyRowAdded(index);
     }
 
     @Override
-    public void onDataRemoved(MarkersDataModel model, int index, MarkerData data) {
+    public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
         notifyRowRemoved(index);
     }
 
     @Override
-    public void onDataChanged(MarkersDataModel model, int index, int number) {
+    public void onDataChanged(MarkerDataModel model, int index, int number) {
         notifyRowChanged(index, number);
     }
 
     @Override
-    public void onAllDataChanged(MarkersDataModel model) {
+    public void onAllDataChanged(MarkerDataModel model) {
         notifyAllRowsChanged();
     }
 
     @Override
-    public void onDataSelected(MarkersDataModel model, int index) {
+    public void onDataSelected(MarkerDataModel model, int index) {
         notifyRowSelected(index);
     }
 
@@ -197,12 +203,15 @@ abstract class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Mark
     }
 }
 
+/**
+ * Abstract base class for table columns.
+ */
 abstract class DataTableColumn {
-    protected MarkersDataModel markersDataModel;
+    protected MarkerDataModel markerDataModel;
     protected ExperimentAnalysis experimentAnalysis;
 
-    public void setMarkersDataModel(MarkersDataModel model) {
-        this.markersDataModel = model;
+    public void setMarkerDataModel(MarkerDataModel model) {
+        this.markerDataModel = model;
     }
 
     public void setExperimentAnalysis(ExperimentAnalysis experimentAnalysis) {
@@ -218,15 +227,19 @@ abstract class DataTableColumn {
     abstract public String getHeader();
 }
 
+
+/**
+ * MarkerDataTableAdapter that can holds a set of {@link DataTableColumn}s.
+ */
 public class ColumnMarkerDataTableAdapter extends MarkerDataTableAdapter {
     private List<DataTableColumn> columns = new ArrayList<DataTableColumn>();
 
-    public ColumnMarkerDataTableAdapter(MarkersDataModel model, ExperimentAnalysis experimentAnalysis) {
+    public ColumnMarkerDataTableAdapter(MarkerDataModel model, ExperimentAnalysis experimentAnalysis) {
         super(model, experimentAnalysis);
     }
 
     public void addColumn(DataTableColumn column) {
-        column.setMarkersDataModel(model);
+        column.setMarkerDataModel(model);
         column.setExperimentAnalysis(experimentAnalysis);
         columns.add(column);
     }

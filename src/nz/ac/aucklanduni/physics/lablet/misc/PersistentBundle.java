@@ -20,6 +20,21 @@ import java.util.List;
 import java.util.Set;
 
 
+/**
+ * Class to make a {@link android.os.Bundle} persistent.
+ * <p>
+ * Note that not all data types in a Bundle can be stored. The supported data types are the following primitive types
+ * and arrays of theses types:
+ * <ul>
+ * <li> String </li>
+ * <li> Integer </li>
+ * <li> Float </li>
+ * <li> Double </li>
+ * <li> Boolean </li>
+ * </ul>
+ * Furthermore, nested bundles are supported.
+ * </p>
+ */
 public class PersistentBundle {
     public Bundle unflattenBundle(InputStream input) throws IOException, XmlPullParserException {
         Bundle bundle= new Bundle();

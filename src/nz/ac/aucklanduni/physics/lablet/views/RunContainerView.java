@@ -13,10 +13,17 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import nz.ac.aucklanduni.physics.lablet.experiment.Calibration;
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.lablet.experiment.MarkersDataModel;
+import nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel;
 import nz.ac.aucklanduni.physics.lablet.experiment.RunDataModel;
 
 
+/**
+ * Container for the {@link nz.ac.aucklanduni.physics.lablet.views.IExperimentRunView} and a marker view overlay.
+ * <p>
+ * The resize behaviour of the run view is copied and the marker view is put exactly on top of the run view. In this way
+ * the screen coordinates of the run view and the marker view are the same.
+ * </p>
+ */
 public class RunContainerView extends RelativeLayout implements RunDataModel.IRunDataModelListener,
         ExperimentAnalysis.IExperimentAnalysisListener {
     private View experimentRunView = null;
@@ -83,7 +90,7 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
         addView(markerView, makerViewParams);
     }
 
-    public void addTagMarkerData(MarkersDataModel data) {
+    public void addTagMarkerData(MarkerDataModel data) {
         IMarkerDataModelPainter painter = new TagMarkerDataModelPainter(markerView,
                 (IExperimentRunView)experimentRunView, data);
         markerView.addMarkerPainter(painter);
@@ -91,7 +98,7 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
         onRunChanged(runDataModel.getCurrentRun());
     }
 
-    public void addXYCalibrationData(MarkersDataModel data) {
+    public void addXYCalibrationData(MarkerDataModel data) {
         IMarkerDataModelPainter painter = new CalibrationMarkerPainter(markerView,
                 (IExperimentRunView)experimentRunView, data);
         markerView.addMarkerPainter(painter);
@@ -101,7 +108,7 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
         markerView.removeMarkerPainter(originMarkerPainter);
     }
 
-    public void addOriginData(MarkersDataModel data, Calibration calibration) {
+    public void addOriginData(MarkerDataModel data, Calibration calibration) {
         originMarkerPainter = new OriginMarkerPainter(markerView, (IExperimentRunView)experimentRunView, data,
                 calibration);
         if (experimentAnalysis.getShowCoordinateSystem())

@@ -19,6 +19,13 @@ import java.io.File;
 import java.io.IOException;
 
 
+/**
+ * Displays a video at a certain frame.
+ * <p>
+ * A normal {@link android.widget.VideoView} can't seek to an exact position in a video, this view can. To do so the
+ * {@link nz.ac.aucklanduni.physics.lablet.views.SeekToFrameExtractor} is leveraged.
+ * </p>
+ */
 public class VideoFrameView extends RatioSurfaceView {
     protected SeekToFrameExtractor seekToFrameExtractor = null;
     protected Rect frame = new Rect();

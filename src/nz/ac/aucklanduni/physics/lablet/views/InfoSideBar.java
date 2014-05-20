@@ -17,6 +17,9 @@ import android.widget.TextView;
 import nz.ac.aucklanduni.physics.lablet.R;
 
 
+/**
+ * The side bar that is shown on the left of the home screens.
+ */
 public class InfoSideBar extends FrameLayout {
     private ImageView iconView;
     private TextView infoTextView;

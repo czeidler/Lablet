@@ -13,10 +13,16 @@ import nz.ac.aucklanduni.physics.lablet.experiment.Calibration;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-import nz.ac.aucklanduni.physics.lablet.experiment.MarkersDataModel;
+import nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel;
 
 
-public class OriginMarkerPainter extends AbstractMarkersPainter implements Calibration.ICalibrationListener {
+/**
+ * Draws the origin coordinate system.
+ * <p>
+ * Expects a MarkerDataModel with two data points. One for the origin and one for the first axis.
+ * </p>
+ */
+public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibration.ICalibrationListener {
     private Calibration calibration;
     private float angleScreen;
     private boolean firstDraw = true;
@@ -36,7 +42,7 @@ public class OriginMarkerPainter extends AbstractMarkersPainter implements Calib
     private final float ARROW_AXIS_OVERLAP;
     private final float LABEL_TO_AXIS_END_DISTANCE;
 
-    public OriginMarkerPainter(View parent, IExperimentRunView runView, MarkersDataModel model,
+    public OriginMarkerPainter(View parent, IExperimentRunView runView, MarkerDataModel model,
                                Calibration calibration) {
         super(parent, runView, model);
         this.calibration = calibration;
@@ -60,7 +66,7 @@ public class OriginMarkerPainter extends AbstractMarkersPainter implements Calib
     }
 
     @Override
-    protected DragableMarker createMarkerForRow(int row) {
+    protected DraggableMarker createMarkerForRow(int row) {
         return new OriginMarker(this);
     }
 
@@ -215,7 +221,7 @@ public class OriginMarkerPainter extends AbstractMarkersPainter implements Calib
     }
 
     @Override
-    public void markerMoveRequest(DragableMarker marker, PointF newPosition) {
+    public void markerMoveRequest(DraggableMarker marker, PointF newPosition) {
         onDraggedTo(marker, newPosition);
 
         PointF origin = new PointF();
@@ -230,7 +236,15 @@ public class OriginMarkerPainter extends AbstractMarkersPainter implements Calib
         markerData.setMarkerPosition(yAxis, 2);
     }
 
-    protected void onDraggedTo(DragableMarker marker, PointF newPosition) {
+    /**
+     * Is called when one of the markers has been dragged.
+     * <p>
+     * This method is responsible to update the whole coordinate system according to the dragged marker.
+     * </p>
+     * @param marker the dragged marker
+     * @param newPosition the new position of the dragged marker
+     */
+    protected void onDraggedTo(DraggableMarker marker, PointF newPosition) {
         int row = markerList.lastIndexOf(marker);
         if (row < 0)
             return;

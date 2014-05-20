@@ -12,6 +12,9 @@ import android.widget.TextView;
 import nz.ac.aucklanduni.physics.lablet.R;
 
 
+/**
+ * An overlay help view for the {@link nz.ac.aucklanduni.physics.lablet.camera.CameraRunSettingsHelpView}.
+ */
 public class CameraRunSettingsHelpView extends FrameLayout {
     private ImageView frameRateImageView;
     private ImageView rangeImageView;

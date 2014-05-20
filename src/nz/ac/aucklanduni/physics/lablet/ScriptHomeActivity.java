@@ -31,6 +31,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Main or home activity to manage scripts (lab activities).
+ * <p>
+ * The user is able to start a new script and resume or delete existing scripts.
+ * </p>
+ */
 public class ScriptHomeActivity extends Activity {
     private List<String> scriptList = null;
     private ArrayAdapter<String> scriptListAdaptor = null;

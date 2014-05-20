@@ -15,6 +15,9 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 
 
+/**
+ * Implementation of a table view. Uses the {@link nz.ac.aucklanduni.physics.lablet.views.table.ITableAdapter}.
+ */
 public class TableView extends TableLayout implements ITableAdapter.ITableAdapterListener {
     protected ITableAdapter<?> adapter = null;
     TableRow selectedRow = null;

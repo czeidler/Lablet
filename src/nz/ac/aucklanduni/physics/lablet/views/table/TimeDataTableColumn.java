@@ -8,19 +8,23 @@
 package nz.ac.aucklanduni.physics.lablet.views.table;
 
 import nz.ac.aucklanduni.physics.lablet.experiment.Experiment;
-import nz.ac.aucklanduni.physics.lablet.experiment.MarkersDataModel;
+import nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel;
 
 
+/**
+ * Table column for the marker data table adapter. Provides a time column for the use in combination with an
+ * position columns.
+ */
 public class TimeDataTableColumn extends DataTableColumn {
     @Override
     public int size() {
-        return markersDataModel.getMarkerCount();
+        return markerDataModel.getMarkerCount();
     }
 
     @Override
     public Number getValue(int index) {
         Experiment experiment = experimentAnalysis.getExperiment();
-        MarkersDataModel markerData = experimentAnalysis.getTagMarkers();
+        MarkerDataModel markerData = experimentAnalysis.getTagMarkers();
         int runId = markerData.getMarkerDataAt(index).getRunId();
         return experiment.getRunValueAt(runId);
     }

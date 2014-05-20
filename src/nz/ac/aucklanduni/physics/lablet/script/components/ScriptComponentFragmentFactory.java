@@ -9,6 +9,14 @@ package nz.ac.aucklanduni.physics.lablet.script.components;
 
 import nz.ac.aucklanduni.physics.lablet.script.*;
 
+
+/**
+ * Factory to create script components by name.
+ * <p>
+ * This class is used when building a {@link nz.ac.aucklanduni.physics.lablet.script.Script} from a lua file. The user
+ * can specify the pages by name and the script builder creates the script components using this factory.
+ * </p>
+ */
 public class ScriptComponentFragmentFactory implements IScriptComponentFactory {
     public ScriptComponentTree create(String componentName, Script script) {
         if (componentName.equals("Sheet"))

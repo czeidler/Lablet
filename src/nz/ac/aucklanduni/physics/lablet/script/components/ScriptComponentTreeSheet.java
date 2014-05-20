@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+/**
+ * View holder for a view that only displays some text.
+ */
 class TextComponent extends ScriptComponentViewHolder {
     private String text = "";
     private int typeface = Typeface.NORMAL;
@@ -52,6 +55,10 @@ class TextComponent extends ScriptComponentViewHolder {
     }
 }
 
+
+/**
+ * View holder for a view that has a checkbox and a text view.
+ */
 class CheckBoxQuestion extends ScriptComponentViewHolder {
     private String text = "";
     public CheckBoxQuestion(String text) {
@@ -87,6 +94,10 @@ class CheckBoxQuestion extends ScriptComponentViewHolder {
     }
 }
 
+
+/**
+ * View holder for a view with just a question.
+ */
 class ScriptComponentQuestion extends ScriptComponentViewHolder {
     private String text = "";
     private ScriptComponentTreeSheetBase component;
@@ -118,6 +129,14 @@ class ScriptComponentQuestion extends ScriptComponentViewHolder {
     }
 }
 
+
+/**
+ * View holder for a view that has a question and a text input view.
+ * <p>
+ * The question is considered as answered as soon as the text input view contains some text. It is not checked if the
+ * question is answered correctly.
+ * </p>
+ */
 class ScriptComponentTextQuestion extends ScriptComponentViewHolder {
     private String text = "";
     private String answer = "";
@@ -210,6 +229,9 @@ class ScriptComponentTextQuestion extends ScriptComponentViewHolder {
 }
 
 
+/**
+ * View holder for a graph view that shows some experiment analysis results.
+ */
 class GraphViewHolder extends ScriptComponentViewHolder {
     private ScriptComponentTreeSheet experimentSheet;
     private ScriptComponentExperiment experiment;
@@ -315,7 +337,20 @@ class GraphViewHolder extends ScriptComponentViewHolder {
     }
 }
 
+
+/**
+ * Base class for the {@link ScriptComponentTreeSheet} class.
+ * <p>
+ * All important logic is done here. ScriptComponentTreeSheet only has an interface to add different child components.
+ * </p>
+ */
 class ScriptComponentTreeSheetBase extends ScriptComponentTreeFragmentHolder {
+    /**
+     * Page wide counter.
+     * <p>
+     * This counter is, for example, used to number the questions on a sheet.
+     * </p>
+     */
     public class Counter {
         private int counter = 0;
 
@@ -435,6 +470,9 @@ class ScriptComponentTreeSheetBase extends ScriptComponentTreeFragmentHolder {
 }
 
 
+/**
+ * Powerful script component that can holds a various kind of child components, e.g., questions or text.
+ */
 public class ScriptComponentTreeSheet extends ScriptComponentTreeSheetBase {
 
     public ScriptComponentTreeSheet(Script script) {

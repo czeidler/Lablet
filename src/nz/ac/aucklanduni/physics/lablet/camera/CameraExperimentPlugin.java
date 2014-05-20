@@ -18,6 +18,10 @@ import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentPlugin;
 
 import java.io.File;
 
+
+/**
+ * The camera experiment plugin.
+ */
 public class CameraExperimentPlugin implements ExperimentPlugin {
     @Override
     public String getName() {

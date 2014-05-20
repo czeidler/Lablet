@@ -16,7 +16,10 @@ import nz.ac.aucklanduni.physics.lablet.R;
 import nz.ac.aucklanduni.physics.lablet.experiment.RunDataModel;
 
 
-public class ExperimentRunViewControl extends LinearLayout implements RunDataModel.IRunDataModelListener {
+/**
+ * Seek bar to work with the {@link nz.ac.aucklanduni.physics.lablet.experiment.RunDataModel}.
+ */
+public class RunDataSeekBar extends LinearLayout implements RunDataModel.IRunDataModelListener {
     private RunDataModel runDataModel = null;
 
     private TextView progressLabel = null;
@@ -32,13 +35,13 @@ public class ExperimentRunViewControl extends LinearLayout implements RunDataMod
         updateViews();
     }
 
-    public ExperimentRunViewControl(Context context) {
+    public RunDataSeekBar(Context context) {
         super(context);
 
         init(context);
     }
 
-    public ExperimentRunViewControl(Context context, AttributeSet attrs) {
+    public RunDataSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         init(context);

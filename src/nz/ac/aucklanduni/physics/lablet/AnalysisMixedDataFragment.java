@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentPlugin;
-import nz.ac.aucklanduni.physics.lablet.views.ExperimentRunViewControl;
+import nz.ac.aucklanduni.physics.lablet.views.RunDataSeekBar;
 import nz.ac.aucklanduni.physics.lablet.views.RunContainerView;
 import nz.ac.aucklanduni.physics.lablet.views.graph.*;
 import nz.ac.aucklanduni.physics.lablet.views.table.*;
@@ -23,9 +23,13 @@ import nz.ac.aucklanduni.physics.lablet.views.table.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Fragment that displays a run view container and a tag data graph/table.
+ */
 public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
     class Layout extends ViewGroup {
-        private ExperimentRunViewControl runViewControl = null;
+        private RunDataSeekBar runViewControl = null;
         private RunContainerView runContainerView = null;
         private ViewGroup experimentDataView = null;
 
@@ -37,7 +41,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         public Layout(Context context) {
             super(context);
 
-            runViewControl = new ExperimentRunViewControl(context);
+            runViewControl = new RunDataSeekBar(context);
             runContainerView = new RunContainerView(context);
 
             LayoutInflater inflater = (LayoutInflater)context.getSystemService
@@ -49,7 +53,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
             addView(experimentDataView);
         }
 
-        public ExperimentRunViewControl getRunViewControl() {
+        public RunDataSeekBar getRunViewControl() {
             return runViewControl;
         }
 
@@ -119,7 +123,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
 
         View experimentRunView = plugin.createExperimentRunView(activity, experimentAnalysis.getExperiment());
 
-        ExperimentRunViewControl runViewControl = view.getRunViewControl();
+        RunDataSeekBar runViewControl = view.getRunViewControl();
         runViewControl.setTo(experimentAnalysis.getRunDataModel());
 
         runContainerView = view.getRunContainerView();

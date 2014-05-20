@@ -11,6 +11,9 @@ import android.graphics.PointF;
 import nz.ac.aucklanduni.physics.lablet.experiment.Calibration;
 
 
+/**
+ * Graph axis for the marker data graph adapter. Provides the x position.
+ */
 public class XPositionMarkerGraphAxis extends MarkerGraphAxis {
     @Override
     public int size() {

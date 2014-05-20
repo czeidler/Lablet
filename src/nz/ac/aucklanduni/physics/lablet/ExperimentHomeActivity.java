@@ -29,6 +29,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Main or home activity to manage experiments.
+ * <p>
+ * The user is able to start a new experiment and resume or delete existing experiments.
+ * </p>
+ */
 public class ExperimentHomeActivity extends Activity {
     private List<ExperimentPlugin> experimentPluginList = null;
     private ArrayList<CheckBoxListEntry> experimentList = null;
@@ -55,7 +62,7 @@ public class ExperimentHomeActivity extends Activity {
 
     static public AlertDialog createAlertInfoBox(final Activity activity) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("Physics Tracker " + ExperimentHomeActivity.getVersionString(activity));
+        builder.setTitle("Lablet " + ExperimentHomeActivity.getVersionString(activity));
         builder.setNeutralButton("leave me alone", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {

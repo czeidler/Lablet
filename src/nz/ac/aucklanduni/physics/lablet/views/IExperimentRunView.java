@@ -2,6 +2,10 @@ package nz.ac.aucklanduni.physics.lablet.views;
 
 import android.graphics.PointF;
 
+
+/**
+ * Common interface for a experiment run view.
+ */
 public interface IExperimentRunView {
     public void setCurrentRun(int run);
 

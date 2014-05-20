@@ -7,10 +7,13 @@
  */
 package nz.ac.aucklanduni.physics.lablet.views.graph;
 
-
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.lablet.experiment.MarkersDataModel;
+import nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel;
 
+
+/**
+ * Graph axis for the marker data graph adapter. Provides the time.
+ */
 public class TimeMarkerGraphAxis extends MarkerGraphAxis {
     @Override
     public int size() {
@@ -19,7 +22,7 @@ public class TimeMarkerGraphAxis extends MarkerGraphAxis {
 
     @Override
     public Number getValue(int index) {
-        MarkersDataModel markerData = getExperimentAnalysis().getTagMarkers();
+        MarkerDataModel markerData = getExperimentAnalysis().getTagMarkers();
         int runId = markerData.getMarkerDataAt(index).getRunId();
         return getExperimentAnalysis().getExperiment().getRunValueAt(runId);
     }

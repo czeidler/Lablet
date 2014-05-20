@@ -10,8 +10,11 @@ package nz.ac.aucklanduni.physics.lablet.views.graph;
 
 import nz.ac.aucklanduni.physics.lablet.experiment.Experiment;
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.lablet.experiment.MarkersDataModel;
+import nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel;
 
+/**
+ * Graph axis for the marker data graph adapter. Provides the x-speed.
+ */
 public class XSpeedMarkerGraphAxis extends MarkerGraphAxis {
     @Override
     public int size() {
@@ -21,7 +24,7 @@ public class XSpeedMarkerGraphAxis extends MarkerGraphAxis {
     @Override
     public Number getValue(int index) {
         ExperimentAnalysis experimentAnalysis = getExperimentAnalysis();
-        MarkersDataModel data = getData();
+        MarkerDataModel data = getData();
 
         Experiment experiment = experimentAnalysis.getExperiment();
         float deltaX = data.getCalibratedMarkerPositionAt(index + 1).x - data.getCalibratedMarkerPositionAt(index).x;

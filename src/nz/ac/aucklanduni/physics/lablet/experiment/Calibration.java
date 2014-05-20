@@ -206,11 +206,26 @@ public class Calibration {
 }
 
 
-class OriginCalibrationSetter implements MarkersDataModel.IMarkersDataModelListener {
+/**
+ * Manages the origin position.
+ * <p>
+ * <ol>
+ * <li>
+ * Monitors the origin marker model and re-calibrates when there are changes. For example, when the user moved the
+ * origin.
+ * </li>
+ * <li>
+ * The position and rotation of the origin can be set directly, OriginCalibrationSetter then updates the calibration as
+ * well as the origin markers.
+ * </li>
+ * </ol>
+ * </p>
+ */
+class OriginCalibrationSetter implements MarkerDataModel.IMarkerDataModelListener {
     private Calibration calibration;
-    private MarkersDataModel calibrationMarkers;
+    private MarkerDataModel calibrationMarkers;
 
-    public OriginCalibrationSetter(Calibration calibration, MarkersDataModel data) {
+    public OriginCalibrationSetter(Calibration calibration, MarkerDataModel data) {
         this.calibration = calibration;
         this.calibrationMarkers = data;
         this.calibrationMarkers.addListener(this);
@@ -234,27 +249,27 @@ class OriginCalibrationSetter implements MarkersDataModel.IMarkersDataModelListe
     }
 
     @Override
-    public void onDataAdded(MarkersDataModel model, int index) {
+    public void onDataAdded(MarkerDataModel model, int index) {
         calibrate();
     }
 
     @Override
-    public void onDataRemoved(MarkersDataModel model, int index, MarkerData data) {
+    public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
         calibrate();
     }
 
     @Override
-    public void onDataChanged(MarkersDataModel model, int index, int number) {
+    public void onDataChanged(MarkerDataModel model, int index, int number) {
         calibrate();
     }
 
     @Override
-    public void onAllDataChanged(MarkersDataModel model) {
+    public void onAllDataChanged(MarkerDataModel model) {
         calibrate();
     }
 
     @Override
-    public void onDataSelected(MarkersDataModel model, int index) {
+    public void onDataSelected(MarkerDataModel model, int index) {
 
     }
 }

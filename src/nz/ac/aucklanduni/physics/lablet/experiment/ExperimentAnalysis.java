@@ -35,9 +35,9 @@ public class ExperimentAnalysis {
     private String xUnitPrefix = "";
     private String yUnitPrefix = "";
 
-    private MarkersDataModel tagMarkers;
-    private MarkersDataModel lengthCalibrationMarkers;
-    private MarkersDataModel originMarkers;
+    private MarkerDataModel tagMarkers;
+    private MarkerDataModel lengthCalibrationMarkers;
+    private MarkerDataModel originMarkers;
 
     private LengthCalibrationSetter lengthCalibrationSetter;
     private OriginCalibrationSetter originCalibrationSetter;
@@ -55,12 +55,12 @@ public class ExperimentAnalysis {
 
         calibration = new Calibration();
 
-        tagMarkers = new MarkersDataModel();
+        tagMarkers = new MarkerDataModel();
         tagMarkers.setCalibration(calibration);
 
         float maxXValue = experiment.getMaxRawX();
         float maxYValue = experiment.getMaxRawY();
-        lengthCalibrationMarkers = new MarkersDataModel();
+        lengthCalibrationMarkers = new MarkerDataModel();
         MarkerData point1 = new MarkerData(-1);
         point1.setPosition(new PointF(maxXValue * 0.1f, maxYValue * 0.9f));
         lengthCalibrationMarkers.addMarkerData(point1);
@@ -71,7 +71,7 @@ public class ExperimentAnalysis {
 
         PointF origin = calibration.getOrigin();
         PointF axis1 = calibration.getAxis1();
-        originMarkers = new MarkersDataModel();
+        originMarkers = new MarkerDataModel();
         // y-axis
         point1 = new MarkerData(-1);
         point1.setPosition(new PointF(10, 10));
@@ -101,11 +101,11 @@ public class ExperimentAnalysis {
     public LengthCalibrationSetter getLengthCalibrationSetter() {
         return lengthCalibrationSetter;
     }
-    public MarkersDataModel getTagMarkers() {
+    public MarkerDataModel getTagMarkers() {
         return tagMarkers;
     }
-    public MarkersDataModel getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
-    public MarkersDataModel getOriginMarkers(){
+    public MarkerDataModel getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
+    public MarkerDataModel getOriginMarkers(){
         return originMarkers;
     }
     public Bundle getExperimentSpecificData() { return experimentSpecificData; }

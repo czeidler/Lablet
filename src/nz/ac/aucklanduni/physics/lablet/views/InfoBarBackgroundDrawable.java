@@ -14,6 +14,9 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 
 
+/**
+ * Background for the info side bar.
+ */
 public class InfoBarBackgroundDrawable extends Drawable {
     private Paint paint;
 

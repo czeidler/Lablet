@@ -28,6 +28,9 @@ import nz.ac.aucklanduni.physics.lablet.script.ScriptRunnerActivity;
 import java.io.File;
 
 
+/**
+ * Script component that has view for starting  a camera experiment.
+ */
 public class ScriptComponentCameraExperiment extends ScriptComponentViewHolder {
     private ScriptComponentExperiment experiment = new ScriptComponentExperiment();
     private String descriptionText = "Please take a video:";
@@ -70,6 +73,9 @@ public class ScriptComponentCameraExperiment extends ScriptComponentViewHolder {
     }
 }
 
+/**
+ * View to start a camera experiment activity.
+ */
 class ScriptComponentCameraExperimentView extends ActivityStarterView {
     static final int PERFORM_EXPERIMENT = 0;
 

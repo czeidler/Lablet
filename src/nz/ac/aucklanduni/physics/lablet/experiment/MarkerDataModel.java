@@ -18,23 +18,23 @@ import java.util.ListIterator;
 /**
  * Data model for the a list of {@link MarkerData}.
  */
-public class MarkersDataModel implements Calibration.ICalibrationListener {
-    public interface IMarkersDataModelListener {
-        public void onDataAdded(MarkersDataModel model, int index);
-        public void onDataRemoved(MarkersDataModel model, int index, MarkerData data);
-        public void onDataChanged(MarkersDataModel model, int index, int number);
-        public void onAllDataChanged(MarkersDataModel model);
-        public void onDataSelected(MarkersDataModel model, int index);
+public class MarkerDataModel implements Calibration.ICalibrationListener {
+    public interface IMarkerDataModelListener {
+        public void onDataAdded(MarkerDataModel model, int index);
+        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data);
+        public void onDataChanged(MarkerDataModel model, int index, int number);
+        public void onAllDataChanged(MarkerDataModel model);
+        public void onDataSelected(MarkerDataModel model, int index);
     }
 
     private List<MarkerData> markerDataList;
-    private List<WeakReference<IMarkersDataModelListener>> listeners;
+    private List<WeakReference<IMarkerDataModelListener>> listeners;
     private int selectedDataIndex = -1;
     private Calibration calibration = null;
 
-    public MarkersDataModel() {
+    public MarkerDataModel() {
         markerDataList = new ArrayList<MarkerData>();
-        listeners = new ArrayList<WeakReference<IMarkersDataModelListener>>();
+        listeners = new ArrayList<WeakReference<IMarkerDataModelListener>>();
     }
 
     /**
@@ -77,11 +77,11 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
         notifyDataChanged(index, 1);
     }
 
-    public void addListener(IMarkersDataModelListener listener) {
-        listeners.add(new WeakReference<IMarkersDataModelListener>(listener));
+    public void addListener(IMarkerDataModelListener listener) {
+        listeners.add(new WeakReference<IMarkerDataModelListener>(listener));
     }
 
-    public boolean removeListener(IMarkersDataModelListener listener) {
+    public boolean removeListener(IMarkerDataModelListener listener) {
         return listeners.remove(listener);
     }
 
@@ -128,8 +128,8 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
     }
 
     public void notifyDataAdded(int index) {
-        for (ListIterator<WeakReference<IMarkersDataModelListener>> it = listeners.listIterator(); it.hasNext(); ) {
-            IMarkersDataModelListener listener = it.next().get();
+        for (ListIterator<WeakReference<IMarkerDataModelListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            IMarkerDataModelListener listener = it.next().get();
             if (listener != null)
                 listener.onDataAdded(this, index);
             else
@@ -138,8 +138,8 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
     }
 
     public void notifyDataRemoved(int index, MarkerData data) {
-        for (ListIterator<WeakReference<IMarkersDataModelListener>> it = listeners.listIterator(); it.hasNext(); ) {
-            IMarkersDataModelListener listener = it.next().get();
+        for (ListIterator<WeakReference<IMarkerDataModelListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            IMarkerDataModelListener listener = it.next().get();
             if (listener != null)
                 listener.onDataRemoved(this, index, data);
             else
@@ -148,8 +148,8 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
     }
 
     public void notifyDataChanged(int index, int number) {
-        for (ListIterator<WeakReference<IMarkersDataModelListener>> it = listeners.listIterator(); it.hasNext(); ) {
-            IMarkersDataModelListener listener = it.next().get();
+        for (ListIterator<WeakReference<IMarkerDataModelListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            IMarkerDataModelListener listener = it.next().get();
             if (listener != null)
                 listener.onDataChanged(this, index, number);
             else
@@ -158,8 +158,8 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
     }
 
     public void notifyAllDataChanged() {
-        for (ListIterator<WeakReference<IMarkersDataModelListener>> it = listeners.listIterator(); it.hasNext(); ) {
-            IMarkersDataModelListener listener = it.next().get();
+        for (ListIterator<WeakReference<IMarkerDataModelListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            IMarkerDataModelListener listener = it.next().get();
             if (listener != null)
                 listener.onAllDataChanged(this);
             else
@@ -168,8 +168,8 @@ public class MarkersDataModel implements Calibration.ICalibrationListener {
     }
 
     private void notifyDataSelected(int index) {
-        for (ListIterator<WeakReference<IMarkersDataModelListener>> it = listeners.listIterator(); it.hasNext(); ) {
-            IMarkersDataModelListener listener = it.next().get();
+        for (ListIterator<WeakReference<IMarkerDataModelListener>> it = listeners.listIterator(); it.hasNext(); ) {
+            IMarkerDataModelListener listener = it.next().get();
             if (listener != null)
                 listener.onDataSelected(this, index);
             else

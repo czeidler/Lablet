@@ -9,18 +9,21 @@ package nz.ac.aucklanduni.physics.lablet.views.table;
 
 import nz.ac.aucklanduni.physics.lablet.experiment.Experiment;
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.lablet.experiment.MarkersDataModel;
+import nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel;
 
 
+/**
+ * Table column for the marker data table adapter. Provides the y-speed.
+ */
 public class YSpeedDataTableColumn extends DataTableColumn {
     @Override
     public int size() {
-        return markersDataModel.getMarkerCount() - 1;
+        return markerDataModel.getMarkerCount() - 1;
     }
 
     @Override
     public Number getValue(int index) {
-        return getSpeed(index, markersDataModel, experimentAnalysis);
+        return getSpeed(index, markerDataModel, experimentAnalysis);
     }
 
     @Override
@@ -29,7 +32,7 @@ public class YSpeedDataTableColumn extends DataTableColumn {
                 + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
     }
 
-    public static Number getSpeed(int index, MarkersDataModel markersDataModel, ExperimentAnalysis experimentAnalysis) {
+    public static Number getSpeed(int index, MarkerDataModel markersDataModel, ExperimentAnalysis experimentAnalysis) {
         Experiment experiment = experimentAnalysis.getExperiment();
         float delta = markersDataModel.getCalibratedMarkerPositionAt(index + 1).y
                 - markersDataModel.getCalibratedMarkerPositionAt(index).y;

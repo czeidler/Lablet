@@ -32,6 +32,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+
+/**
+ * Activity that runs a {@link CameraExperiment}, i,e., records a video.
+ */
 public class CameraExperimentActivity extends ExperimentActivity {
     private RatioSurfaceView preview = null;
     private VideoView videoView = null;

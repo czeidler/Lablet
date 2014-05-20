@@ -10,10 +10,14 @@ package nz.ac.aucklanduni.physics.lablet.views.table;
 import nz.ac.aucklanduni.physics.lablet.experiment.Experiment;
 
 
+/**
+ * Table column for the marker data table adapter. Provides a time column for the use in combination with an
+ * acceleration columns.
+ */
 public class AccelerationTimeDataTableColumn extends TimeDataTableColumn {
     @Override
     public int size() {
-        return markersDataModel.getMarkerCount() - 2;
+        return markerDataModel.getMarkerCount() - 2;
     }
 
     @Override

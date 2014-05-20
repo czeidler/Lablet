@@ -18,7 +18,7 @@ import android.widget.*;
 import nz.ac.aucklanduni.physics.lablet.*;
 import nz.ac.aucklanduni.physics.lablet.ExperimentActivity;
 import nz.ac.aucklanduni.physics.lablet.experiment.MarkerData;
-import nz.ac.aucklanduni.physics.lablet.experiment.MarkersDataModel;
+import nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel;
 import nz.ac.aucklanduni.physics.lablet.views.StartEndSeekBar;
 import nz.ac.aucklanduni.physics.lablet.views.VideoFrameView;
 
@@ -26,6 +26,12 @@ import java.io.File;
 import java.util.ArrayList;
 
 
+/**
+ * Activity to configure the camera experiment analysis.
+ * <p>
+ * The user is able to set video start and end point and set the analysis video frame rate.
+ * </p>
+ */
 public class CameraRunSettingsActivity extends ExperimentActivity {
     private CameraExperiment cameraExperiment;
     private VideoFrameView videoFrameView;
@@ -170,19 +176,19 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
                 seekBar.getPaddingBottom());
 
         // The marker data model keeps listeners as weak references. Thus we have to maintain our own a hard reference.
-        MarkersDataModel.IMarkersDataModelListener startEndSeekBarListener = new MarkersDataModel.IMarkersDataModelListener() {
+        MarkerDataModel.IMarkerDataModelListener startEndSeekBarListener = new MarkerDataModel.IMarkerDataModelListener() {
             @Override
-            public void onDataAdded(MarkersDataModel model, int index) {
+            public void onDataAdded(MarkerDataModel model, int index) {
 
             }
 
             @Override
-            public void onDataRemoved(MarkersDataModel model, int index, MarkerData data) {
+            public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
 
             }
 
             @Override
-            public void onDataChanged(MarkersDataModel model, int index, int number) {
+            public void onDataChanged(MarkerDataModel model, int index, int number) {
                 int frameRate = getFrameRateFromPicker();
                 int duration = getDurationAtFrameRate(frameRate);
 
@@ -203,16 +209,16 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
             }
 
             @Override
-            public void onAllDataChanged(MarkersDataModel model) {
+            public void onAllDataChanged(MarkerDataModel model) {
 
             }
 
             @Override
-            public void onDataSelected(MarkersDataModel model, int index) {
+            public void onDataSelected(MarkerDataModel model, int index) {
 
             }
         };
-        startEndSeekBar.getMarkersDataModel().addListener(startEndSeekBarListener);
+        startEndSeekBar.getMarkerDataModel().addListener(startEndSeekBarListener);
 
         editFrameLength = (EditText)findViewById(R.id.editFrameLength);
         assert editFrameLength != null;
@@ -261,9 +267,9 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         setVideoEnd(videoEndValue);
         PointF point = new PointF();
         point.x = (float)videoStartValue / duration;
-        startEndSeekBar.getMarkersDataModel().getMarkerDataAt(0).setPosition(point);
+        startEndSeekBar.getMarkerDataModel().getMarkerDataAt(0).setPosition(point);
         point.x = (float)videoEndValue / duration;
-        startEndSeekBar.getMarkersDataModel().getMarkerDataAt(1).setPosition(point);
+        startEndSeekBar.getMarkerDataModel().getMarkerDataAt(1).setPosition(point);
 
         helpView = (CameraRunSettingsHelpView)findViewById(R.id.cameraSettingsHelp);
         assert helpView != null;
@@ -311,9 +317,9 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         int frameRate = getFrameRateFromPicker();
         int duration = getDurationAtFrameRate(frameRate);
 
-        float start = startEndSeekBar.getMarkersDataModel().getMarkerDataAt(0).getPosition().x;
+        float start = startEndSeekBar.getMarkerDataModel().getMarkerDataAt(0).getPosition().x;
         start *= duration;
-        float end = startEndSeekBar.getMarkersDataModel().getMarkerDataAt(1).getPosition().x;
+        float end = startEndSeekBar.getMarkerDataModel().getMarkerDataAt(1).getPosition().x;
         end *= duration;
 
         int numberOfFrames = (int)((frameRate * (end - start)) / 1000) + 1;

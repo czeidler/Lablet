@@ -7,7 +7,9 @@
  */
 package nz.ac.aucklanduni.physics.lablet.views;
 
-
+/**
+ * Entry for a list item that has a check box and a label.
+ */
 public class CheckBoxListEntry {
     private boolean selected = false;
     private String name;

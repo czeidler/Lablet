@@ -12,6 +12,9 @@ import android.util.AttributeSet;
 import android.view.SurfaceView;
 
 
+/**
+ * A SurfaceView that has a fixed size ratio.
+ */
 public class RatioSurfaceView extends SurfaceView {
     private float ratio = 4.f/3;
 

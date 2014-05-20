@@ -19,7 +19,9 @@ import nz.ac.aucklanduni.physics.lablet.R;
 
 import java.util.ArrayList;
 
-
+/**
+ * List adapter for checkable list entries (see {@link nz.ac.aucklanduni.physics.lablet.views.CheckBoxListEntry}).
+ */
 public class CheckBoxAdapter extends ArrayAdapter<CheckBoxListEntry> {
     private ArrayList<CheckBoxListEntry> listItems;
     private int layoutId;

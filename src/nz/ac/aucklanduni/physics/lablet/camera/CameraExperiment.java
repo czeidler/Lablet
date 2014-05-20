@@ -16,6 +16,9 @@ import nz.ac.aucklanduni.physics.lablet.experiment.Experiment;
 import java.io.File;
 
 
+/**
+ * Holds all important data for the camera experiment.
+ */
 public class CameraExperiment extends Experiment {
     private String videoFileName;
     private int numberOfRuns;

@@ -9,7 +9,7 @@ package nz.ac.aucklanduni.physics.lablet.views.graph;
 
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.lablet.experiment.MarkerData;
-import nz.ac.aucklanduni.physics.lablet.experiment.MarkersDataModel;
+import nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -24,10 +24,13 @@ import java.util.List;
 import java.util.ListIterator;
 
 
-public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkersDataModel.IMarkersDataModelListener {
+/**
+ * Marker data adapter for the graphs.
+ */
+public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDataModel.IMarkerDataModelListener {
     private List<WeakReference<IGraphAdapterListener>> listeners;
     protected String title;
-    protected MarkersDataModel data;
+    protected MarkerDataModel data;
     protected ExperimentAnalysis experimentAnalysis;
 
     public MarkerGraphAdapter(ExperimentAnalysis experimentAnalysis, String title, MarkerGraphAxis xAxis,
@@ -72,7 +75,7 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkersD
                 new YSpeedMarkerGraphAxis());
     }
 
-    public MarkersDataModel getData() {
+    public MarkerDataModel getData() {
         return data;
     }
 
@@ -100,27 +103,27 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkersD
     }
 
     @Override
-    public void onDataAdded(MarkersDataModel model, int index) {
+    public void onDataAdded(MarkerDataModel model, int index) {
         notifyDataAdded(index);
     }
 
     @Override
-    public void onDataRemoved(MarkersDataModel model, int index, MarkerData data) {
+    public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
         notifyDataRemoved(index);
     }
 
     @Override
-    public void onDataChanged(MarkersDataModel model, int index, int number) {
+    public void onDataChanged(MarkerDataModel model, int index, int number) {
         notifyDataChanged(index, number);
     }
 
     @Override
-    public void onAllDataChanged(MarkersDataModel model) {
+    public void onAllDataChanged(MarkerDataModel model) {
         notifyAllDataChanged();
     }
 
     @Override
-    public void onDataSelected(MarkersDataModel model, int index) {
+    public void onDataSelected(MarkerDataModel model, int index) {
         notifyDataSelected(index);
     }
 

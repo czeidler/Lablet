@@ -7,13 +7,17 @@
  */
 package nz.ac.aucklanduni.physics.lablet.views.table;
 
+
+/**
+ * Table column for the marker data table adapter. Provides the run id.
+ */
 public class RunIdDataTableColumn extends DataTableColumn {
     public int size() {
-        return markersDataModel.getMarkerCount();
+        return markerDataModel.getMarkerCount();
     }
 
     public Number getValue(int index) {
-        return markersDataModel.getMarkerDataAt(index).getRunId();
+        return markerDataModel.getMarkerDataAt(index).getRunId();
     }
 
     public String getStringValue(int index) {

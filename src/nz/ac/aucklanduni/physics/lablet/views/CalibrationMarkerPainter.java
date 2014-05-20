@@ -10,10 +10,17 @@ import nz.ac.aucklanduni.physics.lablet.experiment.Calibration;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-import nz.ac.aucklanduni.physics.lablet.experiment.MarkersDataModel;
+import nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel;
 
 
-public class CalibrationMarkerPainter extends AbstractMarkersPainter {
+/**
+ * Responsible to draw a calibration scale.
+ * <p>
+ * The painter expect a {@link nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel} with two data points; one
+ * for the start and one for the end of the scale.
+ * </p>
+ */
+public class CalibrationMarkerPainter extends AbstractMarkerPainter {
     // device independent sizes:
     private final int FONT_SIZE_DP = 20;
     private final float LINE_WIDTH_DP = 2f;
@@ -24,7 +31,7 @@ public class CalibrationMarkerPainter extends AbstractMarkersPainter {
     private float LINE_WIDTH;
     private float WING_LENGTH;
 
-    public CalibrationMarkerPainter(View parent, IExperimentRunView runView, MarkersDataModel model) {
+    public CalibrationMarkerPainter(View parent, IExperimentRunView runView, MarkerDataModel model) {
         super(parent, runView, model);
 
         FONT_SIZE = toPixel(FONT_SIZE_DP);
@@ -33,7 +40,7 @@ public class CalibrationMarkerPainter extends AbstractMarkersPainter {
     }
 
     @Override
-    protected DragableMarker createMarkerForRow(int row) {
+    protected DraggableMarker createMarkerForRow(int row) {
         return new CalibrationMarker(this);
     }
 

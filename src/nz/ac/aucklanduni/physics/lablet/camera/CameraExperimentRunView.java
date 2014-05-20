@@ -18,6 +18,12 @@ import nz.ac.aucklanduni.physics.lablet.views.VideoFrameView;
 import java.io.File;
 
 
+/**
+ * Implementation of {@link nz.ac.aucklanduni.physics.lablet.views.IExperimentRunView}.
+ * <p>
+ * Displays the video at a certain frame, depending on the current run value.
+ * </p>
+ */
 public class CameraExperimentRunView extends VideoFrameView implements IExperimentRunView {
     private CameraExperiment experiment;
     private int currentRun = -1;

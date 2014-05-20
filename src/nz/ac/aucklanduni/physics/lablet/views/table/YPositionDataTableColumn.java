@@ -8,15 +8,18 @@
 package nz.ac.aucklanduni.physics.lablet.views.table;
 
 
+/**
+ * Table column for the marker data table adapter. Provides the y-position.
+ */
 public class YPositionDataTableColumn extends DataTableColumn {
     @Override
     public int size() {
-        return markersDataModel.getMarkerCount();
+        return markerDataModel.getMarkerCount();
     }
 
     @Override
     public Number getValue(int index) {
-        return markersDataModel.getCalibratedMarkerPositionAt(index).y;
+        return markerDataModel.getCalibratedMarkerPositionAt(index).y;
     }
 
     @Override

@@ -18,11 +18,14 @@ import android.view.*;
 import android.widget.PopupMenu;
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentLoader;
-import nz.ac.aucklanduni.physics.lablet.views.CalibrationView;
+import nz.ac.aucklanduni.physics.lablet.views.ScaleSettingsDialog;
 
 import java.io.*;
 
 
+/**
+ * Common activity to do the experiment analysis.
+ */
 public class ExperimentAnalyserActivity extends ExperimentActivity {
     static final int PERFORM_RUN_SETTINGS = 0;
 
@@ -100,8 +103,8 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
     }
 
     private void showCalibrationMenu() {
-        CalibrationView calibrationView = new CalibrationView(this, experimentAnalysis);
-        calibrationView.show();
+        ScaleSettingsDialog scaleSettingsDialog = new ScaleSettingsDialog(this, experimentAnalysis);
+        scaleSettingsDialog.show();
     }
 
     private void showOriginPopup() {

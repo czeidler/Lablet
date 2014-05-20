@@ -10,13 +10,28 @@ package nz.ac.aucklanduni.physics.lablet.experiment;
 import android.graphics.PointF;
 
 
-public class LengthCalibrationSetter implements MarkersDataModel.IMarkersDataModelListener {
+/**
+ * Class to manage the length calibration scale.
+ * <p>
+ * <ol>
+ * <li>
+ * Monitors the scale marker model and re-calibrates when there are changes. For example, when the user moved the scale.
+ * </li>
+ * <li>
+ * One can set the length of the calibration scale and LengthCalibrationSetter automatically sets the x and y scale
+ * values of the {@link nz.ac.aucklanduni.physics.lablet.experiment.Calibration} class. For example, the length has been
+ * updated in the calibration dialog.
+ * </li>
+ * </ol>
+ * </p>
+ */
+public class LengthCalibrationSetter implements MarkerDataModel.IMarkerDataModelListener {
     private Calibration calibration;
-    private MarkersDataModel calibrationMarkers;
+    private MarkerDataModel calibrationMarkers;
 
     private float calibrationValue;
 
-    public LengthCalibrationSetter(Calibration calibration, MarkersDataModel data) {
+    public LengthCalibrationSetter(Calibration calibration, MarkerDataModel data) {
         this.calibration = calibration;
         this.calibrationMarkers = data;
         this.calibrationMarkers.addListener(this);
@@ -49,27 +64,27 @@ public class LengthCalibrationSetter implements MarkersDataModel.IMarkersDataMod
     }
 
     @Override
-    public void onDataAdded(MarkersDataModel model, int index) {
+    public void onDataAdded(MarkerDataModel model, int index) {
         calibrate();
     }
 
     @Override
-    public void onDataRemoved(MarkersDataModel model, int index, MarkerData data) {
+    public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
         calibrate();
     }
 
     @Override
-    public void onDataChanged(MarkersDataModel model, int index, int number) {
+    public void onDataChanged(MarkerDataModel model, int index, int number) {
         calibrate();
     }
 
     @Override
-    public void onAllDataChanged(MarkersDataModel model) {
+    public void onAllDataChanged(MarkerDataModel model) {
         calibrate();
     }
 
     @Override
-    public void onDataSelected(MarkersDataModel model, int index) {
+    public void onDataSelected(MarkerDataModel model, int index) {
 
     }
 }

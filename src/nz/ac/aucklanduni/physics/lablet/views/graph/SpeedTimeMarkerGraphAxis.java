@@ -8,6 +8,9 @@
 package nz.ac.aucklanduni.physics.lablet.views.graph;
 
 
+/**
+ * Graph axis for the marker data graph adapter. Provides the time for a speed vs time graph.
+ */
 public class SpeedTimeMarkerGraphAxis extends TimeMarkerGraphAxis {
     @Override
     public int size() {

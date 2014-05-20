@@ -16,12 +16,15 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import nz.ac.aucklanduni.physics.lablet.*;
 import nz.ac.aucklanduni.physics.lablet.experiment.MarkerData;
-import nz.ac.aucklanduni.physics.lablet.experiment.MarkersDataModel;
+import nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Interface for a drawable, selectable marker that can handle motion events.
+ */
 interface IMarker {
     public void onDraw(Canvas canvas, float priority);
 
@@ -36,16 +39,22 @@ interface IMarker {
     public void setPosition(PointF position);
 }
 
-/* DragableMarker can be selected. If it is selected there can also be a drag handler to move the marker.
+/**
+ * A selectable and draggable marker.
+ * <p>
+ * Once the marker is selected it can be dragged around. The marker has an area where it can be selected and an area
+ * where it can be dragged. An example for an use-case it that the draggable area can be enabled once the marker has
+ * been selected and otherwise is disabled.
+ * </p>
  */
-abstract class DragableMarker implements IMarker {
+abstract class DraggableMarker implements IMarker {
     protected PointF position;
     protected PointF dragOffset;
     protected boolean isSelected;
     protected boolean isDragging;
-    protected AbstractMarkersPainter parent = null;
+    protected AbstractMarkerPainter parent = null;
 
-    public DragableMarker(AbstractMarkersPainter parentContainer) {
+    public DraggableMarker(AbstractMarkerPainter parentContainer) {
         position = new PointF(0, 0);
         dragOffset = new PointF(0, 0);
         isSelected = false;
@@ -60,6 +69,12 @@ abstract class DragableMarker implements IMarker {
         position = pos;
     }
 
+    /**
+     * Handle action move down.
+     *
+     * @param event from the system
+     * @return return true if the event has been handled, i.e., the marker has been touched in th drag area
+     */
     public boolean handleActionDown(MotionEvent event) {
         PointF point = new PointF(event.getX(), event.getY());
         dragOffset.x = point.x - position.x;
@@ -82,6 +97,16 @@ abstract class DragableMarker implements IMarker {
         return false;
     }
 
+    /**
+     * Handle action up events.
+     * <p>
+     * The default implementation calls {@see markerMoveRequest} only here. When calling it while dragging it, it can
+     * result in performance problems when a lot of data has to be update.
+     * </p>
+     *
+     * @param event from the system
+     * @return return true if the event has been handled, i.e., when the marker has been dragged
+     */
     public boolean handleActionUp(MotionEvent event) {
         boolean wasDragging = isDragging;
 
@@ -93,6 +118,12 @@ abstract class DragableMarker implements IMarker {
         return wasDragging;
     }
 
+    /**
+     * Handle action move events.
+     *
+     * @param event from the system
+     * @return return true if the event has been handled, i.e., when the marker is selected/dragged
+     */
     public boolean handleActionMove(MotionEvent event) {
         if (isDragging) {
             onDraggedTo(getDragPoint(event));
@@ -117,19 +148,39 @@ abstract class DragableMarker implements IMarker {
         return isSelected;
     }
 
+    /**
+     * Notifies a derived class that the user performed a drag operation.
+     *
+     * @param point the new position the marker was dragged to
+     */
     protected void onDraggedTo(PointF point) {
         setPosition(point);
     }
 
+    /**
+     * Check if a point is in the selectable are.
+     *
+     * @param point to be checked
+     * @return true if the point is in the selectable area
+     */
     abstract protected boolean isPointOnSelectArea(PointF point);
 
+    /**
+     * Check if a point is in the draggable area of the marker.
+     *
+     * @param point to be checked
+     * @return true if the point is in the drag area
+     */
     protected boolean isPointOnDragArea(PointF point) {
         return isPointOnSelectArea(point);
     }
 }
 
 
-class SimpleMarker extends DragableMarker {
+/**
+ * Default implementation of a draggable marker.
+ */
+class SimpleMarker extends DraggableMarker {
     // device independent pixels
     private final float INNER_RING_RADIUS_DP = 30;
     private final float INNER_RING_WIDTH_DP = 2;
@@ -144,7 +195,7 @@ class SimpleMarker extends DragableMarker {
     private Paint paint = null;
     private int mainAlpha = 255;
 
-    public SimpleMarker(AbstractMarkersPainter parentContainer) {
+    public SimpleMarker(AbstractMarkerPainter parentContainer) {
         super(parentContainer);
         paint = new Paint();
         paint.setAntiAlias(true);
@@ -223,15 +274,20 @@ interface IMarkerDataModelPainter {
     public void setCurrentRun(int run);
 }
 
-abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, MarkersDataModel.IMarkersDataModelListener {
+
+/**
+ * Abstract base class to draw a {@link nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel} in a
+ * {@link nz.ac.aucklanduni.physics.lablet.views.MarkerView}.
+ */
+abstract class AbstractMarkerPainter implements IMarkerDataModelPainter, MarkerDataModel.IMarkerDataModelListener {
     protected IExperimentRunView experimentRunView = null;
     protected View markerView = null;
-    protected MarkersDataModel markerData = null;
+    protected MarkerDataModel markerData = null;
     protected Rect frame = new Rect();
     protected List<IMarker> markerList;
 
 
-    public AbstractMarkersPainter(View parent, IExperimentRunView runView, MarkersDataModel model) {
+    public AbstractMarkerPainter(View parent, IExperimentRunView runView, MarkerDataModel model) {
         experimentRunView = runView;
         markerView = parent;
         markerData = model;
@@ -266,7 +322,13 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
         markerView.invalidate();
     }
 
-    public void markerMoveRequest(DragableMarker marker, PointF newPosition) {
+    /**
+     * Is called by a child marker.
+     *
+     * @param marker that has been moved
+     * @param newPosition the marker has been moved too
+     */
+    public void markerMoveRequest(DraggableMarker marker, PointF newPosition) {
         int row = markerList.lastIndexOf(marker);
         if (row < 0)
             return;
@@ -300,10 +362,10 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
             point.y = frame.bottom;
     }
 
-    abstract protected DragableMarker createMarkerForRow(int row);
+    abstract protected DraggableMarker createMarkerForRow(int row);
 
     public void addMarker(int row) {
-        DragableMarker marker = createMarkerForRow(row);
+        DraggableMarker marker = createMarkerForRow(row);
         PointF screenPos = new PointF();
         experimentRunView.toScreen(markerData.getMarkerDataAt(row).getPosition(), screenPos);
         marker.setPosition(screenPos);
@@ -336,39 +398,43 @@ abstract class AbstractMarkersPainter implements IMarkerDataModelPainter, Marker
     }
 
     @Override
-    public void onDataAdded(MarkersDataModel model, int index) {
+    public void onDataAdded(MarkerDataModel model, int index) {
         addMarker(index);
         markerView.invalidate();
     }
 
     @Override
-    public void onDataRemoved(MarkersDataModel model, int index, MarkerData data) {
+    public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
         removeMarker(index);
         markerView.invalidate();
     }
 
     @Override
-    public void onDataChanged(MarkersDataModel model, int index, int number) {
+    public void onDataChanged(MarkerDataModel model, int index, int number) {
         updateMarker(index, number);
         markerView.invalidate();
     }
 
     @Override
-    public void onAllDataChanged(MarkersDataModel model) {
+    public void onAllDataChanged(MarkerDataModel model) {
         onViewSizeChanged();
         markerView.invalidate();
     }
 
     @Override
-    public void onDataSelected(MarkersDataModel model, int index) {
+    public void onDataSelected(MarkerDataModel model, int index) {
         markerView.invalidate();
     }
 }
 
-class TagMarkerDataModelPainter extends AbstractMarkersPainter {
+
+/**
+ * Painter for tagged data. For example, the tagged data from a camera experiment.
+ */
+class TagMarkerDataModelPainter extends AbstractMarkerPainter {
     private LastInsertMarkerManager lastInsertMarkerManager = new LastInsertMarkerManager();
 
-    public TagMarkerDataModelPainter(View parent, IExperimentRunView runView, MarkersDataModel data) {
+    public TagMarkerDataModelPainter(View parent, IExperimentRunView runView, MarkerDataModel data) {
         super(parent, runView, data);
     }
 
@@ -403,7 +469,7 @@ class TagMarkerDataModelPainter extends AbstractMarkersPainter {
         return returnMarkerList;
     }
 
-    protected DragableMarker createMarkerForRow(int row) {
+    protected DraggableMarker createMarkerForRow(int row) {
         return new SimpleMarker(this);
     }
 
@@ -414,7 +480,7 @@ class TagMarkerDataModelPainter extends AbstractMarkersPainter {
         private int markerInsertedInLastRun = -1;
         private PointF lastMarkerPosition = new PointF();
 
-        void onCurrentRunChanging(MarkersDataModel markersDataModel) {
+        void onCurrentRunChanging(MarkerDataModel markersDataModel) {
             // Index could be out of bounds, e.g., when the marker data has been cleared.
             if (markerInsertedInLastRun >= markerData.getMarkerCount()) {
                 markerInsertedInLastRun =-1;
@@ -484,8 +550,12 @@ class TagMarkerDataModelPainter extends AbstractMarkersPainter {
     }
 }
 
+
+/**
+ * Marker for the calibration length scale.
+ */
 class CalibrationMarker extends SimpleMarker {
-    public CalibrationMarker(AbstractMarkersPainter parentContainer) {
+    public CalibrationMarker(AbstractMarkerPainter parentContainer) {
         super(parentContainer);
     }
 
@@ -497,6 +567,9 @@ class CalibrationMarker extends SimpleMarker {
 }
 
 
+/**
+ * Marker for the origin coordinate system.
+ */
 class OriginMarker extends SimpleMarker {
     private OriginMarkerPainter originMarkerPainter;
 
@@ -511,6 +584,14 @@ class OriginMarker extends SimpleMarker {
             super.onDraw(canvas, priority);
     }
 
+    /**
+     * Dragging a origin marker needs special treatment since it also affects the other two markers in the coordinate
+     * system.
+     * <p>
+     * Call the painter class that then updates all the markers.
+     * </p>
+     * @param point the new position the marker was dragged to
+     */
     @Override
     protected void onDraggedTo(PointF point) {
         originMarkerPainter.onDraggedTo(this, point);
@@ -518,6 +599,15 @@ class OriginMarker extends SimpleMarker {
 }
 
 
+/**
+ * Displays one or more of marker datasets.
+ * <p>
+ * Each marker dataset is painted using a {@link nz.ac.aucklanduni.physics.lablet.views.IMarkerDataModelPainter}.
+ * </p>
+ * <p>
+ * The MarkerView also takes track of the currently selected {@link nz.ac.aucklanduni.physics.lablet.views.IMarker}.
+ * </p>
+ */
 public class MarkerView extends ViewGroup {
     private IMarker selectedMarker = null;
     protected List<IMarkerDataModelPainter> markerPainterList;

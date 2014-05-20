@@ -51,6 +51,9 @@ interface IGraphAdapter {
 }
 
 
+/**
+ * Abstract base class for graph adapters.
+ */
 abstract class AbstractGraphAdapter implements IGraphAdapter {
     protected IGraphAxis xAxis;
     protected IGraphAxis yAxis;
@@ -79,7 +82,10 @@ abstract class AbstractGraphAdapter implements IGraphAdapter {
     }
 }
 
-// basically a copy from XYSeriesRenderer
+
+/**
+ * Basically a copy of XYSeriesRenderer but can use different styles to draw points.
+ */
 class ImprovedPointAndLineRenderer<FormatterType extends LineAndPointFormatter> extends LineAndPointRenderer {
     abstract class PointRenderer {
         abstract public void drawPoint(Canvas canvas, PointF position, LineAndPointFormatter formatter);
@@ -303,6 +309,10 @@ class ImprovedPointAndLineRenderer<FormatterType extends LineAndPointFormatter> 
     }
 }
 
+
+/**
+ * Custom formatter with wider stroke size.
+ */
 class ImprovedLineAndPointFormatter extends LineAndPointFormatter {
     public ImprovedLineAndPointFormatter(int lineColor, int markerColor, int fillColor) {
         super(lineColor, markerColor, fillColor, new PointLabelFormatter());
@@ -323,6 +333,11 @@ class ImprovedLineAndPointFormatter extends LineAndPointFormatter {
     }
 }
 
+
+/**
+ * Customized XYPlot from the androidplot library that works with an
+ * {@link nz.ac.aucklanduni.physics.lablet.views.graph.IGraphAdapter}.
+ */
 public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterListener {
     private IGraphAdapter adapter;
 

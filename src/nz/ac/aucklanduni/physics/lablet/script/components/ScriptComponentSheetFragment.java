@@ -16,6 +16,9 @@ import android.widget.FrameLayout;
 import nz.ac.aucklanduni.physics.lablet.R;
 
 
+/**
+ * Fragment for the script sheet component.
+ */
 public class ScriptComponentSheetFragment extends ScriptComponentGenericFragment implements IActivityStarterViewParent {
     private FrameLayout sheetLayout = null;
     private int childViewThatHasStartedAnActivity = -1;

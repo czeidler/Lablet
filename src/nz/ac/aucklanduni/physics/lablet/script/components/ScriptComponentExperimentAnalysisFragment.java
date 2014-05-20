@@ -31,6 +31,9 @@ import nz.ac.aucklanduni.physics.lablet.views.graph.YPositionMarkerGraphAxis;
 import java.io.File;
 
 
+/**
+ * Script component that can create a fragment for the experiment analysis.
+ */
 class ScriptComponentTreeExperimentAnalysis extends ScriptComponentTreeFragmentHolder {
     private ScriptComponentExperiment experiment;
     private String descriptionText = "";
@@ -73,6 +76,9 @@ class ScriptComponentTreeExperimentAnalysis extends ScriptComponentTreeFragmentH
 }
 
 
+/**
+ * Fragment to start an experiment analysis.
+ */
 public class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFragment {
     static final int ANALYSE_EXPERIMENT = 0;
 

@@ -17,7 +17,7 @@ import android.widget.*;
 import nz.ac.aucklanduni.physics.lablet.*;
 import nz.ac.aucklanduni.physics.lablet.experiment.Experiment;
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.lablet.experiment.MarkersDataModel;
+import nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel;
 import nz.ac.aucklanduni.physics.lablet.script.Script;
 import nz.ac.aucklanduni.physics.lablet.script.ScriptComponent;
 import nz.ac.aucklanduni.physics.lablet.script.ScriptComponentTreeFragmentHolder;
@@ -27,6 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Script component for the speed/acceleration calculation.
+ * <p>
+ * It can hold a fragment for either the x or the y direction.
+ * </p>
+ */
 class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragmentHolder {
     private ScriptComponentExperiment experiment;
 
@@ -178,6 +184,9 @@ class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragmentHolde
     }
 }
 
+/**
+ * Abstract base class for a script component that ask the user to calculate speed and acceleration of a dataset.
+ */
 abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGenericFragment {
     private EditText time1EditText = null;
     private EditText time2EditText = null;
@@ -204,7 +213,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     private String correctSpeedUnit = "[m/s]";
     private String correctAccelerationUnit = "[m/s^2]";
 
-    protected MarkersDataModel tagMarker = null;
+    protected MarkerDataModel tagMarker = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

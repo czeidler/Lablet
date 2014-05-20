@@ -7,7 +7,6 @@
  */
 package nz.ac.aucklanduni.physics.lablet.views;
 
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -21,13 +20,17 @@ import nz.ac.aucklanduni.physics.lablet.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CalibrationView extends AlertDialog {
+
+/**
+ * Dialog to calibrate the length scale.
+ */
+public class ScaleSettingsDialog extends AlertDialog {
     private LengthCalibrationSetter calibrationSetter;
     private ExperimentAnalysis experimentAnalysis;
     private EditText lengthEditText;
     private Spinner spinnerUnit;
 
-    public CalibrationView(Context context, ExperimentAnalysis analysis) {
+    public ScaleSettingsDialog(Context context, ExperimentAnalysis analysis) {
         super(context);
 
         this.calibrationSetter = analysis.getLengthCalibrationSetter();

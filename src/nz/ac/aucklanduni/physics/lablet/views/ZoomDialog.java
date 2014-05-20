@@ -1,5 +1,11 @@
+/*
+ * Copyright 2014.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
 package nz.ac.aucklanduni.physics.lablet.views;
-
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -15,6 +21,10 @@ import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 
+
+/**
+ * Takes view and zooms it to a certain size. On tab it zooms back and closes.
+ */
 public class ZoomDialog extends Dialog {
     private View contentView;
     private Rect startBounds;
@@ -25,10 +35,9 @@ public class ZoomDialog extends Dialog {
     private int shortAnimationDuration;
     private Animator animator;
 
-
     /**
      * Dialog that open with size finalBounds and then zooms the content view from startBounds up to finalBounds.
-     * IMPORTANT: Somehow it does not work to position the Dialog. So how it works at the moment is that the Dialog
+     * TODO: Somehow it does not work to position the Dialog. So how it works at the moment is that the Dialog
      * goes fullscreen. Thus finalBounds must be the the fullscreen coordinates.
      * @param context
      * @param content A copy of the view that should be zoomed.

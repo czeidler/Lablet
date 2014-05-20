@@ -10,6 +10,10 @@ package nz.ac.aucklanduni.physics.lablet.script.components;
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentAnalysis;
 import nz.ac.aucklanduni.physics.lablet.views.table.*;
 
+
+/**
+ * Fragment component to calculate x speed and acceleration.
+ */
 public class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpeedFragment {
     private XSpeedDataTableColumn speedDataTableColumn;
 

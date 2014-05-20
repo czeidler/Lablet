@@ -10,16 +10,19 @@ package nz.ac.aucklanduni.physics.lablet.views.table;
 import nz.ac.aucklanduni.physics.lablet.experiment.Experiment;
 
 
+/**
+ * Table column for the marker data table adapter. Provides the x-acceleration.
+ */
 public class XAccelerationDataTableColumn extends DataTableColumn {
     @Override
     public int size() {
-        return markersDataModel.getMarkerCount() - 2;
+        return markerDataModel.getMarkerCount() - 2;
     }
 
     @Override
     public Number getValue(int index) {
-        float speed0 = XSpeedDataTableColumn.getSpeed(index, markersDataModel, experimentAnalysis).floatValue();
-        float speed1 = XSpeedDataTableColumn.getSpeed(index + 1, markersDataModel, experimentAnalysis).floatValue();
+        float speed0 = XSpeedDataTableColumn.getSpeed(index, markerDataModel, experimentAnalysis).floatValue();
+        float speed1 = XSpeedDataTableColumn.getSpeed(index + 1, markerDataModel, experimentAnalysis).floatValue();
         float delta = speed1 - speed0;
 
         Experiment experiment = experimentAnalysis.getExperiment();

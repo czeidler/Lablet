@@ -7,10 +7,13 @@
  */
 package nz.ac.aucklanduni.physics.lablet.views.graph;
 
-
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.lablet.experiment.MarkersDataModel;
+import nz.ac.aucklanduni.physics.lablet.experiment.MarkerDataModel;
 
+
+/**
+ * Abstract base class for marker graph axes.
+ */
 public abstract class MarkerGraphAxis implements IGraphAdapter.IGraphAxis {
     protected MarkerGraphAdapter markerGraphAdapter;
 
@@ -18,7 +21,7 @@ public abstract class MarkerGraphAxis implements IGraphAdapter.IGraphAxis {
         markerGraphAdapter = adapter;
     }
 
-    public MarkersDataModel getData() {
+    public MarkerDataModel getData() {
         return markerGraphAdapter.getData();
     }
 
