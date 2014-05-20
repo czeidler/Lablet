@@ -12,9 +12,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import nz.ac.aucklanduni.physics.lablet.experiment.AbstractExperimentPlugin;
 import nz.ac.aucklanduni.physics.lablet.experiment.Experiment;
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentPlugin;
 
 import java.io.File;
 
@@ -22,7 +22,7 @@ import java.io.File;
 /**
  * The camera experiment plugin.
  */
-public class CameraExperimentPlugin implements ExperimentPlugin {
+public class CameraExperimentPlugin extends AbstractExperimentPlugin {
     @Override
     public String getName() {
         return CameraExperiment.class.getSimpleName();
@@ -36,25 +36,20 @@ public class CameraExperimentPlugin implements ExperimentPlugin {
     @Override
     public void startExperimentActivity(Activity parentActivity, int requestCode, Bundle options) {
         Intent intent = new Intent(parentActivity, CameraExperimentActivity.class);
-        if (options != null)
-            intent.putExtras(options);
+        packStartExperimentIntent(intent, options);
         parentActivity.startActivityForResult(intent, requestCode);
     }
 
     @Override
-    public void startRunSettingsActivity(Experiment experiment, Bundle analysisSpecificData, Bundle options,
-                                         Activity parentActivity, int requestCode) {
+    public void startRunSettingsActivity(Activity parentActivity, int requestCode, Experiment experiment,
+                                         Bundle analysisSpecificData, Bundle options) {
         Intent intent = new Intent(parentActivity, CameraRunSettingsActivity.class);
-        intent.putExtra("experiment_path", experiment.getStorageDir().getPath());
-        if (analysisSpecificData != null)
-            intent.putExtra("analysisSpecificData", analysisSpecificData);
-        if (options != null)
-            intent.putExtra("options", options);
+        packStartRunSettingsIntent(intent, experiment, analysisSpecificData, options);
         parentActivity.startActivityForResult(intent, requestCode);
     }
 
     @Override
-    public boolean hasRunEditActivity(StringBuilder menuName) {
+    public boolean hasRunSettingsActivity(StringBuilder menuName) {
         if (menuName != null)
             menuName.append("Video Settings");
         return true;
@@ -66,7 +61,7 @@ public class CameraExperimentPlugin implements ExperimentPlugin {
     }
 
     @Override
-    public ExperimentAnalysis loadExperimentAnalysis(Experiment experiment) {
+    public ExperimentAnalysis createExperimentAnalysis(Experiment experiment) {
         return new CameraExperimentAnalysis(experiment);
     }
 

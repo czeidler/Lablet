@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentAnalysis;
-import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentPlugin;
+import nz.ac.aucklanduni.physics.lablet.experiment.IExperimentPlugin;
 import nz.ac.aucklanduni.physics.lablet.views.RunDataSeekBar;
 import nz.ac.aucklanduni.physics.lablet.views.RunContainerView;
 import nz.ac.aucklanduni.physics.lablet.views.graph.*;
@@ -115,7 +115,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ExperimentAnalyserActivity activity = (ExperimentAnalyserActivity)getActivity();
-        ExperimentPlugin plugin = activity.getExperimentPlugin();
+        IExperimentPlugin plugin = activity.getExperimentPlugin();
         ExperimentAnalysis experimentAnalysis = activity.getExperimentAnalysis();
 
         Layout view = new Layout(getActivity());

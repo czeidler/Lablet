@@ -25,6 +25,13 @@ import java.io.*;
 
 /**
  * Common activity to do the experiment analysis.
+ * <p>
+ * You can put the following extra options into the intent:
+ * <ul>
+ * <li>boolean field "first_start_with_run_settings", to open the run settings on start</li>
+ * <li>boolean field "first_start_with_run_settings_help", to open the run settings with help screen on start</li>
+ * </ul>
+ * </p>
  */
 public class ExperimentAnalyserActivity extends ExperimentActivity {
     static final int PERFORM_RUN_SETTINGS = 0;
@@ -60,7 +67,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         MenuItem settingsItem = menu.findItem(R.id.action_run_settings);
         assert settingsItem != null;
         StringBuilder settingsName = new StringBuilder();
-        if (plugin.hasRunEditActivity(settingsName)) {
+        if (plugin.hasRunSettingsActivity(settingsName)) {
             settingsItem.setTitle(settingsName);
             settingsItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
@@ -131,7 +138,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
     }
 
     private void startRunSettingsActivity(Bundle analysisSpecificData, Bundle options) {
-        plugin.startRunSettingsActivity(experiment, analysisSpecificData, options, this, PERFORM_RUN_SETTINGS);
+        plugin.startRunSettingsActivity(this, PERFORM_RUN_SETTINGS, experiment, analysisSpecificData, options);
     }
 
     private void mailData() {

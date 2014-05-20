@@ -19,10 +19,10 @@ import java.util.List;
 public class ExperimentPluginFactory {
     static ExperimentPluginFactory factory = null;
 
-    private List<ExperimentPlugin> plugins;
+    private List<IExperimentPlugin> plugins;
 
     private ExperimentPluginFactory() {
-        plugins = new ArrayList<ExperimentPlugin>();
+        plugins = new ArrayList<IExperimentPlugin>();
         plugins.add(new CameraExperimentPlugin());
     }
 
@@ -31,7 +31,7 @@ public class ExperimentPluginFactory {
      *
      * @return list of plugins
      */
-    public List<ExperimentPlugin> getPluginList() {
+    public List<IExperimentPlugin> getPluginList() {
         return plugins;
     }
 
@@ -52,11 +52,11 @@ public class ExperimentPluginFactory {
      * @param pluginName the plugin name
      * @return the plugin if found otherwise null
      */
-    public ExperimentPlugin findExperimentPlugin(String pluginName) {
+    public IExperimentPlugin findExperimentPlugin(String pluginName) {
         if (pluginName == null)
             return null;
 
-        for (ExperimentPlugin plugin : plugins) {
+        for (IExperimentPlugin plugin : plugins) {
             if (plugin.getName().equals(pluginName))
                 return plugin;
         }

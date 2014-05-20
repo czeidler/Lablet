@@ -7,7 +7,7 @@
  * </p>
  * <p>
  * To support a new experiment implement a new experiment plugin
- * {@link nz.ac.aucklanduni.physics.lablet.experiment.ExperimentPlugin} (also see
+ * {@link nz.ac.aucklanduni.physics.lablet.experiment.IExperimentPlugin} (also see
  * {@see nz.ac.aucklanduni.physics.tracker.camera.CameraExperimentPlugin}).
  * </p>
  */

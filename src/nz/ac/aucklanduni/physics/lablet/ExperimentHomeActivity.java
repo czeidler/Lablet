@@ -17,7 +17,7 @@ import android.os.Bundle;
 import android.os.FileObserver;
 import android.view.*;
 import android.widget.*;
-import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentPlugin;
+import nz.ac.aucklanduni.physics.lablet.experiment.IExperimentPlugin;
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentPluginFactory;
 import nz.ac.aucklanduni.physics.lablet.misc.StorageLib;
 import nz.ac.aucklanduni.physics.lablet.views.CheckBoxAdapter;
@@ -37,7 +37,7 @@ import java.util.List;
  * </p>
  */
 public class ExperimentHomeActivity extends Activity {
-    private List<ExperimentPlugin> experimentPluginList = null;
+    private List<IExperimentPlugin> experimentPluginList = null;
     private ArrayList<CheckBoxListEntry> experimentList = null;
     private CheckBoxListEntry.OnCheckBoxListEntryListener checkBoxListEntryListener;
     private CheckBoxAdapter experimentListAdaptor = null;
@@ -213,13 +213,13 @@ public class ExperimentHomeActivity extends Activity {
 
         ListView newExperimentList = (ListView)findViewById(R.id.newExperiments);
         newExperimentList.setBackgroundColor(listBackgroundColor);
-        newExperimentList.setAdapter(new ArrayAdapter<ExperimentPlugin>(this,
+        newExperimentList.setAdapter(new ArrayAdapter<IExperimentPlugin>(this,
                 android.R.layout.simple_list_item_1, experimentPluginList));
 
         newExperimentList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ExperimentPlugin plugin = experimentPluginList.get(i);
+                IExperimentPlugin plugin = experimentPluginList.get(i);
                 startExperiment(plugin);
             }
         });
@@ -319,7 +319,7 @@ public class ExperimentHomeActivity extends Activity {
         }
     }
 
-    private void startExperiment(ExperimentPlugin plugin) {
+    private void startExperiment(IExperimentPlugin plugin) {
         plugin.startExperimentActivity(this, PERFORM_EXPERIMENT, null);
     }
 

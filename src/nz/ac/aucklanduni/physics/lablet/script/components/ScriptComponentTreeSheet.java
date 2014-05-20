@@ -576,9 +576,22 @@ abstract class ActivityStarterView extends FrameLayout {
         this.parent = parent;
     }
 
+    /**
+     * Copies the behaviour of the Activity startActivityForResult method.
+     *
+     * @param intent the intent to start the activity
+     * @param requestCode the request code for that activity
+     */
     public void startActivityForResult(android.content.Intent intent, int requestCode) {
         parent.startActivityForResultFromView(this, intent, requestCode);
     }
 
+    /**
+     * Called when the started activity returns.
+     *
+     * @param requestCode the code specified in {@link #startActivityForResult(android.content.Intent, int)}.
+     * @param resultCode the result code
+     * @param data the Intent returned by the activity
+     */
     abstract public void onActivityResult(int requestCode, int resultCode, Intent data);
 }

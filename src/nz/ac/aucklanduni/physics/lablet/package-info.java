@@ -5,7 +5,7 @@
  * <h3>Single Experiments:</h3>
  * <p>
  * Different experiments can be implemented using a plugin architecture
- * {@link nz.ac.aucklanduni.physics.lablet.experiment.ExperimentPlugin}. There is currently one common
+ * {@link nz.ac.aucklanduni.physics.lablet.experiment.IExperimentPlugin}. There is currently one common
  * {@link nz.ac.aucklanduni.physics.lablet.ExperimentAnalyserActivity} to analyze the experiments. However, since there
  * is currently only on {@link nz.ac.aucklanduni.physics.lablet.camera.CameraExperiment} this is not well tested to
  * work with different experiments.

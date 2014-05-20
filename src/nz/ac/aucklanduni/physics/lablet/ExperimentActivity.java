@@ -15,7 +15,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import nz.ac.aucklanduni.physics.lablet.experiment.Experiment;
 import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentLoader;
-import nz.ac.aucklanduni.physics.lablet.experiment.ExperimentPlugin;
+import nz.ac.aucklanduni.physics.lablet.experiment.IExperimentPlugin;
 import nz.ac.aucklanduni.physics.lablet.misc.StorageLib;
 
 import java.io.*;
@@ -26,7 +26,7 @@ import java.io.*;
  */
 abstract public class ExperimentActivity extends FragmentActivity {
     protected Experiment experiment = null;
-    protected ExperimentPlugin plugin = null;
+    protected IExperimentPlugin plugin = null;
 
     private File baseDirectory = null;
 
@@ -54,7 +54,7 @@ abstract public class ExperimentActivity extends FragmentActivity {
     public Experiment getExperiment() {
         return experiment;
     }
-    public ExperimentPlugin getExperimentPlugin() {
+    public IExperimentPlugin getExperimentPlugin() {
         return plugin;
     }
 

@@ -23,7 +23,7 @@ public class ExperimentLoader {
      * The results of an experiment load attempt.
      */
     public static class Result {
-        public ExperimentPlugin plugin;
+        public IExperimentPlugin plugin;
         public Experiment experiment;
         public String loadError;
     }
@@ -95,8 +95,8 @@ public class ExperimentLoader {
     }
 
     // Creates a new ExperimentAnalysis and tries to load an existing analysis.
-    public static ExperimentAnalysis getExperimentAnalysis(Experiment experiment, ExperimentPlugin plugin) {
-        ExperimentAnalysis experimentAnalysis = plugin.loadExperimentAnalysis(experiment);
+    public static ExperimentAnalysis getExperimentAnalysis(Experiment experiment, IExperimentPlugin plugin) {
+        ExperimentAnalysis experimentAnalysis = plugin.createExperimentAnalysis(experiment);
 
         // try to load old analysis
         File projectFile = new File(experiment.getStorageDir(), ExperimentAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
