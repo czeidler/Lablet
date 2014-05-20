@@ -13,13 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Class to map screen coordinates to real coordinates.
+ * <p>
+ * This includes the x and y scale, the origin and the rotation of the screen.
+ * </p>
+ */
 public class Calibration {
     public interface ICalibrationListener {
         public void onCalibrationChanged();
     }
 
-    private float xCalibration;
-    private float yCalibration;
+    private float xScale;
+    private float yScale;
 
     private PointF origin = new PointF(5, 5);
     private PointF axis1 = new PointF(15, 5);
@@ -30,10 +36,14 @@ public class Calibration {
 
     public Calibration() {
         listeners = new ArrayList<ICalibrationListener>();
-        xCalibration = 1;
-        yCalibration = 1;
+        xScale = 1;
+        yScale = 1;
     }
 
+    /**
+     * Add listener to listen for calibration changes.
+     * @param listener the interested object
+     */
     public void addListener(ICalibrationListener listener) {
         listeners.add(listener);
     }
@@ -43,11 +53,11 @@ public class Calibration {
     }
 
     public float getXCalibration() {
-        return xCalibration;
+        return xScale;
     }
 
     public float getYCalibration() {
-        return yCalibration;
+        return yScale;
     }
 
     /**
@@ -77,13 +87,14 @@ public class Calibration {
         }
 
         // scale
-        point.x *= xCalibration;
-        point.y *= yCalibration;
+        point.x *= xScale;
+        point.y *= yScale;
         return point;
     }
 
     /**
      * A raw length vector is scaled to real length vector. (no rotation or origin are taken into account)
+     *
      * @param rawLength length vector on the screen
      * @return length vector in real coordinates.
      */
@@ -91,32 +102,65 @@ public class Calibration {
         PointF point = new PointF();
         point.set(rawLength);
         // scale
-        point.x *= xCalibration;
-        point.y *= yCalibration;
+        point.x *= xScale;
+        point.y *= yScale;
         return point;
     }
 
-    public void setXCalibration(float xCalibration) {
-        this.xCalibration = xCalibration;
+    /**
+     * * Sets the x calibration scale factor.
+     * <p>
+     * A real length can be calculated from the screen length: l_{real} = scale * l_{screen}.
+     * </p>
+     * @param xScale x-scale
+     */
+    public void setXScale(float xScale) {
+        this.xScale = xScale;
         notifyCalibrationChanged();
     }
 
-    public void setYCalibration(float yCalibration) {
-        this.yCalibration = yCalibration;
+    /**
+     * * Sets the y calibration scale factor.
+     * <p>
+     * A real length can be calculated from the screen length: l_{real} = scale * l_{screen}.
+     * </p>
+     * @param yScale y-scale
+     */
+    public void setYScale(float yScale) {
+        this.yScale = yScale;
         notifyCalibrationChanged();
     }
 
-    public void setCalibration(float xCalibration, float yCalibration) {
-        this.xCalibration = xCalibration;
-        this.yCalibration = yCalibration;
+    /**
+     * Sets the calibration scale factors.
+     * <p>
+     * A real length can be calculated from the screen length: l_{real} = scale * l_{screen}.
+     * </p>
+     * @param xScale x-scale
+     * @param yScale y-scale
+     */
+    public void setScale(float xScale, float yScale) {
+        this.xScale = xScale;
+        this.yScale = yScale;
         notifyCalibrationChanged();
     }
 
+    /**
+     * Swap the axes of the coordinate system.
+     *
+     * @param swap true to swap
+     */
     public void setSwapAxis(boolean swap) {
         swapAxis = swap;
         notifyCalibrationChanged();
     }
 
+    /**
+     * Set the origin and the orientation of the x-axis (in real coordinates).
+     *
+     * @param origin real origin of the coordinate system
+     * @param axis1 orientation of the x-axis relative to the origin (length doesn't matter)
+     */
     public void setOrigin(PointF origin, PointF axis1) {
         this.origin.set(origin);
         this.axis1 = axis1;

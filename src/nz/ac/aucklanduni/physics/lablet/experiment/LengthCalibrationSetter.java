@@ -45,7 +45,7 @@ public class LengthCalibrationSetter implements MarkersDataModel.IMarkersDataMod
         if (calibrationMarkers.getMarkerCount() != 2)
             return;
         float value = calibrationValue / scaleLength();
-        calibration.setCalibration(value, value);
+        calibration.setScale(value, value);
     }
 
     @Override

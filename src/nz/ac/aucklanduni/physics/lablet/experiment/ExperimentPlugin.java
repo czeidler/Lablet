@@ -15,6 +15,9 @@ import android.view.View;
 import java.io.File;
 
 
+/**
+ * Plugin base class for experiments.
+ */
 public interface ExperimentPlugin {
     public String getName();
     public void startExperimentActivity(Activity parentActivity, int requestCode, Bundle options);

@@ -20,6 +20,10 @@ import nz.ac.aucklanduni.physics.lablet.misc.StorageLib;
 
 import java.io.*;
 
+
+/**
+ * Abstract base class for activities that perform an experiment.
+ */
 abstract public class ExperimentActivity extends FragmentActivity {
     protected Experiment experiment = null;
     protected ExperimentPlugin plugin = null;
@@ -45,7 +49,6 @@ abstract public class ExperimentActivity extends FragmentActivity {
         }
 
         experiment.setStorageDir(getExperimentStorageDir());
-
     }
 
     public Experiment getExperiment() {

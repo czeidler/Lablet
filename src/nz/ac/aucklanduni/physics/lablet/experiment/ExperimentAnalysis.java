@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Base class for everything that is related to analysing an experiment.
+ */
 public class ExperimentAnalysis {
     public interface IExperimentAnalysisListener {
         void onUnitPrefixChanged();

@@ -14,8 +14,14 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.*;
 
-
+/**
+ * Helper class to load an {@link nz.ac.aucklanduni.physics.lablet.experiment.Experiment} or an
+ * {@link nz.ac.aucklanduni.physics.lablet.experiment.ExperimentAnalysis}.
+ */
 public class ExperimentLoader {
+    /**
+     * The results of an experiment load attempt.
+     */
     public static class Result {
         public ExperimentPlugin plugin;
         public Experiment experiment;

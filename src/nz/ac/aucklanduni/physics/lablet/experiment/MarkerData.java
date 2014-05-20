@@ -9,6 +9,9 @@ package nz.ac.aucklanduni.physics.lablet.experiment;
 
 import android.graphics.PointF;
 
+/**
+ * Two dimensional data that is associated with an integer run id.
+ */
 public class MarkerData {
     private int runId;
     private PointF positionReal;

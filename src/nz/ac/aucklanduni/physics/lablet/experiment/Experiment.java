@@ -17,6 +17,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 
+/**
+ * Abstract base class for experiments.
+ */
 abstract public class Experiment {
     private String uid;
     private File storageDir;
@@ -56,6 +59,11 @@ abstract public class Experiment {
         return true;
     }
 
+    /**
+     * Saves the experiment to the path specified in {@see setStorageDir}.
+     *
+     * @throws IOException
+     */
     public void saveExperimentDataToFile() throws IOException {
         Bundle bundle = new Bundle();
         bundle.putString("experiment_identifier", getIdentifier());
@@ -81,8 +89,22 @@ abstract public class Experiment {
         return storageDir;
     }
 
+    /**
+     * Sub classes can override this method to store data that does not fit into a Bundle.
+     *
+     * This method is called from {@see saveExperimentDataToFile}.
+     *
+     * * @param dir directory where data can be stored
+     */
     public void onSaveAdditionalData(File dir) {}
 
+    /**
+     * Here, derived classes can make their data persistent.
+     *
+     * If an experiment has data that does not fit into an Bundle use {@see onSaveAdditionalData} instead.
+     *
+     * @return a bundle containing the experiment data
+     */
     public Bundle experimentDataToBundle() {
         Bundle bundle = new Bundle();
         bundle.putString("uid", uid);
@@ -90,6 +112,11 @@ abstract public class Experiment {
         return bundle;
     }
 
+    /**
+     * Gets the unique experiment identifier.
+     *
+     * @return the unique id of this experiment
+     */
     public String getUid() {
         return uid;
     }

@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.ListIterator;
 
 
+/**
+ * Data model for the a list of {@link MarkerData}.
+ */
 public class MarkersDataModel implements Calibration.ICalibrationListener {
     public interface IMarkersDataModelListener {
         public void onDataAdded(MarkersDataModel model, int index);

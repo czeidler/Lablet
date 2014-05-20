@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Data model for the set of runs of an experiment.
+ */
 public class RunDataModel {
     public interface IRunDataModelListener {
         public void onRunChanged(int newRun);

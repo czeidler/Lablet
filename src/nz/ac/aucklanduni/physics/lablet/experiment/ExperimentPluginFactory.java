@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Singleton to manage a list of plugins.
+ */
 public class ExperimentPluginFactory {
     static ExperimentPluginFactory factory = null;
 
@@ -23,16 +26,32 @@ public class ExperimentPluginFactory {
         plugins.add(new CameraExperimentPlugin());
     }
 
+    /**
+     * Get list of available plugins.
+     *
+     * @return list of plugins
+     */
     public List<ExperimentPlugin> getPluginList() {
         return plugins;
     }
 
+    /**
+     * Singleton get method.
+     *
+     * @return the one and only factory instance
+     */
     public static ExperimentPluginFactory getFactory() {
         if (factory == null)
             factory = new ExperimentPluginFactory();
         return factory;
     }
 
+    /**
+     * Find a plugin by name.
+     *
+     * @param pluginName the plugin name
+     * @return the plugin if found otherwise null
+     */
     public ExperimentPlugin findExperimentPlugin(String pluginName) {
         if (pluginName == null)
             return null;
