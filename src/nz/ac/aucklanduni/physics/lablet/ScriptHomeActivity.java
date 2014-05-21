@@ -124,7 +124,7 @@ public class ScriptHomeActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.script);
+        setContentView(R.layout.script_home);
 
         int grey = 70;
         int listBackgroundColor = Color.rgb(grey, grey, grey);

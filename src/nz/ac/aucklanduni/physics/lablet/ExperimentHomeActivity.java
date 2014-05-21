@@ -196,12 +196,12 @@ public class ExperimentHomeActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.experiment_home);
 
         // info side bar
         InfoSideBar infoSideBar = (InfoSideBar)findViewById(R.id.infoSideBar);
         assert infoSideBar != null;
-        infoSideBar.setIcon(R.drawable.ic_lab_large);
+        infoSideBar.setIcon(R.drawable.ic_lab);
         infoSideBar.setInfoText("Stand Alone Experiments");
         infoSideBar.setBackground(new InfoBarBackgroundDrawable(Color.argb(255, 75, 140, 20)));
 
