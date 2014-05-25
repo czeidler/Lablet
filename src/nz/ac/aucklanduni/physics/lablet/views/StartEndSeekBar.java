@@ -196,7 +196,7 @@ class StartEndPainter extends AbstractMarkerPainter {
     private float toStepPosition(float floatPosition) {
         if (numberOfSteps <= 1)
             return 0.5f;
-        float stepSize = 1.0f / (numberOfSteps - 1);
+        float stepSize = 1.0f / numberOfSteps;
         int stepPosition = Math.round(floatPosition / stepSize);
         return stepSize * stepPosition;
     }
@@ -284,7 +284,12 @@ public class StartEndSeekBar extends MarkerView implements IExperimentRunView {
         return 100;
     }
 
+    /**
+     * Set range from 0 to max.
+     *
+     * @param max the end of the range
+     */
     public void setMax(int max) {
-        startEndPainter.setNumberOfSteps(max + 1);
+        startEndPainter.setNumberOfSteps(max);
     }
 }

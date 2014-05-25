@@ -38,8 +38,10 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
 
     private SeekBar seekBar = null;
     private StartEndSeekBar startEndSeekBar = null;
+
     // The marker data model keeps listeners as weak references. Thus we have to maintain our own hard reference.
     private MarkerDataModel.IMarkerDataModelListener startEndSeekBarListener = null;
+
     private NumberPicker frameRatePicker = null;
     private EditText editVideoStart = null;
     private EditText editVideoEnd = null;
@@ -132,7 +134,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        frameRateList = new ArrayList<Integer>();
+        frameRateList = new ArrayList<>();
 
         Intent intent = getIntent();
         if (!loadExperiment(intent))
@@ -150,7 +152,6 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
 
         seekBar = (SeekBar)findViewById(R.id.seekBar);
         assert seekBar != null;
-        int duration = cameraExperiment.getVideoDuration();
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -253,7 +254,6 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         }
         int analysisFrameRate = cameraExperiment.getAnalysisFrameRate();
 
-
         // initial views with values
         calculateFrameRateValues(videoFrameView.getVideoFrameRate());
         frameRatePicker.setMinValue(0);
@@ -267,6 +267,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         setVideoStart(videoStartValue);
         setVideoEnd(videoEndValue);
         PointF point = new PointF();
+        int duration = getDurationAtFrameRate(getFrameRateFromPicker());
         point.x = (float)videoStartValue / duration;
         startEndSeekBar.getMarkerDataModel().getMarkerDataAt(0).setPosition(point);
         point.x = (float)videoEndValue / duration;
@@ -278,13 +279,14 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         if (options != null && options.getBoolean("start_with_help", false))
             helpView.setVisibility(View.VISIBLE);
 
-        // init some values:
         int frameRate = getFrameRateFromPicker();
-        setFrameRate(frameRate);
-
         initialFrameRate = frameRate;
         initialVideoStartValue = videoStartValue;
         initialVideoEndValue = videoEndValue;
+
+        setFrameRate(frameRate);
+        // setFrameRate set the seekBar max value so set the progress afterwards
+        seekBar.setProgress(findFrame(videoStartValue));
     }
 
     @Override
@@ -307,8 +309,8 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
     private int getDurationAtFrameRate(int frameRate) {
         int duration = cameraExperiment.getVideoDuration();
         int stepSize = Math.round(1000.0f / frameRate);
-        int numberOfSteps = Math.round((float)(frameRate * duration) / 1000);
-        duration = stepSize * (numberOfSteps - 1);
+        int numberOfSteps = (int)((float)(frameRate * duration) / 1000);
+        duration = stepSize * numberOfSteps;
         return duration;
     }
 
@@ -349,17 +351,17 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
 
     private void setFrameRate(int frameRate) {
         setFrameRateLengthEdit(frameRate);
-        int duration = cameraExperiment.getVideoDuration();
+        int duration = getDurationAtFrameRate(frameRate);
         int numberOfSteps = Math.round((float) (frameRate * duration) / 1000);
 
         // seek bar
         float oldRelativeProgress = (float)seekBar.getProgress() / seekBar.getMax();
-        seekBar.setMax(numberOfSteps - 1);
+        seekBar.setMax(numberOfSteps);
 
-        startEndSeekBar.setMax(numberOfSteps - 1);
+        startEndSeekBar.setMax(numberOfSteps);
 
         // startEndSeek.setNumberOfSteps changes the progress bar, update it to the old value again
-        seekBar.setProgress((int)(oldRelativeProgress * numberOfSteps));
+        seekBar.setProgress(Math.round(oldRelativeProgress * numberOfSteps));
 
         updateEditFrames();
     }
