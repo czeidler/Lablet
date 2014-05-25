@@ -19,7 +19,8 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Start a new lab activity:"
-            android:id="@+id/textView" android:layout_alignParentTop="true" android:layout_alignParentLeft="true"/>
+            android:id="@+id/textView" android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
+            android:layout_marginLeft="5dp"/>
     <ListView
             android:layout_width="wrap_content"
             android:layout_height="151dp"
@@ -32,14 +33,16 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Continue a lab activity:"
             android:id="@+id/textView2"
-            android:layout_below="@+id/scriptList" android:layout_alignParentLeft="true"/>
+            android:layout_below="@+id/scriptList" android:layout_alignParentLeft="true"
+            android:layout_marginLeft="5dp"/>
     <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="All"
             android:id="@+id/checkBoxSelectAll"
             android:layout_below="@+id/textView2"
-            android:layout_alignParentLeft="true"/>
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="5dp"/>
     <ListView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
