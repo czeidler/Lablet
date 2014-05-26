@@ -261,11 +261,6 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
 
     private void exportTagMarkerCSVData() {
         File csvFile = getTagMarkerCSVFile();
-
-        if (!csvFile.setWritable(true))
-            return;
-
-        FileOutputStream outputStream;
         if (!csvFile.exists()) {
             try {
                 if (!csvFile.createNewFile())
@@ -275,6 +270,8 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
                 return;
             }
         }
+
+        FileOutputStream outputStream;
         try {
             outputStream = new FileOutputStream(csvFile);
         } catch (FileNotFoundException e) {
