@@ -48,7 +48,7 @@
                     android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="average speed"
+                    android:text="average velocity"
                     android:id="@+id/textView3"/>
             <TextView
                     android:layout_width="0dp"

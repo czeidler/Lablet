@@ -13,7 +13,7 @@ import java.lang.ref.WeakReference;
 
 
 /**
- * Abstract base class for component in a script. A component has a listener interface a state and can be saved/loaded
+ * Abstract base class for components in a script. A component has a listener interface a state and can be saved/loaded
  * to/from a {@link Bundle}.
  *
  * A state value smaller zero means the script component is not done. All values greater zero means the component has
