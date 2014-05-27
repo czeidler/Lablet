@@ -107,6 +107,7 @@ public class ScriptComponentContainer<ItemType extends ScriptComponent>
 
             i++;
         }
+        allItemsDone = calculateAllItemsDone();
         return true;
     }
 }
