@@ -5,18 +5,21 @@
               android:layout_width="fill_parent"
               android:layout_height="wrap_content">
 
-    <Button
+    <ImageButton
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="prev"
-            android:id="@+id/frameBackButton" android:layout_gravity="center_vertical"/>
-    <Button
+            android:id="@+id/frameBackButton" android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_media_back"
+        />
+    <ImageButton
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="next"
-            android:id="@+id/nextFrameButton" android:layout_gravity="center_vertical"/>
+            android:id="@+id/nextFrameButton" android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_media_next"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

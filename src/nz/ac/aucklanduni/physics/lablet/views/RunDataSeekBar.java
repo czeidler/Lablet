@@ -51,8 +51,8 @@ public class RunDataSeekBar extends LinearLayout implements RunDataModel.IRunDat
         LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         layoutInflater.inflate(R.layout.experiment_run_view_control, this, true);
 
-        Button prevButton = (Button)findViewById(R.id.frameBackButton);
-        Button nextButton = (Button)findViewById(R.id.nextFrameButton);
+        ImageButton prevButton = (ImageButton)findViewById(R.id.frameBackButton);
+        ImageButton nextButton = (ImageButton)findViewById(R.id.nextFrameButton);
         progressLabel = (TextView)findViewById(R.id.progressLabel);
         seekBar = (SeekBar)findViewById(R.id.seekBar);
 
