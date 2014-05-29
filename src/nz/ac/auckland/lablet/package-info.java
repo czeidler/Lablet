@@ -2,9 +2,12 @@
  * Lablet: Physics Experiments on the Tablet
  * <p>
  * <h2>Overview:</h2>
+ * Lablet can run single experiments or lab activities. A lab activity is an "electronic" handout that is described in
+ * a lua script file.
+ *
  * <h3>Single Experiments:</h3>
  * <p>
- * Different experiments can be implemented using a plugin architecture
+ * New experiments can be implemented using the plugin architecture:
  * {@link nz.ac.auckland.lablet.experiment.IExperimentPlugin}. There is currently one common
  * {@link nz.ac.auckland.lablet.ExperimentAnalyserActivity} to analyze the experiments. However, since there
  * is currently only on {@link nz.ac.auckland.lablet.camera.CameraExperiment} this is not well tested to

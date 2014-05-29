@@ -36,7 +36,8 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         /**
          * After a long time of trying I was not able to create the desired layout using Androids layout classes. This
          * layout class builds the layout manually.
-         * @param context
+         *
+         * @param context the fragment context
          */
         public Layout(Context context) {
             super(context);

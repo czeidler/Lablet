@@ -47,8 +47,11 @@ abstract public class Experiment {
         return "";
     }
 
-    /** The raw data is stored in internal units starting at (0,0). These methods return the max values.
+    /**
+     * The raw data is stored in internal units starting at (0,0). These methods return the max values.
      * The max values ratio should be the same as the screen ratio.
+     * 
+     * @return the max raw value
      */
     abstract public float getMaxRawX();
     abstract public float getMaxRawY();

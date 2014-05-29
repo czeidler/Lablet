@@ -17,7 +17,7 @@ import nz.ac.auckland.lablet.views.table.*;
 
 
 /**
- * Fragment the displays a tag data table and a few graphs.
+ * Fragment that displays a tag data table and a few graphs.
  */
 public class AnalysisTableGraphDataFragment extends android.support.v4.app.Fragment {
     private TableView tableView = null;
