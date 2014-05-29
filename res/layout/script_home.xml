@@ -7,7 +7,7 @@
 
     <view android:layout_width="230dp"
           android:layout_height="match_parent"
-          class="nz.ac.aucklanduni.physics.lablet.views.InfoSideBar" android:id="@+id/infoSideBar" android:layout_gravity="bottom"/>
+          class="nz.ac.auckland.lablet.views.InfoSideBar" android:id="@+id/infoSideBar" android:layout_gravity="bottom"/>
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     xmlns:tools="http://schemas.android.com/tools" android:orientation="vertical"

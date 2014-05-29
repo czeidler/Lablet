@@ -29,7 +29,7 @@
             android:id="@+id/analyzeExperimentButton"/>
     <view android:layout_width="500dp"
           android:layout_height="350dp"
-          class="nz.ac.aucklanduni.physics.lablet.views.graph.GraphView2D" android:id="@+id/graphView"
+          class="nz.ac.auckland.lablet.views.graph.GraphView2D" android:id="@+id/graphView"
           android:visibility="visible" android:layout_gravity="center"/>
 
 </LinearLayout>

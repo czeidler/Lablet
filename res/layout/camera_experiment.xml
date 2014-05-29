@@ -44,7 +44,7 @@
         <FrameLayout
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent" android:layout_gravity="center">
-            <view class="nz.ac.aucklanduni.physics.lablet.views.RatioSurfaceView"
+            <view class="nz.ac.auckland.lablet.views.RatioSurfaceView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/surfaceView"
