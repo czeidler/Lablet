@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="New document 1">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="72.86392"
+     inkscape:cy="651.02247"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1879"
+     inkscape:window-height="1057"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:#cad1d7;fill-opacity:1;stroke:#2ea8e6;stroke-width:15.3141222;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 191.70467,789.71051 298.68588,-149.82724 0,299.65448 z"
+       id="path2985"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc"
+       inkscape:export-filename="/home/lec/IdeaProjects/AndroidPhysicsTracker/res/drawable-xhdpi/ic_media_back.png"
+       inkscape:export-xdpi="12.88"
+       inkscape:export-ydpi="12.88" />
+    <rect
+       style="opacity:0.2;fill:#cad1d7;fill-opacity:0;stroke:#2ea8e6;stroke-width:11.67391968;stroke-miterlimit:4;stroke-opacity:0;stroke-dasharray:none"
+       id="rect3815"
+       width="438.32608"
+       height="438.32611"
+       x="121.88457"
+       y="570.54749"
+       inkscape:export-filename="/home/lec/IdeaProjects/AndroidPhysicsTracker/res/drawable-xhdpi/ic_media_back.png"
+       inkscape:export-xdpi="12.88"
+       inkscape:export-ydpi="12.88" />
+    <path
+       style="fill:#cad1d7;fill-opacity:1;stroke:#2ea8e6;stroke-width:15.3141222;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="M 512.99786,240.1995 214.31198,90.372261 l 0,299.654519 z"
+       id="path2985-7"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc"
+       inkscape:export-filename="/home/lec/IdeaProjects/AndroidPhysicsTracker/res/drawable-xhdpi/ic_media_next.png"
+       inkscape:export-xdpi="12.88"
+       inkscape:export-ydpi="12.88" />
+    <rect
+       style="opacity:0.2;fill:#cad1d7;fill-opacity:0;stroke:#2ea8e6;stroke-width:11.67391968;stroke-miterlimit:4;stroke-opacity:0;stroke-dasharray:none"
+       id="rect3815-5"
+       width="438.32608"
+       height="438.32611"
+       x="144.49187"
+       y="21.036451"
+       inkscape:export-filename="/home/lec/IdeaProjects/AndroidPhysicsTracker/res/drawable-xhdpi/ic_media_next.png"
+       inkscape:export-xdpi="12.88"
+       inkscape:export-ydpi="12.88" />
+  </g>
+</svg>
