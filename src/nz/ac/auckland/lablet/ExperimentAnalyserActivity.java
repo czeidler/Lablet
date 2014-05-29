@@ -204,8 +204,10 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
                         && experimentAnalysis.getTagMarkers().getMarkerCount() == 0) {
                     resumeWithRunSettings = true;
                 }
-                if (extras.getBoolean("first_start_with_run_settings_help", false))
+                if (extras.getBoolean("first_start_with_run_settings_help", false)) {
+                    resumeWithRunSettings = true;
                     resumeWithRunSettingsHelp = true;
+                }
             }
         }
 
