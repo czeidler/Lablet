@@ -18,9 +18,7 @@ import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.view.*;
-import android.widget.ImageButton;
-import android.widget.MediaController;
-import android.widget.VideoView;
+import android.widget.*;
 import nz.ac.auckland.lablet.ExperimentActivity;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.misc.StorageLib;
@@ -28,6 +26,7 @@ import nz.ac.auckland.lablet.views.RatioSurfaceView;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -48,6 +47,9 @@ public class CameraExperimentActivity extends ExperimentActivity {
     private Camera.Size videoSize = null;
     private MediaRecorder recorder = null;
     private AbstractViewState state = null;
+
+    private List<Integer> supportedCamcorderProfiles;
+    private Integer selectedCamcorderProfile = -1;
 
     private MenuItem analyseMenuItem = null;
     private int cameraId = 0;
@@ -95,6 +97,16 @@ public class CameraExperimentActivity extends ExperimentActivity {
             }
         }
 
+        MenuItem qualityMenu = menu.findItem(R.id.action_camera_quality_settings);
+        assert qualityMenu != null;
+        qualityMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                showQualityPopup();
+                return true;
+            }
+        });
+
         // set states after menu has been init
         if (previewHolder.getSurface() != null) {
             if (!unsavedExperimentData) {
@@ -106,6 +118,36 @@ public class CameraExperimentActivity extends ExperimentActivity {
         }
 
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void showQualityPopup() {
+        View menuView = findViewById(R.id.action_camera_quality_settings);
+        PopupMenu popup = new PopupMenu(this, menuView);
+        popup.getMenu().setGroupCheckable(0, true, true);
+
+        for (int i = 0; i < supportedCamcorderProfiles.size(); i++) {
+            int profile = supportedCamcorderProfiles.get(i);
+            CamcorderProfile camcorderProfile = CamcorderProfile.get(profile);
+            String label = "";
+            label += camcorderProfile.videoFrameWidth;
+            label += " x ";
+            label += camcorderProfile.videoFrameHeight;
+
+            MenuItem item = popup.getMenu().add(0, i, i, label);
+            item.setCheckable(true);
+        }
+        popup.getMenu().getItem(supportedCamcorderProfiles.indexOf(selectedCamcorderProfile)).setChecked(true);
+
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                int camcorderProfile = supportedCamcorderProfiles.get(menuItem.getItemId());
+                setSelectedCamcorderProfile(camcorderProfile);
+                return true;
+            }
+        });
+
+        popup.show();
     }
 
     @Override
@@ -173,6 +215,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
             return;
 
         outState.putString("unsaved_recording", videoFile.getPath());
+        outState.putInt("selected_camcorder_profile", selectedCamcorderProfile);
     }
 
     @Override
@@ -184,6 +227,9 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
         String filePath = savedInstanceState.getString("unsaved_recording");
         videoFile = new File(filePath);
+
+        if (savedInstanceState.containsKey("selected_camcorder_profile"))
+            setSelectedCamcorderProfile(savedInstanceState.getInt("selected_camcorder_profile"));
 
         // setting unsavedExperimentData here; from this information the correct state is set in onResume (after
         // everything has been init)
@@ -229,6 +275,11 @@ public class CameraExperimentActivity extends ExperimentActivity {
                 }
             }
         };
+
+        supportedCamcorderProfiles = getSupportedCamcorderProfiles(cameraId);
+        if (!supportedCamcorderProfiles.contains(selectedCamcorderProfile))
+            setSelectedCamcorderProfile(supportedCamcorderProfiles.get(0));
+
         if (orientationEventListener.canDetectOrientation())
             orientationEventListener.enable();
 
@@ -284,6 +335,10 @@ public class CameraExperimentActivity extends ExperimentActivity {
         }
     }
 
+    private void setSelectedCamcorderProfile(Integer selectedCamcorderProfile) {
+        this.selectedCamcorderProfile = selectedCamcorderProfile;
+    }
+
     private boolean deleteTempFiles() {
         if (videoFile != null && videoFile.exists())
             return videoFile.delete();
@@ -301,7 +356,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
             recorder.setOrientationHint(getHintRotation());
 
-            CamcorderProfile profile = getOptimalCamcorderProfile(cameraId);
+            CamcorderProfile profile = CamcorderProfile.get(cameraId, selectedCamcorderProfile);
             if (profile == null)
                 throw new Exception("no camcorder profile!");
             recorder.setVideoSize(videoSize.width, videoSize.height);
@@ -392,23 +447,32 @@ public class CameraExperimentActivity extends ExperimentActivity {
         return null;
     }
 
-    // find a supported camcorder profile with best quality
-    private CamcorderProfile getOptimalCamcorderProfile(int cameraId) {
+    /**
+     * Checks for supported camcorder profiles.
+     *
+     * The profile with the highest quality is at the first position.
+     *
+     * @param cameraId the camera id
+     * @return list of supported camcorder profiles
+     */
+    private List<Integer> getSupportedCamcorderProfiles(int cameraId) {
+        List<Integer> supportedCamcorderProfiles = new ArrayList<>();
+
         if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_HIGH))
-            return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH);
+            supportedCamcorderProfiles.add(CamcorderProfile.QUALITY_HIGH);
         if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_1080P))
-            return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_1080P);
+            supportedCamcorderProfiles.add(CamcorderProfile.QUALITY_1080P);
         if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_720P))
-            return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_720P);
+            supportedCamcorderProfiles.add(CamcorderProfile.QUALITY_720P);
         if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_480P))
-            return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_480P);
+            supportedCamcorderProfiles.add(CamcorderProfile.QUALITY_480P);
         if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_CIF))
-            return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_CIF);
+            supportedCamcorderProfiles.add(CamcorderProfile.QUALITY_CIF);
         if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_QVGA))
-            return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_QVGA);
+            supportedCamcorderProfiles.add(CamcorderProfile.QUALITY_QVGA);
         if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_QCIF))
-            return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_QCIF);
-        return null;
+            supportedCamcorderProfiles.add(CamcorderProfile.QUALITY_QCIF);
+        return supportedCamcorderProfiles;
     }
 
     SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
