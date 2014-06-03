@@ -118,23 +118,21 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
         View menuView = findViewById(R.id.action_origin_settings);
         PopupMenu popup = new PopupMenu(this, menuView);
         popup.inflate(R.menu.origin_popup);
-        popup.setOnMenuItemClickListener(new OriginMenuClickListener());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                int item = menuItem.getItemId();
+                if (item == R.id.showCoordinateSystem) {
+                    experimentAnalysis.setShowCoordinateSystem(!menuItem.isChecked());
+                } else if (item == R.id.swapAxis) {
+                    experimentAnalysis.getCalibration().setSwapAxis(!menuItem.isChecked());
+                }
+                return false;
+            }
+        });
         popup.getMenu().getItem(0).setChecked(experimentAnalysis.getShowCoordinateSystem());
         popup.getMenu().getItem(1).setChecked(experimentAnalysis.getCalibration().getSwapAxis());
         popup.show();
-    }
-
-    private class OriginMenuClickListener implements PopupMenu.OnMenuItemClickListener {
-        @Override
-        public boolean onMenuItemClick(MenuItem menuItem) {
-            int item = menuItem.getItemId();
-            if (item == R.id.showCoordinateSystem) {
-                experimentAnalysis.setShowCoordinateSystem(!menuItem.isChecked());
-            } else if (item == R.id.swapAxis) {
-                experimentAnalysis.getCalibration().setSwapAxis(!menuItem.isChecked());
-            }
-            return false;
-        }
     }
 
     private void startRunSettingsActivity(Bundle analysisSpecificData, Bundle options) {
