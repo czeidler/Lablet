@@ -6,6 +6,7 @@ function onBuildExperimentScript(scriptBuilder)
 	takeVideoSheet:setTitle("Camera Experiment:")
 	cameraExperimentView = takeVideoSheet:addCameraExperiment();
 	cameraExperimentView:setDescriptionText("Please take a video:")
+	cameraExperimentView:setRequestedResolution(352, 288)
 	local cameraExperiment = cameraExperimentView:getExperiment()
 
 	local experimentAnalysis = scriptBuilder:create("ExperimentAnalysis")

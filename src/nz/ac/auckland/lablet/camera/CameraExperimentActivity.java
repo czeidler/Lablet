@@ -34,6 +34,15 @@ import java.util.List;
 
 /**
  * Activity that runs a {@link CameraExperiment}, i,e., records a video.
+ * <p>
+ * You can put the following extra options into the intent:
+ * <ul>
+ * <li>boolean field "show_analyse_menu" to show the analyse menu item</li>
+ * <li>int field "requested_video_width" AND</li>
+ * <li>int field "requested_video_height", to request a video resolution. The best matching resolution is selected.
+ * Both values must be greater zero</li>
+ * </ul>
+ * </p>
  */
 public class CameraExperimentActivity extends ExperimentActivity {
     private RatioSurfaceView preview = null;
@@ -50,8 +59,8 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
     private List<VideoSettings> supportedVideoSettings;
     private VideoSettings selectedVideoSettings = null;
-    private int previousVideoWidth = -1;
-    private int previousVideoHeight= -1;
+    private int requestedVideoWidth = -1;
+    private int requestedVideoHeight = -1;
 
     private MenuItem analyseMenuItem = null;
     private MenuItem qualityMenu = null;
@@ -95,7 +104,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
         if (intent != null) {
             Bundle options = intent.getExtras();
             if (options != null) {
-                boolean showAnalyseMenu = options.getBoolean("showAnalyseMenu", true);
+                boolean showAnalyseMenu = options.getBoolean("show_analyse_menu", true);
                 analyseMenuItem.setVisible(showAnalyseMenu);
             }
         }
@@ -157,6 +166,12 @@ public class CameraExperimentActivity extends ExperimentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        if (intent.hasExtra("requested_video_width") && intent.hasExtra("requested_video_height")) {
+            requestedVideoWidth = intent.getIntExtra("requested_video_width", -1);
+            requestedVideoHeight = intent.getIntExtra("requested_video_height", -1);
+        }
 
         setExperiment(new CameraExperiment(this));
 
@@ -228,8 +243,8 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
         if (savedInstanceState.containsKey("selected_video_width")
                 && savedInstanceState.containsKey("selected_video_height")) {
-            previousVideoWidth = savedInstanceState.getInt("selected_video_width");
-            previousVideoHeight = savedInstanceState.getInt("selected_video_height");
+            requestedVideoWidth = savedInstanceState.getInt("selected_video_width");
+            requestedVideoHeight = savedInstanceState.getInt("selected_video_height");
         }
 
         if (savedInstanceState.containsKey("unsaved_recording")) {
@@ -263,12 +278,19 @@ public class CameraExperimentActivity extends ExperimentActivity {
         // video size
         supportedVideoSettings = filterCamcorderProfiles(getSupportedCamcorderProfiles(cameraId),
                 getSuitableCameraVideoSizes(camera));
-        // select the first or a previous settings
+        // select the first or the best matching requested settings
         VideoSettings newVideoSettings = supportedVideoSettings.get(0);
-        for (VideoSettings settings : supportedVideoSettings) {
-            if (settings.videoSize.width == previousVideoWidth && settings.videoSize.height == previousVideoHeight) {
-                newVideoSettings = settings;
-                break;
+        if (requestedVideoWidth > 0 && requestedVideoHeight > 0) {
+            int bestMatchValue = Integer.MAX_VALUE;
+            for (VideoSettings settings : supportedVideoSettings) {
+                int matchValue = (int)Math.pow(settings.videoSize.width - requestedVideoWidth, 2)
+                        + (int)Math.pow(settings.videoSize.height - requestedVideoHeight, 2);
+                if (matchValue < bestMatchValue) {
+                    bestMatchValue = matchValue;
+                    newVideoSettings = settings;
+                }
+                if (matchValue == 0)
+                    break;
             }
         }
         selectCamcorderProfile(newVideoSettings);

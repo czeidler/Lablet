@@ -34,6 +34,8 @@ import java.io.File;
 public class ScriptComponentCameraExperiment extends ScriptComponentViewHolder {
     private ScriptComponentExperiment experiment = new ScriptComponentExperiment();
     private String descriptionText = "Please take a video:";
+    private int requestedVideoWidth = -1;
+    private int requestedVideoHeight = -1;
 
     @Override
     public View createView(Context context, android.support.v4.app.Fragment parent) {
@@ -55,6 +57,18 @@ public class ScriptComponentCameraExperiment extends ScriptComponentViewHolder {
 
     public void setDescriptionText(String descriptionText) {
         this.descriptionText = descriptionText;
+    }
+
+    public int getRequestedVideoWidth() {
+        return requestedVideoWidth;
+    }
+    public int getRequestedVideoHeight() {
+        return requestedVideoHeight;
+    }
+
+    public void setRequestedResolution(int width, int height) {
+        requestedVideoWidth = width;
+        requestedVideoHeight = height;
     }
 
     public void toBundle(Bundle bundle) {
@@ -131,7 +145,14 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
     private void startExperimentActivity() {
         Intent intent = new Intent(getContext(), CameraExperimentActivity.class);
         Bundle options = new Bundle();
-        options.putBoolean("showAnalyseMenu", false);
+        options.putBoolean("show_analyse_menu", false);
+        // requested resolution
+        int requestedWidth = cameraComponent.getRequestedVideoWidth();
+        int requestedHeight = cameraComponent.getRequestedVideoHeight();
+        if (requestedWidth > 0 && requestedHeight > 0) {
+            options.putInt("requested_video_width", requestedWidth);
+            options.putInt("requested_video_height", requestedHeight);
+        }
         options.putString("experiment_base_directory", getScriptExperimentsDir().getPath());
         intent.putExtras(options);
         startActivityForResult(intent, PERFORM_EXPERIMENT);
