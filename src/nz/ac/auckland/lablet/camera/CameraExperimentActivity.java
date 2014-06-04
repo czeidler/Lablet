@@ -732,6 +732,9 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
             // disable screen rotation during recording
             initialRequestedOrientation = lockScreenOrientation();
+
+            // don't fall asleep!
+            preview.setKeepScreenOn(true);
         }
 
         public void leaveState() {
@@ -743,6 +746,9 @@ public class CameraExperimentActivity extends ExperimentActivity {
             camera.stopPreview();
 
             setRequestedOrientation(initialRequestedOrientation);
+
+            // sleep if tired
+            preview.setKeepScreenOn(false);
         }
 
         @Override
