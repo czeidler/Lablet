@@ -5,21 +5,22 @@ function onBuildExperimentScript(scriptBuilder)
 	--sheet:setMainLayoutOrientation("horizontal")
 
 	sheet:setTitle("Group Layout Demo")
-	
-	sheet:addQuestion("header line")
+	sheet:addHeader("This is just a one page demonstration of how questions can be layout on a sheet.")
+	sheet:addText("Below you see a horizontal layout with a nested vertical layout in the middle column:")
 
 	-- start a new horizontal layout
 	local horizontalLayout = sheet:addHorizontalGroupLayout()
-	sheet:addText("left", horizontalLayout)
+	sheet:addText("left column", horizontalLayout)
 
 	-- add a vertical layout into the horizontal layout
 	local verticalLayout = sheet:addVerticalGroupLayout(horizontalLayout)
-	sheet:addQuestion("top", verticalLayout)
-	sheet:addQuestion("bottom", verticalLayout)
+	sheet:addText("top", verticalLayout)
+	sheet:addText("bottom", verticalLayout)
 
-	sheet:addText("right", horizontalLayout)
+	sheet:addText("right column", horizontalLayout)
 
-	sheet:addCheckQuestion("check box")
-	sheet:addQuestion("footer line")
+	sheet:addCheckQuestion("This is a check box question, please tick!")
+	sheet:addQuestion("A text only question, can you see?")
+	sheet:addTextQuestion("A text input field. Please enter some text:")
 
 end
