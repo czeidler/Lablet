@@ -248,7 +248,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         if (analysisSpecificData != null)
             runSettings = analysisSpecificData.getBundle("run_settings");
         if (runSettings != null) {
-            cameraExperiment.setFrameRate(runSettings.getInt("analysis_frame_rate"));
+            cameraExperiment.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
             cameraExperiment.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
             cameraExperiment.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
         }
@@ -285,7 +285,7 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         initialVideoEndValue = videoEndValue;
 
         setFrameRate(frameRate);
-        // setFrameRate set the seekBar max value so set the progress afterwards
+        // setAnalysisFrameRate set the seekBar max value so set the progress afterwards
         seekBar.setProgress(findFrame(videoStartValue));
     }
 

@@ -26,7 +26,7 @@ public class RunDataModel {
     private List<IRunDataModelListener> listeners;
 
     public RunDataModel() {
-        listeners = new ArrayList<IRunDataModelListener>();
+        listeners = new ArrayList<>();
     }
 
     public void addListener(IRunDataModelListener listener) {

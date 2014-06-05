@@ -25,25 +25,57 @@ abstract public class Experiment {
     private File storageDir;
     protected Context context;
 
+    /**
+     * The default file name where the experiment data is stored.
+     * <p>
+     * The data is first stored into a bundle and then transformed to xml using a
+     * {@link nz.ac.auckland.lablet.misc.PersistentBundle}.
+     * </p>
+     */
     final static public String EXPERIMENT_DATA_FILE_NAME = "experiment_data.xml";
 
+    /**
+     * Constructor to load an existing experiment.
+     *
+     * @param experimentContext the context of the experiment
+     * @param bundle the experiment data that fits into a bundle
+     * @param storageDir the storage directory of the experiment
+     */
     public Experiment(Context experimentContext, Bundle bundle, File storageDir) {
         init(experimentContext);
 
         loadExperiment(bundle, storageDir);
     }
 
+    /**
+     * Create a new experiment.
+     *
+     * @param experimentContext the experiment context
+     */
     public Experiment(Context experimentContext) {
         init(experimentContext);
 
         uid = generateNewUid();
     }
 
-    public String getXUnit() {
+    /**
+     * Gets a string of the used base unit.
+     * <p>
+     * The unit should be without a prefix. For example, if the unit is meter, "m" should be returned. This string can,
+     * for example, be used
+     * </p>
+     * @return the x unit string
+     */
+    public String getXBaseUnit() {
         return "";
     }
 
-    public String getYUnit() {
+    /**
+     * See getXBaseUnit.
+     *
+     * @return the y unit string
+     */
+    public String getYBaseUnit() {
         return "";
     }
 
@@ -56,6 +88,15 @@ abstract public class Experiment {
     abstract public float getMaxRawX();
     abstract public float getMaxRawY();
 
+    /**
+     * Load a previously conducted experiment from a Bundle and sets the storage directory.
+     * <p>
+     * The storage directory contains, for example, the video file from a camera experiment.
+     * </p>
+     * @param bundle the where all experiment information is stored
+     * @param storageDir the storage directory of the experiment
+     * @return
+     */
     protected boolean loadExperiment(Bundle bundle, File storageDir) {
         uid = bundle.getString("uid");
         this.storageDir = storageDir;
@@ -85,9 +126,20 @@ abstract public class Experiment {
         persistentBundle.flattenBundle(bundle, fileWriter);
     }
 
+    /**
+     * Set the directory where the experiment data should be stored.
+     *
+     * @param dir the experiment storage directory
+     */
     public void setStorageDir(File dir) {
         storageDir = dir;
     }
+
+    /**
+     * Gets the experiment storage directory.
+     *
+     * @return the experiment storage directory
+     */
     public File getStorageDir() {
         return storageDir;
     }

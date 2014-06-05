@@ -146,11 +146,11 @@ public class ExperimentAnalysis {
     }
 
     public String getXUnit() {
-        return getXUnitPrefix() + experiment.getXUnit();
+        return getXUnitPrefix() + experiment.getXBaseUnit();
     }
 
     public String getYUnit() {
-        return getYUnitPrefix() + experiment.getYUnit();
+        return getYUnitPrefix() + experiment.getYBaseUnit();
     }
 
     public Bundle analysisDataToBundle() {

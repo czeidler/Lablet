@@ -75,7 +75,7 @@ public class CameraExperimentAnalysis extends ExperimentAnalysis {
 
         cameraExperiment.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
         cameraExperiment.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
-        cameraExperiment.setFrameRate(runSettings.getInt("analysis_frame_rate"));
+        cameraExperiment.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
 
         int numberOfRuns = getExperiment().getNumberOfRuns();
         getRunDataModel().setNumberOfRuns(numberOfRuns);
