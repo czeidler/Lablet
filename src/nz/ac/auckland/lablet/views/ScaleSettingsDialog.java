@@ -59,9 +59,9 @@ public class ScaleSettingsDialog extends AlertDialog {
         ArrayAdapter<String> unitsAdapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item, list);
         spinnerUnit.setAdapter(unitsAdapter);
-        if (experimentAnalysis.getXUnitPrefix().equals("cm"))
+        if (experimentAnalysis.getXUnitPrefix().equals("c"))
             spinnerUnit.setSelection(1);
-        if (experimentAnalysis.getXUnitPrefix().equals("mm"))
+        if (experimentAnalysis.getXUnitPrefix().equals("m"))
             spinnerUnit.setSelection(2);
 
         // button bar
