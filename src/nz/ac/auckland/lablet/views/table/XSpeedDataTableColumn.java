@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.table;
 
-import nz.ac.auckland.lablet.experiment.Experiment;
+import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
@@ -29,15 +29,15 @@ public class XSpeedDataTableColumn extends DataTableColumn {
     @Override
     public String getHeader() {
         return "velocity [" + experimentAnalysis.getXUnit() + "/"
-                + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
+                + experimentAnalysis.getExperimentData().getRunValueBaseUnit() + "]";
     }
 
     public static Number getSpeed(int index, MarkerDataModel markersDataModel, ExperimentAnalysis experimentAnalysis) {
-        Experiment experiment = experimentAnalysis.getExperiment();
+        ExperimentData experimentData = experimentAnalysis.getExperimentData();
         float delta = markersDataModel.getCalibratedMarkerPositionAt(index + 1).x
                 - markersDataModel.getCalibratedMarkerPositionAt(index).x;
-        float deltaT = experiment.getRunValueAt(index + 1) - experiment.getRunValueAt(index);
-        if (experimentAnalysis.getExperiment().getRunValueUnitPrefix().equals("m"))
+        float deltaT = experimentData.getRunValueAt(index + 1) - experimentData.getRunValueAt(index);
+        if (experimentAnalysis.getExperimentData().getRunValueUnitPrefix().equals("m"))
             deltaT /= 1000;
         return delta / deltaT;
     }

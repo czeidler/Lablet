@@ -19,8 +19,8 @@ public class SpeedTimeMarkerGraphAxis extends TimeMarkerGraphAxis {
 
     @Override
     public Number getValue(int index) {
-        float t1 = getExperimentAnalysis().getExperiment().getRunValueAt(index + 1);
-        float t0 = getExperimentAnalysis().getExperiment().getRunValueAt(index);
+        float t1 = getExperimentAnalysis().getExperimentData().getRunValueAt(index + 1);
+        float t0 = getExperimentAnalysis().getExperimentData().getRunValueAt(index);
         return t0 + (t1 - t0) / 2f;
     }
 

@@ -13,7 +13,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentPlugin;
-import nz.ac.auckland.lablet.experiment.Experiment;
+import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
 
 import java.io.File;
@@ -25,7 +25,7 @@ import java.io.File;
 public class CameraExperimentPlugin extends AbstractExperimentPlugin {
     @Override
     public String getName() {
-        return CameraExperiment.class.getSimpleName();
+        return CameraExperimentData.class.getSimpleName();
     }
 
     @Override
@@ -41,10 +41,10 @@ public class CameraExperimentPlugin extends AbstractExperimentPlugin {
     }
 
     @Override
-    public void startRunSettingsActivity(Activity parentActivity, int requestCode, Experiment experiment,
+    public void startRunSettingsActivity(Activity parentActivity, int requestCode, ExperimentData experimentData,
                                          Bundle analysisSpecificData, Bundle options) {
         Intent intent = new Intent(parentActivity, CameraRunSettingsActivity.class);
-        packStartRunSettingsIntent(intent, experiment, analysisSpecificData, options);
+        packStartRunSettingsIntent(intent, experimentData, analysisSpecificData, options);
         parentActivity.startActivityForResult(intent, requestCode);
     }
 
@@ -56,17 +56,17 @@ public class CameraExperimentPlugin extends AbstractExperimentPlugin {
     }
 
     @Override
-    public Experiment loadExperiment(Context context, Bundle data, File storageDir) {
-        return new CameraExperiment(context, data, storageDir);
+    public ExperimentData loadExperiment(Context context, Bundle data, File storageDir) {
+        return new CameraExperimentData(context, data, storageDir);
     }
 
     @Override
-    public ExperimentAnalysis createExperimentAnalysis(Experiment experiment) {
-        return new CameraExperimentAnalysis(experiment);
+    public ExperimentAnalysis createExperimentAnalysis(ExperimentData experimentData) {
+        return new CameraExperimentAnalysis(experimentData);
     }
 
     @Override
-    public View createExperimentRunView(Context context, Experiment experiment) {
-        return new CameraExperimentRunView(context, experiment);
+    public View createExperimentRunView(Context context, ExperimentData experimentData) {
+        return new CameraExperimentRunView(context, experimentData);
     }
 }

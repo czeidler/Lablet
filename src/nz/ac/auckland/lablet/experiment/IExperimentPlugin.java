@@ -70,11 +70,11 @@ public interface IExperimentPlugin {
      *
      * @param parentActivity the parent activity
      * @param requestCode request code for the activity
-     * @param experiment the experiment is needed to put information about the experiment into the intent
+     * @param experimentData the experiment is needed to put information about the experiment into the intent
      * @param analysisSpecificData bundle with the analysis specific data (the analysis settings)
      * @param options bundle with options for the run settings activity
      */
-    public void startRunSettingsActivity(Activity parentActivity, int requestCode, Experiment experiment,
+    public void startRunSettingsActivity(Activity parentActivity, int requestCode, ExperimentData experimentData,
                                          Bundle analysisSpecificData, Bundle options);
 
     /**
@@ -97,24 +97,24 @@ public interface IExperimentPlugin {
      * @param storageDir directory where additional data may have been stored
      * @return the loaded experiment or null on failure
      */
-    public Experiment loadExperiment(Context context, Bundle data, File storageDir);
+    public ExperimentData loadExperiment(Context context, Bundle data, File storageDir);
 
     /**
      * Creates an {@link nz.ac.auckland.lablet.experiment.ExperimentAnalysis} object for the given
-     * {@link nz.ac.auckland.lablet.experiment.Experiment}.
+     * {@link ExperimentData}.
      *
-     * @param experiment usually loaded with the loadExperiment method
+     * @param experimentData usually loaded with the loadExperimentData method
      * @return pointer to the created experiment analysis
      */
-    public ExperimentAnalysis createExperimentAnalysis(Experiment experiment);
+    public ExperimentAnalysis createExperimentAnalysis(ExperimentData experimentData);
 
     /**
      * Creates the view that displays the results in the
      * {@link nz.ac.auckland.lablet.ExperimentAnalyserActivity}.
      *
      * @param context context of the view
-     * @param experiment experiment that should be used
+     * @param experimentData experiment that should be used
      * @return a newly created view
      */
-    public View createExperimentRunView(Context context, Experiment experiment);
+    public View createExperimentRunView(Context context, ExperimentData experimentData);
 }

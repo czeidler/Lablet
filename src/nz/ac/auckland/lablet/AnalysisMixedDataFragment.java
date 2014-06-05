@@ -122,7 +122,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         Layout view = new Layout(getActivity());
         assert view != null;
 
-        View experimentRunView = plugin.createExperimentRunView(activity, experimentAnalysis.getExperiment());
+        View experimentRunView = plugin.createExperimentRunView(activity, experimentAnalysis.getExperimentData());
 
         RunDataSeekBar runViewControl = view.getRunViewControl();
         runViewControl.setTo(experimentAnalysis.getRunDataModel());

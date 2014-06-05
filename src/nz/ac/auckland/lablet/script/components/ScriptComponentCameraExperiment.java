@@ -17,7 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.*;
-import nz.ac.auckland.lablet.camera.CameraExperiment;
+import nz.ac.auckland.lablet.camera.CameraExperimentData;
 import nz.ac.auckland.lablet.camera.CameraExperimentActivity;
 import nz.ac.auckland.lablet.experiment.ExperimentLoader;
 import nz.ac.auckland.lablet.misc.StorageLib;
@@ -209,7 +209,7 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
                 if (!ExperimentLoader.loadExperiment(getContext(), experimentPath, result))
                     return null;
 
-                CameraExperiment experiment = (CameraExperiment)result.experiment;
+                CameraExperimentData experiment = (CameraExperimentData)result.experimentData;
                 return new File(experiment.getStorageDir(), experiment.getVideoFileName());
             }
 

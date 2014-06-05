@@ -1,7 +1,7 @@
 /**
  * All experiment related (model) classes.
  * <p>
- * {@link nz.ac.auckland.lablet.experiment.Experiment} and
+ * {@link nz.ac.auckland.lablet.experiment.ExperimentData} and
  * {@link nz.ac.auckland.lablet.experiment.ExperimentAnalysis} are the base classes for an experiment and
  * the analysis of an experiment.
  * </p>

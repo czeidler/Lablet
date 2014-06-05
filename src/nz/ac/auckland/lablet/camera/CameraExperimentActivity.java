@@ -17,9 +17,9 @@ import android.hardware.SensorManager;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.*;
 import android.widget.*;
-import nz.ac.auckland.lablet.ExperimentActivity;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.RatioSurfaceView;
@@ -33,7 +33,7 @@ import java.util.List;
 
 
 /**
- * Activity that runs a {@link CameraExperiment}, i,e., records a video.
+ * Activity that runs a {@link CameraExperimentData}, i,e., records a video.
  * <p>
  * You can put the following extra options into the intent:
  * <ul>
@@ -44,7 +44,8 @@ import java.util.List;
  * </ul>
  * </p>
  */
-public class CameraExperimentActivity extends ExperimentActivity {
+public class CameraExperimentActivity extends FragmentActivity {
+    private CameraExperimentData experimentData;
     private RatioSurfaceView preview = null;
     private VideoView videoView = null;
     private ImageButton startButton = null;
@@ -173,7 +174,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
             requestedVideoHeight = intent.getIntExtra("requested_video_height", -1);
         }
 
-        setExperiment(new CameraExperiment(this));
+        experimentData = new CameraExperimentData(this);
 
         setContentView(R.layout.camera_experiment);
 
@@ -431,7 +432,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
     }
 
     private boolean moveTempFilesToExperimentDir() {
-        File storageDir = experiment.getStorageDir();
+        File storageDir = experimentData.getStorageDir();
         if (!storageDir.exists())
             if (!storageDir.mkdirs())
                 return false;
@@ -445,11 +446,11 @@ public class CameraExperimentActivity extends ExperimentActivity {
         try {
             if (!moveTempFilesToExperimentDir())
                 throw new IOException();
-            ((CameraExperiment)experiment).setVideoFileName(getVideoFileName());
-            experiment.saveExperimentDataToFile();
+            experimentData.setVideoFileName(getVideoFileName());
+            experimentData.saveExperimentDataToFile();
 
             Intent data = new Intent();
-            File outputDir = experiment.getStorageDir();
+            File outputDir = experimentData.getStorageDir();
             data.putExtra("experiment_path", outputDir.getPath());
             data.putExtra("start_analysis", startAnalysis);
             setResult(RESULT_OK, data);
@@ -554,7 +555,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
         return filteredProfiles;
     }
 
-    SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
+    private SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
         public void surfaceCreated(SurfaceHolder holder) {
             // no-op -- wait until surfaceChanged()
         }
@@ -581,7 +582,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
         public void onNewClicked() {}
     }
 
-    void setState(AbstractViewState newState) {
+    private void setState(AbstractViewState newState) {
         if (state != null)
             state.leaveState();
         state = newState;

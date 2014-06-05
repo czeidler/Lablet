@@ -18,14 +18,14 @@ import nz.ac.auckland.lablet.experiment.*;
  */
 public class CameraExperimentAnalysis extends ExperimentAnalysis {
 
-    public CameraExperimentAnalysis(Experiment experiment) {
-        super(experiment);
+    public CameraExperimentAnalysis(ExperimentData experimentData) {
+        super(experimentData);
 
         updateOriginFromVideoRotation();
     }
 
     private void updateOriginFromVideoRotation() {
-        CameraExperiment cameraExperiment = (CameraExperiment)getExperiment();
+        CameraExperimentData cameraExperiment = (CameraExperimentData) getExperimentData();
         Calibration calibration = getCalibration();
 
         // read rotation from video
@@ -65,7 +65,7 @@ public class CameraExperimentAnalysis extends ExperimentAnalysis {
 
     @Override
     protected void onRunSpecificDataChanged() {
-        CameraExperiment cameraExperiment = (CameraExperiment)getExperiment();
+        CameraExperimentData cameraExperiment = (CameraExperimentData) getExperimentData();
         Bundle experimentSpecificData = getExperimentSpecificData();
         if (experimentSpecificData == null)
             return;
@@ -77,7 +77,7 @@ public class CameraExperimentAnalysis extends ExperimentAnalysis {
         cameraExperiment.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
         cameraExperiment.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
 
-        int numberOfRuns = getExperiment().getNumberOfRuns();
+        int numberOfRuns = getExperimentData().getNumberOfRuns();
         getRunDataModel().setNumberOfRuns(numberOfRuns);
         if (numberOfRuns <= getRunDataModel().getCurrentRun())
             getRunDataModel().setCurrentRun(numberOfRuns - 1);

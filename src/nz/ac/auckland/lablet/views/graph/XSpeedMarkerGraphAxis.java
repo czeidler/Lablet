@@ -8,7 +8,7 @@
 package nz.ac.auckland.lablet.views.graph;
 
 
-import nz.ac.auckland.lablet.experiment.Experiment;
+import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
@@ -26,10 +26,10 @@ public class XSpeedMarkerGraphAxis extends MarkerGraphAxis {
         ExperimentAnalysis experimentAnalysis = getExperimentAnalysis();
         MarkerDataModel data = getData();
 
-        Experiment experiment = experimentAnalysis.getExperiment();
+        ExperimentData experimentData = experimentAnalysis.getExperimentData();
         float deltaX = data.getCalibratedMarkerPositionAt(index + 1).x - data.getCalibratedMarkerPositionAt(index).x;
-        float deltaT = experiment.getRunValueAt(index + 1) - experiment.getRunValueAt(index);
-        if (experimentAnalysis.getExperiment().getRunValueUnitPrefix().equals("m"))
+        float deltaT = experimentData.getRunValueAt(index + 1) - experimentData.getRunValueAt(index);
+        if (experimentAnalysis.getExperimentData().getRunValueUnitPrefix().equals("m"))
             deltaT /= 1000;
         return deltaX / deltaT;
     }
@@ -38,7 +38,7 @@ public class XSpeedMarkerGraphAxis extends MarkerGraphAxis {
     public String getLabel() {
         ExperimentAnalysis experimentAnalysis = getExperimentAnalysis();
         return "velocity [" + experimentAnalysis.getXUnit() + "/"
-                + experimentAnalysis.getExperiment().getRunValueBaseUnit() + "]";
+                + experimentAnalysis.getExperimentData().getRunValueBaseUnit() + "]";
     }
 
     @Override

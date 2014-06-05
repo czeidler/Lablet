@@ -11,7 +11,7 @@ import android.content.Context;
 import android.graphics.*;
 import android.os.Bundle;
 import android.view.View;
-import nz.ac.auckland.lablet.experiment.Experiment;
+import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.views.IExperimentRunView;
 import nz.ac.auckland.lablet.views.VideoFrameView;
 
@@ -25,18 +25,18 @@ import java.io.File;
  * </p>
  */
 public class CameraExperimentRunView extends VideoFrameView implements IExperimentRunView {
-    private CameraExperiment experiment;
+    private CameraExperimentData experiment;
     private int currentRun = -1;
 
-    public CameraExperimentRunView(Context context, Experiment experiment) {
+    public CameraExperimentRunView(Context context, ExperimentData experimentData) {
         super(context);
 
         setWillNotDraw(false);
 
-        assert(experiment instanceof CameraExperiment);
-        this.experiment = (CameraExperiment)experiment;
+        assert(experimentData instanceof CameraExperimentData);
+        this.experiment = (CameraExperimentData) experimentData;
 
-        File storageDir = experiment.getStorageDir();
+        File storageDir = experimentData.getStorageDir();
         File videoFile = new File(storageDir, this.experiment.getVideoFileName());
         setVideoFilePath(videoFile.getPath());
     }

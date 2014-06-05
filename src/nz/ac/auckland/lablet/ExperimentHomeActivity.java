@@ -181,7 +181,7 @@ public class ExperimentHomeActivity extends Activity {
     }
 
     private void deleteSelectedExperiments() {
-        File experimentDir = ExperimentActivity.getDefaultExperimentBaseDir(this);
+        File experimentDir = ExperimentDataActivity.getDefaultExperimentBaseDir(this);
         for (CheckBoxListEntry entry : experimentList) {
             if (!entry.getSelected())
                 continue;
@@ -262,7 +262,7 @@ public class ExperimentHomeActivity extends Activity {
             }
         };
 
-        File experimentDir = ExperimentActivity.getDefaultExperimentBaseDir(this);
+        File experimentDir = ExperimentDataActivity.getDefaultExperimentBaseDir(this);
         if (experimentDir.exists()) {
             // TODO: Events are never received, check why. Manually call updateExperimentList in onResume for now.
             experimentDirObserver = new ExperimentDirObserver(experimentDir.getPath());
@@ -271,7 +271,7 @@ public class ExperimentHomeActivity extends Activity {
     }
 
     private void startAnalyzeActivityById(String id) {
-        File experimentDir = ExperimentActivity.getDefaultExperimentBaseDir(this);
+        File experimentDir = ExperimentDataActivity.getDefaultExperimentBaseDir(this);
         File experimentPath = new File(experimentDir, id);
         startAnalyzeActivity(experimentPath.getPath());
     }
@@ -332,7 +332,7 @@ public class ExperimentHomeActivity extends Activity {
 
     private void updateExperimentList() {
         experimentList.clear();
-        File experimentDir = ExperimentActivity.getDefaultExperimentBaseDir(this);
+        File experimentDir = ExperimentDataActivity.getDefaultExperimentBaseDir(this);
         if (experimentDir.isDirectory()) {
             File[] children = experimentDir.listFiles();
             for (File child : children != null ? children : new File[0])

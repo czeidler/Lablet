@@ -33,7 +33,7 @@ import java.io.*;
  * </ul>
  * </p>
  */
-public class ExperimentAnalyserActivity extends ExperimentActivity {
+public class ExperimentAnalyserActivity extends ExperimentDataActivity {
     static final int PERFORM_RUN_SETTINGS = 0;
 
     final public static int MARKER_COLOR = Color.argb(255, 100, 200, 20);
@@ -48,7 +48,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (getExperiment() == null)
+        if (getExperimentData() == null)
             return false;
 
         menu.clear();
@@ -136,7 +136,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
     }
 
     private void startRunSettingsActivity(Bundle analysisSpecificData, Bundle options) {
-        plugin.startRunSettingsActivity(this, PERFORM_RUN_SETTINGS, experiment, analysisSpecificData, options);
+        plugin.startRunSettingsActivity(this, PERFORM_RUN_SETTINGS, experimentData, analysisSpecificData, options);
     }
 
     private void mailData() {
@@ -188,7 +188,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
             return;
         }
 
-        experimentAnalysis = ExperimentLoader.getExperimentAnalysis(experiment, plugin);
+        experimentAnalysis = ExperimentLoader.getExperimentAnalysis(experimentData, plugin);
         if (experimentAnalysis == null) {
             showErrorAndFinish("Unable to load experiment analysis");
             return;
@@ -256,7 +256,7 @@ public class ExperimentAnalyserActivity extends ExperimentActivity {
     }
 
     private File getTagMarkerCSVFile() {
-        return new File(experiment.getStorageDir(), experiment.getUid() + "_tag_markers.csv");
+        return new File(experimentData.getStorageDir(), experimentData.getUid() + "_tag_markers.csv");
     }
 
     private void exportTagMarkerCSVData() {

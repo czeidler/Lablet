@@ -13,7 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import nz.ac.auckland.lablet.experiment.Experiment;
+import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentLoader;
 import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
 import nz.ac.auckland.lablet.misc.StorageLib;
@@ -22,21 +22,21 @@ import java.io.*;
 
 
 /**
- * Abstract base class for activities that perform an experiment.
+ * Abstract base class for activities that analyze an experiment.
  */
-abstract public class ExperimentActivity extends FragmentActivity {
-    protected Experiment experiment = null;
+abstract public class ExperimentDataActivity extends FragmentActivity {
+    protected ExperimentData experimentData = null;
     protected IExperimentPlugin plugin = null;
 
     private File baseDirectory = null;
 
-    protected void setExperiment(Experiment experiment) {
-        this.experiment = experiment;
+    protected void setExperimentData(ExperimentData experimentData) {
+        this.experimentData = experimentData;
 
         baseDirectory = getDefaultExperimentBaseDir(this);
 
         // set experiment storage dir
-        if (experiment.getStorageDir() != null)
+        if (experimentData.getStorageDir() != null)
             return;
 
         Intent intent = getIntent();
@@ -48,11 +48,11 @@ abstract public class ExperimentActivity extends FragmentActivity {
             }
         }
 
-        experiment.setStorageDir(getExperimentStorageDir());
+        experimentData.setStorageDir(getExperimentStorageDir());
     }
 
-    public Experiment getExperiment() {
-        return experiment;
+    public ExperimentData getExperimentData() {
+        return experimentData;
     }
     public IExperimentPlugin getExperimentPlugin() {
         return plugin;
@@ -73,7 +73,7 @@ abstract public class ExperimentActivity extends FragmentActivity {
         }
 
         plugin = result.plugin;
-        experiment = result.experiment;
+        experimentData = result.experimentData;
 
         return true;
     }
@@ -98,7 +98,7 @@ abstract public class ExperimentActivity extends FragmentActivity {
     }
 
     private File getExperimentStorageDir() {
-        String directoryName = getExperiment().getUid();
+        String directoryName = getExperimentData().getUid();
         return new File(baseDirectory, directoryName);
     }
 

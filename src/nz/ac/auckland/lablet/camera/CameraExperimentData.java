@@ -11,7 +11,7 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import nz.ac.auckland.lablet.experiment.Experiment;
+import nz.ac.auckland.lablet.experiment.ExperimentData;
 
 import java.io.File;
 
@@ -19,7 +19,7 @@ import java.io.File;
 /**
  * Holds all important data for the camera experiment.
  */
-public class CameraExperiment extends Experiment {
+public class CameraExperimentData extends ExperimentData {
     private String videoFileName;
     private int numberOfRuns;
 
@@ -33,11 +33,11 @@ public class CameraExperiment extends Experiment {
     private int analysisVideoStart;
     private int analysisVideoEnd;
 
-    public CameraExperiment(Context experimentContext) {
+    public CameraExperimentData(Context experimentContext) {
         super(experimentContext);
     }
 
-    public CameraExperiment(Context experimentContext, Bundle bundle, File storageDir) {
+    public CameraExperimentData(Context experimentContext, Bundle bundle, File storageDir) {
         super(experimentContext, bundle, storageDir);
 
     }
@@ -102,8 +102,8 @@ public class CameraExperiment extends Experiment {
         return "time [" + getRunValueUnit() + "]";
     }
 
-    protected boolean loadExperiment(Bundle bundle, File storageDir) {
-        if (!super.loadExperiment(bundle, storageDir))
+    protected boolean loadExperimentData(Bundle bundle, File storageDir) {
+        if (!super.loadExperimentData(bundle, storageDir))
             return false;
 
         setVideoFileName(bundle.getString("videoName"));
