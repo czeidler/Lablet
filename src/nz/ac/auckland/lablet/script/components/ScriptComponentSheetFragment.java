@@ -30,6 +30,8 @@ public class ScriptComponentSheetFragment extends ScriptComponentGenericFragment
         childViewId = -1;
 
         View view = super.onCreateView(inflater, container, savedInstanceState);
+        if (component == null)
+            return view;
 
         View child = setChild(R.layout.script_component_sheet_fragment);
         assert child != null;

@@ -87,10 +87,12 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
     protected void onSaveInstanceState (Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putString("script_user_data_dir", scriptUserDataDir.getName());
+        outState.putString("script_user_data_dir", scriptUserDataDir.getPath());
     }
 
     public ScriptComponentTree getScriptComponentTreeAt(int index) {
+        if (index >= activeChain.size() || index < 0)
+            return null;
         return activeChain.get(index);
     }
 
@@ -288,7 +290,6 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
         public ScriptFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager,
                                           List<ScriptComponentTree> components) {
             super(fragmentManager);
-
             this.components = components;
         }
 
