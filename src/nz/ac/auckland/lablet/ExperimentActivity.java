@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.view.*;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import nz.ac.auckland.lablet.accelerometer.AccelerometerExperiment;
 import nz.ac.auckland.lablet.camera.CameraExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentPluginFactory;
 import nz.ac.auckland.lablet.experiment.IExperiment;
@@ -142,7 +143,8 @@ public class ExperimentActivity extends Activity {
             }
         });
 
-        IExperimentPlugin plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(CameraExperimentData.class.getSimpleName());
+        //IExperimentPlugin plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(CameraExperimentData.class.getSimpleName());
+        IExperimentPlugin plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(AccelerometerExperiment.class.getSimpleName());
         experimentBaseDir = new File(getExternalFilesDir(null), "experiments");
         IExperiment experiment = plugin.createExperiment(this, getIntent(), experimentBaseDir);
         addExperiment(experiment);
