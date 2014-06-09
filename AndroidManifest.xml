@@ -12,8 +12,8 @@
         <activity android:name="nz.ac.auckland.lablet.ExperimentAnalyserActivity"
                   android:icon="@drawable/ic_tracker"/>
 
-        <activity android:name="nz.ac.auckland.lablet.camera.CameraExperimentActivity"
-                  android:icon="@drawable/ic_video"/>
+        <activity android:name="nz.ac.auckland.lablet.ExperimentActivity"
+                  android:icon="@drawable/ic_lab"/>
         <activity android:name="nz.ac.auckland.lablet.camera.CameraRunSettingsActivity"
                   android:icon="@drawable/ic_cut" />
 
