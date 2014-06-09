@@ -12,9 +12,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import nz.ac.auckland.lablet.ExperimentActivity;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentPlugin;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.IExperiment;
 
 import java.io.File;
 
@@ -34,10 +36,10 @@ public class CameraExperimentPlugin extends AbstractExperimentPlugin {
     }
 
     @Override
-    public void startExperimentActivity(Activity parentActivity, int requestCode, Bundle options) {
-        Intent intent = new Intent(parentActivity, CameraExperimentActivity.class);
-        packStartExperimentIntent(intent, options);
-        parentActivity.startActivityForResult(intent, requestCode);
+    public IExperiment createExperiment(Activity parentActivity, Intent intent, File experimentBaseDir) {
+        IExperiment experiment = new CameraExperiment();
+        experiment.init(parentActivity, intent, experimentBaseDir);
+        return experiment;
     }
 
     @Override
