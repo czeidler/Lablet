@@ -25,7 +25,15 @@ public interface IExperiment {
     }
 
     public View createExperimentView(Context context);
-    public void onPrepareOptionsMenu(MenuItem menuItem, IExperimentParent parent);
+
+    /**
+     * Prepares a option menu for the experiment.
+     *
+     * @param menuItem the menu item for the option menu
+     * @param parent the host for the experiment
+     * @return false if there is no option menu
+     */
+    public boolean onPrepareOptionsMenu(MenuItem menuItem, IExperimentParent parent);
 
     public void init(Activity activity, Intent intent, File experimentBaseDir);
     public void destroy();

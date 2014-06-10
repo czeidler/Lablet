@@ -47,8 +47,8 @@ public class AccelerometerExperiment implements IExperiment {
     }
 
     @Override
-    public void onPrepareOptionsMenu(MenuItem menuItem, IExperimentParent parent) {
-
+    public boolean onPrepareOptionsMenu(MenuItem menuItem, IExperimentParent parent) {
+        return false;
     }
 
     private SensorEventListener sensorEventListener = new SensorEventListener() {

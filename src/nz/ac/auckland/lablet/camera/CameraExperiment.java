@@ -148,7 +148,7 @@ public class CameraExperiment implements IExperiment {
     }
 
     @Override
-    public void onPrepareOptionsMenu(MenuItem menuItem, IExperimentParent parent) {
+    public boolean onPrepareOptionsMenu(MenuItem menuItem, IExperimentParent parent) {
         this.parent = parent;
 
         menuItem.setVisible(false);
@@ -159,6 +159,8 @@ public class CameraExperiment implements IExperiment {
                 return true;
             }
         });
+
+        return true;
     }
 
     @Override

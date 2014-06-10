@@ -17,7 +17,9 @@ import android.os.Bundle;
 import android.view.*;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import nz.ac.auckland.lablet.accelerometer.AccelerometerExperiment;
+import nz.ac.auckland.lablet.camera.CameraExperiment;
 import nz.ac.auckland.lablet.camera.CameraExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentPluginFactory;
 import nz.ac.auckland.lablet.experiment.IExperiment;
@@ -26,11 +28,15 @@ import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class ExperimentActivity extends Activity {
     final private List<IExperiment> experiments = new ArrayList<>();
+    final private Map<IExperiment, View> experimentViews = new HashMap<>();
+
     private IExperiment currentExperiment;
     private File experimentBaseDir;
 
@@ -40,6 +46,8 @@ public class ExperimentActivity extends Activity {
     private ImageButton newButton = null;
     private MenuItem analyseMenuItem = null;
     private MenuItem settingsMenu = null;
+    private MenuItem viewMenu = null;
+    private MenuItem sensorMenu = null;
 
     private AbstractViewState state = null;
 
@@ -81,7 +89,8 @@ public class ExperimentActivity extends Activity {
         settingsMenu = menu.findItem(R.id.action_settings);
         assert settingsMenu != null;
         if (currentExperiment != null) {
-            currentExperiment.onPrepareOptionsMenu(settingsMenu, new IExperiment.IExperimentParent() {
+            boolean hasOptions = currentExperiment.onPrepareOptionsMenu(settingsMenu,
+                    new IExperiment.IExperimentParent() {
                 private AbstractViewState previousState;
 
                 @Override
@@ -95,7 +104,29 @@ public class ExperimentActivity extends Activity {
                     setState(previousState);
                 }
             });
+            settingsMenu.setEnabled(hasOptions);
+            settingsMenu.setVisible(hasOptions);
         }
+
+        viewMenu = menu.findItem(R.id.action_view);
+        assert viewMenu != null;
+        viewMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                showViewMenu(menuItem);
+                return true;
+            }
+        });
+
+        sensorMenu = menu.findItem(R.id.action_sensors);
+        assert sensorMenu != null;
+        sensorMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                showSensorMenu(menuItem);
+                return true;
+            }
+        });
 
         // set states after menu has been init
         if (!unsavedExperimentData) {
@@ -106,6 +137,68 @@ public class ExperimentActivity extends Activity {
         }
 
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void showViewMenu(MenuItem menuItem) {
+        View menuView = findViewById(R.id.action_view);
+        PopupMenu popup = new PopupMenu(menuView.getContext(), menuView);
+
+        for (int i = 0; i < experiments.size(); i++) {
+            IExperiment experiment = experiments.get(i);
+
+            MenuItem item = popup.getMenu().add(1, i, i, experiment.getClass().getSimpleName());
+            item.setCheckable(true);
+        }
+        popup.getMenu().setGroupCheckable(1, true, true);
+        popup.getMenu().getItem(experiments.indexOf(currentExperiment)).setChecked(true);
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                setCurrentExperiment(experiments.get(menuItem.getItemId()));
+                return true;
+            }
+        });
+
+        popup.show();
+    }
+
+    private IExperiment getExperiment(IExperimentPlugin plugin) {
+        for (IExperiment experiment : experiments) {
+            if (experiment.getClass().getSimpleName().equals(plugin.getName()))
+                return experiment;
+        }
+        return null;
+    }
+
+    private void showSensorMenu(MenuItem menuItem) {
+        View menuView = findViewById(R.id.action_view);
+        PopupMenu popup = new PopupMenu(menuView.getContext(), menuView);
+
+        final List<IExperimentPlugin> plugins = ExperimentPluginFactory.getFactory().getPluginList();
+        for (int i = 0; i < plugins.size(); i++) {
+            IExperimentPlugin plugin = plugins.get(i);
+
+            MenuItem item = popup.getMenu().add(1, i, i, plugin.getName());
+            item.setCheckable(true);
+
+            if (getExperiment(plugin) != null)
+                item.setChecked(true);
+        }
+
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                IExperimentPlugin plugin = plugins.get(menuItem.getItemId());
+                IExperiment experiment = getExperiment(plugin);
+                if (experiment != null)
+                    removeExperiment(experiment);
+                else
+                    addExperiment(plugin, experimentBaseDir);
+                return true;
+            }
+        });
+
+        popup.show();
     }
 
     @Override
@@ -143,18 +236,64 @@ public class ExperimentActivity extends Activity {
             }
         });
 
-        //IExperimentPlugin plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(CameraExperimentData.class.getSimpleName());
-        IExperimentPlugin plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(AccelerometerExperiment.class.getSimpleName());
         experimentBaseDir = new File(getExternalFilesDir(null), "experiments");
+
+        IExperimentPlugin plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(AccelerometerExperiment.class.getSimpleName());
+        addExperiment(plugin, experimentBaseDir);
+
+        plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(CameraExperiment.class.getSimpleName());
+        addExperiment(plugin, experimentBaseDir);
+    }
+
+    private void addExperiment(IExperimentPlugin plugin, File experimentBaseDir) {
         IExperiment experiment = plugin.createExperiment(this, getIntent(), experimentBaseDir);
         addExperiment(experiment);
-        centerView.addView(experiment.createExperimentView(this));
     }
 
     private void addExperiment(IExperiment experiment) {
         experiments.add(experiment);
+        centerView.addView(getExperimentView(experiment));
+        setCurrentExperiment(experiment);
+    }
+
+    private void removeExperiment(IExperiment experiment) {
+        setState(null);
+
+        experiments.remove(experiment);
+        centerView.removeView(getExperimentView(experiment));
+        experimentViews.remove(experiment);
+
+        try {
+            experiment.finish(true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        experiment.destroy();
+
+        if (currentExperiment == experiment)
+            setCurrentExperiment(experiments.get(0));
+
+        setState(new PreviewState());
+    }
+
+    private void setCurrentExperiment(IExperiment experiment) {
+        if (currentExperiment != null)
+            getExperimentView(currentExperiment).setVisibility(View.INVISIBLE);
         currentExperiment = experiment;
         invalidateOptionsMenu();
+        View view = getExperimentView(currentExperiment);
+        view.setVisibility(View.VISIBLE);
+
+        centerView.requestLayout();
+    }
+
+    private View getExperimentView(IExperiment experiment) {
+        if (experimentViews.containsKey(experiment))
+            return experimentViews.get(experiment);
+
+        View view = experiment.createExperimentView(this);
+        experimentViews.put(experiment, view);
+        return view;
     }
 
     @Override
