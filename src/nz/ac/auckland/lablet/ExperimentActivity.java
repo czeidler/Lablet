@@ -193,7 +193,7 @@ public class ExperimentActivity extends Activity {
                 if (experiment != null)
                     removeExperiment(experiment);
                 else
-                    addExperiment(plugin, experimentBaseDir);
+                    addExperiment(plugin, experimentBaseDir, true);
                 return true;
             }
         });
@@ -239,20 +239,22 @@ public class ExperimentActivity extends Activity {
         experimentBaseDir = new File(getExternalFilesDir(null), "experiments");
 
         IExperimentPlugin plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(AccelerometerExperiment.class.getSimpleName());
-        addExperiment(plugin, experimentBaseDir);
+        addExperiment(plugin, experimentBaseDir, false);
 
         plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(CameraExperiment.class.getSimpleName());
-        addExperiment(plugin, experimentBaseDir);
+        addExperiment(plugin, experimentBaseDir, false);
     }
 
-    private void addExperiment(IExperimentPlugin plugin, File experimentBaseDir) {
+    private void addExperiment(IExperimentPlugin plugin, File experimentBaseDir, boolean activityIsRunning) {
         IExperiment experiment = plugin.createExperiment(this, getIntent(), experimentBaseDir);
-        addExperiment(experiment);
+        addExperiment(experiment, activityIsRunning);
     }
 
-    private void addExperiment(IExperiment experiment) {
+    private void addExperiment(IExperiment experiment, boolean activityIsRunning) {
         experiments.add(experiment);
         centerView.addView(getExperimentView(experiment));
+        if (activityIsRunning)
+            experiment.init(this, getIntent(), experimentBaseDir);
         setCurrentExperiment(experiment);
     }
 
