@@ -24,13 +24,13 @@ public class TimeMarkerGraphAxis extends MarkerGraphAxis {
     public Number getValue(int index) {
         MarkerDataModel markerData = getExperimentAnalysis().getTagMarkers();
         int runId = markerData.getMarkerDataAt(index).getRunId();
-        return getExperimentAnalysis().getExperimentData().getRunValueAt(runId);
+        return getExperimentAnalysis().getExperimentRunData().getRunValueAt(runId);
     }
 
     @Override
     public String getLabel() {
         ExperimentAnalysis experimentAnalysis = getExperimentAnalysis();
-        return "time [" + experimentAnalysis.getExperimentData().getRunValueUnit() + "]";
+        return "time [" + experimentAnalysis.getExperimentRunData().getRunValueUnit() + "]";
     }
 
     @Override

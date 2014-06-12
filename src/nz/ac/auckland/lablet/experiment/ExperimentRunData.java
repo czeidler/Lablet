@@ -20,7 +20,7 @@ import java.io.IOException;
 /**
  * Abstract base class for experiments.
  */
-abstract public class ExperimentData {
+abstract public class ExperimentRunData {
     private String uid;
     private File storageDir;
     protected Context context;
@@ -41,7 +41,7 @@ abstract public class ExperimentData {
      * @param bundle the experiment data that fits into a bundle
      * @param storageDir the storage directory of the experiment
      */
-    public ExperimentData(Context experimentContext, Bundle bundle, File storageDir) {
+    public ExperimentRunData(Context experimentContext, Bundle bundle, File storageDir) {
         init(experimentContext);
 
         loadExperimentData(bundle, storageDir);
@@ -52,7 +52,7 @@ abstract public class ExperimentData {
      *
      * @param experimentContext the experiment context
      */
-    public ExperimentData(Context experimentContext) {
+    public ExperimentRunData(Context experimentContext) {
         init(experimentContext);
 
         uid = generateNewUid();

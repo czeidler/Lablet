@@ -15,8 +15,8 @@ import android.view.ViewGroup;
 import android.widget.*;
 import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
 import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
-import nz.ac.auckland.lablet.views.RunDataSeekBar;
-import nz.ac.auckland.lablet.views.RunContainerView;
+import nz.ac.auckland.lablet.views.FrameDataSeekBar;
+import nz.ac.auckland.lablet.views.FrameContainerView;
 import nz.ac.auckland.lablet.views.graph.*;
 import nz.ac.auckland.lablet.views.table.*;
 
@@ -29,8 +29,8 @@ import java.util.List;
  */
 public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
     class Layout extends ViewGroup {
-        private RunDataSeekBar runViewControl = null;
-        private RunContainerView runContainerView = null;
+        private FrameDataSeekBar runViewControl = null;
+        private FrameContainerView runContainerView = null;
         private ViewGroup experimentDataView = null;
 
         /**
@@ -42,8 +42,8 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         public Layout(Context context) {
             super(context);
 
-            runViewControl = new RunDataSeekBar(context);
-            runContainerView = new RunContainerView(context);
+            runViewControl = new FrameDataSeekBar(context);
+            runContainerView = new FrameContainerView(context);
 
             LayoutInflater inflater = (LayoutInflater)context.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
@@ -54,11 +54,11 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
             addView(experimentDataView);
         }
 
-        public RunDataSeekBar getRunViewControl() {
+        public FrameDataSeekBar getRunViewControl() {
             return runViewControl;
         }
 
-        public RunContainerView getRunContainerView() {
+        public FrameContainerView getRunContainerView() {
             return runContainerView;
         }
 
@@ -88,7 +88,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         }
     }
 
-    private RunContainerView runContainerView = null;
+    private FrameContainerView runContainerView = null;
     private TableView tableView = null;
     private GraphView2D graphView = null;
     private Spinner graphSpinner = null;
@@ -122,10 +122,10 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         Layout view = new Layout(getActivity());
         assert view != null;
 
-        View experimentRunView = plugin.createExperimentRunView(activity, experimentAnalysis.getExperimentData());
+        View experimentRunView = plugin.createExperimentRunView(activity, experimentAnalysis.getExperimentRunData());
 
-        RunDataSeekBar runViewControl = view.getRunViewControl();
-        runViewControl.setTo(experimentAnalysis.getRunDataModel());
+        FrameDataSeekBar runViewControl = view.getRunViewControl();
+        runViewControl.setTo(experimentAnalysis.getFrameDataModel());
 
         runContainerView = view.getRunContainerView();
         runContainerView.setTo(experimentRunView, experimentAnalysis);

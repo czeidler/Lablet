@@ -22,8 +22,8 @@ import android.widget.MediaController;
 import android.widget.PopupMenu;
 import android.widget.VideoView;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.ExperimentData;
-import nz.ac.auckland.lablet.experiment.IExperiment;
+import nz.ac.auckland.lablet.experiment.ExperimentRunData;
+import nz.ac.auckland.lablet.experiment.IExperimentRun;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.RatioSurfaceView;
 
@@ -106,11 +106,11 @@ class CameraExperimentView extends FrameLayout {
     }
 }
 
-public class CameraExperiment implements IExperiment {
+public class CameraExperimentRun implements IExperimentRun {
     private Activity activity;
     private IExperimentParent parent;
 
-    private CameraExperimentData experimentData;
+    private CameraExperimentRunData experimentData;
     private CameraExperimentView cameraExperimentView = null;
 
     private Camera camera = null;
@@ -172,7 +172,7 @@ public class CameraExperiment implements IExperiment {
             requestedVideoHeight = intent.getIntExtra("requested_video_height", -1);
         }
 
-        experimentData = new CameraExperimentData(activity);
+        experimentData = new CameraExperimentRunData(activity);
         File experimentDir = new File(experimentBaseDir, experimentData.getUid());
         experimentData.setStorageDir(experimentDir);
 
@@ -393,7 +393,7 @@ public class CameraExperiment implements IExperiment {
     }
 
     @Override
-    public ExperimentData getExperimentData() {
+    public ExperimentRunData getExperimentData() {
         return experimentData;
     }
 

@@ -10,7 +10,6 @@ package nz.ac.auckland.lablet.accelerometer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -21,16 +20,14 @@ import android.view.View;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYPlot;
-import com.androidplot.xy.XYSeries;
-import nz.ac.auckland.lablet.experiment.ExperimentData;
-import nz.ac.auckland.lablet.experiment.IExperiment;
-import nz.ac.auckland.lablet.views.graph.GraphView2D;
+import nz.ac.auckland.lablet.experiment.ExperimentRunData;
+import nz.ac.auckland.lablet.experiment.IExperimentRun;
 
 import java.io.File;
 import java.io.IOException;
 
 
-public class AccelerometerExperiment implements IExperiment {
+public class AccelerometerExperimentRun implements IExperimentRun {
     private XYPlot graphView2D;
     private SimpleXYSeries xData;
 
@@ -129,7 +126,7 @@ public class AccelerometerExperiment implements IExperiment {
     }
 
     @Override
-    public ExperimentData getExperimentData() {
+    public ExperimentRunData getExperimentData() {
         return null;
     }
 }

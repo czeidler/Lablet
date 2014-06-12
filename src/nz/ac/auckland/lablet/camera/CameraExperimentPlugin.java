@@ -12,11 +12,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import nz.ac.auckland.lablet.ExperimentActivity;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentPlugin;
-import nz.ac.auckland.lablet.experiment.ExperimentData;
+import nz.ac.auckland.lablet.experiment.ExperimentRunData;
 import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
-import nz.ac.auckland.lablet.experiment.IExperiment;
+import nz.ac.auckland.lablet.experiment.IExperimentRun;
 
 import java.io.File;
 
@@ -27,7 +26,7 @@ import java.io.File;
 public class CameraExperimentPlugin extends AbstractExperimentPlugin {
     @Override
     public String getName() {
-        return CameraExperiment.class.getSimpleName();
+        return CameraExperimentRun.class.getSimpleName();
     }
 
     @Override
@@ -36,17 +35,17 @@ public class CameraExperimentPlugin extends AbstractExperimentPlugin {
     }
 
     @Override
-    public IExperiment createExperiment(Activity parentActivity, Intent intent, File experimentBaseDir) {
-        IExperiment experiment = new CameraExperiment();
+    public IExperimentRun createExperiment(Activity parentActivity, Intent intent, File experimentBaseDir) {
+        IExperimentRun experiment = new CameraExperimentRun();
         experiment.init(parentActivity, intent, experimentBaseDir);
         return experiment;
     }
 
     @Override
-    public void startRunSettingsActivity(Activity parentActivity, int requestCode, ExperimentData experimentData,
+    public void startRunSettingsActivity(Activity parentActivity, int requestCode, ExperimentRunData experimentRunData,
                                          Bundle analysisSpecificData, Bundle options) {
         Intent intent = new Intent(parentActivity, CameraRunSettingsActivity.class);
-        packStartRunSettingsIntent(intent, experimentData, analysisSpecificData, options);
+        packStartRunSettingsIntent(intent, experimentRunData, analysisSpecificData, options);
         parentActivity.startActivityForResult(intent, requestCode);
     }
 
@@ -58,17 +57,17 @@ public class CameraExperimentPlugin extends AbstractExperimentPlugin {
     }
 
     @Override
-    public ExperimentData loadExperiment(Context context, Bundle data, File storageDir) {
-        return new CameraExperimentData(context, data, storageDir);
+    public ExperimentRunData loadExperiment(Context context, Bundle data, File storageDir) {
+        return new CameraExperimentRunData(context, data, storageDir);
     }
 
     @Override
-    public ExperimentAnalysis createExperimentAnalysis(ExperimentData experimentData) {
-        return new CameraExperimentAnalysis(experimentData);
+    public ExperimentAnalysis createExperimentAnalysis(ExperimentRunData experimentRunData) {
+        return new CameraExperimentAnalysis(experimentRunData);
     }
 
     @Override
-    public View createExperimentRunView(Context context, ExperimentData experimentData) {
-        return new CameraExperimentRunView(context, experimentData);
+    public View createExperimentRunView(Context context, ExperimentRunData experimentRunData) {
+        return new CameraExperimentFrameView(context, experimentRunData);
     }
 }

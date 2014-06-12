@@ -277,14 +277,14 @@ interface IMarkerDataModelPainter {
  * {@link nz.ac.auckland.lablet.views.MarkerView}.
  */
 abstract class AbstractMarkerPainter implements IMarkerDataModelPainter, MarkerDataModel.IMarkerDataModelListener {
-    protected IExperimentRunView experimentRunView = null;
+    protected IExperimentFrameView experimentRunView = null;
     protected View markerView = null;
     protected MarkerDataModel markerData = null;
     protected Rect frame = new Rect();
     protected List<IMarker> markerList;
 
 
-    public AbstractMarkerPainter(View parent, IExperimentRunView runView, MarkerDataModel model) {
+    public AbstractMarkerPainter(View parent, IExperimentFrameView runView, MarkerDataModel model) {
         experimentRunView = runView;
         markerView = parent;
         markerData = model;
@@ -438,7 +438,7 @@ abstract class AbstractMarkerPainter implements IMarkerDataModelPainter, MarkerD
 class TagMarkerDataModelPainter extends AbstractMarkerPainter {
     private LastInsertMarkerManager lastInsertMarkerManager = new LastInsertMarkerManager();
 
-    public TagMarkerDataModelPainter(View parent, IExperimentRunView runView, MarkerDataModel data) {
+    public TagMarkerDataModelPainter(View parent, IExperimentFrameView runView, MarkerDataModel data) {
         super(parent, runView, data);
     }
 

@@ -13,36 +13,36 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import nz.ac.auckland.lablet.experiment.Calibration;
 import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
-import nz.ac.auckland.lablet.experiment.RunDataModel;
 
 
 /**
- * Container for the {@link nz.ac.auckland.lablet.views.IExperimentRunView} and a marker view overlay.
+ * Container for the {@link IExperimentFrameView} and a marker view overlay.
  * <p>
  * The resize behaviour of the run view is copied and the marker view is put exactly on top of the run view. In this way
  * the screen coordinates of the run view and the marker view are the same.
  * </p>
  */
-public class RunContainerView extends RelativeLayout implements RunDataModel.IRunDataModelListener,
+public class FrameContainerView extends RelativeLayout implements FrameDataModel.IFrameDataModelListener,
         ExperimentAnalysis.IExperimentAnalysisListener {
     private View experimentRunView = null;
     private MarkerView markerView = null;
-    private RunDataModel runDataModel = null;
+    private FrameDataModel frameDataModel = null;
     private ExperimentAnalysis experimentAnalysis = null;
     private OriginMarkerPainter originMarkerPainter = null;
 
-    public RunContainerView(Context context) {
+    public FrameContainerView(Context context) {
         super(context);
     }
 
-    public RunContainerView(Context context, AttributeSet attrs) {
+    public FrameContainerView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
     protected void finalize() {
         experimentAnalysis.removeListener(this);
-        runDataModel.removeListener(this);
+        frameDataModel.removeListener(this);
 
         try {
             super.finalize();
@@ -57,10 +57,10 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
         experimentAnalysis = analysis;
         experimentAnalysis.addListener(this);
 
-        if (runDataModel != null)
-            runDataModel.removeListener(this);
-        runDataModel = experimentAnalysis.getRunDataModel();
-        runDataModel.addListener(this);
+        if (frameDataModel != null)
+            frameDataModel.removeListener(this);
+        frameDataModel = experimentAnalysis.getFrameDataModel();
+        frameDataModel.addListener(this);
 
         experimentRunView = runView;
 
@@ -92,15 +92,15 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
 
     public void addTagMarkerData(MarkerDataModel data) {
         IMarkerDataModelPainter painter = new TagMarkerDataModelPainter(markerView,
-                (IExperimentRunView)experimentRunView, data);
+                (IExperimentFrameView)experimentRunView, data);
         markerView.addMarkerPainter(painter);
 
-        onRunChanged(runDataModel.getCurrentRun());
+        onFrameChanged(frameDataModel.getCurrentFrame());
     }
 
     public void addXYCalibrationData(MarkerDataModel data) {
         IMarkerDataModelPainter painter = new CalibrationMarkerPainter(markerView,
-                (IExperimentRunView)experimentRunView, data);
+                (IExperimentFrameView)experimentRunView, data);
         markerView.addMarkerPainter(painter);
     }
 
@@ -109,7 +109,7 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
     }
 
     public void addOriginData(MarkerDataModel data, Calibration calibration) {
-        originMarkerPainter = new OriginMarkerPainter(markerView, (IExperimentRunView)experimentRunView, data,
+        originMarkerPainter = new OriginMarkerPainter(markerView, (IExperimentFrameView)experimentRunView, data,
                 calibration);
         if (experimentAnalysis.getShowCoordinateSystem())
             markerView.addMarkerPainter(originMarkerPainter);
@@ -120,14 +120,14 @@ public class RunContainerView extends RelativeLayout implements RunDataModel.IRu
     }
 
     @Override
-    public void onRunChanged(int newRun) {
-        ((IExperimentRunView)experimentRunView).setCurrentRun(newRun);
-        markerView.setCurrentRun(newRun);
+    public void onFrameChanged(int newFrame) {
+        ((IExperimentFrameView)experimentRunView).setCurrentFrame(newFrame);
+        markerView.setCurrentRun(newFrame);
         markerView.invalidate();
     }
 
     @Override
-    public void onNumberOfRunsChanged() {
+    public void onNumberOfFramesChanged() {
 
     }
 

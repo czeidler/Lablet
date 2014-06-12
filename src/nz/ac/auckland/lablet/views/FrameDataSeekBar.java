@@ -13,35 +13,35 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.RunDataModel;
+import nz.ac.auckland.lablet.experiment.FrameDataModel;
 
 
 /**
- * Seek bar to work with the {@link nz.ac.auckland.lablet.experiment.RunDataModel}.
+ * Seek bar to work with the {@link nz.ac.auckland.lablet.experiment.FrameDataModel}.
  */
-public class RunDataSeekBar extends LinearLayout implements RunDataModel.IRunDataModelListener {
-    private RunDataModel runDataModel = null;
+public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.IFrameDataModelListener {
+    private FrameDataModel frameDataModel = null;
 
     private TextView progressLabel = null;
     private SeekBar seekBar = null;
 
     @Override
-    public void onRunChanged(int newRun) {
+    public void onFrameChanged(int newFrame) {
         updateViews();
     }
 
     @Override
-    public void onNumberOfRunsChanged() {
+    public void onNumberOfFramesChanged() {
         updateViews();
     }
 
-    public RunDataSeekBar(Context context) {
+    public FrameDataSeekBar(Context context) {
         super(context);
 
         init(context);
     }
 
-    public RunDataSeekBar(Context context, AttributeSet attrs) {
+    public FrameDataSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         init(context);
@@ -59,13 +59,13 @@ public class RunDataSeekBar extends LinearLayout implements RunDataModel.IRunDat
         prevButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                runDataModel.setCurrentRun(runDataModel.getCurrentRun() - 1);
+                frameDataModel.setCurrentFrame(frameDataModel.getCurrentFrame() - 1);
             }
         });
         nextButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                runDataModel.setCurrentRun(runDataModel.getCurrentRun() + 1);
+                frameDataModel.setCurrentFrame(frameDataModel.getCurrentFrame() + 1);
             }
         });
 
@@ -74,7 +74,7 @@ public class RunDataSeekBar extends LinearLayout implements RunDataModel.IRunDat
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (!fromUser)
                     return;
-                runDataModel.setCurrentRun(progress);
+                frameDataModel.setCurrentFrame(progress);
             }
 
             @Override
@@ -91,24 +91,24 @@ public class RunDataSeekBar extends LinearLayout implements RunDataModel.IRunDat
         progressLabel.setText("--/--");
     }
 
-    public void setTo(RunDataModel model) {
-        if (runDataModel != null)
-            runDataModel.removeListener(this);
+    public void setTo(FrameDataModel model) {
+        if (frameDataModel != null)
+            frameDataModel.removeListener(this);
 
-        runDataModel = model;
-        runDataModel.addListener(this);
+        frameDataModel = model;
+        frameDataModel.addListener(this);
 
         updateViews();
     }
 
     private void updateViews() {
-        int run = runDataModel.getCurrentRun();
+        int run = frameDataModel.getCurrentFrame();
         String labelText = String.valueOf(run);
         labelText += "/";
-        labelText += String.valueOf(runDataModel.getNumberOfRuns() - 1);
+        labelText += String.valueOf(frameDataModel.getNumberOfFrames() - 1);
         progressLabel.setText(labelText);
 
-        seekBar.setMax(runDataModel.getNumberOfRuns() - 1);
+        seekBar.setMax(frameDataModel.getNumberOfFrames() - 1);
         seekBar.setProgress(run);
     }
 }

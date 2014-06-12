@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.table;
 
-import nz.ac.auckland.lablet.experiment.ExperimentData;
+import nz.ac.auckland.lablet.experiment.ExperimentRunData;
 
 
 /**
@@ -22,9 +22,9 @@ public class SpeedTimeDataTableColumn extends TimeDataTableColumn {
 
     @Override
     public Number getValue(int index) {
-        ExperimentData experimentData = experimentAnalysis.getExperimentData();
-        float t0 = experimentData.getRunValueAt(index);
-        float t1 = experimentData.getRunValueAt(index + 1);
+        ExperimentRunData experimentRunData = experimentAnalysis.getExperimentRunData();
+        float t0 = experimentRunData.getRunValueAt(index);
+        float t1 = experimentRunData.getRunValueAt(index + 1);
         return t0 + (t1 - t0) / 2.f;
     }
 }

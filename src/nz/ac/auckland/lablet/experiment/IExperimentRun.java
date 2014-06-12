@@ -18,7 +18,7 @@ import java.io.File;
 import java.io.IOException;
 
 
-public interface IExperiment {
+public interface IExperimentRun {
     public interface IExperimentParent {
         public void startEditingSettings();
         public void finishEditingSettings();
@@ -35,11 +35,11 @@ public interface IExperiment {
      */
     public boolean onPrepareOptionsMenu(MenuItem menuItem, IExperimentParent parent);
 
-    public void init(Activity activity, Intent intent, File experimentBaseDir);
-    public void destroy();
-
     public void onSaveInstanceState(Bundle outState);
     public void onRestoreInstanceState(Bundle savedInstanceState);
+
+    public void init(Activity activity, Intent intent, File experimentBaseDir);
+    public void destroy();
 
     public void finish(boolean discardExperiment) throws IOException;
 
@@ -55,5 +55,5 @@ public interface IExperiment {
     public void startPlayback();
     public void stopPlayback();
 
-    public ExperimentData getExperimentData();
+    public ExperimentRunData getExperimentData();
 }

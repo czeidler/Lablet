@@ -12,11 +12,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import nz.ac.auckland.lablet.camera.*;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentPlugin;
 import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
-import nz.ac.auckland.lablet.experiment.ExperimentData;
-import nz.ac.auckland.lablet.experiment.IExperiment;
+import nz.ac.auckland.lablet.experiment.ExperimentRunData;
+import nz.ac.auckland.lablet.experiment.IExperimentRun;
 
 import java.io.File;
 
@@ -24,7 +23,7 @@ import java.io.File;
 public class AccelerometerExperimentPlugin extends AbstractExperimentPlugin {
     @Override
     public String getName() {
-        return AccelerometerExperiment.class.getSimpleName();
+        return AccelerometerExperimentRun.class.getSimpleName();
     }
 
     @Override
@@ -33,14 +32,14 @@ public class AccelerometerExperimentPlugin extends AbstractExperimentPlugin {
     }
 
     @Override
-    public IExperiment createExperiment(Activity parentActivity, Intent intent, File experimentBaseDir) {
-        IExperiment experiment = new AccelerometerExperiment();
+    public IExperimentRun createExperiment(Activity parentActivity, Intent intent, File experimentBaseDir) {
+        IExperimentRun experiment = new AccelerometerExperimentRun();
         experiment.init(parentActivity, intent, experimentBaseDir);
         return experiment;
     }
 
     @Override
-    public void startRunSettingsActivity(Activity parentActivity, int requestCode, ExperimentData experimentData,
+    public void startRunSettingsActivity(Activity parentActivity, int requestCode, ExperimentRunData experimentRunData,
                                          Bundle analysisSpecificData, Bundle options) {
 
     }
@@ -51,17 +50,17 @@ public class AccelerometerExperimentPlugin extends AbstractExperimentPlugin {
     }
 
     @Override
-    public ExperimentData loadExperiment(Context context, Bundle data, File storageDir) {
+    public ExperimentRunData loadExperiment(Context context, Bundle data, File storageDir) {
         return null;
     }
 
     @Override
-    public ExperimentAnalysis createExperimentAnalysis(ExperimentData experimentData) {
+    public ExperimentAnalysis createExperimentAnalysis(ExperimentRunData experimentRunData) {
         return null;
     }
 
     @Override
-    public View createExperimentRunView(Context context, ExperimentData experimentData) {
+    public View createExperimentRunView(Context context, ExperimentRunData experimentRunData) {
         return null;
     }
 }

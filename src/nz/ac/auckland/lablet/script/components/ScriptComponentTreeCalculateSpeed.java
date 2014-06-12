@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import nz.ac.auckland.lablet.*;
-import nz.ac.auckland.lablet.experiment.ExperimentData;
+import nz.ac.auckland.lablet.experiment.ExperimentRunData;
 import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.script.Script;
@@ -379,18 +379,18 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         adapter.addColumn(new YPositionDataTableColumn());
         rawDataTable.setAdapter(adapter);
 
-        ExperimentData experimentData = experimentAnalysis.getExperimentData();
+        ExperimentRunData experimentRunData = experimentAnalysis.getExperimentRunData();
         if (tagMarker.getMarkerCount() < 3)
             return;
 
         String text = "";
-        text += experimentData.getRunValueAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex()).getRunId());
+        text += experimentRunData.getRunValueAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex()).getRunId());
         time1EditText.setText(text);
         text = "";
-        text += experimentData.getRunValueAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 1).getRunId());
+        text += experimentRunData.getRunValueAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 1).getRunId());
         time2EditText.setText(text);
         text = "";
-        text += experimentData.getRunValueAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 2).getRunId());
+        text += experimentRunData.getRunValueAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 2).getRunId());
         time3EditText.setText(text);
 
         text = "";

@@ -18,14 +18,14 @@ import nz.ac.auckland.lablet.experiment.*;
  */
 public class CameraExperimentAnalysis extends ExperimentAnalysis {
 
-    public CameraExperimentAnalysis(ExperimentData experimentData) {
-        super(experimentData);
+    public CameraExperimentAnalysis(ExperimentRunData experimentRunData) {
+        super(experimentRunData);
 
         updateOriginFromVideoRotation();
     }
 
     private void updateOriginFromVideoRotation() {
-        CameraExperimentData cameraExperiment = (CameraExperimentData) getExperimentData();
+        CameraExperimentRunData cameraExperiment = (CameraExperimentRunData) getExperimentRunData();
         Calibration calibration = getCalibration();
 
         // read rotation from video
@@ -65,7 +65,7 @@ public class CameraExperimentAnalysis extends ExperimentAnalysis {
 
     @Override
     protected void onRunSpecificDataChanged() {
-        CameraExperimentData cameraExperiment = (CameraExperimentData) getExperimentData();
+        CameraExperimentRunData cameraExperiment = (CameraExperimentRunData) getExperimentRunData();
         Bundle experimentSpecificData = getExperimentSpecificData();
         if (experimentSpecificData == null)
             return;
@@ -77,9 +77,9 @@ public class CameraExperimentAnalysis extends ExperimentAnalysis {
         cameraExperiment.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
         cameraExperiment.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
 
-        int numberOfRuns = getExperimentData().getNumberOfRuns();
-        getRunDataModel().setNumberOfRuns(numberOfRuns);
-        if (numberOfRuns <= getRunDataModel().getCurrentRun())
-            getRunDataModel().setCurrentRun(numberOfRuns - 1);
+        int numberOfRuns = getExperimentRunData().getNumberOfRuns();
+        getFrameDataModel().setNumberOfFrames(numberOfRuns);
+        if (numberOfRuns <= getFrameDataModel().getCurrentFrame())
+            getFrameDataModel().setCurrentFrame(numberOfRuns - 1);
     }
 }

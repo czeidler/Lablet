@@ -18,7 +18,6 @@ import android.os.FileObserver;
 import android.view.*;
 import android.widget.*;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentPlugin;
-import nz.ac.auckland.lablet.experiment.IExperiment;
 import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
 import nz.ac.auckland.lablet.experiment.ExperimentPluginFactory;
 import nz.ac.auckland.lablet.misc.StorageLib;

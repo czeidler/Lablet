@@ -27,9 +27,9 @@ public class ExperimentAnalysis {
 
     final public static String EXPERIMENT_ANALYSIS_FILE_NAME = "experiment_analysis.xml";
 
-    private ExperimentData experimentData;
+    private ExperimentRunData experimentRunData;
 
-    private RunDataModel runDataModel;
+    private FrameDataModel frameDataModel;
     private Calibration calibration;
 
     private String xUnitPrefix = "";
@@ -47,19 +47,19 @@ public class ExperimentAnalysis {
 
     private List<IExperimentAnalysisListener> listenerList = new ArrayList<IExperimentAnalysisListener>();
 
-    public ExperimentAnalysis(ExperimentData experimentData) {
-        this.experimentData = experimentData;
+    public ExperimentAnalysis(ExperimentRunData experimentRunData) {
+        this.experimentRunData = experimentRunData;
 
-        runDataModel = new RunDataModel();
-        runDataModel.setNumberOfRuns(experimentData.getNumberOfRuns());
+        frameDataModel = new FrameDataModel();
+        frameDataModel.setNumberOfFrames(experimentRunData.getNumberOfRuns());
 
         calibration = new Calibration();
 
         tagMarkers = new MarkerDataModel();
         tagMarkers.setCalibration(calibration);
 
-        float maxXValue = experimentData.getMaxRawX();
-        float maxYValue = experimentData.getMaxRawY();
+        float maxXValue = experimentRunData.getMaxRawX();
+        float maxYValue = experimentRunData.getMaxRawY();
         lengthCalibrationMarkers = new MarkerDataModel();
         MarkerData point1 = new MarkerData(-1);
         point1.setPosition(new PointF(maxXValue * 0.1f, maxYValue * 0.9f));
@@ -91,9 +91,9 @@ public class ExperimentAnalysis {
         originCalibrationSetter.setOrigin(origin, axis1);
     }
 
-    public ExperimentData getExperimentData() { return experimentData; }
-    public RunDataModel getRunDataModel() {
-        return runDataModel;
+    public ExperimentRunData getExperimentRunData() { return experimentRunData; }
+    public FrameDataModel getFrameDataModel() {
+        return frameDataModel;
     }
     public Calibration getCalibration() {
         return calibration;
@@ -146,17 +146,17 @@ public class ExperimentAnalysis {
     }
 
     public String getXUnit() {
-        return getXUnitPrefix() + experimentData.getXBaseUnit();
+        return getXUnitPrefix() + experimentRunData.getXBaseUnit();
     }
 
     public String getYUnit() {
-        return getYUnitPrefix() + experimentData.getYBaseUnit();
+        return getYUnitPrefix() + experimentRunData.getYBaseUnit();
     }
 
     public Bundle analysisDataToBundle() {
         Bundle analysisDataBundle = new Bundle();
 
-        analysisDataBundle.putInt("currentRun", runDataModel.getCurrentRun());
+        analysisDataBundle.putInt("currentRun", frameDataModel.getCurrentFrame());
 
         if (tagMarkers.getMarkerCount() > 0) {
             Bundle tagMarkerBundle = new Bundle();
@@ -204,7 +204,7 @@ public class ExperimentAnalysis {
         tagMarkers.clear();
 
         setExperimentSpecificData(bundle.getBundle("experiment_specific_data"));
-        runDataModel.setCurrentRun(bundle.getInt("currentRun"));
+        frameDataModel.setCurrentFrame(bundle.getInt("currentRun"));
 
         Bundle tagMarkerBundle = bundle.getBundle("tagMarkers");
         if (tagMarkerBundle != null) {
@@ -268,7 +268,7 @@ public class ExperimentAnalysis {
         bundle.putBundle("analysis_data", experimentData);
 
         // save the bundle
-        File projectFile = new File(this.experimentData.getStorageDir(), EXPERIMENT_ANALYSIS_FILE_NAME);
+        File projectFile = new File(this.experimentRunData.getStorageDir(), EXPERIMENT_ANALYSIS_FILE_NAME);
         FileWriter fileWriter = new FileWriter(projectFile);
         PersistentBundle persistentBundle = new PersistentBundle();
         persistentBundle.flattenBundle(bundle, fileWriter);
@@ -277,7 +277,7 @@ public class ExperimentAnalysis {
     public void exportTagMarkerCSVData(OutputStream outputStream) {
         try {
             String header = "id, x [" + getXUnit() + "], y [" + getYUnit()
-                    + "], " + experimentData.getRunValueLabel() + "\n";
+                    + "], " + experimentRunData.getRunValueLabel() + "\n";
             outputStream.write(header.getBytes());
             for (int i = 0; i < tagMarkers.getMarkerCount(); i++) {
                 MarkerData markerData = tagMarkers.getMarkerDataAt(i);
@@ -298,7 +298,7 @@ public class ExperimentAnalysis {
                 outputStream.write(",".getBytes());
 
                 string = "";
-                string += experimentData.getRunValueAt(i);
+                string += experimentRunData.getRunValueAt(i);
                 outputStream.write(string.getBytes());
 
                 outputStream.write("\n".getBytes());

@@ -41,7 +41,7 @@ public interface IExperimentPlugin {
      * {@see android.app.Activity#startActivityForResult(android.content.Intent, int, android.os.Bundle)})
      * @param options bundle with settings for the experiment
      */
-    public IExperiment createExperiment(Activity parentActivity, Intent intent, File experimentBaseDir);
+    public IExperimentRun createExperiment(Activity parentActivity, Intent intent, File experimentBaseDir);
 
     /**
      * Starts an activity to config the experiment runs.
@@ -71,11 +71,11 @@ public interface IExperimentPlugin {
      *
      * @param parentActivity the parent activity
      * @param requestCode request code for the activity
-     * @param experimentData the experiment is needed to put information about the experiment into the intent
+     * @param experimentRunData the experiment is needed to put information about the experiment into the intent
      * @param analysisSpecificData bundle with the analysis specific data (the analysis settings)
      * @param options bundle with options for the run settings activity
      */
-    public void startRunSettingsActivity(Activity parentActivity, int requestCode, ExperimentData experimentData,
+    public void startRunSettingsActivity(Activity parentActivity, int requestCode, ExperimentRunData experimentRunData,
                                          Bundle analysisSpecificData, Bundle options);
 
     /**
@@ -98,24 +98,24 @@ public interface IExperimentPlugin {
      * @param storageDir directory where additional data may have been stored
      * @return the loaded experiment or null on failure
      */
-    public ExperimentData loadExperiment(Context context, Bundle data, File storageDir);
+    public ExperimentRunData loadExperiment(Context context, Bundle data, File storageDir);
 
     /**
      * Creates an {@link nz.ac.auckland.lablet.experiment.ExperimentAnalysis} object for the given
-     * {@link ExperimentData}.
+     * {@link ExperimentRunData}.
      *
-     * @param experimentData usually loaded with the loadExperimentData method
+     * @param experimentRunData usually loaded with the loadExperimentData method
      * @return pointer to the created experiment analysis
      */
-    public ExperimentAnalysis createExperimentAnalysis(ExperimentData experimentData);
+    public ExperimentAnalysis createExperimentAnalysis(ExperimentRunData experimentRunData);
 
     /**
      * Creates the view that displays the results in the
      * {@link nz.ac.auckland.lablet.ExperimentAnalyserActivity}.
      *
      * @param context context of the view
-     * @param experimentData experiment that should be used
+     * @param experimentRunData experiment that should be used
      * @return a newly created view
      */
-    public View createExperimentRunView(Context context, ExperimentData experimentData);
+    public View createExperimentRunView(Context context, ExperimentRunData experimentRunData);
 }

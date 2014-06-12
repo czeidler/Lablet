@@ -18,11 +18,10 @@ import android.view.*;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
-import nz.ac.auckland.lablet.accelerometer.AccelerometerExperiment;
-import nz.ac.auckland.lablet.camera.CameraExperiment;
-import nz.ac.auckland.lablet.camera.CameraExperimentData;
+import nz.ac.auckland.lablet.accelerometer.AccelerometerExperimentRun;
+import nz.ac.auckland.lablet.camera.CameraExperimentRun;
 import nz.ac.auckland.lablet.experiment.ExperimentPluginFactory;
-import nz.ac.auckland.lablet.experiment.IExperiment;
+import nz.ac.auckland.lablet.experiment.IExperimentRun;
 import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
 
 import java.io.File;
@@ -34,10 +33,10 @@ import java.util.Map;
 
 
 public class ExperimentActivity extends Activity {
-    final private List<IExperiment> experiments = new ArrayList<>();
-    final private Map<IExperiment, View> experimentViews = new HashMap<>();
+    final private List<IExperimentRun> experiments = new ArrayList<>();
+    final private Map<IExperimentRun, View> experimentViews = new HashMap<>();
 
-    private IExperiment currentExperiment;
+    private IExperimentRun currentExperiment;
     private File experimentBaseDir;
 
     private FrameLayout centerView = null;
@@ -90,7 +89,7 @@ public class ExperimentActivity extends Activity {
         assert settingsMenu != null;
         if (currentExperiment != null) {
             boolean hasOptions = currentExperiment.onPrepareOptionsMenu(settingsMenu,
-                    new IExperiment.IExperimentParent() {
+                    new IExperimentRun.IExperimentParent() {
                 private AbstractViewState previousState;
 
                 @Override
@@ -144,7 +143,7 @@ public class ExperimentActivity extends Activity {
         PopupMenu popup = new PopupMenu(menuView.getContext(), menuView);
 
         for (int i = 0; i < experiments.size(); i++) {
-            IExperiment experiment = experiments.get(i);
+            IExperimentRun experiment = experiments.get(i);
 
             MenuItem item = popup.getMenu().add(1, i, i, experiment.getClass().getSimpleName());
             item.setCheckable(true);
@@ -162,8 +161,8 @@ public class ExperimentActivity extends Activity {
         popup.show();
     }
 
-    private IExperiment getExperiment(IExperimentPlugin plugin) {
-        for (IExperiment experiment : experiments) {
+    private IExperimentRun getExperiment(IExperimentPlugin plugin) {
+        for (IExperimentRun experiment : experiments) {
             if (experiment.getClass().getSimpleName().equals(plugin.getName()))
                 return experiment;
         }
@@ -189,7 +188,7 @@ public class ExperimentActivity extends Activity {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 IExperimentPlugin plugin = plugins.get(menuItem.getItemId());
-                IExperiment experiment = getExperiment(plugin);
+                IExperimentRun experiment = getExperiment(plugin);
                 if (experiment != null)
                     removeExperiment(experiment);
                 else
@@ -238,19 +237,19 @@ public class ExperimentActivity extends Activity {
 
         experimentBaseDir = new File(getExternalFilesDir(null), "experiments");
 
-        IExperimentPlugin plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(AccelerometerExperiment.class.getSimpleName());
+        IExperimentPlugin plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(AccelerometerExperimentRun.class.getSimpleName());
         addExperiment(plugin, experimentBaseDir, false);
 
-        plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(CameraExperiment.class.getSimpleName());
+        plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(CameraExperimentRun.class.getSimpleName());
         addExperiment(plugin, experimentBaseDir, false);
     }
 
     private void addExperiment(IExperimentPlugin plugin, File experimentBaseDir, boolean activityIsRunning) {
-        IExperiment experiment = plugin.createExperiment(this, getIntent(), experimentBaseDir);
+        IExperimentRun experiment = plugin.createExperiment(this, getIntent(), experimentBaseDir);
         addExperiment(experiment, activityIsRunning);
     }
 
-    private void addExperiment(IExperiment experiment, boolean activityIsRunning) {
+    private void addExperiment(IExperimentRun experiment, boolean activityIsRunning) {
         experiments.add(experiment);
         centerView.addView(getExperimentView(experiment));
         if (activityIsRunning)
@@ -258,7 +257,7 @@ public class ExperimentActivity extends Activity {
         setCurrentExperiment(experiment);
     }
 
-    private void removeExperiment(IExperiment experiment) {
+    private void removeExperiment(IExperimentRun experiment) {
         setState(null);
 
         experiments.remove(experiment);
@@ -278,7 +277,7 @@ public class ExperimentActivity extends Activity {
         setState(new PreviewState());
     }
 
-    private void setCurrentExperiment(IExperiment experiment) {
+    private void setCurrentExperiment(IExperimentRun experiment) {
         if (currentExperiment != null)
             getExperimentView(currentExperiment).setVisibility(View.INVISIBLE);
         currentExperiment = experiment;
@@ -289,7 +288,7 @@ public class ExperimentActivity extends Activity {
         centerView.requestLayout();
     }
 
-    private View getExperimentView(IExperiment experiment) {
+    private View getExperimentView(IExperimentRun experiment) {
         if (experimentViews.containsKey(experiment))
             return experimentViews.get(experiment);
 
@@ -303,7 +302,7 @@ public class ExperimentActivity extends Activity {
         super.onSaveInstanceState(outState);
 
         for (int i = 0; i < experiments.size(); i++) {
-            IExperiment experiment = experiments.get(i);
+            IExperimentRun experiment = experiments.get(i);
 
             String experimentId = "";
             experimentId += i;
@@ -319,7 +318,7 @@ public class ExperimentActivity extends Activity {
         super.onRestoreInstanceState(savedInstanceState);
 
         for (int i = 0; i < experiments.size(); i++) {
-            IExperiment experiment = experiments.get(i);
+            IExperimentRun experiment = experiments.get(i);
 
             String experimentId = "";
             experimentId += i;
@@ -332,7 +331,7 @@ public class ExperimentActivity extends Activity {
     public void onResume() {
         super.onResume();
 
-        for (IExperiment experiment : experiments)
+        for (IExperimentRun experiment : experiments)
             experiment.init(this, getIntent(), experimentBaseDir);
     }
 
@@ -340,7 +339,7 @@ public class ExperimentActivity extends Activity {
     public void onPause() {
         setState(null);
 
-        for (IExperiment experiment : experiments)
+        for (IExperimentRun experiment : experiments)
             experiment.destroy();
 
         super.onPause();
@@ -366,7 +365,7 @@ public class ExperimentActivity extends Activity {
             builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    for (IExperiment experiment : experiments)
+                    for (IExperimentRun experiment : experiments)
                         try {
                             experiment.finish(true);
                         } catch (IOException e) {
@@ -380,7 +379,7 @@ public class ExperimentActivity extends Activity {
 
             builder.create().show();
         } else {
-            for (IExperiment experiment : experiments)
+            for (IExperimentRun experiment : experiments)
                 try {
                     experiment.finish(true);
                 } catch (IOException e) {
@@ -393,7 +392,7 @@ public class ExperimentActivity extends Activity {
 
     private void startRecording() {
         try {
-            for (IExperiment experiment : experiments)
+            for (IExperimentRun experiment : experiments)
                 experiment.startRecording();
 
         } catch (Exception e) {
@@ -411,7 +410,7 @@ public class ExperimentActivity extends Activity {
 
     private boolean stopRecording() {
         boolean dataTaken = true;
-        for (IExperiment experiment : experiments) {
+        for (IExperimentRun experiment : experiments) {
             if (!experiment.stopRecording())
                 dataTaken = false;
         }
@@ -422,7 +421,7 @@ public class ExperimentActivity extends Activity {
         unsavedExperimentData = false;
 
         try {
-            for (IExperiment experiment : experiments)
+            for (IExperimentRun experiment : experiments)
                 experiment.finish(false);
 
             Intent data = new Intent();
@@ -470,14 +469,14 @@ public class ExperimentActivity extends Activity {
 
             analyseMenuItem.setEnabled(false);
 
-            for (IExperiment experiment : experiments)
+            for (IExperimentRun experiment : experiments)
                 experiment.startPreview();
         }
 
         public void leaveState() {
             settingsMenu.setVisible(false);
 
-            for (IExperiment experiment : experiments)
+            for (IExperimentRun experiment : experiments)
                 experiment.stopPreview();
         }
 
@@ -576,14 +575,14 @@ public class ExperimentActivity extends Activity {
             stopButton.setEnabled(false);
             newButton.setVisibility(View.VISIBLE);
 
-            for (IExperiment experiment : experiments)
+            for (IExperimentRun experiment : experiments)
                 experiment.startPlayback();
 
             analyseMenuItem.setEnabled(true);
         }
 
         public void leaveState() {
-            for (IExperiment experiment : experiments)
+            for (IExperimentRun experiment : experiments)
                 experiment.stopPlayback();
         }
 

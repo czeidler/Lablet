@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.ExperimentData;
+import nz.ac.auckland.lablet.experiment.ExperimentRunData;
 import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
@@ -26,10 +26,10 @@ public class YSpeedMarkerGraphAxis extends MarkerGraphAxis {
         ExperimentAnalysis experimentAnalysis = getExperimentAnalysis();
         MarkerDataModel data = getData();
 
-        ExperimentData experimentData = experimentAnalysis.getExperimentData();
+        ExperimentRunData experimentRunData = experimentAnalysis.getExperimentRunData();
         float deltaX = data.getCalibratedMarkerPositionAt(index + 1).y - data.getCalibratedMarkerPositionAt(index).y;
-        float deltaT = experimentData.getRunValueAt(index + 1) - experimentData.getRunValueAt(index);
-        if (experimentAnalysis.getExperimentData().getRunValueUnitPrefix().equals("m"))
+        float deltaT = experimentRunData.getRunValueAt(index + 1) - experimentRunData.getRunValueAt(index);
+        if (experimentAnalysis.getExperimentRunData().getRunValueUnitPrefix().equals("m"))
             deltaT /= 1000;
         return deltaX / deltaT;
     }
@@ -38,7 +38,7 @@ public class YSpeedMarkerGraphAxis extends MarkerGraphAxis {
     public String getLabel() {
         ExperimentAnalysis experimentAnalysis = getExperimentAnalysis();
         return "velocity [" + experimentAnalysis.getXUnit() + "/"
-                + experimentAnalysis.getExperimentData().getRunValueBaseUnit() + "]";
+                + experimentAnalysis.getExperimentRunData().getRunValueBaseUnit() + "]";
     }
 
     @Override
