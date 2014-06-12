@@ -419,11 +419,19 @@ public class CameraExperimentActivity extends ExperimentActivity {
         recorder.start();
     }
 
-    private void stopRecording() {
-        recorder.stop();
+    private boolean stopRecording() {
+        boolean dataTaken = true;
+        try {
+            recorder.stop();
+        } catch (RuntimeException e) {
+            // this happens if stop is called immediately after start and no data has been taken
+            e.printStackTrace();
+            dataTaken = false;
+        }
         recorder.reset();
 
         camera.lock();
+        return dataTaken;
     }
 
     private String getVideoFileName() {
@@ -775,9 +783,12 @@ public class CameraExperimentActivity extends ExperimentActivity {
 
         @Override
         public void onStopClicked() {
-            stopRecording();
+            boolean dataTaken = stopRecording();
             isRecording = false;
-            setState(new PlaybackState());
+            if (dataTaken)
+                setState(new PlaybackState());
+            else
+                setState(new PreviewState());
         }
     }
 
