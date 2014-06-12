@@ -114,8 +114,8 @@ public class AccelerometerExperiment implements IExperiment {
     }
 
     @Override
-    public void stopRecording() {
-
+    public boolean stopRecording() {
+        return true;
     }
 
     @Override

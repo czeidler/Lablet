@@ -361,14 +361,23 @@ public class CameraExperiment implements IExperiment {
     }
 
     @Override
-    public void stopRecording() {
-        recorder.stop();
+    public boolean stopRecording() {
+        boolean dataTaken = true;
+        try {
+            recorder.stop();
+        } catch (RuntimeException e) {
+            // this can happen when the recoding is stopped to quickly and no data has been taken
+            e.printStackTrace();
+            dataTaken = false;
+        }
         recorder.reset();
 
         camera.lock();
         camera.stopPreview();
 
         cameraExperimentView.setKeepScreenOn(false);
+
+        return dataTaken;
     }
 
     @Override

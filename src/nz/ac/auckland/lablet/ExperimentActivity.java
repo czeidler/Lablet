@@ -407,9 +407,13 @@ public class ExperimentActivity extends Activity {
         }
     }
 
-    private void stopRecording() {
-        for (IExperiment experiment : experiments)
-            experiment.stopRecording();
+    private boolean stopRecording() {
+        boolean dataTaken = true;
+        for (IExperiment experiment : experiments) {
+            if (!experiment.stopRecording())
+                dataTaken = false;
+        }
+        return dataTaken;
     }
 
     private void finishExperiment(boolean startAnalysis) {
@@ -555,9 +559,12 @@ public class ExperimentActivity extends Activity {
 
         @Override
         public void onStopClicked() {
-            stopRecording();
+            boolean dataTaken = stopRecording();
             isRecording = false;
-            setState(new PlaybackState());
+            if (dataTaken)
+                setState(new PlaybackState());
+            else
+                setState(new PreviewState());
         }
     }
 

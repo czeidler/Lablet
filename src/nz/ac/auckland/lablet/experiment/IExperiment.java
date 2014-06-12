@@ -46,7 +46,12 @@ public interface IExperiment {
     public void startPreview();
     public void stopPreview();
     public void startRecording() throws Exception;
-    public void stopRecording();
+    /**
+     * Stops the recording.
+     *
+     * @return true if some data has been taken otherwise false
+     */
+    public boolean stopRecording();
     public void startPlayback();
     public void stopPlayback();
 
