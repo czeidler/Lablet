@@ -28,20 +28,18 @@ public interface IExperimentPlugin {
     public String getName();
 
     /**
-     * Starts an activity to perform an experiment.
+     * Creates an experiment run object.
      * <p>
-     * Important: the options bundles has to be put as an extra into the intent:
+     * The activity intent can hold the following options:
      * <ul>
      * <li>bundle field "options" -> options</li>
      * </ul>
      * </p>
      *
      * @param parentActivity the parent activity
-     * @param requestCode the android request code (see
-     * {@see android.app.Activity#startActivityForResult(android.content.Intent, int, android.os.Bundle)})
-     * @param options bundle with settings for the experiment
+     * @return the experiment run
      */
-    public IExperimentRun createExperiment(Activity parentActivity, Intent intent, File experimentBaseDir);
+    public IExperimentRun createExperiment(Activity parentActivity, File experimentBaseDir);
 
     /**
      * Starts an activity to config the experiment runs.

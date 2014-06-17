@@ -38,7 +38,7 @@ public interface IExperimentRun {
     public void onSaveInstanceState(Bundle outState);
     public void onRestoreInstanceState(Bundle savedInstanceState);
 
-    public void init(Activity activity, Intent intent, File experimentBaseDir);
+    public void init(Activity activity, File experimentBaseDir);
     public void destroy();
 
     public void finish(boolean discardExperiment) throws IOException;

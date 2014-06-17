@@ -164,9 +164,9 @@ public class CameraExperimentRun implements IExperimentRun {
     }
 
     @Override
-    public void init(Activity activity, Intent intent, File experimentBaseDir) {
+    public void init(Activity activity, File experimentBaseDir) {
         this.activity = activity;
-
+        Intent intent = activity.getIntent();
         if (intent.hasExtra("requested_video_width") && intent.hasExtra("requested_video_height")) {
             requestedVideoWidth = intent.getIntExtra("requested_video_width", -1);
             requestedVideoHeight = intent.getIntExtra("requested_video_height", -1);

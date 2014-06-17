@@ -245,7 +245,7 @@ public class ExperimentActivity extends Activity {
     }
 
     private void addExperiment(IExperimentPlugin plugin, File experimentBaseDir, boolean activityIsRunning) {
-        IExperimentRun experiment = plugin.createExperiment(this, getIntent(), experimentBaseDir);
+        IExperimentRun experiment = plugin.createExperiment(this, experimentBaseDir);
         addExperiment(experiment, activityIsRunning);
     }
 
@@ -253,7 +253,7 @@ public class ExperimentActivity extends Activity {
         experiments.add(experiment);
         centerView.addView(getExperimentView(experiment));
         if (activityIsRunning)
-            experiment.init(this, getIntent(), experimentBaseDir);
+            experiment.init(this, experimentBaseDir);
         setCurrentExperiment(experiment);
     }
 
@@ -332,7 +332,7 @@ public class ExperimentActivity extends Activity {
         super.onResume();
 
         for (IExperimentRun experiment : experiments)
-            experiment.init(this, getIntent(), experimentBaseDir);
+            experiment.init(this, experimentBaseDir);
     }
 
     @Override

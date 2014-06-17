@@ -69,7 +69,7 @@ public class AccelerometerExperimentRun implements IExperimentRun {
     };
 
     @Override
-    public void init(Activity activity, Intent intent, File experimentBaseDir) {
+    public void init(Activity activity, File experimentBaseDir) {
         sensorManager = (SensorManager)activity.getSystemService(Context.SENSOR_SERVICE);
         sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_NORMAL);
