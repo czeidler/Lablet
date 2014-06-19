@@ -37,6 +37,9 @@ public interface IExperimentRun {
     public void onSaveInstanceState(Bundle outState);
     public void onRestoreInstanceState(Bundle savedInstanceState);
 
+    public ExperimentRunGroup getExperimentRunGroup();
+    public void setExperimentRunGroup(ExperimentRunGroup experimentRunGroup);
+
     public void init(Activity activity, File experimentBaseDir);
     public void destroy();
 

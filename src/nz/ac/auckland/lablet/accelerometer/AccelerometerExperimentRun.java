@@ -20,6 +20,7 @@ import android.view.View;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYPlot;
+import nz.ac.auckland.lablet.experiment.AbstractExperimentRun;
 import nz.ac.auckland.lablet.experiment.ExperimentRunData;
 import nz.ac.auckland.lablet.experiment.IExperimentRun;
 
@@ -27,7 +28,7 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class AccelerometerExperimentRun implements IExperimentRun {
+public class AccelerometerExperimentRun extends AbstractExperimentRun {
     private XYPlot graphView2D;
     private SimpleXYSeries xData;
 

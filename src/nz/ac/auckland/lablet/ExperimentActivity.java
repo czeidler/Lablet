@@ -253,9 +253,11 @@ public class ExperimentActivity extends Activity {
         addExperimentRun(plugin, experimentBaseDir, false);
     }
 
-    private void addExperimentRun(IExperimentPlugin plugin, File experimentBaseDir, boolean activityIsRunning) {
-        IExperimentRun experiment = plugin.createExperiment(this, experimentBaseDir);
-        addExperimentRun(experiment, activityIsRunning);
+    private IExperimentRun addExperimentRun(IExperimentPlugin plugin, File experimentBaseDir, boolean activityIsRunning) {
+        IExperimentRun experimentRun = plugin.createExperiment(this, experimentBaseDir);
+        experimentRun.setExperimentRunGroup(experiment.getCurrentExperimentRunGroup());
+        addExperimentRun(experimentRun, activityIsRunning);
+        return experimentRun;
     }
 
     private void addExperimentRun(IExperimentRun experimentRun, boolean activityIsRunning) {
@@ -291,20 +293,20 @@ public class ExperimentActivity extends Activity {
         IExperimentRun currentExperimentRun = experiment.getCurrentExperimentRun();
         if (currentExperimentRun != null)
             getExperimentView(currentExperimentRun).setVisibility(View.INVISIBLE);
-        currentExperimentRun = experimentRun;
+        experimentRun.getExperimentRunGroup().setCurrentExperimentRun(experimentRun);
         invalidateOptionsMenu();
-        View view = getExperimentView(currentExperimentRun);
+        View view = getExperimentView(experimentRun);
         view.setVisibility(View.VISIBLE);
 
         centerView.requestLayout();
     }
 
-    private View getExperimentView(IExperimentRun experiment) {
-        if (experimentViews.containsKey(experiment))
-            return experimentViews.get(experiment);
+    private View getExperimentView(IExperimentRun experimentRun) {
+        if (experimentViews.containsKey(experimentRun))
+            return experimentViews.get(experimentRun);
 
-        View view = experiment.createExperimentView(this);
-        experimentViews.put(experiment, view);
+        View view = experimentRun.createExperimentView(this);
+        experimentViews.put(experimentRun, view);
         return view;
     }
 

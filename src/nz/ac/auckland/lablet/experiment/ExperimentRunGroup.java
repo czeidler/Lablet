@@ -37,6 +37,13 @@ public class ExperimentRunGroup {
         currentExperimentRun = getExperimentRunAt(i);
     }
 
+    public boolean setCurrentExperimentRun(IExperimentRun experimentRun) {
+        if (!experimentRuns.contains(experimentRun))
+            return false;
+        currentExperimentRun = experimentRun;
+        return true;
+    }
+
     public IExperimentRun getCurrentExperimentRun() {
         return currentExperimentRun;
     }

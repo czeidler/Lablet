@@ -22,8 +22,7 @@ import android.widget.MediaController;
 import android.widget.PopupMenu;
 import android.widget.VideoView;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.ExperimentRunData;
-import nz.ac.auckland.lablet.experiment.IExperimentRun;
+import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.RatioSurfaceView;
 
@@ -106,7 +105,7 @@ class CameraExperimentView extends FrameLayout {
     }
 }
 
-public class CameraExperimentRun implements IExperimentRun {
+public class CameraExperimentRun extends AbstractExperimentRun {
     private Activity activity;
     private IExperimentParent parent;
 
