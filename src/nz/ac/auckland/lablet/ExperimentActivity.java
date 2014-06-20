@@ -24,6 +24,7 @@ import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,7 @@ public class ExperimentActivity extends Activity {
     private ImageButton startButton = null;
     private ImageButton stopButton = null;
     private ImageButton newButton = null;
+    private ImageButton addRunGroupButton = null;
     private MenuItem analyseMenuItem = null;
     private MenuItem settingsMenu = null;
     private MenuItem viewMenu = null;
@@ -195,12 +197,25 @@ public class ExperimentActivity extends Activity {
                 if (experiment != null)
                     removeExperiment(experiment);
                 else
-                    addExperimentRun(plugin, experimentBaseDir, true);
+                    addExperiment(plugin);
                 return true;
             }
         });
 
         popup.show();
+    }
+
+    private void addExperiment(IExperimentPlugin plugin) {
+        IExperimentRun experimentRun = plugin.createExperiment(this);
+        experiment.getCurrentExperimentRunGroup().addExperimentRun(experimentRun);
+        addExperimentRunToView(experimentRun);
+    }
+
+    private void removeExperiment(IExperimentRun experimentRun) {
+        for (ExperimentRunGroup runGroup : experiment.getExperimentRunGroups())
+            runGroup.removeExperimentRun(runGroup);
+
+        removeExperimentRunFromView(experimentRun);
     }
 
     @Override
@@ -214,6 +229,7 @@ public class ExperimentActivity extends Activity {
         startButton = (ImageButton)findViewById(R.id.recordButton);
         stopButton = (ImageButton)findViewById(R.id.stopButton);
         newButton = (ImageButton)findViewById(R.id.newButton);
+        addRunGroupButton = (ImageButton)findViewById(R.id.addRunButton);
 
         setState(null);
 
@@ -238,37 +254,54 @@ public class ExperimentActivity extends Activity {
             }
         });
 
+
+        addRunGroupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ExperimentRunGroup oldGroup = experiment.getCurrentExperimentRunGroup();
+                List<String> experimentNamesList = new ArrayList<String>();
+                for (IExperimentRun experimentRun : oldGroup.getExperimentRuns())
+                    experimentNamesList.add(experimentRun.getClass().getSimpleName());
+                ExperimentRunGroup experimentRunGroup = createExperimentRunGroup(experimentNamesList);
+                experiment.addRun(experimentRunGroup);
+                setCurrentExperimentRunGroup(experimentRunGroup);
+            }
+        });
+
         experimentBaseDir = new File(getExternalFilesDir(null), "experiments");
 
         experiment = new Experiment(this, experimentBaseDir);
-        ExperimentRunGroup runGroup = new ExperimentRunGroup(experiment, new File(experimentBaseDir,
-                "run" + Integer.toString(experiment.createRunGroupId())));
+
+        List<String> experimentList = new ArrayList<>();
+        experimentList.add(AccelerometerExperimentRun.class.getSimpleName());
+        experimentList.add(CameraExperimentRun.class.getSimpleName());
+
+        ExperimentRunGroup runGroup = createExperimentRunGroup(experimentList);
         experiment.addRun(runGroup);
         experiment.setCurrentExperimentRunGroup(runGroup);
-
-        IExperimentPlugin plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(AccelerometerExperimentRun.class.getSimpleName());
-        addExperimentRun(plugin, experimentBaseDir, false);
-
-        plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(CameraExperimentRun.class.getSimpleName());
-        addExperimentRun(plugin, experimentBaseDir, false);
     }
 
-    private IExperimentRun addExperimentRun(IExperimentPlugin plugin, File experimentBaseDir, boolean activityIsRunning) {
-        IExperimentRun experimentRun = plugin.createExperiment(this, experimentBaseDir);
-        experimentRun.setExperimentRunGroup(experiment.getCurrentExperimentRunGroup());
-        addExperimentRun(experimentRun, activityIsRunning);
-        return experimentRun;
+    private ExperimentRunGroup createExperimentRunGroup(List<String> experimentRuns) {
+        ExperimentRunGroup experimentRunGroup = new ExperimentRunGroup();
+
+        ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
+        for (String experimentRunName : experimentRuns) {
+            IExperimentPlugin plugin = factory.findExperimentPlugin(experimentRunName);
+            IExperimentRun experimentRun = plugin.createExperiment(this);
+            experimentRunGroup.addExperimentRun(experimentRun);
+        }
+
+        return experimentRunGroup;
     }
 
-    private void addExperimentRun(IExperimentRun experimentRun, boolean activityIsRunning) {
+    private void addExperimentRunToView(IExperimentRun experimentRun) {
         getCurrentExperimentRuns().add(experimentRun);
         centerView.addView(getExperimentView(experimentRun));
-        if (activityIsRunning)
-            experimentRun.init(this, experimentBaseDir);
+        experimentRun.init(this);
         setCurrentExperimentRun(experimentRun);
     }
 
-    private void removeExperiment(IExperimentRun experimentRun) {
+    private void removeExperimentRunFromView(IExperimentRun experimentRun) {
         setState(null);
 
         List<IExperimentRun> experimentRuns = getCurrentExperimentRuns();
@@ -287,6 +320,18 @@ public class ExperimentActivity extends Activity {
             setCurrentExperimentRun(experimentRuns.get(0));
 
         setState(new PreviewState());
+    }
+
+    private void setCurrentExperimentRunGroup(ExperimentRunGroup experimentRunGroup) {
+        ExperimentRunGroup oldGroup = experiment.getCurrentExperimentRunGroup();
+        if (oldGroup != null) {
+            for (IExperimentRun experimentRun : oldGroup.getExperimentRuns())
+                removeExperimentRunFromView(experimentRun);
+        }
+
+        experiment.setCurrentExperimentRunGroup(experimentRunGroup);
+        for (IExperimentRun experimentRun : experimentRunGroup.getExperimentRuns())
+            addExperimentRunToView(experimentRun);
     }
 
     private void setCurrentExperimentRun(IExperimentRun experimentRun) {
@@ -346,8 +391,7 @@ public class ExperimentActivity extends Activity {
     public void onResume() {
         super.onResume();
 
-        for (IExperimentRun experiment : getCurrentExperimentRuns())
-            experiment.init(this, experimentBaseDir);
+        setCurrentExperimentRunGroup(experiment.getCurrentExperimentRunGroup());
     }
 
     @Override

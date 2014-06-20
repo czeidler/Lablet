@@ -70,7 +70,7 @@ public class AccelerometerExperimentRun extends AbstractExperimentRun {
     };
 
     @Override
-    public void init(Activity activity, File experimentBaseDir) {
+    public void init(Activity activity) {
         sensorManager = (SensorManager)activity.getSystemService(Context.SENSOR_SERVICE);
         sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_NORMAL);

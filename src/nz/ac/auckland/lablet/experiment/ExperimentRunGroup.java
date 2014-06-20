@@ -21,12 +21,17 @@ public class ExperimentRunGroup {
 
     final private List<IExperimentRun> experimentRuns = new ArrayList<>();
     private IExperimentRun currentExperimentRun = null;
-    final private Experiment experiment;
-    final private File storageDirectory;
+    private Experiment experiment;
+    private File storageDirectory;
 
-    public ExperimentRunGroup(Experiment experiment, File storageDirectory) {
+    public File getStorageDir() {
+        return storageDirectory;
+    }
+
+    public void setExperiment(Experiment experiment) {
         this.experiment = experiment;
-        this.storageDirectory = storageDirectory;
+        int groupId = experiment.createRunGroupId();
+        this.storageDirectory = new File(experiment.getStorageDir(), "run" + Integer.toString(groupId));
     }
 
     public int getExperimentRunCount() {
@@ -56,8 +61,12 @@ public class ExperimentRunGroup {
         return experimentRuns;
     }
 
-    public void addExperimentRun(IExperimentRun experimentRun) {
+    public boolean addExperimentRun(IExperimentRun experimentRun) {
+        if (experimentRun.getExperimentRunGroup() != null)
+            return false;
         experimentRuns.add(experimentRun);
+        experimentRun.setExperimentRunGroup(this);
+        return true;
     }
 
     public String getDescription() {
@@ -105,10 +114,18 @@ public class ExperimentRunGroup {
         for (int i = 0; i < runClassesCount; i++) {
             String runName = experimentRunClasses.getString(Integer.toString(i));
             IExperimentPlugin plugin = factory.findExperimentPlugin(runName);
-            IExperimentRun experimentRun = plugin.createExperiment(experiment.getActivity(), storageDirectory);
+            IExperimentRun experimentRun = plugin.createExperiment(experiment.getActivity());
             Bundle state = savedInstanceState.getBundle(Integer.toString(i));
             experimentRun.onRestoreInstanceState(state);
             experimentRuns.add(experimentRun);
         }
+    }
+
+    public Experiment getExperiment() {
+        return experiment;
+    }
+
+    public void removeExperimentRun(ExperimentRunGroup runGroup) {
+        experimentRuns.remove(runGroup);
     }
 }

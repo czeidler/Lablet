@@ -32,9 +32,8 @@ public class AccelerometerExperimentPlugin extends AbstractExperimentPlugin {
     }
 
     @Override
-    public IExperimentRun createExperiment(Activity parentActivity, File experimentBaseDir) {
+    public IExperimentRun createExperiment(Activity parentActivity) {
         IExperimentRun experiment = new AccelerometerExperimentRun();
-        experiment.init(parentActivity, experimentBaseDir);
         return experiment;
     }
 

@@ -54,10 +54,9 @@ public class Experiment {
             Bundle runState = savedInstanceState.getBundle(runNumberString);
             if (runState == null)
                 continue;
-            ExperimentRunGroup run = new ExperimentRunGroup(this,
-                    new File(storageDirectory, "run" + runNumberString));
-            run.onRestoreInstanceState(runState);
+            ExperimentRunGroup run = new ExperimentRunGroup();
             addRun(run);
+            run.onRestoreInstanceState(runState);
         }
 
         int currentRunIndex = savedInstanceState.getInt("current_run", -1);
@@ -65,10 +64,19 @@ public class Experiment {
             setCurrentExperimentRunGroup(experimentRunGroups.get(currentRunIndex));
     }
 
-    public void addRun(ExperimentRunGroup run) {
+    public List<ExperimentRunGroup> getExperimentRunGroups() {
+        return experimentRunGroups;
+    }
+
+    public boolean addRun(ExperimentRunGroup run) {
+        if (run.getExperiment() != null)
+            return false;
         if (currentExperimentRunGroup == null)
             currentExperimentRunGroup = run;
+        run.setExperiment(this);
         experimentRunGroups.add(run);
+
+        return true;
     }
 
     public void setCurrentExperimentRunGroup(ExperimentRunGroup run) {
@@ -89,5 +97,9 @@ public class Experiment {
         if (runGroup == null)
             return null;
         return runGroup.getCurrentExperimentRun();
+    }
+
+    public File getStorageDir() {
+        return storageDirectory;
     }
 }

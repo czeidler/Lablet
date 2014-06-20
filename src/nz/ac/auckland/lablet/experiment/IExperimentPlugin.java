@@ -39,7 +39,7 @@ public interface IExperimentPlugin {
      * @param parentActivity the parent activity
      * @return the experiment run
      */
-    public IExperimentRun createExperiment(Activity parentActivity, File experimentBaseDir);
+    public IExperimentRun createExperiment(Activity parentActivity);
 
     /**
      * Starts an activity to config the experiment runs.

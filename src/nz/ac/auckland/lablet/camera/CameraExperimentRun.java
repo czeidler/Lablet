@@ -163,7 +163,7 @@ public class CameraExperimentRun extends AbstractExperimentRun {
     }
 
     @Override
-    public void init(Activity activity, File experimentBaseDir) {
+    public void init(Activity activity) {
         this.activity = activity;
         Intent intent = activity.getIntent();
         if (intent.hasExtra("requested_video_width") && intent.hasExtra("requested_video_height")) {
@@ -172,7 +172,7 @@ public class CameraExperimentRun extends AbstractExperimentRun {
         }
 
         experimentData = new CameraExperimentRunData(activity);
-        File experimentDir = new File(experimentBaseDir, experimentData.getUid());
+        File experimentDir = new File(getExperimentRunGroup().getStorageDir(), experimentData.getUid());
         experimentData.setStorageDir(experimentDir);
 
         recorder = new MediaRecorder();

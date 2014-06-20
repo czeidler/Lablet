@@ -35,9 +35,8 @@ public class CameraExperimentPlugin extends AbstractExperimentPlugin {
     }
 
     @Override
-    public IExperimentRun createExperiment(Activity parentActivity, File experimentBaseDir) {
+    public IExperimentRun createExperiment(Activity parentActivity) {
         IExperimentRun experiment = new CameraExperimentRun();
-        experiment.init(parentActivity, experimentBaseDir);
         return experiment;
     }
 

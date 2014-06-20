@@ -40,7 +40,7 @@ public interface IExperimentRun {
     public ExperimentRunGroup getExperimentRunGroup();
     public void setExperimentRunGroup(ExperimentRunGroup experimentRunGroup);
 
-    public void init(Activity activity, File experimentBaseDir);
+    public void init(Activity activity);
     public void destroy();
 
     public void finish(boolean discardExperiment) throws IOException;
