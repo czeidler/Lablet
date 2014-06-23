@@ -260,7 +260,7 @@ public class ExperimentActivity extends Activity {
                 for (IExperimentRun experimentRun : oldGroup.getExperimentRuns())
                     experimentNamesList.add(experimentRun.getClass().getSimpleName());
                 ExperimentRunGroup experimentRunGroup = createExperimentRunGroup(experimentNamesList);
-                experiment.addRun(experimentRunGroup);
+                experiment.addExperimentRunGroup(experimentRunGroup);
                 activateExperimentRunGroup(experimentRunGroup);
             }
         });
@@ -274,7 +274,7 @@ public class ExperimentActivity extends Activity {
         experimentList.add(CameraExperimentRun.class.getSimpleName());
 
         ExperimentRunGroup runGroup = createExperimentRunGroup(experimentList);
-        experiment.addRun(runGroup);
+        experiment.addExperimentRunGroup(runGroup);
         experiment.setCurrentExperimentRunGroup(runGroup);
     }
 

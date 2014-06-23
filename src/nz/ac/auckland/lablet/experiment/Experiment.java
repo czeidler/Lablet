@@ -12,20 +12,31 @@ import android.os.Bundle;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
 public class Experiment {
+    public interface IExperimentListener {
+        public void onExperimentRunGroupAdded(ExperimentRunGroup runGroup);
+        public void onExperimentRunGroupRemoved(ExperimentRunGroup runGroup);
+        public void onCurrentRunGroupChanged(ExperimentRunGroup newGroup, ExperimentRunGroup oldGroup);
+    }
+
     final private List<ExperimentRunGroup> experimentRunGroups = new ArrayList<>();
     private ExperimentRunGroup currentExperimentRunGroup;
     final private Activity activity;
     final private File storageDirectory;
     private int runGroupId = -1;
 
+    private IExperimentListener listener = null;
+
     public Experiment(Activity activity, File storageDirectory) {
         this.activity = activity;
         this.storageDirectory = storageDirectory;
+    }
+
+    public void setListener(IExperimentListener listener) {
+        this.listener = listener;
     }
 
     public Activity getActivity() {
@@ -55,7 +66,7 @@ public class Experiment {
             if (runState == null)
                 continue;
             ExperimentRunGroup run = new ExperimentRunGroup();
-            addRun(run);
+            addExperimentRunGroup(run);
             run.onRestoreInstanceState(runState);
         }
 
@@ -68,19 +79,42 @@ public class Experiment {
         return experimentRunGroups;
     }
 
-    public boolean addRun(ExperimentRunGroup run) {
-        if (run.getExperiment() != null)
+    public boolean addExperimentRunGroup(ExperimentRunGroup runGroup) {
+        if (runGroup.getExperiment() != null)
             return false;
         if (currentExperimentRunGroup == null)
-            currentExperimentRunGroup = run;
-        run.setExperiment(this);
-        experimentRunGroups.add(run);
+            currentExperimentRunGroup = runGroup;
+        runGroup.setExperiment(this);
+        experimentRunGroups.add(runGroup);
 
+        notifyExperimentRunGroupAdded(runGroup);
         return true;
     }
 
-    public void setCurrentExperimentRunGroup(ExperimentRunGroup run) {
-        currentExperimentRunGroup = run;
+    public void removeExperimentRunGroup(ExperimentRunGroup runGroup) {
+        final int removedGroupIndex = experimentRunGroups.indexOf(runGroup);
+
+        runGroup.setExperiment(null);
+        experimentRunGroups.remove(runGroup);
+
+        // find new current group if runGroup was the current group
+        if (runGroup == currentExperimentRunGroup) {
+            if (removedGroupIndex > 0)
+                setCurrentExperimentRunGroup(experimentRunGroups.get(removedGroupIndex - 1));
+            else if (experimentRunGroups.size() > removedGroupIndex)
+                setCurrentExperimentRunGroup(experimentRunGroups.get(removedGroupIndex));
+            else
+                setCurrentExperimentRunGroup(null);
+        }
+
+        notifyExperimentRunGroupRemoved(runGroup);
+    }
+
+    public void setCurrentExperimentRunGroup(ExperimentRunGroup runGroup) {
+        ExperimentRunGroup oldGroup = currentExperimentRunGroup;
+        currentExperimentRunGroup = runGroup;
+
+        notifyCurrentExperimentRunGroupChanged(runGroup, oldGroup);
     }
 
     public ExperimentRunGroup getCurrentExperimentRunGroup() {
@@ -101,5 +135,20 @@ public class Experiment {
 
     public File getStorageDir() {
         return storageDirectory;
+    }
+
+    private void notifyCurrentExperimentRunGroupChanged(ExperimentRunGroup runGroup, ExperimentRunGroup oldGroup) {
+        if (listener != null)
+            listener.onCurrentRunGroupChanged(runGroup, oldGroup);
+    }
+
+    private void notifyExperimentRunGroupAdded(ExperimentRunGroup runGroup) {
+        if (listener != null)
+            listener.onExperimentRunGroupAdded(runGroup);
+    }
+
+    private void notifyExperimentRunGroupRemoved(ExperimentRunGroup runGroup) {
+        if (listener != null)
+            listener.onExperimentRunGroupRemoved(runGroup);
     }
 }
