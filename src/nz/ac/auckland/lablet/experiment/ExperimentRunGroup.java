@@ -125,7 +125,17 @@ public class ExperimentRunGroup {
         return experiment;
     }
 
-    public void removeExperimentRun(ExperimentRunGroup runGroup) {
-        experimentRuns.remove(runGroup);
+    public void removeExperimentRun(IExperimentRun experimentRun) {
+        // update the current experiment run first if necessary
+        if (experimentRun == getCurrentExperimentRun()) {
+            int index = experimentRuns.indexOf(experimentRun);
+            if (index > 0)
+                setCurrentExperimentRun(0);
+            else if (index + 1 < experimentRuns.size())
+                setCurrentExperimentRun(index + 1);
+            else
+                setCurrentExperimentRun(null);
+        }
+        experimentRuns.remove(experimentRun);
     }
 }

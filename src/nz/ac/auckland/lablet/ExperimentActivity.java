@@ -152,7 +152,9 @@ public class ExperimentActivity extends Activity {
             item.setCheckable(true);
         }
         popup.getMenu().setGroupCheckable(1, true, true);
-        popup.getMenu().getItem(experimentRuns.indexOf(experiment.getCurrentExperimentRun())).setChecked(true);
+        IExperimentRun currentExperimentRun = experiment.getCurrentExperimentRun();
+        if (currentExperimentRun != null)
+            popup.getMenu().getItem(experimentRuns.indexOf(currentExperimentRun)).setChecked(true);
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -211,7 +213,7 @@ public class ExperimentActivity extends Activity {
 
     private void removeExperiment(IExperimentRun experimentRun) {
         for (ExperimentRunGroup runGroup : experiment.getExperimentRunGroups())
-            runGroup.removeExperimentRun(runGroup);
+            runGroup.removeExperimentRun(experimentRun);
 
         removeExperimentRunFromView(experimentRun);
     }
@@ -298,21 +300,25 @@ public class ExperimentActivity extends Activity {
     }
 
     private void removeExperimentRunFromView(IExperimentRun experimentRun) {
-        centerView.removeView(getExperimentView(experimentRun));
-        experimentViews.remove(experimentRun);
+        // set new current experiment
+        if (experiment.getCurrentExperimentRun() == experimentRun) {
+            List<IExperimentRun> activeRuns = getActiveExperimentRuns();
+            if (activeRuns.size() > 0)
+                setCurrentExperimentRun(activeRuns.get(0));
+            else
+                setCurrentExperimentRun(null);
+        }
 
+        // Clean up
+        centerView.removeView(getExperimentView(experimentRun));
         try {
             experimentRun.finish(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
         experimentRun.destroy();
-
-        if (experiment.getCurrentExperimentRun() == experimentRun) {
-            List<IExperimentRun> activeRuns = getActiveExperimentRuns();
-            if (activeRuns.size() > 0)
-                setCurrentExperimentRun(activeRuns.get(0));
-        }
+        // remove the entry late because getExperimentView would add it again to the map
+        experimentViews.remove(experimentRun);
     }
 
     private void activateExperimentRunGroup(ExperimentRunGroup experimentRunGroup) {
