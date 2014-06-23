@@ -143,6 +143,7 @@ public class CameraExperimentRun extends AbstractExperimentRun {
     @Override
     public View createExperimentView(Context context) {
         cameraExperimentView = new CameraExperimentView(context, camera);
+        cameraExperimentView.setRatio(getPreviewRatio());
         return cameraExperimentView;
     }
 
