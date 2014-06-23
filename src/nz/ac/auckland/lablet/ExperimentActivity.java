@@ -24,10 +24,7 @@ import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class ExperimentActivity extends Activity {
@@ -127,6 +124,7 @@ public class ExperimentActivity extends Activity {
             }
         });
 
+
         // set states after menu has been init
         if (!unsavedExperimentData) {
             setState(new PreviewState());
@@ -138,15 +136,15 @@ public class ExperimentActivity extends Activity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-    private List<IExperimentRun> getCurrentExperimentRuns() {
-        return experiment.getCurrentExperimentRunGroup().getExperimentRuns();
+    private List<IExperimentRun> getActiveExperimentRuns() {
+        return new ArrayList<>(experimentViews.keySet());
     }
 
     private void showViewMenu(MenuItem menuItem) {
         View menuView = findViewById(R.id.action_view);
         PopupMenu popup = new PopupMenu(menuView.getContext(), menuView);
 
-        final List<IExperimentRun> experimentRuns = getCurrentExperimentRuns();
+        final List<IExperimentRun> experimentRuns = getActiveExperimentRuns();
         for (int i = 0; i < experimentRuns.size(); i++) {
             IExperimentRun experiment = experimentRuns.get(i);
 
@@ -167,7 +165,7 @@ public class ExperimentActivity extends Activity {
     }
 
     private IExperimentRun getExperiment(IExperimentPlugin plugin) {
-        for (IExperimentRun experiment : getCurrentExperimentRuns()) {
+        for (IExperimentRun experiment : getActiveExperimentRuns()) {
             if (experiment.getClass().getSimpleName().equals(plugin.getName()))
                 return experiment;
         }
@@ -254,7 +252,6 @@ public class ExperimentActivity extends Activity {
             }
         });
 
-
         addRunGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -264,7 +261,7 @@ public class ExperimentActivity extends Activity {
                     experimentNamesList.add(experimentRun.getClass().getSimpleName());
                 ExperimentRunGroup experimentRunGroup = createExperimentRunGroup(experimentNamesList);
                 experiment.addRun(experimentRunGroup);
-                setCurrentExperimentRunGroup(experimentRunGroup);
+                activateExperimentRunGroup(experimentRunGroup);
             }
         });
 
@@ -295,17 +292,12 @@ public class ExperimentActivity extends Activity {
     }
 
     private void addExperimentRunToView(IExperimentRun experimentRun) {
-        getCurrentExperimentRuns().add(experimentRun);
-        centerView.addView(getExperimentView(experimentRun));
         experimentRun.init(this);
+        centerView.addView(getExperimentView(experimentRun));
         setCurrentExperimentRun(experimentRun);
     }
 
     private void removeExperimentRunFromView(IExperimentRun experimentRun) {
-        setState(null);
-
-        List<IExperimentRun> experimentRuns = getCurrentExperimentRuns();
-        experimentRuns.remove(experimentRun);
         centerView.removeView(getExperimentView(experimentRun));
         experimentViews.remove(experimentRun);
 
@@ -316,18 +308,16 @@ public class ExperimentActivity extends Activity {
         }
         experimentRun.destroy();
 
-        if (experiment.getCurrentExperimentRun() == experimentRun)
-            setCurrentExperimentRun(experimentRuns.get(0));
-
-        setState(new PreviewState());
+        if (experiment.getCurrentExperimentRun() == experimentRun) {
+            List<IExperimentRun> activeRuns = getActiveExperimentRuns();
+            if (activeRuns.size() > 0)
+                setCurrentExperimentRun(activeRuns.get(0));
+        }
     }
 
-    private void setCurrentExperimentRunGroup(ExperimentRunGroup experimentRunGroup) {
-        ExperimentRunGroup oldGroup = experiment.getCurrentExperimentRunGroup();
-        if (oldGroup != null) {
-            for (IExperimentRun experimentRun : oldGroup.getExperimentRuns())
-                removeExperimentRunFromView(experimentRun);
-        }
+    private void activateExperimentRunGroup(ExperimentRunGroup experimentRunGroup) {
+        for (IExperimentRun experimentRun : getActiveExperimentRuns())
+            removeExperimentRunFromView(experimentRun);
 
         experiment.setCurrentExperimentRunGroup(experimentRunGroup);
         for (IExperimentRun experimentRun : experimentRunGroup.getExperimentRuns())
@@ -359,7 +349,7 @@ public class ExperimentActivity extends Activity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        List<IExperimentRun> experimentRuns = getCurrentExperimentRuns();
+        List<IExperimentRun> experimentRuns = getActiveExperimentRuns();
         for (int i = 0; i < experimentRuns.size(); i++) {
             IExperimentRun experiment = experimentRuns.get(i);
 
@@ -376,7 +366,7 @@ public class ExperimentActivity extends Activity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
-        List<IExperimentRun> experimentRuns = getCurrentExperimentRuns();
+        List<IExperimentRun> experimentRuns = getActiveExperimentRuns();
         for (int i = 0; i < experimentRuns.size(); i++) {
             IExperimentRun experiment = experimentRuns.get(i);
 
@@ -391,14 +381,14 @@ public class ExperimentActivity extends Activity {
     public void onResume() {
         super.onResume();
 
-        setCurrentExperimentRunGroup(experiment.getCurrentExperimentRunGroup());
+        activateExperimentRunGroup(experiment.getCurrentExperimentRunGroup());
     }
 
     @Override
     public void onPause() {
         setState(null);
 
-        for (IExperimentRun experiment : getCurrentExperimentRuns())
+        for (IExperimentRun experiment : getActiveExperimentRuns())
             experiment.destroy();
 
         super.onPause();
@@ -406,7 +396,7 @@ public class ExperimentActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        final List<IExperimentRun> experimentRuns = getCurrentExperimentRuns();
+        final List<IExperimentRun> experimentRuns = getActiveExperimentRuns();
         if (unsavedExperimentData) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Experiment is not saved");
@@ -452,7 +442,7 @@ public class ExperimentActivity extends Activity {
 
     private void startRecording() {
         try {
-            for (IExperimentRun experiment : getCurrentExperimentRuns())
+            for (IExperimentRun experiment : getActiveExperimentRuns())
                 experiment.startRecording();
 
         } catch (Exception e) {
@@ -470,7 +460,7 @@ public class ExperimentActivity extends Activity {
 
     private boolean stopRecording() {
         boolean dataTaken = true;
-        for (IExperimentRun experiment : getCurrentExperimentRuns()) {
+        for (IExperimentRun experiment : getActiveExperimentRuns()) {
             if (!experiment.stopRecording())
                 dataTaken = false;
         }
@@ -481,7 +471,7 @@ public class ExperimentActivity extends Activity {
         unsavedExperimentData = false;
 
         try {
-            for (IExperimentRun experiment : getCurrentExperimentRuns())
+            for (IExperimentRun experiment : getActiveExperimentRuns())
                 experiment.finish(false);
 
             Intent data = new Intent();
@@ -529,14 +519,14 @@ public class ExperimentActivity extends Activity {
 
             analyseMenuItem.setEnabled(false);
 
-            for (IExperimentRun experiment : getCurrentExperimentRuns())
+            for (IExperimentRun experiment : getActiveExperimentRuns())
                 experiment.startPreview();
         }
 
         public void leaveState() {
             settingsMenu.setVisible(false);
 
-            for (IExperimentRun experiment : getCurrentExperimentRuns())
+            for (IExperimentRun experiment : getActiveExperimentRuns())
                 experiment.stopPreview();
         }
 
@@ -635,14 +625,14 @@ public class ExperimentActivity extends Activity {
             stopButton.setEnabled(false);
             newButton.setVisibility(View.VISIBLE);
 
-            for (IExperimentRun experiment : getCurrentExperimentRuns())
+            for (IExperimentRun experiment : getActiveExperimentRuns())
                 experiment.startPlayback();
 
             analyseMenuItem.setEnabled(true);
         }
 
         public void leaveState() {
-            for (IExperimentRun experiment : getCurrentExperimentRuns())
+            for (IExperimentRun experiment : getActiveExperimentRuns())
                 experiment.stopPlayback();
         }
 
