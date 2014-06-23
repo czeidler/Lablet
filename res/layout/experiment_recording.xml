@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add Run"
-        android:id="@+id/addRun"
+        android:id="@+id/addRunButton"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:src="@drawable/ic_media_add"
