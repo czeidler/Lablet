@@ -475,9 +475,8 @@ public class ExperimentActivity extends Activity {
                 experiment.finish(false);
 
             Intent data = new Intent();
-            //TODO: FIX
-            //File outputDir = experimentData.getStorageDir();
-            //data.putExtra("experiment_path", outputDir.getPath());
+            File outputDir = experiment.getStorageDir();
+            data.putExtra("experiment_path", outputDir.getPath());
             data.putExtra("start_analysis", startAnalysis);
             setResult(RESULT_OK, data);
         } catch (IOException e) {
