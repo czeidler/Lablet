@@ -81,7 +81,6 @@ class CameraExperimentView extends FrameLayout implements IExperimentRun.IExperi
         }
 
         public void surfaceDestroyed(SurfaceHolder holder) {
-
         }
     };
 

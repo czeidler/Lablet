@@ -9,7 +9,6 @@ package nz.ac.auckland.lablet.accelerometer;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -22,26 +21,49 @@ import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYPlot;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentRun;
 import nz.ac.auckland.lablet.experiment.ExperimentRunData;
-import nz.ac.auckland.lablet.experiment.IExperimentRun;
 
-import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
+
+class SensorView extends XYPlot implements AccelerometerExperimentRun.ISensorDataListener {
+
+    public SensorView(Context context, String s) {
+        super(context, s);
+    }
+
+    @Override
+    public void onDataUpdated() {
+        invalidate();
+    }
+
+    public void setParent(AccelerometerExperimentRun parent) {
+        parent.setDataListener(this);
+    }
+}
 
 public class AccelerometerExperimentRun extends AbstractExperimentRun {
     private XYPlot graphView2D;
-    private SimpleXYSeries xData;
+    private WeakReference<ISensorDataListener> softDataListener;
+
+    private SimpleXYSeries xData = new SimpleXYSeries("x");;
 
     private SensorManager sensorManager;
 
+    public void setDataListener(SensorView dataListener) {
+        this.softDataListener = new WeakReference<ISensorDataListener>(dataListener);
+    }
+
+    public interface ISensorDataListener {
+        public void onDataUpdated();
+    }
+
     @Override
     public View createExperimentView(Context context) {
-        graphView2D = new XYPlot(context, "Accelerometer");
-
-        xData = new SimpleXYSeries("x");
-
-        graphView2D.addSeries(xData, new LineAndPointFormatter());
-        return graphView2D;
+        SensorView view = new SensorView(context, "Accelerometer");
+        view.setParent(this);
+        view.addSeries(xData, new LineAndPointFormatter());
+        return view;
     }
 
     @Override
@@ -59,7 +81,12 @@ public class AccelerometerExperimentRun extends AbstractExperimentRun {
                 float y = values[1];
                 float z = values[2];
                 xData.addLast(System.currentTimeMillis(), x);
-                graphView2D.invalidate();
+
+                if (softDataListener != null) {
+                    ISensorDataListener dataListener = softDataListener.get();
+                    if (dataListener != null)
+                        dataListener.onDataUpdated();
+                }
             }
         }
 
