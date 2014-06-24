@@ -14,10 +14,11 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.*;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
-import android.widget.PopupMenu;
+import android.widget.*;
 import nz.ac.auckland.lablet.accelerometer.AccelerometerExperimentRun;
 import nz.ac.auckland.lablet.camera.CameraExperimentRun;
 import nz.ac.auckland.lablet.experiment.*;
@@ -27,14 +28,15 @@ import java.io.IOException;
 import java.util.*;
 
 
-public class ExperimentActivity extends Activity {
-    final private Map<IExperimentRun, View> experimentViews = new HashMap<>();
+public class ExperimentActivity extends FragmentActivity {
+    final private List<IExperimentRun> activeExperiments = new ArrayList<>();
 
     private Experiment experiment;
 
     private File experimentBaseDir;
 
-    private FrameLayout centerView = null;
+    private ViewPager pager = null;
+    private ExperimentRunFragmentPagerAdapter pagerAdapter = null;
     private ImageButton startButton = null;
     private ImageButton stopButton = null;
     private ImageButton newButton = null;
@@ -122,8 +124,8 @@ public class ExperimentActivity extends Activity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-    private List<IExperimentRun> getActiveExperimentRuns() {
-        return new ArrayList<>(experimentViews.keySet());
+    public List<IExperimentRun> getActiveExperimentRuns() {
+        return activeExperiments;
     }
 
     private void showViewMenu(MenuItem menuItem) {
@@ -210,7 +212,9 @@ public class ExperimentActivity extends Activity {
 
         setContentView(R.layout.experiment_recording);
 
-        centerView = (FrameLayout)findViewById(R.id.centerLayout);
+        pager = (ViewPager)findViewById(R.id.centerLayout);
+        pagerAdapter = new ExperimentRunFragmentPagerAdapter(getSupportFragmentManager(), activeExperiments);
+        pager.setAdapter(pagerAdapter);
 
         startButton = (ImageButton)findViewById(R.id.recordButton);
         stopButton = (ImageButton)findViewById(R.id.stopButton);
@@ -281,7 +285,10 @@ public class ExperimentActivity extends Activity {
 
     private void addExperimentRunToView(IExperimentRun experimentRun) {
         experimentRun.init(this);
-        centerView.addView(getExperimentView(experimentRun));
+
+        addActiveExperiment(experimentRun);
+        pagerAdapter.update();
+
         setCurrentExperimentRun(experimentRun);
     }
 
@@ -296,7 +303,6 @@ public class ExperimentActivity extends Activity {
         }
 
         // Clean up
-        centerView.removeView(getExperimentView(experimentRun));
         try {
             experimentRun.finish(true);
         } catch (IOException e) {
@@ -304,7 +310,9 @@ public class ExperimentActivity extends Activity {
         }
         experimentRun.destroy();
         // remove the entry late because getExperimentView would add it again to the map
-        experimentViews.remove(experimentRun);
+        activeExperiments.remove(experimentRun);
+
+        pagerAdapter.update();
     }
 
     private void activateExperimentRunGroup(ExperimentRunGroup experimentRunGroup) {
@@ -317,24 +325,14 @@ public class ExperimentActivity extends Activity {
     }
 
     private void setCurrentExperimentRun(IExperimentRun experimentRun) {
-        IExperimentRun currentExperimentRun = experiment.getCurrentExperimentRun();
-        if (currentExperimentRun != null)
-            getExperimentView(currentExperimentRun).setVisibility(View.INVISIBLE);
         experimentRun.getExperimentRunGroup().setCurrentExperimentRun(experimentRun);
         invalidateOptionsMenu();
-        View view = getExperimentView(experimentRun);
-        view.setVisibility(View.VISIBLE);
 
-        centerView.requestLayout();
+        pager.requestLayout();
     }
 
-    private View getExperimentView(IExperimentRun experimentRun) {
-        if (experimentViews.containsKey(experimentRun))
-            return experimentViews.get(experimentRun);
-
-        View view = experimentRun.createExperimentView(this);
-        experimentViews.put(experimentRun, view);
-        return view;
+    private void addActiveExperiment(IExperimentRun experimentRun) {
+        activeExperiments.add(experimentRun);
     }
 
     @Override
@@ -583,7 +581,7 @@ public class ExperimentActivity extends Activity {
             isRecording = true;
 
             // don't fall asleep!
-            centerView.setKeepScreenOn(true);
+            pager.setKeepScreenOn(true);
         }
 
         public void leaveState() {
@@ -596,7 +594,7 @@ public class ExperimentActivity extends Activity {
             setRequestedOrientation(initialRequestedOrientation);
 
             // sleep if tired
-            centerView.setKeepScreenOn(false);
+            pager.setKeepScreenOn(false);
         }
 
         @Override
@@ -631,5 +629,84 @@ public class ExperimentActivity extends Activity {
         public void onNewClicked() {
             setState(new PreviewState());
         }
+    }
+}
+
+
+class ExperimentRunFragmentPagerAdapter extends FragmentStatePagerAdapter {
+    private List<IExperimentRun> activeExperiments;
+
+    public ExperimentRunFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager,
+                                             List<IExperimentRun> activeExperiments) {
+        super(fragmentManager);
+
+        this.activeExperiments = activeExperiments;
+    }
+
+    public void update() {
+        notifyDataSetChanged();
+    }
+
+    class GenericFragment extends android.support.v4.app.Fragment {
+        private IExperimentRun experimentRun;
+
+        public GenericFragment(String exerimentRunName) {
+            super();
+
+            Bundle args = new Bundle();
+            args.putString("experiment_name", exerimentRunName);
+            setArguments(args);
+        }
+
+        public GenericFragment() {
+            super();
+        }
+
+        public IExperimentRun findExperimentFromArguments(Activity activity) {
+            String name = getArguments().getString("experiment_name", "");
+            ExperimentActivity experimentActivity = (ExperimentActivity)activity;
+            List<IExperimentRun> list = experimentActivity.getActiveExperimentRuns();
+            for (IExperimentRun experimentRun : list) {
+                if (experimentRun.getClass().getSimpleName().equals(name))
+                    return experimentRun;
+            }
+            return null;
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            return experimentRun.createExperimentView(getActivity());
+        }
+
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+
+            experimentRun = findExperimentFromArguments(activity);
+        }
+
+        public IExperimentRun getExperimentRun() {
+            return experimentRun;
+        }
+    }
+
+    @Override
+    public android.support.v4.app.Fragment getItem(int position) {
+        return new GenericFragment(activeExperiments.get(position).getClass().getSimpleName());
+    }
+
+    @Override
+    public int getCount() {
+        return activeExperiments.size();
+    }
+
+    public int getItemPosition(Object object) {
+        GenericFragment fragment = (GenericFragment)object;
+        IExperimentRun experimentRun = fragment.getExperimentRun();
+        if (activeExperiments.contains(experimentRun))
+            return activeExperiments.indexOf(experimentRun);
+        else
+            return POSITION_NONE;
     }
 }
