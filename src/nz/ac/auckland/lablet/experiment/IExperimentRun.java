@@ -18,9 +18,14 @@ import java.io.IOException;
 
 
 public interface IExperimentRun {
-    public interface IExperimentParent {
-        public void startEditingSettings();
-        public void finishEditingSettings();
+    public interface IExperimentRunListener {
+        public void onStartPreview();
+        public void onStopPreview();
+        public void onStartRecording();
+        public void onStopRecording();
+        public void onStartPlayback();
+        public void onStopPlayback();
+        public void onSettingsChanged();
     }
 
     public View createExperimentView(Context context);
@@ -29,10 +34,9 @@ public interface IExperimentRun {
      * Prepares a option menu for the experiment.
      *
      * @param menuItem the menu item for the option menu
-     * @param parent the host for the experiment
      * @return false if there is no option menu
      */
-    public boolean onPrepareOptionsMenu(MenuItem menuItem, IExperimentParent parent);
+    public boolean onPrepareOptionsMenu(MenuItem menuItem);
 
     public void onSaveInstanceState(Bundle outState);
     public void onRestoreInstanceState(Bundle savedInstanceState);

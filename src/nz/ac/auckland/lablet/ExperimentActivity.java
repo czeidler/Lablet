@@ -85,21 +85,7 @@ public class ExperimentActivity extends Activity {
         assert settingsMenu != null;
         IExperimentRun currentExperimentRun = experiment.getCurrentExperimentRun();
         if (currentExperimentRun != null) {
-            boolean hasOptions = currentExperimentRun.onPrepareOptionsMenu(settingsMenu,
-                    new IExperimentRun.IExperimentParent() {
-                private AbstractViewState previousState;
-
-                @Override
-                public void startEditingSettings() {
-                    previousState = state;
-                    setState(null);
-                }
-
-                @Override
-                public void finishEditingSettings() {
-                    setState(previousState);
-                }
-            });
+            boolean hasOptions = currentExperimentRun.onPrepareOptionsMenu(settingsMenu);
             settingsMenu.setEnabled(hasOptions);
             settingsMenu.setVisible(hasOptions);
         }

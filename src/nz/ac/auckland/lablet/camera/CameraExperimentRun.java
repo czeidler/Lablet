@@ -34,16 +34,18 @@ import java.util.Comparator;
 import java.util.List;
 
 
-class CameraExperimentView extends FrameLayout {
+class CameraExperimentView extends FrameLayout implements IExperimentRun.IExperimentRunListener {
     private RatioSurfaceView preview = null;
     private VideoView videoView = null;
     private SurfaceHolder previewHolder = null;
+    final private CameraExperimentRun cameraExperimentRun;
     final private Camera camera;
 
-    public CameraExperimentView(Context context, Camera camera) {
+    public CameraExperimentView(Context context, CameraExperimentRun cameraExperimentRun) {
         super(context);
 
-        this.camera = camera;
+        this.cameraExperimentRun = cameraExperimentRun;
+        this.camera = cameraExperimentRun.getCamera();
 
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.camera_experiment_view, null, false);
@@ -60,6 +62,8 @@ class CameraExperimentView extends FrameLayout {
 
         preview.setVisibility(View.VISIBLE);
         videoView.setVisibility(View.INVISIBLE);
+
+        setRatio();
     }
 
     private SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
@@ -81,36 +85,70 @@ class CameraExperimentView extends FrameLayout {
         }
     };
 
-    public void selectPreview() {
+    public void startPlayback(String path) {
+
+    }
+
+    private void selectPreview() {
         preview.setVisibility(View.VISIBLE);
         videoView.setVisibility(View.INVISIBLE);
     }
 
-    public void startPlayback(String path) {
+    @Override
+    public void onStartPreview() {
+        selectPreview();
+    }
+
+    @Override
+    public void onStopPreview() {
+
+    }
+
+    @Override
+    public void onStartRecording() {
+        selectPreview();
+        setKeepScreenOn(true);
+    }
+
+    @Override
+    public void onStopRecording() {
+        setKeepScreenOn(false);
+    }
+
+    @Override
+    public void onStartPlayback() {
+        File videoFile = cameraExperimentRun.getVideoFile();
+        if (videoFile == null)
+            return;
+
         preview.setVisibility(View.INVISIBLE);
         videoView.setVisibility(View.VISIBLE);
 
-        videoView.setVideoPath(path);
+        videoView.setVideoPath(videoFile.getPath());
         videoView.requestFocus();
         videoView.start();
     }
 
-    public void stopPlayback() {
+    @Override
+    public void onStopPlayback() {
         videoView.stopPlayback();
     }
 
-    public void setRatio(float previewRatio) {
-        preview.setRatio(previewRatio);
+    @Override
+    public void onSettingsChanged() {
+        setRatio();
+    }
+
+    private void setRatio() {
+        preview.setRatio(cameraExperimentRun.getPreviewRatio());
         preview.requestLayout();
     }
 }
 
 public class CameraExperimentRun extends AbstractExperimentRun {
     private Activity activity;
-    private IExperimentParent parent;
 
     private CameraExperimentRunData experimentData;
-    private CameraExperimentView cameraExperimentView = null;
 
     private Camera camera = null;
     private Camera.Size videoSize;
@@ -132,6 +170,14 @@ public class CameraExperimentRun extends AbstractExperimentRun {
 
     static final String videoFileName = "video.mp4";
 
+    public Camera getCamera() {
+        return camera;
+    }
+
+    public File getVideoFile() {
+        return videoFile;
+    }
+
     /**
      * Helper class to match a camera recording size with a camcorder profile matching for that size.
      */
@@ -142,15 +188,13 @@ public class CameraExperimentRun extends AbstractExperimentRun {
 
     @Override
     public View createExperimentView(Context context) {
-        cameraExperimentView = new CameraExperimentView(context, camera);
-        cameraExperimentView.setRatio(getPreviewRatio());
+        CameraExperimentView cameraExperimentView = new CameraExperimentView(context, this);
+        setListener(cameraExperimentView);
         return cameraExperimentView;
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(MenuItem menuItem, IExperimentParent parent) {
-        this.parent = parent;
-
+    public boolean onPrepareOptionsMenu(MenuItem menuItem) {
         menuItem.setVisible(false);
         menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -317,10 +361,9 @@ public class CameraExperimentRun extends AbstractExperimentRun {
 
     @Override
     public void startPreview() {
+        super.startPreview();
+
         videoFile = null;
-
-        cameraExperimentView.selectPreview();
-
         camera.startPreview();
     }
 
@@ -355,9 +398,7 @@ public class CameraExperimentRun extends AbstractExperimentRun {
 
         recorder.start();
 
-        cameraExperimentView.selectPreview();
-
-        cameraExperimentView.setKeepScreenOn(true);
+        super.startRecording();
     }
 
     @Override
@@ -375,21 +416,9 @@ public class CameraExperimentRun extends AbstractExperimentRun {
         camera.lock();
         camera.stopPreview();
 
-        cameraExperimentView.setKeepScreenOn(false);
+        super.stopRecording();
 
         return dataTaken;
-    }
-
-    @Override
-    public void startPlayback() {
-        if (videoFile == null)
-            return;
-        cameraExperimentView.startPlayback(videoFile.getPath());
-    }
-
-    @Override
-    public void stopPlayback() {
-        cameraExperimentView.stopPlayback();
     }
 
     @Override
@@ -413,9 +442,6 @@ public class CameraExperimentRun extends AbstractExperimentRun {
     }
 
     private void selectCamcorderProfile(VideoSettings videoSettings) {
-        if (parent != null)
-            parent.startEditingSettings();
-
         selectedVideoSettings = videoSettings;
 
         videoSize = selectedVideoSettings.videoSize;
@@ -423,11 +449,7 @@ public class CameraExperimentRun extends AbstractExperimentRun {
         parameters.setPreviewSize(videoSize.width, videoSize.height);
         camera.setParameters(parameters);
 
-        if (cameraExperimentView != null)
-            cameraExperimentView.setRatio(getPreviewRatio());
-
-        if (parent != null)
-            parent.finishEditingSettings();
+        notifySettingsChanged();
     }
 
     /**
@@ -572,7 +594,7 @@ public class CameraExperimentRun extends AbstractExperimentRun {
         camera.setDisplayOrientation(result);
     }
 
-    private float getPreviewRatio() {
+    public float getPreviewRatio() {
         // get preview ratio
         int orientation = activity.getResources().getConfiguration().orientation;
         float ratio;

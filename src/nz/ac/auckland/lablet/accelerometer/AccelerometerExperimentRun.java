@@ -45,7 +45,7 @@ public class AccelerometerExperimentRun extends AbstractExperimentRun {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(MenuItem menuItem, IExperimentParent parent) {
+    public boolean onPrepareOptionsMenu(MenuItem menuItem) {
         return false;
     }
 
@@ -98,32 +98,33 @@ public class AccelerometerExperimentRun extends AbstractExperimentRun {
 
     @Override
     public void startPreview() {
-
+        super.startPreview();
     }
 
     @Override
     public void stopPreview() {
-
+        super.stopPreview();
     }
 
     @Override
     public void startRecording() throws Exception {
-
+        super.startRecording();
     }
 
     @Override
     public boolean stopRecording() {
+        super.stopRecording();
         return true;
     }
 
     @Override
     public void startPlayback() {
-
+        super.startPlayback();
     }
 
     @Override
     public void stopPlayback() {
-
+        super.stopPlayback();
     }
 
     @Override
