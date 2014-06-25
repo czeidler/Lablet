@@ -28,6 +28,100 @@ import java.io.IOException;
 import java.util.*;
 
 
+class ExperimentRunViewManager {
+    final private Experiment experiment;
+
+    private ImageButton addRunGroupButton = null;
+    private Button nextRunGroupButton = null;
+    private Button prevRunGroupButton = null;
+    private TextView runGroupView = null;
+
+    private Experiment.IExperimentListener experimentListener = new Experiment.IExperimentListener() {
+        @Override
+        public void onExperimentRunGroupAdded(ExperimentRunGroup runGroup) {
+            updateViews();
+        }
+
+        @Override
+        public void onExperimentRunGroupRemoved(ExperimentRunGroup runGroup) {
+            updateViews();
+        }
+
+        @Override
+        public void onCurrentRunGroupChanged(ExperimentRunGroup newGroup, ExperimentRunGroup oldGroup) {
+            updateViews();
+        }
+    };
+
+    public ExperimentRunViewManager(final Activity activity, final Experiment experiment) {
+        this.experiment = experiment;
+
+        addRunGroupButton = (ImageButton)activity.findViewById(R.id.addRunButton);
+        nextRunGroupButton = (Button)activity.findViewById(R.id.nextButton);
+        prevRunGroupButton = (Button)activity.findViewById(R.id.prevButton);
+        runGroupView = (TextView)activity.findViewById(R.id.runGroupView);
+
+        addRunGroupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ExperimentRunGroup oldGroup = experiment.getCurrentExperimentRunGroup();
+                List<String> experimentNamesList = new ArrayList<String>();
+                for (IExperimentRun experimentRun : oldGroup.getExperimentRuns())
+                    experimentNamesList.add(experimentRun.getClass().getSimpleName());
+                ExperimentRunGroup experimentRunGroup = ExperimentRunGroup.createExperimentRunGroup(
+                        experimentNamesList, activity);
+
+                experiment.addExperimentRunGroup(experimentRunGroup);
+                setCurrentExperimentRunGroup(experimentRunGroup);
+            }
+        });
+
+        nextRunGroupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<ExperimentRunGroup> runGroups = experiment.getExperimentRunGroups();
+                int index = runGroups.indexOf(experiment.getCurrentExperimentRunGroup());
+                index++;
+                if (index >= runGroups.size())
+                    return;
+                setCurrentExperimentRunGroup(runGroups.get(index));
+            }
+        });
+
+        prevRunGroupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<ExperimentRunGroup> runGroups = experiment.getExperimentRunGroups();
+                int index = runGroups.indexOf(experiment.getCurrentExperimentRunGroup());
+                index--;
+                if (index < 0)
+                    return;
+                setCurrentExperimentRunGroup(runGroups.get(index));
+            }
+        });
+
+        experiment.addListener(experimentListener);
+
+        updateViews();
+    }
+
+    private void updateViews() {
+        ExperimentRunGroup currentRunGroup = experiment.getCurrentExperimentRunGroup();
+        List<ExperimentRunGroup> runGroups = experiment.getExperimentRunGroups();
+        int index = runGroups.indexOf(currentRunGroup);
+
+        runGroupView.setText(Integer.toString(index));
+
+        nextRunGroupButton.setEnabled(index + 1 < runGroups.size());
+        prevRunGroupButton.setEnabled(index - 1 >= 0);
+    }
+
+    private void setCurrentExperimentRunGroup(ExperimentRunGroup experimentRunGroup) {
+        experiment.setCurrentExperimentRunGroup(experimentRunGroup);
+    }
+}
+
+
 public class ExperimentActivity extends FragmentActivity {
     private Experiment experiment;
 
@@ -37,7 +131,6 @@ public class ExperimentActivity extends FragmentActivity {
     private ImageButton startButton = null;
     private ImageButton stopButton = null;
     private ImageButton newButton = null;
-    private ImageButton addRunGroupButton = null;
     private MenuItem analyseMenuItem = null;
     private MenuItem settingsMenu = null;
     private MenuItem viewMenu = null;
@@ -46,6 +139,27 @@ public class ExperimentActivity extends FragmentActivity {
     private AbstractViewState state = null;
 
     private boolean unsavedExperimentData = false;
+
+    private ExperimentRunViewManager experimentRunViewManager;
+    private ExperimentRunGroup activeExperimentRunGroup = null;
+
+    private Experiment.IExperimentListener experimentListener = new Experiment.IExperimentListener() {
+        @Override
+        public void onExperimentRunGroupAdded(ExperimentRunGroup runGroup) {
+        }
+
+        @Override
+        public void onExperimentRunGroupRemoved(ExperimentRunGroup runGroup) {
+        }
+
+        @Override
+        public void onCurrentRunGroupChanged(ExperimentRunGroup newGroup, ExperimentRunGroup oldGroup) {
+            activateExperimentRunGroup(newGroup, true);
+
+            updateAdapter();
+            setState(new PreviewState());
+        }
+    };
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -223,10 +337,12 @@ public class ExperimentActivity extends FragmentActivity {
         experimentList.add(AccelerometerExperimentRun.class.getSimpleName());
         experimentList.add(CameraExperimentRun.class.getSimpleName());
 
-        ExperimentRunGroup runGroup = createExperimentRunGroup(experimentList);
+        ExperimentRunGroup runGroup = ExperimentRunGroup.createExperimentRunGroup(experimentList, this);
         experiment.addExperimentRunGroup(runGroup);
         experiment.setCurrentExperimentRunGroup(runGroup);
         setCurrentExperimentRun(runGroup.getExperimentRunAt(0));
+
+        experiment.addListener(experimentListener);
 
         // gui
         setContentView(R.layout.experiment_recording);
@@ -253,7 +369,6 @@ public class ExperimentActivity extends FragmentActivity {
         startButton = (ImageButton)findViewById(R.id.recordButton);
         stopButton = (ImageButton)findViewById(R.id.stopButton);
         newButton = (ImageButton)findViewById(R.id.newButton);
-        addRunGroupButton = (ImageButton)findViewById(R.id.addRunButton);
 
         setState(null);
 
@@ -278,23 +393,7 @@ public class ExperimentActivity extends FragmentActivity {
             }
         });
 
-        addRunGroupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ExperimentRunGroup oldGroup = experiment.getCurrentExperimentRunGroup();
-                List<String> experimentNamesList = new ArrayList<String>();
-                for (IExperimentRun experimentRun : oldGroup.getExperimentRuns())
-                    experimentNamesList.add(experimentRun.getClass().getSimpleName());
-                ExperimentRunGroup experimentRunGroup = createExperimentRunGroup(experimentNamesList);
-
-                experiment.addExperimentRunGroup(experimentRunGroup);
-                activateExperimentRunGroup(experimentRunGroup, true);
-                experiment.setCurrentExperimentRunGroup(experimentRunGroup);
-
-                updateAdapter();
-                setState(new PreviewState());
-            }
-        });
+        experimentRunViewManager = new ExperimentRunViewManager(this, experiment);
     }
 
     private void updateAdapter() {
@@ -304,29 +403,17 @@ public class ExperimentActivity extends FragmentActivity {
         pager.setAdapter(pagerAdapter);
     }
 
-    private ExperimentRunGroup createExperimentRunGroup(List<String> experimentRuns) {
-        ExperimentRunGroup experimentRunGroup = new ExperimentRunGroup();
-
-        ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
-        for (String experimentRunName : experimentRuns) {
-            IExperimentPlugin plugin = factory.findExperimentPlugin(experimentRunName);
-            IExperimentRun experimentRun = plugin.createExperiment(this);
-            experimentRunGroup.addExperimentRun(experimentRun);
-        }
-
-        return experimentRunGroup;
-    }
-
     private void activateExperimentRunGroup(ExperimentRunGroup experimentRunGroup, boolean activate) {
-        ExperimentRunGroup oldExperimentRunGroup = experiment.getCurrentExperimentRunGroup();
-        if (oldExperimentRunGroup != experimentRunGroup)
-            oldExperimentRunGroup.activateExperimentRuns(null);
+        if (activeExperimentRunGroup != experimentRunGroup && activeExperimentRunGroup != null)
+            activeExperimentRunGroup.activateExperimentRuns(null);
 
-        if (activate)
+        if (activate) {
             experimentRunGroup.activateExperimentRuns(this);
-        else
+            activeExperimentRunGroup = experimentRunGroup;
+        } else {
             experimentRunGroup.activateExperimentRuns(null);
-
+            activeExperimentRunGroup = null;
+        }
     }
 
     private void setCurrentExperimentRun(IExperimentRun experimentRun) {
