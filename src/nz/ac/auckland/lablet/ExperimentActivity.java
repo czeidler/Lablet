@@ -146,7 +146,11 @@ public class ExperimentActivity extends FragmentActivity {
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                setCurrentExperimentRun(experimentRuns.get(menuItem.getItemId()));
+                int itemPosition = menuItem.getItemId();
+                IExperimentRun experimentRun = experimentRuns.get(itemPosition);
+                setCurrentExperimentRun(experimentRun);
+                pager.requestLayout();
+                pager.setCurrentItem(itemPosition, true);
                 return true;
             }
         });
@@ -215,19 +219,36 @@ public class ExperimentActivity extends FragmentActivity {
 
         experiment = new Experiment(this, experimentBaseDir);
 
-        List<String> experimentList = new ArrayList<>();
+        final List<String> experimentList = new ArrayList<>();
         experimentList.add(AccelerometerExperimentRun.class.getSimpleName());
         experimentList.add(CameraExperimentRun.class.getSimpleName());
 
         ExperimentRunGroup runGroup = createExperimentRunGroup(experimentList);
         experiment.addExperimentRunGroup(runGroup);
         experiment.setCurrentExperimentRunGroup(runGroup);
+        setCurrentExperimentRun(runGroup.getExperimentRunAt(0));
 
         // gui
         setContentView(R.layout.experiment_recording);
 
         pager = (ViewPager)findViewById(R.id.centerLayout);
         updateAdapter();
+        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                setCurrentExperimentRun(experiment.getCurrentExperimentRunGroup().getExperimentRunAt(position));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         startButton = (ImageButton)findViewById(R.id.recordButton);
         stopButton = (ImageButton)findViewById(R.id.stopButton);
@@ -311,8 +332,6 @@ public class ExperimentActivity extends FragmentActivity {
     private void setCurrentExperimentRun(IExperimentRun experimentRun) {
         experimentRun.getExperimentRunGroup().setCurrentExperimentRun(experimentRun);
         invalidateOptionsMenu();
-
-        pager.requestLayout();
     }
 
     @Override
