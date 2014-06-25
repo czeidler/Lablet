@@ -26,6 +26,19 @@ public class ExperimentRunGroup {
     private File storageDirectory;
     private Activity experimentRunActivity;
 
+    static public ExperimentRunGroup createExperimentRunGroup(List<String> experimentRuns, Activity activity) {
+        ExperimentRunGroup experimentRunGroup = new ExperimentRunGroup();
+
+        ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
+        for (String experimentRunName : experimentRuns) {
+            IExperimentPlugin plugin = factory.findExperimentPlugin(experimentRunName);
+            IExperimentRun experimentRun = plugin.createExperiment(activity);
+            experimentRunGroup.addExperimentRun(experimentRun);
+        }
+
+        return experimentRunGroup;
+    }
+
     public File getStorageDir() {
         return storageDirectory;
     }
