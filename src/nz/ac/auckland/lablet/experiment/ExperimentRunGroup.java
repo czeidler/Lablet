@@ -7,6 +7,7 @@
  */
 package nz.ac.auckland.lablet.experiment;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import java.io.File;
@@ -23,6 +24,7 @@ public class ExperimentRunGroup {
     private IExperimentRun currentExperimentRun = null;
     private Experiment experiment;
     private File storageDirectory;
+    private Activity experimentRunActivity;
 
     public File getStorageDir() {
         return storageDirectory;
@@ -32,6 +34,22 @@ public class ExperimentRunGroup {
         this.experiment = experiment;
         int groupId = experiment.createRunGroupId();
         this.storageDirectory = new File(experiment.getStorageDir(), "run" + Integer.toString(groupId));
+    }
+
+    public void activateExperimentRuns(Activity activity) {
+        if (experimentRunActivity != null) {
+            for (IExperimentRun experimentRun : experimentRuns)
+                experimentRun.destroy();
+        }
+        experimentRunActivity = activity;
+        if (experimentRunActivity != null) {
+            for (IExperimentRun experimentRun : experimentRuns)
+                experimentRun.init(experimentRunActivity);
+        }
+    }
+
+    public boolean isActive() {
+        return experimentRunActivity != null;
     }
 
     public int getExperimentRunCount() {
@@ -66,7 +84,27 @@ public class ExperimentRunGroup {
             return false;
         experimentRuns.add(experimentRun);
         experimentRun.setExperimentRunGroup(this);
+
+        if (experimentRunActivity != null)
+            experimentRun.init(experimentRunActivity);
         return true;
+    }
+
+    public void removeExperimentRun(IExperimentRun experimentRun) {
+        // update the current experiment run first if necessary
+        if (experimentRun == getCurrentExperimentRun()) {
+            int index = experimentRuns.indexOf(experimentRun);
+            if (index > 0)
+                setCurrentExperimentRun(0);
+            else if (index + 1 < experimentRuns.size())
+                setCurrentExperimentRun(index + 1);
+            else
+                setCurrentExperimentRun(null);
+        }
+        experimentRuns.remove(experimentRun);
+
+        if (experimentRunActivity != null)
+            experimentRun.destroy();
     }
 
     public String getDescription() {
@@ -123,19 +161,5 @@ public class ExperimentRunGroup {
 
     public Experiment getExperiment() {
         return experiment;
-    }
-
-    public void removeExperimentRun(IExperimentRun experimentRun) {
-        // update the current experiment run first if necessary
-        if (experimentRun == getCurrentExperimentRun()) {
-            int index = experimentRuns.indexOf(experimentRun);
-            if (index > 0)
-                setCurrentExperimentRun(0);
-            else if (index + 1 < experimentRuns.size())
-                setCurrentExperimentRun(index + 1);
-            else
-                setCurrentExperimentRun(null);
-        }
-        experimentRuns.remove(experimentRun);
     }
 }
