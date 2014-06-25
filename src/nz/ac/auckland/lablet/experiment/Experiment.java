@@ -11,7 +11,9 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -28,15 +30,15 @@ public class Experiment {
     final private File storageDirectory;
     private int runGroupId = -1;
 
-    private IExperimentListener listener = null;
+    private List<WeakReference<IExperimentListener>> listeners = new ArrayList<>();
 
     public Experiment(Activity activity, File storageDirectory) {
         this.activity = activity;
         this.storageDirectory = storageDirectory;
     }
 
-    public void setListener(IExperimentListener listener) {
-        this.listener = listener;
+    public void addListener(IExperimentListener listener) {
+        listeners.add(new WeakReference<IExperimentListener>(listener));
     }
 
     public Activity getActivity() {
@@ -137,18 +139,33 @@ public class Experiment {
         return storageDirectory;
     }
 
+    private List<IExperimentListener> getListeners() {
+        List<IExperimentListener> hardListeners = new ArrayList<>();
+
+        Iterator<WeakReference<IExperimentListener>> iterator = listeners.iterator();
+        while (iterator.hasNext()) {
+            IExperimentListener listener = iterator.next().get();
+            if (listener != null)
+                hardListeners.add(listener);
+            else
+                iterator.remove();
+        }
+
+        return hardListeners;
+    }
+
     private void notifyCurrentExperimentRunGroupChanged(ExperimentRunGroup runGroup, ExperimentRunGroup oldGroup) {
-        if (listener != null)
+        for (IExperimentListener listener : getListeners())
             listener.onCurrentRunGroupChanged(runGroup, oldGroup);
     }
 
     private void notifyExperimentRunGroupAdded(ExperimentRunGroup runGroup) {
-        if (listener != null)
+        for (IExperimentListener listener : getListeners())
             listener.onExperimentRunGroupAdded(runGroup);
     }
 
     private void notifyExperimentRunGroupRemoved(ExperimentRunGroup runGroup) {
-        if (listener != null)
+        for (IExperimentListener listener : getListeners())
             listener.onExperimentRunGroupRemoved(runGroup);
     }
 }
