@@ -73,9 +73,12 @@ class CameraExperimentView extends FrameLayout implements IExperimentRun.IExperi
 
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             try {
-                if (camera != null)
+                if (camera != null) {
+                    camera.stopPreview();
                     camera.setPreviewDisplay(previewHolder);
-            } catch (IOException e) {
+                    camera.startPreview();
+                }
+            }catch (IOException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         }
@@ -363,7 +366,6 @@ public class CameraExperimentRun extends AbstractExperimentRun {
         super.startPreview();
 
         videoFile = null;
-        camera.startPreview();
     }
 
     @Override
