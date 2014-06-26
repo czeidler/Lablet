@@ -9,6 +9,7 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.format.Time;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +36,13 @@ public class Experiment {
 
     public Experiment(Activity activity, File storageDirectory) {
         this.activity = activity;
-        this.storageDirectory = storageDirectory;
+        this.storageDirectory = new File(storageDirectory, generateNewUid());
+    }
+
+    private String generateNewUid() {
+        CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", new java.util.Date());
+
+        return "Experiment_" + dateString;
     }
 
     public void addListener(IExperimentListener listener) {

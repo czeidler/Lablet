@@ -326,7 +326,16 @@ public class ExperimentActivity extends FragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        experimentBaseDir = new File(getExternalFilesDir(null), "experiments");
+        Intent intent = getIntent();
+        if (intent != null) {
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                if (extras.containsKey("experiment_base_directory"))
+                    experimentBaseDir = new File(extras.getString("experiment_base_directory"));
+            }
+        }
+        if (experimentBaseDir == null)
+            experimentBaseDir = new File(getExternalFilesDir(null), "experiments");
 
         experiment = new Experiment(this, experimentBaseDir);
 

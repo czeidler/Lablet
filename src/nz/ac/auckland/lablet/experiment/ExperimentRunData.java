@@ -180,13 +180,10 @@ abstract public class ExperimentRunData {
     abstract public String getRunValueLabel();
 
     protected String generateNewUid() {
-        String identifier = getIdentifier();
-
-        Time now = new Time(Time.getCurrentTimezone());
         CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", new java.util.Date());
 
-        now.setToNow();
         String newUid = "";
+        String identifier = getIdentifier();
         if (!identifier.equals("")) {
             newUid += identifier;
             newUid += "_";

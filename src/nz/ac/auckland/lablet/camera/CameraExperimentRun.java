@@ -321,7 +321,7 @@ public class CameraExperimentRun extends AbstractExperimentRun {
         else {
             if (!moveTempFilesToExperimentDir(storageDir))
                 throw new IOException();
-            experimentData.setVideoFileName(getVideoFileName());
+            experimentData.setVideoFileName(storageDir, getVideoFileName());
             experimentData.saveExperimentDataToFile(storageDir);
         }
         videoFile = null;

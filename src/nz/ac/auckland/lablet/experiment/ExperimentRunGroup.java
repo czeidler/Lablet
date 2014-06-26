@@ -221,6 +221,8 @@ public class ExperimentRunGroup {
     }
 
     public void finishExperiment(boolean saveData, File storageDir) throws IOException {
+        storageDir.mkdirs();
+
         data.saveToFile(new File(storageDir, "experiment_run_group.xml"));
 
         for (IExperimentRun experimentRun : experimentRuns) {
