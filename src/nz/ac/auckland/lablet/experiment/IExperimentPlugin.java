@@ -9,7 +9,6 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -41,7 +40,7 @@ public interface IExperimentPlugin {
      * {@see android.app.Activity#startActivityForResult(android.content.Intent, int, android.os.Bundle)})
      * @param options bundle with settings for the experiment
      */
-    public IExperiment createExperiment(Activity parentActivity, Intent intent, File experimentBaseDir);
+    public void startExperimentActivity(Activity parentActivity, int requestCode, Bundle options);
 
     /**
      * Starts an activity to config the experiment runs.

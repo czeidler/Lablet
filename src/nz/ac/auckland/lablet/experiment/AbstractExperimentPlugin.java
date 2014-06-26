@@ -22,7 +22,7 @@ abstract public class AbstractExperimentPlugin implements IExperimentPlugin {
      * @param intent the Intent where the data should be packed to
      * @param options the options for the activity
      */
-    static public void packStartExperimentIntent(Intent intent, Bundle options) {
+    protected void packStartExperimentIntent(Intent intent, Bundle options) {
         if (options != null)
             intent.putExtra("options", options);
     }
@@ -35,8 +35,8 @@ abstract public class AbstractExperimentPlugin implements IExperimentPlugin {
      * @param analysisSpecificData analysis specific data bundle
      * @param options the options for the activity
      */
-    static public void packStartRunSettingsIntent(Intent intent, ExperimentData experimentData,
-                                                  Bundle analysisSpecificData, Bundle options) {
+    protected void packStartRunSettingsIntent(Intent intent, ExperimentData experimentData, Bundle analysisSpecificData,
+                                              Bundle options) {
         intent.putExtra("experiment_path", experimentData.getStorageDir().getPath());
         if (analysisSpecificData != null)
             intent.putExtra("analysisSpecificData", analysisSpecificData);
