@@ -87,6 +87,8 @@ public class ExperimentRunGroup {
         ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
         for (String experimentRunName : experimentRuns) {
             IExperimentPlugin plugin = factory.findExperimentPlugin(experimentRunName);
+            if (plugin == null)
+                continue;
             IExperimentRun experimentRun = plugin.createExperiment(activity);
             experimentRunGroup.addExperimentRun(experimentRun);
         }
@@ -221,9 +223,10 @@ public class ExperimentRunGroup {
     }
 
     public void finishExperiment(boolean saveData, File storageDir) throws IOException {
-        storageDir.mkdirs();
-
-        data.saveToFile(new File(storageDir, "experiment_run_group.xml"));
+        if (saveData) {
+            storageDir.mkdirs();
+            data.saveToFile(new File(storageDir, "experiment_run_group.xml"));
+        }
 
         for (IExperimentRun experimentRun : experimentRuns) {
             experimentRun.finishExperiment(saveData, new File(storageDir, experimentRun.getClass().getSimpleName()));

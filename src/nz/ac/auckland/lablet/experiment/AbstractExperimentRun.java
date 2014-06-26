@@ -107,7 +107,8 @@ abstract public class AbstractExperimentRun implements IExperimentRun {
 
     @Override
     public void finishExperiment(boolean saveData, File storageDir) throws IOException {
-        storageDir.mkdirs();
+        if (saveData)
+            storageDir.mkdirs();
         unsavedExperimentData = false;
     }
 
