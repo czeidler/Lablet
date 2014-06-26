@@ -47,7 +47,7 @@ public class AccelerometerExperimentRun extends AbstractExperimentRun {
     private XYPlot graphView2D;
     private WeakReference<ISensorDataListener> softDataListener;
 
-    private SimpleXYSeries xData = new SimpleXYSeries("x");;
+    private SimpleXYSeries xData = new SimpleXYSeries("x");
 
     private SensorManager sensorManager;
 
