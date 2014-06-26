@@ -480,11 +480,11 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
         getLegendWidget().setVisible(false);
         setTicksPerDomainLabel(2);
 
-        LineAndPointFormatter seriesFormat = new ImprovedLineAndPointFormatter(Color.argb(255, 216, 228, 159),
+        LineAndPointFormatter seriesFormatter = new ImprovedLineAndPointFormatter(Color.argb(255, 216, 228, 159),
                 ExperimentAnalyserActivity.MARKER_COLOR, Color.argb(0, 0, 0, 0));
-        seriesFormat.setPointLabeler(null);
+        seriesFormatter.setPointLabeler(null);
 
-        addSeries(new XYSeriesAdapter(adapter), seriesFormat);
+        addSeries(new XYSeriesAdapter(adapter), seriesFormatter);
 
         refillGraph();
     }
