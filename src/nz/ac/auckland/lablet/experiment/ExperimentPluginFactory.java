@@ -7,6 +7,7 @@
  */
 package nz.ac.auckland.lablet.experiment;
 
+import nz.ac.auckland.lablet.accelerometer.AccelerometerExperimentPlugin;
 import nz.ac.auckland.lablet.camera.CameraExperimentPlugin;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class ExperimentPluginFactory {
     private ExperimentPluginFactory() {
         plugins = new ArrayList<IExperimentPlugin>();
         plugins.add(new CameraExperimentPlugin());
+        plugins.add(new AccelerometerExperimentPlugin());
     }
 
     /**

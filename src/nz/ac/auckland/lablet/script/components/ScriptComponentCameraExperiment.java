@@ -17,8 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.*;
-import nz.ac.auckland.lablet.camera.CameraExperimentData;
-import nz.ac.auckland.lablet.camera.CameraExperimentActivity;
+import nz.ac.auckland.lablet.camera.CameraExperimentRunData;
 import nz.ac.auckland.lablet.experiment.ExperimentLoader;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.script.ScriptComponentTree;
@@ -143,7 +142,7 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
     }
 
     private void startExperimentActivity() {
-        Intent intent = new Intent(getContext(), CameraExperimentActivity.class);
+        Intent intent = new Intent(getContext(), ExperimentActivity.class);
         Bundle options = new Bundle();
         options.putBoolean("show_analyse_menu", false);
         // requested resolution
@@ -209,7 +208,7 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
                 if (!ExperimentLoader.loadExperiment(getContext(), experimentPath, result))
                     return null;
 
-                CameraExperimentData experiment = (CameraExperimentData)result.experimentData;
+                CameraExperimentRunData experiment = (CameraExperimentRunData)result.experimentRunData;
                 return new File(experiment.getStorageDir(), experiment.getVideoFileName());
             }
 

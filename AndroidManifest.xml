@@ -12,8 +12,8 @@
         <activity android:name="nz.ac.auckland.lablet.ExperimentAnalyserActivity"
                   android:icon="@drawable/ic_tracker"/>
 
-        <activity android:name="nz.ac.auckland.lablet.camera.CameraExperimentActivity"
-                  android:icon="@drawable/ic_video"/>
+        <activity android:name="nz.ac.auckland.lablet.ExperimentActivity"
+                  android:icon="@drawable/ic_lab"/>
         <activity android:name="nz.ac.auckland.lablet.camera.CameraRunSettingsActivity"
                   android:icon="@drawable/ic_cut" />
 
@@ -27,13 +27,21 @@
         </activity>
         <activity android:name="nz.ac.auckland.lablet.script.ScriptRunnerActivity"
                   android:icon="@drawable/ic_console"
-                  android:windowSoftInputMode="stateHidden" />
+                  android:windowSoftInputMode="stateHidden"/>
     </application>
 
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera"/>
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
     <uses-permission android:name="android.permission.RECORD_VIDEO"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <supports-screens android:smallScreens="false"
+                      android:normalScreens="false"
+                      android:largeScreens="true"
+                      android:xlargeScreens="true"
+                      android:requiresSmallestWidthDp="600" />
+
 </manifest>

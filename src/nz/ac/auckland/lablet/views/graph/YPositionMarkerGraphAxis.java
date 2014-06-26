@@ -34,7 +34,7 @@ public class YPositionMarkerGraphAxis extends MarkerGraphAxis {
     public Number getMinRange() {
         Calibration calibration = getExperimentAnalysis().getCalibration();
         PointF point = new PointF();
-        point.y = getExperimentAnalysis().getExperimentData().getMaxRawY();
+        point.y = getExperimentAnalysis().getExperimentRunData().getMaxRawY();
         point = calibration.fromRawLength(point);
         return point.y * 0.2f;
     }

@@ -15,7 +15,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.*;
 
 /**
- * Helper class to load an {@link ExperimentData} or an
+ * Helper class to load an {@link ExperimentRunData} or an
  * {@link nz.ac.auckland.lablet.experiment.ExperimentAnalysis}.
  */
 public class ExperimentLoader {
@@ -24,7 +24,7 @@ public class ExperimentLoader {
      */
     public static class Result {
         public IExperimentPlugin plugin;
-        public ExperimentData experimentData;
+        public ExperimentRunData experimentRunData;
         public String loadError;
     }
 
@@ -58,7 +58,7 @@ public class ExperimentLoader {
 
         if (experimentPath != null) {
             storageDir = new File(experimentPath);
-            File file = new File(storageDir, ExperimentData.EXPERIMENT_DATA_FILE_NAME);
+            File file = new File(storageDir, ExperimentRunData.EXPERIMENT_DATA_FILE_NAME);
             bundle = ExperimentLoader.loadBundleFromFile(file);
         }
 
@@ -85,8 +85,8 @@ public class ExperimentLoader {
             result.loadError = "failed to load experiment data";
             return false;
         }
-        result.experimentData = result.plugin.loadExperiment(context, experimentData, storageDir);
-        if (result.experimentData == null) {
+        result.experimentRunData = result.plugin.loadExperimentData(context, experimentData, storageDir);
+        if (result.experimentRunData == null) {
             result.loadError = "can't load experiment";
             return false;
         }
@@ -95,11 +95,11 @@ public class ExperimentLoader {
     }
 
     // Creates a new ExperimentAnalysis and tries to load an existing analysis.
-    public static ExperimentAnalysis getExperimentAnalysis(ExperimentData experimentData, IExperimentPlugin plugin) {
-        ExperimentAnalysis experimentAnalysis = plugin.createExperimentAnalysis(experimentData);
+    public static ExperimentAnalysis getExperimentAnalysis(ExperimentRunData experimentRunData, IExperimentPlugin plugin) {
+        ExperimentAnalysis experimentAnalysis = plugin.createExperimentAnalysis(experimentRunData);
 
         // try to load old analysis
-        File projectFile = new File(experimentData.getStorageDir(), ExperimentAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
+        File projectFile = new File(experimentRunData.getStorageDir(), ExperimentAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
         Bundle bundle = ExperimentLoader.loadBundleFromFile(projectFile);
         if (bundle == null)
             return experimentAnalysis;
@@ -108,7 +108,7 @@ public class ExperimentLoader {
         if (analysisDataBundle == null)
             return experimentAnalysis;
 
-        experimentAnalysis.loadAnalysisData(analysisDataBundle, experimentData.getStorageDir());
+        experimentAnalysis.loadAnalysisData(analysisDataBundle, experimentRunData.getStorageDir());
 
         return experimentAnalysis;
     }
@@ -118,7 +118,7 @@ public class ExperimentLoader {
         if (!loadExperiment(context, experimentPath, result))
             return null;
 
-        return getExperimentAnalysis(result.experimentData, result.plugin);
+        return getExperimentAnalysis(result.experimentRunData, result.plugin);
     }
 }
 

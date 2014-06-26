@@ -2,9 +2,18 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:yourapp="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/action_camera_quality_settings"
+
+    <item android:id="@+id/action_settings"
           android:icon="@drawable/ic_action_settings"
-          android:title="@string/action_camera_quality_settings"
+          android:title="@string/action_settings"
+          yourapp:showAsAction="ifRoom|withText"/>
+    <item android:id="@+id/action_view"
+          android:icon="@drawable/ic_eye"
+          android:title="@string/action_view"
+          yourapp:showAsAction="ifRoom|withText"/>
+    <item android:id="@+id/action_sensors"
+          android:icon="@drawable/ic_sensor"
+          android:title="@string/action_sensors"
           yourapp:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/action_back"
           android:icon="@drawable/ic_action_back"

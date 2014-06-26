@@ -15,7 +15,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="New document 1">
+   sodipodi:docname="media.svg"
+   inkscape:export-filename="/home/lec/IdeaProjects/AndroidPhysicsTracker/res/drawable-xhdpi/ic_media_add.png"
+   inkscape:export-xdpi="47.939999"
+   inkscape:export-ydpi="47.939999">
   <defs
      id="defs4">
     <linearGradient
@@ -43,10 +46,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.83526377"
-     inkscape:cx="5.9679833"
+     inkscape:cx="248.95848"
      inkscape:cy="526.18109"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="svg2"
      showgrid="false"
      inkscape:window-width="1879"
      inkscape:window-height="1057"
@@ -145,6 +148,35 @@
        id="path3822-8"
        inkscape:connector-curvature="0"
        inkscape:export-filename="/home/lec/IdeaProjects/AndroidPhysicsTracker/res/drawable-xhdpi/ic_media_discard.png"
+       inkscape:export-xdpi="47.939999"
+       inkscape:export-ydpi="47.939999" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#b3b3b3;fill-opacity:1;stroke:#000000;stroke-width:10.82479954;stroke-miterlimit:4;stroke-opacity:0;stroke-dasharray:none"
+       id="path3775-2-9"
+       sodipodi:cx="167.68532"
+       sodipodi:cy="217.97618"
+       sodipodi:rx="80.812202"
+       sodipodi:ry="78.791901"
+       d="m 248.49752,217.97618 a 80.812202,78.791901 0 1 1 -161.624404,0 80.812202,78.791901 0 1 1 161.624404,0 z"
+       transform="matrix(1.0452716,0,0,1.0720735,357.48914,206.8929)"
+       inkscape:export-filename="/home/lec/IdeaProjects/AndroidPhysicsTracker/res/drawable-xhdpi/ic_media_add.png"
+       inkscape:export-xdpi="47.939999"
+       inkscape:export-ydpi="47.939999" />
+    <path
+       style="fill:#e6e6e6;stroke:#e1e1e1;stroke-width:10.25518513;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 476.37773,440.5794 112.77621,-1e-5"
+       id="path3822-86"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lec/IdeaProjects/AndroidPhysicsTracker/res/drawable-xhdpi/ic_media_add.png"
+       inkscape:export-xdpi="47.939999"
+       inkscape:export-ydpi="47.939999" />
+    <path
+       style="fill:#e6e6e6;stroke:#e1e1e1;stroke-width:10.25518513;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 532.76584,384.19129 -10e-6,112.77621"
+       id="path3822-8-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/lec/IdeaProjects/AndroidPhysicsTracker/res/drawable-xhdpi/ic_media_add.png"
        inkscape:export-xdpi="47.939999"
        inkscape:export-ydpi="47.939999" />
   </g>

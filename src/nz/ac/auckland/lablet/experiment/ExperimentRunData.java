@@ -20,10 +20,11 @@ import java.io.IOException;
 /**
  * Abstract base class for experiments.
  */
-abstract public class ExperimentData {
+abstract public class ExperimentRunData {
     private String uid;
-    private File storageDir;
     protected Context context;
+
+    private File storageDir;
 
     /**
      * The default file name where the experiment data is stored.
@@ -41,9 +42,10 @@ abstract public class ExperimentData {
      * @param bundle the experiment data that fits into a bundle
      * @param storageDir the storage directory of the experiment
      */
-    public ExperimentData(Context experimentContext, Bundle bundle, File storageDir) {
+    public ExperimentRunData(Context experimentContext, Bundle bundle, File storageDir) {
         init(experimentContext);
 
+        this.storageDir = storageDir;
         loadExperimentData(bundle, storageDir);
     }
 
@@ -52,12 +54,16 @@ abstract public class ExperimentData {
      *
      * @param experimentContext the experiment context
      */
-    public ExperimentData(Context experimentContext) {
+    public ExperimentRunData(Context experimentContext) {
         init(experimentContext);
 
         uid = generateNewUid();
     }
 
+    public File getStorageDir() {
+        return storageDir;
+    }
+    
     /**
      * Gets a string of the used base unit.
      * <p>
@@ -98,8 +104,8 @@ abstract public class ExperimentData {
      * @return
      */
     protected boolean loadExperimentData(Bundle bundle, File storageDir) {
-        uid = bundle.getString("uid");
         this.storageDir = storageDir;
+        uid = bundle.getString("uid");
         return true;
     }
 
@@ -108,40 +114,23 @@ abstract public class ExperimentData {
      *
      * @throws IOException
      */
-    public void saveExperimentDataToFile() throws IOException {
+    public void saveExperimentDataToFile(File storageDir) throws IOException {
+        this.storageDir = storageDir;
+
         Bundle bundle = new Bundle();
         bundle.putString("experiment_identifier", getIdentifier());
         Bundle experimentData = experimentDataToBundle();
         bundle.putBundle("data", experimentData);
 
-        File dir = getStorageDir();
-        if (!dir.exists())
-            dir.mkdir();
-        onSaveAdditionalData(dir);
+        if (!storageDir.exists())
+            storageDir.mkdir();
+        onSaveAdditionalData(storageDir);
 
         // save the bundle
-        File projectFile = new File(getStorageDir(), EXPERIMENT_DATA_FILE_NAME);
+        File projectFile = new File(storageDir, EXPERIMENT_DATA_FILE_NAME);
         FileWriter fileWriter = new FileWriter(projectFile);
         PersistentBundle persistentBundle = new PersistentBundle();
         persistentBundle.flattenBundle(bundle, fileWriter);
-    }
-
-    /**
-     * Set the directory where the experiment data should be stored.
-     *
-     * @param dir the experiment storage directory
-     */
-    public void setStorageDir(File dir) {
-        storageDir = dir;
-    }
-
-    /**
-     * Gets the experiment storage directory.
-     *
-     * @return the experiment storage directory
-     */
-    public File getStorageDir() {
-        return storageDir;
     }
 
     /**
@@ -191,13 +180,10 @@ abstract public class ExperimentData {
     abstract public String getRunValueLabel();
 
     protected String generateNewUid() {
-        String identifier = getIdentifier();
-
-        Time now = new Time(Time.getCurrentTimezone());
         CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", new java.util.Date());
 
-        now.setToNow();
         String newUid = "";
+        String identifier = getIdentifier();
         if (!identifier.equals("")) {
             newUid += identifier;
             newUid += "_";

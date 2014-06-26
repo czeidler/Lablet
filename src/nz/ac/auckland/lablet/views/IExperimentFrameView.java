@@ -4,10 +4,10 @@ import android.graphics.PointF;
 
 
 /**
- * Common interface for a experiment run view.
+ * Common interface for a experiment frame view.
  */
-public interface IExperimentRunView {
-    public void setCurrentRun(int run);
+public interface IExperimentFrameView {
+    public void setCurrentFrame(int frame);
 
     // convert a coordinate on the screen to the real value of the measurement
     public void fromScreen(PointF screen, PointF real);

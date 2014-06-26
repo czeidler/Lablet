@@ -1,11 +1,11 @@
 /*
- * Copyright 2013-2014.
+ * Copyright 2014.
  * Distributed under the terms of the GPLv3 License.
  *
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.camera;
+package nz.ac.auckland.lablet.accelerometer;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,60 +13,54 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentPlugin;
-import nz.ac.auckland.lablet.experiment.ExperimentRunData;
 import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.ExperimentRunData;
 import nz.ac.auckland.lablet.experiment.IExperimentRun;
 
 import java.io.File;
 
 
-/**
- * The camera experiment plugin.
- */
-public class CameraExperimentPlugin extends AbstractExperimentPlugin {
+public class AccelerometerExperimentPlugin extends AbstractExperimentPlugin {
     @Override
     public String getName() {
-        return CameraExperimentRun.class.getSimpleName();
+        return AccelerometerExperimentRun.class.getSimpleName();
     }
 
     @Override
     public String toString() {
-        return "Camera Experiment";
+        return "Accelerometer Experiment";
     }
 
     @Override
     public IExperimentRun createExperiment(Activity parentActivity) {
-        IExperimentRun experiment = new CameraExperimentRun();
+        IExperimentRun experiment = new AccelerometerExperimentRun();
         return experiment;
     }
 
     @Override
     public void startRunSettingsActivity(Activity parentActivity, int requestCode, ExperimentRunData experimentRunData,
                                          Bundle analysisSpecificData, Bundle options) {
-        Intent intent = new Intent(parentActivity, CameraRunSettingsActivity.class);
-        packStartRunSettingsIntent(intent, experimentRunData, analysisSpecificData, options);
-        parentActivity.startActivityForResult(intent, requestCode);
+
     }
 
     @Override
     public boolean hasRunSettingsActivity(StringBuilder menuName) {
-        if (menuName != null)
-            menuName.append("Video Settings");
-        return true;
+        return false;
     }
 
     @Override
     public ExperimentRunData loadExperimentData(Context context, Bundle data, File storageDir) {
-        return new CameraExperimentRunData(context, data, storageDir);
+        return null;
     }
 
     @Override
     public ExperimentAnalysis createExperimentAnalysis(ExperimentRunData experimentRunData) {
-        return new CameraExperimentAnalysis(experimentRunData);
+        return null;
     }
 
     @Override
     public View createExperimentRunView(Context context, ExperimentRunData experimentRunData) {
-        return new CameraExperimentFrameView(context, experimentRunData);
+        return null;
     }
 }
+

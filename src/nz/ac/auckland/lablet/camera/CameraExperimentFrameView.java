@@ -11,40 +11,40 @@ import android.content.Context;
 import android.graphics.*;
 import android.os.Bundle;
 import android.view.View;
-import nz.ac.auckland.lablet.experiment.ExperimentData;
-import nz.ac.auckland.lablet.views.IExperimentRunView;
+import nz.ac.auckland.lablet.experiment.ExperimentRunData;
+import nz.ac.auckland.lablet.views.IExperimentFrameView;
 import nz.ac.auckland.lablet.views.VideoFrameView;
 
 import java.io.File;
 
 
 /**
- * Implementation of {@link nz.ac.auckland.lablet.views.IExperimentRunView}.
+ * Implementation of {@link nz.ac.auckland.lablet.views.IExperimentFrameView}.
  * <p>
  * Displays the video at a certain frame, depending on the current run value.
  * </p>
  */
-public class CameraExperimentRunView extends VideoFrameView implements IExperimentRunView {
-    private CameraExperimentData experiment;
+public class CameraExperimentFrameView extends VideoFrameView implements IExperimentFrameView {
+    private CameraExperimentRunData experiment;
     private int currentRun = -1;
 
-    public CameraExperimentRunView(Context context, ExperimentData experimentData) {
+    public CameraExperimentFrameView(Context context, ExperimentRunData experimentRunData) {
         super(context);
 
         setWillNotDraw(false);
 
-        assert(experimentData instanceof CameraExperimentData);
-        this.experiment = (CameraExperimentData) experimentData;
+        assert(experimentRunData instanceof CameraExperimentRunData);
+        this.experiment = (CameraExperimentRunData) experimentRunData;
 
-        File storageDir = experimentData.getStorageDir();
+        File storageDir = experimentRunData.getStorageDir();
         File videoFile = new File(storageDir, this.experiment.getVideoFileName());
         setVideoFilePath(videoFile.getPath());
     }
 
     @Override
-    public void setCurrentRun(int run) {
-        currentRun = run;
-        Bundle bundle = experiment.getRunAt(run);
+    public void setCurrentFrame(int frame) {
+        currentRun = frame;
+        Bundle bundle = experiment.getRunAt(frame);
         if (bundle == null) {
             toastMessage("can't get run information!");
             return;
@@ -62,7 +62,7 @@ public class CameraExperimentRunView extends VideoFrameView implements IExperime
         if (visibility != View.VISIBLE)
             return;
         if (currentRun >= 0)
-            setCurrentRun(currentRun);
+            setCurrentFrame(currentRun);
     }
 
     @Override

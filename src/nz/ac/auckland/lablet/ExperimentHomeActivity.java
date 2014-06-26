@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.FileObserver;
 import android.view.*;
 import android.widget.*;
+import nz.ac.auckland.lablet.experiment.AbstractExperimentPlugin;
 import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
 import nz.ac.auckland.lablet.experiment.ExperimentPluginFactory;
 import nz.ac.auckland.lablet.misc.StorageLib;
@@ -320,7 +321,10 @@ public class ExperimentHomeActivity extends Activity {
     }
 
     private void startExperiment(IExperimentPlugin plugin) {
-        plugin.startExperimentActivity(this, PERFORM_EXPERIMENT, null);
+        Intent intent = new Intent(this, ExperimentActivity.class);
+        AbstractExperimentPlugin.packStartExperimentIntent(intent, null);
+        // TODO say what experiments should be started!
+        startActivityForResult(intent, PERFORM_EXPERIMENT);
     }
 
     private void startScriptActivity() {

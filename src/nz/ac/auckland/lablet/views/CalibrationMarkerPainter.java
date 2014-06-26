@@ -31,7 +31,7 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
     private float LINE_WIDTH;
     private float WING_LENGTH;
 
-    public CalibrationMarkerPainter(View parent, IExperimentRunView runView, MarkerDataModel model) {
+    public CalibrationMarkerPainter(View parent, IExperimentFrameView runView, MarkerDataModel model) {
         super(parent, runView, model);
 
         FONT_SIZE = toPixel(FONT_SIZE_DP);

@@ -140,7 +140,7 @@ class StartEndPainter extends AbstractMarkerPainter {
      * @param runView run view interface
      * @param data should contain exactly two data points, one for the start and one for the end marker
      */
-    public StartEndPainter(View parent, IExperimentRunView runView, MarkerDataModel data) {
+    public StartEndPainter(View parent, IExperimentFrameView runView, MarkerDataModel data) {
         super(parent, runView, data);
     }
 
@@ -206,7 +206,7 @@ class StartEndPainter extends AbstractMarkerPainter {
 /**
  * A seek bar with a start and an end marker. For example, used to select video start and end point.
  */
-public class StartEndSeekBar extends MarkerView implements IExperimentRunView {
+public class StartEndSeekBar extends MarkerView implements IExperimentFrameView {
     private MarkerDataModel markerDataModel;
     private StartEndPainter startEndPainter;
 
@@ -243,7 +243,7 @@ public class StartEndSeekBar extends MarkerView implements IExperimentRunView {
     }
 
     @Override
-    public void setCurrentRun(int run) {
+    public void setCurrentFrame(int frame) {
 
     }
 

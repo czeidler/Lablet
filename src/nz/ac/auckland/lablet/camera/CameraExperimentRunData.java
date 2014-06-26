@@ -11,7 +11,7 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import nz.ac.auckland.lablet.experiment.ExperimentData;
+import nz.ac.auckland.lablet.experiment.ExperimentRunData;
 
 import java.io.File;
 
@@ -19,7 +19,7 @@ import java.io.File;
 /**
  * Holds all important data for the camera experiment.
  */
-public class CameraExperimentData extends ExperimentData {
+public class CameraExperimentRunData extends ExperimentRunData {
     private String videoFileName;
     private int numberOfRuns;
 
@@ -33,11 +33,11 @@ public class CameraExperimentData extends ExperimentData {
     private int analysisVideoStart;
     private int analysisVideoEnd;
 
-    public CameraExperimentData(Context experimentContext) {
+    public CameraExperimentRunData(Context experimentContext) {
         super(experimentContext);
     }
 
-    public CameraExperimentData(Context experimentContext, Bundle bundle, File storageDir) {
+    public CameraExperimentRunData(Context experimentContext, Bundle bundle, File storageDir) {
         super(experimentContext, bundle, storageDir);
 
     }
@@ -106,7 +106,7 @@ public class CameraExperimentData extends ExperimentData {
         if (!super.loadExperimentData(bundle, storageDir))
             return false;
 
-        setVideoFileName(bundle.getString("videoName"));
+        setVideoFileName(storageDir, bundle.getString("videoName"));
 
         setAnalysisVideoStart(0);
         setAnalysisVideoEnd(0);
@@ -126,12 +126,13 @@ public class CameraExperimentData extends ExperimentData {
     /**
      * Set the file name of the taken video.
      *
-     * @param filename of the taken video
+     * @param storageDir directory where the video file is stored
+     * @param fileName path of the taken video
      */
-    public void setVideoFileName(String filename) {
-        this.videoFileName = filename;
+    public void setVideoFileName(File storageDir, String fileName) {
+        this.videoFileName = fileName;
 
-        MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.parse(getVideoFile().getPath()));
+        MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.fromFile(new File(storageDir, fileName)));
 
         videoDuration = mediaPlayer.getDuration();
         videoWidth = mediaPlayer.getVideoWidth();

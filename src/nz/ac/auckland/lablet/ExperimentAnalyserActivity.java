@@ -48,7 +48,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (getExperimentData() == null)
+        if (getExperimentRunData() == null)
             return false;
 
         menu.clear();
@@ -136,7 +136,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
     }
 
     private void startRunSettingsActivity(Bundle analysisSpecificData, Bundle options) {
-        plugin.startRunSettingsActivity(this, PERFORM_RUN_SETTINGS, experimentData, analysisSpecificData, options);
+        plugin.startRunSettingsActivity(this, PERFORM_RUN_SETTINGS, experimentRunData, analysisSpecificData, options);
     }
 
     private void mailData() {
@@ -173,7 +173,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
                 boolean settingsChanged = extras.getBoolean("run_settings_changed", false);
                 if (settingsChanged) {
                     experimentAnalysis.getTagMarkers().clear();
-                    experimentAnalysis.getRunDataModel().setCurrentRun(0);
+                    experimentAnalysis.getFrameDataModel().setCurrentFrame(0);
                 }
             }
         }
@@ -188,7 +188,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
             return;
         }
 
-        experimentAnalysis = ExperimentLoader.getExperimentAnalysis(experimentData, plugin);
+        experimentAnalysis = ExperimentLoader.getExperimentAnalysis(experimentRunData, plugin);
         if (experimentAnalysis == null) {
             showErrorAndFinish("Unable to load experiment analysis");
             return;
@@ -226,7 +226,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
         super.onResume();
 
         if (experimentAnalysis != null)
-            experimentAnalysis.getRunDataModel().setCurrentRun(experimentAnalysis.getRunDataModel().getCurrentRun());
+            experimentAnalysis.getFrameDataModel().setCurrentFrame(experimentAnalysis.getFrameDataModel().getCurrentFrame());
 
         if (resumeWithRunSettings) {
             Bundle options = null;
@@ -256,7 +256,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
     }
 
     private File getTagMarkerCSVFile() {
-        return new File(experimentData.getStorageDir(), experimentData.getUid() + "_tag_markers.csv");
+        return new File(experimentRunData.getStorageDir(), experimentRunData.getUid() + "_tag_markers.csv");
     }
 
     private void exportTagMarkerCSVData() {

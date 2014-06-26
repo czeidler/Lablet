@@ -42,7 +42,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
     private final float ARROW_AXIS_OVERLAP;
     private final float LABEL_TO_AXIS_END_DISTANCE;
 
-    public OriginMarkerPainter(View parent, IExperimentRunView runView, MarkerDataModel model,
+    public OriginMarkerPainter(View parent, IExperimentFrameView runView, MarkerDataModel model,
                                Calibration calibration) {
         super(parent, runView, model);
         this.calibration = calibration;
