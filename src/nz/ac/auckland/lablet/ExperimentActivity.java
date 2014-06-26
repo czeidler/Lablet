@@ -138,8 +138,6 @@ public class ExperimentActivity extends FragmentActivity {
 
     private AbstractViewState state = null;
 
-    private boolean unsavedExperimentData = false;
-
     private ExperimentRunViewManager experimentRunViewManager;
     private ExperimentRunGroup activeExperimentRunGroup = null;
 
@@ -225,7 +223,7 @@ public class ExperimentActivity extends FragmentActivity {
 
 
         // set states after menu has been init
-        if (!unsavedExperimentData) {
+        if (!experiment.getCurrentExperimentRunGroup().dataTaken()) {
             setState(new PreviewState());
         } else {
             // we have unsaved experiment data means we are in the PlaybackState state
@@ -323,7 +321,6 @@ public class ExperimentActivity extends FragmentActivity {
 
         updateAdapter();
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -473,7 +470,7 @@ public class ExperimentActivity extends FragmentActivity {
     @Override
     public void onBackPressed() {
         final List<IExperimentRun> experimentRuns = getActiveExperimentRuns();
-        if (unsavedExperimentData) {
+        if (experiment.dataTaken()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Experiment is not saved");
             builder.setNeutralButton("Continue", new DialogInterface.OnClickListener() {
@@ -485,19 +482,23 @@ public class ExperimentActivity extends FragmentActivity {
             builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    finishExperiment(false);
+                    try {
+                        experiment.finishExperiment(true);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    setResult(RESULT_OK);
+                    finish();
                 }
             });
             builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    for (IExperimentRun experiment : experimentRuns)
-                        try {
-                            experiment.finish(true);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    unsavedExperimentData = false;
+                    try {
+                        experiment.finishExperiment(false);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     setResult(RESULT_CANCELED);
                     finish();
                 }
@@ -505,12 +506,11 @@ public class ExperimentActivity extends FragmentActivity {
 
             builder.create().show();
         } else {
-            for (IExperimentRun experiment : experimentRuns)
-                try {
-                    experiment.finish(true);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            try {
+                experiment.finishExperiment(false);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             setResult(RESULT_CANCELED);
             finish();
         }
@@ -544,11 +544,8 @@ public class ExperimentActivity extends FragmentActivity {
     }
 
     private void finishExperiment(boolean startAnalysis) {
-        unsavedExperimentData = false;
-
         try {
-            for (IExperimentRun experiment : getActiveExperimentRuns())
-                experiment.finish(false);
+            experiment.finishExperiment(true);
 
             Intent data = new Intent();
             File outputDir = experiment.getStorageDir();
@@ -587,7 +584,6 @@ public class ExperimentActivity extends FragmentActivity {
         public void enterState() {
             settingsMenu.setVisible(true);
 
-            unsavedExperimentData = false;
             startButton.setEnabled(true);
             stopButton.setEnabled(false);
             newButton.setVisibility(View.INVISIBLE);
@@ -675,7 +671,6 @@ public class ExperimentActivity extends FragmentActivity {
                 stopRecording();
                 isRecording = false;
             }
-            unsavedExperimentData = true;
 
             setRequestedOrientation(initialRequestedOrientation);
 

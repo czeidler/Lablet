@@ -35,10 +35,6 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
 
         baseDirectory = getDefaultExperimentBaseDir(this);
 
-        // set experiment storage dir
-        if (experimentRunData.getStorageDir() != null)
-            return;
-
         Intent intent = getIntent();
         if (intent != null) {
             Bundle extras = intent.getExtras();
@@ -47,8 +43,6 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
                     baseDirectory = new File(extras.getString("experiment_base_directory"));
             }
         }
-
-        experimentRunData.setStorageDir(getExperimentStorageDir());
     }
 
     public ExperimentRunData getExperimentRunData() {

@@ -9,21 +9,76 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.app.Activity;
 import android.os.Bundle;
+import nz.ac.auckland.lablet.misc.PersistentBundle;
+import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+class ExperimentRunGroupData {
+    private String description = "";
+    private Bundle runInformation = new Bundle();
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Bundle getRunInformation() {
+        return runInformation;
+    }
+
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString("description", getDescription());
+        outState.putBundle("runInformation", getRunInformation());
+    }
+
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        description = savedInstanceState.getString("description", "");
+        Bundle bundle = savedInstanceState.getBundle("runInformation");
+        if (bundle != null)
+            runInformation = bundle;
+    }
+
+    public void saveToFile(File file) throws IOException {
+        Bundle bundle = new Bundle();
+        onSaveInstanceState(bundle);
+
+        FileWriter fileWriter = new FileWriter(file);
+        PersistentBundle persistentBundle = new PersistentBundle();
+        persistentBundle.flattenBundle(bundle, fileWriter);
+        fileWriter.close();
+    }
+
+    public void loadFromFile(File file) throws IOException {
+        Bundle bundle = null;
+        PersistentBundle persistentBundle = new PersistentBundle();
+        InputStream inStream = null;
+        try {
+            inStream = new FileInputStream(file);
+            bundle = persistentBundle.unflattenBundle(inStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        } finally {
+            inStream.close();
+        }
+        onRestoreInstanceState(bundle);
+    }
+}
 
 public class ExperimentRunGroup {
-    String description = "";
-    Bundle runInformation = new Bundle();
+    private ExperimentRunGroupData data = new ExperimentRunGroupData();
 
     final private List<IExperimentRun> experimentRuns = new ArrayList<>();
     private IExperimentRun currentExperimentRun = null;
     private Experiment experiment;
-    private File storageDirectory;
+    private String subStorageDirectory;
     private Activity experimentRunActivity;
 
     static public ExperimentRunGroup createExperimentRunGroup(List<String> experimentRuns, Activity activity) {
@@ -39,14 +94,9 @@ public class ExperimentRunGroup {
         return experimentRunGroup;
     }
 
-    public File getStorageDir() {
-        return storageDirectory;
-    }
-
-    public void setExperiment(Experiment experiment) {
+    public void setExperiment(Experiment experiment, String subStorageDirectory) {
         this.experiment = experiment;
-        int groupId = experiment.createRunGroupId();
-        this.storageDirectory = new File(experiment.getStorageDir(), "run" + Integer.toString(groupId));
+        this.subStorageDirectory = subStorageDirectory;
     }
 
     public void activateExperimentRuns(Activity activity) {
@@ -120,21 +170,8 @@ public class ExperimentRunGroup {
             experimentRun.destroy();
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Bundle getRunInformation() {
-        return runInformation;
-    }
-
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString("description", getDescription());
-        outState.putBundle("runInformation", getRunInformation());
+        data.onSaveInstanceState(outState);
 
         int i = 0;
         for (IExperimentRun experimentRun : experimentRuns) {
@@ -156,8 +193,7 @@ public class ExperimentRunGroup {
     }
 
     public void onRestoreInstanceState(Bundle savedInstanceState) {
-        description = savedInstanceState.getString("description");
-        runInformation = savedInstanceState.getBundle("runInformation");
+        data.onRestoreInstanceState(savedInstanceState);
 
         int runClassesCount = savedInstanceState.getInt("runClassesCount");
         Bundle experimentRunClasses = savedInstanceState.getBundle("runClasses");
@@ -174,5 +210,21 @@ public class ExperimentRunGroup {
 
     public Experiment getExperiment() {
         return experiment;
+    }
+
+    public boolean dataTaken() {
+        for (IExperimentRun experimentRun : experimentRuns) {
+            if (experimentRun.dataTaken())
+                return true;
+        }
+        return false;
+    }
+
+    public void finishExperiment(boolean saveData, File storageDir) throws IOException {
+        data.saveToFile(new File(storageDir, "experiment_run_group.xml"));
+
+        for (IExperimentRun experimentRun : experimentRuns) {
+            experimentRun.finishExperiment(saveData, new File(storageDir, experimentRun.getClass().getSimpleName()));
+        }
     }
 }

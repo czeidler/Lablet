@@ -47,7 +47,8 @@ public interface IExperimentRun {
     public void init(Activity activity);
     public void destroy();
 
-    public void finish(boolean discardExperiment) throws IOException;
+    public void finishExperiment(boolean saveData, File storageDir) throws IOException;
+    public boolean dataTaken();
 
     public void startPreview();
     public void stopPreview();

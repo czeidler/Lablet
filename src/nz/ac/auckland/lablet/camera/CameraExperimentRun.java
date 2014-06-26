@@ -219,8 +219,6 @@ public class CameraExperimentRun extends AbstractExperimentRun {
         }
 
         experimentData = new CameraExperimentRunData(activity);
-        File experimentDir = new File(getExperimentRunGroup().getStorageDir(), experimentData.getUid());
-        experimentData.setStorageDir(experimentDir);
 
         recorder = new MediaRecorder();
 
@@ -315,14 +313,16 @@ public class CameraExperimentRun extends AbstractExperimentRun {
     }
 
     @Override
-    public void finish(boolean discardExperiment) throws IOException {
-        if (discardExperiment)
+    public void finishExperiment(boolean saveData, File storageDir) throws IOException {
+        super.finishExperiment(saveData, storageDir);
+
+        if (!saveData)
             deleteTempFiles();
         else {
-            if (!moveTempFilesToExperimentDir())
+            if (!moveTempFilesToExperimentDir(storageDir))
                 throw new IOException();
             experimentData.setVideoFileName(getVideoFileName());
-            experimentData.saveExperimentDataToFile();
+            experimentData.saveExperimentDataToFile(storageDir);
         }
         videoFile = null;
     }
@@ -433,8 +433,7 @@ public class CameraExperimentRun extends AbstractExperimentRun {
         return true;
     }
 
-    private boolean moveTempFilesToExperimentDir() {
-        File storageDir = experimentData.getStorageDir();
+    private boolean moveTempFilesToExperimentDir(File storageDir) {
         if (!storageDir.exists())
             if (!storageDir.mkdirs())
                 return false;

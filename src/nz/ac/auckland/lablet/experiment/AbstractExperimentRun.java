@@ -7,12 +7,16 @@
  */
 package nz.ac.auckland.lablet.experiment;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 
 abstract public class AbstractExperimentRun implements IExperimentRun {
     private ExperimentRunGroup experimentRunGroup;
     private WeakReference<IExperimentRunListener> softListener = null;
+
+    protected boolean unsavedExperimentData = false;
 
     private StateNotifier stateNotifier = new NoneStateNotifier();
 
@@ -64,6 +68,7 @@ abstract public class AbstractExperimentRun implements IExperimentRun {
 
     @Override
     public void startPreview() {
+        unsavedExperimentData = false;
         notifyStartPreview();
         stateNotifier = new PreviewStateNotifier();
     }
@@ -82,6 +87,7 @@ abstract public class AbstractExperimentRun implements IExperimentRun {
 
     @Override
     public boolean stopRecording() {
+        unsavedExperimentData = true;
         notifyStopRecording();
         stateNotifier = new NoneStateNotifier();
         return true;
@@ -97,6 +103,16 @@ abstract public class AbstractExperimentRun implements IExperimentRun {
     public void stopPlayback() {
         stateNotifier = new NoneStateNotifier();
         notifyStopPlayback();
+    }
+
+    @Override
+    public void finishExperiment(boolean saveData, File storageDir) throws IOException {
+        unsavedExperimentData = false;
+    }
+
+    @Override
+    public boolean dataTaken() {
+        return unsavedExperimentData;
     }
 
     private IExperimentRunListener getListener() {

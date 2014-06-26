@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -86,7 +87,7 @@ public class Experiment {
             return false;
         if (currentExperimentRunGroup == null)
             currentExperimentRunGroup = runGroup;
-        runGroup.setExperiment(this);
+        runGroup.setExperiment(this, "run" + Integer.toString(createRunGroupId()));
         experimentRunGroups.add(runGroup);
 
         notifyExperimentRunGroupAdded(runGroup);
@@ -96,7 +97,7 @@ public class Experiment {
     public void removeExperimentRunGroup(ExperimentRunGroup runGroup) {
         final int removedGroupIndex = experimentRunGroups.indexOf(runGroup);
 
-        runGroup.setExperiment(null);
+        runGroup.setExperiment(null, "");
         experimentRunGroups.remove(runGroup);
 
         // find new current group if runGroup was the current group
@@ -137,6 +138,22 @@ public class Experiment {
 
     public File getStorageDir() {
         return storageDirectory;
+    }
+
+    public void finishExperiment(boolean saveData) throws IOException {
+        int i = 0;
+        for (ExperimentRunGroup experimentRunGroup : experimentRunGroups) {
+            experimentRunGroup.finishExperiment(saveData, new File(getStorageDir(), "run" + Integer.toString(i)));
+            i++;
+        }
+    }
+
+    public boolean dataTaken() {
+        for (ExperimentRunGroup runGroup : experimentRunGroups) {
+            if (runGroup.dataTaken())
+                return true;
+        }
+        return false;
     }
 
     private List<IExperimentListener> getListeners() {

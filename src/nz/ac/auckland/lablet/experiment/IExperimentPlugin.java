@@ -96,7 +96,7 @@ public interface IExperimentPlugin {
      * @param storageDir directory where additional data may have been stored
      * @return the loaded experiment or null on failure
      */
-    public ExperimentRunData loadExperiment(Context context, Bundle data, File storageDir);
+    public ExperimentRunData loadExperimentData(Context context, Bundle data, File storageDir);
 
     /**
      * Creates an {@link nz.ac.auckland.lablet.experiment.ExperimentAnalysis} object for the given

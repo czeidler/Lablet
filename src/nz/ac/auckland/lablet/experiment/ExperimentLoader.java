@@ -85,7 +85,7 @@ public class ExperimentLoader {
             result.loadError = "failed to load experiment data";
             return false;
         }
-        result.experimentRunData = result.plugin.loadExperiment(context, experimentData, storageDir);
+        result.experimentRunData = result.plugin.loadExperimentData(context, experimentData, storageDir);
         if (result.experimentRunData == null) {
             result.loadError = "can't load experiment";
             return false;

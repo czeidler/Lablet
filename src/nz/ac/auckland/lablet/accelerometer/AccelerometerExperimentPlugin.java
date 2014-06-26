@@ -49,7 +49,7 @@ public class AccelerometerExperimentPlugin extends AbstractExperimentPlugin {
     }
 
     @Override
-    public ExperimentRunData loadExperiment(Context context, Bundle data, File storageDir) {
+    public ExperimentRunData loadExperimentData(Context context, Bundle data, File storageDir) {
         return null;
     }
 

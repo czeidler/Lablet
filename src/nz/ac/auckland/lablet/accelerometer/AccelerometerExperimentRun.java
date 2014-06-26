@@ -22,6 +22,7 @@ import com.androidplot.xy.XYPlot;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentRun;
 import nz.ac.auckland.lablet.experiment.ExperimentRunData;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
@@ -119,7 +120,8 @@ public class AccelerometerExperimentRun extends AbstractExperimentRun {
     }
 
     @Override
-    public void finish(boolean discardExperiment) throws IOException {
+    public void finishExperiment(boolean saveData, File storageDir) throws IOException {
+        super.finishExperiment(saveData, storageDir);
 
     }
 

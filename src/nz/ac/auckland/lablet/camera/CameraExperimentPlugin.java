@@ -56,7 +56,7 @@ public class CameraExperimentPlugin extends AbstractExperimentPlugin {
     }
 
     @Override
-    public ExperimentRunData loadExperiment(Context context, Bundle data, File storageDir) {
+    public ExperimentRunData loadExperimentData(Context context, Bundle data, File storageDir) {
         return new CameraExperimentRunData(context, data, storageDir);
     }
 
