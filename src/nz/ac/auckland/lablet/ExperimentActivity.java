@@ -22,6 +22,7 @@ import android.widget.*;
 import nz.ac.auckland.lablet.accelerometer.AccelerometerExperimentRun;
 import nz.ac.auckland.lablet.camera.CameraExperimentRun;
 import nz.ac.auckland.lablet.experiment.*;
+import nz.ac.auckland.lablet.microphone.MicrophoneExperimentRun;
 
 import java.io.File;
 import java.io.IOException;
@@ -340,6 +341,7 @@ public class ExperimentActivity extends FragmentActivity {
         experiment = new Experiment(this, experimentBaseDir);
 
         final List<String> experimentList = new ArrayList<>();
+        experimentList.add(MicrophoneExperimentRun.class.getSimpleName());
         experimentList.add(AccelerometerExperimentRun.class.getSimpleName());
         experimentList.add(CameraExperimentRun.class.getSimpleName());
 
