@@ -9,7 +9,6 @@ package nz.ac.auckland.lablet.microphone;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -20,16 +19,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import com.androidplot.xy.LineAndPointFormatter;
-import com.androidplot.xy.PointLabelFormatter;
-import com.androidplot.xy.SimpleXYSeries;
-import com.androidplot.xy.XYPlot;
-import edu.emory.mathcs.jtransforms.dct.DoubleDCT_1D;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.accelerometer.AccelerometerExperimentRun;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentRun;
 import nz.ac.auckland.lablet.experiment.ExperimentRunData;
 import nz.ac.auckland.lablet.views.AudioAmplitudeView;
+import nz.ac.auckland.lablet.views.AudioFrequencyView;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,14 +33,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 class MicrophoneExperimentRunView extends FrameLayout {
     private AudioAmplitudeView audioSignalView;
-
-    private int testPos = 0;
+    private AudioFrequencyView audioFrequencyView;
 
     private MicrophoneExperimentRun.ISensorDataListener listener = new MicrophoneExperimentRun.ISensorDataListener() {
         @Override
         public void onNewAudioData(float[] amplitude) {
             audioSignalView.addData(amplitude);
             audioSignalView.invalidate();
+
+            audioFrequencyView.addData(amplitude);
+            audioFrequencyView.invalidate();
         }
     };
 
@@ -58,6 +54,7 @@ class MicrophoneExperimentRunView extends FrameLayout {
         addView(view);
 
         audioSignalView = (AudioAmplitudeView)view.findViewById(R.id.audioSignalView);
+        audioFrequencyView = (AudioFrequencyView)view.findViewById(R.id.audioFrequencyView);
 
         experimentRun.setListener(listener);
     }
@@ -69,6 +66,7 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
     private AudioRecordingTask audioRecordingTask = null;
 
     final int SAMPLE_RATE = 44100;
+    final int FRAME_SIZE = 128;
 
     public interface ISensorDataListener {
         public void onNewAudioData(float[] amplitude);
@@ -106,23 +104,9 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
 
     }
 
-    private void hammingWindow(float[] samples) {
-        for (int i = 0; i < samples.length; i++)
-            samples[i] *= (0.54f - 0.46f * Math.cos(2 * Math.PI * i / (samples.length - 1)));
-    }
-
-
     @Override
     public void init(Activity activity) {
 
-        /*DoubleDCT_1D dct = new DoubleDCT_1D(frameSize);
-
-        // in place window
-        hammingWindow(timeData);
-
-        // in place transform: timeData becomes frequency data
-        dct.forward(timeData, true);
-*/
     }
 
     @Override
@@ -136,11 +120,13 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
 
         final String outputPath;
         final private int samplingRate;
+        final private int sampleSize;
         private int bufferSize;
 
-        AudioRecordingTask(String outputPath, int samplingRate) {
+        AudioRecordingTask(String outputPath, int samplingRate, int sampleSize) {
             this.outputPath = outputPath;
             this.samplingRate = samplingRate;
+            this.sampleSize = sampleSize;
         }
 
         @Override
@@ -154,9 +140,9 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
             }
 
             while (running.get()) {
-                final byte[] buffer = new byte[bufferSize];
-                final int bufferReadResult = audioRecord.read(buffer, 0, bufferSize);
                 final int bytesPerSample = 2;
+                final byte[] buffer = new byte[bytesPerSample * sampleSize];
+                final int bufferReadResult = audioRecord.read(buffer, 0, bytesPerSample * sampleSize);
                 final float frame[] = new float[bufferReadResult / bytesPerSample];
 
                 int frameIndex = 0;
@@ -212,7 +198,7 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
     public void startPreview() {
         super.startPreview();
 
-        audioRecordingTask = new AudioRecordingTask("/dev/null", SAMPLE_RATE);
+        audioRecordingTask = new AudioRecordingTask("/dev/null", SAMPLE_RATE, FRAME_SIZE);
         audioRecordingTask.execute();
     }
 

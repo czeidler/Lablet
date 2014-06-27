@@ -27,7 +27,7 @@ public class AudioAmplitudeView extends ViewGroup {
 
     private int position = 0;
     private float maxPosition = 0;
-    private float samplesPerPixels = 15;
+    private float samplesPerPixels = 32;
     private float amplitudeMax = 100000;
 
 
@@ -77,9 +77,12 @@ public class AudioAmplitudeView extends ViewGroup {
     }
 
     private float toScreenY(float y) {
-        return (viewRect.height() * (1.f - BORDER)) * y / amplitudeMax + getAmpBaseLine();
+        return getAmpBaseLine() - ((viewRect.height() * (1.f - BORDER)) * y / amplitudeMax);
     }
     private void drawAmplitude(int position, float min, float max, float average, float std) {
+        if (bitmapCanvas == null)
+            return;
+
         float x = (float)position / samplesPerPixels;
 
         bitmapCanvas.drawLine(x, toScreenY(min), x, toScreenY(max), penMinMaxPaint);
@@ -91,10 +94,7 @@ public class AudioAmplitudeView extends ViewGroup {
     }
 
     private void clearBitmap() {
-        Paint backgroundPaint = new Paint();
-        backgroundPaint.setColor(BACKGROUND_COLOR);
-        backgroundPaint.setStyle(Paint.Style.FILL);
-        bitmapCanvas.drawRect(viewRect, backgroundPaint);
+        bitmap.eraseColor(BACKGROUND_COLOR);
     }
 
     @Override
@@ -104,6 +104,9 @@ public class AudioAmplitudeView extends ViewGroup {
 
     @Override
     protected void onSizeChanged (int w, int h, int oldw, int oldh) {
+        if (w <= 0 || h <= 0)
+            return;
+
         bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         bitmapCanvas = new Canvas(bitmap);
 
@@ -115,6 +118,7 @@ public class AudioAmplitudeView extends ViewGroup {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawBitmap(bitmap, 0, 0, null);
+        if (bitmap != null)
+            canvas.drawBitmap(bitmap, 0, 0, null);
     }
 }
