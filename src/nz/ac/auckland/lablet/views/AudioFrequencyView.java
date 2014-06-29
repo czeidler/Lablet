@@ -12,7 +12,6 @@ import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
-import edu.emory.mathcs.jtransforms.dct.DoubleDCT_1D;
 
 
 public class AudioFrequencyView extends ViewGroup {
@@ -26,8 +25,9 @@ public class AudioFrequencyView extends ViewGroup {
     private Canvas bitmapCanvas = null;
 
     private int position = 0;
-    private float valueMax = 44100;
+    private float valueMax = 200;
 
+    private double[] frequencies = null;
 
     public AudioFrequencyView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -39,32 +39,23 @@ public class AudioFrequencyView extends ViewGroup {
         penPaint.setStyle(Paint.Style.FILL);
     }
 
-    public void addData(float amplitudes[]) {
-        clearBitmap();
-        position = 0;
-        double[] frequencies = fourier(amplitudes);
-        //float[] bins = binIt(frequencies, 10, valueMax);
-
-        for (int i = 0; i < frequencies.length; i++) {
-
-            drawFrequencies(position, (float)Math.abs(frequencies[i]));
-
-            position++;
-        }
+    public void addData(double[] frequencies) {
+        this.frequencies = frequencies;
+        invalidate();
     }
 
     private float toScreenY(float y) {
-        return getAmpBaseLine() - ((viewRect.height() * (1.f - BORDER)) * y / valueMax);
+        return getAmpBaseLine() - (( viewRect.height() * (1.f - BORDER)) * y / valueMax);
     }
 
     private void drawFrequencies(int position, float frequency) {
-        float binWidth = 3.f;
+        float binWidth = 2.f;
         float binPostition = binWidth * position;
         bitmapCanvas.drawRect(binPostition, toScreenY(frequency), binPostition + binWidth, toScreenY(0), penPaint);
     }
 
-    private int getAmpBaseLine() {
-        return viewRect.height();
+    private float getAmpBaseLine() {
+        return  viewRect.height();
     }
 
     private void clearBitmap() {
@@ -91,28 +82,27 @@ public class AudioFrequencyView extends ViewGroup {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if (frequencies != null && frequencies.length > 0) {
+            clearBitmap();
+            position = 0;
+
+            double min = Double.POSITIVE_INFINITY;
+            double max = Double.NEGATIVE_INFINITY;
+
+            for (int i = 0; i < frequencies.length; i++) {
+                float frequencyValue = (float) Math.abs(frequencies[i]) / frequencies.length;
+
+                min = Math.min(frequencyValue, min);
+                max = Math.max(frequencyValue, max);
+
+                drawFrequencies(position, frequencyValue);
+                position++;
+            }
+
+            frequencies = null;
+        }
+
         if (bitmap != null)
             canvas.drawBitmap(bitmap, 0, 0, null);
-    }
-
-    private void hammingWindow(double[] samples) {
-        for (int i = 0; i < samples.length; i++)
-            samples[i] *= (0.54f - 0.46f * Math.cos(2 * Math.PI * i / (samples.length - 1)));
-    }
-
-    private double[] fourier(float[] in) {
-        double trafo[] = new double[in.length];
-        for (int i = 0; i < in.length; i++)
-            trafo[i] = in[i];
-
-        DoubleDCT_1D dct = new DoubleDCT_1D(trafo.length);
-
-        // in place window
-        hammingWindow(trafo);
-
-        // in place transform: timeData becomes frequency data
-        dct.forward(trafo, true);
-
-        return trafo;
     }
 }
