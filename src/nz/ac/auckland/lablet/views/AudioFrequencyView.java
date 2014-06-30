@@ -24,7 +24,6 @@ public class AudioFrequencyView extends ViewGroup {
     private Bitmap bitmap = null;
     private Canvas bitmapCanvas = null;
 
-    private int position = 0;
     private float valueMax = 200;
 
     private double[] frequencies = null;
@@ -50,8 +49,8 @@ public class AudioFrequencyView extends ViewGroup {
 
     private void drawFrequencies(int position, float frequency) {
         float binWidth = 2.f;
-        float binPostition = binWidth * position;
-        bitmapCanvas.drawRect(binPostition, toScreenY(frequency), binPostition + binWidth, toScreenY(0), penPaint);
+        float binPosition = binWidth * position;
+        bitmapCanvas.drawRect(binPosition, toScreenY(frequency), binPosition + binWidth, toScreenY(0), penPaint);
     }
 
     private float getAmpBaseLine() {
@@ -84,7 +83,6 @@ public class AudioFrequencyView extends ViewGroup {
     protected void onDraw(Canvas canvas) {
         if (frequencies != null && frequencies.length > 0) {
             clearBitmap();
-            position = 0;
 
             double min = Double.POSITIVE_INFINITY;
             double max = Double.NEGATIVE_INFINITY;
@@ -95,8 +93,7 @@ public class AudioFrequencyView extends ViewGroup {
                 min = Math.min(frequencyValue, min);
                 max = Math.max(frequencyValue, max);
 
-                drawFrequencies(position, frequencyValue);
-                position++;
+                drawFrequencies(i, frequencyValue);
             }
 
             frequencies = null;
