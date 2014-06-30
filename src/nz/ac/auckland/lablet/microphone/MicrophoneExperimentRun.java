@@ -24,6 +24,7 @@ import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentRun;
 import nz.ac.auckland.lablet.experiment.ExperimentRunData;
 import nz.ac.auckland.lablet.views.AudioAmplitudeView;
+import nz.ac.auckland.lablet.views.AudioFrequencyMapView;
 import nz.ac.auckland.lablet.views.AudioFrequencyView;
 
 import java.io.File;
@@ -35,6 +36,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class MicrophoneExperimentRunView extends FrameLayout {
     private AudioAmplitudeView audioSignalView;
     private AudioFrequencyView audioFrequencyView;
+    private AudioFrequencyMapView audioFrequencyMapView;
 
     private MicrophoneExperimentRun.ISensorDataListener listener = new MicrophoneExperimentRun.ISensorDataListener() {
         @Override
@@ -42,6 +44,7 @@ class MicrophoneExperimentRunView extends FrameLayout {
             audioSignalView.addData(amplitudes);
 
             audioFrequencyView.addData(frequencies);
+            audioFrequencyMapView.addData(frequencies);
         }
     };
 
@@ -54,6 +57,8 @@ class MicrophoneExperimentRunView extends FrameLayout {
 
         audioSignalView = (AudioAmplitudeView)view.findViewById(R.id.audioSignalView);
         audioFrequencyView = (AudioFrequencyView)view.findViewById(R.id.audioFrequencyView);
+        audioFrequencyMapView = (AudioFrequencyMapView)view.findViewById(R.id.audioFrequencyMapView);
+        audioFrequencyMapView.setFrequencyCount(experimentRun.FRAME_SIZE);
 
         experimentRun.setListener(listener);
     }
@@ -64,8 +69,8 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
     private WeakReference<ISensorDataListener> softListener = null;
     private AudioRecordingTask audioRecordingTask = null;
 
-    final int SAMPLE_RATE = 44100;
-    final int FRAME_SIZE = 1000;
+    final public int SAMPLE_RATE = 44100;
+    final public int FRAME_SIZE = 1000;
 
     public interface ISensorDataListener {
         public void onNewAudioData(float[] amplitudes, double[] frequencies);

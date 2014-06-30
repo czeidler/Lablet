@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <view android:layout_width="540dp"
+          android:layout_height="match_parent"
+          class="nz.ac.auckland.lablet.views.AudioFrequencyMapView" android:id="@+id/audioFrequencyMapView"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <view android:layout_width="wrap_content"
+              android:layout_height="138dp"
+              class="nz.ac.auckland.lablet.views.AudioFrequencyView" android:id="@+id/audioFrequencyView"/>
+
+
+        <view android:layout_width="wrap_content"
+              android:layout_height="match_parent"
+              class="nz.ac.auckland.lablet.views.AudioAmplitudeView" android:id="@+id/audioSignalView"/>
+    </LinearLayout>
+
+</LinearLayout>

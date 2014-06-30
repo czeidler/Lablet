@@ -14,7 +14,7 @@ import android.util.AttributeSet;
 import android.view.ViewGroup;
 
 
-public class AudioAmplitudeView extends ViewGroup {
+public class AudioAmplitudeView extends RangeDrawingView {
     final private float BORDER = 0.0f;
     final private int BACKGROUND_COLOR = Color.argb(255, 80, 80, 80);
     final private Paint penMinMaxPaint = new Paint();
@@ -35,8 +35,6 @@ public class AudioAmplitudeView extends ViewGroup {
     public AudioAmplitudeView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        setWillNotDraw(false);
-
         penMinMaxPaint.setColor(Color.argb(255, 0, 0, 100));
         penMinMaxPaint.setStrokeWidth(1);
         penMinMaxPaint.setStyle(Paint.Style.STROKE);
@@ -44,6 +42,8 @@ public class AudioAmplitudeView extends ViewGroup {
         penStdPaint.setColor(Color.BLUE);
         penStdPaint.setStrokeWidth(1);
         penStdPaint.setStyle(Paint.Style.STROKE);
+
+        setRangeY(-amplitudeMax, amplitudeMax);
     }
 
     public void addData(float amplitudes[]) {
@@ -51,21 +51,13 @@ public class AudioAmplitudeView extends ViewGroup {
         invalidate();
     }
 
-    private float toScreenY(float y) {
-        return getAmpBaseLine() - ((viewRect.height() * (1.f - BORDER)) * y / amplitudeMax);
-    }
     private void drawAmplitude(int position, float min, float max, float average, float std) {
         if (bitmapCanvas == null)
             return;
 
         float x = (float)position / samplesPerPixels;
-
-        bitmapCanvas.drawLine(x, toScreenY(min), x, toScreenY(max), penMinMaxPaint);
-        bitmapCanvas.drawLine(x, toScreenY(average - std / 2), x, toScreenY(average + std / 2), penStdPaint);
-    }
-
-    private int getAmpBaseLine() {
-        return viewRect.height() / 2;
+        bitmapCanvas.drawLine(x, min, x, max, penMinMaxPaint);
+        bitmapCanvas.drawLine(x, average - std / 2, x, average + std / 2, penStdPaint);
     }
 
     private void clearBitmap() {
@@ -73,12 +65,7 @@ public class AudioAmplitudeView extends ViewGroup {
     }
 
     @Override
-    protected void onLayout(boolean b, int i, int i2, int i3, int i4) {
-
-    }
-
-    @Override
-    protected void onSizeChanged (int w, int h, int oldw, int oldh) {
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         if (w <= 0 || h <= 0)
             return;
 
@@ -89,6 +76,9 @@ public class AudioAmplitudeView extends ViewGroup {
         maxPosition = w * samplesPerPixels;
 
         clearBitmap();
+
+        setRangeX(0, w);
+        applyRangeMatrix(bitmapCanvas);
     }
 
     @Override
