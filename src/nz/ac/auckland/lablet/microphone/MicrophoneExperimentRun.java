@@ -19,7 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import edu.emory.mathcs.jtransforms.dct.DoubleDCT_1D;
+import edu.emory.mathcs.jtransforms.dct.FloatDCT_1D;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentRun;
 import nz.ac.auckland.lablet.experiment.ExperimentRunData;
@@ -30,6 +30,7 @@ import nz.ac.auckland.lablet.views.AudioFrequencyView;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -40,7 +41,7 @@ class MicrophoneExperimentRunView extends FrameLayout {
 
     private MicrophoneExperimentRun.ISensorDataListener listener = new MicrophoneExperimentRun.ISensorDataListener() {
         @Override
-        public void onNewAudioData(float[] amplitudes, double[] frequencies) {
+        public void onNewAudioData(float[] amplitudes, float[] frequencies) {
             audioSignalView.addData(amplitudes);
 
             audioFrequencyView.addData(frequencies);
@@ -70,10 +71,10 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
     private AudioRecordingTask audioRecordingTask = null;
 
     final public int SAMPLE_RATE = 44100;
-    final public int FRAME_SIZE = 1000;
+    final public int FRAME_SIZE = 4096;//8192;//16384;
 
     public interface ISensorDataListener {
-        public void onNewAudioData(float[] amplitudes, double[] frequencies);
+        public void onNewAudioData(float[] amplitudes, float[] frequencies);
     }
 
     public void setListener(ISensorDataListener listener) {
@@ -84,7 +85,7 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
         if (softListener == null)
             return;
 
-        double[] frequencies = fourier(amplitudes);
+        float[] frequencies = fourier(amplitudes);
 
         ISensorDataListener listener = softListener.get();
         if (listener != null)
@@ -145,12 +146,15 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
 
                 while (running.get()) {
                     final int bytesPerSample = 2;
-                    final byte[] buffer = new byte[bytesPerSample * sampleSize];
-                    final int bufferReadResult = audioRecord.read(buffer, 0, bytesPerSample * sampleSize);
-                    final float frame[] = new float[bufferReadResult / bytesPerSample];
+                    final int bytesToRead = bytesPerSample * sampleSize;
+                    final byte[] buffer = new byte[bytesToRead];
+
+                    if (!readData(buffer, bytesToRead))
+                        break;
+                    final float frame[] = new float[bytesToRead / bytesPerSample];
 
                     int frameIndex = 0;
-                    for (int index = 0; index < bufferReadResult - bytesPerSample + 1; index += bytesPerSample) {
+                    for (int index = 0; index < bytesToRead - bytesPerSample + 1; index += bytesPerSample) {
                         float sample = 0;
                         for (int b = 0; b < bytesPerSample; b++) {
                             int v = buffer[index + b];
@@ -168,9 +172,21 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
 
                 stopAudioRecording();
             }
+
+            private boolean readData(byte[] buffer, int bytesToRead) {
+                int bytesRead = 0;
+                int missingBytes = bytesToRead;
+                while (running.get()) {
+                    bytesRead += audioRecord.read(buffer, bytesRead, missingBytes);
+                    missingBytes = bytesToRead - bytesRead;
+                    if (missingBytes == 0)
+                        return true;
+                }
+                return false;
+            }
         };
 
-        AudioRecordingTask(String outputPath, int samplingRate, int sampleSize) {
+        public AudioRecordingTask(String outputPath, int samplingRate, int sampleSize) {
             this.outputPath = outputPath;
             this.samplingRate = samplingRate;
             this.sampleSize = sampleSize;
@@ -235,23 +251,20 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
         return null;
     }
 
-    private void hammingWindow(double[] samples) {
+    private void hammingWindow(float[] samples) {
         for (int i = 0; i < samples.length; i++)
             samples[i] *= (0.54f - 0.46f * Math.cos(2 * Math.PI * i / (samples.length - 1)));
     }
 
-    private double[] fourier(float[] in) {
-        double trafo[] = new double[in.length];
-        for (int i = 0; i < in.length; i++)
-            trafo[i] = in[i];
+    private float[] fourier(float[] in) {
+        float trafo[] = Arrays.copyOf(in, in.length);
 
-        DoubleDCT_1D dct = new DoubleDCT_1D(trafo.length);
-
+        FloatDCT_1D dct = new FloatDCT_1D(trafo.length);
         // in place window
         hammingWindow(trafo);
 
         // in place transform: timeData becomes frequency data
-        dct.forward(trafo, true);
+        dct.forward(trafo, false);
 
         return trafo;
     }
