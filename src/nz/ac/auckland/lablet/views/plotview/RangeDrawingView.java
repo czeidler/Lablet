@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views;
+package nz.ac.auckland.lablet.views.plotview;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -31,10 +31,13 @@ public class RangeDrawingView extends ViewGroup {
     }
 
     public void applyRangeMatrix(Canvas canvas) {
+
         float xScale = (float)getWidth() / (rangeRight - rangeLeft);
         float yScale = (float)getHeight() / (rangeBottom - rangeTop);
         canvas.scale(xScale, yScale);
+
         canvas.translate(-rangeLeft, -rangeTop);
+
     }
 
     @Override

@@ -10,6 +10,7 @@ package nz.ac.auckland.lablet.views;
 import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
+import nz.ac.auckland.lablet.views.plotview.RangeDrawingView;
 
 
 public class AudioFrequencyMapView extends RangeDrawingView {
@@ -21,9 +22,9 @@ public class AudioFrequencyMapView extends RangeDrawingView {
     private Canvas bitmapCanvas = null;
 
     private int position = 0;
-    private double[] frequencies = null;
+    private float[] frequencies = null;
     private int frequencyCount = 100;
-    private double maxFrequency = 30000;
+    private double maxFrequency = 100000;
 
     public AudioFrequencyMapView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -37,7 +38,7 @@ public class AudioFrequencyMapView extends RangeDrawingView {
         this.frequencyCount = frequencyCount;
     }
 
-    public void addData(double[] frequencies) {
+    public void addData(float[] frequencies) {
         if (this.frequencies == null) {
 
         }
@@ -69,14 +70,20 @@ public class AudioFrequencyMapView extends RangeDrawingView {
             return Color.WHITE;
 
         int[] colors = {
-                Color.rgb(0, 0, 255), // blue
-                Color.rgb(0, 255, 0), // green
-                Color.rgb(255, 0, 0) // red
+                Color.BLUE,
+                Color.CYAN,
+                Color.GREEN,
+                Color.YELLOW,
+                Color.RED,
                 };
 
         int index = 1;
-        if (value > 0.5)
+        if (value > 0.25)
             index = 2;
+        if (value > 0.5)
+            index = 3;
+        if (value > 0.75)
+            index = 4;
 
         int red = (int)((1.d - value) * Color.red(colors[index - 1]) + value * Color.red(colors[index]));
         int green = (int)((1.d - value) * Color.green(colors[index - 1]) + value * Color.green(colors[index]));

@@ -11,7 +11,7 @@ import android.content.Context;
 
 import android.graphics.*;
 import android.util.AttributeSet;
-import android.view.ViewGroup;
+import nz.ac.auckland.lablet.views.plotview.RangeDrawingView;
 
 
 public class AudioAmplitudeView extends RangeDrawingView {

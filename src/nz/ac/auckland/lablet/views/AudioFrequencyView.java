@@ -26,7 +26,7 @@ public class AudioFrequencyView extends ViewGroup {
 
     private float valueMax = 200;
 
-    private double[] frequencies = null;
+    private float[] frequencies = null;
 
     public AudioFrequencyView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -38,7 +38,7 @@ public class AudioFrequencyView extends ViewGroup {
         penPaint.setStyle(Paint.Style.FILL);
     }
 
-    public void addData(double[] frequencies) {
+    public void addData(float[] frequencies) {
         this.frequencies = frequencies;
         invalidate();
     }
