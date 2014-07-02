@@ -19,6 +19,12 @@ public class RangeDrawingView extends ViewGroup {
     private float rangeTop = 0;
     private float rangeBottom = 100;
 
+    public RangeDrawingView(Context context) {
+        super(context);
+
+        setWillNotDraw(false);
+    }
+
     public RangeDrawingView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -53,5 +59,21 @@ public class RangeDrawingView extends ViewGroup {
     public void setRangeY(float bottom, float top) {
         rangeTop = top;
         rangeBottom = bottom;
+    }
+
+    public float getRangeLeft() {
+        return rangeLeft;
+    }
+
+    public float getRangeRight() {
+        return rangeRight;
+    }
+
+    public float getRangeTop() {
+        return rangeTop;
+    }
+
+    public float getRangeBottom() {
+        return rangeBottom;
     }
 }
