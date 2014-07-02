@@ -164,6 +164,7 @@ public class YAxisView extends ViewGroup implements IYAxis {
 
     private String label = "";
     private String unit = "";
+    private List<LabelPartitioner.LabelEntry> labels;
 
     public YAxisView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -196,7 +197,7 @@ public class YAxisView extends ViewGroup implements IYAxis {
     public void setRelevantLabelDigits(int digits) {
         relevantDigits = digits;
 
-        calculateOptimalWidth();
+        calculateLabels();
     }
 
     @Override
@@ -204,7 +205,7 @@ public class YAxisView extends ViewGroup implements IYAxis {
         realTop = top;
         realBottom = bottom;
 
-        calculateOptimalWidth();
+        calculateLabels();
     }
 
     public String getUnit() {
@@ -221,32 +222,34 @@ public class YAxisView extends ViewGroup implements IYAxis {
         this.unit = unit;
     }
 
+    private void calculateLabels() {
+        LabelPartitioner partitioner = new LabelPartitioner(labelHeight, getAxisLength(), Math.min(realTop, realBottom),
+                Math.max(realTop, realBottom));
+        labels = partitioner.getLabels();
+
+        calculateOptimalWidth();
+    }
+
     private void calculateOptimalWidth() {
-        int labelSize = getTotalDigits(realTop, realBottom, relevantDigits);
+        float maxLabelWidth = 0;
+        for (int i = 0; i < labels.size(); i++) {
+            float width = labelPaint.measureText(labels.get(i).label);
+            if (width > maxLabelWidth)
+                maxLabelWidth = width;
+        }
 
-        // minus sign?
-        if (realTop < 0 || realBottom < 0)
-            labelSize++;
-
-        int maxPower = Math.abs(Math.max(getOrder(realTop), getOrder(realBottom)) - (relevantDigits - 1));
-
-        if (maxPower > 0)
-            labelSize += 2 + maxPower;
-
-        String dummyLabel = "";
-        for (int i = 0; i < labelSize; i++)
-            dummyLabel += "9";
-
-        Rect bounds = new Rect();
-        labelPaint.getTextBounds(dummyLabel, 0, dummyLabel.length(), bounds);
-
-        optimalWidth = SCALE_WIDTH + 2 * SPACING + bounds.width();
+        // axis
+        optimalWidth = SCALE_WIDTH + SPACING;
+        // tick labels
+        optimalWidth += maxLabelWidth + SPACING;
+        // label and uni
+        if (!label.equals("") || !unit.equals(""))
+            optimalWidth += labelHeight;
     }
 
     @Override
     public float getOptimalWidth() {
-        return 100;
-        //return optimalWidth;
+        return optimalWidth;
     }
 
     private void calculateAxisOffsets() {
@@ -257,7 +260,8 @@ public class YAxisView extends ViewGroup implements IYAxis {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-
+        if (changed)
+            calculateLabels();
     }
 
     @Override
@@ -279,9 +283,6 @@ public class YAxisView extends ViewGroup implements IYAxis {
         canvas.drawLine(getWidth() - 1, getAxisTopOffset(), getWidth() - 1, getHeight() - getAxisBottomOffset(),
                 axisPaint);
 
-        LabelPartitioner partitioner = new LabelPartitioner(labelHeight, getAxisLength(), Math.min(realTop, realBottom),
-                Math.max(realTop, realBottom));
-        List<LabelPartitioner.LabelEntry> labels = partitioner.getLabels();
         for (int i = 0; i < labels.size(); i++) {
             LabelPartitioner.LabelEntry entry = labels.get(i);
             float position = 0;
@@ -307,35 +308,5 @@ public class YAxisView extends ViewGroup implements IYAxis {
 
     private float getAxisLength() {
         return getHeight() - getAxisBottomOffset() - getAxisTopOffset();
-    }
-
-    private String toLabel(float value) {
-        return String.format("%1.0f", value);
-    }
-
-    private int getOrder(float number) {
-        number = Math.abs(number);
-
-        if (number == 0.0)
-            return 1;
-
-        int order = 0;
-        while (number >= 10) {
-            number /= 10;
-            order++;
-        }
-        while (number <= 0.1) {
-            number *= 10;
-            order--;
-        }
-        return order;
-    }
-
-    private int getTotalDigits(float value1, float value2, int relevantDigits) {
-        int maxOrder = Math.max(getOrder(value1), getOrder(value2));
-        int diffOrder = getOrder(value2 - value2);
-        int minOrder = diffOrder + (relevantDigits - 1);
-
-        return Math.abs(minOrder - maxOrder) + 1;
     }
 }
