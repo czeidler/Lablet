@@ -26,6 +26,7 @@ import nz.ac.auckland.lablet.experiment.ExperimentRunData;
 import nz.ac.auckland.lablet.views.AudioAmplitudeView;
 import nz.ac.auckland.lablet.views.AudioFrequencyMapView;
 import nz.ac.auckland.lablet.views.AudioFrequencyView;
+import nz.ac.auckland.lablet.views.plotview.PlotView;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class MicrophoneExperimentRunView extends FrameLayout {
     private AudioAmplitudeView audioSignalView;
     private AudioFrequencyView audioFrequencyView;
+    private PlotView frequencyMapPlotView;
     private AudioFrequencyMapView audioFrequencyMapView;
 
     private MicrophoneExperimentRun.ISensorDataListener listener = new MicrophoneExperimentRun.ISensorDataListener() {
@@ -58,8 +60,14 @@ class MicrophoneExperimentRunView extends FrameLayout {
 
         audioSignalView = (AudioAmplitudeView)view.findViewById(R.id.audioSignalView);
         audioFrequencyView = (AudioFrequencyView)view.findViewById(R.id.audioFrequencyView);
-        audioFrequencyMapView = (AudioFrequencyMapView)view.findViewById(R.id.audioFrequencyMapView);
-        audioFrequencyMapView.setFrequencyCount(experimentRun.FRAME_SIZE);
+        frequencyMapPlotView = (PlotView)view.findViewById(R.id.audioFrequencyMapPlot);
+        audioFrequencyMapView = new AudioFrequencyMapView(context);
+
+        frequencyMapPlotView.setMainView(audioFrequencyMapView);
+        frequencyMapPlotView.setRangeY(0, experimentRun.SAMPLE_RATE / 2);
+        frequencyMapPlotView.getYAxisView().setRelevantLabelDigits(4);
+        frequencyMapPlotView.getYAxisView().setUnit("Hz");
+        frequencyMapPlotView.getYAxisView().setLabel("Frequency");
 
         experimentRun.setListener(listener);
     }

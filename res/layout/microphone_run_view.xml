@@ -7,7 +7,7 @@
 
     <view android:layout_width="540dp"
           android:layout_height="match_parent"
-          class="nz.ac.auckland.lablet.views.AudioFrequencyMapView" android:id="@+id/audioFrequencyMapView"/>
+          class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/audioFrequencyMapPlot"/>
 
     <LinearLayout
         android:orientation="vertical"

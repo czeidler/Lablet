@@ -23,19 +23,24 @@ public class AudioFrequencyMapView extends RangeDrawingView {
 
     private int position = 0;
     private float[] frequencies = null;
-    private int frequencyCount = 100;
-    private double maxFrequency = 100000;
+    private double maxFrequency = 1000000;
+
+    public AudioFrequencyMapView(Context context) {
+        super(context);
+
+        init();
+    }
 
     public AudioFrequencyMapView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        init();
+    }
+
+    private void init() {
         penPaint.setColor(Color.GREEN);
         penPaint.setStrokeWidth(1);
         penPaint.setStyle(Paint.Style.FILL);
-    }
-
-    public void setFrequencyCount(int frequencyCount) {
-        this.frequencyCount = frequencyCount;
     }
 
     public void addData(float[] frequencies) {
@@ -61,7 +66,7 @@ public class AudioFrequencyMapView extends RangeDrawingView {
         clearBitmap();
 
         setRangeX(0, w);
-        setRangeY(0, frequencyCount);
+        setRangeY(0, h);
         applyRangeMatrix(bitmapCanvas);
     }
 
@@ -94,6 +99,8 @@ public class AudioFrequencyMapView extends RangeDrawingView {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        penPaint.setColor(Color.CYAN);
+        canvas.drawLine(0, 0, getWidth(), getRangeTop() - getRangeBottom(), penPaint);
         if (frequencies != null && frequencies.length > 0) {
             if (position > getWidth()) {
                 position = 0;
@@ -101,9 +108,10 @@ public class AudioFrequencyMapView extends RangeDrawingView {
             }
 
             for (int i = 0; i < frequencies.length; i++) {
-                double value = Math.log10(Math.abs(frequencies[i])) / Math.log10(maxFrequency);
-                penPaint.setColor(heatMap(value));
-                bitmapCanvas.drawPoint(position, i, penPaint);
+                double amplitude = Math.log10(Math.abs(frequencies[i])) / Math.log10(maxFrequency);
+                penPaint.setColor(heatMap(amplitude));
+                float frequency = (float)i / (frequencies.length - 1) * (getRangeTop() - getRangeBottom());
+                bitmapCanvas.drawPoint(position, frequency, penPaint);
             }
             position++;
             frequencies = null;
