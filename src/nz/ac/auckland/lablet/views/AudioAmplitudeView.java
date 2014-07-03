@@ -28,13 +28,21 @@ public class AudioAmplitudeView extends RangeDrawingView {
     private int position = 0;
     private float maxPosition = 0;
     private float samplesPerPixels = 10;
-    private float amplitudeMax = 100000;
+    private float amplitudeMax = 65535;
 
     private float[] amplitudes = null;
 
     public AudioAmplitudeView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init();
+    }
 
+    public AudioAmplitudeView(Context context) {
+        super(context);
+        init();
+    }
+
+    private void init() {
         penMinMaxPaint.setColor(Color.argb(255, 0, 0, 100));
         penMinMaxPaint.setStrokeWidth(1);
         penMinMaxPaint.setStyle(Paint.Style.STROKE);
@@ -42,8 +50,6 @@ public class AudioAmplitudeView extends RangeDrawingView {
         penStdPaint.setColor(Color.BLUE);
         penStdPaint.setStrokeWidth(1);
         penStdPaint.setStyle(Paint.Style.STROKE);
-
-        setRangeY(-amplitudeMax, amplitudeMax);
     }
 
     public void addData(float amplitudes[]) {
@@ -93,7 +99,7 @@ public class AudioAmplitudeView extends RangeDrawingView {
                     int index = i + a;
                     if (index >= amplitudes.length)
                         break;
-                    float value = amplitudes[index];
+                    float value = amplitudes[index] / amplitudeMax;
                     ampSum += value;
                     ampSquareSum += Math.pow(value, 2);
                     if (value < min)

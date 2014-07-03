@@ -20,7 +20,7 @@
 
         <view android:layout_width="wrap_content"
               android:layout_height="match_parent"
-              class="nz.ac.auckland.lablet.views.AudioAmplitudeView" android:id="@+id/audioSignalView"/>
+              class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/audioSignalView"/>
     </LinearLayout>
 
 </LinearLayout>

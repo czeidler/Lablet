@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 class MicrophoneExperimentRunView extends FrameLayout {
     private AudioAmplitudeView audioSignalView;
+    private PlotView audioSignalPlotView;
     private AudioFrequencyView audioFrequencyView;
     private PlotView frequencyMapPlotView;
     private AudioFrequencyMapView audioFrequencyMapView;
@@ -58,7 +59,11 @@ class MicrophoneExperimentRunView extends FrameLayout {
         ViewGroup view = (ViewGroup)inflater.inflate(R.layout.microphone_run_view, null, false);
         addView(view);
 
-        audioSignalView = (AudioAmplitudeView)view.findViewById(R.id.audioSignalView);
+        audioSignalPlotView = (PlotView)view.findViewById(R.id.audioSignalView);
+        audioSignalView = new AudioAmplitudeView(context);
+        audioSignalPlotView.setMainView(audioSignalView);
+        audioSignalPlotView.setRangeY(-1, 1);
+
         audioFrequencyView = (AudioFrequencyView)view.findViewById(R.id.audioFrequencyView);
         frequencyMapPlotView = (PlotView)view.findViewById(R.id.audioFrequencyMapPlot);
         audioFrequencyMapView = new AudioFrequencyMapView(context);
