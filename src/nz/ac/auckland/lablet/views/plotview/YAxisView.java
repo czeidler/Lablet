@@ -187,7 +187,7 @@ class LabelPartitioner {
 public class YAxisView extends ViewGroup implements IYAxis {
     private float axisTopOffset = 0;
     private float axisBottomOffset = 0;
-    private float realTop = 0;
+    private float realTop = 10;
     private float realBottom = 0;
     private int relevantDigits = 3;
 

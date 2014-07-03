@@ -42,10 +42,12 @@ public class PlotView extends ViewGroup {
 
         ((ViewGroup)yAxisView).measure(MeasureSpec.makeMeasureSpec(yAxisRect.width(), MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(yAxisRect.height(), MeasureSpec.EXACTLY));
-        mainView.measure(MeasureSpec.makeMeasureSpec(mainViewRect.width(), MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(mainViewRect.height(), MeasureSpec.EXACTLY));
-
         ((ViewGroup)yAxisView).layout(yAxisRect.left, yAxisRect.top, yAxisRect.right, yAxisRect.bottom);
-        mainView.layout(mainViewRect.left, mainViewRect.top, mainViewRect.right, mainViewRect.bottom);
+
+        if (mainView != null) {
+            mainView.measure(MeasureSpec.makeMeasureSpec(mainViewRect.width(), MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(mainViewRect.height(), MeasureSpec.EXACTLY));
+            mainView.layout(mainViewRect.left, mainViewRect.top, mainViewRect.right, mainViewRect.bottom);
+        }
     }
 }
