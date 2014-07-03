@@ -60,17 +60,21 @@ class LabelPartitioner {
     }
 
     private void calculateLabelMetric(float stepFactor) {
-        float maxValue = Math.max(realEnd, realStart);
+        float maxValue = Math.max(Math.abs(realEnd), Math.abs(realStart));
         float maxOrder = getOrderValue(maxValue);
         float diffOrder = getOrderValue(Math.abs(realEnd - realStart) * stepFactor);
 
         int digits = (int)Math.log10(maxOrder);
+        if (digits >= 0)
+            digits += 1;
         if (digits < 0)
             labelMetric.decimalPlaceDigits = -digits;
         else
             labelMetric.digits = digits;
 
-        int diffDigits = (int)Math.log10(diffOrder);
+        int diffDigits = (int)Math.round(Math.log10(diffOrder));
+        if (diffDigits >= 0)
+            diffDigits += 1;
         if (diffDigits < 0 && diffDigits < digits)
             labelMetric.decimalPlaceDigits = -diffDigits;
     }
@@ -83,7 +87,7 @@ class LabelPartitioner {
             LabelEntry entry = new LabelEntry();
             float realValue = realLabelStart + i * stepSize;
             entry.realValue = realValue;
-            entry.relativePosition = realValue / diff;
+            entry.relativePosition = i * stepSize / diff;
             entry.label = createLabel(realValue);
 
             labels.add(entry);
@@ -128,7 +132,7 @@ class LabelPartitioner {
         for (int i = 0; bestFoundLabelNumber < maxLabelNumber && bestFoundLabelNumber < optimalLabelNumber; i++) {
             stepFactor = getStepFactor(i);
             stepSize = stepFactor * diffOrderValue;
-            if (stepSize > diff)
+            if (stepSize >= diff)
                 continue;
 
             int labelNumber = (int)(diff / stepSize) + 1;
@@ -144,9 +148,12 @@ class LabelPartitioner {
     }
 
     private String createLabel(float value) {
-        if (labelMetric.decimalPlaceDigits > 0)
-            return String.format("%s", value);
-        else
+        if (labelMetric.decimalPlaceDigits > 0) {
+            String formatString = "%.";
+            formatString += labelMetric.decimalPlaceDigits;
+            formatString += "f";
+            return String.format(formatString, value);
+        } else
             return String.format("%d", (int)value);
     }
 
@@ -176,7 +183,7 @@ class LabelPartitioner {
             number /= 10;
             order *= 10;
         }
-        while (number <= 0.1) {
+        while (number < 1) {
             number *= 10;
             order /= 10;
         }
@@ -259,7 +266,10 @@ public class YAxisView extends ViewGroup implements IYAxis {
     }
 
     private void calculateLabels() {
-        LabelPartitioner partitioner = new LabelPartitioner(labelHeight, getAxisLength(), Math.min(realTop, realBottom),
+        float axisLength = getAxisLength();
+        if (axisLength <= 0)
+            return;
+        LabelPartitioner partitioner = new LabelPartitioner(labelHeight, axisLength, Math.min(realTop, realBottom),
                 Math.max(realTop, realBottom));
         labels = partitioner.getLabels();
     }
