@@ -35,7 +35,7 @@ public class PlotView extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        int yAxisRight = (int)yAxisView.getOptimalWidth();
+        int yAxisRight = (int)yAxisView.optimalWidthForHeight(bottom - top);
         Rect yAxisRect = new Rect(0, 0, yAxisRight, bottom);
         Rect mainViewRect = new Rect(yAxisRight, (int)yAxisView.getAxisTopOffset(), right,
                 bottom - (int)yAxisView.getAxisBottomOffset());

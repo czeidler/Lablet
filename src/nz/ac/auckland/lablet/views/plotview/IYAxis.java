@@ -23,7 +23,7 @@ public interface IYAxis {
     public void setRelevantLabelDigits(int digits);
     public void setDataRange(float bottom, float top);
 
-    public float getOptimalWidth();
+    public float optimalWidthForHeight(float height);
     public void setLabel(String label);
     public void setUnit(String unit);
 }

@@ -33,6 +33,12 @@ class LabelPartitioner {
     }
     List<LabelEntry> labels = new ArrayList<>();
 
+    class LabelMetric {
+        public int digits = 0;
+        public int decimalPlaceDigits = 0;
+    }
+    LabelMetric labelMetric = new LabelMetric();
+
     /**
      *
      * @param labelExtent
@@ -53,28 +59,24 @@ class LabelPartitioner {
         return axisExtent * realValue / Math.abs(realEnd - realStart);
     }
 
-    private void calculate() {
-        final float minSpacing = 20;
-        final float optimalSpacing = axisExtent * 0.15f;
-        int maxLabelNumber = (int)(axisExtent / (labelExtent + minSpacing)) + 1;
-        int optimalLabelNumber = (int)(axisExtent / (labelExtent + optimalSpacing)) + 1;
+    private void calculateLabelMetric(float stepFactor) {
+        float maxValue = Math.max(realEnd, realStart);
+        float maxOrder = getOrderValue(maxValue);
+        float diffOrder = getOrderValue(Math.abs(realEnd - realStart) * stepFactor);
 
+        int digits = (int)Math.log10(maxOrder);
+        if (digits < 0)
+            labelMetric.decimalPlaceDigits = -digits;
+        else
+            labelMetric.digits = digits;
+
+        int diffDigits = (int)Math.log10(diffOrder);
+        if (diffDigits < 0 && diffDigits < digits)
+            labelMetric.decimalPlaceDigits = -diffDigits;
+    }
+
+    private void fillLabelList(int bestFoundLabelNumber, float stepSize) {
         float diff = Math.abs(realEnd - realStart);
-        float diffOrderValue = getOrderValue(diff);
-
-        int bestFoundLabelNumber = 1;
-        float stepSize = 1;
-        for (int i = 0; bestFoundLabelNumber < maxLabelNumber && bestFoundLabelNumber < optimalLabelNumber; i++) {
-            stepSize = getStepFactor(i) * diffOrderValue;
-            if (stepSize > diff)
-                continue;
-
-            int labelNumber = (int)(diff / stepSize) + 1;
-            if (optimalLabelNumber - labelNumber < optimalLabelNumber - bestFoundLabelNumber)
-                bestFoundLabelNumber = labelNumber;
-        }
-
-        // fill label list
         labels.clear();
         float realLabelStart = (int)(Math.min(realStart, realEnd) / stepSize) * stepSize;
         for (int i = 0; i < bestFoundLabelNumber; i++) {
@@ -86,9 +88,20 @@ class LabelPartitioner {
 
             labels.add(entry);
         }
+    }
 
+    private void updateFinishingLabels(float minSpacing) {
         // fill finishing labels
         if (finishingLabelsMatchEnds && labels.size() >= 2) {
+            LabelEntry entryEnd = labels.get(labels.size() - 1);
+            if (Math.abs(toScreen(entryEnd.realValue) - toScreen(realEnd)) > minSpacing) {
+                entryEnd = new LabelEntry();
+                labels.add(entryEnd);
+            }
+            entryEnd.realValue = realEnd;
+            entryEnd.relativePosition = 1;
+            entryEnd.label = createLabel(realEnd);
+
             LabelEntry entryStart = labels.get(0);
             if (Math.abs(toScreen(entryStart.realValue) - toScreen(realStart)) > minSpacing) {
                 entryStart = new LabelEntry();
@@ -97,20 +110,44 @@ class LabelPartitioner {
             entryStart.realValue = realStart;
             entryStart.relativePosition = 0;
             entryStart.label = createLabel(realStart);
-
-            LabelEntry entryEnd = labels.get(labels.size() - 1);
-            if (Math.abs(toScreen(entryEnd.realValue) - toScreen(realEnd)) > minSpacing) {
-                entryStart = new LabelEntry();
-                labels.add(entryStart);
-            }
-            entryEnd.realValue = realEnd;
-            entryEnd.relativePosition = 1;
-            entryEnd.label = createLabel(realEnd);
         }
     }
 
+    private void calculate() {
+        final float minSpacing = 20;
+        final float optimalSpacing = axisExtent * 0.15f;
+        int maxLabelNumber = (int)(axisExtent / (labelExtent + minSpacing)) + 1;
+        int optimalLabelNumber = (int)(axisExtent / (labelExtent + optimalSpacing)) + 1;
+
+        float diff = Math.abs(realEnd - realStart);
+        float diffOrderValue = getOrderValue(diff);
+
+        int bestFoundLabelNumber = 1;
+        float stepSize = 1f;
+        float stepFactor = 1f;
+        for (int i = 0; bestFoundLabelNumber < maxLabelNumber && bestFoundLabelNumber < optimalLabelNumber; i++) {
+            stepFactor = getStepFactor(i);
+            stepSize = stepFactor * diffOrderValue;
+            if (stepSize > diff)
+                continue;
+
+            int labelNumber = (int)(diff / stepSize) + 1;
+            if (optimalLabelNumber - labelNumber < optimalLabelNumber - bestFoundLabelNumber)
+                bestFoundLabelNumber = labelNumber;
+        }
+
+        calculateLabelMetric(stepFactor);
+
+        fillLabelList(bestFoundLabelNumber, stepSize);
+
+        updateFinishingLabels(minSpacing);
+    }
+
     private String createLabel(float value) {
-        return String.format("%1.0f", value);
+        if (labelMetric.decimalPlaceDigits > 0)
+            return String.format("%s", value);
+        else
+            return String.format("%d", (int)value);
     }
 
     public List<LabelEntry> getLabels() {
@@ -152,7 +189,6 @@ public class YAxisView extends ViewGroup implements IYAxis {
     private float axisBottomOffset = 0;
     private float realTop = 0;
     private float realBottom = 0;
-    private float optimalWidth = 0;
     private int relevantDigits = 3;
 
     private Paint labelPaint = new Paint();
@@ -226,14 +262,22 @@ public class YAxisView extends ViewGroup implements IYAxis {
         LabelPartitioner partitioner = new LabelPartitioner(labelHeight, getAxisLength(), Math.min(realTop, realBottom),
                 Math.max(realTop, realBottom));
         labels = partitioner.getLabels();
-
-        calculateOptimalWidth();
     }
 
-    private void calculateOptimalWidth() {
+    @Override
+    public float optimalWidthForHeight(float height) {
+        List<LabelPartitioner.LabelEntry> labelEntries = labels;
+        if (height != getHeight()) {
+            LabelPartitioner partitioner = new LabelPartitioner(labelHeight, height, Math.min(realTop, realBottom),
+                    Math.max(realTop, realBottom));
+            labelEntries = partitioner.getLabels();
+        }
+
+        float optimalWidth = 0;
+
         float maxLabelWidth = 0;
-        for (int i = 0; i < labels.size(); i++) {
-            float width = labelPaint.measureText(labels.get(i).label);
+        for (int i = 0; i < labelEntries.size(); i++) {
+            float width = labelPaint.measureText(labelEntries.get(i).label);
             if (width > maxLabelWidth)
                 maxLabelWidth = width;
         }
@@ -244,11 +288,8 @@ public class YAxisView extends ViewGroup implements IYAxis {
         optimalWidth += maxLabelWidth + SPACING;
         // label and uni
         if (!label.equals("") || !unit.equals(""))
-            optimalWidth += labelHeight;
-    }
+            optimalWidth += labelHeight + SPACING;
 
-    @Override
-    public float getOptimalWidth() {
         return optimalWidth;
     }
 
