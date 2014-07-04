@@ -102,6 +102,7 @@ public class CameraExperimentRunData extends ExperimentRunData {
         return "time [" + getRunValueUnit() + "]";
     }
 
+    @Override
     protected boolean loadExperimentData(Bundle bundle, File storageDir) {
         if (!super.loadExperimentData(bundle, storageDir))
             return false;
@@ -115,6 +116,7 @@ public class CameraExperimentRunData extends ExperimentRunData {
         return true;
     }
 
+    @Override
     public Bundle experimentDataToBundle() {
         Bundle bundle = super.experimentDataToBundle();
 

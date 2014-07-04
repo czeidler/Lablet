@@ -34,7 +34,7 @@ import java.util.Comparator;
 import java.util.List;
 
 
-class CameraExperimentView extends FrameLayout implements IExperimentRun.IExperimentRunListener {
+class CameraExperimentView extends AbstractExperimentRunView {
     private RatioSurfaceView preview = null;
     private VideoView videoView = null;
     private SurfaceHolder previewHolder = null;
@@ -86,10 +86,6 @@ class CameraExperimentView extends FrameLayout implements IExperimentRun.IExperi
         public void surfaceDestroyed(SurfaceHolder holder) {
         }
     };
-
-    public void startPlayback(String path) {
-
-    }
 
     private void selectPreview() {
         preview.setVisibility(View.VISIBLE);
