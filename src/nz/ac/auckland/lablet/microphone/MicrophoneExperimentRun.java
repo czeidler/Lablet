@@ -18,11 +18,13 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import edu.emory.mathcs.jtransforms.dct.FloatDCT_1D;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentRun;
+import nz.ac.auckland.lablet.experiment.AbstractExperimentRunView;
 import nz.ac.auckland.lablet.experiment.ExperimentRunData;
+import nz.ac.auckland.lablet.experiment.IExperimentRun;
+import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.AudioAmplitudeView;
 import nz.ac.auckland.lablet.views.AudioFrequencyMapView;
 import nz.ac.auckland.lablet.views.AudioFrequencyView;
@@ -30,61 +32,112 @@ import nz.ac.auckland.lablet.views.plotview.PlotView;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-class MicrophoneExperimentRunView extends FrameLayout {
-    private AudioAmplitudeView audioSignalView;
-    private PlotView audioSignalPlotView;
-    private AudioFrequencyView audioFrequencyView;
-    private PlotView frequencyMapPlotView;
-    private AudioFrequencyMapView audioFrequencyMapView;
+class MicrophoneExperimentRunView extends AbstractExperimentRunView {
 
-    private MicrophoneExperimentRun.ISensorDataListener listener = new MicrophoneExperimentRun.ISensorDataListener() {
-        @Override
-        public void onNewAudioData(float[] amplitudes, float[] frequencies) {
-            audioSignalView.addData(amplitudes);
+    private ViewGroup previewView;
+    private ViewGroup playbackView;
 
-            audioFrequencyView.addData(frequencies);
-            audioFrequencyMapView.addData(frequencies);
-        }
-    };
-
-    public MicrophoneExperimentRunView(Context context, MicrophoneExperimentRun experimentRun) {
+    public MicrophoneExperimentRunView(final Context context, final MicrophoneExperimentRun experimentRun) {
         super(context);
 
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        ViewGroup view = (ViewGroup)inflater.inflate(R.layout.microphone_run_view, null, false);
+        final ViewGroup view = (ViewGroup)inflater.inflate(R.layout.microphone_run_view, null, false);
         addView(view);
 
-        audioSignalPlotView = (PlotView)view.findViewById(R.id.audioSignalView);
-        audioSignalView = new AudioAmplitudeView(context);
-        audioSignalPlotView.setMainView(audioSignalView);
-        audioSignalPlotView.setRangeY(-1, 1);
+        previewView = (ViewGroup)view.findViewById(R.id.previewView);
+        playbackView = (ViewGroup)view.findViewById(R.id.playbackView);
 
-        audioFrequencyView = (AudioFrequencyView)view.findViewById(R.id.audioFrequencyView);
-        frequencyMapPlotView = (PlotView)view.findViewById(R.id.audioFrequencyMapPlot);
-        audioFrequencyMapView = new AudioFrequencyMapView(context);
+        playbackView.setVisibility(View.INVISIBLE);
 
-        frequencyMapPlotView.setMainView(audioFrequencyMapView);
-        frequencyMapPlotView.setRangeY(0, experimentRun.SAMPLE_RATE / 2);
-        frequencyMapPlotView.getYAxisView().setRelevantLabelDigits(4);
-        frequencyMapPlotView.getYAxisView().setUnit("Hz");
-        frequencyMapPlotView.getYAxisView().setLabel("Frequency");
+        previewState = new AbstractExperimentRun.State() {
+            private AudioAmplitudeView audioSignalView;
+            private PlotView audioSignalPlotView;
+            private AudioFrequencyView audioFrequencyView;
+            private PlotView frequencyMapPlotView;
+            private AudioFrequencyMapView audioFrequencyMapView;
 
-        experimentRun.setListener(listener);
+            private MicrophoneExperimentRun.ISensorDataListener listener = new MicrophoneExperimentRun.ISensorDataListener() {
+                @Override
+                public void onNewAudioData(float[] amplitudes, float[] frequencies) {
+                    audioSignalView.addData(amplitudes);
+
+                    audioFrequencyView.addData(frequencies);
+                    audioFrequencyMapView.addData(frequencies);
+                }
+            };
+
+            {
+                audioSignalPlotView = (PlotView)view.findViewById(R.id.audioSignalView);
+                audioSignalView = new AudioAmplitudeView(context);
+                audioSignalPlotView.setMainView(audioSignalView);
+                audioSignalPlotView.setRangeY(-1, 1);
+
+                audioFrequencyView = (AudioFrequencyView)view.findViewById(R.id.audioFrequencyView);
+                frequencyMapPlotView = (PlotView)view.findViewById(R.id.audioFrequencyMapPlot);
+                audioFrequencyMapView = new AudioFrequencyMapView(context);
+
+                frequencyMapPlotView.setMainView(audioFrequencyMapView);
+                frequencyMapPlotView.setRangeY(0, experimentRun.SAMPLE_RATE / 2);
+                frequencyMapPlotView.getYAxisView().setRelevantLabelDigits(4);
+                frequencyMapPlotView.getYAxisView().setUnit("Hz");
+                frequencyMapPlotView.getYAxisView().setLabel("Frequency");
+
+                experimentRun.setListener(listener);
+            }
+
+            @Override
+            public void start() {
+
+                previewView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public boolean stop() {
+                previewView.setVisibility(View.INVISIBLE);
+                return false;
+            }
+        };
+
+        recordingState = previewState;
+
+        playbackState = new AbstractExperimentRun.State() {
+            @Override
+            public void start() {
+                playbackView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public boolean stop() {
+                playbackView.setVisibility(View.INVISIBLE);
+                return false;
+            }
+        };
     }
 
+    @Override
+    public void onSettingsChanged() {
+
+    }
 }
 
 public class MicrophoneExperimentRun extends AbstractExperimentRun {
+    private Activity activity;
+
     private WeakReference<ISensorDataListener> softListener = null;
-    private AudioRecordingTask audioRecordingTask = null;
 
     final public int SAMPLE_RATE = 44100;
     final public int FRAME_SIZE = 4096;//8192;//16384;
+
+    final String audioFileName = "audio.wav";
+    private File audioFile = null;
+
+    private MicrophoneExperimentRunData experimentData;
 
     public interface ISensorDataListener {
         public void onNewAudioData(float[] amplitudes, float[] frequencies);
@@ -107,7 +160,9 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
 
     @Override
     public View createExperimentView(Context context) {
-        return new MicrophoneExperimentRunView(context, this);
+        AbstractExperimentRunView view = new MicrophoneExperimentRunView(context, this);
+        setListener(view);
+        return view;
     }
 
     @Override
@@ -126,23 +181,87 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
     }
 
     @Override
-    public void init(Activity activity) {
+    public void init(final Activity activity) {
+        this.activity = activity;
 
+        experimentData = new MicrophoneExperimentRunData(activity);
+                
+        previewState = new State() {
+            private AudioRecordingTask audioRecordingTask = null;
+
+            @Override
+            public void start() {
+                audioRecordingTask = new AudioRecordingTask(null, SAMPLE_RATE, FRAME_SIZE);
+                audioRecordingTask.start();
+            }
+
+            @Override
+            public boolean stop() {
+                audioRecordingTask.stop();
+                audioRecordingTask = null;
+                return true;
+            }
+        };
+
+        recordingState = new State() {
+            private AudioRecordingTask audioRecordingTask = null;
+
+            @Override
+            public void start() {
+                File outputDir = activity.getExternalCacheDir();
+                audioFile = new File(outputDir, audioFileName);
+
+                audioRecordingTask = new AudioRecordingTask(audioFile, SAMPLE_RATE, FRAME_SIZE);
+                audioRecordingTask.start();
+            }
+
+            @Override
+            public boolean stop() {
+                audioRecordingTask.stop();
+                audioRecordingTask = null;
+                return true;
+            }
+        };
     }
 
     @Override
-    public void destroy() {
+    public void finishExperiment(boolean saveData, File storageDir) throws IOException {
+        super.finishExperiment(saveData, storageDir);
 
+        if (!saveData)
+            deleteTempFiles();
+        else {
+            if (!moveTempFilesToExperimentDir(storageDir))
+                throw new IOException();
+            experimentData.setAudioFileName(audioFileName);
+            experimentData.saveExperimentDataToFile(storageDir);
+        }
+        audioFile = null;
+    }
+
+    private boolean deleteTempFiles() {
+        if (audioFile != null && audioFile.exists())
+            return audioFile.delete();
+        return true;
+    }
+
+    private boolean moveTempFilesToExperimentDir(File storageDir) {
+        if (!storageDir.exists())
+            if (!storageDir.mkdirs())
+                return false;
+        File target = new File(storageDir, audioFileName);
+        return StorageLib.moveFile(audioFile, target);
     }
 
     private class AudioRecordingTask {
-        private AudioRecord audioRecord = null;
         private AtomicBoolean running = new AtomicBoolean();
 
-        final String outputPath;
         final private int samplingRate;
         final private int sampleSize;
-        private int bufferSize;
+
+        private OutputStream dataOutput = null;
+        final private File outputFile;
+        private AudioRecord audioRecord = null;
 
         Handler uiHandler = new Handler();
 
@@ -151,7 +270,7 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
             public void run() {
                 running.set(true);
                 try {
-                    startAudioRecording(outputPath);
+                    startAudioRecording(outputFile);
                 } catch (IOException e) {
                     e.printStackTrace();
                     return;
@@ -164,6 +283,13 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
 
                     if (!readData(buffer, bytesToRead))
                         break;
+                    if (dataOutput != null) {
+                        try {
+                            dataOutput.write(buffer);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     final float frame[] = new float[bytesToRead / bytesPerSample];
 
                     int frameIndex = 0;
@@ -199,8 +325,8 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
             }
         };
 
-        public AudioRecordingTask(String outputPath, int samplingRate, int sampleSize) {
-            this.outputPath = outputPath;
+        public AudioRecordingTask(File outputFile, int samplingRate, int sampleSize) {
+            this.outputFile = outputFile;
             this.samplingRate = samplingRate;
             this.sampleSize = sampleSize;
         }
@@ -222,41 +348,31 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
             running.set(false);
         }
 
-        private void startAudioRecording(String outputFile) throws IOException {
+        private void startAudioRecording(File outputFile) throws IOException {
+            if (outputFile != null)
+                dataOutput = new AudioWavOutputStream(outputFile, 1, samplingRate);
+
             final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
             final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-            bufferSize = AudioRecord.getMinBufferSize(samplingRate, CHANNEL_CONFIG, FORMAT);
+            int bufferSize = AudioRecord.getMinBufferSize(samplingRate, CHANNEL_CONFIG, FORMAT);
+            audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, samplingRate, CHANNEL_CONFIG, FORMAT,
+                    bufferSize);
 
-            audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, samplingRate,
-                    CHANNEL_CONFIG, FORMAT, bufferSize);
             audioRecord.startRecording();
         }
 
         private void stopAudioRecording() {
             audioRecord.stop();
+            if (dataOutput != null) {
+                try {
+                    dataOutput.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                dataOutput = null;
+            }
+            audioRecord.release();
         }
-    }
-
-    @Override
-    public void startPreview() {
-        super.startPreview();
-
-        audioRecordingTask = new AudioRecordingTask("/dev/null", SAMPLE_RATE, FRAME_SIZE);
-        audioRecordingTask.start();
-    }
-
-    @Override
-    public void stopPreview() {
-        super.stopPreview();
-
-        audioRecordingTask.stop();
-        audioRecordingTask = null;
-    }
-
-    @Override
-    public void finishExperiment(boolean saveData, File storageDir) throws IOException {
-        super.finishExperiment(saveData, storageDir);
-
     }
 
     @Override
