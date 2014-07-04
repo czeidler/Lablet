@@ -13,10 +13,18 @@ import java.lang.ref.WeakReference;
 
 
 abstract public class AbstractExperimentRun implements IExperimentRun {
+    public interface State {
+        public void start();
+        public boolean stop();
+    }
+
     private ExperimentRunGroup experimentRunGroup;
     private WeakReference<IExperimentRunListener> softListener = null;
-
     protected boolean unsavedExperimentData = false;
+
+    protected State previewState = null;
+    protected State recordingState = null;
+    protected State playbackState = null;
 
     private StateNotifier stateNotifier = new NoneStateNotifier();
 
@@ -67,22 +75,36 @@ abstract public class AbstractExperimentRun implements IExperimentRun {
     }
 
     @Override
+    public void destroy() {
+
+    }
+
+    @Override
     public void startPreview() {
         unsavedExperimentData = false;
         notifyStartPreview();
         stateNotifier = new PreviewStateNotifier();
+
+        if (previewState != null)
+            previewState.start();
     }
 
     @Override
     public void stopPreview() {
         notifyStopPreview();
         stateNotifier = new NoneStateNotifier();
+
+        if (previewState != null)
+            previewState.stop();
     }
 
     @Override
     public void startRecording() throws Exception {
         notifyStartRecording();
         stateNotifier = new RecordingStateNotifier();
+
+        if (recordingState != null)
+            recordingState.start();
     }
 
     @Override
@@ -90,6 +112,9 @@ abstract public class AbstractExperimentRun implements IExperimentRun {
         unsavedExperimentData = true;
         notifyStopRecording();
         stateNotifier = new NoneStateNotifier();
+
+        if (recordingState != null)
+            return recordingState.stop();
         return true;
     }
 
@@ -97,12 +122,18 @@ abstract public class AbstractExperimentRun implements IExperimentRun {
     public void startPlayback() {
         notifyStartPlayback();
         stateNotifier = new PlaybackStateNotifier();
+
+        if (playbackState != null)
+            playbackState.start();
     }
 
     @Override
     public void stopPlayback() {
         stateNotifier = new NoneStateNotifier();
         notifyStopPlayback();
+
+        if (playbackState != null)
+            playbackState.stop();
     }
 
     @Override
