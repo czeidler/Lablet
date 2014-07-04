@@ -26,7 +26,7 @@ public class ExperimentPluginFactory {
     private ExperimentPluginFactory() {
         plugins = new ArrayList<IExperimentPlugin>();
         plugins.add(new CameraExperimentPlugin());
-        plugins.add(new AccelerometerExperimentPlugin());
+        //plugins.add(new AccelerometerExperimentPlugin());
         plugins.add(new MircrophoneExperimentPlugin());
     }
 
