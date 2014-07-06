@@ -23,7 +23,6 @@ import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentRun;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentRunView;
 import nz.ac.auckland.lablet.experiment.ExperimentRunData;
-import nz.ac.auckland.lablet.experiment.IExperimentRun;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.AudioAmplitudeView;
 import nz.ac.auckland.lablet.views.AudioFrequencyMapView;
@@ -93,14 +92,13 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
 
             @Override
             public void start() {
-
                 previewView.setVisibility(View.VISIBLE);
             }
 
             @Override
             public boolean stop() {
                 previewView.setVisibility(View.INVISIBLE);
-                return false;
+                return true;
             }
         };
 
@@ -185,7 +183,7 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
         this.activity = activity;
 
         experimentData = new MicrophoneExperimentRunData(activity);
-                
+
         previewState = new State() {
             private AudioRecordingTask audioRecordingTask = null;
 
