@@ -123,6 +123,45 @@ class ExperimentRunViewManager {
 }
 
 
+/**
+ * Manage a menu item that may not exist yet.
+ *
+ * The option menu and its items are created after onResume. However, we like to configure the items there.
+ */
+class MenuItemProxy {
+    private MenuItem item = null;
+    private boolean visible = true;
+    private boolean enabled = true;
+
+    public void setMenuItem(MenuItem item) {
+        this.item = item;
+        if (item != null)
+            update();
+    }
+
+    private void update() {
+        item.setVisible(visible);
+        item.setEnabled(enabled);
+    }
+
+    public void setVisible(boolean visible) {
+        if (item != null)
+            item.setVisible(visible);
+        this.visible = visible;
+    }
+
+    public void setEnabled(boolean enabled) {
+        if (item != null)
+            item.setEnabled(enabled);
+        this.enabled = enabled;
+    }
+
+    public boolean getVisible() {
+        return visible;
+    }
+}
+
+
 public class ExperimentActivity extends FragmentActivity {
     private Experiment experiment;
 
@@ -132,8 +171,8 @@ public class ExperimentActivity extends FragmentActivity {
     private ImageButton startButton = null;
     private ImageButton stopButton = null;
     private ImageButton newButton = null;
-    private MenuItem analyseMenuItem = null;
-    private MenuItem settingsMenu = null;
+    final private MenuItemProxy analyseMenuItem = new MenuItemProxy();
+    final private MenuItemProxy settingsMenuItem = new MenuItemProxy();
     private MenuItem viewMenu = null;
     private MenuItem sensorMenu = null;
 
@@ -174,10 +213,11 @@ public class ExperimentActivity extends FragmentActivity {
                 return false;
             }
         });
-        analyseMenuItem = menu.findItem(R.id.action_analyse);
-        assert analyseMenuItem != null;
-        analyseMenuItem.setEnabled(false);
-        analyseMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        MenuItem analyseItem = menu.findItem(R.id.action_analyse);
+        assert analyseItem != null;
+        analyseMenuItem.setMenuItem(analyseItem);
+        analyseItem.setEnabled(false);
+        analyseItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 finishExperiment(true);
@@ -193,8 +233,9 @@ public class ExperimentActivity extends FragmentActivity {
             }
         }
 
-        settingsMenu = menu.findItem(R.id.action_settings);
+        MenuItem settingsMenu = menu.findItem(R.id.action_settings);
         assert settingsMenu != null;
+        settingsMenuItem.setMenuItem(settingsMenu);
         IExperimentRun currentExperimentRun = experiment.getCurrentExperimentRun();
         if (currentExperimentRun != null) {
             boolean hasOptions = currentExperimentRun.onPrepareOptionsMenu(settingsMenu);
@@ -221,15 +262,6 @@ public class ExperimentActivity extends FragmentActivity {
                 return true;
             }
         });
-
-
-        // set states after menu has been init
-        if (!experiment.getCurrentExperimentRunGroup().dataTaken()) {
-            setState(new PreviewState());
-        } else {
-            // we have unsaved experiment data means we are in the PlaybackState state
-            setState(new PlaybackState());
-        }
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -467,6 +499,13 @@ public class ExperimentActivity extends FragmentActivity {
 
         activateExperimentRunGroup(experiment.getCurrentExperimentRunGroup(), true);
         updateAdapter();
+
+        if (!experiment.getCurrentExperimentRunGroup().dataTaken()) {
+            setState(new PreviewState());
+        } else {
+            // we have unsaved experiment data means we are in the PlaybackState state
+            setState(new PlaybackState());
+        }
     }
 
     @Override
@@ -593,20 +632,20 @@ public class ExperimentActivity extends FragmentActivity {
 
     class PreviewState extends AbstractViewState {
         public void enterState() {
-            settingsMenu.setVisible(true);
+            if (settingsMenuItem != null)
+                settingsMenuItem.setVisible(true);
 
             startButton.setEnabled(true);
             stopButton.setEnabled(false);
             newButton.setVisibility(View.INVISIBLE);
-
-            analyseMenuItem.setEnabled(false);
 
             for (IExperimentRun experiment : getActiveExperimentRuns())
                 experiment.startPreview();
         }
 
         public void leaveState() {
-            settingsMenu.setVisible(false);
+            if (settingsMenuItem != null)
+                settingsMenuItem.setVisible(false);
 
             for (IExperimentRun experiment : getActiveExperimentRuns())
                 experiment.stopPreview();
