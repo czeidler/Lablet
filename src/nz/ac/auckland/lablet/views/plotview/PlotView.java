@@ -66,23 +66,22 @@ public class PlotView extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        int width = right - left;
-        int xAxisTop = bottom;
-        if (hasYAxis())
-            xAxisTop -= (int)yAxisView.getAxisBottomOffset();
+        final int width = right - left;
+        final int height = bottom - top;
+        int xAxisTop = height;
         int xAxisLeftOffset = 0;
         int xAxisRightOffset = 0;
         if (hasXAxis()) {
-            xAxisTop = bottom - (int)xAxisView.optimalHeight();
+            xAxisTop -= (int)xAxisView.optimalHeight();
             xAxisRightOffset = (int)xAxisView.getAxisRightOffset();
             xAxisLeftOffset = (int)xAxisView.getAxisLeftOffset();
         }
-        int mainAreaHeight = xAxisTop - top - (int)yAxisView.getAxisTopOffset();
-        int yAxisRight = (int)yAxisView.optimalWidthForHeight(mainAreaHeight);
+        final int mainAreaHeight = xAxisTop - (int)yAxisView.getAxisTopOffset();
+        final int yAxisRight = (int)yAxisView.optimalWidthForHeight(mainAreaHeight);
 
-        Rect xAxisRect = new Rect(yAxisRight - xAxisLeftOffset, xAxisTop, right, bottom);
-        Rect yAxisRect = new Rect(0, 0, yAxisRight, xAxisTop + (int)yAxisView.getAxisBottomOffset());
-        Rect mainViewRect = new Rect(yAxisRight, (int)yAxisView.getAxisTopOffset(),
+        final Rect xAxisRect = new Rect(yAxisRight - xAxisLeftOffset, xAxisTop, width, height);
+        final Rect yAxisRect = new Rect(0, 0, yAxisRight, xAxisTop + (int)yAxisView.getAxisBottomOffset());
+        final Rect mainViewRect = new Rect(yAxisRight, (int)yAxisView.getAxisTopOffset(),
                 width - xAxisRightOffset, xAxisTop);
 
         if (hasXAxis()) {
