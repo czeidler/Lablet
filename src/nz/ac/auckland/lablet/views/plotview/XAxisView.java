@@ -89,8 +89,9 @@ public class XAxisView extends ViewGroup implements IXAxis {
         float axisLength = getAxisLength();
         if (axisLength <= 0)
             return;
-        // TODO: calculate the max label width and use it instead of labelHeight!
-        LabelPartitioner partitioner = new LabelPartitioner(labelHeight, axisLength, Math.min(realLeft, realRight),
+        float maxLabelWidth = labelPaint.measureText(LabelPartitioner.createDummyLabel(
+                LabelPartitioner.estimateLabelMetric(realLeft, realRight)));
+        LabelPartitioner partitioner = new LabelPartitioner(maxLabelWidth, axisLength, Math.min(realLeft, realRight),
                 Math.max(realLeft, realRight));
         labels = partitioner.getLabels();
     }
