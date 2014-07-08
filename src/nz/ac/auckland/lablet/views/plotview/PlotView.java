@@ -15,25 +15,29 @@ import android.view.ViewGroup;
 
 public class PlotView extends ViewGroup {
     private IYAxis yAxisView;
-    private RangeDrawingView mainView;
+    private PlotPainterContainerView mainView;
 
     public PlotView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         yAxisView = new YAxisView(context, attrs);
         addView((ViewGroup)yAxisView);
+
+        this.mainView = new PlotPainterContainerView(context);
+        addView(mainView);
     }
 
-    public void setMainView(RangeDrawingView mainView) {
-        this.mainView = mainView;
-        if (this.mainView != null)
-            removeView(mainView);
-        addView(mainView);
+    public void addPlotPainter(IPlotPainter painter) {
+        mainView.addPlotPainter(painter);
     }
 
     public void setRangeY(float bottom, float top) {
         yAxisView.setDataRange(bottom, top);
         mainView.setRangeY(bottom, top);
+    }
+
+    public void setRangeX(float left, float right) {
+        mainView.setRangeX(left, right);
     }
 
     public IYAxis getYAxisView() {

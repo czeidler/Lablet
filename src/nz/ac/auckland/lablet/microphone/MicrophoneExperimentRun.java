@@ -24,9 +24,7 @@ import nz.ac.auckland.lablet.experiment.AbstractExperimentRun;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentRunView;
 import nz.ac.auckland.lablet.experiment.ExperimentRunData;
 import nz.ac.auckland.lablet.misc.StorageLib;
-import nz.ac.auckland.lablet.views.AudioAmplitudeView;
-import nz.ac.auckland.lablet.views.AudioFrequencyMapView;
-import nz.ac.auckland.lablet.views.AudioFrequencyView;
+import nz.ac.auckland.lablet.views.*;
 import nz.ac.auckland.lablet.views.plotview.PlotView;
 
 import java.io.File;
@@ -45,7 +43,7 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
     public MicrophoneExperimentRunView(final Context context, final MicrophoneExperimentRun experimentRun) {
         super(context);
 
-        LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final ViewGroup view = (ViewGroup)inflater.inflate(R.layout.microphone_run_view, null, false);
         addView(view);
 
@@ -55,33 +53,50 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
         playbackView.setVisibility(View.INVISIBLE);
 
         previewState = new AbstractExperimentRun.State() {
-            private AudioAmplitudeView audioSignalView;
-            private PlotView audioSignalPlotView;
             private AudioFrequencyView audioFrequencyView;
+
+            private PlotView audioSignalPlotView;
+            private AudioAmplitudePlotDataAdapter audioAmplitudePlotAdapter;
+
             private PlotView frequencyMapPlotView;
-            private AudioFrequencyMapView audioFrequencyMapView;
+            private AudioFrequencyMapAdapter audioFrequencyMapAdapter;
+
+            private int frequencyMapTimeSpan = 60;
+            private int amplitudeTimeSpan = 3;
 
             private MicrophoneExperimentRun.ISensorDataListener listener = new MicrophoneExperimentRun.ISensorDataListener() {
                 @Override
                 public void onNewAudioData(float[] amplitudes, float[] frequencies) {
-                    audioSignalView.addData(amplitudes);
+                    if (audioAmplitudePlotAdapter.getSize() / experimentRun.SAMPLE_RATE >= amplitudeTimeSpan)
+                        audioAmplitudePlotAdapter.clear();
+                    audioAmplitudePlotAdapter.addData(amplitudes);
 
                     audioFrequencyView.addData(frequencies);
-                    audioFrequencyMapView.addData(frequencies);
+
+                    if (audioFrequencyMapAdapter.getSize() * experimentRun.FRAME_SIZE / experimentRun.SAMPLE_RATE
+                            >= frequencyMapTimeSpan)
+                        audioFrequencyMapAdapter.clear();
+                    audioFrequencyMapAdapter.addData(frequencies);
                 }
             };
 
             {
                 audioSignalPlotView = (PlotView)view.findViewById(R.id.audioSignalView);
-                audioSignalView = new AudioAmplitudeView(context);
-                audioSignalPlotView.setMainView(audioSignalView);
+                AudioAmplitudePainter audioAmplitudePainter = new AudioAmplitudePainter();
+                audioAmplitudePlotAdapter = new AudioAmplitudePlotDataAdapter();
+                audioAmplitudePainter.setDataAdapter(audioAmplitudePlotAdapter);
+                audioSignalPlotView.addPlotPainter(audioAmplitudePainter);
+                audioSignalPlotView.setRangeX(0, amplitudeTimeSpan);
                 audioSignalPlotView.setRangeY(-1, 1);
 
                 audioFrequencyView = (AudioFrequencyView)view.findViewById(R.id.audioFrequencyView);
-                frequencyMapPlotView = (PlotView)view.findViewById(R.id.audioFrequencyMapPlot);
-                audioFrequencyMapView = new AudioFrequencyMapView(context);
 
-                frequencyMapPlotView.setMainView(audioFrequencyMapView);
+                frequencyMapPlotView = (PlotView)view.findViewById(R.id.audioFrequencyMapPlot);
+                audioFrequencyMapAdapter = new AudioFrequencyMapAdapter();
+                AudioFrequencyMapPainter audioFrequencyMapPainter = new AudioFrequencyMapPainter();
+                audioFrequencyMapPainter.setDataAdapter(audioFrequencyMapAdapter);
+                frequencyMapPlotView.addPlotPainter(audioFrequencyMapPainter);
+                frequencyMapPlotView.setRangeX(0, frequencyMapTimeSpan);
                 frequencyMapPlotView.setRangeY(0, experimentRun.SAMPLE_RATE / 2);
                 frequencyMapPlotView.getYAxisView().setRelevantLabelDigits(4);
                 frequencyMapPlotView.getYAxisView().setUnit("Hz");

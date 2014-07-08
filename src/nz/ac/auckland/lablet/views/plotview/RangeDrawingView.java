@@ -9,6 +9,8 @@ package nz.ac.auckland.lablet.views.plotview;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 
@@ -18,6 +20,8 @@ public class RangeDrawingView extends ViewGroup {
     private float rangeRight = 100;
     private float rangeTop = 0;
     private float rangeBottom = 100;
+    private int width;
+    private int height;
 
     public RangeDrawingView(Context context) {
         super(context);
@@ -36,14 +40,48 @@ public class RangeDrawingView extends ViewGroup {
 
     }
 
+    public float toScreenX(float real) {
+        return (real - rangeLeft) / (rangeRight - rangeLeft) * width;
+    }
+
+    public float toScreenY(float real) {
+        return (1.f - (real - rangeBottom) / (rangeTop - rangeBottom)) * height ;
+    }
+
+    public float fromScreenX(float screen) {
+        return rangeLeft + screen * (rangeRight - rangeLeft) / width;
+    }
+
+    public float fromScreenY(float screen) {
+        return rangeTop - screen * (rangeTop - rangeBottom) / height;
+    }
+
     public void applyRangeMatrix(Canvas canvas) {
-
-        float xScale = (float)getWidth() / (rangeRight - rangeLeft);
-        float yScale = (float)getHeight() / (rangeBottom - rangeTop);
-        canvas.scale(xScale, yScale);
-
+        canvas.scale(getXScale(), getYScale());
         canvas.translate(-rangeLeft, -rangeTop);
+    }
 
+    public void applyRangeMatrix(Path path) {
+        Matrix matrix = new Matrix();
+        matrix.setScale(getXScale(), getYScale());
+        matrix.preTranslate(-rangeLeft, -rangeTop);
+        path.transform(matrix);
+    }
+
+    private float getXScale() {
+        return (float)getWidth() / (rangeRight - rangeLeft);
+    }
+
+    private float getYScale() {
+        return (float)getHeight() / (rangeBottom - rangeTop);
+    }
+
+    @Override
+    public void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+
+        width = w;
+        height = h;
     }
 
     @Override
