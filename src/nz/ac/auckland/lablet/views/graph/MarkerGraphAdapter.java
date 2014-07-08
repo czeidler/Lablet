@@ -151,7 +151,7 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
         for (ListIterator<WeakReference<IGraphAdapterListener>> it = listeners.listIterator(); it.hasNext(); ) {
             IGraphAdapterListener listener = it.next().get();
             if (listener != null)
-                listener.onDataPointChanged(this, index, number);
+                listener.onDataPointsChanged(this, index, number);
             else
                 it.remove();
         }

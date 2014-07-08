@@ -28,12 +28,12 @@ interface IGraphAdapter {
     interface IGraphAdapterListener {
         public void onDataPointAdded(IGraphAdapter graph, int index);
         public void onDataPointRemoved(IGraphAdapter graph, int index);
-        public void onDataPointChanged(IGraphAdapter graph, int index, int number);
+        public void onDataPointsChanged(IGraphAdapter graph, int index, int number);
         public void onAllDataPointsChanged(IGraphAdapter graph);
         public void onDataPointSelected(IGraphAdapter graph, int index);
     }
 
-    interface IGraphAxis {
+    interface IGraphDataAxis {
         public int size();
         public Number getValue(int index);
         public String getLabel();
@@ -46,8 +46,8 @@ interface IGraphAdapter {
     public void setTitle(String title);
     public String getTitle();
 
-    public IGraphAxis getXAxis();
-    public IGraphAxis getYAxis();
+    public IGraphDataAxis getXAxis();
+    public IGraphDataAxis getYAxis();
 }
 
 
@@ -55,8 +55,8 @@ interface IGraphAdapter {
  * Abstract base class for graph adapters.
  */
 abstract class AbstractGraphAdapter implements IGraphAdapter {
-    protected IGraphAxis xAxis;
-    protected IGraphAxis yAxis;
+    protected IGraphDataAxis xAxis;
+    protected IGraphDataAxis yAxis;
 
     @Override
     public int size() {
@@ -64,20 +64,20 @@ abstract class AbstractGraphAdapter implements IGraphAdapter {
     }
 
     @Override
-    public IGraphAxis getXAxis() {
+    public IGraphDataAxis getXAxis() {
         return xAxis;
     }
 
     @Override
-    public IGraphAxis getYAxis() {
+    public IGraphDataAxis getYAxis() {
         return yAxis;
     }
 
-    public void setXAxis(IGraphAxis axis) {
+    public void setXAxis(IGraphDataAxis axis) {
         xAxis = axis;
     }
 
-    public void setYAxis(IGraphAxis axis) {
+    public void setYAxis(IGraphDataAxis axis) {
         yAxis = axis;
     }
 }
@@ -521,7 +521,7 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
     }
 
     @Override
-    public void onDataPointChanged(IGraphAdapter graph, int index, int number) {
+    public void onDataPointsChanged(IGraphAdapter graph, int index, int number) {
         refillGraph();
     }
 
