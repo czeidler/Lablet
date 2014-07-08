@@ -71,7 +71,7 @@ class LabelPartitioner {
     static private LabelMetric calculateLabelMetric(float stepFactor, float realStart, float realEnd) {
         float maxValue = Math.max(Math.abs(realEnd), Math.abs(realStart));
         float maxOrder = getOrderValue(maxValue);
-        float diffOrder = getOrderValue(Math.abs(realEnd - realStart) * stepFactor);
+        float diffOrder = getOrderValue(Math.abs(realEnd - realStart)) * getOrderValue(stepFactor);
 
         LabelMetric labelMetric = new LabelMetric();
 
