@@ -88,6 +88,8 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
                 audioSignalPlotView.addPlotPainter(audioAmplitudePainter);
                 audioSignalPlotView.setRangeX(0, amplitudeTimeSpan);
                 audioSignalPlotView.setRangeY(-1, 1);
+                audioSignalPlotView.getXAxisView().setUnit("s");
+                audioSignalPlotView.getXAxisView().setLabel("Time");
 
                 audioFrequencyView = (AudioFrequencyView)view.findViewById(R.id.audioFrequencyView);
 
@@ -98,9 +100,10 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
                 frequencyMapPlotView.addPlotPainter(audioFrequencyMapPainter);
                 frequencyMapPlotView.setRangeX(0, frequencyMapTimeSpan);
                 frequencyMapPlotView.setRangeY(0, experimentRun.SAMPLE_RATE / 2);
-                frequencyMapPlotView.getYAxisView().setRelevantLabelDigits(4);
                 frequencyMapPlotView.getYAxisView().setUnit("Hz");
                 frequencyMapPlotView.getYAxisView().setLabel("Frequency");
+                frequencyMapPlotView.getXAxisView().setUnit("s");
+                frequencyMapPlotView.getXAxisView().setLabel("Time");
 
                 experimentRun.setListener(listener);
             }

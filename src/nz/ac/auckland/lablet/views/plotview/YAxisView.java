@@ -191,6 +191,20 @@ class LabelPartitioner {
     }
 }
 
+class AxisSettings {
+    final private float scaleWidth = 8;
+    final private float spacing = 4;
+
+    public float getSpacing() {
+        return spacing;
+    }
+
+    public float getScaleExtent() {
+        return scaleWidth;
+    }
+
+}
+
 public class YAxisView extends ViewGroup implements IYAxis {
     private float axisTopOffset = 0;
     private float axisBottomOffset = 0;
@@ -202,15 +216,14 @@ public class YAxisView extends ViewGroup implements IYAxis {
     private float labelHeight = 5;
     private Paint axisPaint = new Paint();
 
-    final private float SCALE_WIDTH = 8;
-    final private float SPACING = 4;
+    private AxisSettings settings = new AxisSettings();
 
     private String label = "";
     private String unit = "";
     private List<LabelPartitioner.LabelEntry> labels;
 
-    public YAxisView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public YAxisView(Context context) {
+        super(context);
 
         setWillNotDraw(false);
 
@@ -277,13 +290,11 @@ public class YAxisView extends ViewGroup implements IYAxis {
     @Override
     public float optimalWidthForHeight(float height) {
         List<LabelPartitioner.LabelEntry> labelEntries = labels;
-        if (height != getHeight()) {
+        if (height != getAxisLength()) {
             LabelPartitioner partitioner = new LabelPartitioner(labelHeight, height, Math.min(realTop, realBottom),
                     Math.max(realTop, realBottom));
             labelEntries = partitioner.getLabels();
         }
-
-        float optimalWidth = 0;
 
         float maxLabelWidth = 0;
         for (int i = 0; i < labelEntries.size(); i++) {
@@ -293,12 +304,12 @@ public class YAxisView extends ViewGroup implements IYAxis {
         }
 
         // axis
-        optimalWidth = SCALE_WIDTH + SPACING;
+        float optimalWidth = settings.getScaleExtent() + settings.getSpacing();
         // tick labels
-        optimalWidth += maxLabelWidth + SPACING;
+        optimalWidth += maxLabelWidth + settings.getSpacing();
         // label and uni
         if (!label.equals("") || !unit.equals(""))
-            optimalWidth += labelHeight + SPACING;
+            optimalWidth += labelHeight + settings.getSpacing();
 
         return optimalWidth;
     }
@@ -350,11 +361,11 @@ public class YAxisView extends ViewGroup implements IYAxis {
         Rect labelRect = new Rect();
         labelPaint.getTextBounds(labelText, 0, labelText.length(), labelRect);
 
-        canvas.drawText(labelText, getWidth() - labelRect.width() - SPACING - SCALE_WIDTH,
+        canvas.drawText(labelText, getWidth() - labelRect.width() - settings.getSpacing() - settings.getScaleExtent(),
                 yPosition + labelRect.height() / 2, labelPaint);
 
         // draw tick
-        canvas.drawLine(getWidth() - SCALE_WIDTH, yPosition, getWidth(), yPosition, axisPaint);
+        canvas.drawLine(getWidth() - settings.getScaleExtent(), yPosition, getWidth(), yPosition, axisPaint);
     }
 
     private float getAxisLength() {
