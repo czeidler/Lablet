@@ -24,23 +24,43 @@
 
 
             <view android:layout_width="wrap_content"
-                  android:layout_height="match_parent"
+                  android:layout_height="wrap_content"
                   class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/audioSignalView"/>
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:orientation="horizontal"
+                  android:orientation="vertical"
                   android:layout_width="match_parent"
                   android:layout_height="match_parent"
-                  android:id="@+id/playbackView">
+                  android:id="@+id/playbackView" android:weightSum="1">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Recorded"
-            android:id="@+id/textView"/>
+        <view android:layout_width="wrap_content"
+              android:layout_height="300dp"
+              class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/playbackAmplitudeView"/>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <ToggleButton
+                android:id="@+id/startPauseButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/media_start_pause"
+                android:textOff=""
+                android:textOn="" android:layout_gravity="center_vertical"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="length"
+                android:id="@+id/lengthTextView" android:minWidth="100dp" android:layout_gravity="center_vertical"/>
+            <SeekBar
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/seekBar" android:layout_gravity="center_vertical"/>
+        </LinearLayout>
     </LinearLayout>
 
 </FrameLayout>

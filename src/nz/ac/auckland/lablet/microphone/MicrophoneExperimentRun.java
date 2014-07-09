@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +19,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.ToggleButton;
 import edu.emory.mathcs.jtransforms.dct.FloatDCT_1D;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentRun;
@@ -55,7 +60,7 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
         previewState = new AbstractExperimentRun.State() {
             private AudioFrequencyView audioFrequencyView;
 
-            private PlotView audioSignalPlotView;
+            private PlotView audioAmplitudePlotView;
             private AudioAmplitudePlotDataAdapter audioAmplitudePlotAdapter;
 
             private PlotView frequencyMapPlotView;
@@ -81,15 +86,15 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
             };
 
             {
-                audioSignalPlotView = (PlotView)view.findViewById(R.id.audioSignalView);
+                audioAmplitudePlotView = (PlotView)view.findViewById(R.id.audioSignalView);
                 AudioAmplitudePainter audioAmplitudePainter = new AudioAmplitudePainter();
                 audioAmplitudePlotAdapter = new AudioAmplitudePlotDataAdapter();
                 audioAmplitudePainter.setDataAdapter(audioAmplitudePlotAdapter);
-                audioSignalPlotView.addPlotPainter(audioAmplitudePainter);
-                audioSignalPlotView.setRangeX(0, amplitudeTimeSpan);
-                audioSignalPlotView.setRangeY(-1, 1);
-                audioSignalPlotView.getXAxisView().setUnit("s");
-                audioSignalPlotView.getXAxisView().setLabel("Time");
+                audioAmplitudePlotView.addPlotPainter(audioAmplitudePainter);
+                audioAmplitudePlotView.setRangeX(0, amplitudeTimeSpan);
+                audioAmplitudePlotView.setRangeY(-1, 1);
+                audioAmplitudePlotView.getXAxisView().setUnit("s");
+                audioAmplitudePlotView.getXAxisView().setLabel("Time");
 
                 audioFrequencyView = (AudioFrequencyView)view.findViewById(R.id.audioFrequencyView);
 
@@ -123,14 +128,107 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
         recordingState = previewState;
 
         playbackState = new AbstractExperimentRun.State() {
+            final private ToggleButton startPauseButton;
+            final private SeekBar seekBar;
+            final private TextView lengthTextView;
+            final private PlotView playbackAmplitudeView;
+            private AudioAmplitudePlotDataAdapter audioAmplitudePlotAdapter;
+
+            final private MediaPlayer mediaPlayer;
+            private boolean initOk = true;
+
+            final private Runnable seekBarUpdater = new Runnable() {
+                @Override
+                public void run() {
+                    if (!initOk)
+                        return;
+                    seekBar.setProgress(mediaPlayer.getCurrentPosition());
+                    if (!mediaPlayer.isPlaying())
+                        return;
+                    new Handler().postDelayed(seekBarUpdater, 500);
+                }
+            };
+
+            {
+                startPauseButton = (ToggleButton)view.findViewById(R.id.startPauseButton);
+                seekBar = (SeekBar)view.findViewById(R.id.seekBar);
+                lengthTextView = (TextView)view.findViewById(R.id.lengthTextView);
+                playbackAmplitudeView = (PlotView)view.findViewById(R.id.playbackAmplitudeView);
+                AudioAmplitudePainter audioAmplitudePainter = new AudioAmplitudePainter();
+                audioAmplitudePlotAdapter = new AudioAmplitudePlotDataAdapter();
+                audioAmplitudePainter.setDataAdapter(audioAmplitudePlotAdapter);
+                playbackAmplitudeView.addPlotPainter(audioAmplitudePainter);
+                playbackAmplitudeView.setRangeY(-1, 1);
+                playbackAmplitudeView.getXAxisView().setUnit("s");
+                playbackAmplitudeView.getXAxisView().setLabel("Time");
+
+                mediaPlayer = new MediaPlayer();
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mediaPlayer) {
+                        startPauseButton.setChecked(false);
+                        mediaPlayer.seekTo(0);
+                    }
+                });
+
+                startPauseButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                        if (!initOk)
+                            return;
+                        if (checked) {
+                            mediaPlayer.start();
+                            seekBarUpdater.run();
+                        } else
+                            mediaPlayer.pause();
+                    }
+                });
+
+                seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+                        mediaPlayer.seekTo(progress);
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+            }
+
             @Override
             public void start() {
                 playbackView.setVisibility(View.VISIBLE);
+
+                try {
+                    mediaPlayer.setDataSource(experimentRun.getAudioFile().getPath());
+                    mediaPlayer.prepare();
+                    int duration = mediaPlayer.getDuration();
+                    seekBar.setMax(duration);
+                    lengthTextView.setText("" + (duration / 1000) + "s");
+                    playbackAmplitudeView.setRangeX(0, (float)duration / 1000);
+
+                    initOk = true;
+                } catch (IOException e) {
+                    initOk = false;
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public boolean stop() {
                 playbackView.setVisibility(View.INVISIBLE);
+
+                if (initOk) {
+                    mediaPlayer.stop();
+                    mediaPlayer.release();
+                }
                 return false;
             }
         };
@@ -253,6 +351,10 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
             experimentData.saveExperimentDataToFile(storageDir);
         }
         audioFile = null;
+    }
+
+    public File getAudioFile() {
+        return audioFile;
     }
 
     private boolean deleteTempFiles() {
