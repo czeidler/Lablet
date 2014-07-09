@@ -105,7 +105,7 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
                 frequencyMapPlotView.getXAxisView().setUnit("s");
                 frequencyMapPlotView.getXAxisView().setLabel("Time");
 
-                experimentRun.setListener(listener);
+                experimentRun.setSensorDataListener(listener);
             }
 
             @Override
@@ -159,8 +159,8 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
         public void onNewAudioData(float[] amplitudes, float[] frequencies);
     }
 
-    public void setListener(ISensorDataListener listener) {
-        softListener = new WeakReference<ISensorDataListener>(listener);
+    public void setSensorDataListener(ISensorDataListener listener) {
+        softListener = new WeakReference<>(listener);
     }
 
     private void notifyNewAudioData(float[] amplitudes) {
@@ -279,7 +279,8 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
         final private File outputFile;
         private AudioRecord audioRecord = null;
 
-        Handler uiHandler = new Handler();
+        private Handler uiHandler = new Handler();
+        private Thread thread = null;
 
         Runnable pollRunnable = new Runnable() {
             @Override
@@ -332,7 +333,10 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
                 int bytesRead = 0;
                 int missingBytes = bytesToRead;
                 while (running.get()) {
-                    bytesRead += audioRecord.read(buffer, bytesRead, missingBytes);
+                    int result = audioRecord.read(buffer, bytesRead, missingBytes);
+                    if (result < 0)
+                        break;
+                    bytesRead += result;
                     missingBytes = bytesToRead - bytesRead;
                     if (missingBytes == 0)
                         return true;
@@ -357,11 +361,17 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
         }
 
         public void start() {
-            new Thread(pollRunnable).start();
+            thread = new Thread(pollRunnable);
+            thread.start();
         }
 
         public void stop() {
             running.set(false);
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         private void startAudioRecording(File outputFile) throws IOException {
