@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.microphone;
+package nz.ac.auckland.lablet.misc;
 
 import java.io.*;
 

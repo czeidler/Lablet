@@ -16,7 +16,6 @@ import java.util.List;
 
 public class PlotPainterContainerView extends RangeDrawingView {
     final private List<IPlotPainter> plotPainters = new ArrayList();
-    private boolean autoZoom = true;
 
     public PlotPainterContainerView(Context context) {
         super(context);
@@ -25,24 +24,6 @@ public class PlotPainterContainerView extends RangeDrawingView {
     public void addPlotPainter(IPlotPainter painter) {
         plotPainters.add(painter);
         painter.setContainer(this);
-    }
-
-    public void onXRangeChanged(IPlotPainter painter) {
-        if (autoZoom)
-            autoZoomXRange();
-    }
-
-    public void onYRangeChanged(IPlotPainter painter) {
-        if (autoZoom)
-            autoZoomYRange();
-    }
-
-    private void autoZoomXRange() {
-
-    }
-
-    private void autoZoomYRange() {
-
     }
 
     @Override

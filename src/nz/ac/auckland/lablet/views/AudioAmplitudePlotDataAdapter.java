@@ -14,12 +14,20 @@ import java.util.List;
 
 
 class FixSizedBunchArray {
-    final public List<float[]> list = new ArrayList<>();
+    final public List<float[]> list;
     final public int bunchSize;
     public int size = 0;
 
     public FixSizedBunchArray(int bunchSize) {
+        this.list = new ArrayList<>();
         this.bunchSize = bunchSize;
+    }
+
+    // creates a shallow copy
+    public FixSizedBunchArray(FixSizedBunchArray array) {
+        this.list = new ArrayList<>(array.list);
+        this.bunchSize = array.bunchSize;
+        this.size = array.size;
     }
 
     public void add(float[] data) {
@@ -73,6 +81,12 @@ public class AudioAmplitudePlotDataAdapter extends AbstractPlotDataAdapter {
     public void clear() {
         data.clear();
         notifyAllDataChanged();
+    }
+
+    public AudioAmplitudePlotDataAdapter clone() {
+        AudioAmplitudePlotDataAdapter adapter = new AudioAmplitudePlotDataAdapter();
+        adapter.data = new FixSizedBunchArray(data);
+        return adapter;
     }
 
     public float getX(int index) {

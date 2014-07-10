@@ -8,20 +8,16 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Path;
+import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 
 
 public class RangeDrawingView extends ViewGroup {
-    private float rangeLeft = 0;
-    private float rangeRight = 100;
-    private float rangeTop = 0;
-    private float rangeBottom = 100;
-    private int width;
-    private int height;
+    final private RectF rangeRect = new RectF(0, 0, 100, 100);
+
+    private int viewWidth;
+    private int viewHeight;
 
     public RangeDrawingView(Context context) {
         super(context);
@@ -35,53 +31,73 @@ public class RangeDrawingView extends ViewGroup {
         setWillNotDraw(false);
     }
 
+    public RectF getRangeRect() {
+        return rangeRect;
+    }
+
     @Override
     protected void onLayout(boolean b, int i, int i2, int i3, int i4) {
 
     }
 
     public float toScreenX(float real) {
-        return (real - rangeLeft) / (rangeRight - rangeLeft) * width;
+        return (real - rangeRect.left) / (rangeRect.right - rangeRect.left) * viewWidth;
     }
 
     public float toScreenY(float real) {
-        return (1.f - (real - rangeBottom) / (rangeTop - rangeBottom)) * height ;
+        return (1.f - (real - rangeRect.bottom) / (rangeRect.top - rangeRect.bottom)) * viewHeight;
     }
 
     public float fromScreenX(float screen) {
-        return rangeLeft + screen * (rangeRight - rangeLeft) / width;
+        return rangeRect.left + screen * (rangeRect.right - rangeRect.left) / viewWidth;
     }
 
     public float fromScreenY(float screen) {
-        return rangeTop - screen * (rangeTop - rangeBottom) / height;
+        return rangeRect.top - screen * (rangeRect.top - rangeRect.bottom) / viewHeight;
+    }
+
+    public Rect toScreen(RectF real) {
+        Rect screen = new Rect();
+        screen.left = Math.round(toScreenX(real.left));
+        screen.top = Math.round(toScreenY(real.top));
+        screen.right = Math.round(toScreenX(real.right));
+        screen.bottom = Math.round(toScreenY(real.bottom));
+        return screen;
     }
 
     public void applyRangeMatrix(Canvas canvas) {
         canvas.scale(getXScale(), getYScale());
-        canvas.translate(-rangeLeft, -rangeTop);
+        canvas.translate(-rangeRect.left, -rangeRect.top);
     }
 
     public void applyRangeMatrix(Path path) {
         Matrix matrix = new Matrix();
         matrix.setScale(getXScale(), getYScale());
-        matrix.preTranslate(-rangeLeft, -rangeTop);
+        matrix.preTranslate(-rangeRect.left, -rangeRect.top);
         path.transform(matrix);
     }
 
+    public Matrix getRangeMatrix() {
+        Matrix matrix = new Matrix();
+        matrix.setScale(getXScale(), getYScale());
+        matrix.preTranslate(-rangeRect.left, -rangeRect.top);
+        return matrix;
+    }
+
     private float getXScale() {
-        return (float)getWidth() / (rangeRight - rangeLeft);
+        return (float)getWidth() / (rangeRect.right - rangeRect.left);
     }
 
     private float getYScale() {
-        return (float)getHeight() / (rangeBottom - rangeTop);
+        return (float)getHeight() / (rangeRect.bottom - rangeRect.top);
     }
 
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        width = w;
-        height = h;
+        viewWidth = w;
+        viewHeight = h;
     }
 
     @Override
@@ -90,28 +106,28 @@ public class RangeDrawingView extends ViewGroup {
     }
 
     public void setRangeX(float left, float right) {
-        rangeLeft = left;
-        rangeRight = right;
+        rangeRect.left = left;
+        rangeRect.right = right;
     }
 
     public void setRangeY(float bottom, float top) {
-        rangeTop = top;
-        rangeBottom = bottom;
+        rangeRect.top = top;
+        rangeRect.bottom = bottom;
     }
 
     public float getRangeLeft() {
-        return rangeLeft;
+        return rangeRect.left;
     }
 
     public float getRangeRight() {
-        return rangeRight;
+        return rangeRect.right;
     }
 
     public float getRangeTop() {
-        return rangeTop;
+        return rangeRect.top;
     }
 
     public float getRangeBottom() {
-        return rangeBottom;
+        return rangeRect.bottom;
     }
 }
