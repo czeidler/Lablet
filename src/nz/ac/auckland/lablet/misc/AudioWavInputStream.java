@@ -29,6 +29,11 @@ public class AudioWavInputStream extends InputStream implements Closeable {
     }
 
     @Override
+    public int read(byte[] buffer, int offset, int length) throws IOException {
+        return inputStream.read(buffer, offset, length);
+    }
+
+    @Override
     public void close() throws IOException {
         super.close();
         inputStream.close();

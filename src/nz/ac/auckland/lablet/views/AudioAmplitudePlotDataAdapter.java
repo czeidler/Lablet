@@ -79,13 +79,16 @@ public class AudioAmplitudePlotDataAdapter extends AbstractPlotDataAdapter {
     }
 
     public void clear() {
-        data.clear();
+        if (data == null)
+            return;
+        data = null;
         notifyAllDataChanged();
     }
 
     public AudioAmplitudePlotDataAdapter clone() {
         AudioAmplitudePlotDataAdapter adapter = new AudioAmplitudePlotDataAdapter();
-        adapter.data = new FixSizedBunchArray(data);
+        if (data != null)
+            adapter.data = new FixSizedBunchArray(data);
         return adapter;
     }
 

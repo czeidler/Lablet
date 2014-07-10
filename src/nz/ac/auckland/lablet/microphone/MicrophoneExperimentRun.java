@@ -13,6 +13,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -28,13 +29,13 @@ import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentRun;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentRunView;
 import nz.ac.auckland.lablet.experiment.ExperimentRunData;
+import nz.ac.auckland.lablet.misc.AudioWavInputStream;
+import nz.ac.auckland.lablet.misc.AudioWavOutputStream;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.*;
 import nz.ac.auckland.lablet.views.plotview.PlotView;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -134,18 +135,17 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
             final private PlotView playbackAmplitudeView;
             private AudioAmplitudePlotDataAdapter audioAmplitudePlotAdapter;
 
-            final private MediaPlayer mediaPlayer;
-            private boolean initOk = true;
+            private MediaPlayer mediaPlayer;
 
             final private Runnable seekBarUpdater = new Runnable() {
                 @Override
                 public void run() {
-                    if (!initOk)
+                    if (mediaPlayer == null)
                         return;
                     seekBar.setProgress(mediaPlayer.getCurrentPosition());
                     if (!mediaPlayer.isPlaying())
                         return;
-                    new Handler().postDelayed(seekBarUpdater, 500);
+                    new Handler().postDelayed(seekBarUpdater, 100);
                 }
             };
 
@@ -159,22 +159,13 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
                 audioAmplitudePainter.setDataAdapter(audioAmplitudePlotAdapter);
                 playbackAmplitudeView.addPlotPainter(audioAmplitudePainter);
                 playbackAmplitudeView.setRangeY(-1, 1);
-                playbackAmplitudeView.getXAxisView().setUnit("s");
+                playbackAmplitudeView.getXAxisView().setUnit("ms");
                 playbackAmplitudeView.getXAxisView().setLabel("Time");
-
-                mediaPlayer = new MediaPlayer();
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mediaPlayer) {
-                        startPauseButton.setChecked(false);
-                        mediaPlayer.seekTo(0);
-                    }
-                });
 
                 startPauseButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
-                        if (!initOk)
+                        if (mediaPlayer == null)
                             return;
                         if (checked) {
                             mediaPlayer.start();
@@ -202,32 +193,75 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
                 });
             }
 
+            private void loadWavFileAsync() {
+                audioAmplitudePlotAdapter.clear();
+
+                AsyncTask<File, Integer, Void> asyncTask = new AsyncTask<File, Integer, Void>() {
+                    private byte[] data;
+
+                    @Override
+                    protected Void doInBackground(File... files) {
+                        try {
+                            AudioWavInputStream audioWavInputStream = new AudioWavInputStream(files[0]);
+                            int size = audioWavInputStream.getSize();
+                            BufferedInputStream bufferedInputStream = new BufferedInputStream(audioWavInputStream);
+                            data = new byte[size];
+                            for (int i = 0; i < size; i++)
+                                data[i] = (byte)bufferedInputStream.read();
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        return null;
+                    }
+
+                    protected void onPostExecute(Void result) {
+                        audioAmplitudePlotAdapter.addData(AudioWavInputStream.toAmplitudeData(data, data.length));
+                    }
+                };
+                asyncTask.execute(experimentRun.getAudioFile());
+            }
+
             @Override
             public void start() {
                 playbackView.setVisibility(View.VISIBLE);
 
+                loadWavFileAsync();
+
                 try {
+                    mediaPlayer = new MediaPlayer();
+                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+                            startPauseButton.setChecked(false);
+                            mediaPlayer.seekTo(0);
+                        }
+                    });
+
                     mediaPlayer.setDataSource(experimentRun.getAudioFile().getPath());
                     mediaPlayer.prepare();
-                    int duration = mediaPlayer.getDuration();
-                    seekBar.setMax(duration);
-                    lengthTextView.setText("" + (duration / 1000) + "s");
-                    playbackAmplitudeView.setRangeX(0, (float)duration / 1000);
 
-                    initOk = true;
                 } catch (IOException e) {
-                    initOk = false;
+                    mediaPlayer = null;
                     e.printStackTrace();
+                    return;
                 }
+
+                int duration = mediaPlayer.getDuration();
+                seekBar.setMax(duration);
+                lengthTextView.setText("" + (duration / 1000) + "s");
+                playbackAmplitudeView.setRangeX(0, (float)duration / 1000);
             }
 
             @Override
             public boolean stop() {
                 playbackView.setVisibility(View.INVISIBLE);
 
-                if (initOk) {
+                if (mediaPlayer != null) {
                     mediaPlayer.stop();
                     mediaPlayer.release();
+                    mediaPlayer = null;
                 }
                 return false;
             }
@@ -409,21 +443,7 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
                             e.printStackTrace();
                         }
                     }
-                    final float frame[] = new float[bytesToRead / bytesPerSample];
-
-                    int frameIndex = 0;
-                    for (int index = 0; index < bytesToRead - bytesPerSample + 1; index += bytesPerSample) {
-                        float sample = 0;
-                        for (int b = 0; b < bytesPerSample; b++) {
-                            int v = buffer[index + b];
-                            if (b < bytesPerSample - 1 || bytesPerSample == 1) {
-                                v &= 0xFF;
-                            }
-                            sample += v << (b * 8);
-                        }
-                        frame[frameIndex] = sample;
-                        frameIndex++;
-                    }
+                    final float frame[] = AudioWavInputStream.toAmplitudeData(buffer, bytesToRead);
 
                     publishData(frame);
                 }
