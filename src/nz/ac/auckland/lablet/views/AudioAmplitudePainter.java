@@ -38,9 +38,10 @@ public class AudioAmplitudePainter extends OffScreenPlotPainter {
         public int dataIndex;
         public int dataSize;
 
-        public AudioRenderPayload(RectF realDataRect, Matrix rangeMatrix, AudioAmplitudePlotDataAdapter adapter,
+        public AudioRenderPayload(RectF realDataRect, Rect screenRect,
+                                  Matrix rangeMatrix, AudioAmplitudePlotDataAdapter adapter,
                                   int dataIndex, int dataSize) {
-            super(realDataRect);
+            super(realDataRect, screenRect);
             this.rangeMatrix = rangeMatrix;
             this.adapter = adapter;
             this.dataIndex = dataIndex;
@@ -123,9 +124,12 @@ public class AudioAmplitudePainter extends OffScreenPlotPainter {
                 //dataAdded += number;
                 //containerView.invalidate();
 
-                AudioRenderPayload renderPayload = new AudioRenderPayload(containerView.getRangeRect(),
-                        containerView.getRangeMatrix(), ((AudioAmplitudePlotDataAdapter)dataAdapter).clone(),
-                        dataAdapter.getSize() - number, number);
+                RectF realDataRect = containerView.getRangeRect();
+                Rect screenRect = containerView.toScreen(realDataRect);
+                AudioRenderPayload renderPayload = new AudioRenderPayload(realDataRect, screenRect,
+                        containerView.getRangeMatrix(), ((AudioAmplitudePlotDataAdapter) dataAdapter).clone(),
+                        index, number);
+
                 triggerOffScreenRendering(renderPayload);
             }
 
@@ -145,13 +149,12 @@ public class AudioAmplitudePainter extends OffScreenPlotPainter {
             }
 
             private void triggerRedrawAll() {
-                bitmap.eraseColor(Color.TRANSPARENT);
-
-                discardOngoingRendering();
-
-                AudioRenderPayload renderPayload = new AudioRenderPayload(containerView.getRangeRect(),
+                RectF realDataRect = containerView.getRangeRect();
+                Rect screenRect = containerView.toScreen(realDataRect);
+                AudioRenderPayload renderPayload = new AudioRenderPayload(realDataRect, screenRect,
                         containerView.getRangeMatrix(), ((AudioAmplitudePlotDataAdapter)dataAdapter).clone(),
                         0, dataAdapter.getSize());
+                renderPayload.clearParentBitmap = true;
                 triggerOffScreenRendering(renderPayload);
             }
         };

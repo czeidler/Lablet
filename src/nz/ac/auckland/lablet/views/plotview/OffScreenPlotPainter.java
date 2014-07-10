@@ -10,6 +10,8 @@ package nz.ac.auckland.lablet.views.plotview;
 import android.graphics.*;
 import android.os.Handler;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 class RenderTask {
@@ -18,9 +20,7 @@ class RenderTask {
     final private AtomicBoolean running = new AtomicBoolean();
     private Thread thread;
     final private Handler uiHandler = new Handler();
-    private Bitmap bitmap;
-    private Canvas bitmapCanvas;
-    private OffScreenPlotPainter.RenderPayload payload;
+    private List<OffScreenPlotPainter.RenderPayload> payloadList;
 
     public RenderTask(OffScreenPlotPainter plotPainter) {
         this.plotPainter = plotPainter;
@@ -29,33 +29,41 @@ class RenderTask {
     Runnable renderRunnable = new Runnable() {
         @Override
         public void run() {
-            bitmap.eraseColor(Color.TRANSPARENT);
-            plotPainter.render(bitmapCanvas, payload);
-            publishBitmap(payload, bitmap);
-            // don't touch it anymore after publishing it in the ui thread
-            payload = null;
-            bitmap = null;
-            bitmapCanvas = null;
+            int size = payloadList.size();
+            int index = 0;
+            for (OffScreenPlotPainter.RenderPayload payload : payloadList) {
+                Rect screenRect = payload.screenRect;
+                Bitmap bitmap = Bitmap.createBitmap(screenRect.width(), screenRect.height(), Bitmap.Config.ARGB_8888);
+                Canvas bitmapCanvas = new Canvas(bitmap);
 
-            running.set(false);
+                bitmap.eraseColor(Color.TRANSPARENT);
+                plotPainter.render(bitmapCanvas, payload);
+
+                // set running to false before notifying the ui thread
+                if (index == size - 1) {
+                    payloadList = null;
+                    running.set(false);
+                }
+                publishBitmap(payload, bitmap);
+                index++;
+            }
         }
     };
 
-    private void publishBitmap(final OffScreenPlotPainter.RenderPayload payload, final Bitmap b) {
+    private void publishBitmap(final OffScreenPlotPainter.RenderPayload payload, Bitmap bitmap) {
+        payload.resultBitmap = bitmap;
         uiHandler.post(new Runnable() {
             @Override
             public void run() {
-                plotPainter.onOffScreenRenderingFinished(payload, b);
+                plotPainter.onOffScreenRenderingFinished(payload);
             }
         });
     }
 
-    public boolean start(OffScreenPlotPainter.RenderPayload payload, Rect screenRect) {
+    public boolean start(List<OffScreenPlotPainter.RenderPayload> payloadList) {
         if (running.get())
             return false;
-        this.payload = payload;
-        bitmap = Bitmap.createBitmap(screenRect.width(), screenRect.height(), Bitmap.Config.ARGB_8888);
-        bitmapCanvas = new Canvas(bitmap);
+        this.payloadList = payloadList;
         thread = new Thread(renderRunnable);
         thread.start();
         running.set(true);
@@ -83,37 +91,45 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
     protected Bitmap bitmap = null;
     protected Canvas bitmapCanvas = null;
     final private RenderTask renderTask = new RenderTask(this);
-    protected long validId = 0;
-    //private RenderTask renderTask = new RenderTask(this);
+    private List<RenderPayload> payloadQueue = new ArrayList<>();
 
     public class RenderPayload {
-        public RenderPayload(RectF realDataRect) {
-            this.realDataRect = realDataRect;
-        }
-
         public RectF realDataRect;
-        public long validId;
+        public Rect screenRect;
+        public Bitmap resultBitmap;
+        public boolean clearParentBitmap = false;
+
+        public RenderPayload(RectF realDataRect, Rect screenRect) {
+            this.realDataRect = realDataRect;
+            this.screenRect = screenRect;
+        }
     }
 
     protected void triggerOffScreenRendering(RenderPayload payload) {
-        Rect screenRect = containerView.toScreen(payload.realDataRect);
-        //renderTask = new RenderTask(this);
-        payload.validId = validId;
-        renderTask.start(payload, screenRect);
-    }
-
-    protected void onOffScreenRenderingFinished(RenderPayload payload, Bitmap bitmap) {
-        if (validId > payload.validId)
+        if (renderTask.isRendering()) {
+            payloadQueue.add(payload);
             return;
-
-        Rect sourceRect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-        Rect targetRect = containerView.toScreen(payload.realDataRect);
-        bitmapCanvas.drawBitmap(bitmap, sourceRect, targetRect, null);
-        containerView.invalidate();
+        }
+        List<RenderPayload> payloadList = new ArrayList<>();
+        payloadList.addAll(payloadQueue);
+        payloadQueue.clear();
+        payloadList.add(payload);
+        renderTask.start(payloadList);
     }
 
-    protected void discardOngoingRendering() {
-        validId++;
+    protected void onOffScreenRenderingFinished(RenderPayload payload) {
+        Bitmap resultBitmap = payload.resultBitmap;
+        Rect sourceRect = new Rect(0, 0, resultBitmap.getWidth(), resultBitmap.getHeight());
+        Rect targetRect = containerView.toScreen(payload.realDataRect);
+        if (payload.clearParentBitmap)
+            this.bitmap.eraseColor(Color.TRANSPARENT);
+        bitmapCanvas.drawBitmap(resultBitmap, sourceRect, targetRect, null);
+        containerView.invalidate();
+
+        if (!renderTask.isRendering() && payloadQueue.size() > 0) {
+            renderTask.start(payloadQueue);
+            payloadQueue = new ArrayList<>();
+        }
     }
 
     abstract protected void render(Canvas bitmapCanvas, RenderPayload payload);
