@@ -40,12 +40,24 @@ public class PlotView extends ViewGroup {
         if (hasYAxis())
             yAxisView.setDataRange(bottom, top);
         mainView.setRangeY(bottom, top);
+
+        invalidate();
     }
 
     public void setRangeX(float left, float right) {
         if (hasXAxis())
             xAxisView.setDataRange(left, right);
         mainView.setRangeX(left, right);
+
+        invalidate();
+    }
+
+    public void invalidate() {
+        mainView.invalidate();
+        if (xAxisView != null)
+            ((View)xAxisView).invalidate();
+        if (yAxisView != null)
+            ((View)yAxisView).invalidate();
     }
 
     public IYAxis getYAxisView() {
