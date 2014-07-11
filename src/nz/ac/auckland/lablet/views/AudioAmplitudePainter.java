@@ -124,10 +124,13 @@ public class AudioAmplitudePainter extends OffScreenPlotPainter {
                 //dataAdded += number;
                 //containerView.invalidate();
 
+                AudioAmplitudePlotDataAdapter adapter = (AudioAmplitudePlotDataAdapter)dataAdapter;
                 RectF realDataRect = containerView.getRangeRect();
+                realDataRect.left = adapter.getX(index);
+                realDataRect.right = adapter.getX(index + number);
                 Rect screenRect = containerView.toScreen(realDataRect);
                 AudioRenderPayload renderPayload = new AudioRenderPayload(realDataRect, screenRect,
-                        containerView.getRangeMatrix(), ((AudioAmplitudePlotDataAdapter) dataAdapter).clone(),
+                        containerView.getRangeMatrix(), adapter.clone(),
                         index, number);
 
                 triggerOffScreenRendering(renderPayload);
