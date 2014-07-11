@@ -14,6 +14,7 @@ import java.util.List;
 
 abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
     protected Region1D dirtyRegion = new Region1D();
+    protected int maxDirtyRanges = -1;
 
     protected class ArrayRenderPayload extends RenderPayload {
         public Matrix rangeMatrix;
@@ -63,6 +64,17 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
         dirtyRegion.clear();
     }
 
+    /**
+     * Set number of max dirty ranges.
+     *
+     * This can be used to update the view in smaller steps even there is not free rendering pipe available.
+     *
+     * @param maxDirtyRanges number of max dirty ranges
+     */
+    public void setMaxDirtyRanges(int maxDirtyRanges) {
+        this.maxDirtyRanges = maxDirtyRanges;
+    }
+
     @Override
     protected AbstractPlotDataAdapter.IListener createListener() {
         return new AbstractPlotDataAdapter.IListener() {
@@ -70,10 +82,8 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
             public void onDataAdded(AbstractPlotDataAdapter plot, int index, int number) {
                 dirtyRegion.addRange(index, index + number - 1);
 
-                if (!hasFreeRenderingPipe())
-                    return;
-
-                flushDirtyRegion();
+                if ((maxDirtyRanges > 0 && maxDirtyRanges <= dirtyRegion.getSize()) || hasFreeRenderingPipe())
+                    flushDirtyRegion();
             }
 
             @Override

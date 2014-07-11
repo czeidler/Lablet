@@ -16,6 +16,10 @@ import nz.ac.auckland.lablet.views.plotview.Range;
 public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
     private double maxFrequency = 1000000;
 
+    public AudioFrequencyMapPainter() {
+        setMaxDirtyRanges(3);
+    }
+
     private int heatMap(double value) {
         if (value > 1.)
             return Color.WHITE;
