@@ -9,14 +9,13 @@ package nz.ac.auckland.lablet.views;
 
 import android.graphics.*;
 import nz.ac.auckland.lablet.views.plotview.AbstractPlotDataAdapter;
-import nz.ac.auckland.lablet.views.plotview.OffScreenPlotPainter;
+import nz.ac.auckland.lablet.views.plotview.ArrayOffScreenPlotPainter;
+import nz.ac.auckland.lablet.views.plotview.Range;
 
 
-public class AudioAmplitudePainter extends OffScreenPlotPainter {
+public class AudioAmplitudePainter extends ArrayOffScreenPlotPainter {
     final private Paint penMinMaxPaint = new Paint();
     final private Paint penStdPaint = new Paint();
-
-    private int dataAdded = 0;
 
     public AudioAmplitudePainter() {
         init();
@@ -32,43 +31,22 @@ public class AudioAmplitudePainter extends OffScreenPlotPainter {
         penStdPaint.setStyle(Paint.Style.STROKE);
     }
 
-    class AudioRenderPayload extends RenderPayload {
-        public Matrix rangeMatrix;
-        public AudioAmplitudePlotDataAdapter adapter;
-        public int dataIndex;
-        public int dataSize;
-
-        public AudioRenderPayload(RectF realDataRect, Rect screenRect,
-                                  Matrix rangeMatrix, AudioAmplitudePlotDataAdapter adapter,
-                                  int dataIndex, int dataSize) {
-            super(realDataRect, screenRect);
-            this.rangeMatrix = rangeMatrix;
-            this.adapter = adapter;
-            this.dataIndex = dataIndex;
-            this.dataSize = dataSize;
-        }
+    @Override
+    protected RectF getRealDataRect(AbstractPlotDataAdapter adapter, int startIndex, int lastIndex) {
+        AudioAmplitudePlotDataAdapter audioAmplitudePlotDataAdapter = (AudioAmplitudePlotDataAdapter)adapter;
+        RectF realDataRect = containerView.getRangeRect();
+        realDataRect.left = audioAmplitudePlotDataAdapter.getX(startIndex);
+        realDataRect.right = audioAmplitudePlotDataAdapter.getX(lastIndex);
+        return realDataRect;
     }
 
     @Override
-    protected void render(Canvas bitmapCanvas, RenderPayload payload) {
-        AudioRenderPayload renderPayload = (AudioRenderPayload)payload;
+    protected void drawRange(Canvas canvas, ArrayRenderPayload payload, Range range) {
+        AudioAmplitudePlotDataAdapter adapter = (AudioAmplitudePlotDataAdapter)payload.adapter;
+        Matrix rangeMatrix = payload.rangeMatrix;
 
-        draw(bitmapCanvas, renderPayload.rangeMatrix, renderPayload.adapter, renderPayload.dataIndex,
-                renderPayload.dataSize);
-    }
-
-    @Override
-    public void onDraw(Canvas canvas) {
-        if (dataAdded > 0) {
-            draw(bitmapCanvas, containerView.getRangeMatrix(), (AudioAmplitudePlotDataAdapter)dataAdapter,
-                    dataAdapter.getSize() - dataAdded, dataAdded);
-            dataAdded = 0;
-        }
-
-        super.onDraw(canvas);
-    }
-
-    private void draw(Canvas canvas, Matrix rangeMatrix, AudioAmplitudePlotDataAdapter adapter, int start, int count) {
+        int start = range.min;
+        int count = range.max - range.min + 1;
         if (start < 0)
             start = 0;
         int dataSize = adapter.getSize();
@@ -114,52 +92,5 @@ public class AudioAmplitudePainter extends OffScreenPlotPainter {
         innerPath.transform(rangeMatrix);
         canvas.drawPath(outerPath, penMinMaxPaint);
         canvas.drawPath(innerPath, penStdPaint);
-    }
-
-    @Override
-    protected AbstractPlotDataAdapter.IListener createListener() {
-        return new AbstractPlotDataAdapter.IListener() {
-            @Override
-            public void onDataAdded(AbstractPlotDataAdapter plot, int index, int number) {
-                //dataAdded += number;
-                //containerView.invalidate();
-
-                AudioAmplitudePlotDataAdapter adapter = (AudioAmplitudePlotDataAdapter)dataAdapter;
-                RectF realDataRect = containerView.getRangeRect();
-                realDataRect.left = adapter.getX(index);
-                realDataRect.right = adapter.getX(index + number);
-                Rect screenRect = containerView.toScreen(realDataRect);
-                AudioRenderPayload renderPayload = new AudioRenderPayload(realDataRect, screenRect,
-                        containerView.getRangeMatrix(), adapter.clone(),
-                        index, number);
-
-                triggerOffScreenRendering(renderPayload);
-            }
-
-            @Override
-            public void onDataRemoved(AbstractPlotDataAdapter plot, int index, int number) {
-                triggerRedrawAll();
-            }
-
-            @Override
-            public void onDataChanged(AbstractPlotDataAdapter plot, int index, int number) {
-                triggerRedrawAll();
-            }
-
-            @Override
-            public void onAllDataChanged(AbstractPlotDataAdapter plot) {
-                triggerRedrawAll();
-            }
-
-            private void triggerRedrawAll() {
-                RectF realDataRect = containerView.getRangeRect();
-                Rect screenRect = containerView.toScreen(realDataRect);
-                AudioRenderPayload renderPayload = new AudioRenderPayload(realDataRect, screenRect,
-                        containerView.getRangeMatrix(), ((AudioAmplitudePlotDataAdapter)dataAdapter).clone(),
-                        0, dataAdapter.getSize());
-                renderPayload.clearParentBitmap = true;
-                triggerOffScreenRendering(renderPayload);
-            }
-        };
     }
 }

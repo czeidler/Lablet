@@ -7,10 +7,10 @@
  */
 package nz.ac.auckland.lablet.views;
 
-import nz.ac.auckland.lablet.views.plotview.AbstractPlotDataAdapter;
+import nz.ac.auckland.lablet.views.plotview.CloneablePlotDataAdapter;
 
 
-public class AudioFrequencyMapAdapter extends AbstractPlotDataAdapter {
+public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
     private FixSizedBunchArray data = null;
     private int sampleRate = 44100;
 

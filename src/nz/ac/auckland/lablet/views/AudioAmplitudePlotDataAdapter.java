@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views;
 
 import nz.ac.auckland.lablet.views.plotview.AbstractPlotDataAdapter;
+import nz.ac.auckland.lablet.views.plotview.CloneablePlotDataAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,8 @@ class FixSizedBunchArray {
     }
 }
 
-public class AudioAmplitudePlotDataAdapter extends AbstractPlotDataAdapter {
+
+public class AudioAmplitudePlotDataAdapter extends CloneablePlotDataAdapter {
     private FixSizedBunchArray data = null;
     private float amplitudeMax = 65535;
     private int sampleRate = 44100;

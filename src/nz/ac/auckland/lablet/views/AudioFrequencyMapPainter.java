@@ -9,11 +9,11 @@ package nz.ac.auckland.lablet.views;
 
 import android.graphics.*;
 import nz.ac.auckland.lablet.views.plotview.AbstractPlotDataAdapter;
-import nz.ac.auckland.lablet.views.plotview.OffScreenPlotPainter;
+import nz.ac.auckland.lablet.views.plotview.ArrayOffScreenPlotPainter;
+import nz.ac.auckland.lablet.views.plotview.Range;
 
 
-public class AudioFrequencyMapPainter extends OffScreenPlotPainter {
-    private int dataAdded = 0;
+public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
     private double maxFrequency = 1000000;
 
     private int heatMap(double value) {
@@ -44,25 +44,27 @@ public class AudioFrequencyMapPainter extends OffScreenPlotPainter {
     }
 
     @Override
-    protected void render(Canvas bitmapCanvas, RenderPayload payload) {
-        FrequencyMapRenderPayload renderPayload = (FrequencyMapRenderPayload)payload;
-
-        draw(bitmapCanvas, renderPayload.rangeMatrix, renderPayload.adapter, renderPayload.dataIndex,
-                renderPayload.dataSize);
+    protected RectF getRealDataRect(AbstractPlotDataAdapter adapter, int startIndex, int lastIndex) {
+        AudioFrequencyMapAdapter audioAmplitudePlotDataAdapter = (AudioFrequencyMapAdapter)adapter;
+        RectF realDataRect = containerView.getRangeRect();
+        realDataRect.left = audioAmplitudePlotDataAdapter.getX(startIndex);
+        realDataRect.right = audioAmplitudePlotDataAdapter.getX(lastIndex);
+        return realDataRect;
     }
 
     @Override
-    public void onDraw(Canvas canvas) {
-        if (dataAdded > 0) {
-            draw(bitmapCanvas, containerView.getRangeMatrix(), (AudioFrequencyMapAdapter)dataAdapter,
-                    dataAdapter.getSize() - dataAdded, dataAdded);
-            dataAdded = 0;
-        }
+    protected void drawRange(Canvas canvas, ArrayRenderPayload payload, Range range) {
+        AudioFrequencyMapAdapter adapter = (AudioFrequencyMapAdapter)payload.adapter;
+        Matrix rangeMatrix = payload.rangeMatrix;
 
-        super.onDraw(canvas);
-    }
+        int start = range.min;
+        int count = range.max - range.min + 1;
+        if (start < 0)
+            start = 0;
+        int dataSize = adapter.getSize();
+        if (count > dataSize)
+            count = dataSize;
 
-    private void draw(Canvas canvas, Matrix rangeMatrix, AudioFrequencyMapAdapter adapter, int start, int count) {
         Paint paint = new Paint();
         for (int idx = 0; idx < count; idx++) {
             int index = start + idx;
@@ -82,81 +84,5 @@ public class AudioFrequencyMapPainter extends OffScreenPlotPainter {
                 canvas.drawPoint(points[0], points[1], paint);
             }
         }
-    }
-
-    class FrequencyMapRenderPayload extends RenderPayload {
-        public Matrix rangeMatrix;
-        public AudioFrequencyMapAdapter adapter;
-        public int dataIndex;
-        public int dataSize;
-
-        public FrequencyMapRenderPayload(RectF realDataRect, Rect screenRect,
-                                  Matrix rangeMatrix, AudioFrequencyMapAdapter adapter,
-                                  int dataIndex, int dataSize) {
-            super(realDataRect, screenRect);
-            this.rangeMatrix = rangeMatrix;
-            this.adapter = adapter;
-            this.dataIndex = dataIndex;
-            this.dataSize = dataSize;
-        }
-    }
-
-    @Override
-    protected AbstractPlotDataAdapter.IListener createListener() {
-        return new AbstractPlotDataAdapter.IListener() {
-            int added = 0;
-
-            @Override
-            public void onDataAdded(AbstractPlotDataAdapter plot, int index, int number) {
-                //dataAdded += number;
-                //containerView.invalidate();
-                added += number;
-                if (added < 3)
-                    return;
-                index = dataAdapter.getSize() - added;
-                if (index < 0)
-                    index = 0;
-                number = added;
-                if (index + number >= dataAdapter.getSize())
-                    number = dataAdapter.getSize() - index;
-                added = 0;
-
-                AudioFrequencyMapAdapter adapter = (AudioFrequencyMapAdapter)dataAdapter;
-                RectF realDataRect = containerView.getRangeRect();
-                realDataRect.left = adapter.getX(index);
-                realDataRect.right = adapter.getX(index + number);
-                Rect screenRect = containerView.toScreen(realDataRect);
-                FrequencyMapRenderPayload renderPayload = new FrequencyMapRenderPayload(realDataRect, screenRect,
-                        containerView.getRangeMatrix(), ((AudioFrequencyMapAdapter)dataAdapter).clone(),
-                        index, number);
-
-                triggerOffScreenRendering(renderPayload);
-            }
-
-            @Override
-            public void onDataRemoved(AbstractPlotDataAdapter plot, int index, int number) {
-                triggerRedrawAll();
-            }
-
-            @Override
-            public void onDataChanged(AbstractPlotDataAdapter plot, int index, int number) {
-                triggerRedrawAll();
-            }
-
-            @Override
-            public void onAllDataChanged(AbstractPlotDataAdapter plot) {
-                triggerRedrawAll();
-            }
-
-            private void triggerRedrawAll() {
-                RectF realDataRect = containerView.getRangeRect();
-                Rect screenRect = containerView.toScreen(realDataRect);
-                FrequencyMapRenderPayload renderPayload = new FrequencyMapRenderPayload(realDataRect, screenRect,
-                        containerView.getRangeMatrix(), ((AudioFrequencyMapAdapter)dataAdapter).clone(),
-                        0, dataAdapter.getSize());
-                renderPayload.clearParentBitmap = true;
-                triggerOffScreenRendering(renderPayload);
-            }
-        };
     }
 }
