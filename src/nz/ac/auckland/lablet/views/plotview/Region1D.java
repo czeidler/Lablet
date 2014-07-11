@@ -14,6 +14,35 @@ import java.util.List;
 public class Region1D {
     private List<Range> ranges = new ArrayList<>();
 
+    public Region1D() {
+
+    }
+
+    public Region1D(int min, int max) {
+        addRange(min, max);
+    }
+
+    public Region1D(Region1D other) {
+        for (Range range : other.ranges)
+            ranges.add(new Range(range));
+    }
+
+    public int getMin() {
+        if (ranges.size() == 0)
+            return 0;
+        return ranges.get(0).min;
+    }
+
+    public int getMax() {
+        if (ranges.size() == 0)
+            return 0;
+        return ranges.get(ranges.size() - 1).max;
+    }
+
+    public void clear() {
+        ranges.clear();
+    }
+
     public void addRange(int min, int max) {
         if (ranges.size() == 0) {
             ranges.add(new Range(min, max));
