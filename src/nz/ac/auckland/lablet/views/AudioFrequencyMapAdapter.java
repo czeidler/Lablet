@@ -7,15 +7,16 @@
  */
 package nz.ac.auckland.lablet.views;
 
-
 import nz.ac.auckland.lablet.views.plotview.AbstractPlotDataAdapter;
+
 
 public class AudioFrequencyMapAdapter extends AbstractPlotDataAdapter {
     private FixSizedBunchArray data = null;
     private int sampleRate = 44100;
 
     public void clear() {
-        data.clear();
+        if (data != null)
+            data.clear();
         notifyAllDataChanged();
     }
 
@@ -29,6 +30,13 @@ public class AudioFrequencyMapAdapter extends AbstractPlotDataAdapter {
         notifyDataAdded(oldSize, 1);
     }
 
+    public AudioFrequencyMapAdapter clone() {
+        AudioFrequencyMapAdapter adapter = new AudioFrequencyMapAdapter();
+        if (data != null)
+            adapter.data = new FixSizedBunchArray(data);
+        return adapter;
+    }
+
     public float getX(int index) {
         float time = (float)data.getBunchSize() / sampleRate * index;
         return time;
@@ -36,10 +44,6 @@ public class AudioFrequencyMapAdapter extends AbstractPlotDataAdapter {
 
     public float[] getY(int index) {
         return data.getBunch(index);
-    }
-
-    public int findIndex(float xValue) {
-        return (int)(xValue * sampleRate / data.getBunchSize());
     }
 
     @Override
