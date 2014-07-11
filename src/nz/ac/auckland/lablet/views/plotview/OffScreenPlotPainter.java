@@ -30,6 +30,10 @@ class RenderTask {
         @Override
         public void run() {
             int size = payloadList.size();
+            if (size == 0) {
+                running.set(false);
+                return;
+            }
             int index = 0;
             for (OffScreenPlotPainter.RenderPayload payload : payloadList) {
                 Rect screenRect = payload.screenRect;
@@ -66,9 +70,9 @@ class RenderTask {
         if (running.get())
             return false;
         this.payloadList = payloadList;
+        running.set(true);
         thread = new Thread(renderRunnable);
         thread.start();
-        running.set(true);
         return true;
     }
 
@@ -105,6 +109,10 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
             this.realDataRect = realDataRect;
             this.screenRect = screenRect;
         }
+    }
+
+    protected boolean hasFreeRenderingPipe() {
+        return !renderTask.isRendering();
     }
 
     protected void triggerOffScreenRendering(RenderPayload payload) {
