@@ -4,6 +4,9 @@
     <facet type="android" name="Android">
       <configuration>
         <option name="PACK_TEST_CODE" value="true" />
+        <proGuardCfgFiles>
+          <file>file:///usr/lib/jvm/java-7-openjdk-amd64/tools/proguard/proguard-android.txt</file>
+        </proGuardCfgFiles>
         <option name="UPDATE_PROPERTY_FILES" value="true" />
       </configuration>
     </facet>
