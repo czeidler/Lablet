@@ -32,7 +32,7 @@ public class RangeDrawingView extends ViewGroup {
     }
 
     public RectF getRangeRect() {
-        return rangeRect;
+        return new RectF(rangeRect);
     }
 
     @Override
@@ -58,10 +58,10 @@ public class RangeDrawingView extends ViewGroup {
 
     public Rect toScreen(RectF real) {
         Rect screen = new Rect();
-        screen.left = Math.round(toScreenX(real.left));
-        screen.top = Math.round(toScreenY(real.top));
-        screen.right = Math.round(toScreenX(real.right));
-        screen.bottom = Math.round(toScreenY(real.bottom));
+        screen.left = (int)(toScreenX(real.left));
+        screen.top = (int)(toScreenY(real.top));
+        screen.right = Math.round(toScreenX(real.right) + 0.5f);
+        screen.bottom = Math.round(toScreenY(real.bottom) + 0.5f);
         return screen;
     }
 

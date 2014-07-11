@@ -35,6 +35,8 @@ class RenderTask {
                 Rect screenRect = payload.screenRect;
                 Bitmap bitmap = Bitmap.createBitmap(screenRect.width(), screenRect.height(), Bitmap.Config.ARGB_8888);
                 Canvas bitmapCanvas = new Canvas(bitmap);
+                // move the canvas over the bitmap
+                bitmapCanvas.translate(-screenRect.left, -screenRect.top);
 
                 bitmap.eraseColor(Color.TRANSPARENT);
                 plotPainter.render(bitmapCanvas, payload);
@@ -119,11 +121,10 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
 
     protected void onOffScreenRenderingFinished(RenderPayload payload) {
         Bitmap resultBitmap = payload.resultBitmap;
-        Rect sourceRect = new Rect(0, 0, resultBitmap.getWidth(), resultBitmap.getHeight());
         Rect targetRect = containerView.toScreen(payload.realDataRect);
         if (payload.clearParentBitmap)
             this.bitmap.eraseColor(Color.TRANSPARENT);
-        bitmapCanvas.drawBitmap(resultBitmap, sourceRect, targetRect, null);
+        bitmapCanvas.drawBitmap(resultBitmap, null, targetRect, null);
         containerView.invalidate();
 
         if (!renderTask.isRendering() && payloadQueue.size() > 0) {
