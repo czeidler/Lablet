@@ -48,7 +48,7 @@ public class AudioFrequencyView extends ViewGroup {
     }
 
     private void drawFrequencies(int position, float frequency) {
-        float binWidth = 2.f;
+        float binWidth = 1.f;
         float binPosition = binWidth * position;
         bitmapCanvas.drawRect(binPosition, toScreenY(frequency), binPosition + binWidth, toScreenY(0), penPaint);
     }
