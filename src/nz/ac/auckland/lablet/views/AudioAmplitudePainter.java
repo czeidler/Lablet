@@ -92,8 +92,8 @@ public class AudioAmplitudePainter extends ArrayOffScreenPlotPainter {
             outerPath.moveTo(x, min);
             outerPath.lineTo(x, max);
 
-            innerPath.moveTo(x, average - std / 2);
-            innerPath.lineTo(x, average + std / 2);
+            innerPath.moveTo(x, average - std / 2.f * 3.f);
+            innerPath.lineTo(x, average + std / 2.f * 3.f);
         }
 
         outerPath.transform(rangeMatrix);
