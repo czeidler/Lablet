@@ -69,24 +69,51 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
         if (count > dataSize)
             count = dataSize;
 
-        Paint paint = new Paint();
         for (int idx = 0; idx < count; idx++) {
             int index = start + idx;
             float[] frequencies = adapter.getY(index);
             float time = adapter.getX(index);
 
-            for (int i = 0; i < frequencies.length; i++) {
-                double amplitude = Math.log10(Math.abs(frequencies[i])) / Math.log10(maxFrequency);
-                paint.setColor(heatMap(amplitude));
-                float frequency = (float)i / (frequencies.length - 1)
-                        * 44100 / 2;
+            final float pixelsPerFrequency = (float)(payload.getScreenRect().height()) / frequencies.length;
 
-                float[] points = new float[2];
-                points[0] = time;
-                points[1] = frequency;
-                rangeMatrix.mapPoints(points);
-                canvas.drawPoint(points[0], points[1], paint);
+            final int[] colors = new int[payload.getScreenRect().height()];
+
+            float frequencySum = 0;
+            int currentPixel = 0;
+            int perPixelCount = 0;
+            for (int i = 0; i < frequencies.length; i++) {
+                if (pixelsPerFrequency < 1) {
+                    while (true) {
+                        if (i >= frequencies.length)
+                            break;
+                        int pixel = Math.round(pixelsPerFrequency * i);
+                        if (pixel == currentPixel) {
+                            frequencySum += frequencies[i];
+                            perPixelCount++;
+                        } else {
+                            float frequency = frequencySum / perPixelCount;
+                            double amplitude = Math.log10(Math.abs(frequency)) / Math.log10(maxFrequency);
+                            colors[colors.length - 1 - currentPixel] = heatMap(amplitude);
+
+                            frequencySum = frequencies[i];
+                            currentPixel++;
+                            perPixelCount = 1;
+                            break;
+                        }
+                        i++;
+                    }
+                } else {
+                    // TODO implement if necessary: fill pixel with same color
+                }
             }
+
+            float[] screenTop = new float[2];
+            screenTop[0] = time;
+            screenTop[1] = 44100.f / 2;
+            rangeMatrix.mapPoints(screenTop);
+
+            canvas.drawBitmap(colors, 0, 1, screenTop[0] - 0.5f, screenTop[1], 1, payload.getScreenRect().height(),
+                    false, null);
         }
     }
 }
