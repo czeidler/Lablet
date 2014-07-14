@@ -36,7 +36,7 @@ class RenderTask {
             }
             int index = 0;
             for (OffScreenPlotPainter.RenderPayload payload : payloadList) {
-                Rect screenRect = payload.screenRect;
+                Rect screenRect = payload.getScreenRect();
                 Bitmap bitmap = Bitmap.createBitmap(screenRect.width(), screenRect.height(), Bitmap.Config.ARGB_8888);
                 Canvas bitmapCanvas = new Canvas(bitmap);
                 // move the canvas over the bitmap
@@ -57,7 +57,7 @@ class RenderTask {
     };
 
     private void publishBitmap(final OffScreenPlotPainter.RenderPayload payload, Bitmap bitmap) {
-        payload.resultBitmap = bitmap;
+        payload.setResultBitmap(bitmap);
         uiHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -100,14 +100,46 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
     private List<RenderPayload> payloadQueue = new ArrayList<>();
 
     public class RenderPayload {
-        public RectF realDataRect;
-        public Rect screenRect;
-        public Bitmap resultBitmap;
-        public boolean clearParentBitmap = false;
+        private RectF realDataRect;
+        private Rect screenRect;
+        private Bitmap resultBitmap;
+        private boolean clearParentBitmap = false;
 
         public RenderPayload(RectF realDataRect, Rect screenRect) {
             this.realDataRect = realDataRect;
             this.screenRect = screenRect;
+        }
+
+        public RectF getRealDataRect() {
+            return realDataRect;
+        }
+
+        public void setRealDataRect(RectF realDataRect) {
+            this.realDataRect = realDataRect;
+        }
+
+        public Rect getScreenRect() {
+            return screenRect;
+        }
+
+        public void setScreenRect(Rect screenRect) {
+            this.screenRect = screenRect;
+        }
+
+        public Bitmap getResultBitmap() {
+            return resultBitmap;
+        }
+
+        public void setResultBitmap(Bitmap resultBitmap) {
+            this.resultBitmap = resultBitmap;
+        }
+
+        public boolean isClearParentBitmap() {
+            return clearParentBitmap;
+        }
+
+        public void setClearParentBitmap(boolean clearParentBitmap) {
+            this.clearParentBitmap = clearParentBitmap;
         }
     }
 

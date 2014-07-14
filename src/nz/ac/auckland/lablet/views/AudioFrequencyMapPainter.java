@@ -58,8 +58,8 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
 
     @Override
     protected void drawRange(Canvas canvas, ArrayRenderPayload payload, Range range) {
-        AudioFrequencyMapAdapter adapter = (AudioFrequencyMapAdapter)payload.adapter;
-        Matrix rangeMatrix = payload.rangeMatrix;
+        AudioFrequencyMapAdapter adapter = (AudioFrequencyMapAdapter)payload.getAdapter();
+        Matrix rangeMatrix = payload.getRangeMatrix();
 
         int start = range.min;
         int count = range.max - range.min + 1;

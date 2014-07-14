@@ -17,15 +17,39 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
     protected int maxDirtyRanges = -1;
 
     protected class ArrayRenderPayload extends RenderPayload {
-        public Matrix rangeMatrix;
-        public CloneablePlotDataAdapter adapter;
-        public Region1D region;
+        private Matrix rangeMatrix;
+        private CloneablePlotDataAdapter adapter;
+        private Region1D region;
 
         public ArrayRenderPayload(RectF realDataRect, Rect screenRect,
                                   Matrix rangeMatrix, CloneablePlotDataAdapter adapter, Region1D region) {
             super(realDataRect, screenRect);
             this.rangeMatrix = rangeMatrix;
             this.adapter = adapter;
+            this.region = region;
+        }
+
+        public Matrix getRangeMatrix() {
+            return rangeMatrix;
+        }
+
+        public void setRangeMatrix(Matrix rangeMatrix) {
+            this.rangeMatrix = rangeMatrix;
+        }
+
+        public CloneablePlotDataAdapter getAdapter() {
+            return adapter;
+        }
+
+        public void setAdapter(CloneablePlotDataAdapter adapter) {
+            this.adapter = adapter;
+        }
+
+        public Region1D getRegion() {
+            return region;
+        }
+
+        public void setRegion(Region1D region) {
             this.region = region;
         }
     }
@@ -107,7 +131,7 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
                 ArrayRenderPayload renderPayload = new ArrayRenderPayload(realDataRect, screenRect,
                         containerView.getRangeMatrix(), ((CloneablePlotDataAdapter)dataAdapter).clone(),
                         new Region1D(0, dataAdapter.getSize() - 1));
-                renderPayload.clearParentBitmap = true;
+                renderPayload.setClearParentBitmap(true);
                 triggerOffScreenRendering(renderPayload);
 
                 dirtyRegion.clear();
