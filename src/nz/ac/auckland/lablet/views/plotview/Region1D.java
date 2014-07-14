@@ -54,7 +54,7 @@ public class Region1D {
 
         for (int i = 0; i < ranges.size(); i++){
             Range range = ranges.get(i);
-            if (min > range.max) {
+            if (min > range.max + 1) {
                 // last one?
                 if (i < ranges.size() - 1)
                     continue;
@@ -63,7 +63,7 @@ public class Region1D {
                     return;
                 }
             }
-            if (max < range.min) {
+            if (max < range.min - 1) {
                 ranges.add(i, new Range(min, max));
                 return;
             }

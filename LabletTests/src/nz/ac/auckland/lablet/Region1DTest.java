@@ -69,9 +69,24 @@ public class Region1DTest extends TestCase {
         assertTrue(region1D.equals(expectedRanges));
 
         region1D.addRange(0, 30);
-        // 0-5, 7-10, 14-20
+        // 0-30
         expectedRanges = new ArrayList();
         expectedRanges.add(new Range(0, 30));
+        assertTrue(region1D.equals(expectedRanges));
+
+        region1D.addRange(31, 40);
+        // 0-40
+        expectedRanges = new ArrayList();
+        expectedRanges.add(new Range(0, 40));
+        assertTrue(region1D.equals(expectedRanges));
+
+        region1D.clear();
+
+        region1D.addRange(20, 30);
+        region1D.addRange(10, 19);
+        // 10-30
+        expectedRanges = new ArrayList();
+        expectedRanges.add(new Range(10, 30));
         assertTrue(region1D.equals(expectedRanges));
     }
 
