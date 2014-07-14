@@ -40,10 +40,18 @@ public class AudioAmplitudePainter extends ArrayOffScreenPlotPainter {
         return realDataRect;
     }
 
+    private int getSamplesPerPixel(ArrayRenderPayload payload) {
+        Rect screenRect = payload.getScreenRect();
+
+        int dataRange = payload.getRegion().getMax() - payload.getRegion().getMin();
+
+        return (int)Math.ceil((double)dataRange / screenRect.width());
+    }
+
     @Override
     protected void drawRange(Canvas canvas, ArrayRenderPayload payload, Range range) {
-        AudioAmplitudePlotDataAdapter adapter = (AudioAmplitudePlotDataAdapter)payload.adapter;
-        Matrix rangeMatrix = payload.rangeMatrix;
+        AudioAmplitudePlotDataAdapter adapter = (AudioAmplitudePlotDataAdapter)payload.getAdapter();
+        Matrix rangeMatrix = payload.getRangeMatrix();
 
         int start = range.min;
         int count = range.max - range.min + 1;
@@ -53,17 +61,17 @@ public class AudioAmplitudePainter extends ArrayOffScreenPlotPainter {
         if (count > dataSize)
             count = dataSize;
 
-        final int samplesPerPixels = 10;
+        final int samplesPerPixel = getSamplesPerPixel(payload);
 
         Path outerPath = new Path();
         Path innerPath = new Path();
 
-        for (int i = 0; i < count; i += samplesPerPixels) {
+        for (int i = 0; i < count; i += samplesPerPixel) {
             float min = Float.MAX_VALUE;
             float max = Float.MIN_VALUE;
             float ampSum = 0;
             float ampSquareSum = 0;
-            for (int a = 0; a < samplesPerPixels; a++) {
+            for (int a = 0; a < samplesPerPixel; a++) {
                 int index = i + a;
                 if (start + index >= dataSize)
                     break;
@@ -75,9 +83,9 @@ public class AudioAmplitudePainter extends ArrayOffScreenPlotPainter {
                 if (value > max)
                     max = value;
             }
-            float average = ampSum / samplesPerPixels;
-            float std = (float) Math.sqrt((samplesPerPixels * ampSquareSum + Math.pow(ampSum, 2))
-                    / (samplesPerPixels * (samplesPerPixels - 1)));
+            float average = ampSum / samplesPerPixel;
+            float std = (float) Math.sqrt((samplesPerPixel * ampSquareSum + Math.pow(ampSum, 2))
+                    / (samplesPerPixel * (samplesPerPixel - 1)));
 
             // drawing
             float x = adapter.getX(start + i);
