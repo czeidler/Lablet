@@ -9,10 +9,7 @@ package nz.ac.auckland.lablet.microphone;
 
 import android.app.Activity;
 import android.content.Context;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaPlayer;
-import android.media.MediaRecorder;
+import android.media.*;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -138,6 +135,8 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
             private MediaPlayer mediaPlayer;
 
             final private Runnable seekBarUpdater = new Runnable() {
+                private Handler handler = new Handler();
+
                 @Override
                 public void run() {
                     if (mediaPlayer == null)
@@ -145,7 +144,7 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
                     seekBar.setProgress(mediaPlayer.getCurrentPosition());
                     if (!mediaPlayer.isPlaying())
                         return;
-                    new Handler().postDelayed(seekBarUpdater, 100);
+                    handler.postDelayed(seekBarUpdater, 100);
                 }
             };
 
@@ -177,8 +176,9 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
 
                 seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-                        mediaPlayer.seekTo(progress);
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        if (fromUser)
+                            mediaPlayer.seekTo(progress);
                     }
 
                     @Override
@@ -436,22 +436,14 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
 
                     if (!readData(buffer, bytesToRead))
                         break;
-                    if (dataOutput != null) {
-                        try {
-                            dataOutput.write(buffer);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    final float frame[] = AudioWavInputStream.toAmplitudeData(buffer, bytesToRead);
 
-                    publishData(frame);
+                    publishData(buffer, bytesToRead);
                 }
 
                 stopAudioRecording();
             }
 
-            private boolean readData(byte[] buffer, int bytesToRead) {
+            private boolean readData(byte[] buffer, final int bytesToRead) {
                 int bytesRead = 0;
                 int missingBytes = bytesToRead;
                 while (running.get()) {
@@ -459,7 +451,7 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
                     if (result < 0)
                         break;
                     bytesRead += result;
-                    missingBytes = bytesToRead - bytesRead;
+                    missingBytes -= result;
                     if (missingBytes == 0)
                         return true;
                 }
@@ -473,10 +465,19 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
             this.sampleSize = sampleSize;
         }
 
-        private void publishData(final float frame[]) {
+        private void publishData(final byte buffer[], final int dataSize) {
             uiHandler.post(new Runnable() {
                 @Override
                 public void run() {
+                    if (dataOutput != null) {
+                        try {
+                            dataOutput.write(buffer, 0, dataSize);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    final float frame[] = AudioWavInputStream.toAmplitudeData(buffer, dataSize);
                     notifyNewAudioData(frame);
                 }
             });
@@ -502,7 +503,7 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
 
             final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
             final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-            int bufferSize = AudioRecord.getMinBufferSize(samplingRate, CHANNEL_CONFIG, FORMAT);
+            int bufferSize = AudioRecord.getMinBufferSize(samplingRate, CHANNEL_CONFIG, FORMAT) * 4;
             audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, samplingRate, CHANNEL_CONFIG, FORMAT,
                     bufferSize);
 
