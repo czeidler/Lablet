@@ -13,13 +13,13 @@ import java.nio.ByteOrder;
 
 
 public class AudioWavInputStream extends InputStream implements Closeable {
-    private FileInputStream inputStream;
+    private InputStream inputStream;
     private int channelCount;
     private int sampleRate;
     private int audioDataSize;
 
     public AudioWavInputStream(File file) throws IOException {
-        inputStream = new FileInputStream(file);
+        inputStream = new BufferedInputStream(new FileInputStream(file));
         readHeader();
     }
 

@@ -14,6 +14,9 @@ public class AudioWavOutputStream extends OutputStream implements Closeable {
     private RandomAccessFile outFile;
     private long audioDataLength = 0;
     private long sampleRate = 0;
+    final private int PCM_FORMAT = 1;
+    final private int PCM_SUB_CHUNK_SIZE = 16;
+    final private int BITS_PER_SAMPLE = 16;
     protected int channelCount;
 
     public AudioWavOutputStream(File file, int channelCount, int sampleRate) throws IOException {
@@ -36,6 +39,12 @@ public class AudioWavOutputStream extends OutputStream implements Closeable {
     public void write(byte[] buffer) throws java.io.IOException {
         outFile.write(buffer);
         audioDataLength += buffer.length;
+    }
+
+    @Override
+    public void write(byte[] buffer, int offset, int count) throws java.io.IOException {
+        outFile.write(buffer, offset, count);
+        audioDataLength += count;
     }
 
     @Override
@@ -68,20 +77,20 @@ public class AudioWavOutputStream extends OutputStream implements Closeable {
         outFile.write('m');
         outFile.write('t');
         outFile.write(' ');
-        outFile.writeByte(16);
+        outFile.writeByte(PCM_SUB_CHUNK_SIZE);
         outFile.writeByte(0);
         outFile.writeByte(0);
         outFile.writeByte(0);
-        outFile.writeByte(1); // format
+        outFile.writeByte(PCM_FORMAT);
         outFile.writeByte(0);
         outFile.writeByte(channelCount);
         outFile.writeByte(0);
         writeAsBigEndian(sampleRate);
         long byteRate = sampleRate * 2 * channelCount;
         writeAsBigEndian(byteRate);
-        outFile.writeByte(2 * channelCount);
+        outFile.writeByte(BITS_PER_SAMPLE / 2 * channelCount);
         outFile.writeByte(0);
-        outFile.writeByte(16); // bits per sample
+        outFile.writeByte(BITS_PER_SAMPLE);
         outFile.writeByte(0);
         outFile.write('d');
         outFile.write('a');
