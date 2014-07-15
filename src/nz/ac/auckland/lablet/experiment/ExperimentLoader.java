@@ -13,6 +13,8 @@ import nz.ac.auckland.lablet.misc.PersistentBundle;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper class to load an {@link ExperimentRunData} or an
@@ -22,10 +24,23 @@ public class ExperimentLoader {
     /**
      * The results of an experiment load attempt.
      */
-    public static class Result {
-        public IExperimentPlugin plugin;
-        public ExperimentRunData experimentRunData;
+    static public class Result {
+        public ExperimentData experimentData;
         public String loadError;
+    }
+
+    static public class ExperimentData {
+        public static class RunEntry {
+            public IExperimentPlugin plugin;
+            public ExperimentRunData experimentRunData;
+        }
+
+        public static class GroupEntry {
+            public ExperimentRunGroupData groupData;
+            public List<RunEntry> runs = new ArrayList<>();
+        }
+
+        public List<GroupEntry> groups = new ArrayList<>();
     }
 
     static public Bundle loadBundleFromFile(File file) {
@@ -52,54 +67,95 @@ public class ExperimentLoader {
         return bundle;
     }
 
-    public static boolean loadExperiment(Context context, String experimentPath, Result result) {
-        File storageDir = null;
+    private static ExperimentData.RunEntry loadExperimentRun(Context context, File runDirectory, Result result) {
+        ExperimentData.RunEntry runEntry = new ExperimentData.RunEntry();
+
         Bundle bundle = null;
 
-        if (experimentPath != null) {
-            storageDir = new File(experimentPath);
-            File file = new File(storageDir, ExperimentRunData.EXPERIMENT_DATA_FILE_NAME);
-            bundle = ExperimentLoader.loadBundleFromFile(file);
-        }
+        File file = new File(runDirectory, ExperimentRunData.EXPERIMENT_DATA_FILE_NAME);
+        bundle = ExperimentLoader.loadBundleFromFile(file);
 
         if (bundle == null) {
             result.loadError = "can't read experiment file";
-            return false;
+            return null;
         }
 
         String experimentIdentifier = bundle.getString("experiment_identifier");
         if (experimentIdentifier == null) {
             result.loadError = "invalid experiment data";
-            return false;
+            return null;
         }
 
         ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
-        result.plugin = factory.findExperimentPlugin(experimentIdentifier);
-        if (result.plugin == null) {
+        runEntry.plugin = factory.findExperimentPlugin(experimentIdentifier);
+        if (runEntry.plugin == null) {
             result.loadError = "unknown experiment type";
-            return false;
+            return null;
         }
 
         Bundle experimentData = bundle.getBundle("data");
         if (experimentData == null) {
             result.loadError = "failed to load experiment data";
-            return false;
+            return null;
         }
-        result.experimentRunData = result.plugin.loadExperimentData(context, experimentData, storageDir);
-        if (result.experimentRunData == null) {
+        runEntry.experimentRunData = runEntry.plugin.loadExperimentData(context, experimentData, runDirectory);
+        if (runEntry.experimentRunData == null) {
             result.loadError = "can't load experiment";
-            return false;
+            return null;
+        }
+
+        return runEntry;
+    }
+
+    private static ExperimentData.GroupEntry loadRunGroup(Context context, File groupDir, Result result) {
+        ExperimentRunGroupData groupData = new ExperimentRunGroupData();
+        File groupFile = new File(groupDir, ExperimentRunGroup.EXPERIMENT_RUN_GROUP_FILE_NAME);
+        try {
+            groupData.loadFromFile(groupFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        ExperimentData.GroupEntry groupEntry = new ExperimentData.GroupEntry();
+        groupEntry.groupData = groupData;
+
+        for (File runDirectory : groupDir.listFiles()) {
+            if (!runDirectory.isDirectory())
+                continue;
+            ExperimentData.RunEntry runEntry = loadExperimentRun(context, runDirectory, result);
+            if (runEntry == null)
+                return null;
+            groupEntry.runs.add(runEntry);
+        }
+        return groupEntry;
+    }
+
+    public static boolean loadExperiment(Context context, String experimentPath, Result result) {
+        File storageDir = new File(experimentPath);
+
+        result.experimentData = new ExperimentData();
+
+        for (File groupDir : storageDir.listFiles()) {
+            if (!groupDir.isDirectory())
+                continue;
+
+            ExperimentData.GroupEntry groupEntry = loadRunGroup(context, groupDir, result);
+            if (groupEntry == null)
+                return false;
+            result.experimentData.groups.add(groupEntry);
         }
 
         return true;
     }
 
     // Creates a new ExperimentAnalysis and tries to load an existing analysis.
-    public static ExperimentAnalysis getExperimentAnalysis(ExperimentRunData experimentRunData, IExperimentPlugin plugin) {
-        ExperimentAnalysis experimentAnalysis = plugin.createExperimentAnalysis(experimentRunData);
+    public static ExperimentAnalysis getExperimentAnalysis(ExperimentData.RunEntry runEntry) {
+        ExperimentRunData runData = runEntry.experimentRunData;
+        ExperimentAnalysis experimentAnalysis = runEntry.plugin.createExperimentAnalysis(runData);
 
         // try to load old analysis
-        File projectFile = new File(experimentRunData.getStorageDir(), ExperimentAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
+        File projectFile = new File(runData.getStorageDir(), ExperimentAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
         Bundle bundle = ExperimentLoader.loadBundleFromFile(projectFile);
         if (bundle == null)
             return experimentAnalysis;
@@ -108,17 +164,9 @@ public class ExperimentLoader {
         if (analysisDataBundle == null)
             return experimentAnalysis;
 
-        experimentAnalysis.loadAnalysisData(analysisDataBundle, experimentRunData.getStorageDir());
+        experimentAnalysis.loadAnalysisData(analysisDataBundle, runData.getStorageDir());
 
         return experimentAnalysis;
-    }
-
-    public static ExperimentAnalysis loadExperimentAnalysis(Context context, String experimentPath) {
-        Result result = new ExperimentLoader.Result();
-        if (!loadExperiment(context, experimentPath, result))
-            return null;
-
-        return getExperimentAnalysis(result.experimentRunData, result.plugin);
     }
 }
 

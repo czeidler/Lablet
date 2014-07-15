@@ -10,11 +10,9 @@ package nz.ac.auckland.lablet.experiment;
 import android.app.Activity;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.misc.PersistentBundle;
-import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 class ExperimentRunGroupData {
@@ -80,6 +78,8 @@ public class ExperimentRunGroup {
     private Experiment experiment;
     private String subStorageDirectory;
     private Activity experimentRunActivity;
+
+    final static public String EXPERIMENT_RUN_GROUP_FILE_NAME = "experiment_run_group.xml";
 
     static public ExperimentRunGroup createExperimentRunGroup(List<String> experimentRuns, Activity activity) {
         ExperimentRunGroup experimentRunGroup = new ExperimentRunGroup();
@@ -225,7 +225,7 @@ public class ExperimentRunGroup {
     public void finishExperiment(boolean saveData, File storageDir) throws IOException {
         if (saveData) {
             storageDir.mkdirs();
-            data.saveToFile(new File(storageDir, "experiment_run_group.xml"));
+            data.saveToFile(new File(storageDir, EXPERIMENT_RUN_GROUP_FILE_NAME));
         }
 
         for (IExperimentRun experimentRun : experimentRuns) {
