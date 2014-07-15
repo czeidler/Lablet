@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 
@@ -25,7 +25,7 @@ public abstract class MarkerGraphAxis implements IGraphAdapter.IGraphDataAxis {
         return markerGraphAdapter.getData();
     }
 
-    public ExperimentAnalysis getExperimentAnalysis() {
-        return markerGraphAdapter.getExperimentAnalysis();
+    public SensorAnalysis getExperimentAnalysis() {
+        return markerGraphAdapter.getSensorAnalysis();
     }
 }

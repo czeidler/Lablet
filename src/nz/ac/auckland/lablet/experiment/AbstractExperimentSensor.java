@@ -12,14 +12,14 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 
-abstract public class AbstractExperimentRun implements IExperimentRun {
+abstract public class AbstractExperimentSensor implements IExperimentSensor {
     public interface State {
         public void start();
         public boolean stop();
     }
 
     private ExperimentRunGroup experimentRunGroup;
-    private WeakReference<IExperimentRunListener> softListener = null;
+    private WeakReference<IExperimentSensorListener> softListener = null;
     protected boolean unsavedExperimentData = false;
 
     protected State previewState = null;
@@ -64,8 +64,8 @@ abstract public class AbstractExperimentRun implements IExperimentRun {
         return experimentRunGroup;
     }
 
-    public void setListener(IExperimentRunListener listener) {
-        this.softListener = new WeakReference<IExperimentRunListener>(listener);
+    public void setListener(IExperimentSensorListener listener) {
+        this.softListener = new WeakReference<IExperimentSensorListener>(listener);
         stateNotifier.notifyCurrentState();
     }
 
@@ -148,53 +148,53 @@ abstract public class AbstractExperimentRun implements IExperimentRun {
         return unsavedExperimentData;
     }
 
-    private IExperimentRunListener getListener() {
+    private IExperimentSensorListener getListener() {
         if (softListener == null)
             return null;
-        IExperimentRunListener listener = softListener.get();
+        IExperimentSensorListener listener = softListener.get();
         if (listener == null)
             softListener = null;
         return listener;
     }
 
     private void notifyStartPreview() {
-        IExperimentRunListener listener = getListener();
+        IExperimentSensorListener listener = getListener();
         if (listener != null)
             listener.onStartPreview();
     }
 
     private void notifyStopPreview() {
-        IExperimentRunListener listener = getListener();
+        IExperimentSensorListener listener = getListener();
         if (listener != null)
             listener.onStopPreview();
     }
 
     private void notifyStartRecording() {
-        IExperimentRunListener listener = getListener();
+        IExperimentSensorListener listener = getListener();
         if (listener != null)
             listener.onStartRecording();
     }
 
     private void notifyStopRecording() {
-        IExperimentRunListener listener = getListener();
+        IExperimentSensorListener listener = getListener();
         if (listener != null)
             listener.onStopRecording();
     }
 
     private void notifyStartPlayback() {
-        IExperimentRunListener listener = getListener();
+        IExperimentSensorListener listener = getListener();
         if (listener != null)
             listener.onStartPlayback();
     }
 
     private void notifyStopPlayback() {
-        IExperimentRunListener listener = getListener();
+        IExperimentSensorListener listener = getListener();
         if (listener != null)
             listener.onStopPlayback();
     }
 
     protected void notifySettingsChanged() {
-        IExperimentRunListener listener = getListener();
+        IExperimentSensorListener listener = getListener();
         if (listener != null)
             listener.onSettingsChanged();
     }

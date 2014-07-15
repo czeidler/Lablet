@@ -13,7 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.experiment.ExperimentLoader;
 import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
 
@@ -27,7 +27,7 @@ import java.util.List;
  */
 abstract public class ExperimentDataActivity extends FragmentActivity {
     protected class AnalysisEntry {
-        public ExperimentAnalysis analysis;
+        public SensorAnalysis analysis;
         public IExperimentPlugin plugin;
     }
 

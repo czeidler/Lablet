@@ -9,7 +9,6 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.text.format.Time;
 
 import java.io.File;
 import java.io.IOException;
@@ -136,7 +135,7 @@ public class Experiment {
         return runGroupId;
     }
 
-    public IExperimentRun getCurrentExperimentRun() {
+    public IExperimentSensor getCurrentExperimentRun() {
         ExperimentRunGroup runGroup = getCurrentExperimentRunGroup();
         if (runGroup == null)
             return null;

@@ -15,7 +15,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.*;
 import android.widget.*;
-import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.script.*;
 import nz.ac.auckland.lablet.views.graph.*;
 import nz.ac.auckland.lablet.R;
@@ -258,8 +258,8 @@ class GraphViewHolder extends ScriptComponentViewHolder {
 
         graphView2D.setMaxWidth(500);
 
-        ExperimentAnalysis experimentAnalysis = experiment.getExperimentAnalysis(context);
-        if (experimentAnalysis != null) {
+        SensorAnalysis sensorAnalysis = experiment.getExperimentAnalysis(context);
+        if (sensorAnalysis != null) {
             MarkerGraphAxis xAxis = createAxis(xAxisContentId);
             if (xAxis == null)
                 xAxis = new XPositionMarkerGraphAxis();
@@ -267,7 +267,7 @@ class GraphViewHolder extends ScriptComponentViewHolder {
             if (yAxis == null)
                 yAxis = new XPositionMarkerGraphAxis();
 
-            adapter = new MarkerGraphAdapter(experimentAnalysis, title, xAxis, yAxis);
+            adapter = new MarkerGraphAdapter(sensorAnalysis, title, xAxis, yAxis);
             graphView2D.setAdapter(adapter);
         }
 
@@ -276,7 +276,7 @@ class GraphViewHolder extends ScriptComponentViewHolder {
         experimentListener = new ScriptComponentExperiment.IScriptComponentExperimentListener() {
             @Override
             public void onExperimentAnalysisUpdated() {
-                adapter.setExperimentAnalysis(experiment.getExperimentAnalysis(contextFinal));
+                adapter.setSensorAnalysis(experiment.getExperimentAnalysis(contextFinal));
             }
         };
         experiment.addListener(experimentListener);

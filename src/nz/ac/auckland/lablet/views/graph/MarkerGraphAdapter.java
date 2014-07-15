@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
@@ -31,13 +31,13 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
     private List<WeakReference<IGraphAdapterListener>> listeners;
     protected String title;
     protected MarkerDataModel data;
-    protected ExperimentAnalysis experimentAnalysis;
+    protected SensorAnalysis sensorAnalysis;
 
-    public MarkerGraphAdapter(ExperimentAnalysis experimentAnalysis, String title, MarkerGraphAxis xAxis,
+    public MarkerGraphAdapter(SensorAnalysis sensorAnalysis, String title, MarkerGraphAxis xAxis,
                               MarkerGraphAxis yAxis) {
         listeners = new ArrayList<WeakReference<IGraphAdapterListener>>();
         this.title = title;
-        setExperimentAnalysis(experimentAnalysis);
+        setSensorAnalysis(sensorAnalysis);
 
         xAxis.setMarkerGraphAdapter(this);
         yAxis.setMarkerGraphAdapter(this);
@@ -45,11 +45,11 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
         setYAxis(yAxis);
     }
 
-    public void setExperimentAnalysis(ExperimentAnalysis experimentAnalysis) {
+    public void setSensorAnalysis(SensorAnalysis sensorAnalysis) {
         if (data != null)
             data.removeListener(this);
-        this.experimentAnalysis = experimentAnalysis;
-        data = experimentAnalysis.getTagMarkers();
+        this.sensorAnalysis = sensorAnalysis;
+        data = sensorAnalysis.getTagMarkers();
         data.addListener(this);
 
         notifyAllDataChanged();
@@ -60,18 +60,18 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
         data.removeListener(this);
     }
 
-    public static MarkerGraphAdapter createPositionAdapter(ExperimentAnalysis experimentAnalysis, String title) {
-        return new MarkerGraphAdapter(experimentAnalysis, title, new XPositionMarkerGraphAxis(),
+    public static MarkerGraphAdapter createPositionAdapter(SensorAnalysis sensorAnalysis, String title) {
+        return new MarkerGraphAdapter(sensorAnalysis, title, new XPositionMarkerGraphAxis(),
                 new YPositionMarkerGraphAxis());
     }
 
-    public static MarkerGraphAdapter createXSpeedAdapter(ExperimentAnalysis experimentAnalysis, String title) {
-        return new MarkerGraphAdapter(experimentAnalysis, title, new SpeedTimeMarkerGraphAxis(),
+    public static MarkerGraphAdapter createXSpeedAdapter(SensorAnalysis sensorAnalysis, String title) {
+        return new MarkerGraphAdapter(sensorAnalysis, title, new SpeedTimeMarkerGraphAxis(),
                 new XSpeedMarkerGraphAxis());
     }
 
-    public static MarkerGraphAdapter createYSpeedAdapter(ExperimentAnalysis experimentAnalysis, String title) {
-        return new MarkerGraphAdapter(experimentAnalysis, title, new SpeedTimeMarkerGraphAxis(),
+    public static MarkerGraphAdapter createYSpeedAdapter(SensorAnalysis sensorAnalysis, String title) {
+        return new MarkerGraphAdapter(sensorAnalysis, title, new SpeedTimeMarkerGraphAxis(),
                 new YSpeedMarkerGraphAxis());
     }
 
@@ -79,8 +79,8 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
         return data;
     }
 
-    public ExperimentAnalysis getExperimentAnalysis() {
-        return experimentAnalysis;
+    public SensorAnalysis getSensorAnalysis() {
+        return sensorAnalysis;
     }
 
     @Override

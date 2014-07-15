@@ -19,15 +19,15 @@ import android.view.View;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYPlot;
-import nz.ac.auckland.lablet.experiment.AbstractExperimentRun;
-import nz.ac.auckland.lablet.experiment.ExperimentRunData;
+import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
+import nz.ac.auckland.lablet.experiment.SensorData;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 
-class SensorView extends XYPlot implements AccelerometerExperimentRun.ISensorDataListener {
+class SensorView extends XYPlot implements AccelerometerExperimentSensor.ISensorDataListener {
 
     public SensorView(Context context, String s) {
         super(context, s);
@@ -38,12 +38,12 @@ class SensorView extends XYPlot implements AccelerometerExperimentRun.ISensorDat
         invalidate();
     }
 
-    public void setParent(AccelerometerExperimentRun parent) {
+    public void setParent(AccelerometerExperimentSensor parent) {
         parent.setDataListener(this);
     }
 }
 
-public class AccelerometerExperimentRun extends AbstractExperimentRun {
+public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     private XYPlot graphView2D;
     private WeakReference<ISensorDataListener> softDataListener;
 
@@ -157,7 +157,7 @@ public class AccelerometerExperimentRun extends AbstractExperimentRun {
     }
 
     @Override
-    public ExperimentRunData getExperimentData() {
+    public SensorData getExperimentData() {
         return null;
     }
 }

@@ -9,19 +9,19 @@ package nz.ac.auckland.lablet.microphone;
 
 import android.content.Context;
 import android.os.Bundle;
-import nz.ac.auckland.lablet.experiment.ExperimentRunData;
+import nz.ac.auckland.lablet.experiment.SensorData;
 
 import java.io.File;
 
 
-public class MicrophoneExperimentRunData extends ExperimentRunData {
+public class MicrophoneSensorData extends SensorData {
     private String audioFileName = "";
 
-    public MicrophoneExperimentRunData(Context experimentContext, Bundle bundle, File storageDir) {
+    public MicrophoneSensorData(Context experimentContext, Bundle bundle, File storageDir) {
         super(experimentContext, bundle, storageDir);
     }
 
-    public MicrophoneExperimentRunData(Context experimentContext) {
+    public MicrophoneSensorData(Context experimentContext) {
         super(experimentContext);
     }
 

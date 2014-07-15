@@ -14,9 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
-import nz.ac.auckland.lablet.experiment.IExperimentRun;
 import nz.ac.auckland.lablet.views.FrameDataSeekBar;
 import nz.ac.auckland.lablet.views.FrameContainerView;
 import nz.ac.auckland.lablet.views.graph.*;
@@ -148,27 +147,27 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
                              Bundle savedInstanceState) {
         final ExperimentAnalyserActivity activity = (ExperimentAnalyserActivity)getActivity();
         final IExperimentPlugin plugin = analysisEntry.plugin;
-        final ExperimentAnalysis experimentAnalysis = analysisEntry.analysis;
+        final SensorAnalysis sensorAnalysis = analysisEntry.analysis;
 
         final Layout view = new Layout(getActivity());
         assert view != null;
 
-        final View experimentRunView = plugin.createExperimentRunView(activity, experimentAnalysis.getExperimentRunData());
+        final View experimentRunView = plugin.createSensorAnalysisView(activity, sensorAnalysis.getSensorData());
 
         final FrameDataSeekBar runViewControl = view.getRunViewControl();
-        runViewControl.setTo(experimentAnalysis.getFrameDataModel());
+        runViewControl.setTo(sensorAnalysis.getFrameDataModel());
 
         runContainerView = view.getRunContainerView();
-        runContainerView.setTo(experimentRunView, experimentAnalysis);
-        runContainerView.addTagMarkerData(experimentAnalysis.getTagMarkers());
-        runContainerView.addXYCalibrationData(experimentAnalysis.getXYCalibrationMarkers());
-        runContainerView.addOriginData(experimentAnalysis.getOriginMarkers(), experimentAnalysis.getCalibration());
+        runContainerView.setTo(experimentRunView, sensorAnalysis);
+        runContainerView.addTagMarkerData(sensorAnalysis.getTagMarkers());
+        runContainerView.addXYCalibrationData(sensorAnalysis.getXYCalibrationMarkers());
+        runContainerView.addOriginData(sensorAnalysis.getOriginMarkers(), sensorAnalysis.getCalibration());
 
         // marker table view
         tableView = (TableView)view.findViewById(R.id.tagMarkerTableView);
         assert tableView != null;
-        final ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(experimentAnalysis.getTagMarkers(),
-                experimentAnalysis);
+        final ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(sensorAnalysis.getTagMarkers(),
+                sensorAnalysis);
         adapter.addColumn(new RunIdDataTableColumn());
         adapter.addColumn(new TimeDataTableColumn());
         adapter.addColumn(new XPositionDataTableColumn());
@@ -179,11 +178,11 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         graphView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
 
         // graph spinner
-        graphSpinnerEntryList.add(new GraphSpinnerEntry("Position Data", new MarkerGraphAdapter(experimentAnalysis,
+        graphSpinnerEntryList.add(new GraphSpinnerEntry("Position Data", new MarkerGraphAdapter(sensorAnalysis,
                 "Position Data", new XPositionMarkerGraphAxis(), new YPositionMarkerGraphAxis())));
-        graphSpinnerEntryList.add(new GraphSpinnerEntry("x-Velocity", new MarkerGraphAdapter(experimentAnalysis,
+        graphSpinnerEntryList.add(new GraphSpinnerEntry("x-Velocity", new MarkerGraphAdapter(sensorAnalysis,
                 "x-Velocity", new TimeMarkerGraphAxis(), new XSpeedMarkerGraphAxis())));
-        graphSpinnerEntryList.add(new GraphSpinnerEntry("y-Velocity", new MarkerGraphAdapter(experimentAnalysis,
+        graphSpinnerEntryList.add(new GraphSpinnerEntry("y-Velocity", new MarkerGraphAdapter(sensorAnalysis,
                 "y-Velocity", new TimeMarkerGraphAxis(), new YSpeedMarkerGraphAxis())));
 
         graphSpinner = (Spinner)view.findViewById(R.id.graphSpinner);

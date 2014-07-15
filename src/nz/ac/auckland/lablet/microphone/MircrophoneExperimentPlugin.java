@@ -12,9 +12,9 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentPlugin;
-import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
-import nz.ac.auckland.lablet.experiment.ExperimentRunData;
-import nz.ac.auckland.lablet.experiment.IExperimentRun;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
+import nz.ac.auckland.lablet.experiment.IExperimentSensor;
+import nz.ac.auckland.lablet.experiment.SensorData;
 
 import java.io.File;
 
@@ -22,7 +22,7 @@ import java.io.File;
 public class MircrophoneExperimentPlugin extends AbstractExperimentPlugin {
     @Override
     public String getName() {
-        return MicrophoneExperimentRun.class.getSimpleName();
+        return MicrophoneExperimentSensor.class.getSimpleName();
     }
 
     @Override
@@ -31,32 +31,32 @@ public class MircrophoneExperimentPlugin extends AbstractExperimentPlugin {
     }
 
     @Override
-    public IExperimentRun createExperiment(Activity parentActivity) {
-        return new MicrophoneExperimentRun();
+    public IExperimentSensor createExperimentSensor(Activity parentActivity) {
+        return new MicrophoneExperimentSensor();
     }
 
     @Override
-    public void startRunSettingsActivity(Activity parentActivity, int requestCode, ExperimentRunData experimentRunData, Bundle analysisSpecificData, Bundle options) {
+    public void startRunSettingsActivity(Activity parentActivity, int requestCode, SensorData sensorData, Bundle analysisSpecificData, Bundle options) {
 
     }
 
     @Override
-    public boolean hasRunSettingsActivity(StringBuilder menuName) {
+    public boolean hasSensorSettingsActivity(StringBuilder menuName) {
         return false;
     }
 
     @Override
-    public ExperimentRunData loadExperimentData(Context context, Bundle data, File storageDir) {
+    public SensorData loadSensorData(Context context, Bundle data, File storageDir) {
         return null;
     }
 
     @Override
-    public ExperimentAnalysis createExperimentAnalysis(ExperimentRunData experimentRunData) {
+    public SensorAnalysis createSensorAnalysis(SensorData sensorData) {
         return null;
     }
 
     @Override
-    public View createExperimentRunView(Context context, ExperimentRunData experimentRunData) {
+    public View createSensorAnalysisView(Context context, SensorData sensorData) {
         return null;
     }
 }

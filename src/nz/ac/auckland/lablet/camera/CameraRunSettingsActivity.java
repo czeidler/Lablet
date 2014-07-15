@@ -33,7 +33,7 @@ import java.util.ArrayList;
  * </p>
  */
 public class CameraRunSettingsActivity extends ExperimentDataActivity {
-    private CameraExperimentRunData cameraExperiment;
+    private CameraSensorData cameraExperiment;
     private VideoFrameView videoFrameView;
 
     private SeekBar seekBar = null;
@@ -140,7 +140,8 @@ public class CameraRunSettingsActivity extends ExperimentDataActivity {
         if (!loadExperiment(intent))
             return;
 
-        cameraExperiment = (CameraExperimentRunData)getExperimentRunData();
+
+        cameraExperiment = (CameraSensorData)getExperimentRunData();
 
         setContentView(R.layout.camera_run_settings);
 

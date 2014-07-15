@@ -7,8 +7,8 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.ExperimentRunData;
-import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 
@@ -23,22 +23,22 @@ public class YSpeedMarkerGraphAxis extends MarkerGraphAxis {
 
     @Override
     public Number getValue(int index) {
-        ExperimentAnalysis experimentAnalysis = getExperimentAnalysis();
+        SensorAnalysis sensorAnalysis = getExperimentAnalysis();
         MarkerDataModel data = getData();
 
-        ExperimentRunData experimentRunData = experimentAnalysis.getExperimentRunData();
+        SensorData sensorData = sensorAnalysis.getSensorData();
         float deltaX = data.getCalibratedMarkerPositionAt(index + 1).y - data.getCalibratedMarkerPositionAt(index).y;
-        float deltaT = experimentRunData.getRunValueAt(index + 1) - experimentRunData.getRunValueAt(index);
-        if (experimentAnalysis.getExperimentRunData().getRunValueUnitPrefix().equals("m"))
+        float deltaT = sensorData.getRunValueAt(index + 1) - sensorData.getRunValueAt(index);
+        if (sensorAnalysis.getSensorData().getRunValueUnitPrefix().equals("m"))
             deltaT /= 1000;
         return deltaX / deltaT;
     }
 
     @Override
     public String getLabel() {
-        ExperimentAnalysis experimentAnalysis = getExperimentAnalysis();
-        return "velocity [" + experimentAnalysis.getXUnit() + "/"
-                + experimentAnalysis.getExperimentRunData().getRunValueBaseUnit() + "]";
+        SensorAnalysis sensorAnalysis = getExperimentAnalysis();
+        return "velocity [" + sensorAnalysis.getXUnit() + "/"
+                + sensorAnalysis.getSensorData().getRunValueBaseUnit() + "]";
     }
 
     @Override

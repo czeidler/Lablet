@@ -31,13 +31,13 @@ abstract public class AbstractExperimentPlugin implements IExperimentPlugin {
      * Helper method to pack the analysis specific data and the options bundles correctly.
      *
      * @param intent the Intent where the data should be packed to
-     * @param experimentRunData the parent activity
+     * @param sensorData the parent activity
      * @param analysisSpecificData analysis specific data bundle
      * @param options the options for the activity
      */
-    static public void packStartRunSettingsIntent(Intent intent, ExperimentRunData experimentRunData,
+    static public void packStartRunSettingsIntent(Intent intent, SensorData sensorData,
                                                   Bundle analysisSpecificData, Bundle options) {
-        intent.putExtra("experiment_path", experimentRunData.getStorageDir().getPath());
+        intent.putExtra("experiment_path", sensorData.getStorageDir().getPath());
         if (analysisSpecificData != null)
             intent.putExtra("analysisSpecificData", analysisSpecificData);
         if (options != null)

@@ -24,6 +24,6 @@ public class YPositionDataTableColumn extends DataTableColumn {
 
     @Override
     public String getHeader() {
-        return "y [" + experimentAnalysis.getYUnit() + "]";
+        return "y [" + sensorAnalysis.getYUnit() + "]";
     }
 }

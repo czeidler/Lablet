@@ -10,15 +10,14 @@ package nz.ac.auckland.lablet;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.*;
 import android.widget.PopupMenu;
-import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.experiment.ExperimentLoader;
-import nz.ac.auckland.lablet.experiment.ExperimentRunData;
+import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 
@@ -66,7 +65,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
         final MenuItem settingsItem = menu.findItem(R.id.action_run_settings);
         assert settingsItem != null;
         final StringBuilder settingsName = new StringBuilder();
-        if (currentAnalysisRun.plugin.hasRunSettingsActivity(settingsName)) {
+        if (currentAnalysisRun.plugin.hasSensorSettingsActivity(settingsName)) {
             settingsItem.setTitle(settingsName);
             settingsItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
@@ -136,8 +135,8 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
 
     private void startRunSettingsActivity(Bundle analysisSpecificData, Bundle options) {
         IExperimentPlugin plugin = currentAnalysisRun.plugin;
-        ExperimentRunData experimentRunData = currentAnalysisRun.analysis.getExperimentRunData();
-        plugin.startRunSettingsActivity(this, PERFORM_RUN_SETTINGS, experimentRunData, analysisSpecificData, options);
+        SensorData sensorData = currentAnalysisRun.analysis.getSensorData();
+        plugin.startSensorSettingsActivity(this, PERFORM_RUN_SETTINGS, sensorData, analysisSpecificData, options);
     }
 
     /*
@@ -162,22 +161,22 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
             return;
 
         if (requestCode == PERFORM_RUN_SETTINGS) {
-            ExperimentAnalysis experimentAnalysis = currentAnalysisRun.analysis;
+            SensorAnalysis sensorAnalysis = currentAnalysisRun.analysis;
 
             Bundle extras = data.getExtras();
             if (extras != null) {
                 Bundle settings = extras.getBundle("run_settings");
                 if (settings != null) {
-                    Bundle specificData = experimentAnalysis.getExperimentSpecificData();
+                    Bundle specificData = sensorAnalysis.getExperimentSpecificData();
                     if (specificData == null)
                         specificData = new Bundle();
                     specificData.putBundle("run_settings", settings);
-                    experimentAnalysis.setExperimentSpecificData(specificData);
+                    sensorAnalysis.setExperimentSpecificData(specificData);
                 }
                 boolean settingsChanged = extras.getBoolean("run_settings_changed", false);
                 if (settingsChanged) {
-                    experimentAnalysis.getTagMarkers().clear();
-                    experimentAnalysis.getFrameDataModel().setCurrentFrame(0);
+                    sensorAnalysis.getTagMarkers().clear();
+                    sensorAnalysis.getFrameDataModel().setCurrentFrame(0);
                 }
             }
         }
@@ -246,9 +245,9 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
     protected void onResume() {
         super.onResume();
 
-        ExperimentAnalysis experimentAnalysis = currentAnalysisRun.analysis;
-        if (experimentAnalysis != null)
-            experimentAnalysis.getFrameDataModel().setCurrentFrame(experimentAnalysis.getFrameDataModel().getCurrentFrame());
+        SensorAnalysis sensorAnalysis = currentAnalysisRun.analysis;
+        if (sensorAnalysis != null)
+            sensorAnalysis.getFrameDataModel().setCurrentFrame(sensorAnalysis.getFrameDataModel().getCurrentFrame());
 
         if (resumeWithRunSettings) {
             Bundle options = null;
@@ -256,7 +255,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
                 options = new Bundle();
                 options.putBoolean("start_with_help", true);
             }
-            startRunSettingsActivity(experimentAnalysis.getExperimentSpecificData(), options);
+            startRunSettingsActivity(sensorAnalysis.getExperimentSpecificData(), options);
             resumeWithRunSettings = false;
         }
     }
@@ -283,9 +282,9 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
         exportTagMarkerCSVData();
     }
 
-    private File getTagMarkerCSVFile(ExperimentAnalysis analysis) {
-        ExperimentRunData experimentRunData = analysis.getExperimentRunData();
-        return new File(experimentRunData.getStorageDir(), experimentRunData.getUid() + "_tag_markers.csv");
+    private File getTagMarkerCSVFile(SensorAnalysis analysis) {
+        SensorData sensorData = analysis.getSensorData();
+        return new File(sensorData.getStorageDir(), sensorData.getUid() + "_tag_markers.csv");
     }
 
     private void exportTagMarkerCSVData() {
@@ -296,8 +295,8 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
         }
     }
 
-    private void exportTagMarkerCSVData(ExperimentAnalysis experimentAnalysis) {
-        File csvFile = getTagMarkerCSVFile(experimentAnalysis);
+    private void exportTagMarkerCSVData(SensorAnalysis sensorAnalysis) {
+        File csvFile = getTagMarkerCSVFile(sensorAnalysis);
         if (!csvFile.exists()) {
             try {
                 if (!csvFile.createNewFile())
@@ -316,7 +315,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
             return;
         }
 
-        experimentAnalysis.exportTagMarkerCSVData(outputStream);
+        sensorAnalysis.exportTagMarkerCSVData(outputStream);
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

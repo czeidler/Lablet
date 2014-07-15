@@ -17,7 +17,6 @@ import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.view.*;
-import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.widget.PopupMenu;
 import android.widget.VideoView;
@@ -34,14 +33,14 @@ import java.util.Comparator;
 import java.util.List;
 
 
-class CameraExperimentView extends AbstractExperimentRunView {
+class CameraExperimentView extends AbstractExperimentSensorView {
     private RatioSurfaceView preview = null;
     private VideoView videoView = null;
     private SurfaceHolder previewHolder = null;
-    final private CameraExperimentRun cameraExperimentRun;
+    final private CameraExperimentSensor cameraExperimentRun;
     final private Camera camera;
 
-    public CameraExperimentView(Context context, CameraExperimentRun cameraExperimentRun) {
+    public CameraExperimentView(Context context, CameraExperimentSensor cameraExperimentRun) {
         super(context);
 
         this.cameraExperimentRun = cameraExperimentRun;
@@ -143,10 +142,10 @@ class CameraExperimentView extends AbstractExperimentRunView {
     }
 }
 
-public class CameraExperimentRun extends AbstractExperimentRun {
+public class CameraExperimentSensor extends AbstractExperimentSensor {
     private Activity activity;
 
-    private CameraExperimentRunData experimentData;
+    private CameraSensorData experimentData;
 
     private Camera camera = null;
     private Camera.Size videoSize;
@@ -214,7 +213,7 @@ public class CameraExperimentRun extends AbstractExperimentRun {
             requestedVideoHeight = intent.getIntExtra("requested_video_height", -1);
         }
 
-        experimentData = new CameraExperimentRunData(activity);
+        experimentData = new CameraSensorData(activity);
 
         recorder = new MediaRecorder();
 
@@ -419,7 +418,7 @@ public class CameraExperimentRun extends AbstractExperimentRun {
     }
 
     @Override
-    public ExperimentRunData getExperimentData() {
+    public SensorData getExperimentData() {
         return experimentData;
     }
 

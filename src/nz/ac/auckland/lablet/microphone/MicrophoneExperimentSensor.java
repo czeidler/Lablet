@@ -23,9 +23,9 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 import edu.emory.mathcs.jtransforms.dct.FloatDCT_1D;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.AbstractExperimentRun;
-import nz.ac.auckland.lablet.experiment.AbstractExperimentRunView;
-import nz.ac.auckland.lablet.experiment.ExperimentRunData;
+import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
+import nz.ac.auckland.lablet.experiment.AbstractExperimentSensorView;
+import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.misc.AudioWavOutputStream;
 import nz.ac.auckland.lablet.misc.StorageLib;
@@ -38,12 +38,12 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-class MicrophoneExperimentRunView extends AbstractExperimentRunView {
+class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
 
     private ViewGroup previewView;
     private ViewGroup playbackView;
 
-    public MicrophoneExperimentRunView(final Context context, final MicrophoneExperimentRun experimentRun) {
+    public MicrophoneExperimentSensorView(final Context context, final MicrophoneExperimentSensor experimentRun) {
         super(context);
 
         final LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -55,7 +55,7 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
 
         playbackView.setVisibility(View.INVISIBLE);
 
-        previewState = new AbstractExperimentRun.State() {
+        previewState = new AbstractExperimentSensor.State() {
             private AudioFrequencyView audioFrequencyView;
 
             private PlotView audioAmplitudePlotView;
@@ -67,7 +67,7 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
             private int frequencyMapTimeSpan = 60;
             private int amplitudeTimeSpan = 3;
 
-            private MicrophoneExperimentRun.ISensorDataListener listener = new MicrophoneExperimentRun.ISensorDataListener() {
+            private MicrophoneExperimentSensor.ISensorDataListener listener = new MicrophoneExperimentSensor.ISensorDataListener() {
                 @Override
                 public void onNewAudioData(float[] amplitudes, float[] frequencies) {
                     if (audioAmplitudePlotAdapter.getSize() / experimentRun.SAMPLE_RATE >= amplitudeTimeSpan)
@@ -125,7 +125,7 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
 
         recordingState = previewState;
 
-        playbackState = new AbstractExperimentRun.State() {
+        playbackState = new AbstractExperimentSensor.State() {
             final private ToggleButton startPauseButton;
             final private SeekBar seekBar;
             final private TextView lengthTextView;
@@ -274,7 +274,7 @@ class MicrophoneExperimentRunView extends AbstractExperimentRunView {
     }
 }
 
-public class MicrophoneExperimentRun extends AbstractExperimentRun {
+public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     private Activity activity;
 
     private WeakReference<ISensorDataListener> softListener = null;
@@ -285,7 +285,7 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
     final String audioFileName = "audio.wav";
     private File audioFile = null;
 
-    private MicrophoneExperimentRunData experimentData;
+    private MicrophoneSensorData experimentData;
 
     public interface ISensorDataListener {
         public void onNewAudioData(float[] amplitudes, float[] frequencies);
@@ -308,7 +308,7 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
 
     @Override
     public View createExperimentView(Context context) {
-        AbstractExperimentRunView view = new MicrophoneExperimentRunView(context, this);
+        AbstractExperimentSensorView view = new MicrophoneExperimentSensorView(context, this);
         setListener(view);
         return view;
     }
@@ -332,7 +332,7 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
     public void init(final Activity activity) {
         this.activity = activity;
 
-        experimentData = new MicrophoneExperimentRunData(activity);
+        experimentData = new MicrophoneSensorData(activity);
 
         previewState = new State() {
             private AudioRecordingTask audioRecordingTask = null;
@@ -525,7 +525,7 @@ public class MicrophoneExperimentRun extends AbstractExperimentRun {
     }
 
     @Override
-    public ExperimentRunData getExperimentData() {
+    public SensorData getExperimentData() {
         return null;
     }
 

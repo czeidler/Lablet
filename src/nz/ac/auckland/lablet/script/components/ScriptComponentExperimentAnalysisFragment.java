@@ -18,7 +18,7 @@ import android.widget.CheckedTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 import nz.ac.auckland.lablet.ExperimentAnalyserActivity;
-import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptComponent;
@@ -159,11 +159,11 @@ public class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGe
 
     private boolean validateAnalysis() {
         ScriptComponentExperiment experiment = ((ScriptComponentTreeExperimentAnalysis)component).getExperiment();
-        ExperimentAnalysis experimentAnalysis = experiment.getExperimentAnalysis(getActivity());
-        if (experimentAnalysis == null)
+        SensorAnalysis sensorAnalysis = experiment.getExperimentAnalysis(getActivity());
+        if (sensorAnalysis == null)
             return false;
 
-        if (experimentAnalysis.getTagMarkers().getMarkerCount() < 3)
+        if (sensorAnalysis.getTagMarkers().getMarkerCount() < 3)
             return false;
 
         return true;
@@ -183,10 +183,10 @@ public class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGe
         if (component.getState() == ScriptComponent.SCRIPT_STATE_DONE) {
             takenExperimentInfo.setChecked(true);
             ScriptComponentExperiment experiment = ((ScriptComponentTreeExperimentAnalysis)component).getExperiment();
-            ExperimentAnalysis experimentAnalysis = experiment.getExperimentAnalysis(getActivity());
-            if (experimentAnalysis == null)
+            SensorAnalysis sensorAnalysis = experiment.getExperimentAnalysis(getActivity());
+            if (sensorAnalysis == null)
                 return;
-            MarkerGraphAdapter adapter = new MarkerGraphAdapter(experimentAnalysis, "Position Data:",
+            MarkerGraphAdapter adapter = new MarkerGraphAdapter(sensorAnalysis, "Position Data:",
                     new XPositionMarkerGraphAxis(), new YPositionMarkerGraphAxis());
             graphView.setAdapter(adapter);
             graphView.setVisibility(View.VISIBLE);

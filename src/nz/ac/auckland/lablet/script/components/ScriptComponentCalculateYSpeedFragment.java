@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.script.components;
 
-import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.views.table.*;
 
 
@@ -30,10 +30,10 @@ public class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalcu
     @Override
     String getPositionUnit() {
         ScriptComponentExperiment experiment = ((ScriptComponentTreeCalculateSpeed)component).getExperiment();
-        ExperimentAnalysis experimentAnalysis = experiment.getExperimentAnalysis(getActivity());
-        if (experimentAnalysis == null)
+        SensorAnalysis sensorAnalysis = experiment.getExperimentAnalysis(getActivity());
+        if (sensorAnalysis == null)
             return "";
-        return experimentAnalysis.getYUnit();
+        return sensorAnalysis.getYUnit();
     }
 
     @Override
@@ -42,8 +42,8 @@ public class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalcu
     }
 
     @Override
-    ColumnMarkerDataTableAdapter createSpeedTableAdapter(ExperimentAnalysis experimentAnalysis) {
-        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
+    ColumnMarkerDataTableAdapter createSpeedTableAdapter(SensorAnalysis sensorAnalysis) {
+        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, sensorAnalysis);
         speedDataTableColumn = new YSpeedDataTableColumn();
         adapter.addColumn(new SpeedTimeDataTableColumn());
         adapter.addColumn(speedDataTableColumn);
@@ -52,8 +52,8 @@ public class ScriptComponentCalculateYSpeedFragment extends ScriptComponentCalcu
     }
 
     @Override
-    ColumnMarkerDataTableAdapter createAccelerationTableAdapter(ExperimentAnalysis experimentAnalysis) {
-        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, experimentAnalysis);
+    ColumnMarkerDataTableAdapter createAccelerationTableAdapter(SensorAnalysis sensorAnalysis) {
+        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, sensorAnalysis);
         YAccelerationDataTableColumn accelerationDataTableColumn = new YAccelerationDataTableColumn();
         adapter.addColumn(new AccelerationTimeDataTableColumn());
         adapter.addColumn(accelerationDataTableColumn);

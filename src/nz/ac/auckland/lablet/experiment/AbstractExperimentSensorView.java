@@ -12,16 +12,16 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 
-abstract public class AbstractExperimentRunView extends FrameLayout implements IExperimentRun.IExperimentRunListener {
-    protected AbstractExperimentRun.State previewState = null;
-    protected AbstractExperimentRun.State recordingState = null;
-    protected AbstractExperimentRun.State playbackState = null;
+abstract public class AbstractExperimentSensorView extends FrameLayout implements IExperimentSensor.IExperimentSensorListener {
+    protected AbstractExperimentSensor.State previewState = null;
+    protected AbstractExperimentSensor.State recordingState = null;
+    protected AbstractExperimentSensor.State playbackState = null;
 
-    public AbstractExperimentRunView(Context context) {
+    public AbstractExperimentSensorView(Context context) {
         super(context);
     }
 
-    public AbstractExperimentRunView(Context context, AttributeSet attrs) {
+    public AbstractExperimentSensorView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

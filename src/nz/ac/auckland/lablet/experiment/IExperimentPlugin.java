@@ -9,7 +9,6 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -39,7 +38,7 @@ public interface IExperimentPlugin {
      * @param parentActivity the parent activity
      * @return the experiment run
      */
-    public IExperimentRun createExperiment(Activity parentActivity);
+    public IExperimentSensor createExperimentSensor(Activity parentActivity);
 
     /**
      * Starts an activity to config the experiment runs.
@@ -69,12 +68,13 @@ public interface IExperimentPlugin {
      *
      * @param parentActivity the parent activity
      * @param requestCode request code for the activity
-     * @param experimentRunData the experiment is needed to put information about the experiment into the intent
+     * @param sensorDataRef the sensor that should be configured
      * @param analysisSpecificData bundle with the analysis specific data (the analysis settings)
      * @param options bundle with options for the run settings activity
      */
-    public void startRunSettingsActivity(Activity parentActivity, int requestCode, ExperimentRunData experimentRunData,
-                                         Bundle analysisSpecificData, Bundle options);
+    public void startSensorSettingsActivity(Activity parentActivity, int requestCode,
+                                            ExperimentData.SensorDataRef sensorDataRef,
+                                            Bundle analysisSpecificData, Bundle options);
 
     /**
      * Check if a run settings activity exist.
@@ -82,7 +82,7 @@ public interface IExperimentPlugin {
      * @param menuName optional, if not null the name of the run settings activity is put here
      * @return true if there is a run settings activity
      */
-    public boolean hasRunSettingsActivity(StringBuilder menuName);
+    public boolean hasSensorSettingsActivity(StringBuilder menuName);
 
     /**
      * Load an old experiment from a data bundle.
@@ -96,24 +96,24 @@ public interface IExperimentPlugin {
      * @param storageDir directory where additional data may have been stored
      * @return the loaded experiment or null on failure
      */
-    public ExperimentRunData loadExperimentData(Context context, Bundle data, File storageDir);
+    public SensorData loadSensorData(Context context, Bundle data, File storageDir);
 
     /**
-     * Creates an {@link nz.ac.auckland.lablet.experiment.ExperimentAnalysis} object for the given
-     * {@link ExperimentRunData}.
+     * Creates an {@link SensorAnalysis} object for the given
+     * {@link SensorData}.
      *
-     * @param experimentRunData usually loaded with the loadExperimentData method
+     * @param sensorData usually loaded with the loadSensorData method
      * @return pointer to the created experiment analysis
      */
-    public ExperimentAnalysis createExperimentAnalysis(ExperimentRunData experimentRunData);
+    public SensorAnalysis createSensorAnalysis(SensorData sensorData);
 
     /**
      * Creates the view that displays the results in the
      * {@link nz.ac.auckland.lablet.ExperimentAnalyserActivity}.
      *
      * @param context context of the view
-     * @param experimentRunData experiment that should be used
+     * @param sensorData experiment that should be used
      * @return a newly created view
      */
-    public View createExperimentRunView(Context context, ExperimentRunData experimentRunData);
+    public View createSensorAnalysisView(Context context, SensorData sensorData);
 }

@@ -9,7 +9,7 @@ package nz.ac.auckland.lablet.script.components;
 
 
 import android.content.Context;
-import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.experiment.ExperimentLoader;
 
 import java.lang.ref.WeakReference;
@@ -29,7 +29,7 @@ public class ScriptComponentExperiment {
     private List<WeakReference<IScriptComponentExperimentListener>> listeners
             = new ArrayList<WeakReference<IScriptComponentExperimentListener>>();
     private String experimentPath = "";
-    private ExperimentAnalysis experimentAnalysis;
+    private SensorAnalysis sensorAnalysis;
 
     public String getExperimentPath() {
         return experimentPath;
@@ -39,10 +39,10 @@ public class ScriptComponentExperiment {
 
     }
 
-    public ExperimentAnalysis getExperimentAnalysis(Context context) {
-        if (experimentAnalysis == null)
-            experimentAnalysis = loadExperimentAnalysis(context);
-        return experimentAnalysis;
+    public SensorAnalysis getExperimentAnalysis(Context context) {
+        if (sensorAnalysis == null)
+            sensorAnalysis = loadExperimentAnalysis(context);
+        return sensorAnalysis;
     }
 
     public void addListener(IScriptComponentExperimentListener listener) {
@@ -54,7 +54,7 @@ public class ScriptComponentExperiment {
     }
 
     public void reloadExperimentAnalysis(Context context) {
-        experimentAnalysis = loadExperimentAnalysis(context);
+        sensorAnalysis = loadExperimentAnalysis(context);
         for (ListIterator<WeakReference<IScriptComponentExperimentListener>> it = listeners.listIterator();
              it.hasNext();) {
             IScriptComponentExperimentListener listener = it.next().get();
@@ -65,7 +65,7 @@ public class ScriptComponentExperiment {
         }
     }
 
-    private ExperimentAnalysis loadExperimentAnalysis(Context context) {
+    private SensorAnalysis loadExperimentAnalysis(Context context) {
         return ExperimentLoader.loadExperimentAnalysis(context, getExperimentPath());
     }
 }

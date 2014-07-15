@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.table;
 
-import nz.ac.auckland.lablet.experiment.ExperimentRunData;
+import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 
@@ -23,10 +23,10 @@ public class TimeDataTableColumn extends DataTableColumn {
 
     @Override
     public Number getValue(int index) {
-        ExperimentRunData experimentRunData = experimentAnalysis.getExperimentRunData();
-        MarkerDataModel markerData = experimentAnalysis.getTagMarkers();
+        SensorData sensorData = sensorAnalysis.getSensorData();
+        MarkerDataModel markerData = sensorAnalysis.getTagMarkers();
         int runId = markerData.getMarkerDataAt(index).getRunId();
-        return experimentRunData.getRunValueAt(runId);
+        return sensorData.getRunValueAt(runId);
     }
 
     @Override
@@ -37,6 +37,6 @@ public class TimeDataTableColumn extends DataTableColumn {
 
     @Override
     public String getHeader() {
-        return "time [" + experimentAnalysis.getExperimentRunData().getRunValueUnit() + "]";
+        return "time [" + sensorAnalysis.getSensorData().getRunValueUnit() + "]";
     }
 }

@@ -24,6 +24,6 @@ public class XPositionDataTableColumn extends DataTableColumn {
 
     @Override
     public String getHeader() {
-        return "x [" + experimentAnalysis.getXUnit() + "]";
+        return "x [" + sensorAnalysis.getXUnit() + "]";
     }
 }

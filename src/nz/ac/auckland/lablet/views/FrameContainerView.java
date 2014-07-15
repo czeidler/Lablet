@@ -12,7 +12,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
 import nz.ac.auckland.lablet.experiment.Calibration;
-import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
@@ -25,11 +25,11 @@ import nz.ac.auckland.lablet.experiment.MarkerDataModel;
  * </p>
  */
 public class FrameContainerView extends RelativeLayout implements FrameDataModel.IFrameDataModelListener,
-        ExperimentAnalysis.IExperimentAnalysisListener {
+        SensorAnalysis.IExperimentAnalysisListener {
     private View experimentRunView = null;
     private MarkerView markerView = null;
     private FrameDataModel frameDataModel = null;
-    private ExperimentAnalysis experimentAnalysis = null;
+    private SensorAnalysis sensorAnalysis = null;
     private OriginMarkerPainter originMarkerPainter = null;
 
     public FrameContainerView(Context context) {
@@ -41,7 +41,7 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
     }
 
     protected void finalize() {
-        experimentAnalysis.removeListener(this);
+        sensorAnalysis.removeListener(this);
         frameDataModel.removeListener(this);
 
         try {
@@ -51,15 +51,15 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
         }
     }
 
-    public void setTo(View runView, ExperimentAnalysis analysis) {
-        if (experimentAnalysis != null)
-            experimentAnalysis.removeListener(this);
-        experimentAnalysis = analysis;
-        experimentAnalysis.addListener(this);
+    public void setTo(View runView, SensorAnalysis analysis) {
+        if (sensorAnalysis != null)
+            sensorAnalysis.removeListener(this);
+        sensorAnalysis = analysis;
+        sensorAnalysis.addListener(this);
 
         if (frameDataModel != null)
             frameDataModel.removeListener(this);
-        frameDataModel = experimentAnalysis.getFrameDataModel();
+        frameDataModel = sensorAnalysis.getFrameDataModel();
         frameDataModel.addListener(this);
 
         experimentRunView = runView;
@@ -111,7 +111,7 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
     public void addOriginData(MarkerDataModel data, Calibration calibration) {
         originMarkerPainter = new OriginMarkerPainter(markerView, (IExperimentFrameView)experimentRunView, data,
                 calibration);
-        if (experimentAnalysis.getShowCoordinateSystem())
+        if (sensorAnalysis.getShowCoordinateSystem())
             markerView.addMarkerPainter(originMarkerPainter);
     }
 

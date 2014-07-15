@@ -11,7 +11,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.TextView;
-import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
@@ -28,17 +28,17 @@ import java.util.ListIterator;
  * </p>
  */
 abstract class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, MarkerDataModel.IMarkerDataModelListener,
-        ExperimentAnalysis.IExperimentAnalysisListener {
+        SensorAnalysis.IExperimentAnalysisListener {
     protected MarkerDataModel model;
-    protected ExperimentAnalysis experimentAnalysis;
+    protected SensorAnalysis sensorAnalysis;
     private List<WeakReference<ITableAdapterListener>> listeners;
 
-    public MarkerDataTableAdapter(MarkerDataModel model, ExperimentAnalysis experimentAnalysis) {
+    public MarkerDataTableAdapter(MarkerDataModel model, SensorAnalysis sensorAnalysis) {
         this.model = model;
         model.addListener(this);
         listeners = new ArrayList<WeakReference<ITableAdapterListener>>();
-        this.experimentAnalysis = experimentAnalysis;
-        this.experimentAnalysis.addListener(this);
+        this.sensorAnalysis = sensorAnalysis;
+        this.sensorAnalysis.addListener(this);
     }
 
     @Override
@@ -208,14 +208,14 @@ abstract class MarkerDataTableAdapter implements ITableAdapter<MarkerData>, Mark
  */
 abstract class DataTableColumn {
     protected MarkerDataModel markerDataModel;
-    protected ExperimentAnalysis experimentAnalysis;
+    protected SensorAnalysis sensorAnalysis;
 
     public void setMarkerDataModel(MarkerDataModel model) {
         this.markerDataModel = model;
     }
 
-    public void setExperimentAnalysis(ExperimentAnalysis experimentAnalysis) {
-        this.experimentAnalysis = experimentAnalysis;
+    public void setSensorAnalysis(SensorAnalysis sensorAnalysis) {
+        this.sensorAnalysis = sensorAnalysis;
     }
 
     abstract public int size();
@@ -234,13 +234,13 @@ abstract class DataTableColumn {
 public class ColumnMarkerDataTableAdapter extends MarkerDataTableAdapter {
     private List<DataTableColumn> columns = new ArrayList<DataTableColumn>();
 
-    public ColumnMarkerDataTableAdapter(MarkerDataModel model, ExperimentAnalysis experimentAnalysis) {
-        super(model, experimentAnalysis);
+    public ColumnMarkerDataTableAdapter(MarkerDataModel model, SensorAnalysis sensorAnalysis) {
+        super(model, sensorAnalysis);
     }
 
     public void addColumn(DataTableColumn column) {
         column.setMarkerDataModel(model);
-        column.setExperimentAnalysis(experimentAnalysis);
+        column.setSensorAnalysis(sensorAnalysis);
         columns.add(column);
     }
 

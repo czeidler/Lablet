@@ -17,8 +17,8 @@ import java.io.File;
 import java.io.IOException;
 
 
-public interface IExperimentRun {
-    public interface IExperimentRunListener {
+public interface IExperimentSensor {
+    public interface IExperimentSensorListener {
         public void onStartPreview();
         public void onStopPreview();
         public void onStartRecording();
@@ -62,5 +62,5 @@ public interface IExperimentRun {
     public void startPlayback();
     public void stopPlayback();
 
-    public ExperimentRunData getExperimentData();
+    public SensorData getExperimentData();
 }

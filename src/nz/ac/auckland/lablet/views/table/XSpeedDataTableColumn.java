@@ -7,8 +7,8 @@
  */
 package nz.ac.auckland.lablet.views.table;
 
-import nz.ac.auckland.lablet.experiment.ExperimentRunData;
-import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 
@@ -23,21 +23,21 @@ public class XSpeedDataTableColumn extends DataTableColumn {
 
     @Override
     public Number getValue(int index) {
-        return getSpeed(index, markerDataModel, experimentAnalysis);
+        return getSpeed(index, markerDataModel, sensorAnalysis);
     }
 
     @Override
     public String getHeader() {
-        return "velocity [" + experimentAnalysis.getXUnit() + "/"
-                + experimentAnalysis.getExperimentRunData().getRunValueBaseUnit() + "]";
+        return "velocity [" + sensorAnalysis.getXUnit() + "/"
+                + sensorAnalysis.getSensorData().getRunValueBaseUnit() + "]";
     }
 
-    public static Number getSpeed(int index, MarkerDataModel markersDataModel, ExperimentAnalysis experimentAnalysis) {
-        ExperimentRunData experimentRunData = experimentAnalysis.getExperimentRunData();
+    public static Number getSpeed(int index, MarkerDataModel markersDataModel, SensorAnalysis sensorAnalysis) {
+        SensorData sensorData = sensorAnalysis.getSensorData();
         float delta = markersDataModel.getCalibratedMarkerPositionAt(index + 1).x
                 - markersDataModel.getCalibratedMarkerPositionAt(index).x;
-        float deltaT = experimentRunData.getRunValueAt(index + 1) - experimentRunData.getRunValueAt(index);
-        if (experimentAnalysis.getExperimentRunData().getRunValueUnitPrefix().equals("m"))
+        float deltaT = sensorData.getRunValueAt(index + 1) - sensorData.getRunValueAt(index);
+        if (sensorAnalysis.getSensorData().getRunValueUnitPrefix().equals("m"))
             deltaT /= 1000;
         return delta / deltaT;
     }

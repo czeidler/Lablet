@@ -11,7 +11,7 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import nz.ac.auckland.lablet.experiment.ExperimentRunData;
+import nz.ac.auckland.lablet.experiment.SensorData;
 
 import java.io.File;
 
@@ -19,7 +19,7 @@ import java.io.File;
 /**
  * Holds all important data for the camera experiment.
  */
-public class CameraExperimentRunData extends ExperimentRunData {
+public class CameraSensorData extends SensorData {
     private String videoFileName;
     private int numberOfRuns;
 
@@ -33,11 +33,11 @@ public class CameraExperimentRunData extends ExperimentRunData {
     private int analysisVideoStart;
     private int analysisVideoEnd;
 
-    public CameraExperimentRunData(Context experimentContext) {
+    public CameraSensorData(Context experimentContext) {
         super(experimentContext);
     }
 
-    public CameraExperimentRunData(Context experimentContext, Bundle bundle, File storageDir) {
+    public CameraSensorData(Context experimentContext, Bundle bundle, File storageDir) {
         super(experimentContext, bundle, storageDir);
 
     }

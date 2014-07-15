@@ -13,9 +13,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentPlugin;
-import nz.ac.auckland.lablet.experiment.ExperimentRunData;
-import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
-import nz.ac.auckland.lablet.experiment.IExperimentRun;
+import nz.ac.auckland.lablet.experiment.IExperimentSensor;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorData;
 
 import java.io.File;
 
@@ -26,7 +26,7 @@ import java.io.File;
 public class CameraExperimentPlugin extends AbstractExperimentPlugin {
     @Override
     public String getName() {
-        return CameraExperimentRun.class.getSimpleName();
+        return CameraExperimentSensor.class.getSimpleName();
     }
 
     @Override
@@ -35,38 +35,38 @@ public class CameraExperimentPlugin extends AbstractExperimentPlugin {
     }
 
     @Override
-    public IExperimentRun createExperiment(Activity parentActivity) {
-        IExperimentRun experiment = new CameraExperimentRun();
+    public IExperimentSensor createExperimentSensor(Activity parentActivity) {
+        IExperimentSensor experiment = new CameraExperimentSensor();
         return experiment;
     }
 
     @Override
-    public void startRunSettingsActivity(Activity parentActivity, int requestCode, ExperimentRunData experimentRunData,
+    public void startRunSettingsActivity(Activity parentActivity, int requestCode, SensorData sensorData,
                                          Bundle analysisSpecificData, Bundle options) {
         Intent intent = new Intent(parentActivity, CameraRunSettingsActivity.class);
-        packStartRunSettingsIntent(intent, experimentRunData, analysisSpecificData, options);
+        packStartRunSettingsIntent(intent, sensorData, analysisSpecificData, options);
         parentActivity.startActivityForResult(intent, requestCode);
     }
 
     @Override
-    public boolean hasRunSettingsActivity(StringBuilder menuName) {
+    public boolean hasSensorSettingsActivity(StringBuilder menuName) {
         if (menuName != null)
             menuName.append("Video Settings");
         return true;
     }
 
     @Override
-    public ExperimentRunData loadExperimentData(Context context, Bundle data, File storageDir) {
-        return new CameraExperimentRunData(context, data, storageDir);
+    public SensorData loadSensorData(Context context, Bundle data, File storageDir) {
+        return new CameraSensorData(context, data, storageDir);
     }
 
     @Override
-    public ExperimentAnalysis createExperimentAnalysis(ExperimentRunData experimentRunData) {
-        return new CameraExperimentAnalysis(experimentRunData);
+    public SensorAnalysis createSensorAnalysis(SensorData sensorData) {
+        return new CameraExperimentAnalysis(sensorData);
     }
 
     @Override
-    public View createExperimentRunView(Context context, ExperimentRunData experimentRunData) {
-        return new CameraExperimentFrameView(context, experimentRunData);
+    public View createSensorAnalysisView(Context context, SensorData sensorData) {
+        return new CameraExperimentFrameView(context, sensorData);
     }
 }
