@@ -7,6 +7,7 @@
  */
 package nz.ac.auckland.lablet;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
 import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
+import nz.ac.auckland.lablet.experiment.IExperimentRun;
 import nz.ac.auckland.lablet.views.FrameDataSeekBar;
 import nz.ac.auckland.lablet.views.FrameContainerView;
 import nz.ac.auckland.lablet.views.graph.*;
@@ -92,7 +94,8 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
     private TableView tableView = null;
     private GraphView2D graphView = null;
     private Spinner graphSpinner = null;
-    private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<GraphSpinnerEntry>();
+    final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
+    private ExperimentDataActivity.AnalysisEntry analysisEntry;
 
     private class GraphSpinnerEntry {
         private String name;
@@ -112,19 +115,47 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         }
     }
 
+    public AnalysisMixedDataFragment() {
+        super();
+    }
+
+    public AnalysisMixedDataFragment(int position) {
+        super();
+
+        Bundle args = new Bundle();
+        args.putInt("analysisRunId", position);
+        setArguments(args);
+    }
+
+    private ExperimentDataActivity.AnalysisEntry findExperimentFromArguments(Activity activity) {
+        int position = getArguments().getInt("analysisRunId", 0);
+
+        ExperimentAnalyserActivity experimentActivity = (ExperimentAnalyserActivity)activity;
+        List<ExperimentDataActivity.AnalysisEntry> list = experimentActivity.getCurrentAnalysisRuns();
+        return list.get(position);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        analysisEntry = findExperimentFromArguments(activity);
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ExperimentAnalyserActivity activity = (ExperimentAnalyserActivity)getActivity();
-        IExperimentPlugin plugin = activity.getExperimentPlugin();
-        ExperimentAnalysis experimentAnalysis = activity.getExperimentAnalysis();
+        final ExperimentAnalyserActivity activity = (ExperimentAnalyserActivity)getActivity();
+        final IExperimentPlugin plugin = analysisEntry.plugin;
+        final ExperimentAnalysis experimentAnalysis = analysisEntry.analysis;
 
-        Layout view = new Layout(getActivity());
+        final Layout view = new Layout(getActivity());
         assert view != null;
 
-        View experimentRunView = plugin.createExperimentRunView(activity, experimentAnalysis.getExperimentRunData());
+        final View experimentRunView = plugin.createExperimentRunView(activity, experimentAnalysis.getExperimentRunData());
 
-        FrameDataSeekBar runViewControl = view.getRunViewControl();
+        final FrameDataSeekBar runViewControl = view.getRunViewControl();
         runViewControl.setTo(experimentAnalysis.getFrameDataModel());
 
         runContainerView = view.getRunContainerView();
@@ -136,7 +167,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         // marker table view
         tableView = (TableView)view.findViewById(R.id.tagMarkerTableView);
         assert tableView != null;
-        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(experimentAnalysis.getTagMarkers(),
+        final ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(experimentAnalysis.getTagMarkers(),
                 experimentAnalysis);
         adapter.addColumn(new RunIdDataTableColumn());
         adapter.addColumn(new TimeDataTableColumn());
@@ -156,7 +187,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
                 "y-Velocity", new TimeMarkerGraphAxis(), new YSpeedMarkerGraphAxis())));
 
         graphSpinner = (Spinner)view.findViewById(R.id.graphSpinner);
-        graphSpinner.setAdapter(new ArrayAdapter<GraphSpinnerEntry>(getActivity(), android.R.layout.simple_spinner_item,
+        graphSpinner.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item,
                 graphSpinnerEntryList));
         graphSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

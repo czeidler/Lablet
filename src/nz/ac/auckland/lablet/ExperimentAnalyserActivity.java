@@ -18,9 +18,13 @@ import android.view.*;
 import android.widget.PopupMenu;
 import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
 import nz.ac.auckland.lablet.experiment.ExperimentLoader;
+import nz.ac.auckland.lablet.experiment.ExperimentRunData;
+import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -38,23 +42,18 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
 
     final public static int MARKER_COLOR = Color.argb(255, 100, 200, 20);
 
-    private ExperimentAnalysis experimentAnalysis;
     private boolean resumeWithRunSettings = false;
     private boolean resumeWithRunSettingsHelp = false;
 
-    public ExperimentAnalysis getExperimentAnalysis() {
-        return experimentAnalysis;
-    }
-
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (getExperimentRunData() == null)
+        if (getExperimentData() == null)
             return false;
 
         menu.clear();
         getMenuInflater().inflate(R.menu.experiment_analyser_activity_actions, menu);
 
-        MenuItem backItem = menu.findItem(R.id.action_back);
+        final MenuItem backItem = menu.findItem(R.id.action_back);
         assert backItem != null;
         backItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -64,15 +63,15 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
                 return true;
             }
         });
-        MenuItem settingsItem = menu.findItem(R.id.action_run_settings);
+        final MenuItem settingsItem = menu.findItem(R.id.action_run_settings);
         assert settingsItem != null;
-        StringBuilder settingsName = new StringBuilder();
-        if (plugin.hasRunSettingsActivity(settingsName)) {
+        final StringBuilder settingsName = new StringBuilder();
+        if (currentAnalysisRun.plugin.hasRunSettingsActivity(settingsName)) {
             settingsItem.setTitle(settingsName);
             settingsItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
-                    startRunSettingsActivity(experimentAnalysis.getExperimentSpecificData(), null);
+                    startRunSettingsActivity(currentAnalysisRun.analysis.getExperimentSpecificData(), null);
                     return true;
                 }
             });
@@ -80,7 +79,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
             settingsItem.setVisible(false);
         }
 
-        MenuItem calibrationMenu = menu.findItem(R.id.action_calibration_settings);
+        final MenuItem calibrationMenu = menu.findItem(R.id.action_calibration_settings);
         assert calibrationMenu != null;
         calibrationMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -90,7 +89,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
             }
         });
 
-        MenuItem originMenu = menu.findItem(R.id.action_origin_settings);
+        final MenuItem originMenu = menu.findItem(R.id.action_origin_settings);
         assert originMenu != null;
         originMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -110,49 +109,52 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
     }
 
     private void showCalibrationMenu() {
-        ScaleSettingsDialog scaleSettingsDialog = new ScaleSettingsDialog(this, experimentAnalysis);
+        ScaleSettingsDialog scaleSettingsDialog = new ScaleSettingsDialog(this, currentAnalysisRun.analysis);
         scaleSettingsDialog.show();
     }
 
     private void showOriginPopup() {
-        View menuView = findViewById(R.id.action_origin_settings);
-        PopupMenu popup = new PopupMenu(this, menuView);
+        final View menuView = findViewById(R.id.action_origin_settings);
+        final PopupMenu popup = new PopupMenu(this, menuView);
         popup.inflate(R.menu.origin_popup);
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 int item = menuItem.getItemId();
                 if (item == R.id.showCoordinateSystem) {
-                    experimentAnalysis.setShowCoordinateSystem(!menuItem.isChecked());
+                    currentAnalysisRun.analysis.setShowCoordinateSystem(!menuItem.isChecked());
                 } else if (item == R.id.swapAxis) {
-                    experimentAnalysis.getCalibration().setSwapAxis(!menuItem.isChecked());
+                    currentAnalysisRun.analysis.getCalibration().setSwapAxis(!menuItem.isChecked());
                 }
                 return false;
             }
         });
-        popup.getMenu().getItem(0).setChecked(experimentAnalysis.getShowCoordinateSystem());
-        popup.getMenu().getItem(1).setChecked(experimentAnalysis.getCalibration().getSwapAxis());
+        popup.getMenu().getItem(0).setChecked(currentAnalysisRun.analysis.getShowCoordinateSystem());
+        popup.getMenu().getItem(1).setChecked(currentAnalysisRun.analysis.getCalibration().getSwapAxis());
         popup.show();
     }
 
     private void startRunSettingsActivity(Bundle analysisSpecificData, Bundle options) {
+        IExperimentPlugin plugin = currentAnalysisRun.plugin;
+        ExperimentRunData experimentRunData = currentAnalysisRun.analysis.getExperimentRunData();
         plugin.startRunSettingsActivity(this, PERFORM_RUN_SETTINGS, experimentRunData, analysisSpecificData, options);
     }
 
+    /*
     private void mailData() {
         // first save data again
         exportTagMarkerCSVData();
-        File tagMarkerCSVFile = getTagMarkerCSVFile();
+        final File tagMarkerCSVFile = getTagMarkerCSVFile();
 
         // start mail intent
-        Intent intent = new Intent(Intent.ACTION_SEND);
+        final Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/html");
         intent.putExtra(Intent.EXTRA_SUBJECT, "Experiment Data");
         intent.putExtra(Intent.EXTRA_TEXT, "Attached is your experiment data.");
         intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(tagMarkerCSVFile));
 
         startActivity(Intent.createChooser(intent, "Send Email"));
-    }
+    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -160,6 +162,8 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
             return;
 
         if (requestCode == PERFORM_RUN_SETTINGS) {
+            ExperimentAnalysis experimentAnalysis = currentAnalysisRun.analysis;
+
             Bundle extras = data.getExtras();
             if (extras != null) {
                 Bundle settings = extras.getBundle("run_settings");
@@ -188,18 +192,35 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
             return;
         }
 
-        experimentAnalysis = ExperimentLoader.getExperimentAnalysis(experimentRunData, plugin);
-        if (experimentAnalysis == null) {
-            showErrorAndFinish("Unable to load experiment analysis");
+        for (ExperimentLoader.ExperimentData.GroupEntry groupEntry : experimentData.groups) {
+            List<AnalysisEntry> groupList = new ArrayList<>();
+            for (ExperimentLoader.ExperimentData.RunEntry runEntry : groupEntry.runs) {
+                AnalysisEntry entry = new AnalysisEntry();
+                entry.plugin = runEntry.plugin;
+                entry.analysis = ExperimentLoader.getExperimentAnalysis(runEntry);
+                if (entry.analysis == null) {
+                    showErrorAndFinish("Unable to load experiment analysis");
+                    return;
+                }
+                groupList.add(entry);
+            }
+            analysisRunGroups.add(groupList);
+        }
+
+        if (analysisRunGroups.size() == 0 || currentAnalysisRunGroup.size() == 0) {
+            showErrorAndFinish("No experiment found.");
             return;
         }
 
-        Intent intent = getIntent();
+        setCurrentAnalysisRunGroup(0);
+        setCurrentAnalysisRun(0);
+
+        final Intent intent = getIntent();
         if (intent != null) {
             Bundle extras = intent.getExtras();
             if (extras != null) {
                 if (extras.getBoolean("first_start_with_run_settings", false)
-                        && experimentAnalysis.getTagMarkers().getMarkerCount() == 0) {
+                        && currentAnalysisRun.analysis.getTagMarkers().getMarkerCount() == 0) {
                     resumeWithRunSettings = true;
                 }
                 if (extras.getBoolean("first_start_with_run_settings_help", false)) {
@@ -213,8 +234,8 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
 
         setContentView(R.layout.experiment_analyser);
         // Instantiate a ViewPager and a PagerAdapter.
-        ViewPager pager = (ViewPager)findViewById(R.id.pager);
-        ScreenSlidePagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        final ViewPager pager = (ViewPager)findViewById(R.id.pager);
+        final ScreenSlidePagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
         pager.setCurrentItem(0);
 
@@ -225,6 +246,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
     protected void onResume() {
         super.onResume();
 
+        ExperimentAnalysis experimentAnalysis = currentAnalysisRun.analysis;
         if (experimentAnalysis != null)
             experimentAnalysis.getFrameDataModel().setCurrentFrame(experimentAnalysis.getFrameDataModel().getCurrentFrame());
 
@@ -243,24 +265,39 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
     protected void onPause() {
         super.onPause();
 
-        if (experimentAnalysis == null)
+        if (analysisRunGroups.size() == 0)
             return;
 
-        try {
-            experimentAnalysis.saveAnalysisDataToFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (List<AnalysisEntry> entries : analysisRunGroups) {
+            for (AnalysisEntry entry : entries) {
+                try {
+                    entry.analysis.saveAnalysisDataToFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+
+
 
         exportTagMarkerCSVData();
     }
 
-    private File getTagMarkerCSVFile() {
+    private File getTagMarkerCSVFile(ExperimentAnalysis analysis) {
+        ExperimentRunData experimentRunData = analysis.getExperimentRunData();
         return new File(experimentRunData.getStorageDir(), experimentRunData.getUid() + "_tag_markers.csv");
     }
 
     private void exportTagMarkerCSVData() {
-        File csvFile = getTagMarkerCSVFile();
+        for (List<AnalysisEntry> entries : analysisRunGroups) {
+            for (AnalysisEntry entry : entries) {
+                exportTagMarkerCSVData(entry.analysis);
+            }
+        }
+    }
+
+    private void exportTagMarkerCSVData(ExperimentAnalysis experimentAnalysis) {
+        File csvFile = getTagMarkerCSVFile(experimentAnalysis);
         if (!csvFile.exists()) {
             try {
                 if (!csvFile.createNewFile())
@@ -289,16 +326,12 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            if (position == 0)
-                return new AnalysisMixedDataFragment();
-            else if (position == 1)
-                return new AnalysisTableGraphDataFragment();
-            return null;
+            return new AnalysisMixedDataFragment(position);
         }
 
         @Override
         public int getCount() {
-            return 2;
+            return currentAnalysisRunGroup.size();
         }
     }
 }

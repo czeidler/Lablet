@@ -790,7 +790,7 @@ class ExperimentRunFragmentPagerAdapter extends FragmentStatePagerAdapter {
             super();
         }
 
-        public IExperimentRun findExperimentFromArguments(Activity activity) {
+        private IExperimentRun findExperimentFromArguments(Activity activity) {
             String name = getArguments().getString("experiment_name", "");
             ExperimentActivity experimentActivity = (ExperimentActivity)activity;
             List<IExperimentRun> list = experimentActivity.getActiveExperimentRuns();
@@ -821,8 +821,6 @@ class ExperimentRunFragmentPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public android.support.v4.app.Fragment getItem(int position) {
-
-
         List<IExperimentRun> list = experimentRunGroup.getExperimentRuns();
         return new ExperimentRunFragment(list.get(position).getClass().getSimpleName());
     }

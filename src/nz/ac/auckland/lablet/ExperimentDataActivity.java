@@ -13,25 +13,47 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import nz.ac.auckland.lablet.experiment.ExperimentRunData;
+import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
 import nz.ac.auckland.lablet.experiment.ExperimentLoader;
 import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
-import nz.ac.auckland.lablet.misc.StorageLib;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * Abstract base class for activities that analyze an experiment.
  */
 abstract public class ExperimentDataActivity extends FragmentActivity {
-    protected ExperimentRunData experimentRunData = null;
-    protected IExperimentPlugin plugin = null;
+    protected class AnalysisEntry {
+        public ExperimentAnalysis analysis;
+        public IExperimentPlugin plugin;
+    }
+
+    protected ExperimentLoader.ExperimentData experimentData = null;
 
     private File baseDirectory = null;
 
-    protected void setExperimentRunData(ExperimentRunData experimentRunData) {
-        this.experimentRunData = experimentRunData;
+    final protected List<List<AnalysisEntry>> analysisRunGroups = new ArrayList<>();
+    protected List<AnalysisEntry> currentAnalysisRunGroup;
+    protected AnalysisEntry currentAnalysisRun;
+
+    protected void setCurrentAnalysisRunGroup(int index) {
+        currentAnalysisRunGroup = analysisRunGroups.get(index);
+        setCurrentAnalysisRun(0);
+    }
+
+    protected void setCurrentAnalysisRun(int index) {
+        currentAnalysisRun = currentAnalysisRunGroup.get(index);
+    }
+
+    public List<AnalysisEntry> getCurrentAnalysisRuns() {
+        return currentAnalysisRunGroup;
+    }
+
+    protected void setExperimentData(ExperimentLoader.ExperimentData experimentData) {
+        this.experimentData = experimentData;
 
         baseDirectory = getDefaultExperimentBaseDir(this);
 
@@ -45,11 +67,8 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
         }
     }
 
-    public ExperimentRunData getExperimentRunData() {
-        return experimentRunData;
-    }
-    public IExperimentPlugin getExperimentPlugin() {
-        return plugin;
+    public ExperimentLoader.ExperimentData getExperimentData() {
+        return experimentData;
     }
 
     protected boolean loadExperiment(Intent intent) {
@@ -66,9 +85,7 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
             return false;
         }
 
-        plugin = result.plugin;
-        experimentRunData = result.experimentRunData;
-
+        experimentData = result.experimentData;
         return true;
     }
 
@@ -89,15 +106,5 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
     static public File getDefaultExperimentBaseDir(Context context) {
         File baseDir = context.getExternalFilesDir(null);
         return new File(baseDir, "experiments");
-    }
-
-    private File getExperimentStorageDir() {
-        String directoryName = getExperimentRunData().getUid();
-        return new File(baseDirectory, directoryName);
-    }
-
-    protected boolean deleteStorageDir() {
-        File file = getExperimentStorageDir();
-        return StorageLib.recursiveDeleteFile(file);
     }
 }

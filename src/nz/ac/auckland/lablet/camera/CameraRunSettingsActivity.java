@@ -140,7 +140,7 @@ public class CameraRunSettingsActivity extends ExperimentDataActivity {
         if (!loadExperiment(intent))
             return;
 
-        cameraExperiment = (CameraExperimentRunData) getExperimentRunData();
+        cameraExperiment = (CameraExperimentRunData)getExperimentRunData();
 
         setContentView(R.layout.camera_run_settings);
 
