@@ -21,8 +21,10 @@ import android.view.*;
 import android.widget.*;
 import nz.ac.auckland.lablet.accelerometer.AccelerometerExperimentSensor;
 import nz.ac.auckland.lablet.camera.CameraExperimentSensor;
+import nz.ac.auckland.lablet.camera.CameraSensorData;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.microphone.MicrophoneExperimentSensor;
+import nz.ac.auckland.lablet.microphone.MicrophoneSensorData;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,7 +69,7 @@ class ExperimentRunViewManager {
             public void onClick(View view) {
                 ExperimentRun oldGroup = experiment.getCurrentExperimentRun();
                 List<String> experimentNamesList = new ArrayList<String>();
-                for (IExperimentSensor experimentRun : oldGroup.getExperimentRuns())
+                for (IExperimentSensor experimentRun : oldGroup.getExperimentSensors())
                     experimentNamesList.add(experimentRun.getClass().getSimpleName());
                 ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(
                         experimentNamesList, activity);
@@ -269,7 +271,7 @@ public class ExperimentActivity extends FragmentActivity {
     public List<IExperimentSensor> getActiveExperimentRuns() {
         ExperimentRun currentGroup = experiment.getCurrentExperimentRun();
         if (currentGroup.isActive())
-            return currentGroup.getExperimentRuns();
+            return currentGroup.getExperimentSensors();
         return new ArrayList<>();
     }
 
@@ -373,9 +375,9 @@ public class ExperimentActivity extends FragmentActivity {
         experiment = new Experiment(this, experimentBaseDir);
 
         final List<String> experimentList = new ArrayList<>();
-        experimentList.add(MicrophoneExperimentSensor.class.getSimpleName());
-        experimentList.add(AccelerometerExperimentSensor.class.getSimpleName());
-        experimentList.add(CameraExperimentSensor.class.getSimpleName());
+        experimentList.add(MicrophoneSensorData.class.getSimpleName());
+        //experimentList.add(AccelerometerSensorData.class.getSimpleName());
+        experimentList.add(CameraSensorData.class.getSimpleName());
 
         ExperimentRun runGroup = ExperimentRun.createExperimentRunGroup(experimentList, this);
         experiment.addExperimentRunGroup(runGroup);
@@ -821,13 +823,13 @@ class ExperimentRunFragmentPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public android.support.v4.app.Fragment getItem(int position) {
-        List<IExperimentSensor> list = experimentRun.getExperimentRuns();
+        List<IExperimentSensor> list = experimentRun.getExperimentSensors();
         return new ExperimentRunFragment(list.get(position).getClass().getSimpleName());
     }
 
     @Override
     public int getCount() {
-        List<IExperimentSensor> list = experimentRun.getExperimentRuns();
+        List<IExperimentSensor> list = experimentRun.getExperimentSensors();
         return list.size();
     }
 
