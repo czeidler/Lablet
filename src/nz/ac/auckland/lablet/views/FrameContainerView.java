@@ -41,8 +41,10 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
     }
 
     protected void finalize() {
-        sensorAnalysis.removeListener(this);
-        frameDataModel.removeListener(this);
+        if (sensorAnalysis != null)
+            sensorAnalysis.removeListener(this);
+        if (frameDataModel != null)
+            frameDataModel.removeListener(this);
 
         try {
             super.finalize();
