@@ -18,7 +18,7 @@ abstract public class AbstractExperimentSensor implements IExperimentSensor {
         public boolean stop();
     }
 
-    private ExperimentRunGroup experimentRunGroup;
+    private ExperimentRun experimentRun;
     private WeakReference<IExperimentSensorListener> softListener = null;
     protected boolean unsavedExperimentData = false;
 
@@ -60,8 +60,8 @@ abstract public class AbstractExperimentSensor implements IExperimentSensor {
     }
 
     @Override
-    public ExperimentRunGroup getExperimentRunGroup() {
-        return experimentRunGroup;
+    public ExperimentRun getExperimentRun() {
+        return experimentRun;
     }
 
     public void setListener(IExperimentSensorListener listener) {
@@ -70,8 +70,8 @@ abstract public class AbstractExperimentSensor implements IExperimentSensor {
     }
 
     @Override
-    public void setExperimentRunGroup(ExperimentRunGroup experimentRunGroup) {
-        this.experimentRunGroup = experimentRunGroup;
+    public void setExperimentRun(ExperimentRun experimentRun) {
+        this.experimentRun = experimentRun;
     }
 
     @Override

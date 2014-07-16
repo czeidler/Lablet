@@ -21,7 +21,7 @@
  * <h3>Scripts (Lab Activities):</h3>
  * <p>
  * It is possible to script a whole lab activity using a lua script. The script can have multiple pages including
- * questions, text, experiments, analysis... The script runs in the
+ * questions, text, experiments, analysis... The script sensors in the
  * {@link nz.ac.auckland.lablet.script.ScriptRunnerActivity}.
  * </p>
  * <p>

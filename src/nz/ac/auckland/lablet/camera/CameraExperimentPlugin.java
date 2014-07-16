@@ -12,10 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import nz.ac.auckland.lablet.experiment.AbstractExperimentPlugin;
-import nz.ac.auckland.lablet.experiment.IExperimentSensor;
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
-import nz.ac.auckland.lablet.experiment.SensorData;
+import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.File;
 
@@ -41,10 +38,11 @@ public class CameraExperimentPlugin extends AbstractExperimentPlugin {
     }
 
     @Override
-    public void startRunSettingsActivity(Activity parentActivity, int requestCode, SensorData sensorData,
+    public void startSensorSettingsActivity(Activity parentActivity, int requestCode,
+                                         ExperimentData.SensorDataRef sensorDataRef,
                                          Bundle analysisSpecificData, Bundle options) {
         Intent intent = new Intent(parentActivity, CameraRunSettingsActivity.class);
-        packStartRunSettingsIntent(intent, sensorData, analysisSpecificData, options);
+        packStartRunSettingsIntent(intent, sensorDataRef, analysisSpecificData, options);
         parentActivity.startActivityForResult(intent, requestCode);
     }
 

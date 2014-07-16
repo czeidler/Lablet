@@ -11,10 +11,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
-import nz.ac.auckland.lablet.experiment.AbstractExperimentPlugin;
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
-import nz.ac.auckland.lablet.experiment.IExperimentSensor;
-import nz.ac.auckland.lablet.experiment.SensorData;
+import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.File;
 
@@ -37,8 +34,9 @@ public class AccelerometerExperimentPlugin extends AbstractExperimentPlugin {
     }
 
     @Override
-    public void startRunSettingsActivity(Activity parentActivity, int requestCode, SensorData sensorData,
-                                         Bundle analysisSpecificData, Bundle options) {
+    public void startSensorSettingsActivity(Activity parentActivity, int requestCode,
+                                            ExperimentData.SensorDataRef sensorDataRef,
+                                            Bundle analysisSpecificData, Bundle options) {
 
     }
 

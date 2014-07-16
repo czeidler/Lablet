@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.*;
 import nz.ac.auckland.lablet.camera.CameraSensorData;
+import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentLoader;
 import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.misc.StorageLib;
@@ -205,13 +206,13 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
         AsyncTask task = new AsyncTask() {
             @Override
             protected Object doInBackground(Object... objects) {
-                ExperimentLoader.Result result = new ExperimentLoader.Result();
-                if (!ExperimentLoader.loadExperiment(getContext(), experimentPath, result))
+                ExperimentData experimentData = new ExperimentData();
+                if (!experimentData.load(getContext(), experimentPath))
                     return null;
 
-                // TODO fix if there are more than one run runs or runs
-                SensorData sensorData = result.experimentData.runs.get(0).runs.get(0).sensorData;
-                CameraSensorData experiment = (CameraSensorData) sensorData;
+                // TODO fix if there are more than one run sensors or sensors
+                SensorData sensorData = experimentData.getRuns().get(0).sensors.get(0).sensorData;
+                CameraSensorData experiment = (CameraSensorData)sensorData;
                 return new File(experiment.getStorageDir(), experiment.getVideoFileName());
             }
 

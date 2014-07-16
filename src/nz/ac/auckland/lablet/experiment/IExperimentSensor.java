@@ -41,8 +41,8 @@ public interface IExperimentSensor {
     public void onSaveInstanceState(Bundle outState);
     public void onRestoreInstanceState(Bundle savedInstanceState);
 
-    public ExperimentRunGroup getExperimentRunGroup();
-    public void setExperimentRunGroup(ExperimentRunGroup experimentRunGroup);
+    public ExperimentRun getExperimentRun();
+    public void setExperimentRun(ExperimentRun experimentRun);
 
     public void init(Activity activity);
     public void destroy();

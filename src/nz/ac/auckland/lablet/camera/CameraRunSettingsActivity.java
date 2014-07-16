@@ -33,7 +33,7 @@ import java.util.ArrayList;
  * </p>
  */
 public class CameraRunSettingsActivity extends ExperimentDataActivity {
-    private CameraSensorData cameraExperiment;
+    private CameraSensorData cameraSensorData;
     private VideoFrameView videoFrameView;
 
     private SeekBar seekBar = null;
@@ -141,14 +141,14 @@ public class CameraRunSettingsActivity extends ExperimentDataActivity {
             return;
 
 
-        cameraExperiment = (CameraSensorData)getExperimentRunData();
+        cameraSensorData = (CameraSensorData)currentAnalysisSensor.analysis.getSensorData();
 
         setContentView(R.layout.camera_run_settings);
 
         videoFrameView = (VideoFrameView)findViewById(R.id.videoFrameView);
         assert videoFrameView != null;
-        File storageDir = cameraExperiment.getStorageDir();
-        File videoFile = new File(storageDir, cameraExperiment.getVideoFileName());
+        File storageDir = cameraSensorData.getStorageDir();
+        File videoFile = new File(storageDir, cameraSensorData.getVideoFileName());
         videoFrameView.setVideoFilePath(videoFile.getPath());
 
         seekBar = (SeekBar)findViewById(R.id.seekBar);
@@ -160,7 +160,7 @@ public class CameraRunSettingsActivity extends ExperimentDataActivity {
                     return;
                 int frameRate = getFrameRateFromPicker();
                 float frameSize = 1000.f / frameRate;
-                seekTo((int)(frameSize * progress));
+                seekTo((int) (frameSize * progress));
             }
 
             @Override
@@ -249,11 +249,11 @@ public class CameraRunSettingsActivity extends ExperimentDataActivity {
         if (analysisSpecificData != null)
             runSettings = analysisSpecificData.getBundle("run_settings");
         if (runSettings != null) {
-            cameraExperiment.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
-            cameraExperiment.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
-            cameraExperiment.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
+            cameraSensorData.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
+            cameraSensorData.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
+            cameraSensorData.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
         }
-        int analysisFrameRate = cameraExperiment.getAnalysisFrameRate();
+        int analysisFrameRate = cameraSensorData.getAnalysisFrameRate();
 
         // initial views with values
         calculateFrameRateValues(videoFrameView.getVideoFrameRate());
@@ -263,8 +263,8 @@ public class CameraRunSettingsActivity extends ExperimentDataActivity {
         int pickerFrameRateIndex = getNumberPickerIndexForFrameRate(analysisFrameRate);
         frameRatePicker.setValue(pickerFrameRateIndex);
 
-        videoStartValue = cameraExperiment.getAnalysisVideoStart();
-        videoEndValue = cameraExperiment.getAnalysisVideoEnd();
+        videoStartValue = cameraSensorData.getAnalysisVideoStart();
+        videoEndValue = cameraSensorData.getAnalysisVideoEnd();
         setVideoStart(videoStartValue);
         setVideoEnd(videoEndValue);
         PointF point = new PointF();
@@ -308,7 +308,7 @@ public class CameraRunSettingsActivity extends ExperimentDataActivity {
     }
 
     private int getDurationAtFrameRate(int frameRate) {
-        int duration = cameraExperiment.getVideoDuration();
+        int duration = cameraSensorData.getVideoDuration();
         int stepSize = Math.round(1000.0f / frameRate);
         int numberOfSteps = (int)((float)(frameRate * duration) / 1000);
         duration = stepSize * numberOfSteps;

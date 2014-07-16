@@ -39,17 +39,17 @@ class ExperimentRunViewManager {
 
     private Experiment.IExperimentListener experimentListener = new Experiment.IExperimentListener() {
         @Override
-        public void onExperimentRunGroupAdded(ExperimentRunGroup runGroup) {
+        public void onExperimentRunGroupAdded(ExperimentRun runGroup) {
             updateViews();
         }
 
         @Override
-        public void onExperimentRunGroupRemoved(ExperimentRunGroup runGroup) {
+        public void onExperimentRunGroupRemoved(ExperimentRun runGroup) {
             updateViews();
         }
 
         @Override
-        public void onCurrentRunGroupChanged(ExperimentRunGroup newGroup, ExperimentRunGroup oldGroup) {
+        public void onCurrentRunGroupChanged(ExperimentRun newGroup, ExperimentRun oldGroup) {
             updateViews();
         }
     };
@@ -65,23 +65,23 @@ class ExperimentRunViewManager {
         addRunGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ExperimentRunGroup oldGroup = experiment.getCurrentExperimentRunGroup();
+                ExperimentRun oldGroup = experiment.getCurrentExperimentRun();
                 List<String> experimentNamesList = new ArrayList<String>();
                 for (IExperimentSensor experimentRun : oldGroup.getExperimentRuns())
                     experimentNamesList.add(experimentRun.getClass().getSimpleName());
-                ExperimentRunGroup experimentRunGroup = ExperimentRunGroup.createExperimentRunGroup(
+                ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(
                         experimentNamesList, activity);
 
-                experiment.addExperimentRunGroup(experimentRunGroup);
-                setCurrentExperimentRunGroup(experimentRunGroup);
+                experiment.addExperimentRunGroup(experimentRun);
+                setCurrentExperimentRunGroup(experimentRun);
             }
         });
 
         nextRunGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                List<ExperimentRunGroup> runGroups = experiment.getExperimentRunGroups();
-                int index = runGroups.indexOf(experiment.getCurrentExperimentRunGroup());
+                List<ExperimentRun> runGroups = experiment.getExperimentRuns();
+                int index = runGroups.indexOf(experiment.getCurrentExperimentRun());
                 index++;
                 if (index >= runGroups.size())
                     return;
@@ -92,8 +92,8 @@ class ExperimentRunViewManager {
         prevRunGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                List<ExperimentRunGroup> runGroups = experiment.getExperimentRunGroups();
-                int index = runGroups.indexOf(experiment.getCurrentExperimentRunGroup());
+                List<ExperimentRun> runGroups = experiment.getExperimentRuns();
+                int index = runGroups.indexOf(experiment.getCurrentExperimentRun());
                 index--;
                 if (index < 0)
                     return;
@@ -107,8 +107,8 @@ class ExperimentRunViewManager {
     }
 
     private void updateViews() {
-        ExperimentRunGroup currentRunGroup = experiment.getCurrentExperimentRunGroup();
-        List<ExperimentRunGroup> runGroups = experiment.getExperimentRunGroups();
+        ExperimentRun currentRunGroup = experiment.getCurrentExperimentRun();
+        List<ExperimentRun> runGroups = experiment.getExperimentRuns();
         int index = runGroups.indexOf(currentRunGroup);
 
         runGroupView.setText(Integer.toString(index));
@@ -117,8 +117,8 @@ class ExperimentRunViewManager {
         prevRunGroupButton.setEnabled(index - 1 >= 0);
     }
 
-    private void setCurrentExperimentRunGroup(ExperimentRunGroup experimentRunGroup) {
-        experiment.setCurrentExperimentRunGroup(experimentRunGroup);
+    private void setCurrentExperimentRunGroup(ExperimentRun experimentRun) {
+        experiment.setCurrentExperimentRun(experimentRun);
     }
 }
 
@@ -179,19 +179,19 @@ public class ExperimentActivity extends FragmentActivity {
     private AbstractViewState state = null;
 
     private ExperimentRunViewManager experimentRunViewManager;
-    private ExperimentRunGroup activeExperimentRunGroup = null;
+    private ExperimentRun activeExperimentRun = null;
 
     private Experiment.IExperimentListener experimentListener = new Experiment.IExperimentListener() {
         @Override
-        public void onExperimentRunGroupAdded(ExperimentRunGroup runGroup) {
+        public void onExperimentRunGroupAdded(ExperimentRun runGroup) {
         }
 
         @Override
-        public void onExperimentRunGroupRemoved(ExperimentRunGroup runGroup) {
+        public void onExperimentRunGroupRemoved(ExperimentRun runGroup) {
         }
 
         @Override
-        public void onCurrentRunGroupChanged(ExperimentRunGroup newGroup, ExperimentRunGroup oldGroup) {
+        public void onCurrentRunGroupChanged(ExperimentRun newGroup, ExperimentRun oldGroup) {
             activateExperimentRunGroup(newGroup, true);
 
             updateAdapter();
@@ -236,9 +236,9 @@ public class ExperimentActivity extends FragmentActivity {
         MenuItem settingsMenu = menu.findItem(R.id.action_settings);
         assert settingsMenu != null;
         settingsMenuItem.setMenuItem(settingsMenu);
-        IExperimentSensor currentExperimentRun = experiment.getCurrentExperimentRun();
-        if (currentExperimentRun != null) {
-            boolean hasOptions = currentExperimentRun.onPrepareOptionsMenu(settingsMenu);
+        IExperimentSensor currentExperimentSensor = experiment.getCurrentExperimentSensor();
+        if (currentExperimentSensor != null) {
+            boolean hasOptions = currentExperimentSensor.onPrepareOptionsMenu(settingsMenu);
             settingsMenu.setEnabled(hasOptions);
             settingsMenu.setVisible(hasOptions);
         }
@@ -267,7 +267,7 @@ public class ExperimentActivity extends FragmentActivity {
     }
 
     public List<IExperimentSensor> getActiveExperimentRuns() {
-        ExperimentRunGroup currentGroup = experiment.getCurrentExperimentRunGroup();
+        ExperimentRun currentGroup = experiment.getCurrentExperimentRun();
         if (currentGroup.isActive())
             return currentGroup.getExperimentRuns();
         return new ArrayList<>();
@@ -285,9 +285,9 @@ public class ExperimentActivity extends FragmentActivity {
             item.setCheckable(true);
         }
         popup.getMenu().setGroupCheckable(1, true, true);
-        IExperimentSensor currentExperimentRun = experiment.getCurrentExperimentRun();
-        if (currentExperimentRun != null)
-            popup.getMenu().getItem(experimentRuns.indexOf(currentExperimentRun)).setChecked(true);
+        IExperimentSensor currentExperimentSensor = experiment.getCurrentExperimentSensor();
+        if (currentExperimentSensor != null)
+            popup.getMenu().getItem(experimentRuns.indexOf(currentExperimentSensor)).setChecked(true);
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -344,13 +344,13 @@ public class ExperimentActivity extends FragmentActivity {
 
     private void addExperiment(IExperimentPlugin plugin) {
         IExperimentSensor experimentRun = plugin.createExperimentSensor(this);
-        experiment.getCurrentExperimentRunGroup().addExperimentRun(experimentRun);
+        experiment.getCurrentExperimentRun().addExperimentRun(experimentRun);
 
         updateAdapter();
     }
 
     private void removeExperimentRun(IExperimentSensor experimentRun) {
-        experiment.getCurrentExperimentRunGroup().removeExperimentRun(experimentRun);
+        experiment.getCurrentExperimentRun().removeExperimentRun(experimentRun);
 
         updateAdapter();
     }
@@ -377,9 +377,9 @@ public class ExperimentActivity extends FragmentActivity {
         experimentList.add(AccelerometerExperimentSensor.class.getSimpleName());
         experimentList.add(CameraExperimentSensor.class.getSimpleName());
 
-        ExperimentRunGroup runGroup = ExperimentRunGroup.createExperimentRunGroup(experimentList, this);
+        ExperimentRun runGroup = ExperimentRun.createExperimentRunGroup(experimentList, this);
         experiment.addExperimentRunGroup(runGroup);
-        experiment.setCurrentExperimentRunGroup(runGroup);
+        experiment.setCurrentExperimentRun(runGroup);
         setCurrentExperimentRun(runGroup.getExperimentRunAt(0));
 
         experiment.addListener(experimentListener);
@@ -397,7 +397,7 @@ public class ExperimentActivity extends FragmentActivity {
 
             @Override
             public void onPageSelected(int position) {
-                setCurrentExperimentRun(experiment.getCurrentExperimentRunGroup().getExperimentRunAt(position));
+                setCurrentExperimentRun(experiment.getCurrentExperimentRun().getExperimentRunAt(position));
             }
 
             @Override
@@ -439,25 +439,25 @@ public class ExperimentActivity extends FragmentActivity {
     private void updateAdapter() {
         ExperimentRunFragmentPagerAdapter pagerAdapter = new ExperimentRunFragmentPagerAdapter(
                 getSupportFragmentManager());
-        pagerAdapter.setExperimentRunGroup(experiment.getCurrentExperimentRunGroup());
+        pagerAdapter.setExperimentRun(experiment.getCurrentExperimentRun());
         pager.setAdapter(pagerAdapter);
     }
 
-    private void activateExperimentRunGroup(ExperimentRunGroup experimentRunGroup, boolean activate) {
-        if (activeExperimentRunGroup != experimentRunGroup && activeExperimentRunGroup != null)
-            activeExperimentRunGroup.activateExperimentRuns(null);
+    private void activateExperimentRunGroup(ExperimentRun experimentRun, boolean activate) {
+        if (activeExperimentRun != experimentRun && activeExperimentRun != null)
+            activeExperimentRun.activateExperimentRuns(null);
 
         if (activate) {
-            experimentRunGroup.activateExperimentRuns(this);
-            activeExperimentRunGroup = experimentRunGroup;
+            experimentRun.activateExperimentRuns(this);
+            activeExperimentRun = experimentRun;
         } else {
-            experimentRunGroup.activateExperimentRuns(null);
-            activeExperimentRunGroup = null;
+            experimentRun.activateExperimentRuns(null);
+            activeExperimentRun = null;
         }
     }
 
     private void setCurrentExperimentRun(IExperimentSensor experimentRun) {
-        experimentRun.getExperimentRunGroup().setCurrentExperimentRun(experimentRun);
+        experimentRun.getExperimentRun().setCurrentExperimentRun(experimentRun);
         invalidateOptionsMenu();
     }
 
@@ -497,10 +497,10 @@ public class ExperimentActivity extends FragmentActivity {
     public void onResume() {
         super.onResume();
 
-        activateExperimentRunGroup(experiment.getCurrentExperimentRunGroup(), true);
+        activateExperimentRunGroup(experiment.getCurrentExperimentRun(), true);
         updateAdapter();
 
-        if (!experiment.getCurrentExperimentRunGroup().dataTaken()) {
+        if (!experiment.getCurrentExperimentRun().dataTaken()) {
             setState(new PreviewState());
         } else {
             // we have unsaved experiment data means we are in the PlaybackState state
@@ -512,7 +512,7 @@ public class ExperimentActivity extends FragmentActivity {
     public void onPause() {
         setState(null);
 
-        ExperimentRunGroup currentGroup = experiment.getCurrentExperimentRunGroup();
+        ExperimentRun currentGroup = experiment.getCurrentExperimentRun();
         activateExperimentRunGroup(currentGroup, false);
         super.onPause();
     }
@@ -764,14 +764,14 @@ public class ExperimentActivity extends FragmentActivity {
 }
 
 class ExperimentRunFragmentPagerAdapter extends FragmentStatePagerAdapter {
-    private ExperimentRunGroup experimentRunGroup;
+    private ExperimentRun experimentRun;
 
     public ExperimentRunFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager) {
         super(fragmentManager);
     }
 
-    public void setExperimentRunGroup(ExperimentRunGroup experimentRunGroup) {
-        this.experimentRunGroup = experimentRunGroup;
+    public void setExperimentRun(ExperimentRun experimentRun) {
+        this.experimentRun = experimentRun;
         notifyDataSetChanged();
     }
 
@@ -821,13 +821,13 @@ class ExperimentRunFragmentPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public android.support.v4.app.Fragment getItem(int position) {
-        List<IExperimentSensor> list = experimentRunGroup.getExperimentRuns();
+        List<IExperimentSensor> list = experimentRun.getExperimentRuns();
         return new ExperimentRunFragment(list.get(position).getClass().getSimpleName());
     }
 
     @Override
     public int getCount() {
-        List<IExperimentSensor> list = experimentRunGroup.getExperimentRuns();
+        List<IExperimentSensor> list = experimentRun.getExperimentRuns();
         return list.size();
     }
 

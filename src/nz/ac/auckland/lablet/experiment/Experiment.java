@@ -20,13 +20,13 @@ import java.util.List;
 
 public class Experiment {
     public interface IExperimentListener {
-        public void onExperimentRunGroupAdded(ExperimentRunGroup runGroup);
-        public void onExperimentRunGroupRemoved(ExperimentRunGroup runGroup);
-        public void onCurrentRunGroupChanged(ExperimentRunGroup newGroup, ExperimentRunGroup oldGroup);
+        public void onExperimentRunGroupAdded(ExperimentRun runGroup);
+        public void onExperimentRunGroupRemoved(ExperimentRun runGroup);
+        public void onCurrentRunGroupChanged(ExperimentRun newGroup, ExperimentRun oldGroup);
     }
 
-    final private List<ExperimentRunGroup> experimentRunGroups = new ArrayList<>();
-    private ExperimentRunGroup currentExperimentRunGroup;
+    final private List<ExperimentRun> experimentRuns = new ArrayList<>();
+    private ExperimentRun currentExperimentRun;
     final private Activity activity;
     final private File storageDirectory;
     private int runGroupId = -1;
@@ -53,11 +53,11 @@ public class Experiment {
     }
 
     public void onSaveInstanceState(Bundle outState) {
-        outState.putInt("number_of_runs", experimentRunGroups.size());
-        if (currentExperimentRunGroup != null)
-            outState.putInt("current_run", experimentRunGroups.indexOf(currentExperimentRunGroup));
+        outState.putInt("number_of_runs", experimentRuns.size());
+        if (currentExperimentRun != null)
+            outState.putInt("current_run", experimentRuns.indexOf(currentExperimentRun));
         int i = 0;
-        for (ExperimentRunGroup run : experimentRunGroups) {
+        for (ExperimentRun run : experimentRuns) {
             Bundle runBundle = new Bundle();
             run.onSaveInstanceState(runBundle);
             outState.putBundle(Integer.toString(i), runBundle);
@@ -66,7 +66,7 @@ public class Experiment {
     }
 
     public void onRestoreInstanceState(Bundle savedInstanceState) {
-        assert(experimentRunGroups.size() == 0);
+        assert(experimentRuns.size() == 0);
 
         int numberOfRuns = savedInstanceState.getInt("number_of_runs", 0);
         for (int i = 0; i < numberOfRuns; i++) {
@@ -74,60 +74,60 @@ public class Experiment {
             Bundle runState = savedInstanceState.getBundle(runNumberString);
             if (runState == null)
                 continue;
-            ExperimentRunGroup run = new ExperimentRunGroup();
+            ExperimentRun run = new ExperimentRun();
             addExperimentRunGroup(run);
             run.onRestoreInstanceState(runState);
         }
 
         int currentRunIndex = savedInstanceState.getInt("current_run", -1);
         if (currentRunIndex >= 0)
-            setCurrentExperimentRunGroup(experimentRunGroups.get(currentRunIndex));
+            setCurrentExperimentRun(experimentRuns.get(currentRunIndex));
     }
 
-    public List<ExperimentRunGroup> getExperimentRunGroups() {
-        return experimentRunGroups;
+    public List<ExperimentRun> getExperimentRuns() {
+        return experimentRuns;
     }
 
-    public boolean addExperimentRunGroup(ExperimentRunGroup runGroup) {
+    public boolean addExperimentRunGroup(ExperimentRun runGroup) {
         if (runGroup.getExperiment() != null)
             return false;
-        if (currentExperimentRunGroup == null)
-            currentExperimentRunGroup = runGroup;
+        if (currentExperimentRun == null)
+            currentExperimentRun = runGroup;
         runGroup.setExperiment(this, "run" + Integer.toString(createRunGroupId()));
-        experimentRunGroups.add(runGroup);
+        experimentRuns.add(runGroup);
 
         notifyExperimentRunGroupAdded(runGroup);
         return true;
     }
 
-    public void removeExperimentRunGroup(ExperimentRunGroup runGroup) {
-        final int removedGroupIndex = experimentRunGroups.indexOf(runGroup);
+    public void removeExperimentRunGroup(ExperimentRun runGroup) {
+        final int removedGroupIndex = experimentRuns.indexOf(runGroup);
 
         runGroup.setExperiment(null, "");
-        experimentRunGroups.remove(runGroup);
+        experimentRuns.remove(runGroup);
 
         // find new current group if runGroup was the current group
-        if (runGroup == currentExperimentRunGroup) {
+        if (runGroup == currentExperimentRun) {
             if (removedGroupIndex > 0)
-                setCurrentExperimentRunGroup(experimentRunGroups.get(removedGroupIndex - 1));
-            else if (experimentRunGroups.size() > removedGroupIndex)
-                setCurrentExperimentRunGroup(experimentRunGroups.get(removedGroupIndex));
+                setCurrentExperimentRun(experimentRuns.get(removedGroupIndex - 1));
+            else if (experimentRuns.size() > removedGroupIndex)
+                setCurrentExperimentRun(experimentRuns.get(removedGroupIndex));
             else
-                setCurrentExperimentRunGroup(null);
+                setCurrentExperimentRun(null);
         }
 
         notifyExperimentRunGroupRemoved(runGroup);
     }
 
-    public void setCurrentExperimentRunGroup(ExperimentRunGroup runGroup) {
-        ExperimentRunGroup oldGroup = currentExperimentRunGroup;
-        currentExperimentRunGroup = runGroup;
+    public void setCurrentExperimentRun(ExperimentRun runGroup) {
+        ExperimentRun oldGroup = currentExperimentRun;
+        currentExperimentRun = runGroup;
 
         notifyCurrentExperimentRunGroupChanged(runGroup, oldGroup);
     }
 
-    public ExperimentRunGroup getCurrentExperimentRunGroup() {
-        return currentExperimentRunGroup;
+    public ExperimentRun getCurrentExperimentRun() {
+        return currentExperimentRun;
     }
 
     public int createRunGroupId() {
@@ -135,11 +135,11 @@ public class Experiment {
         return runGroupId;
     }
 
-    public IExperimentSensor getCurrentExperimentRun() {
-        ExperimentRunGroup runGroup = getCurrentExperimentRunGroup();
+    public IExperimentSensor getCurrentExperimentSensor() {
+        ExperimentRun runGroup = getCurrentExperimentRun();
         if (runGroup == null)
             return null;
-        return runGroup.getCurrentExperimentRun();
+        return runGroup.getCurrentExperimentSensor();
     }
 
     public File getStorageDir() {
@@ -148,14 +148,14 @@ public class Experiment {
 
     public void finishExperiment(boolean saveData) throws IOException {
         int i = 0;
-        for (ExperimentRunGroup experimentRunGroup : experimentRunGroups) {
-            experimentRunGroup.finishExperiment(saveData, new File(getStorageDir(), "run" + Integer.toString(i)));
+        for (ExperimentRun experimentRun : experimentRuns) {
+            experimentRun.finishExperiment(saveData, new File(getStorageDir(), "run" + Integer.toString(i)));
             i++;
         }
     }
 
     public boolean dataTaken() {
-        for (ExperimentRunGroup runGroup : experimentRunGroups) {
+        for (ExperimentRun runGroup : experimentRuns) {
             if (runGroup.dataTaken())
                 return true;
         }
@@ -177,17 +177,17 @@ public class Experiment {
         return hardListeners;
     }
 
-    private void notifyCurrentExperimentRunGroupChanged(ExperimentRunGroup runGroup, ExperimentRunGroup oldGroup) {
+    private void notifyCurrentExperimentRunGroupChanged(ExperimentRun runGroup, ExperimentRun oldGroup) {
         for (IExperimentListener listener : getListeners())
             listener.onCurrentRunGroupChanged(runGroup, oldGroup);
     }
 
-    private void notifyExperimentRunGroupAdded(ExperimentRunGroup runGroup) {
+    private void notifyExperimentRunGroupAdded(ExperimentRun runGroup) {
         for (IExperimentListener listener : getListeners())
             listener.onExperimentRunGroupAdded(runGroup);
     }
 
-    private void notifyExperimentRunGroupRemoved(ExperimentRunGroup runGroup) {
+    private void notifyExperimentRunGroupRemoved(ExperimentRun runGroup) {
         for (IExperimentListener listener : getListeners())
             listener.onExperimentRunGroupRemoved(runGroup);
     }

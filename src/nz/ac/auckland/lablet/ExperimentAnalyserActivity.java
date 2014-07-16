@@ -15,10 +15,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.*;
 import android.widget.PopupMenu;
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
-import nz.ac.auckland.lablet.experiment.ExperimentLoader;
-import nz.ac.auckland.lablet.experiment.SensorData;
-import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
+import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 
 import java.io.*;
@@ -65,12 +62,12 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
         final MenuItem settingsItem = menu.findItem(R.id.action_run_settings);
         assert settingsItem != null;
         final StringBuilder settingsName = new StringBuilder();
-        if (currentAnalysisRun.plugin.hasSensorSettingsActivity(settingsName)) {
+        if (currentAnalysisSensor.plugin.hasSensorSettingsActivity(settingsName)) {
             settingsItem.setTitle(settingsName);
             settingsItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
-                    startRunSettingsActivity(currentAnalysisRun.analysis.getExperimentSpecificData(), null);
+                    startRunSettingsActivity(currentAnalysisSensor.analysis.getExperimentSpecificData(), null);
                     return true;
                 }
             });
@@ -108,7 +105,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
     }
 
     private void showCalibrationMenu() {
-        ScaleSettingsDialog scaleSettingsDialog = new ScaleSettingsDialog(this, currentAnalysisRun.analysis);
+        ScaleSettingsDialog scaleSettingsDialog = new ScaleSettingsDialog(this, currentAnalysisSensor.analysis);
         scaleSettingsDialog.show();
     }
 
@@ -121,22 +118,35 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
             public boolean onMenuItemClick(MenuItem menuItem) {
                 int item = menuItem.getItemId();
                 if (item == R.id.showCoordinateSystem) {
-                    currentAnalysisRun.analysis.setShowCoordinateSystem(!menuItem.isChecked());
+                    currentAnalysisSensor.analysis.setShowCoordinateSystem(!menuItem.isChecked());
                 } else if (item == R.id.swapAxis) {
-                    currentAnalysisRun.analysis.getCalibration().setSwapAxis(!menuItem.isChecked());
+                    currentAnalysisSensor.analysis.getCalibration().setSwapAxis(!menuItem.isChecked());
                 }
                 return false;
             }
         });
-        popup.getMenu().getItem(0).setChecked(currentAnalysisRun.analysis.getShowCoordinateSystem());
-        popup.getMenu().getItem(1).setChecked(currentAnalysisRun.analysis.getCalibration().getSwapAxis());
+        popup.getMenu().getItem(0).setChecked(currentAnalysisSensor.analysis.getShowCoordinateSystem());
+        popup.getMenu().getItem(1).setChecked(currentAnalysisSensor.analysis.getCalibration().getSwapAxis());
         popup.show();
     }
 
+    private ExperimentData.SensorDataRef getSensorDataRef(AnalysisEntry analysisEntry) {
+        for (int run = 0; run < analysisRuns.size(); run++) {
+            List<AnalysisEntry> analysisList = analysisRuns.get(run);
+            for (int sensor = 0; sensor < analysisList.size(); sensor++) {
+                AnalysisEntry entry = analysisList.get(sensor);
+                if (entry == analysisEntry)
+                    return new ExperimentData.SensorDataRef(experimentData, run, sensor);
+            }
+        }
+        return null;
+    }
+
+
     private void startRunSettingsActivity(Bundle analysisSpecificData, Bundle options) {
-        IExperimentPlugin plugin = currentAnalysisRun.plugin;
-        SensorData sensorData = currentAnalysisRun.analysis.getSensorData();
-        plugin.startSensorSettingsActivity(this, PERFORM_RUN_SETTINGS, sensorData, analysisSpecificData, options);
+        IExperimentPlugin plugin = currentAnalysisSensor.plugin;
+        ExperimentData.SensorDataRef sensorDataRef = getSensorDataRef(currentAnalysisSensor);
+        plugin.startSensorSettingsActivity(this, PERFORM_RUN_SETTINGS, sensorDataRef, analysisSpecificData, options);
     }
 
     /*
@@ -161,7 +171,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
             return;
 
         if (requestCode == PERFORM_RUN_SETTINGS) {
-            SensorAnalysis sensorAnalysis = currentAnalysisRun.analysis;
+            SensorAnalysis sensorAnalysis = currentAnalysisSensor.analysis;
 
             Bundle extras = data.getExtras();
             if (extras != null) {
@@ -191,35 +201,35 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
             return;
         }
 
-        for (ExperimentLoader.ExperimentData.GroupEntry groupEntry : experimentData.groups) {
-            List<AnalysisEntry> groupList = new ArrayList<>();
-            for (ExperimentLoader.ExperimentData.RunEntry runEntry : groupEntry.runs) {
+        for (ExperimentData.RunEntry runEntry : experimentData.getRuns()) {
+            List<AnalysisEntry> analysisEntryList = new ArrayList<>();
+            for (ExperimentData.SensorEntry sensor : runEntry.sensors) {
                 AnalysisEntry entry = new AnalysisEntry();
-                entry.plugin = runEntry.plugin;
-                entry.analysis = ExperimentLoader.getExperimentAnalysis(runEntry);
+                entry.plugin = sensor.plugin;
+                entry.analysis = ExperimentLoader.getSensorAnalysis(sensor);
                 if (entry.analysis == null) {
                     showErrorAndFinish("Unable to load experiment analysis");
                     return;
                 }
-                groupList.add(entry);
+                analysisEntryList.add(entry);
             }
-            analysisRunGroups.add(groupList);
+            analysisRuns.add(analysisEntryList);
         }
 
-        if (analysisRunGroups.size() == 0 || currentAnalysisRunGroup.size() == 0) {
+        if (analysisRuns.size() == 0 || currentAnalysisRun.size() == 0) {
             showErrorAndFinish("No experiment found.");
             return;
         }
 
-        setCurrentAnalysisRunGroup(0);
         setCurrentAnalysisRun(0);
+        setCurrentAnalysisSensor(0);
 
         final Intent intent = getIntent();
         if (intent != null) {
             Bundle extras = intent.getExtras();
             if (extras != null) {
                 if (extras.getBoolean("first_start_with_run_settings", false)
-                        && currentAnalysisRun.analysis.getTagMarkers().getMarkerCount() == 0) {
+                        && currentAnalysisSensor.analysis.getTagMarkers().getMarkerCount() == 0) {
                     resumeWithRunSettings = true;
                 }
                 if (extras.getBoolean("first_start_with_run_settings_help", false)) {
@@ -245,7 +255,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
     protected void onResume() {
         super.onResume();
 
-        SensorAnalysis sensorAnalysis = currentAnalysisRun.analysis;
+        SensorAnalysis sensorAnalysis = currentAnalysisSensor.analysis;
         if (sensorAnalysis != null)
             sensorAnalysis.getFrameDataModel().setCurrentFrame(sensorAnalysis.getFrameDataModel().getCurrentFrame());
 
@@ -264,10 +274,10 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
     protected void onPause() {
         super.onPause();
 
-        if (analysisRunGroups.size() == 0)
+        if (analysisRuns.size() == 0)
             return;
 
-        for (List<AnalysisEntry> entries : analysisRunGroups) {
+        for (List<AnalysisEntry> entries : analysisRuns) {
             for (AnalysisEntry entry : entries) {
                 try {
                     entry.analysis.saveAnalysisDataToFile();
@@ -288,7 +298,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
     }
 
     private void exportTagMarkerCSVData() {
-        for (List<AnalysisEntry> entries : analysisRunGroups) {
+        for (List<AnalysisEntry> entries : analysisRuns) {
             for (AnalysisEntry entry : entries) {
                 exportTagMarkerCSVData(entry.analysis);
             }
@@ -330,7 +340,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
 
         @Override
         public int getCount() {
-            return currentAnalysisRunGroup.size();
+            return currentAnalysisRun.size();
         }
     }
 }

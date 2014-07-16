@@ -70,7 +70,7 @@ class ExperimentRunData {
     }
 }
 
-public class ExperimentRunGroup {
+public class ExperimentRun {
     private ExperimentRunData data = new ExperimentRunData();
 
     final private List<IExperimentSensor> experimentRuns = new ArrayList<>();
@@ -81,8 +81,8 @@ public class ExperimentRunGroup {
 
     final static public String EXPERIMENT_RUN_GROUP_FILE_NAME = "experiment_run_group.xml";
 
-    static public ExperimentRunGroup createExperimentRunGroup(List<String> experimentRuns, Activity activity) {
-        ExperimentRunGroup experimentRunGroup = new ExperimentRunGroup();
+    static public ExperimentRun createExperimentRunGroup(List<String> experimentRuns, Activity activity) {
+        ExperimentRun experimentRunGroup = new ExperimentRun();
 
         ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
         for (String experimentRunName : experimentRuns) {
@@ -132,7 +132,7 @@ public class ExperimentRunGroup {
         return true;
     }
 
-    public IExperimentSensor getCurrentExperimentRun() {
+    public IExperimentSensor getCurrentExperimentSensor() {
         return currentExperimentRun;
     }
 
@@ -145,10 +145,10 @@ public class ExperimentRunGroup {
     }
 
     public boolean addExperimentRun(IExperimentSensor experimentRun) {
-        if (experimentRun.getExperimentRunGroup() != null)
+        if (experimentRun.getExperimentRun() != null)
             return false;
         experimentRuns.add(experimentRun);
-        experimentRun.setExperimentRunGroup(this);
+        experimentRun.setExperimentRun(this);
 
         if (experimentRunActivity != null)
             experimentRun.init(experimentRunActivity);
@@ -157,7 +157,7 @@ public class ExperimentRunGroup {
 
     public void removeExperimentRun(IExperimentSensor experimentRun) {
         // update the current experiment run first if necessary
-        if (experimentRun == getCurrentExperimentRun()) {
+        if (experimentRun == getCurrentExperimentSensor()) {
             int index = experimentRuns.indexOf(experimentRun);
             if (index > 0)
                 setCurrentExperimentRun(0);

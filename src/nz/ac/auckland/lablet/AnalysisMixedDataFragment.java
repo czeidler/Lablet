@@ -130,7 +130,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         int position = getArguments().getInt("analysisRunId", 0);
 
         ExperimentAnalyserActivity experimentActivity = (ExperimentAnalyserActivity)activity;
-        List<ExperimentDataActivity.AnalysisEntry> list = experimentActivity.getCurrentAnalysisRuns();
+        List<ExperimentDataActivity.AnalysisEntry> list = experimentActivity.getCurrentAnalysisRun();
         return list.get(position);
     }
 

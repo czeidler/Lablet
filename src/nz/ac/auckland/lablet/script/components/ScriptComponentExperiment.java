@@ -9,8 +9,9 @@ package nz.ac.auckland.lablet.script.components;
 
 
 import android.content.Context;
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
+import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentLoader;
+import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class ScriptComponentExperiment {
     private List<WeakReference<IScriptComponentExperimentListener>> listeners
             = new ArrayList<WeakReference<IScriptComponentExperimentListener>>();
     private String experimentPath = "";
-    private SensorAnalysis sensorAnalysis;
+    private ExperimentData experimentData;
 
     public String getExperimentPath() {
         return experimentPath;
@@ -40,9 +41,12 @@ public class ScriptComponentExperiment {
     }
 
     public SensorAnalysis getExperimentAnalysis(Context context) {
-        if (sensorAnalysis == null)
-            sensorAnalysis = loadExperimentAnalysis(context);
-        return sensorAnalysis;
+        if (experimentData == null)
+            experimentData = loadSensorAnalysis(context);
+
+        ExperimentData.SensorEntry entry = new ExperimentData.SensorEntry();
+
+        return ExperimentLoader.getSensorAnalysis(experimentData.getRuns().get(0).sensors.get(0));
     }
 
     public void addListener(IScriptComponentExperimentListener listener) {
@@ -54,7 +58,7 @@ public class ScriptComponentExperiment {
     }
 
     public void reloadExperimentAnalysis(Context context) {
-        sensorAnalysis = loadExperimentAnalysis(context);
+        experimentData = loadSensorAnalysis(context);
         for (ListIterator<WeakReference<IScriptComponentExperimentListener>> it = listeners.listIterator();
              it.hasNext();) {
             IScriptComponentExperimentListener listener = it.next().get();
@@ -65,7 +69,10 @@ public class ScriptComponentExperiment {
         }
     }
 
-    private SensorAnalysis loadExperimentAnalysis(Context context) {
-        return ExperimentLoader.loadExperimentAnalysis(context, getExperimentPath());
+    private ExperimentData loadSensorAnalysis(Context context) {
+        ExperimentData experimentData = new ExperimentData();
+        if (!experimentData.load(context, getExperimentPath()))
+            return null;
+        return experimentData;
     }
 }

@@ -13,8 +13,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.SensorAnalysis;
-import nz.ac.auckland.lablet.experiment.ExperimentLoader;
 import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
 
 import java.io.*;
@@ -31,28 +31,28 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
         public IExperimentPlugin plugin;
     }
 
-    protected ExperimentLoader.ExperimentData experimentData = null;
+    protected ExperimentData experimentData = null;
 
     private File baseDirectory = null;
 
-    final protected List<List<AnalysisEntry>> analysisRunGroups = new ArrayList<>();
-    protected List<AnalysisEntry> currentAnalysisRunGroup;
-    protected AnalysisEntry currentAnalysisRun;
-
-    protected void setCurrentAnalysisRunGroup(int index) {
-        currentAnalysisRunGroup = analysisRunGroups.get(index);
-        setCurrentAnalysisRun(0);
-    }
+    final protected List<List<AnalysisEntry>> analysisRuns = new ArrayList<>();
+    protected List<AnalysisEntry> currentAnalysisRun;
+    protected AnalysisEntry currentAnalysisSensor;
 
     protected void setCurrentAnalysisRun(int index) {
-        currentAnalysisRun = currentAnalysisRunGroup.get(index);
+        currentAnalysisRun = analysisRuns.get(index);
+        setCurrentAnalysisSensor(0);
     }
 
-    public List<AnalysisEntry> getCurrentAnalysisRuns() {
-        return currentAnalysisRunGroup;
+    protected void setCurrentAnalysisSensor(int index) {
+        currentAnalysisSensor = currentAnalysisRun.get(index);
     }
 
-    protected void setExperimentData(ExperimentLoader.ExperimentData experimentData) {
+    public List<AnalysisEntry> getCurrentAnalysisRun() {
+        return currentAnalysisRun;
+    }
+
+    protected void setExperimentData(ExperimentData experimentData) {
         this.experimentData = experimentData;
 
         baseDirectory = getDefaultExperimentBaseDir(this);
@@ -67,7 +67,7 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
         }
     }
 
-    public ExperimentLoader.ExperimentData getExperimentData() {
+    public ExperimentData getExperimentData() {
         return experimentData;
     }
 
@@ -78,14 +78,18 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
         }
 
         String experimentPath = intent.getStringExtra("experiment_path");
+        int runId = intent.getIntExtra("run_id", 0);
+        int sensorId = intent.getIntExtra("sensor_id", 0);
 
-        ExperimentLoader.Result result = new ExperimentLoader.Result();
-        if (!ExperimentLoader.loadExperiment(this, experimentPath, result)) {
-            showErrorAndFinish(result.loadError);
+        experimentData = new ExperimentData();
+        if (!experimentData.load(this, experimentPath)) {
+            showErrorAndFinish(experimentData.getLoadError());
+            experimentData = null;
             return false;
         }
 
-        experimentData = result.experimentData;
+        setCurrentAnalysisRun(runId);
+        setCurrentAnalysisSensor(sensorId);
         return true;
     }
 

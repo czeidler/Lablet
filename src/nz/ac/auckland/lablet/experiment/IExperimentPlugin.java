@@ -41,7 +41,7 @@ public interface IExperimentPlugin {
     public IExperimentSensor createExperimentSensor(Activity parentActivity);
 
     /**
-     * Starts an activity to config the experiment runs.
+     * Starts an activity to config the experiment sensors.
      * <p>
      * For example, the camera experiment uses it to set the framerate and the video start and end point.
      * </p>

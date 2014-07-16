@@ -178,8 +178,8 @@ public class CameraSensorData extends SensorData {
      * Set the frame rate at which the video should be analysed.
      * <p>
      * This method should only be called from the {@link nz.ac.auckland.lablet.camera.CameraExperimentAnalysis}. The
-     * frame rate determined how many runs are returned by the experiments, i.e., a higher frame rate results in more
-     * runs.
+     * frame rate determined how many sensors are returned by the experiments, i.e., a higher frame rate results in more
+     * sensors.
      * </p>
      * <p>
      * The analysis frame rate should be smaller or equal to the frame rate of the recorded video. Furthermore, the
@@ -210,7 +210,7 @@ public class CameraSensorData extends SensorData {
      * Sets the start time of the video analysis.
      * <p>
      * This value should only be set by {@link nz.ac.auckland.lablet.camera.CameraExperimentAnalysis}. The analysis
-     * start point affects the number of returned runs.
+     * start point affects the number of returned sensors.
      * </p>
      * @param startTime the time for the analysis start
      */
@@ -231,7 +231,7 @@ public class CameraSensorData extends SensorData {
      * Sets the end time for the video analysis.
      * <p>
      * This value should only be set by {@link nz.ac.auckland.lablet.camera.CameraExperimentAnalysis}. The analysis
-     * end point affects the number of returned runs.
+     * end point affects the number of returned sensors.
      * </p>
      * @param endTime the time for the analysis end
      */
