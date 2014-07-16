@@ -16,7 +16,7 @@ import nz.ac.auckland.lablet.experiment.*;
 import java.io.File;
 
 
-public class MircrophoneExperimentPlugin extends AbstractExperimentPlugin {
+public class MicrophoneExperimentPlugin extends AbstractExperimentPlugin {
     @Override
     public String getName() {
         return MicrophoneExperimentSensor.class.getSimpleName();
