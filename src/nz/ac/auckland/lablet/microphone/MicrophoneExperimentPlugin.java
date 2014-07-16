@@ -19,7 +19,7 @@ import java.io.File;
 public class MicrophoneExperimentPlugin extends AbstractExperimentPlugin {
     @Override
     public String getName() {
-        return MicrophoneExperimentSensor.class.getSimpleName();
+        return MicrophoneSensorData.class.getSimpleName();
     }
 
     @Override
@@ -46,7 +46,7 @@ public class MicrophoneExperimentPlugin extends AbstractExperimentPlugin {
 
     @Override
     public SensorData loadSensorData(Context context, Bundle data, File storageDir) {
-        return null;
+        return new MicrophoneSensorData(context, data, storageDir);
     }
 
     @Override

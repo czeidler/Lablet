@@ -23,7 +23,7 @@ import java.io.File;
 public class CameraExperimentPlugin extends AbstractExperimentPlugin {
     @Override
     public String getName() {
-        return CameraExperimentSensor.class.getSimpleName();
+        return CameraSensorData.class.getSimpleName();
     }
 
     @Override

@@ -27,8 +27,13 @@ import java.util.List;
  */
 abstract public class ExperimentDataActivity extends FragmentActivity {
     protected class AnalysisEntry {
-        public SensorAnalysis analysis;
-        public IExperimentPlugin plugin;
+        final public SensorAnalysis analysis;
+        final public IExperimentPlugin plugin;
+
+        public AnalysisEntry(ExperimentData.SensorEntry sensorEntry) {
+            this.plugin = sensorEntry.plugin;
+            this.analysis = sensorEntry.plugin.createSensorAnalysis(sensorEntry.sensorData);
+        }
     }
 
     protected ExperimentData experimentData = null;
@@ -54,6 +59,25 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
 
     protected void setExperimentData(ExperimentData experimentData) {
         this.experimentData = experimentData;
+
+        for (ExperimentData.RunEntry runEntry : experimentData.getRuns()) {
+            List<AnalysisEntry> analysisEntryList = new ArrayList<>();
+            for (ExperimentData.SensorEntry sensor : runEntry.sensors) {
+                AnalysisEntry entry = new AnalysisEntry(sensor);
+                if (entry.analysis == null)
+                    continue;
+                analysisEntryList.add(entry);
+            }
+            analysisRuns.add(analysisEntryList);
+        }
+
+        if (analysisRuns.size() == 0 || analysisRuns.get(0).size() == 0) {
+            showErrorAndFinish("No experiment found.");
+            return;
+        }
+
+        setCurrentAnalysisRun(0);
+        setCurrentAnalysisSensor(0);
 
         baseDirectory = getDefaultExperimentBaseDir(this);
 
@@ -81,12 +105,12 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
         int runId = intent.getIntExtra("run_id", 0);
         int sensorId = intent.getIntExtra("sensor_id", 0);
 
-        experimentData = new ExperimentData();
+        ExperimentData experimentData = new ExperimentData();
         if (!experimentData.load(this, experimentPath)) {
             showErrorAndFinish(experimentData.getLoadError());
-            experimentData = null;
             return false;
         }
+        setExperimentData(experimentData);
 
         setCurrentAnalysisRun(runId);
         setCurrentAnalysisSensor(sensorId);

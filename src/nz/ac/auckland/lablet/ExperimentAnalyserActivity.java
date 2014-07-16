@@ -201,29 +201,6 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
             return;
         }
 
-        for (ExperimentData.RunEntry runEntry : experimentData.getRuns()) {
-            List<AnalysisEntry> analysisEntryList = new ArrayList<>();
-            for (ExperimentData.SensorEntry sensor : runEntry.sensors) {
-                AnalysisEntry entry = new AnalysisEntry();
-                entry.plugin = sensor.plugin;
-                entry.analysis = ExperimentLoader.getSensorAnalysis(sensor);
-                if (entry.analysis == null) {
-                    showErrorAndFinish("Unable to load experiment analysis");
-                    return;
-                }
-                analysisEntryList.add(entry);
-            }
-            analysisRuns.add(analysisEntryList);
-        }
-
-        if (analysisRuns.size() == 0 || currentAnalysisRun.size() == 0) {
-            showErrorAndFinish("No experiment found.");
-            return;
-        }
-
-        setCurrentAnalysisRun(0);
-        setCurrentAnalysisSensor(0);
-
         final Intent intent = getIntent();
         if (intent != null) {
             Bundle extras = intent.getExtras();
@@ -255,6 +232,8 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
     protected void onResume() {
         super.onResume();
 
+        if (currentAnalysisSensor == null)
+            return;
         SensorAnalysis sensorAnalysis = currentAnalysisSensor.analysis;
         if (sensorAnalysis != null)
             sensorAnalysis.getFrameDataModel().setCurrentFrame(sensorAnalysis.getFrameDataModel().getCurrentFrame());
