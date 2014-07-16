@@ -45,11 +45,11 @@ public class ExperimentLoader {
 
     // Creates a new ExperimentAnalysis and tries to load an existing analysis.
     static public SensorAnalysis getSensorAnalysis(ExperimentData.SensorEntry sensorEntry) {
-        SensorData runData = sensorEntry.sensorData;
-        SensorAnalysis sensorAnalysis = sensorEntry.plugin.createSensorAnalysis(runData);
+        SensorData sensorData = sensorEntry.sensorData;
+        SensorAnalysis sensorAnalysis = sensorEntry.plugin.createSensorAnalysis(sensorData);
 
         // try to load old analysis
-        File projectFile = new File(runData.getStorageDir(), SensorAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
+        File projectFile = new File(sensorData.getStorageDir(), SensorAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
         Bundle bundle = ExperimentLoader.loadBundleFromFile(projectFile);
         if (bundle == null)
             return sensorAnalysis;
@@ -58,7 +58,7 @@ public class ExperimentLoader {
         if (analysisDataBundle == null)
             return sensorAnalysis;
 
-        sensorAnalysis.loadAnalysisData(analysisDataBundle, runData.getStorageDir());
+        sensorAnalysis.loadAnalysisData(analysisDataBundle, sensorData.getStorageDir());
 
         return sensorAnalysis;
     }

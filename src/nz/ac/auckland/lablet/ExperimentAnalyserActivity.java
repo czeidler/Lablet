@@ -19,7 +19,6 @@ import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -265,8 +264,6 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
                 }
             }
         }
-
-
 
         exportTagMarkerCSVData();
     }

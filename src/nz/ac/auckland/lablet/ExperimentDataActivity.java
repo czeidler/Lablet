@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
+import nz.ac.auckland.lablet.experiment.ExperimentLoader;
 import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
 
@@ -32,7 +33,7 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
 
         public AnalysisEntry(ExperimentData.SensorEntry sensorEntry) {
             this.plugin = sensorEntry.plugin;
-            this.analysis = sensorEntry.plugin.createSensorAnalysis(sensorEntry.sensorData);
+            this.analysis = ExperimentLoader.getSensorAnalysis(sensorEntry);
         }
     }
 
