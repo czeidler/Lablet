@@ -26,7 +26,7 @@ import nz.ac.auckland.lablet.experiment.MarkerDataModel;
  */
 public class FrameContainerView extends RelativeLayout implements FrameDataModel.IFrameDataModelListener,
         SensorAnalysis.IExperimentAnalysisListener {
-    private View experimentRunView = null;
+    private View sensorAnalysisView = null;
     private MarkerView markerView = null;
     private FrameDataModel frameDataModel = null;
     private SensorAnalysis sensorAnalysis = null;
@@ -62,13 +62,13 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
         frameDataModel = sensorAnalysis.getFrameDataModel();
         frameDataModel.addListener(this);
 
-        experimentRunView = runView;
+        sensorAnalysisView = runView;
 
-        experimentRunView.addOnLayoutChangeListener(new OnLayoutChangeListener() {
+        sensorAnalysisView.addOnLayoutChangeListener(new OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View view, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
-                int parentWidth = experimentRunView.getMeasuredWidth();
-                int parentHeight = experimentRunView.getMeasuredHeight();
+                int parentWidth = sensorAnalysisView.getMeasuredWidth();
+                int parentHeight = sensorAnalysisView.getMeasuredHeight();
                 markerView.setSize(parentWidth, parentHeight);
             }
         });
@@ -76,15 +76,15 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
         // run view
         RelativeLayout.LayoutParams runViewParams = new RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        addView(experimentRunView, runViewParams);
+        addView(sensorAnalysisView, runViewParams);
 
         // marker view
         RelativeLayout.LayoutParams makerViewParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        makerViewParams.addRule(RelativeLayout.ALIGN_LEFT, experimentRunView.getId());
-        makerViewParams.addRule(RelativeLayout.ALIGN_TOP, experimentRunView.getId());
-        makerViewParams.addRule(RelativeLayout.ALIGN_RIGHT, experimentRunView.getId());
-        makerViewParams.addRule(RelativeLayout.ALIGN_BOTTOM, experimentRunView.getId());
+        makerViewParams.addRule(RelativeLayout.ALIGN_LEFT, sensorAnalysisView.getId());
+        makerViewParams.addRule(RelativeLayout.ALIGN_TOP, sensorAnalysisView.getId());
+        makerViewParams.addRule(RelativeLayout.ALIGN_RIGHT, sensorAnalysisView.getId());
+        makerViewParams.addRule(RelativeLayout.ALIGN_BOTTOM, sensorAnalysisView.getId());
 
         markerView = new MarkerView(getContext());
         addView(markerView, makerViewParams);
@@ -92,7 +92,7 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
 
     public void addTagMarkerData(MarkerDataModel data) {
         IMarkerDataModelPainter painter = new TagMarkerDataModelPainter(markerView,
-                (IExperimentFrameView)experimentRunView, data);
+                (IExperimentFrameView) sensorAnalysisView, data);
         markerView.addMarkerPainter(painter);
 
         onFrameChanged(frameDataModel.getCurrentFrame());
@@ -100,7 +100,7 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
 
     public void addXYCalibrationData(MarkerDataModel data) {
         IMarkerDataModelPainter painter = new CalibrationMarkerPainter(markerView,
-                (IExperimentFrameView)experimentRunView, data);
+                (IExperimentFrameView) sensorAnalysisView, data);
         markerView.addMarkerPainter(painter);
     }
 
@@ -109,19 +109,20 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
     }
 
     public void addOriginData(MarkerDataModel data, Calibration calibration) {
-        originMarkerPainter = new OriginMarkerPainter(markerView, (IExperimentFrameView)experimentRunView, data,
+        originMarkerPainter = new OriginMarkerPainter(markerView, (IExperimentFrameView) sensorAnalysisView, data,
                 calibration);
         if (sensorAnalysis.getShowCoordinateSystem())
             markerView.addMarkerPainter(originMarkerPainter);
     }
 
     public void release() {
-        markerView.release();
+        if (markerView != null)
+            markerView.release();
     }
 
     @Override
     public void onFrameChanged(int newFrame) {
-        ((IExperimentFrameView)experimentRunView).setCurrentFrame(newFrame);
+        ((IExperimentFrameView) sensorAnalysisView).setCurrentFrame(newFrame);
         markerView.setCurrentRun(newFrame);
         markerView.invalidate();
     }
@@ -145,17 +146,22 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
     }
 
     /**
-     * Copy resize behaviour of the experimentRunView.
+     * Copy resize behaviour of the sensorAnalysisView.
      */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (sensorAnalysis == null) {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            return;
+        }
+
         int specWidthMode = MeasureSpec.getMode(widthMeasureSpec);
         int specHeightMode = MeasureSpec.getMode(heightMeasureSpec);
 
-        experimentRunView.measure(widthMeasureSpec, heightMeasureSpec);
+        sensorAnalysisView.measure(widthMeasureSpec, heightMeasureSpec);
 
-        int width = experimentRunView.getMeasuredWidth();
-        int height = experimentRunView.getMeasuredHeight();
+        int width = sensorAnalysisView.getMeasuredWidth();
+        int height = sensorAnalysisView.getMeasuredHeight();
 
         super.onMeasure(MeasureSpec.makeMeasureSpec(width, specWidthMode),
                 MeasureSpec.makeMeasureSpec(height, specHeightMode));

@@ -31,7 +31,7 @@ import java.util.List;
 public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
     class Layout extends ViewGroup {
         private FrameDataSeekBar runViewControl = null;
-        private FrameContainerView runContainerView = null;
+        private FrameContainerView sensorContainerView = null;
         private ViewGroup experimentDataView = null;
 
         /**
@@ -44,14 +44,14 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
             super(context);
 
             runViewControl = new FrameDataSeekBar(context);
-            runContainerView = new FrameContainerView(context);
+            sensorContainerView = new FrameContainerView(context);
 
             LayoutInflater inflater = (LayoutInflater)context.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
             experimentDataView = (ViewGroup)inflater.inflate(R.layout.analysis_data_side_bar, null, false);
 
             addView(runViewControl);
-            addView(runContainerView);
+            addView(sensorContainerView);
             addView(experimentDataView);
         }
 
@@ -59,8 +59,8 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
             return runViewControl;
         }
 
-        public FrameContainerView getRunContainerView() {
-            return runContainerView;
+        public FrameContainerView getSensorContainerView() {
+            return sensorContainerView;
         }
 
         @Override
@@ -73,9 +73,9 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
             int controlHeight = runViewControl.getMeasuredHeight();
 
             int containerHeight = height - controlHeight;
-            runContainerView.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+            sensorContainerView.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
                     MeasureSpec.makeMeasureSpec(containerHeight, MeasureSpec.EXACTLY));
-            int containerWidth = runContainerView.getMeasuredWidth();
+            int containerWidth = sensorContainerView.getMeasuredWidth();
 
             // the child's measure methods have to be called with the final sizes, Android ^^...
             experimentDataView.measure(MeasureSpec.makeMeasureSpec(width - containerWidth, MeasureSpec.EXACTLY),
@@ -83,7 +83,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
             runViewControl.measure(MeasureSpec.makeMeasureSpec(containerWidth, MeasureSpec.EXACTLY),
                     MeasureSpec.makeMeasureSpec(height - containerHeight, MeasureSpec.EXACTLY));
 
-            runContainerView.layout(0, 0, containerWidth, containerHeight);
+            sensorContainerView.layout(0, 0, containerWidth, containerHeight);
             runViewControl.layout(0, containerHeight, containerWidth, height);
             experimentDataView.layout(containerWidth, 0, width, height);
         }
@@ -149,23 +149,29 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         final IExperimentPlugin plugin = analysisEntry.plugin;
         final SensorAnalysis sensorAnalysis = analysisEntry.analysis;
 
-        final Layout view = new Layout(getActivity());
-        assert view != null;
+        final Layout mainView = new Layout(getActivity());
+        assert mainView != null;
 
-        final View experimentRunView = plugin.createSensorAnalysisView(activity, sensorAnalysis.getSensorData());
+        runContainerView = mainView.getSensorContainerView();
+        // marker graph view
+        graphView = (GraphView2D)mainView.findViewById(R.id.tagMarkerGraphView);
+        assert graphView != null;
+        tableView = (TableView)mainView.findViewById(R.id.tagMarkerTableView);
+        assert tableView != null;
 
-        final FrameDataSeekBar runViewControl = view.getRunViewControl();
+        final View sensorAnalysisView = plugin.createSensorAnalysisView(activity, sensorAnalysis.getSensorData());
+        if (sensorAnalysisView == null)
+            return mainView;
+
+        final FrameDataSeekBar runViewControl = mainView.getRunViewControl();
         runViewControl.setTo(sensorAnalysis.getFrameDataModel());
 
-        runContainerView = view.getRunContainerView();
-        runContainerView.setTo(experimentRunView, sensorAnalysis);
+        runContainerView.setTo(sensorAnalysisView, sensorAnalysis);
         runContainerView.addTagMarkerData(sensorAnalysis.getTagMarkers());
         runContainerView.addXYCalibrationData(sensorAnalysis.getXYCalibrationMarkers());
         runContainerView.addOriginData(sensorAnalysis.getOriginMarkers(), sensorAnalysis.getCalibration());
 
         // marker table view
-        tableView = (TableView)view.findViewById(R.id.tagMarkerTableView);
-        assert tableView != null;
         final ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(sensorAnalysis.getTagMarkers(),
                 sensorAnalysis);
         adapter.addColumn(new RunIdDataTableColumn());
@@ -173,9 +179,6 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         adapter.addColumn(new XPositionDataTableColumn());
         adapter.addColumn(new YPositionDataTableColumn());
         tableView.setAdapter(adapter);
-
-        // marker graph view
-        graphView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
 
         // graph spinner
         graphSpinnerEntryList.add(new GraphSpinnerEntry("Position Data", new MarkerGraphAdapter(sensorAnalysis,
@@ -185,7 +188,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         graphSpinnerEntryList.add(new GraphSpinnerEntry("y-Velocity", new MarkerGraphAdapter(sensorAnalysis,
                 "y-Velocity", new TimeMarkerGraphAxis(), new YSpeedMarkerGraphAxis())));
 
-        graphSpinner = (Spinner)view.findViewById(R.id.graphSpinner);
+        graphSpinner = (Spinner)mainView.findViewById(R.id.graphSpinner);
         graphSpinner.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item,
                 graphSpinnerEntryList));
         graphSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -202,7 +205,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         });
         graphSpinner.setSelection(0);
 
-        return view;
+        return mainView;
     }
 
     @Override

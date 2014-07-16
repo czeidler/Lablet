@@ -51,7 +51,7 @@ public class MicrophoneExperimentPlugin extends AbstractExperimentPlugin {
 
     @Override
     public SensorAnalysis createSensorAnalysis(SensorData sensorData) {
-        return null;
+        return new SensorAnalysis(sensorData);
     }
 
     @Override
