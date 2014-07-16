@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="edu.emory.mathcs:JTransforms:2.4" type="repository">
+    <properties maven-id="edu.emory.mathcs:JTransforms:2.4" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/edu/emory/mathcs/JTransforms/2.4/JTransforms-2.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
