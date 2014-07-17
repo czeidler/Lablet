@@ -98,6 +98,7 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
     protected Canvas bitmapCanvas = null;
     final private RenderTask renderTask = new RenderTask(this);
     private List<RenderPayload> payloadQueue = new ArrayList<>();
+    private IsRenderingDrawer isRenderingDrawer = new IsRenderingDrawer();
 
     public class RenderPayload {
         private RectF realDataRect;
@@ -186,9 +187,47 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
         bitmap.eraseColor(Color.TRANSPARENT);
     }
 
+    private boolean isRendering() {
+        return renderTask.isRendering();
+    }
+
+    class IsRenderingDrawer {
+        private long renderTimerStart = -1;
+        private Paint paint = new Paint();
+        final private long TIME_THRESHOLD = 500;
+
+        public IsRenderingDrawer() {
+            paint.setColor(Color.WHITE);
+        }
+
+        public void onDraw(Canvas canvas) {
+            // draw rendering notice
+            if (isRendering()) {
+                long currentTime = System.currentTimeMillis();
+                if (renderTimerStart < 0)
+                    renderTimerStart = currentTime;
+                long timeDiff = currentTime - renderTimerStart;
+                if (timeDiff <= TIME_THRESHOLD)
+                    return;
+
+                long numberOfDots = (timeDiff / 1000) % 3;
+                String text = "Rendering";
+                for (int i = 0; i < numberOfDots; i++)
+                    text += ".";
+
+                float textHeight = paint.descent() - paint.ascent();
+                canvas.drawText(text, 5, textHeight + 5, paint);
+            } else {
+                renderTimerStart = -1;
+            }
+        }
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         if (bitmap != null)
             canvas.drawBitmap(bitmap, 0, 0, null);
+
+        //isRenderingDrawer.onDraw(canvas);
     }
 }
