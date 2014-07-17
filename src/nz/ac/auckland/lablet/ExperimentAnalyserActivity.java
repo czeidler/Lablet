@@ -224,6 +224,26 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
         pager.setAdapter(pagerAdapter);
         pager.setCurrentItem(0);
 
+        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                setCurrentAnalysisSensor(position);
+
+                // repopulate the menu
+                invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
