@@ -19,13 +19,8 @@ public class LabelPartitionerLog10 extends LabelPartitioner {
     }
 
     @Override
-    public LabelMetric estimateLabelMetric(float min, float max) {
-        return null;
-    }
-
-    @Override
     protected void calculate() {
-        final LabelMetric labelMetric = calculateLabelMetric(0.1f, realStart, realEnd);
+        final LabelMetric labelMetric = LabelPartitionerHelper.calculateLabelMetric(0.1f, realStart, realEnd);
 
         final float realStartLog = scale.scale(realStart);
         final float realEndLog = scale.scale(realEnd);
@@ -41,7 +36,7 @@ public class LabelPartitionerLog10 extends LabelPartitioner {
             float realValue = (float)Math.pow(10, logValue);
             entry.realValue = realValue;
             entry.relativePosition = logValue / (realEndLog - realStartLog);
-            entry.label = createLabel(realValue, labelMetric);
+            entry.label = LabelPartitionerHelper.createLabel(realValue, labelMetric);
 
             labels.add(entry);
 
@@ -68,7 +63,7 @@ public class LabelPartitionerLog10 extends LabelPartitioner {
 
                 float screenPosition = toScreen(currentReal);
                 if (Math.abs(previousScreenPosition - screenPosition) > labelExtent + 0.0 * minSpacing)
-                    newEntry.label = createLabel(currentReal, labelMetric);
+                    newEntry.label = LabelPartitionerHelper.createLabel(currentReal, labelMetric);
                 previousScreenPosition = screenPosition;
             }
         }

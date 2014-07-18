@@ -16,45 +16,8 @@ class LabelMetric {
     public int decimalPlaceDigits = 0;
 }
 
-abstract class LabelPartitioner {
-    final protected float minSpacing = 5;
-    protected float optimalSpacing;
 
-    protected float labelExtent;
-    protected float axisExtent;
-    protected float realStart;
-    protected float realEnd;
-
-
-    class LabelEntry {
-        String label = "";
-        boolean isFullTick = true;
-        float realValue;
-        float relativePosition;
-    }
-    protected List<LabelEntry> labels = new ArrayList<>();
-
-    /**
-     *
-     * @param labelExtent
-     * @param axisExtent
-     * @param realStart must be smaller than realEnd
-     * @param realEnd
-     */
-    public List<LabelEntry> calculate(float labelExtent, float axisExtent, float realStart, float realEnd) {
-        labels.clear();
-
-        this.labelExtent = labelExtent;
-        this.axisExtent = axisExtent;
-        this.realStart = realStart;
-        this.realEnd = realEnd;
-        this.optimalSpacing = axisExtent * 0.15f;
-
-        calculate();
-
-        return labels;
-    }
-
+class LabelPartitionerHelper {
     static public String createDummyLabel(LabelMetric metric) {
         float dummyValue = 1.f / 3 * 10 * metric.digits;
         return createLabel(dummyValue, metric);
@@ -70,11 +33,11 @@ abstract class LabelPartitioner {
             return String.format("%d", (int)value);
     }
 
-    public LabelMetric estimateLabelMetric(float min, float max) {
+    static public LabelMetric estimateLabelMetric(float min, float max) {
         return calculateLabelMetric(0.1f, min, max);
     }
 
-    protected LabelMetric calculateLabelMetric(float stepFactor, float realStart, float realEnd) {
+    static protected LabelMetric calculateLabelMetric(float stepFactor, float realStart, float realEnd) {
         float maxValue = Math.max(Math.abs(realEnd), Math.abs(realStart));
         float maxOrder = getOrderValue(maxValue);
         float diffOrder = getOrderValue(Math.abs(realEnd - realStart)) * getOrderValue(stepFactor);
@@ -98,9 +61,6 @@ abstract class LabelPartitioner {
         return labelMetric;
     }
 
-    abstract protected void calculate();
-
-
     static protected float getOrderValue(float number) {
         number = Math.abs(number);
 
@@ -117,6 +77,48 @@ abstract class LabelPartitioner {
             order /= 10;
         }
         return order;
+    }
+}
+
+abstract class LabelPartitioner {
+    final protected float minSpacing = 5;
+    protected float optimalSpacing;
+
+    protected float labelExtent;
+    protected float axisExtent;
+    protected float realStart;
+    protected float realEnd;
+
+
+    class LabelEntry {
+        String label = "";
+        boolean isFullTick = true;
+        float realValue;
+        float relativePosition;
+    }
+    protected List<LabelEntry> labels = new ArrayList<>();
+
+    abstract protected void calculate();
+
+    /**
+     *
+     * @param labelExtent
+     * @param axisExtent
+     * @param realStart must be smaller than realEnd
+     * @param realEnd
+     */
+    public List<LabelEntry> calculate(float labelExtent, float axisExtent, float realStart, float realEnd) {
+        labels.clear();
+
+        this.labelExtent = labelExtent;
+        this.axisExtent = axisExtent;
+        this.realStart = realStart;
+        this.realEnd = realEnd;
+        this.optimalSpacing = axisExtent * 0.15f;
+
+        calculate();
+
+        return labels;
     }
 }
 

@@ -56,8 +56,8 @@ public class XAxisView extends AbstractXAxis {
         float axisLength = getAxisLength();
         if (axisLength <= 0)
             return;
-        float maxLabelWidth = labelPaint.measureText(LabelPartitioner.createDummyLabel(
-                labelPartitioner.estimateLabelMetric(realLeft, realRight)));
+        float maxLabelWidth = labelPaint.measureText(LabelPartitionerHelper.createDummyLabel(
+                LabelPartitionerHelper.estimateLabelMetric(realLeft, realRight)));
         labels = labelPartitioner.calculate(maxLabelWidth, axisLength, Math.min(realLeft, realRight),
                 Math.max(realLeft, realRight));
     }

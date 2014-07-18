@@ -24,7 +24,7 @@ public class LabelPartitionerLinear extends LabelPartitioner {
             float realValue = realLabelStart + i * stepSize;
             entry.realValue = realValue;
             entry.relativePosition = i * stepSize / diff;
-            entry.label = createLabel(realValue, labelMetric);
+            entry.label = LabelPartitionerHelper.createLabel(realValue, labelMetric);
 
             labels.add(entry);
         }
@@ -40,7 +40,7 @@ public class LabelPartitionerLinear extends LabelPartitioner {
             }
             entryEnd.realValue = realEnd;
             entryEnd.relativePosition = 1;
-            entryEnd.label = createLabel(realEnd, labelMetric);
+            entryEnd.label = LabelPartitionerHelper.createLabel(realEnd, labelMetric);
 
             LabelEntry entryStart = labels.get(0);
             if (Math.abs(toScreen(entryStart.realValue) - toScreen(realStart)) > minSpacing) {
@@ -49,7 +49,7 @@ public class LabelPartitionerLinear extends LabelPartitioner {
             }
             entryStart.realValue = realStart;
             entryStart.relativePosition = 0;
-            entryStart.label = createLabel(realStart, labelMetric);
+            entryStart.label = LabelPartitionerHelper.createLabel(realStart, labelMetric);
         }
     }
 
@@ -59,7 +59,7 @@ public class LabelPartitionerLinear extends LabelPartitioner {
         int optimalLabelNumber = (int)(axisExtent / (labelExtent + optimalSpacing)) + 1;
 
         float diff = Math.abs(realEnd - realStart);
-        float diffOrderValue = getOrderValue(diff);
+        float diffOrderValue = LabelPartitionerHelper.getOrderValue(diff);
 
         int bestFoundLabelNumber = 1;
         float stepSize = 1f;
@@ -75,7 +75,7 @@ public class LabelPartitionerLinear extends LabelPartitioner {
                 bestFoundLabelNumber = labelNumber;
         }
 
-        LabelMetric labelMetric = calculateLabelMetric(stepFactor, realStart, realEnd);
+        LabelMetric labelMetric = LabelPartitionerHelper.calculateLabelMetric(stepFactor, realStart, realEnd);
 
         fillLabelList(bestFoundLabelNumber, stepSize, labelMetric);
 
