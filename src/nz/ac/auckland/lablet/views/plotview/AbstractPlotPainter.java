@@ -13,6 +13,9 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
     protected AbstractPlotDataAdapter.IListener listener = null;
     protected PlotPainterContainerView containerView;
 
+    protected IScale xScale = new LinearScale();
+    protected IScale yScale = new LinearScale();
+
     abstract protected AbstractPlotDataAdapter.IListener createListener();
 
     public void setDataAdapter(AbstractPlotDataAdapter adapter) {
@@ -23,5 +26,13 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
 
     public void setContainer(PlotPainterContainerView view) {
         this.containerView = view;
+    }
+
+    public void setXScale(IScale xScale) {
+        this.xScale = xScale;
+    }
+
+    public void setYScale(IScale yScale) {
+        this.yScale = yScale;
     }
 }

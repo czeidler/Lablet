@@ -14,19 +14,19 @@ import nz.ac.auckland.lablet.views.plotview.*;
 public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
     final private double maxFrequencyAmplitude = 1000000;
     final private int maxFrequency = 22050;
-    private IScale scale = new LinearScale();
     float maxScaledFrequency;
 
     public AudioFrequencyMapPainter() {
         setMaxDirtyRanges(3);
 
-        maxScaledFrequency = scale.scale(maxFrequency);
+        maxScaledFrequency = yScale.scale(maxFrequency);
     }
 
-    public void setScale(IScale scale) {
-        this.scale = scale;
+    @Override
+    public void setYScale(IScale yScale) {
+        super.setYScale(yScale);
 
-        maxScaledFrequency = this.scale.scale(maxFrequency);
+        maxScaledFrequency = this.yScale.scale(maxFrequency);
     }
 
     private int heatMap(double value) {
@@ -113,7 +113,7 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
             float frequencyAmp = frequencies[i];
 
             float frequency = getRealValue(i, frequencies.length, maxFrequency);
-            int pixel = toPixel(scale.scale(frequency), screenHeight);
+            int pixel = toPixel(yScale.scale(frequency), screenHeight);
             if (pixel == currentPixel) {
                 frequencyAmpSum += frequencyAmp;
                 perPixelCount++;
