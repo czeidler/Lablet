@@ -104,7 +104,7 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 audioFrequencyMapPainter.setDataAdapter(audioFrequencyMapAdapter);
                 frequencyMapPlotView.addPlotPainter(audioFrequencyMapPainter);
                 frequencyMapPlotView.setRangeX(0, frequencyMapTimeSpan);
-                frequencyMapPlotView.setRangeY(0, experimentRun.SAMPLE_RATE / 2);
+                frequencyMapPlotView.setRangeY(1, experimentRun.SAMPLE_RATE / 2);
                 audioFrequencyMapPainter.setYScale(new Log10Scale());
                 frequencyMapPlotView.getYAxisView().setLabelPartitioner(new LabelPartitionerLog10());
                 frequencyMapPlotView.getYAxisView().setUnit("Hz");
