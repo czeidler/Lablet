@@ -35,6 +35,10 @@ public class RangeDrawingView extends ViewGroup {
         return new RectF(rangeRect);
     }
 
+    public Rect getScreenRect() {
+        return toScreen(getRangeRect());
+    }
+
     @Override
     protected void onLayout(boolean b, int i, int i2, int i3, int i4) {
 
