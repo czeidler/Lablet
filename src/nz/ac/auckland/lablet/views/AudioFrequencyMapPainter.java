@@ -8,16 +8,25 @@
 package nz.ac.auckland.lablet.views;
 
 import android.graphics.*;
-import nz.ac.auckland.lablet.views.plotview.AbstractPlotDataAdapter;
-import nz.ac.auckland.lablet.views.plotview.ArrayOffScreenPlotPainter;
-import nz.ac.auckland.lablet.views.plotview.Range;
+import nz.ac.auckland.lablet.views.plotview.*;
 
 
 public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
-    private double maxFrequency = 1000000;
+    final private double maxFrequencyAmplitude = 1000000;
+    final private int maxFrequency = 22050;
+    private IScale scale = new LinearScale();
+    float maxScaledFrequency;
 
     public AudioFrequencyMapPainter() {
         setMaxDirtyRanges(3);
+
+        maxScaledFrequency = scale.scale(maxFrequency);
+    }
+
+    public void setScale(IScale scale) {
+        this.scale = scale;
+
+        maxScaledFrequency = this.scale.scale(maxFrequency);
     }
 
     private int heatMap(double value) {
@@ -70,50 +79,54 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
             count = dataSize;
 
         for (int idx = 0; idx < count; idx++) {
-            int index = start + idx;
-            float[] frequencies = adapter.getY(index);
-            float time = adapter.getX(index);
+            final int index = start + idx;
+            final float[] frequencies = adapter.getY(index);
+            final float time = adapter.getX(index);
 
-            final float pixelsPerFrequency = (float)(payload.getScreenRect().height()) / frequencies.length;
+            final int[] colors = getColors(frequencies, payload.getScreenRect().height());
 
-            final int[] colors = new int[payload.getScreenRect().height()];
+            float[] screenLeftTop = new float[2];
+            screenLeftTop[0] = time;
+            screenLeftTop[1] = maxFrequency;
+            rangeMatrix.mapPoints(screenLeftTop);
 
-            float frequencySum = 0;
-            int currentPixel = 0;
-            int perPixelCount = 0;
-            for (int i = 0; i < frequencies.length; i++) {
-                if (pixelsPerFrequency < 1) {
-                    while (true) {
-                        if (i >= frequencies.length)
-                            break;
-                        int pixel = Math.round(pixelsPerFrequency * i);
-                        if (pixel == currentPixel) {
-                            frequencySum += frequencies[i];
-                            perPixelCount++;
-                        } else {
-                            float frequency = frequencySum / perPixelCount;
-                            double amplitude = Math.log10(Math.abs(frequency)) / Math.log10(maxFrequency);
-                            colors[colors.length - 1 - currentPixel] = heatMap(amplitude);
-
-                            frequencySum = frequencies[i];
-                            currentPixel++;
-                            perPixelCount = 1;
-                            break;
-                        }
-                        i++;
-                    }
-                } else {
-                    // TODO implement if necessary: fill pixel with same color
-                }
-            }
-
-            float[] screenTop = new float[2];
-            screenTop[0] = time;
-            screenTop[1] = 44100.f / 2;
-            rangeMatrix.mapPoints(screenTop);
-
-            canvas.drawBitmap(colors, 0, 1, screenTop[0] - 0.5f, screenTop[1], 1, payload.getScreenRect().height(),
-                    false, null);
+            canvas.drawBitmap(colors, 0, 1, screenLeftTop[0] - 0.5f, screenLeftTop[1], 1,
+                    payload.getScreenRect().height(), false, null);
         }
+    }
+
+    private int toPixel(float value, int screenRange) {
+        return (int)(value / maxScaledFrequency * screenRange);
+    }
+
+    private float getRealValue(int index, int arraySize, float frequencyRang) {
+        return (float)index / arraySize * frequencyRang;
+    }
+
+    private int[] getColors(final float[] frequencies, final int screenHeight) {
+        final int[] colors = new int[screenHeight];
+
+        float frequencyAmpSum = 0;
+        int currentPixel = 0;
+        int perPixelCount = 0;
+        for (int i = 0; i < frequencies.length; i++) {
+            float frequencyAmp = frequencies[i];
+
+            float frequency = getRealValue(i, frequencies.length, maxFrequency);
+            int pixel = toPixel(scale.scale(frequency), screenHeight);
+            if (pixel == currentPixel) {
+                frequencyAmpSum += frequencyAmp;
+                perPixelCount++;
+            } else {
+                float frequencyAmpAverage = frequencyAmpSum / perPixelCount;
+                double amplitude = Math.log10(Math.abs(frequencyAmpAverage)) / Math.log10(maxFrequencyAmplitude);
+                colors[colors.length - 1 - currentPixel] = heatMap(amplitude);
+
+                frequencyAmpSum = frequencyAmp;
+                currentPixel++;
+                perPixelCount = 1;
+            }
+        }
+        return colors;
     }
 }
