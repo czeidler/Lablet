@@ -30,7 +30,9 @@ import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.misc.AudioWavOutputStream;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.*;
+import nz.ac.auckland.lablet.views.plotview.Log10Scale;
 import nz.ac.auckland.lablet.views.plotview.PlotView;
+import nz.ac.auckland.lablet.views.plotview.axes.LabelPartitionerLog10;
 
 import java.io.*;
 import java.lang.ref.WeakReference;
@@ -103,6 +105,8 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 frequencyMapPlotView.addPlotPainter(audioFrequencyMapPainter);
                 frequencyMapPlotView.setRangeX(0, frequencyMapTimeSpan);
                 frequencyMapPlotView.setRangeY(0, experimentRun.SAMPLE_RATE / 2);
+                audioFrequencyMapPainter.setScale(new Log10Scale());
+                frequencyMapPlotView.getYAxisView().setLabelPartitioner(new LabelPartitionerLog10());
                 frequencyMapPlotView.getYAxisView().setUnit("Hz");
                 frequencyMapPlotView.getYAxisView().setLabel("Frequency");
                 frequencyMapPlotView.getXAxisView().setUnit("s");
