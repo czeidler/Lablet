@@ -12,21 +12,23 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import nz.ac.auckland.lablet.views.plotview.axes.XAxisView;
+import nz.ac.auckland.lablet.views.plotview.axes.YAxisView;
 
 
 public class PlotView extends ViewGroup {
-    private IXAxis xAxisView;
-    private IYAxis yAxisView;
+    private XAxisView xAxisView;
+    private YAxisView yAxisView;
     private PlotPainterContainerView mainView;
 
     public PlotView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         xAxisView = new XAxisView(context);
-        addView((ViewGroup)xAxisView);
+        addView(xAxisView);
 
         yAxisView = new YAxisView(context);
-        addView((ViewGroup)yAxisView);
+        addView(yAxisView);
 
         this.mainView = new PlotPainterContainerView(context);
         addView(mainView);
@@ -55,25 +57,25 @@ public class PlotView extends ViewGroup {
     public void invalidate() {
         mainView.invalidate();
         if (xAxisView != null)
-            ((View)xAxisView).invalidate();
+            xAxisView.invalidate();
         if (yAxisView != null)
-            ((View)yAxisView).invalidate();
+            yAxisView.invalidate();
     }
 
-    public IYAxis getYAxisView() {
+    public YAxisView getYAxisView() {
         return yAxisView;
     }
 
-    public IXAxis getXAxisView() {
+    public XAxisView getXAxisView() {
         return xAxisView;
     }
 
     private boolean hasXAxis() {
-        return xAxisView != null && ((ViewGroup)xAxisView).getVisibility() == View.VISIBLE;
+        return xAxisView != null && xAxisView.getVisibility() == View.VISIBLE;
     }
 
     private boolean hasYAxis() {
-        return yAxisView != null && ((ViewGroup)yAxisView).getVisibility() == View.VISIBLE;
+        return yAxisView != null && yAxisView.getVisibility() == View.VISIBLE;
     }
 
     @Override
@@ -97,15 +99,15 @@ public class PlotView extends ViewGroup {
                 width - xAxisRightOffset, xAxisTop);
 
         if (hasXAxis()) {
-            ((ViewGroup) xAxisView).measure(MeasureSpec.makeMeasureSpec(xAxisRect.width(), MeasureSpec.EXACTLY),
+            xAxisView.measure(MeasureSpec.makeMeasureSpec(xAxisRect.width(), MeasureSpec.EXACTLY),
                     MeasureSpec.makeMeasureSpec(xAxisRect.height(), MeasureSpec.EXACTLY));
-            ((ViewGroup) xAxisView).layout(xAxisRect.left, xAxisRect.top, xAxisRect.right, xAxisRect.bottom);
+            xAxisView.layout(xAxisRect.left, xAxisRect.top, xAxisRect.right, xAxisRect.bottom);
         }
 
         if (hasYAxis()) {
-            ((ViewGroup) yAxisView).measure(MeasureSpec.makeMeasureSpec(yAxisRect.width(), MeasureSpec.EXACTLY),
+            yAxisView.measure(MeasureSpec.makeMeasureSpec(yAxisRect.width(), MeasureSpec.EXACTLY),
                     MeasureSpec.makeMeasureSpec(yAxisRect.height(), MeasureSpec.EXACTLY));
-            ((ViewGroup) yAxisView).layout(yAxisRect.left, yAxisRect.top, yAxisRect.right, yAxisRect.bottom);
+            yAxisView.layout(yAxisRect.left, yAxisRect.top, yAxisRect.right, yAxisRect.bottom);
         }
 
         if (mainView != null) {

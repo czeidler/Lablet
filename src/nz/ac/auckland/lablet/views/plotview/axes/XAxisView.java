@@ -5,24 +5,18 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views.plotview;
+package nz.ac.auckland.lablet.views.plotview.axes;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.util.AttributeSet;
-import android.view.ViewGroup;
-
-import java.util.List;
 
 
-public class XAxisView extends ViewGroup implements IXAxis {
+public class XAxisView extends AbstractXAxis {
     private float axisLeftOffset = 0;
     private float axisRightOffset = 0;
-    private float realLeft = 0;
-    private float realRight = 10;
 
     private Paint labelPaint = new Paint();
     private float labelHeight = 5;
@@ -31,14 +25,8 @@ public class XAxisView extends ViewGroup implements IXAxis {
 
     private AxisSettings settings = new AxisSettings();
 
-    private String label = "";
-    private String unit = "";
-    private List<LabelPartitioner.LabelEntry> labels;
-
     public XAxisView(Context context) {
         super(context);
-
-        setWillNotDraw(false);
 
         labelPaint.setColor(Color.WHITE);
         labelPaint.setStrokeWidth(1);
@@ -64,42 +52,20 @@ public class XAxisView extends ViewGroup implements IXAxis {
     }
 
     @Override
-    public void setDataRange(float left, float right) {
-        realLeft = left;
-        realRight = right;
-
-        calculateLabels();
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    @Override
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    @Override
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    private void calculateLabels() {
+    protected void calculateLabels() {
         float axisLength = getAxisLength();
         if (axisLength <= 0)
             return;
         float maxLabelWidth = labelPaint.measureText(LabelPartitioner.createDummyLabel(
-                LabelPartitioner.estimateLabelMetric(realLeft, realRight)));
-        LabelPartitioner partitioner = new LabelPartitioner(maxLabelWidth, axisLength, Math.min(realLeft, realRight),
+                labelPartitioner.estimateLabelMetric(realLeft, realRight)));
+        labels = labelPartitioner.calculate(maxLabelWidth, axisLength, Math.min(realLeft, realRight),
                 Math.max(realLeft, realRight));
-        labels = partitioner.getLabels();
     }
 
     @Override
     public float optimalHeight() {
         // axis
-        float optimalWidth = settings.getScaleExtent() + labelHeight;
+        float optimalWidth = settings.getFullTickSize() + labelHeight;
         // label and uni
         if (!label.equals("") || !unit.equals(""))
             optimalWidth += labelHeight;
@@ -166,10 +132,13 @@ public class XAxisView extends ViewGroup implements IXAxis {
         else
             labelPosition -= labelRect.width() / 2;
 
-        canvas.drawText(labelText, labelPosition, settings.getScaleExtent() + labelHeight - labelDescent, labelPaint);
+        canvas.drawText(labelText, labelPosition, settings.getFullTickSize() + labelHeight - labelDescent, labelPaint);
 
         // draw tick
-        canvas.drawLine(xPosition, 0, xPosition, settings.getScaleExtent(), axisPaint);
+        float tickLength = settings.getFullTickSize();
+        if (!labelEntry.isFullTick)
+            tickLength = settings.getShortTickSize();
+        canvas.drawLine(xPosition, 0, xPosition, tickLength, axisPaint);
     }
 
     private float getAxisLength() {

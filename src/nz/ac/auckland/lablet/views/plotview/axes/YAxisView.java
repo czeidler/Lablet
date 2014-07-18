@@ -5,38 +5,20 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views.plotview;
+package nz.ac.auckland.lablet.views.plotview.axes;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.view.ViewGroup;
 
 import java.util.List;
 
 
-class AxisSettings {
-    final private float scaleWidth = 8;
-    final private float spacing = 4;
-
-    public float getSpacing() {
-        return spacing;
-    }
-
-    public float getScaleExtent() {
-        return scaleWidth;
-    }
-
-}
-
-public class YAxisView extends ViewGroup implements IYAxis {
+public class YAxisView extends AbstractYAxis {
     private float axisTopOffset = 0;
     private float axisBottomOffset = 0;
-    private float realTop = 10;
-    private float realBottom = 0;
-    private int relevantDigits = 3;
 
     private Paint labelPaint = new Paint();
     private float labelHeight = 5;
@@ -44,14 +26,8 @@ public class YAxisView extends ViewGroup implements IYAxis {
 
     private AxisSettings settings = new AxisSettings();
 
-    private String label = "";
-    private String unit = "";
-    private List<LabelPartitioner.LabelEntry> labels;
-
     public YAxisView(Context context) {
         super(context);
-
-        setWillNotDraw(false);
 
         labelPaint.setColor(Color.WHITE);
         labelPaint.setStrokeWidth(1);
@@ -76,50 +52,20 @@ public class YAxisView extends ViewGroup implements IYAxis {
     }
 
     @Override
-    public void setRelevantLabelDigits(int digits) {
-        relevantDigits = digits;
-
-        calculateLabels();
-    }
-
-    @Override
-    public void setDataRange(float bottom, float top) {
-        realTop = top;
-        realBottom = bottom;
-
-        calculateLabels();
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    @Override
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    @Override
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    private void calculateLabels() {
+    protected void calculateLabels() {
         float axisLength = getAxisLength();
         if (axisLength <= 0)
             return;
-        LabelPartitioner partitioner = new LabelPartitioner(labelHeight, axisLength, Math.min(realTop, realBottom),
+        labels = labelPartitioner.calculate(labelHeight, axisLength, Math.min(realTop, realBottom),
                 Math.max(realTop, realBottom));
-        labels = partitioner.getLabels();
     }
 
     @Override
     public float optimalWidthForHeight(float height) {
         List<LabelPartitioner.LabelEntry> labelEntries = labels;
         if (height != getAxisLength()) {
-            LabelPartitioner partitioner = new LabelPartitioner(labelHeight, height, Math.min(realTop, realBottom),
+            labelEntries = labelPartitioner.calculate(labelHeight, height, Math.min(realTop, realBottom),
                     Math.max(realTop, realBottom));
-            labelEntries = partitioner.getLabels();
         }
 
         float maxLabelWidth = 0;
@@ -130,7 +76,7 @@ public class YAxisView extends ViewGroup implements IYAxis {
         }
 
         // axis
-        float optimalWidth = settings.getScaleExtent() + settings.getSpacing();
+        float optimalWidth = settings.getFullTickSize() + settings.getSpacing();
         // tick labels
         optimalWidth += maxLabelWidth + settings.getSpacing();
         // label and uni
@@ -187,14 +133,13 @@ public class YAxisView extends ViewGroup implements IYAxis {
         Rect labelRect = new Rect();
         labelPaint.getTextBounds(labelText, 0, labelText.length(), labelRect);
 
-        canvas.drawText(labelText, getWidth() - labelRect.width() - settings.getSpacing() - settings.getScaleExtent(),
+        canvas.drawText(labelText, getWidth() - labelRect.width() - settings.getSpacing() - settings.getFullTickSize(),
                 yPosition + labelRect.height() / 2, labelPaint);
 
         // draw tick
-        canvas.drawLine(getWidth() - settings.getScaleExtent(), yPosition, getWidth(), yPosition, axisPaint);
-    }
-
-    private float getAxisLength() {
-        return getHeight() - getAxisBottomOffset() - getAxisTopOffset();
+        float tickLength = settings.getFullTickSize();
+        if (!labelEntry.isFullTick)
+            tickLength = settings.getShortTickSize();
+        canvas.drawLine(getWidth() - tickLength, yPosition, getWidth(), yPosition, axisPaint);
     }
 }

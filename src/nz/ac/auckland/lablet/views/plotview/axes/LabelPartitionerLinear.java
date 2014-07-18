@@ -5,83 +5,14 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views.plotview;
-
-import java.util.ArrayList;
-import java.util.List;
+package nz.ac.auckland.lablet.views.plotview.axes;
 
 
-class LabelMetric {
-    public int digits = 0;
-    public int decimalPlaceDigits = 0;
-}
-
-class LabelPartitioner {
-    float labelExtent;
-    float axisExtent;
-    float realStart;
-    float realEnd;
-
+public class LabelPartitionerLinear extends LabelPartitioner {
     boolean finishingLabelsMatchEnds = true;
-
-    class LabelEntry {
-        String label;
-        float realValue;
-        float relativePosition;
-    }
-    List<LabelEntry> labels = new ArrayList<>();
-
-    /**
-     *
-     * @param labelExtent
-     * @param axisExtent
-     * @param realStart must be smaller than realEnd
-     * @param realEnd
-     */
-    public LabelPartitioner(float labelExtent, float axisExtent, float realStart, float realEnd) {
-        this.labelExtent = labelExtent;
-        this.axisExtent = axisExtent;
-        this.realStart = realStart;
-        this.realEnd = realEnd;
-
-        calculate();
-    }
 
     private float toScreen(float realValue) {
         return axisExtent * realValue / Math.abs(realEnd - realStart);
-    }
-
-    static public String createDummyLabel(LabelMetric metric) {
-        float dummyValue = 1.f / 3 * 10 * metric.digits;
-        return createLabel(dummyValue, metric);
-    }
-
-    static public LabelMetric estimateLabelMetric(float min, float max) {
-        return calculateLabelMetric(0.1f, min, max);
-    }
-
-    static private LabelMetric calculateLabelMetric(float stepFactor, float realStart, float realEnd) {
-        float maxValue = Math.max(Math.abs(realEnd), Math.abs(realStart));
-        float maxOrder = getOrderValue(maxValue);
-        float diffOrder = getOrderValue(Math.abs(realEnd - realStart)) * getOrderValue(stepFactor);
-
-        LabelMetric labelMetric = new LabelMetric();
-
-        int digits = (int)Math.log10(maxOrder);
-        if (digits >= 0)
-            digits += 1;
-        if (digits < 0)
-            labelMetric.decimalPlaceDigits = -digits;
-        else
-            labelMetric.digits = digits;
-
-        int diffDigits = (int)Math.round(Math.log10(diffOrder));
-        if (diffDigits >= 0)
-            diffDigits += 1;
-        if (diffDigits < 0 && diffDigits < digits)
-            labelMetric.decimalPlaceDigits = -diffDigits;
-
-        return labelMetric;
     }
 
     private void fillLabelList(int bestFoundLabelNumber, float stepSize, LabelMetric labelMetric) {
@@ -122,9 +53,8 @@ class LabelPartitioner {
         }
     }
 
-    private void calculate() {
-        final float minSpacing = 20;
-        final float optimalSpacing = axisExtent * 0.15f;
+    @Override
+    protected void calculate() {
         int maxLabelNumber = (int)(axisExtent / (labelExtent + minSpacing)) + 1;
         int optimalLabelNumber = (int)(axisExtent / (labelExtent + optimalSpacing)) + 1;
 
@@ -152,20 +82,6 @@ class LabelPartitioner {
         updateFinishingLabels(minSpacing, labelMetric);
     }
 
-    static private String createLabel(float value, LabelMetric labelMetric) {
-        if (labelMetric.decimalPlaceDigits > 0) {
-            String formatString = "%.";
-            formatString += labelMetric.decimalPlaceDigits;
-            formatString += "f";
-            return String.format(formatString, value);
-        } else
-            return String.format("%d", (int)value);
-    }
-
-    public List<LabelEntry> getLabels() {
-        return labels;
-    }
-
     private float getStepFactor(int index) {
         int rest = index % 3;
         float stepBase = 5;
@@ -175,23 +91,5 @@ class LabelPartitioner {
             stepBase = 1f;
 
         return stepBase / (float)Math.pow(10.f, index / 3);
-    }
-
-    static private float getOrderValue(float number) {
-        number = Math.abs(number);
-
-        if (number == 0.0)
-            return 1;
-
-        float order = 1;
-        while (number >= 10) {
-            number /= 10;
-            order *= 10;
-        }
-        while (number < 1) {
-            number *= 10;
-            order /= 10;
-        }
-        return order;
     }
 }
