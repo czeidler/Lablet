@@ -35,7 +35,7 @@ public class LabelPartitionerLog10 extends LabelPartitioner {
             LabelEntry entry = new LabelEntry();
             float realValue = (float)Math.pow(10, logValue);
             entry.realValue = realValue;
-            entry.relativePosition = logValue / (realEndLog - realStartLog);
+            entry.relativePosition = (logValue - realStartLog) / (realEndLog - realStartLog);
             entry.label = LabelPartitionerHelper.createLabel(realValue, labelMetric);
 
             labels.add(entry);
@@ -57,7 +57,7 @@ public class LabelPartitionerLog10 extends LabelPartitioner {
                     break;
                 LabelEntry newEntry = new LabelEntry();
                 newEntry.realValue = currentReal;
-                newEntry.relativePosition = scale.scale(currentReal) / (realEndLog - realStartLog);
+                newEntry.relativePosition = (scale.scale(currentReal) - realStartLog) / (realEndLog - realStartLog);
                 newEntry.isFullTick = false;
                 labels.add(i, newEntry);
 
