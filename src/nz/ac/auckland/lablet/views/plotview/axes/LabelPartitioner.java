@@ -80,7 +80,7 @@ class LabelPartitionerHelper {
     }
 }
 
-abstract class LabelPartitioner {
+public abstract class LabelPartitioner {
     final protected float minSpacing = 5;
     protected float optimalSpacing;
 

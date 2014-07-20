@@ -42,4 +42,8 @@ public class PlotPainterContainerView extends RangeDrawingView {
         for (IPlotPainter painter : plotPainters)
             painter.onSizeChanged(w, h, oldw, oldh);
     }
+
+    public List<IPlotPainter> getPlotPainters() {
+        return plotPainters;
+    }
 }

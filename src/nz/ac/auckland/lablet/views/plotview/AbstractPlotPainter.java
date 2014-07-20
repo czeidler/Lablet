@@ -28,10 +28,12 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
         this.containerView = view;
     }
 
+    @Override
     public void setXScale(IScale xScale) {
         this.xScale = xScale;
     }
 
+    @Override
     public void setYScale(IScale yScale) {
         this.yScale = yScale;
     }

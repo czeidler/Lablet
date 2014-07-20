@@ -15,4 +15,7 @@ public interface IPlotPainter {
 
     public void onSizeChanged(int width, int height, int oldw, int oldh);
     public void onDraw(Canvas canvas);
+
+    void setXScale(IScale xScale);
+    void setYScale(IScale yScale);
 }

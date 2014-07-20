@@ -12,11 +12,21 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import nz.ac.auckland.lablet.views.plotview.axes.XAxisView;
-import nz.ac.auckland.lablet.views.plotview.axes.YAxisView;
+import nz.ac.auckland.lablet.views.plotview.axes.*;
 
 
 public class PlotView extends ViewGroup {
+    public static class PlotScale {
+        public IScale scale;
+        public LabelPartitioner labelPartitioner;
+    }
+    static public PlotScale log10Scale() {
+        PlotScale plotScale = new PlotScale();
+        plotScale.scale = new Log10Scale();
+        plotScale.labelPartitioner = new LabelPartitionerLog10();
+        return plotScale;
+    }
+
     private XAxisView xAxisView;
     private YAxisView yAxisView;
     private PlotPainterContainerView mainView;
@@ -38,7 +48,14 @@ public class PlotView extends ViewGroup {
         mainView.addPlotPainter(painter);
     }
 
-    public void setRangeY(float bottom, float top) {
+    public void setYScale(PlotScale plotScale) {
+        if (yAxisView != null)
+            yAxisView.setLabelPartitioner(plotScale.labelPartitioner);
+        for (IPlotPainter painter : mainView.getPlotPainters())
+            painter.setYScale(plotScale.scale);
+    }
+
+    public void setYRange(float bottom, float top) {
         if (hasYAxis())
             yAxisView.setDataRange(bottom, top);
         mainView.setRangeY(bottom, top);
@@ -46,7 +63,7 @@ public class PlotView extends ViewGroup {
         invalidate();
     }
 
-    public void setRangeX(float left, float right) {
+    public void setXRange(float left, float right) {
         if (hasXAxis())
             xAxisView.setDataRange(left, right);
         mainView.setRangeX(left, right);
