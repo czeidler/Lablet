@@ -16,14 +16,15 @@ public class LabelPartitionerLinear extends LabelPartitioner {
     }
 
     private void fillLabelList(int bestFoundLabelNumber, float stepSize, LabelMetric labelMetric) {
-        float diff = Math.abs(realEnd - realStart);
+        float realDiff = Math.abs(realEnd - realStart);
         labels.clear();
         float realLabelStart = (int)(Math.min(realStart, realEnd) / stepSize) * stepSize;
+        float realLabelStartOffset = realLabelStart - Math.min(realStart, realEnd);
         for (int i = 0; i < bestFoundLabelNumber; i++) {
             LabelEntry entry = new LabelEntry();
             float realValue = realLabelStart + i * stepSize;
             entry.realValue = realValue;
-            entry.relativePosition = i * stepSize / diff;
+            entry.relativePosition = (realLabelStartOffset + i * stepSize) / realDiff;
             entry.label = LabelPartitionerHelper.createLabel(realValue, labelMetric);
 
             labels.add(entry);
