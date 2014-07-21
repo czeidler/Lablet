@@ -18,4 +18,7 @@ public interface IPlotPainter {
 
     void setXScale(IScale xScale);
     void setYScale(IScale yScale);
+
+    void onXRangeChanged();
+    void onYRangeChanged();
 }

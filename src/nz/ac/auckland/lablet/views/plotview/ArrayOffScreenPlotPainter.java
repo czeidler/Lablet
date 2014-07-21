@@ -132,10 +132,22 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
                         containerView.getRangeMatrix(), ((CloneablePlotDataAdapter)dataAdapter).clone(),
                         new Region1D(0, dataAdapter.getSize() - 1));
                 renderPayload.setClearParentBitmap(true);
+
+                emptyOffScreenRenderingQueue();
                 triggerOffScreenRendering(renderPayload);
 
                 dirtyRegion.clear();
             }
         };
+    }
+
+    @Override
+    public void onXRangeChanged() {
+        dataAdapter.notifyAllDataChanged();
+    }
+
+    @Override
+    public void onYRangeChanged() {
+        dataAdapter.notifyAllDataChanged();
     }
 }

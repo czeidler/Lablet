@@ -8,10 +8,10 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 import android.content.Context;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import nz.ac.auckland.lablet.views.plotview.axes.*;
 
 
@@ -31,8 +31,107 @@ public class PlotView extends ViewGroup {
     private YAxisView yAxisView;
     private PlotPainterContainerView mainView;
 
+    private ScaleGestureDetector scaleGestureDetector;
+    private DragDetector dragDetector = new DragDetector();
+
+    private boolean xDraggable = false;
+    private boolean yDraggable = false;
+    private boolean xZoomable = false;
+    private boolean yZoomable = false;
+
+    class DragDetector {
+        public PointF point = new PointF(-1, -1);
+
+        public boolean onTouchEvent(MotionEvent event) {
+            if (event.getPointerCount() > 1) {
+                point.set(-1, -1);
+                return false;
+            }
+            int action = event.getActionMasked();
+            boolean handled = false;
+            if (action == MotionEvent.ACTION_DOWN) {
+                point.set(event.getX(), event.getY());
+            } else if (action == MotionEvent.ACTION_UP) {
+                point.set(-1, -1);
+            } else if (action == MotionEvent.ACTION_MOVE) {
+                float xDragged = event.getX() - point.x;
+                float yDragged = event.getY() - point.y;
+                point.set(event.getX(), event.getY());
+
+                handled = onDragged(xDragged, yDragged);
+            }
+            return handled;
+        }
+
+        private boolean onDragged(float x, float y) {
+            if (yDraggable) {
+                float realDelta = mainView.fromScreenY(y) - mainView.fromScreenY(0);
+                if (mainView.getRangeBottom() < mainView.getRangeTop())
+                    realDelta *= -1;
+                float newBottom = mainView.getRangeBottom() + realDelta;
+                float newTop = mainView.getRangeTop() + realDelta;
+
+                setYRange(newBottom, newTop);
+                return true;
+            }
+            if (xDraggable) {
+                float realDelta = mainView.fromScreenX(x) - mainView.fromScreenX(0);
+                if (mainView.getRangeLeft() < mainView.getRangeRight())
+                    realDelta *= -1;
+                float newLeft = mainView.getRangeBottom() + realDelta;
+                float newRight = mainView.getRangeRight() + realDelta;
+
+                setXRange(newLeft, newRight);
+                return true;
+            }
+            return false;
+        }
+    }
+
     public PlotView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        scaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureDetector.OnScaleGestureListener() {
+            @Override
+            public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
+                if (yZoomable) {
+                    float zoom = scaleGestureDetector.getPreviousSpanY() - scaleGestureDetector.getCurrentSpanY();
+                    zoom /= getHeight();
+                    float currentRange = Math.abs(mainView.getRangeTop() - mainView.getRangeBottom());
+                    float zoomValue = zoom * currentRange / 10;
+
+                    float newBottom = mainView.getRangeBottom() - zoomValue;
+                    float newTop = mainView.getRangeTop() + zoomValue;
+                    setYRange(newBottom, newTop);
+
+                    return true;
+                }
+
+                if (xZoomable) {
+                    float zoom = scaleGestureDetector.getPreviousSpanX() - scaleGestureDetector.getCurrentSpanX();
+                    zoom /= getWidth();
+                    float currentRange = Math.abs(mainView.getRangeLeft() - mainView.getRangeRight());
+                    float zoomValue = zoom * currentRange / 10;
+
+                    float newLeft = mainView.getRangeLeft() - zoomValue;
+                    float newRight = mainView.getRangeRight() + zoomValue;
+                    setXRange(newLeft, newRight);
+
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onScaleBegin(ScaleGestureDetector scaleGestureDetector) {
+                return true;
+            }
+
+            @Override
+            public void onScaleEnd(ScaleGestureDetector scaleGestureDetector) {
+
+            }
+        });
 
         xAxisView = new XAxisView(context);
         addView(xAxisView);
@@ -60,6 +159,9 @@ public class PlotView extends ViewGroup {
             yAxisView.setDataRange(bottom, top);
         mainView.setRangeY(bottom, top);
 
+        for (IPlotPainter painter : mainView.getPlotPainters())
+            painter.onYRangeChanged();
+
         invalidate();
     }
 
@@ -68,7 +170,42 @@ public class PlotView extends ViewGroup {
             xAxisView.setDataRange(left, right);
         mainView.setRangeX(left, right);
 
+        for (IPlotPainter painter : mainView.getPlotPainters())
+            painter.onXRangeChanged();
+
         invalidate();
+    }
+
+    public boolean isXDragable() {
+        return xDraggable;
+    }
+
+    public void setXDragable(boolean xDragable) {
+        this.xDraggable = xDragable;
+    }
+
+    public boolean isYDragable() {
+        return yDraggable;
+    }
+
+    public void setYDragable(boolean yDragable) {
+        this.yDraggable = yDragable;
+    }
+
+    public boolean isXZoomable() {
+        return xZoomable;
+    }
+
+    public void setXZoomable(boolean xZoomable) {
+        this.xZoomable = xZoomable;
+    }
+
+    public boolean isYZoomable() {
+        return yZoomable;
+    }
+
+    public void setYZoomable(boolean yZoomable) {
+        this.yZoomable = yZoomable;
     }
 
     public void invalidate() {
@@ -132,5 +269,14 @@ public class PlotView extends ViewGroup {
                     MeasureSpec.makeMeasureSpec(mainViewRect.height(), MeasureSpec.EXACTLY));
             mainView.layout(mainViewRect.left, mainViewRect.top, mainViewRect.right, mainViewRect.bottom);
         }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        dragDetector.onTouchEvent(event);
+        if (scaleGestureDetector.onTouchEvent(event))
+            return true;
+
+        return super.onTouchEvent(event);
     }
 }

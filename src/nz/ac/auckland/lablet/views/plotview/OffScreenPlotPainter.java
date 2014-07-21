@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+
 class RenderTask {
     final private OffScreenPlotPainter plotPainter;
 
@@ -148,6 +149,10 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
         return !renderTask.isRendering();
     }
 
+    protected void emptyOffScreenRenderingQueue() {
+        payloadQueue.clear();
+    }
+
     protected void triggerOffScreenRendering(RenderPayload payload) {
         if (renderTask.isRendering()) {
             payloadQueue.add(payload);
@@ -194,7 +199,7 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
     class IsRenderingDrawer {
         private long renderTimerStart = -1;
         private Paint paint = new Paint();
-        final private long TIME_THRESHOLD = 500;
+        final private long TIME_THRESHOLD = 300;
 
         public IsRenderingDrawer() {
             paint.setColor(Color.WHITE);
@@ -210,13 +215,15 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
                 if (timeDiff <= TIME_THRESHOLD)
                     return;
 
-                long numberOfDots = (timeDiff / 1000) % 3;
+                long numberOfDots = (timeDiff / 500) % 4;
                 String text = "Rendering";
                 for (int i = 0; i < numberOfDots; i++)
                     text += ".";
 
                 float textHeight = paint.descent() - paint.ascent();
                 canvas.drawText(text, 5, textHeight + 5, paint);
+
+                containerView.invalidate();
             } else {
                 renderTimerStart = -1;
             }
@@ -228,6 +235,6 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
         if (bitmap != null)
             canvas.drawBitmap(bitmap, 0, 0, null);
 
-        //isRenderingDrawer.onDraw(canvas);
+        isRenderingDrawer.onDraw(canvas);
     }
 }
