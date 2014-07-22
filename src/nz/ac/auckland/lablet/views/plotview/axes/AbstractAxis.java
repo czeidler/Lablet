@@ -38,7 +38,7 @@ class AxisSettings {
 }
 
 abstract public class AbstractAxis extends ViewGroup {
-    protected String label = "";
+    protected String title = "";
     protected String unit = "";
     protected LabelPartitioner labelPartitioner = new LabelPartitionerLinear();
 
@@ -56,8 +56,16 @@ abstract public class AbstractAxis extends ViewGroup {
         setWillNotDraw(false);
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setTitle(String label) {
+        this.title = label;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public List<LabelPartitioner.LabelEntry> getLabels() {
+        return labels;
     }
 
     public void setUnit(String unit) {

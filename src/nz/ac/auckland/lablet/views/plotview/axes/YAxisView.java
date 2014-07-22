@@ -79,8 +79,8 @@ public class YAxisView extends AbstractYAxis {
         float optimalWidth = settings.getFullTickSize() + settings.getSpacing();
         // tick labels
         optimalWidth += maxLabelWidth + settings.getSpacing();
-        // label and uni
-        if (!label.equals("") || !unit.equals(""))
+        // title and uni
+        if (!title.equals("") || !unit.equals(""))
             optimalWidth += labelHeight + settings.getSpacing();
 
         return optimalWidth;
@@ -100,10 +100,10 @@ public class YAxisView extends AbstractYAxis {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        boolean hasLabel = !label.equals("");
+        boolean hasLabel = !title.equals("");
         boolean hasUnit = !unit.equals("");
         if (hasLabel || hasUnit) {
-            String completeLabel = label;
+            String completeLabel = title;
             if (hasLabel && hasUnit)
                 completeLabel += " ";
             if (hasUnit)

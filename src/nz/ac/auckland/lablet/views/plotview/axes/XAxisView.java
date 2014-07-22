@@ -66,8 +66,8 @@ public class XAxisView extends AbstractXAxis {
     public float optimalHeight() {
         // axis
         float optimalWidth = settings.getFullTickSize() + labelHeight;
-        // label and uni
-        if (!label.equals("") || !unit.equals(""))
+        // title and uni
+        if (!title.equals("") || !unit.equals(""))
             optimalWidth += labelHeight;
 
         return optimalWidth;
@@ -86,10 +86,10 @@ public class XAxisView extends AbstractXAxis {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        boolean hasLabel = !label.equals("");
+        boolean hasLabel = !title.equals("");
         boolean hasUnit = !unit.equals("");
         if (hasLabel || hasUnit) {
-            String completeLabel = label;
+            String completeLabel = title;
             if (hasLabel && hasUnit)
                 completeLabel += " ";
             if (hasUnit)
@@ -108,7 +108,7 @@ public class XAxisView extends AbstractXAxis {
             else
                 position = getAxisLeftOffset() + entry.relativePosition * getAxisLength();
 
-            // fix first and last label position
+            // fix first and last title position
             if (i == 0)
                 drawLabel(canvas, entry, position, true, false);
             else if (i == labels.size() - 1)
