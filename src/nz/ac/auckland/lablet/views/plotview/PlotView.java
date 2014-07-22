@@ -98,7 +98,7 @@ public class PlotView extends ViewGroup {
                     float zoom = scaleGestureDetector.getPreviousSpanY() - scaleGestureDetector.getCurrentSpanY();
                     zoom /= getHeight();
                     float currentRange = Math.abs(mainView.getRangeTop() - mainView.getRangeBottom());
-                    float zoomValue = zoom * currentRange / 10;
+                    float zoomValue = zoom * currentRange;
 
                     float newBottom = mainView.getRangeBottom() - zoomValue;
                     float newTop = mainView.getRangeTop() + zoomValue;
@@ -111,7 +111,7 @@ public class PlotView extends ViewGroup {
                     float zoom = scaleGestureDetector.getPreviousSpanX() - scaleGestureDetector.getCurrentSpanX();
                     zoom /= getWidth();
                     float currentRange = Math.abs(mainView.getRangeLeft() - mainView.getRangeRight());
-                    float zoomValue = zoom * currentRange / 10;
+                    float zoomValue = zoom * currentRange;
 
                     float newLeft = mainView.getRangeLeft() - zoomValue;
                     float newRight = mainView.getRangeRight() + zoomValue;
@@ -154,30 +154,19 @@ public class PlotView extends ViewGroup {
             painter.setYScale(plotScale.scale);
     }
 
-    public void setYRange(float bottom, float top) {
-        float oldBottom = mainView.getRangeBottom();
-        float oldTop = mainView.getRangeTop();
 
+    public void setYRange(float bottom, float top) {
         if (hasYAxis())
             yAxisView.setDataRange(bottom, top);
         mainView.setRangeY(bottom, top);
-
-        for (IPlotPainter painter : mainView.getPlotPainters())
-            painter.onYRangeChanged(bottom, top, oldBottom, oldTop);
 
         invalidate();
     }
 
     public void setXRange(float left, float right) {
-        float oldLeft = mainView.getRangeLeft();
-        float oldRight = mainView.getRangeRight();
-
         if (hasXAxis())
             xAxisView.setDataRange(left, right);
         mainView.setRangeX(left, right);
-
-        for (IPlotPainter painter : mainView.getPlotPainters())
-            painter.onXRangeChanged(left, right, oldLeft, oldRight);
 
         invalidate();
     }
