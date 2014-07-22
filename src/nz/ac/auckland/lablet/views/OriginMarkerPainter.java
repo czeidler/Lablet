@@ -155,11 +155,11 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         transform(label1Position);
         transform(label2Position);
 
-        // 0-label
+        // 0-title
         drawLabel(canvas, paint, labelOrigin, originPosition, textAngle);
-        // x-label
+        // x-title
         drawLabel(canvas, paint, label1, label1Position, textAngle);
-        // y-label
+        // y-title
         drawLabel(canvas, paint, label2, label2Position, textAngle);
 
         drawArrows(canvas, paint);

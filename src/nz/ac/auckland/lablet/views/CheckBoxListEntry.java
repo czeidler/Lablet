@@ -8,7 +8,7 @@
 package nz.ac.auckland.lablet.views;
 
 /**
- * Entry for a list item that has a check box and a label.
+ * Entry for a list item that has a check box and a title.
  */
 public class CheckBoxListEntry {
     private boolean selected = false;

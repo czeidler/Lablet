@@ -229,7 +229,7 @@ class ImprovedPointAndLineRenderer<FormatterType extends LineAndPointFormatter> 
                     pointRenderer.drawPoint(canvas, new PointF(p.first.x, p.first.y), formatter);
                 }
 
-                // if textPaint and pointLabeler are available, draw point's text label:
+                // if textPaint and pointLabeler are available, draw point's text title:
                 if(plf != null && pointLabeler != null) {
                     canvas.drawText(pointLabeler.getLabel(series, p.second), p.first.x + plf.hOffset, p.first.y + plf.vOffset, plf.getTextPaint());
                 }
