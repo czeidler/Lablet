@@ -95,26 +95,32 @@ public class PlotView extends ViewGroup {
             @Override
             public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
                 if (yZoomable) {
+                    float focusPoint = scaleGestureDetector.getFocusY();
+                    float focusPointRatio = focusPoint / mainView.getHeight();
+
                     float zoom = scaleGestureDetector.getPreviousSpanY() - scaleGestureDetector.getCurrentSpanY();
                     zoom /= getHeight();
                     float currentRange = Math.abs(mainView.getRangeTop() - mainView.getRangeBottom());
                     float zoomValue = zoom * currentRange;
 
-                    float newBottom = mainView.getRangeBottom() - zoomValue;
-                    float newTop = mainView.getRangeTop() + zoomValue;
+                    float newBottom = mainView.getRangeBottom() - zoomValue * (1 - focusPointRatio);
+                    float newTop = mainView.getRangeTop() + zoomValue * focusPointRatio;
                     setYRange(newBottom, newTop);
 
                     return true;
                 }
 
                 if (xZoomable) {
+                    float focusPoint = scaleGestureDetector.getFocusX();
+                    float focusPointRatio = focusPoint / mainView.getWidth();
+
                     float zoom = scaleGestureDetector.getPreviousSpanX() - scaleGestureDetector.getCurrentSpanX();
                     zoom /= getWidth();
                     float currentRange = Math.abs(mainView.getRangeLeft() - mainView.getRangeRight());
                     float zoomValue = zoom * currentRange;
 
-                    float newLeft = mainView.getRangeLeft() - zoomValue;
-                    float newRight = mainView.getRangeRight() + zoomValue;
+                    float newLeft = mainView.getRangeLeft() - zoomValue * focusPointRatio;
+                    float newRight = mainView.getRangeRight() + zoomValue * (1 - focusPointRatio);
                     setXRange(newLeft, newRight);
 
                     return true;
