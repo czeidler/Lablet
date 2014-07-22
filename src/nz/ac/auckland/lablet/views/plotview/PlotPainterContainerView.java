@@ -11,14 +11,68 @@ import android.content.Context;
 import android.graphics.Canvas;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
+class JoinedList<T> implements Iterable<T> {
+    private List<List<? extends T>> allLists = new ArrayList<>();
+
+    public void addList(List list) {
+        allLists.add(list);
+    }
+
+    public JoinedList(List<? extends T>... lists) {
+        for (List<? extends T> list : lists)
+            addList(list);
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
+            final Iterator<List<? extends T>> allListIterator = allLists.iterator();
+            Iterator<? extends T> currentListIterator = null;
+
+            {
+                if (allListIterator.hasNext())
+                    currentListIterator = allListIterator.next().iterator();
+            }
+
+            @Override
+            public boolean hasNext() {
+                return currentListIterator.hasNext();
+            }
+
+            @Override
+            public T next() {
+                T next = currentListIterator.next();
+                if (!currentListIterator.hasNext() && allListIterator.hasNext())
+                    currentListIterator = allListIterator.next().iterator();
+                return next;
+            }
+
+            @Override
+            public void remove() {
+
+            }
+        };
+    }
+}
+
 public class PlotPainterContainerView extends RangeDrawingView {
+    final private List<IPlotPainter> backgroundPainters = new ArrayList();
     final private List<IPlotPainter> plotPainters = new ArrayList();
+    final private List<IPlotPainter> foregroundPainters = new ArrayList();
+    final private JoinedList<IPlotPainter> allPainters = new JoinedList(backgroundPainters, plotPainters,
+            foregroundPainters);
 
     public PlotPainterContainerView(Context context) {
         super(context);
+    }
+
+    public void addBackgroundPainter(IPlotPainter painter) {
+        backgroundPainters.add(painter);
+        painter.setContainer(this);
     }
 
     public void addPlotPainter(IPlotPainter painter) {
@@ -26,9 +80,14 @@ public class PlotPainterContainerView extends RangeDrawingView {
         painter.setContainer(this);
     }
 
+    public void addForegroundPainter(IPlotPainter painter) {
+        foregroundPainters.add(painter);
+        painter.setContainer(this);
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
-        for (IPlotPainter painter : plotPainters) {
+        for (IPlotPainter painter : allPainters) {
             canvas.save();
             painter.onDraw(canvas);
             canvas.restore();
@@ -39,7 +98,7 @@ public class PlotPainterContainerView extends RangeDrawingView {
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        for (IPlotPainter painter : plotPainters)
+        for (IPlotPainter painter : allPainters)
             painter.onSizeChanged(w, h, oldw, oldh);
     }
 
@@ -54,7 +113,7 @@ public class PlotPainterContainerView extends RangeDrawingView {
 
         super.setRangeX(left, right);
 
-        for (IPlotPainter painter : getPlotPainters())
+        for (IPlotPainter painter : allPainters)
             painter.onXRangeChanged(left, right, oldLeft, oldRight);
     }
 
@@ -64,7 +123,7 @@ public class PlotPainterContainerView extends RangeDrawingView {
 
         super.setRangeY(bottom, top);
 
-        for (IPlotPainter painter : getPlotPainters())
+        for (IPlotPainter painter : allPainters)
             painter.onYRangeChanged(bottom, top, oldBottom, oldTop);
     }
 }

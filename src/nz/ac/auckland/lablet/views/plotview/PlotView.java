@@ -30,6 +30,7 @@ public class PlotView extends ViewGroup {
     private XAxisView xAxisView;
     private YAxisView yAxisView;
     private PlotPainterContainerView mainView;
+    private BackgroundPainter backgroundPainter;
 
     private ScaleGestureDetector scaleGestureDetector;
     private DragDetector dragDetector = new DragDetector();
@@ -147,6 +148,9 @@ public class PlotView extends ViewGroup {
 
         this.mainView = new PlotPainterContainerView(context);
         addView(mainView);
+
+        backgroundPainter = new BackgroundPainter(xAxisView, yAxisView);
+        mainView.addBackgroundPainter(backgroundPainter);
     }
 
     public void addPlotPainter(IPlotPainter painter) {
@@ -160,6 +164,9 @@ public class PlotView extends ViewGroup {
             painter.setYScale(plotScale.scale);
     }
 
+    public BackgroundPainter getBackgroundPainter() {
+        return backgroundPainter;
+    }
 
     public void setYRange(float bottom, float top) {
         if (hasYAxis())
