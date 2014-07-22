@@ -35,16 +35,20 @@ class RenderTask {
                 running.set(false);
                 return;
             }
-            int index = 0;
-            for (OffScreenPlotPainter.RenderPayload payload : payloadList) {
-                Rect screenRect = payload.getScreenRect();
-                Bitmap bitmap = Bitmap.createBitmap(screenRect.width(), screenRect.height(), Bitmap.Config.ARGB_8888);
-                Canvas bitmapCanvas = new Canvas(bitmap);
-                // move the canvas over the bitmap
-                bitmapCanvas.translate(-screenRect.left, -screenRect.top);
+            for (int index = 0; payloadList != null && index < payloadList.size(); index++) {
+                OffScreenPlotPainter.RenderPayload payload = payloadList.get(index);
 
-                bitmap.eraseColor(Color.TRANSPARENT);
-                plotPainter.render(bitmapCanvas, payload);
+                Rect screenRect = payload.getScreenRect();
+                Bitmap bitmap = null;
+                if (screenRect.width() > 0 && screenRect.height() > 0) {
+                    bitmap = Bitmap.createBitmap(screenRect.width(), screenRect.height(), Bitmap.Config.ARGB_8888);
+                    Canvas bitmapCanvas = new Canvas(bitmap);
+                    // move the canvas over the bitmap
+                    bitmapCanvas.translate(-screenRect.left, -screenRect.top);
+
+                    bitmap.eraseColor(Color.TRANSPARENT);
+                    plotPainter.render(bitmapCanvas, payload);
+                }
 
                 // set running to false before notifying the ui thread
                 if (index == size - 1) {
@@ -52,7 +56,6 @@ class RenderTask {
                     running.set(false);
                 }
                 publishBitmap(payload, bitmap);
-                index++;
             }
         }
     };
@@ -95,8 +98,12 @@ class RenderTask {
 
 
 abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
+    // the bitmap holding the results for the
     protected Bitmap bitmap = null;
+    // what the bitmap is showing
+    protected RectF bitmapRealRect = new RectF(0, 0, Float.MIN_VALUE, Float.MIN_VALUE);
     protected Canvas bitmapCanvas = null;
+
     final private RenderTask renderTask = new RenderTask(this);
     private List<RenderPayload> payloadQueue = new ArrayList<>();
     private IsRenderingDrawer isRenderingDrawer = new IsRenderingDrawer();
@@ -166,11 +173,17 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
     }
 
     protected void onOffScreenRenderingFinished(RenderPayload payload) {
+        if (payload.clearParentBitmap) {
+            bitmapRealRect = containerView.getRangeRect();
+            // reset the origin
+            bitmapCanvas.setMatrix(new Matrix());
+            bitmap.eraseColor(Color.TRANSPARENT);
+        }
         Bitmap resultBitmap = payload.resultBitmap;
-        Rect targetRect = containerView.toScreen(payload.realDataRect);
-        if (payload.clearParentBitmap)
-            this.bitmap.eraseColor(Color.TRANSPARENT);
-        bitmapCanvas.drawBitmap(resultBitmap, null, targetRect, null);
+        if (resultBitmap != null) {
+            Rect targetRect = containerView.toScreen(payload.realDataRect);
+            bitmapCanvas.drawBitmap(resultBitmap, null, targetRect, null);
+        }
         containerView.invalidate();
 
         if (!renderTask.isRendering() && payloadQueue.size() > 0) {
@@ -192,6 +205,43 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
         bitmap.eraseColor(Color.TRANSPARENT);
     }
 
+    @Override
+    public void onDraw(Canvas canvas) {
+        Rect bitmapScreenRect = containerView.toScreen(bitmapRealRect);
+        if (bitmap != null)
+            canvas.drawBitmap(bitmap, null, bitmapScreenRect, null);
+
+        isRenderingDrawer.onDraw(canvas);
+    }
+
+    @Override
+    public void onXRangeChanged(float left, float right, float oldLeft, float oldRight) {
+        super.onXRangeChanged(left, right, oldLeft, oldRight);
+
+        if (bitmapRealRect.right == Float.MIN_VALUE || bitmapCanvas == null) {
+            bitmapRealRect.left = left;
+            bitmapRealRect.right = right;
+        } else {
+            float screenLeft = containerView.toScreenX(left);
+            float oldScreenLeft = containerView.toScreenX(oldLeft);
+            bitmapCanvas.translate(screenLeft - oldScreenLeft, 0);
+        }
+    }
+
+    @Override
+    public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop) {
+        super.onYRangeChanged(bottom, top, oldBottom, oldTop);
+
+        if (bitmapRealRect.bottom == Float.MIN_VALUE || bitmapCanvas == null) {
+            bitmapRealRect.bottom = bottom;
+            bitmapRealRect.top = top;
+        } else {
+            float screenTop = containerView.toScreenY(top);
+            float oldScreenTop = containerView.toScreenY(oldTop);
+            bitmapCanvas.translate(0, screenTop - oldScreenTop);
+        }
+    }
+
     private boolean isRendering() {
         return renderTask.isRendering();
     }
@@ -199,10 +249,13 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
     class IsRenderingDrawer {
         private long renderTimerStart = -1;
         private Paint paint = new Paint();
+        private Paint backGroundPaint = new Paint();
         final private long TIME_THRESHOLD = 300;
 
         public IsRenderingDrawer() {
-            paint.setColor(Color.WHITE);
+            paint.setColor(Color.BLACK);
+            backGroundPaint.setColor(Color.WHITE);
+            backGroundPaint.setStyle(Paint.Style.FILL);
         }
 
         public void onDraw(Canvas canvas) {
@@ -220,21 +273,18 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
                 for (int i = 0; i < numberOfDots; i++)
                     text += ".";
 
-                float textHeight = paint.descent() - paint.ascent();
-                canvas.drawText(text, 5, textHeight + 5, paint);
+                final int offset = 5;
+                Rect textBounds = new Rect();
+                paint.getTextBounds("Rendering...", 0, "Rendering...".length(), textBounds);
+                textBounds.offset(offset, offset + textBounds.height());
+                canvas.drawRect(textBounds, backGroundPaint);
+                float textHeight = textBounds.height();
+                canvas.drawText(text, offset, textHeight + offset, paint);
 
                 containerView.invalidate();
             } else {
                 renderTimerStart = -1;
             }
         }
-    }
-
-    @Override
-    public void onDraw(Canvas canvas) {
-        if (bitmap != null)
-            canvas.drawBitmap(bitmap, 0, 0, null);
-
-        isRenderingDrawer.onDraw(canvas);
     }
 }

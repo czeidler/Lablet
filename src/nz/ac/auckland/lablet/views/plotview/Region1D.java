@@ -36,13 +36,13 @@ public class Region1D {
 
     public int getMin() {
         if (ranges.size() == 0)
-            return 0;
+            return -1;
         return ranges.get(0).min;
     }
 
     public int getMax() {
         if (ranges.size() == 0)
-            return 0;
+            return -1;
         return ranges.get(ranges.size() - 1).max;
     }
 

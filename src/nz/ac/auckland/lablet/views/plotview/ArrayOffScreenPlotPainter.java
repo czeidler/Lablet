@@ -80,7 +80,7 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
         RectF realDataRect = getRealDataRect(adapter, dirtyRegion.getMin(), dirtyRegion.getMax());
         Rect screenRect = containerView.toScreen(realDataRect);
         ArrayRenderPayload renderPayload = new ArrayRenderPayload(realDataRect, screenRect,
-                containerView.getRangeMatrix(), adapter.clone(),
+                containerView.getRangeMatrixCopy(), adapter.clone(),
                 new Region1D(dirtyRegion));
 
         triggerOffScreenRendering(renderPayload);
@@ -129,7 +129,7 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
                 RectF realDataRect = containerView.getRangeRect();
                 Rect screenRect = containerView.toScreen(realDataRect);
                 ArrayRenderPayload renderPayload = new ArrayRenderPayload(realDataRect, screenRect,
-                        containerView.getRangeMatrix(), ((CloneablePlotDataAdapter)dataAdapter).clone(),
+                        containerView.getRangeMatrixCopy(), ((CloneablePlotDataAdapter)dataAdapter).clone(),
                         new Region1D(0, dataAdapter.getSize() - 1));
                 renderPayload.setClearParentBitmap(true);
 
@@ -142,12 +142,16 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
     }
 
     @Override
-    public void onXRangeChanged() {
+    public void onXRangeChanged(float left, float right, float oldLeft, float oldRight) {
+        super.onXRangeChanged(left, right, oldLeft, oldRight);
+
         dataAdapter.notifyAllDataChanged();
     }
 
     @Override
-    public void onYRangeChanged() {
+    public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop) {
+        super.onYRangeChanged(bottom, top, oldBottom, oldTop);
+
         dataAdapter.notifyAllDataChanged();
     }
 }

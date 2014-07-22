@@ -81,7 +81,7 @@ public class RangeDrawingView extends ViewGroup {
         path.transform(matrix);
     }
 
-    public Matrix getRangeMatrix() {
+    public Matrix getRangeMatrixCopy() {
         Matrix matrix = new Matrix();
         matrix.setScale(getXScale(), getYScale());
         matrix.preTranslate(-rangeRect.left, -rangeRect.top);

@@ -155,23 +155,29 @@ public class PlotView extends ViewGroup {
     }
 
     public void setYRange(float bottom, float top) {
+        float oldBottom = mainView.getRangeBottom();
+        float oldTop = mainView.getRangeTop();
+
         if (hasYAxis())
             yAxisView.setDataRange(bottom, top);
         mainView.setRangeY(bottom, top);
 
         for (IPlotPainter painter : mainView.getPlotPainters())
-            painter.onYRangeChanged();
+            painter.onYRangeChanged(bottom, top, oldBottom, oldTop);
 
         invalidate();
     }
 
     public void setXRange(float left, float right) {
+        float oldLeft = mainView.getRangeLeft();
+        float oldRight = mainView.getRangeRight();
+
         if (hasXAxis())
             xAxisView.setDataRange(left, right);
         mainView.setRangeX(left, right);
 
         for (IPlotPainter painter : mainView.getPlotPainters())
-            painter.onXRangeChanged();
+            painter.onXRangeChanged(left, right, oldLeft, oldRight);
 
         invalidate();
     }

@@ -39,12 +39,12 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
     }
 
     @Override
-    public void onXRangeChanged() {
+    public void onXRangeChanged(float left, float right, float oldLeft, float oldRight) {
 
     }
 
     @Override
-    public void onYRangeChanged() {
+    public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop) {
 
     }
 }

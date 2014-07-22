@@ -49,8 +49,10 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
     protected RectF getRealDataRect(AbstractPlotDataAdapter adapter, int startIndex, int lastIndex) {
         AudioFrequencyMapAdapter audioAmplitudePlotDataAdapter = (AudioFrequencyMapAdapter)adapter;
         RectF realDataRect = containerView.getRangeRect();
-        realDataRect.left = audioAmplitudePlotDataAdapter.getX(startIndex);
-        realDataRect.right = audioAmplitudePlotDataAdapter.getX(lastIndex);
+        if (audioAmplitudePlotDataAdapter.getSize() > 0) {
+            realDataRect.left = audioAmplitudePlotDataAdapter.getX(startIndex);
+            realDataRect.right = audioAmplitudePlotDataAdapter.getX(lastIndex);
+        }
         return realDataRect;
     }
 
@@ -72,11 +74,11 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
             final float[] frequencies = adapter.getY(index);
             final float time = adapter.getX(index);
 
-            final int[] colors = getColors(frequencies, payload.getScreenRect().height());
+            final int[] colors = getColors(frequencies, payload);
 
             float[] screenLeftTop = new float[2];
             screenLeftTop[0] = time;
-            screenLeftTop[1] = containerView.getRangeTop();
+            screenLeftTop[1] = payload.getRealDataRect().top;
             rangeMatrix.mapPoints(screenLeftTop);
 
             canvas.drawBitmap(colors, 0, 1, screenLeftTop[0] - 0.5f, screenLeftTop[1], 1,
@@ -93,12 +95,11 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
         return (float)index / arraySize * frequencyRang;
     }
 
-    private int[] getColors(final float[] frequencies, final int screenHeight) {
-        final float scaledBottom = yScale.scale(containerView.getRangeBottom());
-        final float scaledTop = yScale.scale(containerView.getRangeTop());
-        final Rect screenRect = containerView.getScreenRect();
-
-        final int[] colors = new int[screenHeight];
+    private int[] getColors(final float[] frequencies, final ArrayRenderPayload payload) {
+        final float scaledBottom = yScale.scale(payload.getRealDataRect().bottom);
+        final float scaledTop = yScale.scale(payload.getRealDataRect().top);
+        final Rect screenRect = payload.getScreenRect();
+        final int[] colors = new int[screenRect.height()];
 
         float frequencyAmpSum = 0;
         int currentPixel = -1;
