@@ -268,9 +268,14 @@ public class CameraRunSettingsActivity extends ExperimentActivity {
         setVideoEnd(videoEndValue);
         PointF point = new PointF();
         int duration = getDurationAtFrameRate(getFrameRateFromPicker());
+        // because the duration is for a certain frame rate it can be smaller than the actual video length
+        if (point.x > 1)
+            point.x = 1;
         point.x = (float)videoStartValue / duration;
         startEndSeekBar.getMarkerDataModel().getMarkerDataAt(0).setPosition(point);
         point.x = (float)videoEndValue / duration;
+        if (point.x > 1)
+            point.x = 1;
         startEndSeekBar.getMarkerDataModel().getMarkerDataAt(1).setPosition(point);
 
         helpView = (CameraRunSettingsHelpView)findViewById(R.id.cameraSettingsHelp);
