@@ -10,6 +10,8 @@ package nz.ac.auckland.lablet.views;
 import android.graphics.*;
 import nz.ac.auckland.lablet.views.plotview.*;
 
+import java.util.Arrays;
+
 
 public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
     final private double maxFrequencyAmplitude = 1000000;
@@ -82,7 +84,7 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
             rangeMatrix.mapPoints(screenLeftTop);
 
             canvas.drawBitmap(colors, 0, 1, screenLeftTop[0] - 0.5f, screenLeftTop[1], 1,
-                    payload.getScreenRect().height(), false, null);
+                    payload.getScreenRect().height(), true, null);
         }
     }
 
@@ -100,6 +102,7 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
         final float scaledTop = yScale.scale(payload.getRealDataRect().top);
         final Rect screenRect = payload.getScreenRect();
         final int[] colors = new int[screenRect.height()];
+        Arrays.fill(colors, Color.TRANSPARENT);
 
         float frequencyAmpSum = 0;
         int currentPixel = -1;
