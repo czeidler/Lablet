@@ -90,11 +90,11 @@ public abstract class LabelPartitioner {
     protected float realEnd;
 
 
-    class LabelEntry {
-        String label = "";
-        boolean isFullTick = true;
-        float realValue;
-        float relativePosition;
+    public static class LabelEntry {
+        public String label = "";
+        public boolean isFullTick = true;
+        public float realValue;
+        public float relativePosition;
     }
     protected List<LabelEntry> labels = new ArrayList<>();
 
