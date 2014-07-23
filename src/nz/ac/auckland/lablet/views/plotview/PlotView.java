@@ -45,6 +45,7 @@ public class PlotView extends ViewGroup {
     private boolean yDraggable = false;
     private boolean xZoomable = false;
     private boolean yZoomable = false;
+    private boolean rangeChanging = false;
 
     // Float.MAX_VALUE means there there is no end range (negative or positive)
     private RectF maxRange = new RectF(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
@@ -71,33 +72,32 @@ public class PlotView extends ViewGroup {
                 point.set(event.getX(), event.getY());
 
                 handled = onDragged(xDragged, yDragged);
+                setRangeIsChanging(handled);
             }
             return handled;
         }
 
         private void setDragging(boolean dragging) {
             this.isDragging = dragging;
-            setRangeIsChanging(dragging);
         }
 
         private boolean onDragged(float x, float y) {
+            boolean handled = false;
             if (yDraggable) {
                 float realDelta = mainView.fromScreenY(y) - mainView.fromScreenY(0);
                 if (mainView.getRangeBottom() < mainView.getRangeTop())
                     realDelta *= -1;
 
-                offsetYRange(realDelta);
-                return true;
+                handled = offsetYRange(realDelta);
             }
             if (xDraggable) {
                 float realDelta = mainView.fromScreenX(x) - mainView.fromScreenX(0);
                 if (mainView.getRangeLeft() < mainView.getRangeRight())
                     realDelta *= -1;
 
-                offsetXRange(realDelta);
-                return true;
+                handled = offsetXRange(realDelta);
             }
-            return false;
+            return handled;
         }
     }
 
@@ -107,6 +107,7 @@ public class PlotView extends ViewGroup {
         scaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureDetector.OnScaleGestureListener() {
             @Override
             public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
+                boolean handled = false;
                 if (yZoomable) {
                     setRangeIsChanging(true);
 
@@ -122,7 +123,7 @@ public class PlotView extends ViewGroup {
                     float newTop = mainView.getRangeTop() + zoomValue * focusPointRatio;
                     setYRange(newBottom, newTop);
 
-                    return true;
+                    handled = true;
                 }
 
                 if (xZoomable) {
@@ -140,9 +141,9 @@ public class PlotView extends ViewGroup {
                     float newRight = mainView.getRangeRight() + zoomValue * (1 - focusPointRatio);
                     setXRange(newLeft, newRight);
 
-                    return true;
+                    handled = true;
                 }
-                return false;
+                return handled;
             }
 
             @Override
@@ -188,7 +189,7 @@ public class PlotView extends ViewGroup {
     }
 
     private void setRangeIsChanging(boolean changing) {
-        
+        rangeChanging = changing;
     }
 
     public void setMaxYRange(float bottom, float top) {
@@ -267,10 +268,13 @@ public class PlotView extends ViewGroup {
     }
 
     private boolean fuzzyEquals(float value1, float value2) {
-        return Math.abs(value1 - value2) < 0.00001;
+        return Math.abs(value1 - value2) < 0.000001;
     }
 
-    private void setYRange(float bottom, float top, boolean keepDistance) {
+    private boolean setYRange(float bottom, float top, boolean keepDistance) {
+        float oldBottom = mainView.getRangeBottom();
+        float oldTop = mainView.getRangeTop();
+
         RangeF range = new RangeF(bottom, top);
         validateYRange(range);
         if (keepDistance && !fuzzyEquals(bottom - top, range.start - range.end)) {
@@ -281,15 +285,21 @@ public class PlotView extends ViewGroup {
         }
         bottom = range.start;
         top = range.end;
+        if (fuzzyEquals(bottom, oldBottom) && fuzzyEquals(top, oldTop))
+            return false;
 
         if (hasYAxis())
             yAxisView.setDataRange(bottom, top);
         mainView.setRangeY(bottom, top);
 
         invalidate();
+        return true;
     }
 
-    public void setXRange(float left, float right, boolean keepDistance) {
+    public boolean setXRange(float left, float right, boolean keepDistance) {
+        float oldLeft = mainView.getRangeLeft();
+        float oldRight = mainView.getRangeRight();
+
         RangeF range = new RangeF(left, right);
         validateXRange(range);
         if (keepDistance && !fuzzyEquals(left - right, range.start - range.end)) {
@@ -300,28 +310,31 @@ public class PlotView extends ViewGroup {
         }
         left = range.start;
         right = range.end;
+        if (fuzzyEquals(left, oldLeft) && fuzzyEquals(right, oldRight))
+            return false;
 
         if (hasXAxis())
             xAxisView.setDataRange(left, right);
         mainView.setRangeX(left, right);
 
         invalidate();
+        return true;
     }
 
-    public void setXRange(float left, float right) {
-        setXRange(left, right, false);
+    public boolean setXRange(float left, float right) {
+        return setXRange(left, right, false);
     }
 
-    public void setYRange(float bottom, float top) {
-        setYRange(bottom, top, false);
+    public boolean setYRange(float bottom, float top) {
+        return setYRange(bottom, top, false);
     }
 
-    public void offsetXRange(float offset) {
-        setXRange(mainView.getRangeLeft() + offset, mainView.getRangeRight() + offset, true);
+    public boolean offsetXRange(float offset) {
+        return setXRange(mainView.getRangeLeft() + offset, mainView.getRangeRight() + offset, true);
     }
 
-    public void offsetYRange(float offset) {
-        setYRange(mainView.getRangeBottom() + offset, mainView.getRangeTop() + offset, true);
+    public boolean offsetYRange(float offset) {
+        return setYRange(mainView.getRangeBottom() + offset, mainView.getRangeTop() + offset, true);
     }
 
     public boolean isXDragable() {
@@ -449,12 +462,18 @@ public class PlotView extends ViewGroup {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        dragDetector.onTouchEvent(event);
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        boolean handled = dragDetector.onTouchEvent(event);
 
-        if (scaleGestureDetector.onTouchEvent(event))
-            return true;
+        if (xZoomable || yZoomable)
+            handled = scaleGestureDetector.onTouchEvent(event);
 
-        return super.onTouchEvent(event);
+        if (handled) {
+            ViewParent parent = getParent();
+            if (parent != null)
+                parent.requestDisallowInterceptTouchEvent(true);
+        }
+
+        return handled;
     }
 }
