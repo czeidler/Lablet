@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -16,6 +17,8 @@ import nz.ac.auckland.lablet.views.plotview.axes.*;
 
 
 public class PlotView extends ViewGroup {
+    final static public int DEFAULT_PEN_COLOR = Color.WHITE;
+
     public static class PlotScale {
         public IScale scale;
         public LabelPartitioner labelPartitioner;
@@ -27,6 +30,7 @@ public class PlotView extends ViewGroup {
         return plotScale;
     }
 
+    private TitleView titleView;
     private XAxisView xAxisView;
     private YAxisView yAxisView;
     private PlotPainterContainerView mainView;
@@ -140,6 +144,9 @@ public class PlotView extends ViewGroup {
             }
         });
 
+        titleView = new TitleView(context);
+        addView(titleView);
+
         xAxisView = new XAxisView(context);
         addView(xAxisView);
 
@@ -224,12 +231,20 @@ public class PlotView extends ViewGroup {
             yAxisView.invalidate();
     }
 
+    public TitleView getTitleView() {
+        return titleView;
+    }
+
     public YAxisView getYAxisView() {
         return yAxisView;
     }
 
     public XAxisView getXAxisView() {
         return xAxisView;
+    }
+
+    private boolean hasTitle() {
+        return titleView != null && titleView.getVisibility() == View.VISIBLE;
     }
 
     private boolean hasXAxis() {
@@ -244,6 +259,11 @@ public class PlotView extends ViewGroup {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         final int width = right - left;
         final int height = bottom - top;
+        int titleBottom = 0;
+        if (hasTitle())
+            titleBottom = (int)titleView.getPreferredHeight();
+        final int titleHeight = titleBottom;
+
         int xAxisTop = height;
         int xAxisLeftOffset = 0;
         int xAxisRightOffset = 0;
@@ -252,13 +272,29 @@ public class PlotView extends ViewGroup {
             xAxisRightOffset = (int)xAxisView.getAxisRightOffset();
             xAxisLeftOffset = (int)xAxisView.getAxisLeftOffset();
         }
-        final int mainAreaHeight = xAxisTop - (int)yAxisView.getAxisTopOffset();
-        final int yAxisRight = (int)yAxisView.optimalWidthForHeight(mainAreaHeight);
 
+        int yAxisRight = 0;
+        int yAxisTopOffset = 0;
+        int yAxisBottomOffset = 0;
+        if (hasYAxis()) {
+            final int mainAreaHeight = xAxisTop - (int)Math.max(yAxisView.getAxisTopOffset(), titleHeight);
+            yAxisRight = (int) yAxisView.optimalWidthForHeight(mainAreaHeight);
+            yAxisTopOffset = (int) yAxisView.getAxisTopOffset();
+            yAxisBottomOffset = (int)yAxisView.getAxisBottomOffset();
+        }
+
+        final Rect titleRect = new Rect(yAxisRight, 0, width, titleBottom);
         final Rect xAxisRect = new Rect(yAxisRight - xAxisLeftOffset, xAxisTop, width, height);
-        final Rect yAxisRect = new Rect(0, 0, yAxisRight, xAxisTop + (int)yAxisView.getAxisBottomOffset());
-        final Rect mainViewRect = new Rect(yAxisRight, (int)yAxisView.getAxisTopOffset(),
-                width - xAxisRightOffset, xAxisTop);
+        final Rect yAxisRect = new Rect(0, Math.max(0, titleBottom - yAxisTopOffset), yAxisRight,
+                xAxisTop + yAxisBottomOffset);
+        final Rect mainViewRect = new Rect(yAxisRight, Math.max(titleBottom, yAxisTopOffset), width - xAxisRightOffset,
+                xAxisTop);
+
+        if (hasTitle()) {
+            titleView.measure(MeasureSpec.makeMeasureSpec(titleRect.width(), MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(titleRect.height(), MeasureSpec.EXACTLY));
+            titleView.layout(titleRect.left, titleRect.top, titleRect.right, titleRect.bottom);
+        }
 
         if (hasXAxis()) {
             xAxisView.measure(MeasureSpec.makeMeasureSpec(xAxisRect.width(), MeasureSpec.EXACTLY),

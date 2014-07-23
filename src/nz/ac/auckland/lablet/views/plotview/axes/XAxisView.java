@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import nz.ac.auckland.lablet.views.plotview.PlotView;
 
 
 public class XAxisView extends AbstractXAxis {
@@ -28,8 +29,7 @@ public class XAxisView extends AbstractXAxis {
     public XAxisView(Context context) {
         super(context);
 
-        labelPaint.setColor(Color.WHITE);
-        labelPaint.setStrokeWidth(1);
+        labelPaint.setColor(PlotView.DEFAULT_PEN_COLOR);
         labelPaint.setStyle(Paint.Style.STROKE);
         labelDescent = labelPaint.descent();
         labelHeight = labelDescent - labelPaint.ascent();

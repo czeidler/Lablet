@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import nz.ac.auckland.lablet.views.plotview.PlotView;
 
 import java.util.List;
 
@@ -29,8 +30,7 @@ public class YAxisView extends AbstractYAxis {
     public YAxisView(Context context) {
         super(context);
 
-        labelPaint.setColor(Color.WHITE);
-        labelPaint.setStrokeWidth(1);
+        labelPaint.setColor(PlotView.DEFAULT_PEN_COLOR);
         labelPaint.setStyle(Paint.Style.STROKE);
         labelHeight = labelPaint.descent() - labelPaint.ascent();
 
