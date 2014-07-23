@@ -17,38 +17,14 @@ import android.view.*;
 import nz.ac.auckland.lablet.views.plotview.axes.*;
 
 
-public class PlotView extends ViewGroup {
-    final static public int DEFAULT_PEN_COLOR = Color.WHITE;
-
-    public static class PlotScale {
-        public IScale scale;
-        public LabelPartitioner labelPartitioner;
-    }
-    static public PlotScale log10Scale() {
-        PlotScale plotScale = new PlotScale();
-        plotScale.scale = new Log10Scale();
-        plotScale.labelPartitioner = new LabelPartitionerLog10();
-        return plotScale;
-    }
-
-    private TitleView titleView;
-    private XAxisView xAxisView;
-    private YAxisView yAxisView;
-    private PlotPainterContainerView mainView;
-    private BackgroundPainter backgroundPainter;
-    private RangeInfoPainter rangeInfoPainter;
-
+class PlotGestureDetector {
     private ScaleGestureDetector scaleGestureDetector;
     private DragDetector dragDetector = new DragDetector();
 
-    private boolean xDraggable = false;
-    private boolean yDraggable = false;
-    private boolean xZoomable = false;
-    private boolean yZoomable = false;
-    private boolean rangeChanging = false;
+    final private PlotView plotView;
+    final private RangeDrawingView rangeView;
 
-    // Float.MAX_VALUE means there there is no end range (negative or positive)
-    private RectF maxRange = new RectF(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
+    private boolean rangeChanging = false;
 
     class DragDetector {
         private boolean isDragging = false;
@@ -83,63 +59,64 @@ public class PlotView extends ViewGroup {
 
         private boolean onDragged(float x, float y) {
             boolean handled = false;
-            if (yDraggable) {
-                float realDelta = mainView.fromScreenY(y) - mainView.fromScreenY(0);
-                if (mainView.getRangeBottom() < mainView.getRangeTop())
+            if (plotView.isYDragable()) {
+                float realDelta = rangeView.fromScreenY(y) - rangeView.fromScreenY(0);
+                if (rangeView.getRangeBottom() < rangeView.getRangeTop())
                     realDelta *= -1;
 
-                handled = offsetYRange(realDelta);
+                handled = plotView.offsetYRange(realDelta);
             }
-            if (xDraggable) {
-                float realDelta = mainView.fromScreenX(x) - mainView.fromScreenX(0);
-                if (mainView.getRangeLeft() < mainView.getRangeRight())
+            if (plotView.isXDragable()) {
+                float realDelta = rangeView.fromScreenX(x) - rangeView.fromScreenX(0);
+                if (rangeView.getRangeLeft() < rangeView.getRangeRight())
                     realDelta *= -1;
 
-                handled = offsetXRange(realDelta);
+                handled = plotView.offsetXRange(realDelta);
             }
             return handled;
         }
     }
 
-    public PlotView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public PlotGestureDetector(Context context, final PlotView plotView, final RangeDrawingView rangeView) {
+        this.plotView = plotView;
+        this.rangeView = rangeView;
 
         scaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureDetector.OnScaleGestureListener() {
             @Override
             public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
                 boolean handled = false;
-                if (yZoomable) {
+                if (plotView.isYZoomable()) {
                     setRangeIsChanging(true);
 
                     float focusPoint = scaleGestureDetector.getFocusY();
-                    float focusPointRatio = focusPoint / mainView.getHeight();
+                    float focusPointRatio = focusPoint / plotView.getHeight();
 
                     float zoom = scaleGestureDetector.getPreviousSpanY() - scaleGestureDetector.getCurrentSpanY();
-                    zoom /= getHeight();
-                    float currentRange = Math.abs(mainView.getRangeTop() - mainView.getRangeBottom());
+                    zoom /= plotView.getHeight();
+                    float currentRange = Math.abs(rangeView.getRangeTop() - rangeView.getRangeBottom());
                     float zoomValue = zoom * currentRange;
 
-                    float newBottom = mainView.getRangeBottom() - zoomValue * (1 - focusPointRatio);
-                    float newTop = mainView.getRangeTop() + zoomValue * focusPointRatio;
-                    setYRange(newBottom, newTop);
+                    float newBottom = rangeView.getRangeBottom() - zoomValue * (1 - focusPointRatio);
+                    float newTop = rangeView.getRangeTop() + zoomValue * focusPointRatio;
+                    plotView.setYRange(newBottom, newTop);
 
                     handled = true;
                 }
 
-                if (xZoomable) {
+                if (plotView.isXZoomable()) {
                     setRangeIsChanging(true);
 
                     float focusPoint = scaleGestureDetector.getFocusX();
-                    float focusPointRatio = focusPoint / mainView.getWidth();
+                    float focusPointRatio = focusPoint / plotView.getWidth();
 
                     float zoom = scaleGestureDetector.getPreviousSpanX() - scaleGestureDetector.getCurrentSpanX();
-                    zoom /= getWidth();
-                    float currentRange = Math.abs(mainView.getRangeLeft() - mainView.getRangeRight());
+                    zoom /= plotView.getWidth();
+                    float currentRange = Math.abs(rangeView.getRangeLeft() - rangeView.getRangeRight());
                     float zoomValue = zoom * currentRange;
 
-                    float newLeft = mainView.getRangeLeft() - zoomValue * focusPointRatio;
-                    float newRight = mainView.getRangeRight() + zoomValue * (1 - focusPointRatio);
-                    setXRange(newLeft, newRight);
+                    float newLeft = rangeView.getRangeLeft() - zoomValue * focusPointRatio;
+                    float newRight = rangeView.getRangeRight() + zoomValue * (1 - focusPointRatio);
+                    plotView.setXRange(newLeft, newRight);
 
                     handled = true;
                 }
@@ -156,6 +133,52 @@ public class PlotView extends ViewGroup {
                 setRangeIsChanging(false);
             }
         });
+    }
+
+    public boolean onTouchEvent(MotionEvent event) {
+        boolean handled = dragDetector.onTouchEvent(event);
+
+        if (plotView.isXZoomable() || plotView.isYZoomable())
+            handled = scaleGestureDetector.onTouchEvent(event);
+
+        return handled;
+    }
+
+    private void setRangeIsChanging(boolean changing) {
+        rangeChanging = changing;
+    }
+}
+
+
+public class PlotView extends ViewGroup {
+    final static public int DEFAULT_PEN_COLOR = Color.WHITE;
+
+    public static class PlotScale {
+        public IScale scale;
+        public LabelPartitioner labelPartitioner;
+    }
+    static public PlotScale log10Scale() {
+        PlotScale plotScale = new PlotScale();
+        plotScale.scale = new Log10Scale();
+        plotScale.labelPartitioner = new LabelPartitionerLog10();
+        return plotScale;
+    }
+
+    private TitleView titleView;
+    private XAxisView xAxisView;
+    private YAxisView yAxisView;
+    private PlotPainterContainerView mainView;
+    private BackgroundPainter backgroundPainter;
+    private RangeInfoPainter rangeInfoPainter;
+
+    private boolean xDraggable = false;
+    private boolean yDraggable = false;
+    private boolean xZoomable = false;
+    private boolean yZoomable = false;
+    private PlotGestureDetector plotGestureDetector;
+
+    public PlotView(Context context, AttributeSet attrs) {
+        super(context, attrs);
 
         titleView = new TitleView(context);
         addView(titleView);
@@ -174,168 +197,14 @@ public class PlotView extends ViewGroup {
 
         rangeInfoPainter = new RangeInfoPainter(this);
         mainView.addForegroundPainter(rangeInfoPainter);
+
+        plotGestureDetector = new PlotGestureDetector(context, this, mainView);
     }
 
     public void addPlotPainter(IPlotPainter painter) {
         mainView.addPlotPainter(painter);
     }
 
-    public void setMaxXRange(float left, float right) {
-        maxRange.left = left;
-        maxRange.right = right;
-
-        // reset range
-        setXRange(mainView.getRangeLeft(), mainView.getRangeRight());
-    }
-
-    private void setRangeIsChanging(boolean changing) {
-        rangeChanging = changing;
-    }
-
-    public void setMaxYRange(float bottom, float top) {
-        maxRange.bottom = bottom;
-        maxRange.top = top;
-
-        // reset range
-        setYRange(mainView.getRangeBottom(), mainView.getRangeTop());
-    }
-
-    public RectF getMaxRange() {
-        return new RectF(maxRange);
-    }
-
-    static class RangeF {
-        public RangeF(float start, float end) {
-            this.start = start;
-            this.end = end;
-        }
-
-        public float start;
-        public float end;
-    }
-
-    private void validateXRange(RangeF range) {
-        if (maxRange.left != Float.MAX_VALUE) {
-            if (range.end > range.start) {
-                if (range.start < maxRange.left)
-                    range.start = maxRange.left;
-            } else {
-                if (range.start > maxRange.left)
-                    range.start = maxRange.left;
-            }
-        }
-        if (maxRange.right != Float.MAX_VALUE) {
-            if (range.end > range.start) {
-                if (range.end > maxRange.right)
-                    range.end = maxRange.right;
-            } else {
-                if (range.end < maxRange.right)
-                    range.end = maxRange.right;
-            }
-        }
-    }
-
-    private void validateYRange(RangeF range) {
-        if (maxRange.bottom != Float.MAX_VALUE) {
-            if (range.end > range.start) {
-                if (range.start < maxRange.bottom)
-                    range.start = maxRange.bottom;
-            } else {
-                if (range.start > maxRange.bottom)
-                    range.start = maxRange.bottom;
-            }
-        }
-        if (maxRange.top != Float.MAX_VALUE) {
-            if (range.end > range.start) {
-                if (range.end > maxRange.top)
-                    range.end = maxRange.top;
-            } else {
-                if (range.end < maxRange.top)
-                    range.end = maxRange.top;
-            }
-        }
-    }
-
-    public void setYScale(PlotScale plotScale) {
-        if (yAxisView != null)
-            yAxisView.setLabelPartitioner(plotScale.labelPartitioner);
-        for (IPlotPainter painter : mainView.getPlotPainters())
-            painter.setYScale(plotScale.scale);
-    }
-
-    public BackgroundPainter getBackgroundPainter() {
-        return backgroundPainter;
-    }
-
-    private boolean fuzzyEquals(float value1, float value2) {
-        return Math.abs(value1 - value2) < 0.000001;
-    }
-
-    private boolean setYRange(float bottom, float top, boolean keepDistance) {
-        float oldBottom = mainView.getRangeBottom();
-        float oldTop = mainView.getRangeTop();
-
-        RangeF range = new RangeF(bottom, top);
-        validateYRange(range);
-        if (keepDistance && !fuzzyEquals(bottom - top, range.start - range.end)) {
-            if (bottom != range.start)
-                range.end = range.start + (top - bottom);
-            else if (top != range.end)
-                range.start = range.end - (top - bottom);
-        }
-        bottom = range.start;
-        top = range.end;
-        if (fuzzyEquals(bottom, oldBottom) && fuzzyEquals(top, oldTop))
-            return false;
-
-        if (hasYAxis())
-            yAxisView.setDataRange(bottom, top);
-        mainView.setRangeY(bottom, top);
-
-        invalidate();
-        return true;
-    }
-
-    public boolean setXRange(float left, float right, boolean keepDistance) {
-        float oldLeft = mainView.getRangeLeft();
-        float oldRight = mainView.getRangeRight();
-
-        RangeF range = new RangeF(left, right);
-        validateXRange(range);
-        if (keepDistance && !fuzzyEquals(left - right, range.start - range.end)) {
-            if (left != range.start)
-                range.end = range.start + (right - left);
-            else if (right != range.end)
-                range.start = range.end - (right - left);
-        }
-        left = range.start;
-        right = range.end;
-        if (fuzzyEquals(left, oldLeft) && fuzzyEquals(right, oldRight))
-            return false;
-
-        if (hasXAxis())
-            xAxisView.setDataRange(left, right);
-        mainView.setRangeX(left, right);
-
-        invalidate();
-        return true;
-    }
-
-    public boolean setXRange(float left, float right) {
-        return setXRange(left, right, false);
-    }
-
-    public boolean setYRange(float bottom, float top) {
-        return setYRange(bottom, top, false);
-    }
-
-    public boolean offsetXRange(float offset) {
-        return setXRange(mainView.getRangeLeft() + offset, mainView.getRangeRight() + offset, true);
-    }
-
-    public boolean offsetYRange(float offset) {
-        return setYRange(mainView.getRangeBottom() + offset, mainView.getRangeTop() + offset, true);
-    }
 
     public boolean isXDragable() {
         return xDraggable;
@@ -367,6 +236,69 @@ public class PlotView extends ViewGroup {
 
     public void setYZoomable(boolean yZoomable) {
         this.yZoomable = yZoomable;
+    }
+
+    public void setMaxXRange(float left, float right) {
+        mainView.setMaxXRange(left, right);
+    }
+
+    public void setMaxYRange(float bottom, float top) {
+        mainView.setMaxYRange(bottom, top);
+    }
+
+    public RectF getMaxRange() {
+        return mainView.getMaxRange();
+    }
+
+    public void setYScale(PlotScale plotScale) {
+        if (yAxisView != null)
+            yAxisView.setLabelPartitioner(plotScale.labelPartitioner);
+        for (IPlotPainter painter : mainView.getPlotPainters())
+            painter.setYScale(plotScale.scale);
+    }
+
+    public BackgroundPainter getBackgroundPainter() {
+        return backgroundPainter;
+    }
+
+    public boolean setXRange(float left, float right) {
+        return setXRange(left, right, false);
+    }
+
+    public boolean setYRange(float bottom, float top) {
+        return setYRange(bottom, top, false);
+    }
+
+    public boolean offsetXRange(float offset) {
+        return setXRange(mainView.getRangeLeft() + offset, mainView.getRangeRight() + offset, true);
+    }
+
+    public boolean offsetYRange(float offset) {
+        return setYRange(mainView.getRangeBottom() + offset, mainView.getRangeTop() + offset, true);
+    }
+
+    private boolean setXRange(float left, float right, boolean keepDistance) {
+        if (!mainView.setXRange(left, right, keepDistance))
+            return false;
+
+        // always use the validated range values from the mainView!
+        if (hasXAxis())
+            xAxisView.setDataRange(mainView.getRangeLeft(), mainView.getRangeRight());
+
+        invalidate();
+        return true;
+    }
+
+    private boolean setYRange(float bottom, float top, boolean keepDistance) {
+        if (!mainView.setYRange(bottom, top, keepDistance))
+            return false;
+
+        // always use the validated range values from the mainView!
+        if (hasYAxis())
+            yAxisView.setDataRange(mainView.getRangeBottom(), mainView.getRangeTop());
+
+        invalidate();
+        return true;
     }
 
     public void invalidate() {
@@ -463,10 +395,7 @@ public class PlotView extends ViewGroup {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        boolean handled = dragDetector.onTouchEvent(event);
-
-        if (xZoomable || yZoomable)
-            handled = scaleGestureDetector.onTouchEvent(event);
+        boolean handled = plotGestureDetector.onTouchEvent(event);
 
         if (handled) {
             ViewParent parent = getParent();

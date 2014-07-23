@@ -10,7 +10,10 @@ package nz.ac.auckland.lablet.views.plotview;
 import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 
 
 public class RangeDrawingView extends ViewGroup {
@@ -19,14 +22,11 @@ public class RangeDrawingView extends ViewGroup {
     private int viewWidth;
     private int viewHeight;
 
+    // Float.MAX_VALUE means there there is no end range (negative or positive)
+    private RectF maxRange = new RectF(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
+
     public RangeDrawingView(Context context) {
         super(context);
-
-        setWillNotDraw(false);
-    }
-
-    public RangeDrawingView(Context context, AttributeSet attrs) {
-        super(context, attrs);
 
         setWillNotDraw(false);
     }
@@ -37,6 +37,142 @@ public class RangeDrawingView extends ViewGroup {
 
     public Rect getScreenRect() {
         return toScreen(getRangeRect());
+    }
+
+    public void setMaxXRange(float left, float right) {
+        maxRange.left = left;
+        maxRange.right = right;
+
+        // reset range
+        setXRange(getRangeLeft(), getRangeRight());
+    }
+
+    public void setMaxYRange(float bottom, float top) {
+        maxRange.bottom = bottom;
+        maxRange.top = top;
+
+        // reset range
+        setYRange(getRangeBottom(), getRangeTop());
+    }
+
+    public RectF getMaxRange() {
+        return new RectF(maxRange);
+    }
+
+    static class RangeF {
+        public RangeF(float start, float end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public float start;
+        public float end;
+    }
+
+    private void validateXRange(RangeF range) {
+        if (maxRange.left != Float.MAX_VALUE) {
+            if (range.end > range.start) {
+                if (range.start < maxRange.left)
+                    range.start = maxRange.left;
+            } else {
+                if (range.start > maxRange.left)
+                    range.start = maxRange.left;
+            }
+        }
+        if (maxRange.right != Float.MAX_VALUE) {
+            if (range.end > range.start) {
+                if (range.end > maxRange.right)
+                    range.end = maxRange.right;
+            } else {
+                if (range.end < maxRange.right)
+                    range.end = maxRange.right;
+            }
+        }
+    }
+
+    private void validateYRange(RangeF range) {
+        if (maxRange.bottom != Float.MAX_VALUE) {
+            if (range.end > range.start) {
+                if (range.start < maxRange.bottom)
+                    range.start = maxRange.bottom;
+            } else {
+                if (range.start > maxRange.bottom)
+                    range.start = maxRange.bottom;
+            }
+        }
+        if (maxRange.top != Float.MAX_VALUE) {
+            if (range.end > range.start) {
+                if (range.end > maxRange.top)
+                    range.end = maxRange.top;
+            } else {
+                if (range.end < maxRange.top)
+                    range.end = maxRange.top;
+            }
+        }
+    }
+
+    private boolean fuzzyEquals(float value1, float value2) {
+        return Math.abs(value1 - value2) < 0.000001;
+    }
+
+    final public boolean setXRange(float left, float right) {
+        return setXRange(left, right, false);
+    }
+
+    final public boolean setYRange(float bottom, float top) {
+        return setYRange(bottom, top, false);
+    }
+
+    public boolean setXRange(float left, float right, boolean keepDistance) {
+        float oldLeft = getRangeLeft();
+        float oldRight = getRangeRight();
+
+        RangeF range = new RangeF(left, right);
+        validateXRange(range);
+        if (keepDistance && !fuzzyEquals(left - right, range.start - range.end)) {
+            if (left != range.start)
+                range.end = range.start + (right - left);
+            else if (right != range.end)
+                range.start = range.end - (right - left);
+        }
+        left = range.start;
+        right = range.end;
+        if (fuzzyEquals(left, oldLeft) && fuzzyEquals(right, oldRight))
+            return false;
+
+        rangeRect.left = left;
+        rangeRect.right = right;
+        return true;
+    }
+
+    public boolean setYRange(float bottom, float top, boolean keepDistance) {
+        float oldBottom = getRangeBottom();
+        float oldTop = getRangeTop();
+
+        RangeF range = new RangeF(bottom, top);
+        validateYRange(range);
+        if (keepDistance && !fuzzyEquals(bottom - top, range.start - range.end)) {
+            if (bottom != range.start)
+                range.end = range.start + (top - bottom);
+            else if (top != range.end)
+                range.start = range.end - (top - bottom);
+        }
+        bottom = range.start;
+        top = range.end;
+        if (fuzzyEquals(bottom, oldBottom) && fuzzyEquals(top, oldTop))
+            return false;
+
+        rangeRect.bottom = bottom;
+        rangeRect.top = top;
+        return true;
+    }
+
+    public boolean offsetXRange(float offset) {
+        return setXRange(getRangeLeft() + offset, getRangeRight() + offset, true);
+    }
+
+    public boolean offsetYRange(float offset) {
+        return setYRange(getRangeBottom() + offset, getRangeTop() + offset, true);
     }
 
     @Override
@@ -107,16 +243,6 @@ public class RangeDrawingView extends ViewGroup {
     @Override
     protected void onDraw(Canvas canvas) {
         applyRangeMatrix(canvas);
-    }
-
-    public void setRangeX(float left, float right) {
-        rangeRect.left = left;
-        rangeRect.right = right;
-    }
-
-    public void setRangeY(float bottom, float top) {
-        rangeRect.top = top;
-        rangeRect.bottom = bottom;
     }
 
     public float getRangeLeft() {

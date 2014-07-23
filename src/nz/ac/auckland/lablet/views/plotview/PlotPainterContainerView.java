@@ -107,23 +107,30 @@ public class PlotPainterContainerView extends RangeDrawingView {
     }
 
     @Override
-    public void setRangeX(float left, float right) {
+    public boolean setXRange(float left, float right, boolean keepDistance) {
         float oldLeft = getRangeLeft();
         float oldRight = getRangeRight();
 
-        super.setRangeX(left, right);
+        if (!super.setXRange(left, right, keepDistance))
+            return false;
 
         for (IPlotPainter painter : allPainters)
-            painter.onXRangeChanged(left, right, oldLeft, oldRight);
+            painter.onXRangeChanged(getRangeLeft(), getRangeRight(), oldLeft, oldRight);
+
+        return true;
     }
 
-    public void setRangeY(float bottom, float top) {
+    @Override
+    public boolean setYRange(float bottom, float top, boolean keepDistance) {
         float oldBottom = getRangeBottom();
         float oldTop = getRangeTop();
 
-        super.setRangeY(bottom, top);
+        if (!super.setYRange(bottom, top, keepDistance))
+            return false;
 
         for (IPlotPainter painter : allPainters)
-            painter.onYRangeChanged(bottom, top, oldBottom, oldTop);
+            painter.onYRangeChanged(getRangeBottom(), getRangeTop(), oldBottom, oldTop);
+
+        return true;
     }
 }
