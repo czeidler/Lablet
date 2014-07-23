@@ -11,6 +11,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.*;
 import nz.ac.auckland.lablet.views.plotview.axes.*;
@@ -43,6 +44,9 @@ public class PlotView extends ViewGroup {
     private boolean yDraggable = false;
     private boolean xZoomable = false;
     private boolean yZoomable = false;
+
+    // Float.MAX_VALUE means there there is no end range (negative or positive)
+    private RectF maxRange = new RectF(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
 
     class DragDetector {
         public PointF point = new PointF(-1, -1);
@@ -164,6 +168,78 @@ public class PlotView extends ViewGroup {
         mainView.addPlotPainter(painter);
     }
 
+    public void setMaxXRange(float left, float right) {
+        maxRange.left = left;
+        maxRange.right = right;
+
+        // reset range
+        setXRange(mainView.getRangeLeft(), mainView.getRangeRight());
+    }
+
+    public void setMaxYRange(float bottom, float top) {
+        maxRange.bottom = bottom;
+        maxRange.top = top;
+
+        // reset range
+        setYRange(mainView.getRangeBottom(), mainView.getRangeTop());
+    }
+
+    public RectF getMaxRange() {
+        return new RectF(maxRange);
+    }
+
+    static class RangeF {
+        public RangeF(float start, float end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public float start;
+        public float end;
+    }
+
+    private void validateXRange(RangeF range) {
+        if (maxRange.left != Float.MAX_VALUE) {
+            if (range.end > range.start) {
+                if (range.start < maxRange.left)
+                    range.start = maxRange.left;
+            } else {
+                if (range.start > maxRange.left)
+                    range.start = maxRange.left;
+            }
+        }
+        if (maxRange.right != Float.MAX_VALUE) {
+            if (range.end > range.start) {
+                if (range.end > maxRange.right)
+                    range.end = maxRange.right;
+            } else {
+                if (range.end < maxRange.right)
+                    range.end = maxRange.right;
+            }
+        }
+    }
+
+    private void validateYRange(RangeF range) {
+        if (maxRange.bottom != Float.MAX_VALUE) {
+            if (range.end > range.start) {
+                if (range.start < maxRange.bottom)
+                    range.start = maxRange.bottom;
+            } else {
+                if (range.start > maxRange.bottom)
+                    range.start = maxRange.bottom;
+            }
+        }
+        if (maxRange.top != Float.MAX_VALUE) {
+            if (range.end > range.start) {
+                if (range.end > maxRange.top)
+                    range.end = maxRange.top;
+            } else {
+                if (range.end < maxRange.top)
+                    range.end = maxRange.top;
+            }
+        }
+    }
+
     public void setYScale(PlotScale plotScale) {
         if (yAxisView != null)
             yAxisView.setLabelPartitioner(plotScale.labelPartitioner);
@@ -176,6 +252,11 @@ public class PlotView extends ViewGroup {
     }
 
     public void setYRange(float bottom, float top) {
+        RangeF range = new RangeF(bottom, top);
+        validateYRange(range);
+        bottom = range.start;
+        top = range.end;
+
         if (hasYAxis())
             yAxisView.setDataRange(bottom, top);
         mainView.setRangeY(bottom, top);
@@ -184,6 +265,11 @@ public class PlotView extends ViewGroup {
     }
 
     public void setXRange(float left, float right) {
+        RangeF range = new RangeF(left, right);
+        validateXRange(range);
+        left = range.start;
+        right = range.end;
+
         if (hasXAxis())
             xAxisView.setDataRange(left, right);
         mainView.setRangeX(left, right);
