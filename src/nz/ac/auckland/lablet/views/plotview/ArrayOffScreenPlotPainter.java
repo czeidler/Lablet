@@ -55,6 +55,9 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
     }
 
     abstract protected RectF getRealDataRect(int startIndex, int lastIndex);
+    protected Range getDataRangeFor(float left, float right) {
+        return new Range(0, dataAdapter.getSize() - 1);
+    }
     abstract protected void drawRange(Canvas bitmapCanvas, ArrayRenderPayload payload, Range range);
 
     @Override
@@ -119,47 +122,51 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
 
             @Override
             public void onDataRemoved(AbstractPlotDataAdapter plot, int index, int number) {
-                triggerRedrawAll();
+                triggerRedrawScreen();
             }
 
             @Override
             public void onDataChanged(AbstractPlotDataAdapter plot, int index, int number) {
-                triggerRedrawAll();
+                triggerRedrawScreen();
             }
 
             @Override
             public void onAllDataChanged(AbstractPlotDataAdapter plot) {
-                triggerRedrawAll();
+                triggerRedrawScreen();
             }
 
-            private void triggerRedrawAll() {
-                RectF realDataRect = containerView.getRangeRect();
-                Rect screenRect = containerView.toScreen(realDataRect);
-                Region1D dirtyRegion = new Region1D(0, dataAdapter.getSize() - 1);
-                ArrayRenderPayload renderPayload = new ArrayRenderPayload(realDataRect, screenRect,
-                        containerView.getRangeMatrixCopy(), ((CloneablePlotDataAdapter)dataAdapter).clone(dirtyRegion),
-                        dirtyRegion);
-                renderPayload.setClearParentBitmap(true);
-
-                emptyOffScreenRenderingQueue();
-                triggerOffScreenRendering(renderPayload);
-
-                dirtyRegion.clear();
-            }
         };
+    }
+
+    protected void triggerRedrawScreen() {
+        Range dirty = getDataRangeFor(containerView.getRangeLeft(), containerView.getRangeRight());
+        Region1D regionToRender = new Region1D(dirty);
+
+        RectF realDataRect = containerView.getRangeRect();
+        Rect screenRect = containerView.toScreen(realDataRect);
+        ArrayRenderPayload renderPayload = new ArrayRenderPayload(realDataRect, screenRect,
+                containerView.getRangeMatrixCopy(),
+                ((CloneablePlotDataAdapter)dataAdapter).clone(regionToRender),
+                regionToRender);
+        renderPayload.setClearParentBitmap(true);
+
+        emptyOffScreenRenderingQueue();
+        triggerOffScreenRendering(renderPayload);
+
+        dirtyRegion.clear();
     }
 
     @Override
     public void onXRangeChanged(float left, float right, float oldLeft, float oldRight) {
         super.onXRangeChanged(left, right, oldLeft, oldRight);
 
-        dataAdapter.notifyAllDataChanged();
+        triggerRedrawScreen();
     }
 
     @Override
     public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop) {
         super.onYRangeChanged(bottom, top, oldBottom, oldTop);
 
-        dataAdapter.notifyAllDataChanged();
+        triggerRedrawScreen();
     }
 }

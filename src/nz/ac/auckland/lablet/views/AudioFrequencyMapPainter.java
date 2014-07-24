@@ -59,6 +59,26 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
     }
 
     @Override
+    protected Range getDataRangeFor(float left, float right) {
+        Range range = new Range(0, dataAdapter.getSize() - 1);
+        if (dataAdapter.getSize() > 1) {
+            AudioFrequencyMapAdapter audioAmplitudePlotDataAdapter = (AudioFrequencyMapAdapter)dataAdapter;
+            float value0 = audioAmplitudePlotDataAdapter.getX(0);
+            float value1 = audioAmplitudePlotDataAdapter.getX(1);
+            float stepSize = value1 - value0;
+
+            range.min = (int)((left - value0) / stepSize);
+            range.max = (int)Math.ceil((right - value0) / stepSize);
+
+            if (range.min < 0)
+                range.min = 0;
+            if (range.max >= dataAdapter.getSize())
+                range.max = dataAdapter.getSize() -1;
+        }
+        return range;
+    }
+
+    @Override
     protected void drawRange(Canvas canvas, ArrayRenderPayload payload, Range range) {
         AudioFrequencyMapAdapter adapter = (AudioFrequencyMapAdapter)payload.getAdapter();
         Matrix rangeMatrix = payload.getRangeMatrix();
