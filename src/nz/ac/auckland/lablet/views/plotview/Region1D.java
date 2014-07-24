@@ -29,6 +29,10 @@ public class Region1D {
         addRange(min, max);
     }
 
+    public Region1D(Range range) {
+        ranges.add(range);
+    }
+
     public Region1D(Region1D other) {
         for (Range range : other.ranges)
             ranges.add(new Range(range));
@@ -69,6 +73,7 @@ public class Region1D {
                     ranges.add(new Range(min, max));
                     return;
                 }
+
             }
             if (max < range.min - 1) {
                 ranges.add(i, new Range(min, max));
