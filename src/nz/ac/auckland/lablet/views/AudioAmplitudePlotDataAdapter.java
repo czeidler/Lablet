@@ -7,8 +7,8 @@
  */
 package nz.ac.auckland.lablet.views;
 
-import nz.ac.auckland.lablet.views.plotview.AbstractPlotDataAdapter;
 import nz.ac.auckland.lablet.views.plotview.CloneablePlotDataAdapter;
+import nz.ac.auckland.lablet.views.plotview.Region1D;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +87,7 @@ public class AudioAmplitudePlotDataAdapter extends CloneablePlotDataAdapter {
         notifyAllDataChanged();
     }
 
-    public AudioAmplitudePlotDataAdapter clone() {
+    public AudioAmplitudePlotDataAdapter clone(Region1D region) {
         AudioAmplitudePlotDataAdapter adapter = new AudioAmplitudePlotDataAdapter();
         if (data != null)
             adapter.data = new FixSizedBunchArray(data);

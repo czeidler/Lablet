@@ -9,5 +9,5 @@ package nz.ac.auckland.lablet.views.plotview;
 
 
 public abstract class CloneablePlotDataAdapter extends AbstractPlotDataAdapter {
-    abstract public CloneablePlotDataAdapter clone();
+    abstract public CloneablePlotDataAdapter clone(Region1D region);
 }

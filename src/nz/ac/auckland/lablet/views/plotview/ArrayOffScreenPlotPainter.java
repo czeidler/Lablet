@@ -54,7 +54,7 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
         }
     }
 
-    abstract protected RectF getRealDataRect(AbstractPlotDataAdapter adapter, int startIndex, int lastIndex);
+    abstract protected RectF getRealDataRect(int startIndex, int lastIndex);
     abstract protected void drawRange(Canvas bitmapCanvas, ArrayRenderPayload payload, Range range);
 
     @Override
@@ -76,11 +76,18 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
     }
 
     protected void flushDirtyRegion() {
+        if (dirtyRegion.getSize() == 0)
+            return;
+
         CloneablePlotDataAdapter adapter = (CloneablePlotDataAdapter)dataAdapter;
-        RectF realDataRect = getRealDataRect(adapter, dirtyRegion.getMin(), dirtyRegion.getMax());
+        RectF realDataRect = getRealDataRect(dirtyRegion.getMin(), dirtyRegion.getMax());
         Rect screenRect = containerView.toScreen(realDataRect);
+        if (screenRect.width() <= 1) {
+            screenRect.left -= 40;
+            screenRect.right += 40;
+        }
         ArrayRenderPayload renderPayload = new ArrayRenderPayload(realDataRect, screenRect,
-                containerView.getRangeMatrixCopy(), adapter.clone(),
+                containerView.getRangeMatrixCopy(), adapter.clone(dirtyRegion),
                 new Region1D(dirtyRegion));
 
         triggerOffScreenRendering(renderPayload);
@@ -128,9 +135,10 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
             private void triggerRedrawAll() {
                 RectF realDataRect = containerView.getRangeRect();
                 Rect screenRect = containerView.toScreen(realDataRect);
+                Region1D dirtyRegion = new Region1D(0, dataAdapter.getSize() - 1);
                 ArrayRenderPayload renderPayload = new ArrayRenderPayload(realDataRect, screenRect,
-                        containerView.getRangeMatrixCopy(), ((CloneablePlotDataAdapter)dataAdapter).clone(),
-                        new Region1D(0, dataAdapter.getSize() - 1));
+                        containerView.getRangeMatrixCopy(), ((CloneablePlotDataAdapter)dataAdapter).clone(dirtyRegion),
+                        dirtyRegion);
                 renderPayload.setClearParentBitmap(true);
 
                 emptyOffScreenRenderingQueue();

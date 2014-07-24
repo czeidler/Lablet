@@ -48,8 +48,8 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
     }
 
     @Override
-    protected RectF getRealDataRect(AbstractPlotDataAdapter adapter, int startIndex, int lastIndex) {
-        AudioFrequencyMapAdapter audioAmplitudePlotDataAdapter = (AudioFrequencyMapAdapter)adapter;
+    protected RectF getRealDataRect(int startIndex, int lastIndex) {
+        AudioFrequencyMapAdapter audioAmplitudePlotDataAdapter = (AudioFrequencyMapAdapter)dataAdapter;
         RectF realDataRect = containerView.getRangeRect();
         if (audioAmplitudePlotDataAdapter.getSize() > 0) {
             realDataRect.left = audioAmplitudePlotDataAdapter.getX(startIndex);

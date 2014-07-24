@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views;
 
 import nz.ac.auckland.lablet.views.plotview.CloneablePlotDataAdapter;
+import nz.ac.auckland.lablet.views.plotview.Region1D;
 
 
 public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
@@ -30,7 +31,7 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
         notifyDataAdded(oldSize, 1);
     }
 
-    public AudioFrequencyMapAdapter clone() {
+    public AudioFrequencyMapAdapter clone(Region1D region) {
         AudioFrequencyMapAdapter adapter = new AudioFrequencyMapAdapter();
         if (data != null)
             adapter.data = new FixSizedBunchArray(data);
