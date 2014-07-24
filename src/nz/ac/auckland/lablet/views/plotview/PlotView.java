@@ -59,14 +59,14 @@ class PlotGestureDetector {
 
         private boolean onDragged(float x, float y) {
             boolean handled = false;
-            if (plotView.isYDragable()) {
+            if (plotView.isYDraggable()) {
                 float realDelta = rangeView.fromScreenY(y) - rangeView.fromScreenY(0);
                 if (rangeView.getRangeBottom() < rangeView.getRangeTop())
                     realDelta *= -1;
 
                 handled = plotView.offsetYRange(realDelta);
             }
-            if (plotView.isXDragable()) {
+            if (plotView.isXDraggable()) {
                 float realDelta = rangeView.fromScreenX(x) - rangeView.fromScreenX(0);
                 if (rangeView.getRangeLeft() < rangeView.getRangeRight())
                     realDelta *= -1;
@@ -177,9 +177,19 @@ public class PlotView extends ViewGroup {
     private boolean yZoomable = false;
     private PlotGestureDetector plotGestureDetector;
 
+    public PlotView(Context context) {
+        super(context);
+
+        init(context);
+    }
+
     public PlotView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        init(context);
+    }
+
+    private void init(Context context) {
         titleView = new TitleView(context);
         addView(titleView);
 
@@ -206,20 +216,25 @@ public class PlotView extends ViewGroup {
     }
 
 
-    public boolean isXDragable() {
+    public boolean isXDraggable() {
         return xDraggable;
     }
 
-    public void setXDragable(boolean xDragable) {
+    public void setXDraggable(boolean xDragable) {
         this.xDraggable = xDragable;
     }
 
-    public boolean isYDragable() {
+    public boolean isYDraggable() {
         return yDraggable;
     }
 
-    public void setYDragable(boolean yDragable) {
+    public void setYDraggable(boolean yDragable) {
         this.yDraggable = yDragable;
+    }
+
+    public void setDraggable(boolean draggable) {
+        setXDraggable(draggable);
+        setYDraggable(draggable);
     }
 
     public boolean isXZoomable() {
@@ -236,6 +251,11 @@ public class PlotView extends ViewGroup {
 
     public void setYZoomable(boolean yZoomable) {
         this.yZoomable = yZoomable;
+    }
+
+    public void setZoomable(boolean zoomable) {
+        setXZoomable(zoomable);
+        setYZoomable(zoomable);
     }
 
     public void setMaxXRange(float left, float right) {
