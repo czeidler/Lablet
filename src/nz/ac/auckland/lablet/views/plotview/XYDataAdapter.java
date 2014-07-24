@@ -1,7 +1,6 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class XYDataAdapter extends CloneablePlotDataAdapter {

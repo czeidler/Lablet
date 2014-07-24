@@ -86,8 +86,13 @@ public class XYPainter extends ArrayOffScreenPlotPainter {
     protected void drawRange(Canvas bitmapCanvas, ArrayRenderPayload payload, Range range) {
         XYDataAdapter adapter = (XYDataAdapter)payload.getAdapter();
 
+        // start with the previous value (the data adapter assures that there is one more entry in the data)
+        int start = range.min;
+        if (start > 0)
+            start--;
+
         List<float[]> screenPoints = new ArrayList<>();
-        for (int i = range.min; i < range.max + 1; i++) {
+        for (int i = start; i < range.max + 1; i++) {
             float[] screenPoint = new float[2];
             screenPoint[0] = adapter.getX(i);
             screenPoint[1] = adapter.getY(i);
