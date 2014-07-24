@@ -19,7 +19,7 @@ import java.io.File;
 public class AccelerometerExperimentPlugin extends AbstractExperimentPlugin {
     @Override
     public String getName() {
-        return AccelerometerExperimentSensor.class.getSimpleName();
+        return AccelerometerSensorData.class.getSimpleName();
     }
 
     @Override

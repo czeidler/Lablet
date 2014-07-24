@@ -16,54 +16,34 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import com.androidplot.xy.LineAndPointFormatter;
-import com.androidplot.xy.SimpleXYSeries;
-import com.androidplot.xy.XYPlot;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
 import nz.ac.auckland.lablet.experiment.SensorData;
+import nz.ac.auckland.lablet.views.plotview.PlotView;
+import nz.ac.auckland.lablet.views.plotview.XYDataAdapter;
+import nz.ac.auckland.lablet.views.plotview.XYPainter;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 
-
-class SensorView extends XYPlot implements AccelerometerExperimentSensor.ISensorDataListener {
-
-    public SensorView(Context context, String s) {
-        super(context, s);
-    }
-
-    @Override
-    public void onDataUpdated() {
-        invalidate();
-    }
-
-    public void setParent(AccelerometerExperimentSensor parent) {
-        parent.setDataListener(this);
-    }
-}
 
 public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
-    private XYPlot graphView2D;
-    private WeakReference<ISensorDataListener> softDataListener;
-
-    private SimpleXYSeries xData = new SimpleXYSeries("x");
+    private XYDataAdapter xData = new XYDataAdapter();
 
     private SensorManager sensorManager;
 
-    public void setDataListener(SensorView dataListener) {
-        this.softDataListener = new WeakReference<ISensorDataListener>(dataListener);
-    }
-
-    public interface ISensorDataListener {
-        public void onDataUpdated();
-    }
 
     @Override
     public View createExperimentView(Context context) {
-        SensorView view = new SensorView(context, "Accelerometer");
-        view.setParent(this);
-        view.addSeries(xData, new LineAndPointFormatter());
+        PlotView view = new PlotView(context);
+        view.getTitleView().setTitle("Accelerometer");
+        view.setXRange(0, 20000);
+        view.setYRange(-0.5f, 0.5f);
+        view.setZoomable(true);
+        view.setDraggable(true);
+
+        XYPainter painter = new XYPainter();
+        painter.setDataAdapter(xData);
+        view.addPlotPainter(painter);
         return view;
     }
 
@@ -71,6 +51,8 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     public boolean onPrepareOptionsMenu(MenuItem menuItem) {
         return false;
     }
+
+    final private long startTime = System.currentTimeMillis();
 
     private SensorEventListener sensorEventListener = new SensorEventListener() {
         @Override
@@ -81,13 +63,8 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
                 float x = values[0];
                 float y = values[1];
                 float z = values[2];
-                xData.addLast(System.currentTimeMillis(), x);
-
-                if (softDataListener != null) {
-                    ISensorDataListener dataListener = softDataListener.get();
-                    if (dataListener != null)
-                        dataListener.onDataUpdated();
-                }
+                long time = System.currentTimeMillis() - startTime;
+                xData.addData((float)time, x);
             }
         }
 
