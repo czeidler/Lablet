@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views;
 
-import nz.ac.auckland.lablet.views.plotview.CloneablePlotDataAdapter;
+import nz.ac.auckland.lablet.views.plotview.AbstractXYDataAdapter;
 import nz.ac.auckland.lablet.views.plotview.Region1D;
 
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ class FixSizedBunchArray {
 }
 
 
-public class AudioAmplitudePlotDataAdapter extends CloneablePlotDataAdapter {
+public class AudioAmplitudePlotDataAdapter extends AbstractXYDataAdapter {
     private FixSizedBunchArray data = null;
     private float amplitudeMax = 65535;
     private int sampleRate = 44100;
@@ -94,10 +94,12 @@ public class AudioAmplitudePlotDataAdapter extends CloneablePlotDataAdapter {
         return adapter;
     }
 
+    @Override
     public float getX(int index) {
         return (float)index / sampleRate;
     }
 
+    @Override
     public float getY(int index) {
         return data.get(index) / amplitudeMax;
     }

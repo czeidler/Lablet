@@ -8,7 +8,6 @@
 package nz.ac.auckland.lablet.views;
 
 import android.graphics.*;
-import nz.ac.auckland.lablet.views.plotview.AbstractPlotDataAdapter;
 import nz.ac.auckland.lablet.views.plotview.ArrayOffScreenPlotPainter;
 import nz.ac.auckland.lablet.views.plotview.Range;
 
@@ -34,7 +33,7 @@ public class AudioAmplitudePainter extends ArrayOffScreenPlotPainter {
     @Override
     protected RectF getRealDataRect(int startIndex, int lastIndex) {
         AudioAmplitudePlotDataAdapter audioAmplitudePlotDataAdapter = (AudioAmplitudePlotDataAdapter)dataAdapter;
-        RectF realDataRect = containerView.getRangeRect();
+        RectF realDataRect = containerView.getRange();
         realDataRect.left = audioAmplitudePlotDataAdapter.getX(startIndex);
         realDataRect.right = audioAmplitudePlotDataAdapter.getX(lastIndex);
         return realDataRect;

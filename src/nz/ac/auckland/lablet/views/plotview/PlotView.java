@@ -16,6 +16,9 @@ import android.util.AttributeSet;
 import android.view.*;
 import nz.ac.auckland.lablet.views.plotview.axes.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 class PlotGestureDetector {
     private ScaleGestureDetector scaleGestureDetector;
@@ -149,7 +152,6 @@ class PlotGestureDetector {
     }
 }
 
-
 public class PlotView extends ViewGroup {
     final static public int DEFAULT_PEN_COLOR = Color.WHITE;
 
@@ -171,11 +173,146 @@ public class PlotView extends ViewGroup {
     private BackgroundPainter backgroundPainter;
     private RangeInfoPainter rangeInfoPainter;
 
+    final static public int AUTO_RANGE_DISABLED = 0;
+    final static public int AUTO_RANGE_ZOOM = 1;
+    final static public int AUTO_RANGE_SCROLL = 2;
+
     private boolean xDraggable = false;
     private boolean yDraggable = false;
     private boolean xZoomable = false;
     private boolean yZoomable = false;
+    private AutoRange autoRange = null;
     private PlotGestureDetector plotGestureDetector;
+
+    class AutoRange implements DataStatistics.IListener {
+        final private List<DataStatistics> dataStatisticsList = new ArrayList<>();
+
+        private float offsetRatio = 0.25f;
+
+        private int behaviourX = AUTO_RANGE_DISABLED;
+        private int behaviourY = AUTO_RANGE_DISABLED;
+        private RectF previousLimits;
+
+        public AutoRange(List<IPlotPainter> painters, int behaviourX, int behaviourY) {
+            this.behaviourX = behaviourX;
+            this.behaviourY = behaviourY;
+
+            for (IPlotPainter painter : painters) {
+                AbstractPlotPainter abstractPlotPainter = (AbstractPlotPainter)painter;
+                if (abstractPlotPainter == null)
+                    continue;
+                AbstractXYDataAdapter adapter = (AbstractXYDataAdapter)abstractPlotPainter.dataAdapter;
+                if (adapter == null)
+                    continue;
+
+                DataStatistics dataStatistics = new DataStatistics(adapter);
+                dataStatistics.addListener(this);
+                dataStatisticsList.add(dataStatistics);
+            }
+        }
+
+        public void release() {
+            for (DataStatistics dataStatistics : dataStatisticsList)
+                dataStatistics.release();
+            dataStatisticsList.clear();
+        }
+
+        private void swapX(RectF rect) {
+            float temp = rect.left;
+            rect.left = rect.right;
+            rect.right = temp;
+        }
+
+        private void swapY(RectF rect) {
+            float temp = rect.top;
+            rect.top = rect.bottom;
+            rect.bottom = temp;
+        }
+
+        @Override
+        public void onLimitsChanged(DataStatistics dataStatistics) {
+            RectF limits = dataStatistics.getDataLimits();
+            RectF oldRange = getRange();
+            RectF newRange = new RectF(oldRange);
+
+            boolean xFlipped = false;
+            boolean yFlipped = false;
+
+            if (newRange.left > newRange.right) {
+                swapX(newRange);
+                swapX(oldRange);
+                xFlipped = true;
+            }
+            if (newRange.top > newRange.bottom) {
+                swapY(newRange);
+                swapY(oldRange);
+                yFlipped = true;
+            }
+
+            if (newRange.left > limits.left)
+                newRange.left = limits.left;
+            if (newRange.right < limits.right)
+                newRange.right = limits.right;
+
+            if (newRange.top > limits.top)
+                newRange.top = limits.top;
+            if (newRange.bottom < limits.bottom)
+                newRange.bottom = limits.bottom;
+
+            if (newRange.height() == 0) {
+                newRange.top -= 1;
+                newRange.bottom += 1;
+            }
+            if (newRange.width() == 0) {
+                newRange.left -= 1;
+                newRange.right += 1;
+            }
+
+            if (behaviourX == AUTO_RANGE_ZOOM) {
+                if (xFlipped)
+                    swapX(newRange);
+                setXRange(newRange.left, newRange.right);
+            }
+            if (behaviourY == AUTO_RANGE_ZOOM) {
+                if (yFlipped)
+                    swapY(newRange);
+                setYRange(newRange.bottom, newRange.top);
+            }
+            if (behaviourX == AUTO_RANGE_SCROLL && previousLimits != null) {
+                // only offset when the limits have changed
+                int xOffset = 0;
+                if (previousLimits.left > limits.left && oldRange.left >= limits.left)
+                    xOffset = -1;
+                if (previousLimits.right < limits.right && oldRange.right <= limits.right)
+                    xOffset = 1;
+
+                if (xFlipped)
+                    xOffset *= -1;
+                if (xOffset != 0)
+                    offsetXRange(oldRange.width() * xOffset * offsetRatio);
+            }
+            if (behaviourY == AUTO_RANGE_SCROLL && previousLimits != null) {
+                // only offset when the limits have changed
+                int yOffset = 0;
+                if (previousLimits.top > limits.top && oldRange.top >= limits.top)
+                    yOffset = -1;
+                if (previousLimits.bottom < limits.bottom && oldRange.bottom <= limits.bottom)
+                    yOffset = 1;
+
+                if (yFlipped)
+                    yOffset *= -1;
+                if (yOffset != 0)
+                    offsetXRange(oldRange.height() * yOffset * offsetRatio);
+            }
+
+            previousLimits = new RectF(limits);
+        };
+
+        public void setBehaviour(int behaviourX, int behaviourY) {
+            this.behaviourX = behaviourX;
+            this.behaviourY = behaviourY;
+        }
+    }
 
     public PlotView(Context context) {
         super(context);
@@ -215,6 +352,9 @@ public class PlotView extends ViewGroup {
         mainView.addPlotPainter(painter);
     }
 
+    public RectF getRange() {
+        return mainView.getRange();
+    }
 
     public boolean isXDraggable() {
         return xDraggable;
@@ -235,6 +375,24 @@ public class PlotView extends ViewGroup {
     public void setDraggable(boolean draggable) {
         setXDraggable(draggable);
         setYDraggable(draggable);
+    }
+
+    public void setAutoRange(int behaviourX, int behaviourY) {
+        if (behaviourX == AUTO_RANGE_DISABLED && behaviourY == AUTO_RANGE_DISABLED) {
+            if (autoRange != null) {
+                autoRange.release();
+                autoRange = null;
+            }
+            return;
+        }
+
+        if (behaviourX > 2 || behaviourY > 2)
+            return;
+
+        if (autoRange == null)
+            autoRange = new AutoRange(mainView.getPlotPainters(), behaviourX, behaviourY);
+        else
+            autoRange.setBehaviour(behaviourX, behaviourY);
     }
 
     public boolean isXZoomable() {
@@ -279,6 +437,11 @@ public class PlotView extends ViewGroup {
 
     public BackgroundPainter getBackgroundPainter() {
         return backgroundPainter;
+    }
+
+    public void setRange(RectF range) {
+        setXRange(range.left, range.right);
+        setYRange(range.bottom, range.top);
     }
 
     public boolean setXRange(float left, float right) {

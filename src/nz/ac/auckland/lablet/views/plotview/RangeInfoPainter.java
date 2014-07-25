@@ -87,7 +87,7 @@ public class RangeInfoPainter implements IPlotPainter {
     }
 
     private void recalculateRangeValue() {
-        RectF range = containerView.getRangeRect();
+        RectF range = containerView.getRange();
         RectF maxRange = plotView.getMaxRange();
 
         if (maxRange.left == Float.MAX_VALUE)

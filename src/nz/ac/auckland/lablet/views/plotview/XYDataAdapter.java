@@ -1,9 +1,17 @@
+/*
+ * Copyright 2014.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
 package nz.ac.auckland.lablet.views.plotview;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class XYDataAdapter extends CloneablePlotDataAdapter {
+
+public class XYDataAdapter extends AbstractXYDataAdapter {
     // for the clone
     final private int startIndex;
     private List<Float> xValues = new ArrayList<>();
@@ -32,10 +40,12 @@ public class XYDataAdapter extends CloneablePlotDataAdapter {
         notifyAllDataChanged();
     }
 
+    @Override
     public float getX(int index) {
         return xValues.get(index - startIndex);
     }
 
+    @Override
     public float getY(int index) {
         return yValues.get(index - startIndex);
     }

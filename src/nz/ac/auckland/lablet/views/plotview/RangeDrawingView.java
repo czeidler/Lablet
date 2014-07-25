@@ -9,11 +9,7 @@ package nz.ac.auckland.lablet.views.plotview;
 
 import android.content.Context;
 import android.graphics.*;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 
 
 public class RangeDrawingView extends ViewGroup {
@@ -31,12 +27,12 @@ public class RangeDrawingView extends ViewGroup {
         setWillNotDraw(false);
     }
 
-    public RectF getRangeRect() {
+    public RectF getRange() {
         return new RectF(rangeRect);
     }
 
     public Rect getScreenRect() {
-        return toScreen(getRangeRect());
+        return toScreen(getRange());
     }
 
     public void setMaxXRange(float left, float right) {

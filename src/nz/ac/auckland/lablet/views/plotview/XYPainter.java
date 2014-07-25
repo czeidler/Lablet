@@ -24,8 +24,10 @@ class DrawConfig {
     public DrawConfig() {
         markerPaint.setColor(Color.GREEN);
         markerPaint.setStyle(Paint.Style.STROKE);
+
         linePaint.setColor(Color.YELLOW);
         linePaint.setStyle(Paint.Style.STROKE);
+        linePaint.setAntiAlias(true);
     }
 
     public Paint getMarkerPaint() {
@@ -76,9 +78,13 @@ public class XYPainter extends ArrayOffScreenPlotPainter {
         if (startIndex > 0)
             startIndex--;
         XYDataAdapter adapter = (XYDataAdapter)dataAdapter;
-        RectF realDataRect = containerView.getRangeRect();
+        RectF realDataRect = containerView.getRange();
         realDataRect.left = adapter.getX(startIndex);
         realDataRect.right = adapter.getX(lastIndex);
+        if (realDataRect.width() < 40) {
+            realDataRect.left -= 20;
+            realDataRect.right += 20;
+        }
         return realDataRect;
     }
 

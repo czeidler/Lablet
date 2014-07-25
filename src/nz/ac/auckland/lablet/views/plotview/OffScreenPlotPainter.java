@@ -25,6 +25,7 @@ class RenderTask {
 
     public RenderTask(OffScreenPlotPainter plotPainter) {
         this.plotPainter = plotPainter;
+        running.set(false);
     }
 
     Runnable renderRunnable = new Runnable() {
@@ -174,7 +175,7 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
 
     protected void onOffScreenRenderingFinished(RenderPayload payload) {
         if (payload.clearParentBitmap) {
-            bitmapRealRect = containerView.getRangeRect();
+            bitmapRealRect = containerView.getRange();
             // reset the origin
             bitmapCanvas.setMatrix(new Matrix());
             bitmap.eraseColor(Color.TRANSPARENT);
@@ -201,6 +202,7 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
 
         bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         bitmapCanvas = new Canvas(bitmap);
+        bitmapRealRect = containerView.getRange();
 
         bitmap.eraseColor(Color.TRANSPARENT);
     }

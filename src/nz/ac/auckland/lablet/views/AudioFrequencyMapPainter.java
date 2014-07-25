@@ -50,7 +50,7 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
     @Override
     protected RectF getRealDataRect(int startIndex, int lastIndex) {
         AudioFrequencyMapAdapter audioAmplitudePlotDataAdapter = (AudioFrequencyMapAdapter)dataAdapter;
-        RectF realDataRect = containerView.getRangeRect();
+        RectF realDataRect = containerView.getRange();
         if (audioAmplitudePlotDataAdapter.getSize() > 0) {
             realDataRect.left = audioAmplitudePlotDataAdapter.getX(startIndex);
             realDataRect.right = audioAmplitudePlotDataAdapter.getX(lastIndex);
@@ -145,6 +145,7 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
             } else {
                 float frequencyAmpAverage = frequencyAmpSum / perPixelCount;
                 double amplitude = Math.log10(Math.abs(frequencyAmpAverage)) / Math.log10(maxFrequencyAmplitude);
+                //double amplitude = Math.abs(frequencyAmpAverage) / maxFrequencyAmplitude;
                 int colorIndex = colors.length - 1 - currentPixel;
                 colors[colorIndex] = heatMap(amplitude);
 
