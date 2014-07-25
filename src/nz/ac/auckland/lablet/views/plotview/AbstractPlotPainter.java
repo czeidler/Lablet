@@ -21,7 +21,7 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
     public void setDataAdapter(AbstractPlotDataAdapter adapter) {
         this.dataAdapter = adapter;
         listener = createListener();
-        this.dataAdapter.setListener(listener);
+        this.dataAdapter.addListener(listener);
     }
 
     public void setContainer(PlotPainterContainerView view) {

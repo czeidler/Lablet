@@ -8,10 +8,71 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 
-public abstract class AbstractPlotDataAdapter {
-    WeakReference<IListener> listenerWeakReference = null;
+class WeakListenable<Listener> {
+    private List<WeakReference<Listener>> listeners = new ArrayList<>();
+
+    public void addListener(Listener listener) {
+        if (hasListener(listener))
+            return;
+        listeners.add(new WeakReference<Listener>(listener));
+    }
+
+    public boolean hasListener(Listener listener) {
+        Iterator<WeakReference<Listener>> it = listeners.iterator();
+        while (it.hasNext()) {
+            WeakReference<Listener> listenerWeak = it.next();
+            Listener listenerStrong = listenerWeak.get();
+            if (listenerStrong == null) {
+                it.remove();
+                continue;
+            }
+            if (listenerWeak.get() == listener)
+                return true;
+        }
+        return false;
+    }
+
+    public void removeListener(Listener listener) {
+        Iterator<WeakReference<Listener>> it = listeners.iterator();
+        while (it.hasNext()) {
+            WeakReference<Listener> listenerWeak = it.next();
+            Listener listenerStrong = listenerWeak.get();
+            if (listenerStrong == null) {
+                it.remove();
+                continue;
+            }
+            if (listenerStrong == listener) {
+                it.remove();
+                return;
+            }
+        }
+    }
+
+    protected List<Listener> getListeners() {
+        List<Listener> outList = new ArrayList<>();
+
+        Iterator<WeakReference<Listener>> it = listeners.iterator();
+        while (it.hasNext()) {
+            WeakReference<Listener> listenerWeak = it.next();
+            Listener listenerStrong = listenerWeak.get();
+            if (listenerStrong == null) {
+                it.remove();
+                continue;
+            }
+            outList.add(listenerStrong);
+        }
+
+        return outList;
+    }
+
+}
+
+public abstract class AbstractPlotDataAdapter extends WeakListenable<AbstractPlotDataAdapter.IListener> {
 
     public interface IListener {
         public void onDataAdded(AbstractPlotDataAdapter plot, int index, int number);
@@ -22,45 +83,24 @@ public abstract class AbstractPlotDataAdapter {
 
     abstract public int getSize();
 
-    public void setListener(IListener listener) {
-        if (listener == null) {
-            listenerWeakReference = null;
-            return;
-        }
-        listenerWeakReference = new WeakReference<IListener>(listener);
-    }
-
-    protected IListener getListener() {
-        if (listenerWeakReference == null)
-            return null;
-        return listenerWeakReference.get();
-    }
 
     protected void notifyDataAdded(int index, int number) {
-        IListener listener = getListener();
-        if (listener == null)
-            return;
-        listener.onDataAdded(this, index, number);
+        for (IListener listener : getListeners())
+            listener.onDataAdded(this, index, number);
     }
 
     protected void notifyDataRemoved(int index, int number) {
-        IListener listener = getListener();
-        if (listener == null)
-            return;
-        listener.onDataRemoved(this, index, number);
+        for (IListener listener : getListeners())
+            listener.onDataRemoved(this, index, number);
     }
 
     protected void notifyDataChanged(int index, int number) {
-        IListener listener = getListener();
-        if (listener == null)
-            return;
-        listener.onDataChanged(this, index, number);
+        for (IListener listener : getListeners())
+            listener.onDataChanged(this, index, number);
     }
 
     protected void notifyAllDataChanged() {
-        IListener listener = getListener();
-        if (listener == null)
-            return;
-        listener.onAllDataChanged(this);
+        for (IListener listener : getListeners())
+            listener.onAllDataChanged(this);
     }
 }
