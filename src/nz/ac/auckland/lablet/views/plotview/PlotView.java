@@ -139,7 +139,13 @@ class PlotGestureDetector {
     }
 
     public boolean onTouchEvent(MotionEvent event) {
-        boolean handled = dragDetector.onTouchEvent(event);
+        boolean handled = false;
+
+        if (plotView.isXDraggable() || plotView.isYDraggable())
+            handled = dragDetector.onTouchEvent(event);
+
+        if (handled)
+            return true;
 
         if (plotView.isXZoomable() || plotView.isYZoomable())
             handled = scaleGestureDetector.onTouchEvent(event);
@@ -211,6 +217,28 @@ public class PlotView extends ViewGroup {
             }
         }
 
+        public RectF getDataLimits() {
+            RectF limits = null;
+            for (DataStatistics statistics : dataStatisticsList) {
+                RectF currentLimits = statistics.getDataLimits();
+                if (currentLimits == null)
+                    continue;
+                if (limits == null)
+                    limits = currentLimits;
+                else {
+                    if (limits.left > currentLimits.left)
+                        limits.left = currentLimits.left;
+                    if (limits.top > currentLimits.top)
+                        limits.top = currentLimits.top;
+                    if (limits.right < currentLimits.right)
+                        limits.right = currentLimits.right;
+                    if (limits.bottom < currentLimits.bottom)
+                        limits.bottom = currentLimits.bottom;
+                }
+            }
+            return limits;
+        }
+
         public void release() {
             for (DataStatistics dataStatistics : dataStatisticsList)
                 dataStatistics.release();
@@ -249,14 +277,13 @@ public class PlotView extends ViewGroup {
                 yFlipped = true;
             }
 
-            if (newRange.left > limits.left)
+            if (newRange.left > limits.left || oldRange.left == Float.MAX_VALUE)
                 newRange.left = limits.left;
-            if (newRange.right < limits.right)
+            if (newRange.right < limits.right || oldRange.right == Float.MAX_VALUE)
                 newRange.right = limits.right;
-
-            if (newRange.top > limits.top)
+            if (newRange.top > limits.top || oldRange.top == Float.MAX_VALUE)
                 newRange.top = limits.top;
-            if (newRange.bottom < limits.bottom)
+            if (newRange.bottom < limits.bottom || oldRange.bottom == Float.MAX_VALUE)
                 newRange.bottom = limits.bottom;
 
             if (newRange.height() == 0) {
@@ -352,6 +379,10 @@ public class PlotView extends ViewGroup {
         mainView.addPlotPainter(painter);
     }
 
+    public void removePlotPainter(XYPainter painter) {
+        mainView.removePlotPainter(painter);
+    }
+
     public RectF getRange() {
         return mainView.getRange();
     }
@@ -360,16 +391,16 @@ public class PlotView extends ViewGroup {
         return xDraggable;
     }
 
-    public void setXDraggable(boolean xDragable) {
-        this.xDraggable = xDragable;
+    public void setXDraggable(boolean xDraggable) {
+        this.xDraggable = xDraggable;
     }
 
     public boolean isYDraggable() {
         return yDraggable;
     }
 
-    public void setYDraggable(boolean yDragable) {
-        this.yDraggable = yDragable;
+    public void setYDraggable(boolean yDraggable) {
+        this.yDraggable = yDraggable;
     }
 
     public void setDraggable(boolean draggable) {
@@ -393,6 +424,14 @@ public class PlotView extends ViewGroup {
             autoRange = new AutoRange(mainView.getPlotPainters(), behaviourX, behaviourY);
         else
             autoRange.setBehaviour(behaviourX, behaviourY);
+    }
+
+    public void autoZoom() {
+        RectF limits = autoRange.getDataLimits();
+        if (limits == null)
+            return;
+        setXRange(limits.left, limits.right);
+        setYRange(limits.bottom, limits.top);
     }
 
     public boolean isXZoomable() {
@@ -422,6 +461,14 @@ public class PlotView extends ViewGroup {
 
     public void setMaxYRange(float bottom, float top) {
         mainView.setMaxYRange(bottom, top);
+    }
+
+    public void setMinXRange(float range) {
+        mainView.setMinXRange(range);
+    }
+
+    public void setMinYRange(float range) {
+        mainView.setMinYRange(range);
     }
 
     public RectF getMaxRange() {
@@ -584,7 +631,8 @@ public class PlotView extends ViewGroup {
             ViewParent parent = getParent();
             if (parent != null)
                 parent.requestDisallowInterceptTouchEvent(true);
-        }
+        } else
+            return super.dispatchTouchEvent(event);
 
         return handled;
     }

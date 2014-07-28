@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 
 public class TitleView extends ViewGroup {
     private String title = "";
-    private Paint penPaint = new Paint();
+    private Paint labelPaint = new Paint();
 
     final private int TOP_OFFSET = 3;
 
@@ -25,8 +25,8 @@ public class TitleView extends ViewGroup {
 
         setWillNotDraw(false);
 
-        penPaint.setColor(PlotView.DEFAULT_PEN_COLOR);
-        penPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        labelPaint.setColor(PlotView.DEFAULT_PEN_COLOR);
+        labelPaint.setTypeface(Typeface.DEFAULT_BOLD);
     }
 
     public String getTitle() {
@@ -37,10 +37,14 @@ public class TitleView extends ViewGroup {
         this.title = title;
     }
 
+    public Paint getLabelPaint() {
+        return labelPaint;
+    }
+
     public float getPreferredHeight() {
         if (title.equals(""))
             return 0;
-        return penPaint.descent() - penPaint.ascent() + TOP_OFFSET;
+        return labelPaint.descent() - labelPaint.ascent() + TOP_OFFSET;
     }
 
     @Override
@@ -50,8 +54,8 @@ public class TitleView extends ViewGroup {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        float titleLength = penPaint.measureText(title, 0, title.length());
+        float titleLength = labelPaint.measureText(title, 0, title.length());
         canvas.drawText(title, 0, title.length(), (getWidth() - titleLength) / 2,
-                getPreferredHeight() - penPaint.descent(), penPaint);
+                getPreferredHeight() - labelPaint.descent(), labelPaint);
     }
 }

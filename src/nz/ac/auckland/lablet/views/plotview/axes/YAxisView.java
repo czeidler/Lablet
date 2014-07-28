@@ -21,22 +21,10 @@ public class YAxisView extends AbstractYAxis {
     private float axisTopOffset = 0;
     private float axisBottomOffset = 0;
 
-    private Paint labelPaint = new Paint();
-    private float labelHeight = 5;
-    private Paint axisPaint = new Paint();
-
     private AxisSettings settings = new AxisSettings();
 
     public YAxisView(Context context) {
         super(context);
-
-        labelPaint.setColor(PlotView.DEFAULT_PEN_COLOR);
-        labelPaint.setStyle(Paint.Style.STROKE);
-        labelHeight = labelPaint.descent() - labelPaint.ascent();
-
-        axisPaint.setColor(Color.WHITE);
-        axisPaint.setStrokeWidth(2);
-        axisPaint.setStyle(Paint.Style.STROKE);
 
         calculateAxisOffsets();
     }
@@ -53,15 +41,18 @@ public class YAxisView extends AbstractYAxis {
 
     @Override
     protected void calculateLabels() {
-        float axisLength = getAxisLength();
+        final float titleHeight = titlePaint.descent() - titlePaint.ascent();
+        final float axisLength = getAxisLength();
         if (axisLength <= 0)
             return;
-        labels = labelPartitioner.calculate(labelHeight, axisLength, Math.min(realTop, realBottom),
+        labels = labelPartitioner.calculate(titleHeight, axisLength, Math.min(realTop, realBottom),
                 Math.max(realTop, realBottom));
     }
 
     @Override
     public float optimalWidthForHeight(float height) {
+        final float labelHeight = titlePaint.descent() - titlePaint.ascent();
+
         List<LabelPartitioner.LabelEntry> labelEntries = labels;
         if (height != getAxisLength()) {
             labelEntries = labelPartitioner.calculate(labelHeight, height, Math.min(realTop, realBottom),
@@ -70,7 +61,7 @@ public class YAxisView extends AbstractYAxis {
 
         float maxLabelWidth = 0;
         for (int i = 0; i < labelEntries.size(); i++) {
-            float width = labelPaint.measureText(labelEntries.get(i).label);
+            float width = titlePaint.measureText(labelEntries.get(i).label);
             if (width > maxLabelWidth)
                 maxLabelWidth = width;
         }
@@ -87,7 +78,7 @@ public class YAxisView extends AbstractYAxis {
     }
 
     private void calculateAxisOffsets() {
-        float textHeight = labelPaint.descent() - labelPaint.ascent();
+        float textHeight = titlePaint.descent() - titlePaint.ascent();
         axisTopOffset = textHeight / 2;
         axisBottomOffset = textHeight / 2;
     }
@@ -100,6 +91,8 @@ public class YAxisView extends AbstractYAxis {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        final float titleHeight = titlePaint.descent() - titlePaint.ascent();
+
         boolean hasLabel = !title.equals("");
         boolean hasUnit = !unit.equals("");
         if (hasLabel || hasUnit) {
@@ -109,9 +102,9 @@ public class YAxisView extends AbstractYAxis {
             if (hasUnit)
                 completeLabel += "[" + unit + "]";
             canvas.save();
-            canvas.translate(labelHeight, ((float)(getHeight() + labelPaint.measureText(completeLabel))) / 2);
+            canvas.translate(titleHeight, ((float)(getHeight() + titlePaint.measureText(completeLabel))) / 2);
             canvas.rotate(-90);
-            canvas.drawText(completeLabel, 0, 0, labelPaint);
+            canvas.drawText(completeLabel, 0, 0, titlePaint);
             canvas.restore();
         }
         canvas.drawLine(getWidth() - 1, getAxisTopOffset(), getWidth() - 1, getHeight() - getAxisBottomOffset(),
@@ -131,10 +124,10 @@ public class YAxisView extends AbstractYAxis {
     private void drawLabel(Canvas canvas, LabelPartitioner.LabelEntry labelEntry, float yPosition) {
         String labelText = labelEntry.label;
         Rect labelRect = new Rect();
-        labelPaint.getTextBounds(labelText, 0, labelText.length(), labelRect);
+        titlePaint.getTextBounds(labelText, 0, labelText.length(), labelRect);
 
         canvas.drawText(labelText, getWidth() - labelRect.width() - settings.getSpacing() - settings.getFullTickSize(),
-                yPosition + labelRect.height() / 2, labelPaint);
+                yPosition + labelRect.height() / 2, titlePaint);
 
         // draw tick
         float tickLength = settings.getFullTickSize();

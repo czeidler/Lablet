@@ -34,6 +34,14 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
         reset();
     }
 
+    @Override
+    public void addListener(DataStatistics.IListener listener) {
+        super.addListener(listener);
+
+        if (dataLimits != null)
+            listener.onLimitsChanged(this);
+    }
+
     public void release() {
         adapter.removeListener(this);
     }
@@ -44,6 +52,8 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
     }
 
     public RectF getDataLimits() {
+        if (dataLimits == null)
+            return null;
         return new RectF(dataLimits);
     }
 

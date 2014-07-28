@@ -17,11 +17,8 @@ import com.androidplot.exception.PlotRenderException;
 import com.androidplot.ui.*;
 import com.androidplot.util.ValPixConverter;
 import com.androidplot.xy.*;
-import nz.ac.auckland.lablet.ExperimentAnalyserActivity;
 import nz.ac.auckland.lablet.views.ZoomDialog;
-import nz.ac.auckland.lablet.views.plotview.AbstractPlotDataAdapter;
-import nz.ac.auckland.lablet.views.plotview.AbstractXYDataAdapter;
-import nz.ac.auckland.lablet.views.plotview.XYDataAdapter;
+import nz.ac.auckland.lablet.views.plotview.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +27,7 @@ import java.util.List;
 /**
  * Abstract base class for graph adapters.
  */
-abstract class AbstractGraphAdapter extends XYDataAdapter {
+abstract class AbstractGraphAdapter extends AbstractXYDataAdapter {
     public interface IGraphDataAxis {
         public int size();
         public Number getValue(int index);
@@ -73,6 +70,15 @@ abstract class AbstractGraphAdapter extends XYDataAdapter {
     @Override
     public float getY(int i) {
         return getYAxis().getValue(i).floatValue();
+    }
+
+    @Override
+    public CloneablePlotDataAdapter clone(Region1D region) {
+        XYDataAdapter xyDataAdapter = new XYDataAdapter(region.getMin());
+        for (int i = region.getMin(); i < region.getMax() + 1; i++) {
+            xyDataAdapter.addData(getX(i), getY(i));
+        }
+        return xyDataAdapter;
     }
 }
 
@@ -332,8 +338,10 @@ class ImprovedLineAndPointFormatter extends LineAndPointFormatter {
  * Customized XYPlot from the androidplot library that works with an
  * {@link nz.ac.auckland.lablet.views.graph.AbstractGraphAdapter}.
  */
-public class GraphView2D extends XYPlot implements AbstractPlotDataAdapter.IListener {
+public class GraphView2D extends PlotView {
     private AbstractGraphAdapter adapter;
+
+    private XYPainter painter;
 
     // max layout sizes in dp
     private int maxWidth = -1;
@@ -363,7 +371,9 @@ public class GraphView2D extends XYPlot implements AbstractPlotDataAdapter.IList
     }
 
     public GraphView2D(Context context, String title, boolean zoomOnClick) {
-        super(context, title);
+        super(context);
+
+        getTitleView().setTitle(title);
 
         init();
 
@@ -383,15 +393,11 @@ public class GraphView2D extends XYPlot implements AbstractPlotDataAdapter.IList
         TITLE_TEXT_SIZE = toPixel(TITLE_TEXT_SIZE_DP);
         LABEL_TEXT_SIZE = toPixel(LABEL_TEXT_SIZE_DP);
 
-        getTitleWidget().getLabelPaint().setTextSize(TITLE_TEXT_SIZE);
-        getDomainLabelWidget().getLabelPaint().setTextSize(LABEL_TEXT_SIZE);
-        getRangeLabelWidget().getLabelPaint().setTextSize(LABEL_TEXT_SIZE);
-        getGraphWidget().getDomainLabelPaint().setTextSize(LABEL_TEXT_SIZE);
-        getGraphWidget().getRangeLabelPaint().setTextSize(LABEL_TEXT_SIZE);
-        getGraphWidget().getDomainOriginLabelPaint().setTextSize(LABEL_TEXT_SIZE);
-        getGraphWidget().getRangeOriginLabelPaint().setTextSize(LABEL_TEXT_SIZE);
-
-        doGraphLayout();
+        getTitleView().getLabelPaint().setTextSize(TITLE_TEXT_SIZE);
+        getXAxisView().getAxisPaint().setTextSize(LABEL_TEXT_SIZE);
+        getXAxisView().getTitlePaint().setTextSize(LABEL_TEXT_SIZE);
+        getYAxisView().getAxisPaint().setTextSize(LABEL_TEXT_SIZE);
+        getYAxisView().getTitlePaint().setTextSize(LABEL_TEXT_SIZE);
     }
 
     public void setZoomOnClick(boolean zoomable) {
@@ -402,8 +408,8 @@ public class GraphView2D extends XYPlot implements AbstractPlotDataAdapter.IList
                 public void onClick(View view) {
                     //zoom();
 
-                    GraphView2D zoomGraphView = new GraphView2D(getContext(), getTitle(), false);
-                    zoomGraphView.setAdapter(getAdapter());
+                    GraphView2D zoomGraphView = new GraphView2D(getContext(), adapter.getTitle(), false);
+                    zoomGraphView.setAdapter(adapter);
 
                     Rect startBounds = new Rect();
                     Rect finalBounds = new Rect();
@@ -422,69 +428,31 @@ public class GraphView2D extends XYPlot implements AbstractPlotDataAdapter.IList
         }
     }
 
-    private void doGraphLayout() {
-        float titleBottom = getTitleWidget().getPositionMetrics().getYPositionMetric().getValue()
-                + getTitleWidget().getHeightMetric().getValue();
-        float yAxisLabelRight = getRangeLabelWidget().getPositionMetrics().getXPositionMetric().getValue()
-                + getRangeLabelWidget().getWidthMetric().getValue();
-        float xAxisLabelHeight = getDomainLabelWidget().getPositionMetrics().getYPositionMetric().getValue()
-                + getDomainLabelWidget().getHeightMetric().getValue();
-
-        getGraphWidget().position(yAxisLabelRight, XLayoutStyle.ABSOLUTE_FROM_LEFT, titleBottom,
-                YLayoutStyle.ABSOLUTE_FROM_TOP);
-        getGraphWidget().setWidth(yAxisLabelRight, SizeLayoutType.FILL);
-        getGraphWidget().setHeight(titleBottom + xAxisLabelHeight, SizeLayoutType.FILL);
-
-        float xAxisTextHeight = getGraphWidget().getDomainOriginLabelPaint().descent()
-                - getGraphWidget().getDomainOriginLabelPaint().ascent();
-        // a bit hacky, why "-10"?:
-        getGraphWidget().setPaddingBottom(xAxisTextHeight - 10);
-    }
-
     private int toPixel(float densityIndependentPixel) {
         final float scale = getResources().getDisplayMetrics().density;
         return Math.round(densityIndependentPixel * scale);
     }
 
-    @Override
-    protected void finalize() {
-        if (this.adapter != null)
-            this.adapter.removeListener(this);
-        this.adapter = null;
-    }
-
     public void setAdapter(AbstractGraphAdapter adapter) {
         if (this.adapter != null)
-            this.adapter.removeListener(this);
+            removePlotPainter(painter);
+        painter = null;
         this.adapter = adapter;
-
-        if (this.adapter == null) {
-            clear();
+        if (adapter == null)
             return;
-        }
 
-        this.adapter.addListener(this);
+        getTitleView().setTitle(adapter.getTitle());
+        getXAxisView().setTitle(this.adapter.getXAxis().getLabel());
+        getYAxisView().setTitle(this.adapter.getYAxis().getLabel());
 
-        // init graph
-        clear();
+        setMinXRange(this.adapter.getXAxis().getMinRange().floatValue());
+        setMinYRange(this.adapter.getYAxis().getMinRange().floatValue());
 
-        setTitle(adapter.getTitle());
-        setDomainLabel(this.adapter.getXAxis().getLabel());
-        setRangeLabel(this.adapter.getYAxis().getLabel());
-        getLegendWidget().setVisible(false);
-        setTicksPerDomainLabel(2);
+        painter = new XYPainter();
+        painter.setDataAdapter(adapter);
+        addPlotPainter(painter);
 
-        LineAndPointFormatter seriesFormatter = new ImprovedLineAndPointFormatter(Color.argb(255, 216, 228, 159),
-                ExperimentAnalyserActivity.MARKER_COLOR, Color.argb(0, 0, 0, 0));
-        seriesFormatter.setPointLabeler(null);
-
-        addSeries(new XYSeriesAdapter(adapter), seriesFormatter);
-
-        refillGraph();
-    }
-
-    public AbstractGraphAdapter getAdapter() {
-        return adapter;
+        setAutoRange(AUTO_RANGE_ZOOM, AUTO_RANGE_ZOOM);
     }
 
     @Override
@@ -502,109 +470,6 @@ public class GraphView2D extends XYPlot implements AbstractPlotDataAdapter.IList
             heightMeasureSpec = MeasureSpec.makeMeasureSpec(maxHeight, measureMode);
         }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    }
-
-    @Override
-    public void onDataAdded(AbstractPlotDataAdapter plot, int index, int number) {
-        refillGraph();
-    }
-
-    @Override
-    public void onDataRemoved(AbstractPlotDataAdapter plot, int index, int number) {
-        refillGraph();
-    }
-
-    @Override
-    public void onDataChanged(AbstractPlotDataAdapter plot, int index, int number) {
-        refillGraph();
-    }
-
-    @Override
-    public void onAllDataChanged(AbstractPlotDataAdapter plot) {
-        refillGraph();
-    }
-
-    private class XYSeriesAdapter implements XYSeries {
-        private AbstractGraphAdapter adapter = null;
-
-        public XYSeriesAdapter(AbstractGraphAdapter adapter) {
-            this.adapter = adapter;
-        }
-
-        public int size() {
-            return adapter.getSize();
-        }
-
-        public Number getX(int i) {
-            return adapter.getX(i);
-        }
-
-        public Number getY(int i) {
-            return adapter.getY(i);
-        }
-
-        @Override
-        public String getTitle() {
-            return adapter.getTitle();
-        }
-    }
-
-    private void refillGraph() {
-        setDomainLeftMax(null);
-        setDomainRightMin(null);
-        setRangeBottomMax(null);
-        setRangeTopMin(null);
-
-        if (adapter.getSize() == 0) {
-            redraw();
-            return;
-        }
-
-        float minXRange = adapter.getXAxis().getMinRange().floatValue();
-        // ensure min x range
-        if (minXRange > 0.f) {
-            float average = 0;
-            float max = -Float.MAX_VALUE;
-            float min = Float.MAX_VALUE;
-            for (int i = 0; i < adapter.getSize(); i++) {
-                float value = adapter.getXAxis().getValue(i).floatValue();
-                average += value;
-                if (value > max)
-                    max = value;
-                if (value < min)
-                    min = value;
-            }
-            average /= adapter.getSize();
-            float currentRange = max - min;
-            if (currentRange < minXRange) {
-                setDomainLeftMax(average - minXRange / 2);
-                setDomainRightMin(average + minXRange / 2);
-            }
-        }
-
-        float minYRange = adapter.getYAxis().getMinRange().floatValue();
-        // ensure min y range
-        if (minYRange > 0.f) {
-            float average = 0;
-            float max = -Float.MAX_VALUE;
-            float min = Float.MAX_VALUE;
-            for (int i = 0; i < adapter.getSize(); i++) {
-                float value = adapter.getYAxis().getValue(i).floatValue();
-                average += value;
-                if (value > max)
-                    max = value;
-                if (value < min)
-                    min = value;
-            }
-            average /= adapter.getSize();
-            float currentRange = max - min;
-            if (currentRange < minYRange) {
-                setRangeBottomMax(average - minYRange / 2);
-                setRangeTopMin(average + minYRange / 2);
-            }
-        }
-
-        redraw();
     }
 }
 

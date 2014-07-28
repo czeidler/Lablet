@@ -21,7 +21,7 @@ public class XYDataAdapter extends AbstractXYDataAdapter {
         this.startIndex = 0;
     }
 
-    private XYDataAdapter(int startIndex) {
+    public XYDataAdapter(int startIndex) {
         this.startIndex = startIndex;
     }
 

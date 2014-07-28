@@ -8,8 +8,11 @@
 package nz.ac.auckland.lablet.views.plotview.axes;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
+import nz.ac.auckland.lablet.views.plotview.PlotView;
 
 import java.util.List;
 
@@ -40,6 +43,9 @@ class AxisSettings {
 abstract public class AbstractAxis extends ViewGroup {
     protected String title = "";
     protected String unit = "";
+    protected Paint titlePaint = new Paint();
+    protected Paint axisPaint = new Paint();
+
     protected LabelPartitioner labelPartitioner = new LabelPartitionerLinear();
 
     protected List<LabelPartitioner.LabelEntry> labels;
@@ -47,13 +53,24 @@ abstract public class AbstractAxis extends ViewGroup {
     public AbstractAxis(Context context) {
         super(context);
 
-        setWillNotDraw(false);
+        init();
     }
 
     public AbstractAxis(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        init();
+    }
+
+    private void init() {
         setWillNotDraw(false);
+
+        titlePaint.setColor(PlotView.DEFAULT_PEN_COLOR);
+        titlePaint.setStyle(Paint.Style.STROKE);
+
+        axisPaint.setColor(Color.WHITE);
+        axisPaint.setStrokeWidth(2);
+        axisPaint.setStyle(Paint.Style.STROKE);
     }
 
     public void setTitle(String label) {
@@ -62,6 +79,14 @@ abstract public class AbstractAxis extends ViewGroup {
 
     public String getTitle() {
         return title;
+    }
+
+    public Paint getTitlePaint() {
+        return titlePaint;
+    }
+
+    public Paint getAxisPaint() {
+        return axisPaint;
     }
 
     public List<LabelPartitioner.LabelEntry> getLabels() {

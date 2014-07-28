@@ -13,10 +13,13 @@ import android.view.ViewGroup;
 
 
 public class RangeDrawingView extends ViewGroup {
-    final private RectF rangeRect = new RectF(0, 0, 100, 100);
+    // Float.MAX_VALUE means unset
+    final private RectF rangeRect = new RectF(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
 
     private int viewWidth;
     private int viewHeight;
+    private float minXRange = -1;
+    private float minYRange = -1;
 
     // Float.MAX_VALUE means there there is no end range (negative or positive)
     private RectF maxRange = new RectF(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
@@ -55,6 +58,22 @@ public class RangeDrawingView extends ViewGroup {
         return new RectF(maxRange);
     }
 
+    public float getMinXRange() {
+        return minXRange;
+    }
+
+    public void setMinXRange(float minXRange) {
+        this.minXRange = minXRange;
+    }
+
+    public float getMinYRange() {
+        return minYRange;
+    }
+
+    public void setMinYRange(float minYRange) {
+        this.minYRange = minYRange;
+    }
+
     static class RangeF {
         public RangeF(float start, float end) {
             this.start = start;
@@ -84,6 +103,18 @@ public class RangeDrawingView extends ViewGroup {
                     range.end = maxRange.right;
             }
         }
+
+        float diff = Math.abs(range.end - range.start);
+        if (minXRange > 0 && minXRange > diff) {
+            final float middle = (range.end + range.start) / 2;
+            if (range.end > range.start) {
+                range.end = middle + diff / 2;
+                range.start = middle - diff / 2;
+            } else {
+                range.start = middle + diff / 2;
+                range.end = middle - diff / 2;
+            }
+        }
     }
 
     private void validateYRange(RangeF range) {
@@ -103,6 +134,18 @@ public class RangeDrawingView extends ViewGroup {
             } else {
                 if (range.end < maxRange.top)
                     range.end = maxRange.top;
+            }
+        }
+
+        float diff = Math.abs(range.end - range.start);
+        if (minYRange > 0 && minYRange > diff) {
+            final float middle = (range.end + range.start) / 2;
+            if (range.end > range.start) {
+                range.end = middle + diff / 2;
+                range.start = middle - diff / 2;
+            } else {
+                range.start = middle + diff / 2;
+                range.end = middle - diff / 2;
             }
         }
     }

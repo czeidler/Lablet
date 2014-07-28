@@ -19,24 +19,11 @@ public class XAxisView extends AbstractXAxis {
     private float axisLeftOffset = 0;
     private float axisRightOffset = 0;
 
-    private Paint labelPaint = new Paint();
-    private float labelHeight = 5;
-    private float labelDescent = 2;
-    private Paint axisPaint = new Paint();
 
     private AxisSettings settings = new AxisSettings();
 
     public XAxisView(Context context) {
         super(context);
-
-        labelPaint.setColor(PlotView.DEFAULT_PEN_COLOR);
-        labelPaint.setStyle(Paint.Style.STROKE);
-        labelDescent = labelPaint.descent();
-        labelHeight = labelDescent - labelPaint.ascent();
-
-        axisPaint.setColor(Color.WHITE);
-        axisPaint.setStrokeWidth(2);
-        axisPaint.setStyle(Paint.Style.STROKE);
 
         calculateAxisOffsets();
     }
@@ -56,7 +43,7 @@ public class XAxisView extends AbstractXAxis {
         float axisLength = getAxisLength();
         if (axisLength <= 0)
             return;
-        float maxLabelWidth = labelPaint.measureText(LabelPartitionerHelper.createDummyLabel(
+        float maxLabelWidth = titlePaint.measureText(LabelPartitionerHelper.createDummyLabel(
                 LabelPartitionerHelper.estimateLabelMetric(realLeft, realRight)));
         labels = labelPartitioner.calculate(maxLabelWidth, axisLength, Math.min(realLeft, realRight),
                 Math.max(realLeft, realRight));
@@ -64,11 +51,12 @@ public class XAxisView extends AbstractXAxis {
 
     @Override
     public float optimalHeight() {
+        final float titleHeight = titlePaint.descent() - titlePaint.ascent();
         // axis
-        float optimalWidth = settings.getFullTickSize() + labelHeight;
+        float optimalWidth = settings.getFullTickSize() + titleHeight;
         // title and uni
         if (!title.equals("") || !unit.equals(""))
-            optimalWidth += labelHeight;
+            optimalWidth += titleHeight;
 
         return optimalWidth;
     }
@@ -95,8 +83,8 @@ public class XAxisView extends AbstractXAxis {
             if (hasUnit)
                 completeLabel += "[" + unit + "]";
 
-            canvas.drawText(completeLabel, getWidth() / 2 - labelPaint.measureText(completeLabel) / 2,
-                    getHeight() - labelDescent, labelPaint);
+            canvas.drawText(completeLabel, getWidth() / 2 - titlePaint.measureText(completeLabel) / 2,
+                    getHeight() - titlePaint.descent(), titlePaint);
         }
         canvas.drawLine(getAxisLeftOffset(), 1, getWidth() - getAxisRightOffset(), 1, axisPaint);
 
@@ -122,7 +110,7 @@ public class XAxisView extends AbstractXAxis {
                            boolean isLast) {
         String labelText = labelEntry.label;
         Rect labelRect = new Rect();
-        labelPaint.getTextBounds(labelText, 0, labelText.length(), labelRect);
+        titlePaint.getTextBounds(labelText, 0, labelText.length(), labelRect);
 
         float labelPosition = xPosition;
         if (isFirst)
@@ -132,7 +120,7 @@ public class XAxisView extends AbstractXAxis {
         else
             labelPosition -= labelRect.width() / 2;
 
-        canvas.drawText(labelText, labelPosition, settings.getFullTickSize() + labelHeight - labelDescent, labelPaint);
+        canvas.drawText(labelText, labelPosition, settings.getFullTickSize() - titlePaint.ascent(), titlePaint);
 
         // draw tick
         float tickLength = settings.getFullTickSize();
