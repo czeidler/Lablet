@@ -162,15 +162,22 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
     }
 
     protected void triggerOffScreenRendering(RenderPayload payload) {
-        if (renderTask.isRendering()) {
+        if (renderTask.isRendering() || bitmapCanvas == null) {
             payloadQueue.add(payload);
             return;
         }
-        List<RenderPayload> payloadList = new ArrayList<>();
-        payloadList.addAll(payloadQueue);
-        payloadQueue.clear();
-        payloadList.add(payload);
-        renderTask.start(payloadList);
+
+        payloadQueue.add(payload);
+        renderQueue();
+    }
+
+    private void renderQueue() {
+        if (payloadQueue.size() == 0)
+            return;
+
+        List<RenderPayload> payloadsToRender = payloadQueue;
+        payloadQueue = new ArrayList<>();
+        renderTask.start(payloadsToRender);
     }
 
     protected void onOffScreenRenderingFinished(RenderPayload payload) {
@@ -205,6 +212,9 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
         bitmapRealRect = containerView.getRange();
 
         bitmap.eraseColor(Color.TRANSPARENT);
+
+        // in case there are already jobs, render them
+        renderQueue();
     }
 
     @Override
