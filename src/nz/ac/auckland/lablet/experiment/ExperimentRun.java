@@ -101,15 +101,15 @@ public class ExperimentRun {
         this.subStorageDirectory = subStorageDirectory;
     }
 
-    public void activateExperimentRuns(Activity activity) {
+    public void activateSensors(Activity activity) {
         if (experimentActivity != null) {
             for (IExperimentSensor experimentRun : experimentSensors)
                 experimentRun.destroy();
         }
         experimentActivity = activity;
         if (experimentActivity != null) {
-            for (IExperimentSensor experimentRun : experimentSensors)
-                experimentRun.init(experimentActivity);
+            for (IExperimentSensor experimentSensor : experimentSensors)
+                experimentSensor.init(experimentActivity);
         }
     }
 
