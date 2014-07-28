@@ -19,56 +19,40 @@ import com.androidplot.util.ValPixConverter;
 import com.androidplot.xy.*;
 import nz.ac.auckland.lablet.ExperimentAnalyserActivity;
 import nz.ac.auckland.lablet.views.ZoomDialog;
+import nz.ac.auckland.lablet.views.plotview.AbstractPlotDataAdapter;
+import nz.ac.auckland.lablet.views.plotview.AbstractXYDataAdapter;
+import nz.ac.auckland.lablet.views.plotview.XYDataAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-interface IGraphAdapter {
-    interface IGraphAdapterListener {
-        public void onDataPointAdded(IGraphAdapter graph, int index);
-        public void onDataPointRemoved(IGraphAdapter graph, int index);
-        public void onDataPointsChanged(IGraphAdapter graph, int index, int number);
-        public void onAllDataPointsChanged(IGraphAdapter graph);
-        public void onDataPointSelected(IGraphAdapter graph, int index);
-    }
-
-    interface IGraphDataAxis {
+/**
+ * Abstract base class for graph adapters.
+ */
+abstract class AbstractGraphAdapter extends XYDataAdapter {
+    public interface IGraphDataAxis {
         public int size();
         public Number getValue(int index);
         public String getLabel();
         public Number getMinRange();
     }
 
-    public void addListener(IGraphAdapterListener listener);
-    public boolean removeListener(IGraphAdapterListener listener);
-    public int size();
-    public void setTitle(String title);
-    public String getTitle();
-
-    public IGraphDataAxis getXAxis();
-    public IGraphDataAxis getYAxis();
-}
-
-
-/**
- * Abstract base class for graph adapters.
- */
-abstract class AbstractGraphAdapter implements IGraphAdapter {
     protected IGraphDataAxis xAxis;
     protected IGraphDataAxis yAxis;
 
     @Override
-    public int size() {
+    public int getSize() {
         return Math.min(getXAxis().size(), getYAxis().size());
     }
 
-    @Override
+    abstract public void setTitle(String title);
+    abstract public String getTitle();
+
     public IGraphDataAxis getXAxis() {
         return xAxis;
     }
 
-    @Override
     public IGraphDataAxis getYAxis() {
         return yAxis;
     }
@@ -79,6 +63,16 @@ abstract class AbstractGraphAdapter implements IGraphAdapter {
 
     public void setYAxis(IGraphDataAxis axis) {
         yAxis = axis;
+    }
+
+    @Override
+    public float getX(int i) {
+        return getXAxis().getValue(i).floatValue();
+    }
+
+    @Override
+    public float getY(int i) {
+        return getYAxis().getValue(i).floatValue();
     }
 }
 
@@ -336,10 +330,10 @@ class ImprovedLineAndPointFormatter extends LineAndPointFormatter {
 
 /**
  * Customized XYPlot from the androidplot library that works with an
- * {@link nz.ac.auckland.lablet.views.graph.IGraphAdapter}.
+ * {@link nz.ac.auckland.lablet.views.graph.AbstractGraphAdapter}.
  */
-public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterListener {
-    private IGraphAdapter adapter;
+public class GraphView2D extends XYPlot implements AbstractPlotDataAdapter.IListener {
+    private AbstractGraphAdapter adapter;
 
     // max layout sizes in dp
     private int maxWidth = -1;
@@ -459,7 +453,7 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
         this.adapter = null;
     }
 
-    public void setAdapter(IGraphAdapter adapter) {
+    public void setAdapter(AbstractGraphAdapter adapter) {
         if (this.adapter != null)
             this.adapter.removeListener(this);
         this.adapter = adapter;
@@ -489,7 +483,7 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
         refillGraph();
     }
 
-    public IGraphAdapter getAdapter() {
+    public AbstractGraphAdapter getAdapter() {
         return adapter;
     }
 
@@ -511,47 +505,42 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
     }
 
     @Override
-    public void onDataPointAdded(IGraphAdapter graph, int index) {
+    public void onDataAdded(AbstractPlotDataAdapter plot, int index, int number) {
         refillGraph();
     }
 
     @Override
-    public void onDataPointRemoved(IGraphAdapter graph, int index) {
+    public void onDataRemoved(AbstractPlotDataAdapter plot, int index, int number) {
         refillGraph();
     }
 
     @Override
-    public void onDataPointsChanged(IGraphAdapter graph, int index, int number) {
+    public void onDataChanged(AbstractPlotDataAdapter plot, int index, int number) {
         refillGraph();
     }
 
     @Override
-    public void onAllDataPointsChanged(IGraphAdapter graph) {
+    public void onAllDataChanged(AbstractPlotDataAdapter plot) {
         refillGraph();
-    }
-
-    @Override
-    public void onDataPointSelected(IGraphAdapter graph, int index) {
-
     }
 
     private class XYSeriesAdapter implements XYSeries {
-        private IGraphAdapter adapter = null;
+        private AbstractGraphAdapter adapter = null;
 
-        public XYSeriesAdapter(IGraphAdapter adapter) {
+        public XYSeriesAdapter(AbstractGraphAdapter adapter) {
             this.adapter = adapter;
         }
 
         public int size() {
-            return adapter.size();
+            return adapter.getSize();
         }
 
         public Number getX(int i) {
-            return adapter.getXAxis().getValue(i);
+            return adapter.getX(i);
         }
 
         public Number getY(int i) {
-            return adapter.getYAxis().getValue(i);
+            return adapter.getY(i);
         }
 
         @Override
@@ -566,7 +555,7 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
         setRangeBottomMax(null);
         setRangeTopMin(null);
 
-        if (adapter.size() == 0) {
+        if (adapter.getSize() == 0) {
             redraw();
             return;
         }
@@ -577,7 +566,7 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
             float average = 0;
             float max = -Float.MAX_VALUE;
             float min = Float.MAX_VALUE;
-            for (int i = 0; i < adapter.size(); i++) {
+            for (int i = 0; i < adapter.getSize(); i++) {
                 float value = adapter.getXAxis().getValue(i).floatValue();
                 average += value;
                 if (value > max)
@@ -585,7 +574,7 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
                 if (value < min)
                     min = value;
             }
-            average /= adapter.size();
+            average /= adapter.getSize();
             float currentRange = max - min;
             if (currentRange < minXRange) {
                 setDomainLeftMax(average - minXRange / 2);
@@ -599,7 +588,7 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
             float average = 0;
             float max = -Float.MAX_VALUE;
             float min = Float.MAX_VALUE;
-            for (int i = 0; i < adapter.size(); i++) {
+            for (int i = 0; i < adapter.getSize(); i++) {
                 float value = adapter.getYAxis().getValue(i).floatValue();
                 average += value;
                 if (value > max)
@@ -607,7 +596,7 @@ public class GraphView2D extends XYPlot implements IGraphAdapter.IGraphAdapterLi
                 if (value < min)
                     min = value;
             }
-            average /= adapter.size();
+            average /= adapter.getSize();
             float currentRange = max - min;
             if (currentRange < minYRange) {
                 setRangeBottomMax(average - minYRange / 2);

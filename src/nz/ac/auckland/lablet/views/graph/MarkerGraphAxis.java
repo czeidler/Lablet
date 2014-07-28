@@ -14,7 +14,7 @@ import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 /**
  * Abstract base class for marker graph axes.
  */
-public abstract class MarkerGraphAxis implements IGraphAdapter.IGraphDataAxis {
+public abstract class MarkerGraphAxis implements AbstractGraphAdapter.IGraphDataAxis {
     protected MarkerGraphAdapter markerGraphAdapter;
 
     public void setMarkerGraphAdapter(MarkerGraphAdapter adapter) {
