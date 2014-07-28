@@ -18,10 +18,10 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="androidplot-core-0.6.0" level="project" />
     <orderEntry type="library" name="org.luaj:luaj-jse:3.0-beta2" level="project" />
     <orderEntry type="library" name="v4" level="project" />
     <orderEntry type="library" name="org.jboss.apiviz:apiviz:1.3.2.GA" level="project" />
+    <orderEntry type="library" name="edu.emory.mathcs:JTransforms:2.4" level="project" />
   </component>
 </module>
 

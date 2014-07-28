@@ -180,8 +180,11 @@ public class PlotView extends ViewGroup {
     private RangeInfoPainter rangeInfoPainter;
 
     final static public int AUTO_RANGE_DISABLED = 0;
-    final static public int AUTO_RANGE_ZOOM = 1;
-    final static public int AUTO_RANGE_SCROLL = 2;
+    final static public int AUTO_RANGE_SCROLL = 10;
+    final static public int AUTO_RANGE_ZOOM = 20;
+    // only extend the range when the data can't be displayed
+    final static public int AUTO_RANGE_ZOOM_EXTENDING = 21;
+
 
     private boolean xDraggable = false;
     private boolean yDraggable = false;
@@ -266,24 +269,24 @@ public class PlotView extends ViewGroup {
             boolean xFlipped = false;
             boolean yFlipped = false;
 
-            if (newRange.left > newRange.right) {
+            if (oldRange.left > oldRange.right) {
                 swapX(newRange);
                 swapX(oldRange);
                 xFlipped = true;
             }
-            if (newRange.top > newRange.bottom) {
+            if (oldRange.top > oldRange.bottom) {
                 swapY(newRange);
                 swapY(oldRange);
                 yFlipped = true;
             }
 
-            if (newRange.left > limits.left || oldRange.left == Float.MAX_VALUE)
+            if (oldRange.left > limits.left || oldRange.left == Float.MAX_VALUE)
                 newRange.left = limits.left;
-            if (newRange.right < limits.right || oldRange.right == Float.MAX_VALUE)
+            if (oldRange.right < limits.right || oldRange.right == Float.MAX_VALUE)
                 newRange.right = limits.right;
-            if (newRange.top > limits.top || oldRange.top == Float.MAX_VALUE)
+            if (oldRange.top > limits.top || oldRange.top == Float.MAX_VALUE)
                 newRange.top = limits.top;
-            if (newRange.bottom < limits.bottom || oldRange.bottom == Float.MAX_VALUE)
+            if (oldRange.bottom < limits.bottom || oldRange.bottom == Float.MAX_VALUE)
                 newRange.bottom = limits.bottom;
 
             if (newRange.height() == 0) {
@@ -295,16 +298,29 @@ public class PlotView extends ViewGroup {
                 newRange.right += 1;
             }
 
+            RectF limitsCopy = new RectF(limits);
             if (behaviourX == AUTO_RANGE_ZOOM) {
+                if (xFlipped)
+                    swapX(limitsCopy);
+                setXRange(limitsCopy.left, limitsCopy.right);
+            }
+            if (behaviourY == AUTO_RANGE_ZOOM) {
+                if (yFlipped)
+                    swapY(limitsCopy);
+                setYRange(limitsCopy.bottom, limitsCopy.top);
+            }
+
+            if (behaviourX == AUTO_RANGE_ZOOM_EXTENDING) {
                 if (xFlipped)
                     swapX(newRange);
                 setXRange(newRange.left, newRange.right);
             }
-            if (behaviourY == AUTO_RANGE_ZOOM) {
+            if (behaviourY == AUTO_RANGE_ZOOM_EXTENDING) {
                 if (yFlipped)
                     swapY(newRange);
                 setYRange(newRange.bottom, newRange.top);
             }
+
             if (behaviourX == AUTO_RANGE_SCROLL && previousLimits != null) {
                 // only offset when the limits have changed
                 int xOffset = 0;
@@ -416,9 +432,6 @@ public class PlotView extends ViewGroup {
             }
             return;
         }
-
-        if (behaviourX > 2 || behaviourY > 2)
-            return;
 
         if (autoRange == null)
             autoRange = new AutoRange(mainView.getPlotPainters(), behaviourX, behaviourY);

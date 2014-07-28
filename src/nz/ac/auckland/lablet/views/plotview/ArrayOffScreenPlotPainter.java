@@ -92,6 +92,9 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
     }
 
     protected void triggerRedrawScreen() {
+        if (containerView == null)
+            return;
+        
         emptyOffScreenRenderingQueue();
 
         Range dirty = getDataRangeFor(containerView.getRangeLeft(), containerView.getRangeRight());
@@ -164,6 +167,13 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
     @Override
     public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop) {
         super.onYRangeChanged(bottom, top, oldBottom, oldTop);
+
+        triggerRedrawScreen();
+    }
+
+    @Override
+    public void setDataAdapter(AbstractPlotDataAdapter adapter) {
+        super.setDataAdapter(adapter);
 
         triggerRedrawScreen();
     }

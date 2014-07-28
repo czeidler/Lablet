@@ -44,7 +44,7 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
         painter.setDataAdapter(xData);
         view.addPlotPainter(painter);
 
-        view.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_ZOOM);
+        view.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_ZOOM_EXTENDING);
         return view;
     }
 

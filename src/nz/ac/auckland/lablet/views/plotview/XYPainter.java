@@ -77,7 +77,7 @@ public class XYPainter extends ArrayOffScreenPlotPainter {
     protected RectF getRealDataRect(int startIndex, int lastIndex) {
         if (startIndex > 0)
             startIndex--;
-        XYDataAdapter adapter = (XYDataAdapter)dataAdapter;
+        AbstractXYDataAdapter adapter = (AbstractXYDataAdapter)dataAdapter;
         RectF realDataRect = containerView.getRange();
         realDataRect.left = adapter.getX(startIndex);
         realDataRect.right = adapter.getX(lastIndex);
@@ -90,7 +90,7 @@ public class XYPainter extends ArrayOffScreenPlotPainter {
 
     @Override
     protected void drawRange(Canvas bitmapCanvas, ArrayRenderPayload payload, Range range) {
-        XYDataAdapter adapter = (XYDataAdapter)payload.getAdapter();
+        AbstractXYDataAdapter adapter = (AbstractXYDataAdapter)payload.getAdapter();
 
         // start with the previous value (the data adapter assures that there is one more entry in the data)
         int start = range.min;

@@ -82,11 +82,11 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
             dataLimits.right = x;
             limitsChanged = true;
         }
-        if (dataLimits.top > y) {
+        if (dataLimits.top < y) {
             dataLimits.top = y;
             limitsChanged = true;
         }
-        if (dataLimits.bottom < y) {
+        if (dataLimits.bottom > y) {
             dataLimits.bottom = y;
             limitsChanged = true;
         }
