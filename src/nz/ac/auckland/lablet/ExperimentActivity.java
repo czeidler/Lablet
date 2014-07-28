@@ -512,7 +512,7 @@ public class ExperimentActivity extends FragmentActivity {
         super.onResume();
 
         updateAdapter();
-        
+
         if (!experiment.getCurrentExperimentRun().dataTaken()) {
             setState(new PreviewState());
         } else {
