@@ -38,7 +38,6 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
         view.getTitleView().setTitle("Accelerometer");
         view.setXRange(0, 20000);
         view.setYRange(-0.5f, 0.5f);
-        view.setZoomable(true);
         view.setDraggable(true);
 
         XYPainter painter = new XYPainter();
