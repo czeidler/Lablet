@@ -100,10 +100,10 @@ class RenderTask {
 
 abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
     // the bitmap holding the results for the
-    protected Bitmap bitmap = null;
+    private Bitmap bitmap = null;
     // what the bitmap is showing
-    protected RectF bitmapRealRect = new RectF(0, 0, Float.MIN_VALUE, Float.MIN_VALUE);
-    protected Canvas bitmapCanvas = null;
+    private RectF bitmapRealRect = new RectF(0, 0, Float.MIN_VALUE, Float.MIN_VALUE);
+    private Canvas bitmapCanvas = null;
 
     final private RenderTask renderTask = new RenderTask(this);
     private List<RenderPayload> payloadQueue = new ArrayList<>();
@@ -161,6 +161,11 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
         payloadQueue.clear();
     }
 
+
+    protected Canvas getBitmapCanvas() {
+        return bitmapCanvas;
+    }
+
     protected void triggerOffScreenRendering(RenderPayload payload) {
         if (renderTask.isRendering() || bitmapCanvas == null) {
             payloadQueue.add(payload);
@@ -213,8 +218,7 @@ abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
 
         bitmap.eraseColor(Color.TRANSPARENT);
 
-        // in case there are already jobs, render them
-        renderQueue();
+        invalidate();
     }
 
     @Override

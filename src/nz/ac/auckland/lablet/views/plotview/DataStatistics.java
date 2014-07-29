@@ -51,6 +51,10 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
         release();
     }
 
+    public AbstractXYDataAdapter getAdapter() {
+        return adapter;
+    }
+
     public RectF getDataLimits() {
         if (dataLimits == null)
             return null;

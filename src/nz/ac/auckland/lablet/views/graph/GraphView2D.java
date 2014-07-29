@@ -193,6 +193,8 @@ public class GraphView2D extends PlotView {
         addPlotPainter(painter);
 
         setAutoRange(AUTO_RANGE_ZOOM, AUTO_RANGE_ZOOM);
+
+        invalidate();
     }
 
     @Override

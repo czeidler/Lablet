@@ -16,9 +16,16 @@ public interface IPlotPainter {
     public void onSizeChanged(int width, int height, int oldw, int oldh);
     public void onDraw(Canvas canvas);
 
-    void setXScale(IScale xScale);
-    void setYScale(IScale yScale);
+    /**
+     * Invalidate the state of the painter.
+     *
+     * For example, cached drawings have to be invalidated or a complete redraw has to be triggered.
+     */
+    public void invalidate();
 
-    void onXRangeChanged(float left, float right, float oldLeft, float oldRight);
-    void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop);
+    public void setXScale(IScale xScale);
+    public void setYScale(IScale yScale);
+
+    public void onXRangeChanged(float left, float right, float oldLeft, float oldRight);
+    public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop);
 }

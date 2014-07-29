@@ -25,10 +25,17 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
         this.dataAdapter = adapter;
         listener = createListener();
         this.dataAdapter.addListener(listener);
+
+        invalidate();
+    }
+
+    public AbstractPlotDataAdapter getDataAdapter() {
+        return dataAdapter;
     }
 
     public void setContainer(PlotPainterContainerView view) {
         this.containerView = view;
+        invalidate();
     }
 
     @Override

@@ -91,8 +91,9 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
         dirtyRegion.clear();
     }
 
-    protected void triggerRedrawScreen() {
-        if (containerView == null)
+    @Override
+    public void invalidate() {
+        if (containerView == null || getBitmapCanvas() == null || dataAdapter == null)
             return;
 
         emptyOffScreenRenderingQueue();
@@ -141,17 +142,17 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
 
             @Override
             public void onDataRemoved(AbstractPlotDataAdapter plot, int index, int number) {
-                triggerRedrawScreen();
+                invalidate();
             }
 
             @Override
             public void onDataChanged(AbstractPlotDataAdapter plot, int index, int number) {
-                triggerRedrawScreen();
+                invalidate();
             }
 
             @Override
             public void onAllDataChanged(AbstractPlotDataAdapter plot) {
-                triggerRedrawScreen();
+                invalidate();
             }
 
         };
@@ -161,20 +162,13 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
     public void onXRangeChanged(float left, float right, float oldLeft, float oldRight) {
         super.onXRangeChanged(left, right, oldLeft, oldRight);
 
-        triggerRedrawScreen();
+        invalidate();
     }
 
     @Override
     public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop) {
         super.onYRangeChanged(bottom, top, oldBottom, oldTop);
 
-        triggerRedrawScreen();
-    }
-
-    @Override
-    public void setDataAdapter(AbstractPlotDataAdapter adapter) {
-        super.setDataAdapter(adapter);
-
-        triggerRedrawScreen();
+        invalidate();
     }
 }

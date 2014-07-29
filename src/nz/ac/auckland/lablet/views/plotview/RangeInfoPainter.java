@@ -7,8 +7,8 @@
  */
 package nz.ac.auckland.lablet.views.plotview;
 
-
 import android.graphics.*;
+
 
 public class RangeInfoPainter implements IPlotPainter {
     final private PlotView plotView;
@@ -60,6 +60,11 @@ public class RangeInfoPainter implements IPlotPainter {
         canvas.clipRect(displayRect.left, displayRect.top, displayRect.right, displayRect.bottom);
         canvas.drawRect(scaledRangeDisplayRect, rangePaint);
         canvas.restore();
+    }
+
+    @Override
+    public void invalidate() {
+
     }
 
     private float getRelativePosition(float value, float start, float end) {

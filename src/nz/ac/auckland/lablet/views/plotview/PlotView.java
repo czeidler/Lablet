@@ -17,6 +17,7 @@ import android.view.*;
 import nz.ac.auckland.lablet.views.plotview.axes.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -220,6 +221,29 @@ public class PlotView extends ViewGroup {
             }
         }
 
+        public boolean removePainter(IPlotPainter painter) {
+            XYPainter xyPainter = (XYPainter)painter;
+            if (xyPainter == null)
+                return true;
+            AbstractXYDataAdapter xyDataAdapter = (AbstractXYDataAdapter)xyPainter.getDataAdapter();
+            if (xyDataAdapter == null)
+                return true;
+
+            Iterator<DataStatistics> iterator = dataStatisticsList.iterator();
+            while (iterator.hasNext()) {
+                DataStatistics dataStatistics = iterator.next();
+
+                if (dataStatistics.getAdapter() != xyDataAdapter)
+                    continue;
+
+                dataStatistics.release();
+                iterator.remove();
+                return true;
+            }
+
+            return false;
+        }
+
         public RectF getDataLimits() {
             RectF limits = null;
             for (DataStatistics statistics : dataStatisticsList) {
@@ -397,6 +421,9 @@ public class PlotView extends ViewGroup {
 
     public void removePlotPainter(XYPainter painter) {
         mainView.removePlotPainter(painter);
+
+        if (autoRange != null)
+            autoRange.removePainter(painter);
     }
 
     public RectF getRange() {
@@ -425,13 +452,13 @@ public class PlotView extends ViewGroup {
     }
 
     public void setAutoRange(int behaviourX, int behaviourY) {
-        if (behaviourX == AUTO_RANGE_DISABLED && behaviourY == AUTO_RANGE_DISABLED) {
-            if (autoRange != null) {
-                autoRange.release();
-                autoRange = null;
-            }
-            return;
+        if (autoRange != null) {
+            autoRange.release();
+            autoRange = null;
         }
+
+        if (behaviourX == AUTO_RANGE_DISABLED && behaviourY == AUTO_RANGE_DISABLED)
+            return;
 
         if (autoRange == null)
             autoRange = new AutoRange(mainView.getPlotPainters(), behaviourX, behaviourY);

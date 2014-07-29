@@ -107,6 +107,11 @@ public class BackgroundPainter implements IPlotPainter {
     }
 
     @Override
+    public void invalidate() {
+
+    }
+
+    @Override
     public void setXScale(IScale xScale) {
 
     }

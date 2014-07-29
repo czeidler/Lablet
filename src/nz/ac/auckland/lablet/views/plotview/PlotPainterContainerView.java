@@ -78,6 +78,8 @@ public class PlotPainterContainerView extends RangeDrawingView {
     public void addPlotPainter(IPlotPainter painter) {
         plotPainters.add(painter);
         painter.setContainer(this);
+        if (getWidth() > 0 && getHeight() > 0)
+            painter.onSizeChanged(getWidth(), getHeight(), 0, 0);
     }
 
     public void removePlotPainter(XYPainter painter) {
