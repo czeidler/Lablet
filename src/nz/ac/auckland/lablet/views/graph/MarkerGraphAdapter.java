@@ -80,7 +80,9 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
 
     @Override
     public void onDataAdded(MarkerDataModel model, int index) {
-        notifyDataAdded(index, 1);
+        // see onDataChanged
+        //notifyDataAdded(index, 1);
+        notifyAllDataChanged();
     }
 
     @Override
@@ -90,7 +92,11 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
 
     @Override
     public void onDataChanged(MarkerDataModel model, int index, int number) {
-        notifyDataChanged(index, number);
+        // when displaying the velocity the marker point index is not equal to the velocity point index
+        // for that reason we invalidate all data
+        // TODO: this could be optimized
+        //notifyDataChanged(index, number);
+        notifyAllDataChanged();
     }
 
     @Override
