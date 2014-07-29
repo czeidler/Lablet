@@ -19,6 +19,9 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
     abstract protected AbstractPlotDataAdapter.IListener createListener();
 
     public void setDataAdapter(AbstractPlotDataAdapter adapter) {
+        if (this.dataAdapter != null)
+            this.dataAdapter.removeListener(listener);
+
         this.dataAdapter = adapter;
         listener = createListener();
         this.dataAdapter.addListener(listener);

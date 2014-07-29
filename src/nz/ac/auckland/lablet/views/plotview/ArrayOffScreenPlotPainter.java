@@ -94,7 +94,7 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
     protected void triggerRedrawScreen() {
         if (containerView == null)
             return;
-        
+
         emptyOffScreenRenderingQueue();
 
         Range dirty = getDataRangeFor(containerView.getRangeLeft(), containerView.getRangeRight());
