@@ -30,9 +30,7 @@ import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.misc.AudioWavOutputStream;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.*;
-import nz.ac.auckland.lablet.views.plotview.Log10Scale;
 import nz.ac.auckland.lablet.views.plotview.PlotView;
-import nz.ac.auckland.lablet.views.plotview.axes.LabelPartitionerLog10;
 
 import java.io.*;
 import java.lang.ref.WeakReference;
@@ -66,7 +64,7 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
             private PlotView frequencyMapPlotView;
             private AudioFrequencyMapAdapter audioFrequencyMapAdapter;
 
-            private int frequencyMapTimeSpan = 60;
+            private int frequencyMapTimeSpan = 30;
             private int amplitudeTimeSpan = 3;
 
             private MicrophoneExperimentSensor.ISensorDataListener listener = new MicrophoneExperimentSensor.ISensorDataListener() {
@@ -91,10 +89,12 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 audioAmplitudePlotAdapter = new AudioAmplitudePlotDataAdapter();
                 audioAmplitudePainter.setDataAdapter(audioAmplitudePlotAdapter);
                 audioAmplitudePlotView.addPlotPainter(audioAmplitudePainter);
-                audioAmplitudePlotView.setRangeX(0, amplitudeTimeSpan);
-                audioAmplitudePlotView.setRangeY(-1, 1);
+                audioAmplitudePlotView.setXRange(0, amplitudeTimeSpan);
+                audioAmplitudePlotView.setYRange(-1, 1);
+                audioAmplitudePlotView.getTitleView().setTitle("Signal Strength Vs Time");
                 audioAmplitudePlotView.getXAxisView().setUnit("s");
-                audioAmplitudePlotView.getXAxisView().setLabel("Time");
+                audioAmplitudePlotView.getXAxisView().setTitle("Time");
+                audioAmplitudePlotView.getBackgroundPainter().setShowYGrid(true);
 
                 audioFrequencyView = (AudioFrequencyView)view.findViewById(R.id.audioFrequencyView);
 
@@ -103,14 +103,20 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 AudioFrequencyMapPainter audioFrequencyMapPainter = new AudioFrequencyMapPainter();
                 audioFrequencyMapPainter.setDataAdapter(audioFrequencyMapAdapter);
                 frequencyMapPlotView.addPlotPainter(audioFrequencyMapPainter);
-                frequencyMapPlotView.setRangeX(0, frequencyMapTimeSpan);
-                frequencyMapPlotView.setRangeY(1, experimentRun.SAMPLE_RATE / 2);
-                audioFrequencyMapPainter.setYScale(new Log10Scale());
-                frequencyMapPlotView.getYAxisView().setLabelPartitioner(new LabelPartitionerLog10());
+                frequencyMapPlotView.setXRange(0, frequencyMapTimeSpan);
+                frequencyMapPlotView.setYRange(1, experimentRun.SAMPLE_RATE / 2);
+                frequencyMapPlotView.setMaxXRange(0, frequencyMapTimeSpan);
+                frequencyMapPlotView.setMaxYRange(1, experimentRun.SAMPLE_RATE / 2);
+                //frequencyMapPlotView.getBackgroundPainter().setShowGrid(true);
+                //frequencyMapPlotView.setYScale(PlotView.log10Scale());
+                frequencyMapPlotView.setXDraggable(true);
+                frequencyMapPlotView.setYDraggable(true);
+                frequencyMapPlotView.setXZoomable(true);
+                frequencyMapPlotView.setYZoomable(true);
                 frequencyMapPlotView.getYAxisView().setUnit("Hz");
-                frequencyMapPlotView.getYAxisView().setLabel("Frequency");
+                frequencyMapPlotView.getYAxisView().setTitle("Frequency");
                 frequencyMapPlotView.getXAxisView().setUnit("s");
-                frequencyMapPlotView.getXAxisView().setLabel("Time");
+                frequencyMapPlotView.getXAxisView().setTitle("Time");
 
                 experimentRun.setSensorDataListener(listener);
             }
@@ -161,9 +167,9 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 audioAmplitudePlotAdapter = new AudioAmplitudePlotDataAdapter();
                 audioAmplitudePainter.setDataAdapter(audioAmplitudePlotAdapter);
                 playbackAmplitudeView.addPlotPainter(audioAmplitudePainter);
-                playbackAmplitudeView.setRangeY(-1, 1);
+                playbackAmplitudeView.setYRange(-1, 1);
                 playbackAmplitudeView.getXAxisView().setUnit("ms");
-                playbackAmplitudeView.getXAxisView().setLabel("Time");
+                playbackAmplitudeView.getXAxisView().setTitle("Time");
 
                 startPauseButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
@@ -255,7 +261,7 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 int duration = mediaPlayer.getDuration();
                 seekBar.setMax(duration);
                 lengthTextView.setText("" + (duration / 1000) + "s");
-                playbackAmplitudeView.setRangeX(0, (float)duration / 1000);
+                playbackAmplitudeView.setXRange(0, (float) duration / 1000);
             }
 
             @Override
