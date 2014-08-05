@@ -45,7 +45,7 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
     private void setScriptComponent(int index) {
         ScriptRunnerActivity activity = (ScriptRunnerActivity)getActivity();
 
-        this.component = activity.getScriptComponentTreeAt(index);
+        component = activity.getScriptComponentTreeAt(index);
         if (component != null)
             component.setListener(this);
     }

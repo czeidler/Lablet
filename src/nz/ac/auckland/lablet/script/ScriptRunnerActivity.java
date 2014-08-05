@@ -91,7 +91,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
     }
 
     public ScriptComponentTree getScriptComponentTreeAt(int index) {
-        if (index >= activeChain.size() || index < 0)
+        if (index < 0 || index >= activeChain.size())
             return null;
         return activeChain.get(index);
     }
