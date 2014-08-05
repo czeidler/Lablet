@@ -240,7 +240,7 @@ class SimpleMarker extends DraggableMarker {
 
     protected boolean isPointOnDragArea(PointF point) {
         float distance = (float)Math.sqrt(Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2));
-        if (distance < RING_RADIUS + RING_WIDTH / 2 && distance > RING_RADIUS - RING_WIDTH / 2)
+        if (distance < RING_RADIUS + RING_WIDTH / 2)
             return true;
         return isPointOnSelectArea(point);
     }
@@ -443,18 +443,21 @@ class TagMarkerDataModelPainter extends AbstractMarkerPainter {
     }
 
     public void draw(Canvas canvas, float priority) {
+
         int currentMarkerRow = markerData.getSelectedMarkerData();
         IMarker topMarker = getMarkerForRow(currentMarkerRow);
         for (int i = 0; i < markerList.size(); i++) {
             IMarker marker = markerList.get(i);
+            if (marker == topMarker)
+                continue;
 
             float currentPriority = priority;
             float runDistance = Math.abs(currentMarkerRow - i);
-            currentPriority = currentPriority * (float)(1.18 - 0.2 * runDistance);
+            currentPriority = currentPriority * (float)(0.35 - 0.1 * runDistance);
             if (currentPriority > 1.0)
                 currentPriority = (float)1.0;
-            if (currentPriority < 0.4)
-                currentPriority = (float)0.4;
+            if (currentPriority < 0.1)
+                currentPriority = (float)0.1;
 
             marker.onDraw(canvas, currentPriority);
         }
