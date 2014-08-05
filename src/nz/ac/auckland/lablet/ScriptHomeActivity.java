@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
@@ -49,6 +50,7 @@ public class ScriptHomeActivity extends Activity {
     private CheckBox selectAllCheckBox = null;
 
     final int START_SCRIPT = 1;
+    final String PREFERENCES_NAME = "lablet_preferences";
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -291,6 +293,10 @@ public class ScriptHomeActivity extends Activity {
     }
 
     private void copyResourceScripts(boolean overwriteExisting) {
+        SharedPreferences settings = getSharedPreferences(PREFERENCES_NAME, 0);
+        if (settings.getBoolean("scripts_copied", false))
+            return;
+
         File scriptDir = getScriptDirectory(this);
         if (!scriptDir.exists()) {
             if (!scriptDir.mkdir())
@@ -322,6 +328,8 @@ public class ScriptHomeActivity extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        settings.edit().putBoolean("scripts_copied", true).commit();
     }
 
     private boolean isLuaFile(String name) {
