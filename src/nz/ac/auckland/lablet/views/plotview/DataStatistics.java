@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 import android.graphics.RectF;
+import nz.ac.auckland.lablet.misc.WeakListenable;
 
 
 public class DataStatistics extends WeakListenable<DataStatistics.IListener>
