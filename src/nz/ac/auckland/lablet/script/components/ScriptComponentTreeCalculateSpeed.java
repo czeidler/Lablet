@@ -515,14 +515,17 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     }
 
     private void setDone(boolean done) {
+        // always set state to done (in case there is a bug in the calculation and the student can't get further)
+        // TODO: remove again!
+        setState(ScriptComponent.SCRIPT_STATE_DONE);
+        return;
+
+        /*
         if (done)
             setState(ScriptComponent.SCRIPT_STATE_DONE);
         else
             setState(ScriptComponent.SCRIPT_STATE_ONGOING);
-
-        // always set state to done (in case there is a bug in the calculation and the student can't get further)
-        // TODO: remove again!
-        setState(ScriptComponent.SCRIPT_STATE_DONE);
+        */
     }
 
     // error propagation
