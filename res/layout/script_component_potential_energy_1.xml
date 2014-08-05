@@ -97,6 +97,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_alignParentEnd="true"
-                android:checked="false" android:id="@+id/doneCheckBox" android:layout_alignParentTop="true"/>
+                android:checked="false" android:clickable="false"
+                android:id="@+id/doneCheckBox" android:layout_alignParentTop="true"/>
     </RelativeLayout>
 </LinearLayout>
