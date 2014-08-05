@@ -87,10 +87,12 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
     protected void onSaveInstanceState (Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putString("script_user_data_dir", scriptUserDataDir.getName());
+        outState.putString("script_user_data_dir", scriptUserDataDir.getPath());
     }
 
     public ScriptComponentTree getScriptComponentTreeAt(int index) {
+        if (index < 0 || index >= activeChain.size())
+            return null;
         return activeChain.get(index);
     }
 

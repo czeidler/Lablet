@@ -45,8 +45,9 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
     private void setScriptComponent(int index) {
         ScriptRunnerActivity activity = (ScriptRunnerActivity)getActivity();
 
-        this.component = activity.getScriptComponentTreeAt(index);
-        component.setListener(this);
+        component = activity.getScriptComponentTreeAt(index);
+        if (component != null)
+            component.setListener(this);
     }
 
     @Override
@@ -76,6 +77,9 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.script_component_generic_fragment, container, false);
         assert view != null;
+
+        if (component == null)
+            return view;
 
         titleView = (TextView)view.findViewById(R.id.titleTextView);
         String title = ((ScriptComponentTreeFragmentHolder)component).getTitle();
