@@ -62,6 +62,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
     private int requestedVideoWidth = -1;
     private int requestedVideoHeight = -1;
 
+    private MenuItem backItem = null;
     private MenuItem analyseMenuItem = null;
     private MenuItem qualityMenu = null;
     private int cameraId = 0;
@@ -81,7 +82,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
         menu.clear();
         getMenuInflater().inflate(R.menu.perform_experiment_activity_actions, menu);
 
-        MenuItem backItem = menu.findItem(R.id.action_back);
+        backItem = menu.findItem(R.id.action_back);
         assert backItem != null;
         backItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -752,6 +753,7 @@ public class CameraExperimentActivity extends ExperimentActivity {
             stopButton.setEnabled(true);
             newButton.setVisibility(View.INVISIBLE);
 
+            backItem.setEnabled(false);
             analyseMenuItem.setEnabled(false);
 
             preview.setVisibility(View.VISIBLE);
@@ -768,6 +770,8 @@ public class CameraExperimentActivity extends ExperimentActivity {
         }
 
         public void leaveState() {
+            backItem.setEnabled(true);
+
             if (isRecording) {
                 stopRecording();
                 isRecording = false;
