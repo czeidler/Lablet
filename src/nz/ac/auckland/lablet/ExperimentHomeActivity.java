@@ -44,6 +44,7 @@ public class ExperimentHomeActivity extends Activity {
     private CheckBoxAdapter experimentListAdaptor = null;
     private CheckBox selectAllCheckBox = null;
     private MenuItem deleteItem = null;
+    private MenuItem exportItem = null;
     private AlertDialog infoAlertBox = null;
     private AlertDialog deleteExperimentAlertBox = null;
     private ExperimentDirObserver experimentDirObserver = null;
@@ -167,7 +168,39 @@ public class ExperimentHomeActivity extends Activity {
             }
         });
 
+        exportItem = menu.findItem(R.id.action_mail);
+        assert exportItem != null;
+        exportItem.setVisible(false);
+        exportItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if (!isAtLeastOneExperimentSelected())
+                    return false;
+                exportSelection();
+                return true;
+            }
+        });
+
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void exportSelection() {
+        List<File> exportList = new ArrayList<>();
+
+        File experimentBaseDir = ExperimentDataActivity.getDefaultExperimentBaseDir(this);
+        for (CheckBoxListEntry entry : experimentList) {
+            if (!entry.getSelected())
+                continue;
+            File experimentDir = new File(experimentBaseDir, entry.getName());
+            exportList.add(experimentDir);
+        }
+
+        File[] fileArray = new File[exportList.size()];
+        for (int i = 0; i < exportList.size(); i++)
+            fileArray[i] = exportList.get(i);
+
+        ExportDirDialog dirDialog = new ExportDirDialog(this, fileArray);
+        dirDialog.show();
     }
 
     private boolean isAtLeastOneExperimentSelected() {
@@ -182,12 +215,12 @@ public class ExperimentHomeActivity extends Activity {
     }
 
     private void deleteSelectedExperiments() {
-        File experimentDir = ExperimentDataActivity.getDefaultExperimentBaseDir(this);
+        File experimentBaseDir = ExperimentDataActivity.getDefaultExperimentBaseDir(this);
         for (CheckBoxListEntry entry : experimentList) {
             if (!entry.getSelected())
                 continue;
-            File experimentFile = new File(experimentDir, entry.getName());
-            StorageLib.recursiveDeleteFile(experimentFile);
+            File experimentDir = new File(experimentBaseDir, entry.getName());
+            StorageLib.recursiveDeleteFile(experimentDir);
         }
         selectAllCheckBox.setChecked(false);
         deleteItem.setVisible(false);
@@ -256,10 +289,13 @@ public class ExperimentHomeActivity extends Activity {
                 if (deleteItem == null)
                     return;
 
-                if (isAtLeastOneExperimentSelected())
+                if (isAtLeastOneExperimentSelected()) {
                     deleteItem.setVisible(true);
-                else
+                    exportItem.setVisible(true);
+                } else {
                     deleteItem.setVisible(false);
+                    exportItem.setVisible(false);
+                }
             }
         };
 

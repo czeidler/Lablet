@@ -371,8 +371,8 @@ public class ExperimentActivity extends FragmentActivity {
         experiment = new Experiment(this, experimentBaseDir);
 
         final List<String> experimentList = new ArrayList<>();
-        experimentList.add(MicrophoneSensorData.class.getSimpleName());
-        experimentList.add(AccelerometerSensorData.class.getSimpleName());
+        //experimentList.add(MicrophoneSensorData.class.getSimpleName());
+        //experimentList.add(AccelerometerSensorData.class.getSimpleName());
         experimentList.add(CameraSensorData.class.getSimpleName());
 
         ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(experimentList, this);

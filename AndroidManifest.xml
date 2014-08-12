@@ -28,6 +28,9 @@
         <activity android:name="nz.ac.auckland.lablet.script.ScriptRunnerActivity"
                   android:icon="@drawable/ic_console"
                   android:windowSoftInputMode="stateHidden"/>
+
+        <provider android:name=".misc.LabletDataProvider" android:authorities="nz.ac.auckland.lablet.provider"
+                  android:exported="true"/>
     </application>
 
     <uses-permission android:name="android.permission.CAMERA"/>
