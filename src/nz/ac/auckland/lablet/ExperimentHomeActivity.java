@@ -108,7 +108,7 @@ public class ExperimentHomeActivity extends Activity {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         menu.clear();
         getMenuInflater().inflate(R.menu.main_activity_actions, menu);
 
@@ -180,6 +180,15 @@ public class ExperimentHomeActivity extends Activity {
                 return true;
             }
         });
+
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean atLeastOnExperimentSelected = isAtLeastOneExperimentSelected();
+        deleteItem.setVisible(atLeastOnExperimentSelected);
+        exportItem.setVisible(atLeastOnExperimentSelected);
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -286,16 +295,7 @@ public class ExperimentHomeActivity extends Activity {
         checkBoxListEntryListener = new CheckBoxListEntry.OnCheckBoxListEntryListener() {
             @Override
             public void onSelected(CheckBoxListEntry entry) {
-                if (deleteItem == null)
-                    return;
-
-                if (isAtLeastOneExperimentSelected()) {
-                    deleteItem.setVisible(true);
-                    exportItem.setVisible(true);
-                } else {
-                    deleteItem.setVisible(false);
-                    exportItem.setVisible(false);
-                }
+                updateSelectedMenuItem();
             }
         };
 
@@ -305,6 +305,10 @@ public class ExperimentHomeActivity extends Activity {
             experimentDirObserver = new ExperimentDirObserver(experimentDir.getPath());
             experimentDirObserver.startWatching();
         }
+    }
+
+    private void updateSelectedMenuItem() {
+        invalidateOptionsMenu();
     }
 
     private void startAnalyzeActivityById(String id) {
@@ -322,6 +326,9 @@ public class ExperimentHomeActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
+
+        selectAllCheckBox.setChecked(false);
+        invalidateOptionsMenu();
 
         updateExperimentList();
     }
