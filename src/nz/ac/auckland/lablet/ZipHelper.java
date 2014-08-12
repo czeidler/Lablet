@@ -38,17 +38,28 @@ public class ZipHelper {
         outputStream.close();
     }
 
-    public void addDir(File directory, StreamHelper.IProgressListener listener) throws IOException {
-        File[] files = directory.listFiles();
+    public void addDir(File dir, StreamHelper.IProgressListener listener) throws IOException {
+        File rootDir = dir.getParentFile();
+        if (rootDir == null)
+            rootDir = dir;
+        addDir(rootDir, dir.getName(), listener);
+    }
+
+    public void addDir(File rootDir, String subDir, StreamHelper.IProgressListener listener) throws IOException {
+        File absoluteDir = new File(rootDir, subDir);
+        File[] files = absoluteDir.listFiles();
         for (int i = 0; i < files.length; i++) {
             if (canceled)
                 return;
 
-            if (files[i].isDirectory()) {
-                addDir(files[i], listener);
+            File file = files[i];
+            String subSubFile = subDir + File.separator + file.getName();
+
+            if (file.isDirectory()) {
+                addDir(rootDir, subSubFile, listener);
                 continue;
             }
-            addFile(files[i], listener);
+            addFile(rootDir, subSubFile, listener);
         }
     }
 
@@ -57,10 +68,12 @@ public class ZipHelper {
         close();
     }
 
-    public void addFile(File file, StreamHelper.IProgressListener listener) throws IOException {
-        FileInputStream in = new FileInputStream(file.getAbsolutePath());
+    public void addFile(File rootDir, String file,  StreamHelper.IProgressListener listener) throws IOException {
+        File absoluteFile = new File(rootDir, file);
+
+        FileInputStream in = new FileInputStream(absoluteFile.getAbsolutePath());
         try {
-            outputStream.putNextEntry(new ZipEntry(file.getAbsolutePath()));
+            outputStream.putNextEntry(new ZipEntry(file));
             StreamHelper.copy(in, outputStream, listener);
             outputStream.closeEntry();
         } finally {
