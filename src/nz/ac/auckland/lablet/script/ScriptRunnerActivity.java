@@ -39,7 +39,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
     private File scriptFile = null;
     private String lastErrorMessage = "";
 
-    final String SCRIPT_USER_DATA_FILENAME = "user_data.xml";
+    final String SCRIPT_USER_DATA_FILENAME = "script_user_data.xml";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
