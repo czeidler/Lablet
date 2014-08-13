@@ -39,8 +39,6 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
 
     protected ExperimentData experimentData = null;
 
-    private File baseDirectory = null;
-
     final protected List<List<AnalysisEntry>> analysisRuns = new ArrayList<>();
     protected List<AnalysisEntry> currentAnalysisRun;
     protected AnalysisEntry currentAnalysisSensor;
@@ -58,7 +56,7 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
         return currentAnalysisRun;
     }
 
-    protected void setExperimentData(ExperimentData experimentData) {
+    private void setExperimentData(ExperimentData experimentData) {
         this.experimentData = experimentData;
 
         for (ExperimentData.RunEntry runEntry : experimentData.getRuns()) {
@@ -79,17 +77,6 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
 
         setCurrentAnalysisRun(0);
         setCurrentAnalysisSensor(0);
-
-        baseDirectory = getDefaultExperimentBaseDir(this);
-
-        Intent intent = getIntent();
-        if (intent != null) {
-            Bundle extras = intent.getExtras();
-            if (extras != null) {
-                if (extras.containsKey("experiment_base_directory"))
-                    baseDirectory = new File(extras.getString("experiment_base_directory"));
-            }
-        }
     }
 
     public ExperimentData getExperimentData() {
