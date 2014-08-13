@@ -90,7 +90,7 @@ public class ExperimentRun {
             if (plugin == null)
                 continue;
             IExperimentSensor experimentRun = plugin.createExperimentSensor(activity);
-            experimentRunGroup.addExperimentRun(experimentRun);
+            experimentRunGroup.addExperimentSensor(experimentRun);
         }
 
         return experimentRunGroup;
@@ -144,18 +144,18 @@ public class ExperimentRun {
         return experimentSensors;
     }
 
-    public boolean addExperimentRun(IExperimentSensor experimentRun) {
-        if (experimentRun.getExperimentRun() != null)
+    public boolean addExperimentSensor(IExperimentSensor experimentSensor) {
+        if (experimentSensor.getExperimentRun() != null)
             return false;
-        experimentSensors.add(experimentRun);
-        experimentRun.setExperimentRun(this);
+        experimentSensors.add(experimentSensor);
+        experimentSensor.setExperimentRun(this);
 
         if (experimentActivity != null)
-            experimentRun.init(experimentActivity);
+            experimentSensor.init(experimentActivity);
         return true;
     }
 
-    public void removeExperimentRun(IExperimentSensor experimentRun) {
+    public void removeExperimentSensor(IExperimentSensor experimentRun) {
         // update the current experiment run first if necessary
         if (experimentRun == getCurrentExperimentSensor()) {
             int index = experimentSensors.indexOf(experimentRun);

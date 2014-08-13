@@ -75,7 +75,7 @@ abstract public class AbstractExperimentSensor implements IExperimentSensor {
     }
 
     public void setListener(IExperimentSensorListener listener) {
-        this.softListener = new WeakReference<IExperimentSensorListener>(listener);
+        this.softListener = new WeakReference<>(listener);
         stateNotifier.notifyCurrentState();
     }
 
