@@ -54,8 +54,15 @@ public class LabelPartitionerLinear extends LabelPartitioner {
         }
     }
 
+    private boolean fuzzyEqual(float value1, float value2) {
+        return Math.abs(value1 - value2) < 0.0000001;
+    }
+
     @Override
     protected void calculate() {
+        if (fuzzyEqual(realEnd, realStart))
+            return;
+
         int maxLabelNumber = (int)(axisExtent / (labelExtent + minSpacing)) + 1;
         int optimalLabelNumber = (int)(axisExtent / (labelExtent + optimalSpacing)) + 1;
 
