@@ -368,8 +368,7 @@ public class ExperimentHomeActivity extends Activity {
 
     private void startExperiment(IExperimentPlugin plugin) {
         Intent intent = new Intent(this, ExperimentActivity.class);
-        AbstractExperimentPlugin.packStartExperimentIntent(intent, null);
-        // TODO say what experiments should be started!
+        AbstractExperimentPlugin.packStartExperimentIntent(intent, plugin, null);
         startActivityForResult(intent, PERFORM_EXPERIMENT);
     }
 

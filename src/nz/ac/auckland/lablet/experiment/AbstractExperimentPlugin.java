@@ -18,11 +18,12 @@ import android.os.Bundle;
 abstract public class AbstractExperimentPlugin implements IExperimentPlugin {
     /**
      * Helper method to pack the option bundle correctly.
-     *
-     * @param intent the Intent where the data should be packed to
+     *  @param intent the Intent where the data should be packed to
+     * @param plugin
      * @param options the options for the activity
      */
-    static public void packStartExperimentIntent(Intent intent, Bundle options) {
+    static public void packStartExperimentIntent(Intent intent, IExperimentPlugin plugin, Bundle options) {
+        intent.putExtra("plugin", plugin.getName());
         if (options != null)
             intent.putExtra("options", options);
     }

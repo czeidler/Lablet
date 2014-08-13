@@ -19,10 +19,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.*;
 import android.widget.*;
-import nz.ac.auckland.lablet.accelerometer.AccelerometerSensorData;
-import nz.ac.auckland.lablet.camera.CameraSensorData;
 import nz.ac.auckland.lablet.experiment.*;
-import nz.ac.auckland.lablet.microphone.MicrophoneSensorData;
 
 import java.io.File;
 import java.io.IOException;
@@ -358,22 +355,25 @@ public class ExperimentActivity extends FragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Intent intent = getIntent();
-        if (intent != null) {
-            Bundle extras = intent.getExtras();
-            if (extras != null) {
-                if (extras.containsKey("experiment_base_directory"))
-                    experimentBaseDir = new File(extras.getString("experiment_base_directory"));
+        IExperimentPlugin plugin = null;
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            if (extras.containsKey("experiment_base_directory"))
+                experimentBaseDir = new File(extras.getString("experiment_base_directory"));
+            if (extras.containsKey("plugin")) {
+                String pluginName = extras.getString("plugin");
+                plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(pluginName);
             }
         }
+
         if (experimentBaseDir == null)
             experimentBaseDir = new File(getExternalFilesDir(null), "experiments");
 
         experiment = new Experiment(this, experimentBaseDir);
 
         final List<String> experimentList = new ArrayList<>();
-        //experimentList.add(MicrophoneSensorData.class.getSimpleName());
-        //experimentList.add(AccelerometerSensorData.class.getSimpleName());
-        experimentList.add(CameraSensorData.class.getSimpleName());
+        if (plugin != null)
+            experimentList.add(plugin.getName());
 
         ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(experimentList, this);
         experiment.addExperimentRunGroup(experimentRun);
@@ -385,6 +385,8 @@ public class ExperimentActivity extends FragmentActivity {
 
         // load experiment first
         super.onCreate(savedInstanceState);
+        if (plugin == null)
+            finish();
 
         // gui
         setContentView(R.layout.experiment_recording);

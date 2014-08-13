@@ -72,9 +72,9 @@ public class ScriptHomeActivity extends Activity {
         // info item
         MenuItem infoItem = menu.findItem(R.id.action_info);
         assert(infoItem != null);
-        String versionString = ExperimentHomeActivity.getVersionString(this);
+        String versionString = InfoHelper.getVersionString(this);
         infoItem.setTitle(versionString);
-        infoAlertBox = ExperimentHomeActivity.createAlertInfoBox(this);
+        infoAlertBox = InfoHelper.createAlertInfoBox(this);
         infoItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
