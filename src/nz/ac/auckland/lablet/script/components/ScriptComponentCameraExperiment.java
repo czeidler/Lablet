@@ -210,7 +210,7 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
                 if (!experimentData.load(getContext(), experimentPath))
                     return null;
 
-                // TODO fix if there are more than one run sensors or sensors
+                // TODO fix if there are more than one runs or sensors
                 SensorData sensorData = experimentData.getRuns().get(0).sensors.get(0).sensorData;
                 CameraSensorData experiment = (CameraSensorData)sensorData;
                 return new File(experiment.getStorageDir(), experiment.getVideoFileName());

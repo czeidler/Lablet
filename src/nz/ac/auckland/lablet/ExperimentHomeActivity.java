@@ -265,8 +265,9 @@ public class ExperimentHomeActivity extends Activity {
         newExperimentList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                IExperimentPlugin plugin = experimentPluginList.get(i);
-                startExperiment(plugin);
+                List<IExperimentPlugin> pluginList = new ArrayList<IExperimentPlugin>();
+                pluginList.add(experimentPluginList.get(i));
+                startExperiment(pluginList);
             }
         });
 
@@ -366,9 +367,9 @@ public class ExperimentHomeActivity extends Activity {
         }
     }
 
-    private void startExperiment(IExperimentPlugin plugin) {
+    private void startExperiment(List<IExperimentPlugin> plugins) {
         Intent intent = new Intent(this, ExperimentActivity.class);
-        AbstractExperimentPlugin.packStartExperimentIntent(intent, plugin, null);
+        AbstractExperimentPlugin.packStartExperimentIntent(intent, plugins, null);
         startActivityForResult(intent, PERFORM_EXPERIMENT);
     }
 

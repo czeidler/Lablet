@@ -264,7 +264,7 @@ public class ExperimentActivity extends FragmentActivity {
     }
 
     public List<IExperimentSensor> getActiveSensors() {
-        ExperimentRun currentRun = experiment.getCurrentExperimentRun();
+        ExperimentRun currentRun = getExperiment().getCurrentExperimentRun();
         if (currentRun.isActive())
             return currentRun.getExperimentSensors();
         return new ArrayList<>();
@@ -352,40 +352,56 @@ public class ExperimentActivity extends FragmentActivity {
         updateAdapter();
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        Intent intent = getIntent();
-        IExperimentPlugin plugin = null;
-        Bundle extras = intent.getExtras();
+    /**
+     * Gets/loads the Experiment.
+     *
+     * This must be called from the fragment views to obtain the experiment.
+     *
+     * @return
+     */
+    public Experiment getExperiment() {
+        if (experiment != null)
+            return experiment;
+
+        final Intent intent = getIntent();
+        final List<String> experimentList = new ArrayList<>();
+        final Bundle extras = intent.getExtras();
         if (extras != null) {
             if (extras.containsKey("experiment_base_directory"))
                 experimentBaseDir = new File(extras.getString("experiment_base_directory"));
-            if (extras.containsKey("plugin")) {
-                String pluginName = extras.getString("plugin");
-                plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(pluginName);
+
+            String[] pluginNames = extras.getStringArray("plugins");
+            if (pluginNames != null) {
+                for (String pluginName : pluginNames) {
+                    IExperimentPlugin plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(pluginName);
+                    experimentList.add(plugin.getName());
+                }
             }
         }
 
         if (experimentBaseDir == null)
             experimentBaseDir = new File(getExternalFilesDir(null), "experiments");
 
+        if (experimentList.size() == 0)
+            return null;
+
         experiment = new Experiment(this, experimentBaseDir);
 
-        final List<String> experimentList = new ArrayList<>();
-        if (plugin != null)
-            experimentList.add(plugin.getName());
-
-        ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(experimentList, this);
+        final ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(experimentList, this);
         experiment.addExperimentRunGroup(experimentRun);
         experiment.setCurrentExperimentRun(experimentRun);
         activateExperimentRun(experiment.getCurrentExperimentRun(), true);
         setCurrentSensor(experimentRun.getExperimentRunAt(0));
 
         experiment.addListener(experimentListener);
+        return experiment;
+    }
 
-        // load experiment first
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (plugin == null)
+        // make sure the experiment gets loaded (but it will be loaded beforehand from the fragments in onCreateView)
+        if (getExperiment() == null)
             finish();
 
         // gui
