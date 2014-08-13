@@ -196,7 +196,6 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public boolean onPrepareOptionsMenu(MenuItem menuItem) {
-        menuItem.setVisible(false);
         menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {

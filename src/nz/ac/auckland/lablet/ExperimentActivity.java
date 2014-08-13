@@ -63,7 +63,7 @@ class ExperimentRunViewManager {
             @Override
             public void onClick(View view) {
                 ExperimentRun oldGroup = experiment.getCurrentExperimentRun();
-                List<String> experimentNamesList = new ArrayList<String>();
+                List<String> experimentNamesList = new ArrayList<>();
                 for (IExperimentSensor experimentRun : oldGroup.getExperimentSensors())
                     experimentNamesList.add(experimentRun.getClass().getSimpleName());
                 ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(
@@ -136,6 +136,10 @@ class MenuItemProxy {
             update();
     }
 
+    public MenuItem getMenuItem() {
+        return item;
+    }
+
     private void update() {
         item.setVisible(visible);
         item.setEnabled(enabled);
@@ -170,8 +174,9 @@ public class ExperimentActivity extends FragmentActivity {
     private ImageButton newButton = null;
     final private MenuItemProxy analyseMenuItem = new MenuItemProxy();
     final private MenuItemProxy settingsMenuItem = new MenuItemProxy();
+    final private MenuItemProxy sensorMenuItem = new MenuItemProxy();
+
     private MenuItem viewMenu = null;
-    private MenuItem sensorMenu = null;
 
     private AbstractViewState state = null;
 
@@ -197,10 +202,11 @@ public class ExperimentActivity extends FragmentActivity {
     };
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         menu.clear();
         getMenuInflater().inflate(R.menu.perform_experiment_activity_actions, menu);
 
+        // back item
         MenuItem backItem = menu.findItem(R.id.action_back);
         assert backItem != null;
         backItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -210,6 +216,8 @@ public class ExperimentActivity extends FragmentActivity {
                 return false;
             }
         });
+
+        // analyse item
         MenuItem analyseItem = menu.findItem(R.id.action_analyse);
         assert analyseItem != null;
         analyseMenuItem.setMenuItem(analyseItem);
@@ -230,16 +238,12 @@ public class ExperimentActivity extends FragmentActivity {
             }
         }
 
+        // settings item
         MenuItem settingsMenu = menu.findItem(R.id.action_settings);
         assert settingsMenu != null;
         settingsMenuItem.setMenuItem(settingsMenu);
-        IExperimentSensor currentExperimentSensor = experiment.getCurrentExperimentSensor();
-        if (currentExperimentSensor != null) {
-            boolean hasOptions = currentExperimentSensor.onPrepareOptionsMenu(settingsMenu);
-            settingsMenu.setEnabled(hasOptions);
-            settingsMenu.setVisible(hasOptions);
-        }
 
+        // sensor view item
         viewMenu = menu.findItem(R.id.action_view);
         assert viewMenu != null;
         viewMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -250,8 +254,10 @@ public class ExperimentActivity extends FragmentActivity {
             }
         });
 
-        sensorMenu = menu.findItem(R.id.action_sensors);
+        // activate sensors item
+        MenuItem sensorMenu = menu.findItem(R.id.action_sensors);
         assert sensorMenu != null;
+        sensorMenuItem.setMenuItem(sensorMenu);
         sensorMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -259,6 +265,17 @@ public class ExperimentActivity extends FragmentActivity {
                 return true;
             }
         });
+
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        IExperimentSensor currentExperimentSensor = experiment.getCurrentExperimentSensor();
+        if (currentExperimentSensor != null) {
+            boolean hasOptions = currentExperimentSensor.onPrepareOptionsMenu(settingsMenuItem.getMenuItem());
+            settingsMenuItem.setVisible(hasOptions);
+        }
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -341,13 +358,16 @@ public class ExperimentActivity extends FragmentActivity {
 
     private void addExperiment(IExperimentPlugin plugin) {
         IExperimentSensor experimentRun = plugin.createExperimentSensor(this);
-        experiment.getCurrentExperimentRun().addExperimentRun(experimentRun);
+        experiment.getCurrentExperimentRun().addExperimentSensor(experimentRun);
+
+        experimentRun.startPreview();
 
         updateAdapter();
     }
 
     private void removeExperimentRun(IExperimentSensor experimentRun) {
-        experiment.getCurrentExperimentRun().removeExperimentRun(experimentRun);
+        experiment.getCurrentExperimentRun().removeExperimentSensor(experimentRun);
+        experimentRun.stopPreview();
 
         updateAdapter();
     }
@@ -661,8 +681,8 @@ public class ExperimentActivity extends FragmentActivity {
 
     class PreviewState extends AbstractViewState {
         public void enterState() {
-            if (settingsMenuItem != null)
-                settingsMenuItem.setVisible(true);
+            settingsMenuItem.setEnabled(true);
+            sensorMenuItem.setEnabled(true);
 
             startButton.setEnabled(true);
             stopButton.setEnabled(false);
@@ -670,11 +690,13 @@ public class ExperimentActivity extends FragmentActivity {
 
             for (IExperimentSensor experiment : getActiveSensors())
                 experiment.startPreview();
+
+            invalidateOptionsMenu();
         }
 
         public void leaveState() {
-            if (settingsMenuItem != null)
-                settingsMenuItem.setVisible(false);
+            settingsMenuItem.setEnabled(false);
+            sensorMenuItem.setEnabled(false);
 
             for (IExperimentSensor experiment : getActiveSensors())
                 experiment.stopPreview();
