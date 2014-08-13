@@ -148,22 +148,6 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
         plugin.startSensorSettingsActivity(this, PERFORM_RUN_SETTINGS, sensorDataRef, analysisSpecificData, options);
     }
 
-    /*
-    private void mailData() {
-        // first save data again
-        exportTagMarkerCSVData();
-        final File tagMarkerCSVFile = getTagMarkerCSVFile();
-
-        // start mail intent
-        final Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/html");
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Experiment Data");
-        intent.putExtra(Intent.EXTRA_TEXT, "Attached is your experiment data.");
-        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(tagMarkerCSVFile));
-
-        startActivity(Intent.createChooser(intent, "Send Email"));
-    }*/
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != RESULT_OK)
