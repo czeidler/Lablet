@@ -31,31 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**
- * Main or home activity to manage experiments.
- * <p>
- * The user is able to start a new experiment and resume or delete existing experiments.
- * </p>
- */
-public class ExperimentHomeActivity extends Activity {
-    private List<IExperimentPlugin> experimentPluginList = null;
-    private ArrayList<CheckBoxListEntry> experimentList = null;
-    private CheckBoxListEntry.OnCheckBoxListEntryListener checkBoxListEntryListener;
-    private CheckBoxAdapter experimentListAdaptor = null;
-    private CheckBox selectAllCheckBox = null;
-    private MenuItem deleteItem = null;
-    private MenuItem exportItem = null;
-    private AlertDialog infoAlertBox = null;
-    private AlertDialog deleteExperimentAlertBox = null;
-    private ExperimentDirObserver experimentDirObserver = null;
-
-    static final int PERFORM_EXPERIMENT = 0;
-    static final int ANALYSE_EXPERIMENT = 1;
-
-    public ExperimentHomeActivity() {
-
-    }
-
+class InfoHelper {
     static private String getAuthorList() {
         String authors = "Authors:\n";
         authors += "\tClemens Zeidler <czei002@aucklanduni.ac.nz> (2013, 2014)\n";
@@ -64,7 +40,7 @@ public class ExperimentHomeActivity extends Activity {
 
     static public AlertDialog createAlertInfoBox(final Activity activity) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("Lablet " + ExperimentHomeActivity.getVersionString(activity));
+        builder.setTitle("Lablet " + getVersionString(activity));
         builder.setNeutralButton("leave me alone", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -106,6 +82,33 @@ public class ExperimentHomeActivity extends Activity {
         }
         return versionString;
     }
+}
+
+
+/**
+ * Main or home activity to manage experiments.
+ * <p>
+ * The user is able to start a new experiment and resume or delete existing experiments.
+ * </p>
+ */
+public class ExperimentHomeActivity extends Activity {
+    private List<IExperimentPlugin> experimentPluginList = null;
+    private ArrayList<CheckBoxListEntry> experimentList = null;
+    private CheckBoxListEntry.OnCheckBoxListEntryListener checkBoxListEntryListener;
+    private CheckBoxAdapter experimentListAdaptor = null;
+    private CheckBox selectAllCheckBox = null;
+    private MenuItem deleteItem = null;
+    private MenuItem exportItem = null;
+    private AlertDialog infoAlertBox = null;
+    private AlertDialog deleteExperimentAlertBox = null;
+    private ExperimentDirObserver experimentDirObserver = null;
+
+    static final int PERFORM_EXPERIMENT = 0;
+    static final int ANALYSE_EXPERIMENT = 1;
+
+    public ExperimentHomeActivity() {
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -126,9 +129,9 @@ public class ExperimentHomeActivity extends Activity {
         // info item
         MenuItem infoItem = menu.findItem(R.id.action_info);
         assert(infoItem != null);
-        String versionString = getVersionString(this);
+        String versionString = InfoHelper.getVersionString(this);
         infoItem.setTitle(versionString);
-        infoAlertBox = createAlertInfoBox(this);
+        infoAlertBox = InfoHelper.createAlertInfoBox(this);
         infoItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
