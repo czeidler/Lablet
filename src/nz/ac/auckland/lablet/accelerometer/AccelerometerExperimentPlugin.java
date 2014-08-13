@@ -29,7 +29,7 @@ public class AccelerometerExperimentPlugin extends AbstractExperimentPlugin {
 
     @Override
     public IExperimentSensor createExperimentSensor(Activity parentActivity) {
-        IExperimentSensor experiment = new AccelerometerExperimentSensor();
+        IExperimentSensor experiment = new AccelerometerExperimentSensor(this);
         return experiment;
     }
 

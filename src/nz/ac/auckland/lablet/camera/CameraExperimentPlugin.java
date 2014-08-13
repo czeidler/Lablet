@@ -33,7 +33,7 @@ public class CameraExperimentPlugin extends AbstractExperimentPlugin {
 
     @Override
     public IExperimentSensor createExperimentSensor(Activity parentActivity) {
-        IExperimentSensor experiment = new CameraExperimentSensor();
+        IExperimentSensor experiment = new CameraExperimentSensor(this);
         return experiment;
     }
 

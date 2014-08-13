@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
+import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
 import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.views.plotview.PlotView;
 import nz.ac.auckland.lablet.views.plotview.XYDataAdapter;
@@ -30,6 +31,10 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     private XYDataAdapter xData = new XYDataAdapter();
 
     private SensorManager sensorManager;
+
+    public AccelerometerExperimentSensor(IExperimentPlugin plugin) {
+        super(plugin);
+    }
 
 
     @Override

@@ -29,7 +29,7 @@ public class MicrophoneExperimentPlugin extends AbstractExperimentPlugin {
 
     @Override
     public IExperimentSensor createExperimentSensor(Activity parentActivity) {
-        return new MicrophoneExperimentSensor();
+        return new MicrophoneExperimentSensor(this);
     }
 
     @Override

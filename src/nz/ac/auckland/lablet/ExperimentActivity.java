@@ -302,7 +302,7 @@ public class ExperimentActivity extends FragmentActivity {
 
     private IExperimentSensor getExperiment(IExperimentPlugin plugin) {
         for (IExperimentSensor experiment : getActiveSensors()) {
-            if (experiment.getClass().getSimpleName().equals(plugin.getName()))
+            if (experiment.getPlugin() == plugin)
                 return experiment;
         }
         return null;

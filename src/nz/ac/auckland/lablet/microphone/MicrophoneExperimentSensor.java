@@ -25,6 +25,7 @@ import edu.emory.mathcs.jtransforms.dct.FloatDCT_1D;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensorView;
+import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
 import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.misc.AudioWavOutputStream;
@@ -296,6 +297,10 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     private File audioFile = null;
 
     private MicrophoneSensorData experimentData;
+
+    public MicrophoneExperimentSensor(IExperimentPlugin plugin) {
+        super(plugin);
+    }
 
     public interface ISensorDataListener {
         public void onNewAudioData(float[] amplitudes, float[] frequencies);
