@@ -186,9 +186,9 @@ public class ExperimentHomeActivity extends Activity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean atLeastOnExperimentSelected = isAtLeastOneExperimentSelected();
-        deleteItem.setVisible(atLeastOnExperimentSelected);
-        exportItem.setVisible(atLeastOnExperimentSelected);
+        boolean atLeastOneExperimentSelected = isAtLeastOneExperimentSelected();
+        deleteItem.setVisible(atLeastOneExperimentSelected);
+        exportItem.setVisible(atLeastOneExperimentSelected);
 
         return super.onPrepareOptionsMenu(menu);
     }

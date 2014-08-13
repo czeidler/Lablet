@@ -45,6 +45,7 @@ public class ScriptHomeActivity extends Activity {
     private CheckBoxListEntry.OnCheckBoxListEntryListener checkBoxListEntryListener;
     private CheckBoxAdapter existingScriptListAdaptor = null;
     private MenuItem deleteItem = null;
+    private MenuItem exportItem = null;
     private AlertDialog deleteScriptDataAlertBox = null;
     private AlertDialog infoAlertBox = null;
     private CheckBox selectAllCheckBox = null;
@@ -53,7 +54,7 @@ public class ScriptHomeActivity extends Activity {
     final String PREFERENCES_NAME = "lablet_preferences";
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         menu.clear();
         getMenuInflater().inflate(R.menu.script_activity_actions, menu);
 
@@ -113,7 +114,48 @@ public class ScriptHomeActivity extends Activity {
             }
         });
 
+        exportItem = menu.findItem(R.id.action_mail);
+        assert exportItem != null;
+        exportItem.setVisible(false);
+        exportItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if (!isAtLeastOneExistingScriptSelected())
+                    return false;
+                exportSelection();
+                return true;
+            }
+        });
+
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean atLeastOneSelected = isAtLeastOneExistingScriptSelected();
+        deleteItem.setVisible(atLeastOneSelected);
+        exportItem.setVisible(atLeastOneSelected);
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void exportSelection() {
+        List<File> exportList = new ArrayList<>();
+
+        File scriptBaseDir = getScriptUserDataDir(this);
+        for (CheckBoxListEntry entry : existingScriptList) {
+            if (!entry.getSelected())
+                continue;
+            File experimentDir = new File(scriptBaseDir, entry.getName());
+            exportList.add(experimentDir);
+        }
+
+        File[] fileArray = new File[exportList.size()];
+        for (int i = 0; i < exportList.size(); i++)
+            fileArray[i] = exportList.get(i);
+
+        ExportDirDialog dirDialog = new ExportDirDialog(this, fileArray);
+        dirDialog.show();
     }
 
     private void startStandAloneExperimentActivity() {
@@ -184,22 +226,23 @@ public class ScriptHomeActivity extends Activity {
         checkBoxListEntryListener = new CheckBoxListEntry.OnCheckBoxListEntryListener() {
             @Override
             public void onSelected(CheckBoxListEntry entry) {
-                if (deleteItem == null)
-                    return;
-
-                if (isAtLeastOneExistingScriptSelected())
-                    deleteItem.setVisible(true);
-                else
-                    deleteItem.setVisible(false);
+                updateSelectedMenuItem();
             }
         };
 
         copyResourceScripts(true);
     }
 
+    private void updateSelectedMenuItem() {
+        invalidateOptionsMenu();
+    }
+
     @Override
     public void onResume() {
         super.onResume();
+
+        selectAllCheckBox.setChecked(false);
+        invalidateOptionsMenu();
 
         updateScriptList();
         updateExistingScriptList();
