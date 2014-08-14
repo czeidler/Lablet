@@ -44,6 +44,7 @@ class PlotGestureDetector {
             if (action == MotionEvent.ACTION_DOWN) {
                 setDragging(true);
                 point.set(event.getX(), event.getY());
+                handled = true;
             } else if (action == MotionEvent.ACTION_UP) {
                 setDragging(false);
             } else if (action == MotionEvent.ACTION_MOVE && isDragging) {
@@ -199,13 +200,13 @@ public class PlotView extends ViewGroup {
 
         private float offsetRatio = 0.25f;
 
-        private int behaviourX = AUTO_RANGE_DISABLED;
-        private int behaviourY = AUTO_RANGE_DISABLED;
+        private ResizePolicy xPolicy = null;
+        private ResizePolicy yPolicy = null;
+
         private RectF previousLimits;
 
         public AutoRange(List<IPlotPainter> painters, int behaviourX, int behaviourY) {
-            this.behaviourX = behaviourX;
-            this.behaviourY = behaviourY;
+            setBehaviour(behaviourX, behaviourY);
 
             for (IPlotPainter painter : painters) {
                 AbstractPlotPainter abstractPlotPainter = (AbstractPlotPainter)painter;
@@ -284,60 +285,72 @@ public class PlotView extends ViewGroup {
             rect.bottom = temp;
         }
 
-        @Override
-        public void onLimitsChanged(DataStatistics dataStatistics) {
-            RectF limits = dataStatistics.getDataLimits();
-            RectF oldRange = getRange();
-            RectF newRange = new RectF(oldRange);
+        abstract class ResizePolicy {
+            abstract void onLimitsChanged(RectF limits, RectF oldRange, boolean flippedAxis);
+        }
 
-            boolean xFlipped = false;
-            boolean yFlipped = false;
-
-            if (oldRange.left > oldRange.right) {
-                swapX(newRange);
-                swapX(oldRange);
-                xFlipped = true;
-            }
-            if (oldRange.top < oldRange.bottom) {
-                swapY(newRange);
-                swapY(oldRange);
-                yFlipped = true;
-            }
-
-            if (oldRange.left > limits.left || oldRange.left == Float.MAX_VALUE)
-                newRange.left = limits.left;
-            if (oldRange.right < limits.right || oldRange.right == Float.MAX_VALUE)
-                newRange.right = limits.right;
-            if (oldRange.top > limits.top || oldRange.top == Float.MAX_VALUE)
-                newRange.top = limits.top;
-            if (oldRange.bottom < limits.bottom || oldRange.bottom == Float.MAX_VALUE)
-                newRange.bottom = limits.bottom;
-
-            // in case for pure zoom use the exact new limits
-            RectF limitsCopy = new RectF(limits);
-            if (behaviourX == AUTO_RANGE_ZOOM) {
-                if (xFlipped)
+        class ZoomPolicyH extends ResizePolicy {
+            @Override
+            void onLimitsChanged(RectF limits, RectF oldRange, boolean flippedAxis) {
+                RectF limitsCopy = new RectF(limits);
+                if (flippedAxis)
                     swapX(limitsCopy);
                 setXRange(limitsCopy.left, limitsCopy.right);
             }
-            if (behaviourY == AUTO_RANGE_ZOOM) {
-                if (yFlipped)
+        }
+
+        class ZoomPolicyV extends ResizePolicy {
+            @Override
+            void onLimitsChanged(RectF limits, RectF oldRange, boolean flippedAxis) {
+                RectF limitsCopy = new RectF(limits);
+                if (flippedAxis)
                     swapY(limitsCopy);
                 setYRange(limitsCopy.bottom, limitsCopy.top);
             }
+        }
 
-            if (behaviourX == AUTO_RANGE_ZOOM_EXTENDING) {
-                if (xFlipped)
+        class ZoomExtPolicyH extends ResizePolicy {
+            @Override
+            void onLimitsChanged(RectF limits, RectF oldRange, boolean flippedAxis) {
+                RectF newRange = new RectF(oldRange);
+                if (flippedAxis)
+                    swapX(newRange);
+
+                if (oldRange.left > limits.left || oldRange.left == Float.MAX_VALUE)
+                    newRange.left = limits.left;
+                if (oldRange.right < limits.right || oldRange.right == Float.MAX_VALUE)
+                    newRange.right = limits.right;
+
+                if (flippedAxis)
                     swapX(newRange);
                 setXRange(newRange.left, newRange.right);
             }
-            if (behaviourY == AUTO_RANGE_ZOOM_EXTENDING) {
-                if (yFlipped)
+        }
+
+        class ZoomExtPolicyV extends ResizePolicy {
+            @Override
+            void onLimitsChanged(RectF limits, RectF oldRange, boolean flippedAxis) {
+                RectF newRange = new RectF(oldRange);
+                if (flippedAxis)
+                    swapY(newRange);
+
+                if (oldRange.top < limits.top || oldRange.top == Float.MAX_VALUE)
+                    newRange.top = limits.top;
+                if (oldRange.bottom > limits.bottom || oldRange.bottom == Float.MAX_VALUE)
+                    newRange.bottom = limits.bottom;
+
+                if (flippedAxis)
                     swapY(newRange);
                 setYRange(newRange.bottom, newRange.top);
             }
+        }
 
-            if (behaviourX == AUTO_RANGE_SCROLL && previousLimits != null) {
+        class ScrollPolicyH extends ResizePolicy {
+            @Override
+            void onLimitsChanged(RectF limits, RectF oldRange, boolean flippedAxis) {
+                if (previousLimits == null)
+                    return;
+
                 // only offset when the limits have changed
                 int xOffset = 0;
                 if (previousLimits.left > limits.left && oldRange.left >= limits.left)
@@ -345,12 +358,19 @@ public class PlotView extends ViewGroup {
                 if (previousLimits.right < limits.right && oldRange.right <= limits.right)
                     xOffset = 1;
 
-                if (xFlipped)
+                if (flippedAxis)
                     xOffset *= -1;
                 if (xOffset != 0)
                     offsetXRange(oldRange.width() * xOffset * offsetRatio);
             }
-            if (behaviourY == AUTO_RANGE_SCROLL && previousLimits != null) {
+        }
+
+        class ScrollPolicyV extends ResizePolicy {
+            @Override
+            void onLimitsChanged(RectF limits, RectF oldRange, boolean flippedAxis) {
+                if (previousLimits == null)
+                    return;
+
                 // only offset when the limits have changed
                 int yOffset = 0;
                 if (previousLimits.top > limits.top && oldRange.top >= limits.top)
@@ -358,18 +378,68 @@ public class PlotView extends ViewGroup {
                 if (previousLimits.bottom < limits.bottom && oldRange.bottom <= limits.bottom)
                     yOffset = 1;
 
-                if (yFlipped)
+                if (flippedAxis)
                     yOffset *= -1;
                 if (yOffset != 0)
                     offsetXRange(oldRange.height() * yOffset * offsetRatio);
             }
+        }
+
+        @Override
+        public void onLimitsChanged(DataStatistics dataStatistics) {
+            RectF limits = dataStatistics.getDataLimits();
+            RectF oldRange = getRange();
+
+            boolean xFlipped = false;
+            boolean yFlipped = false;
+
+            if (oldRange.left > oldRange.right) {
+                swapX(oldRange);
+                xFlipped = true;
+            }
+            if (oldRange.top < oldRange.bottom) {
+                swapY(oldRange);
+                yFlipped = true;
+            }
+
+            if (xPolicy != null)
+                xPolicy.onLimitsChanged(limits, oldRange, xFlipped);
+            if (yPolicy != null)
+                yPolicy.onLimitsChanged(limits, oldRange, yFlipped);
 
             previousLimits = new RectF(limits);
         };
 
         public void setBehaviour(int behaviourX, int behaviourY) {
-            this.behaviourX = behaviourX;
-            this.behaviourY = behaviourY;
+            switch (behaviourX) {
+                case AUTO_RANGE_DISABLED:
+                    xPolicy = null;
+                    break;
+                case AUTO_RANGE_ZOOM:
+                    xPolicy = new ZoomPolicyH();
+                    break;
+                case AUTO_RANGE_ZOOM_EXTENDING:
+                    xPolicy = new ZoomExtPolicyH();
+                    break;
+                case AUTO_RANGE_SCROLL:
+                    xPolicy = new ScrollPolicyH();
+                    break;
+            }
+
+            switch (behaviourY) {
+                case AUTO_RANGE_DISABLED:
+                    yPolicy = null;
+                    break;
+                case AUTO_RANGE_ZOOM:
+                    yPolicy = new ZoomPolicyV();
+                    break;
+                case AUTO_RANGE_ZOOM_EXTENDING:
+                    yPolicy = new ZoomExtPolicyV();
+                    break;
+                case AUTO_RANGE_SCROLL:
+                    yPolicy = new ScrollPolicyV();
+                    break;
+            }
         }
     }
 
