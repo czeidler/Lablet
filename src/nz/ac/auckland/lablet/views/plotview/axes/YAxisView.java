@@ -117,11 +117,15 @@ public class YAxisView extends AbstractYAxis {
                 position = getAxisTopOffset() + entry.relativePosition * getAxisLength();
             else
                 position = getHeight() - getAxisBottomOffset() - entry.relativePosition * getAxisLength();
+
             drawLabel(canvas, entry, position);
         }
     }
 
     private void drawLabel(Canvas canvas, LabelPartitioner.LabelEntry labelEntry, float yPosition) {
+        if (yPosition < getAxisTopOffset() || yPosition > getHeight() - getAxisBottomOffset())
+            return;
+
         String labelText = labelEntry.label;
         Rect labelRect = new Rect();
         titlePaint.getTextBounds(labelText, 0, labelText.length(), labelRect);

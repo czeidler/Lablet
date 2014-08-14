@@ -17,7 +17,9 @@ public class LabelPartitionerLinear extends LabelPartitioner {
     private void fillLabelList(final int bestFoundLabelNumber, final float stepSize, LabelMetric labelMetric) {
         final float realDiff = Math.abs(realEnd - realStart);
         labels.clear();
-        final float realLabelStart = (int)(Math.min(realStart, realEnd) / stepSize) * stepSize;
+        float realLabelStart = (int)(Math.min(realStart, realEnd) / stepSize) * stepSize;
+        if (realLabelStart < realStart)
+            realLabelStart += stepSize;
         final float realLabelStartOffset = realLabelStart - Math.min(realStart, realEnd);
 
         for (int i = 0; i < bestFoundLabelNumber; i++) {
