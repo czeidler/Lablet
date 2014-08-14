@@ -280,8 +280,8 @@ abstract class AbstractMarkerPainter implements IMarkerDataModelPainter, MarkerD
     protected IExperimentFrameView experimentRunView = null;
     protected View markerView = null;
     protected MarkerDataModel markerData = null;
-    protected Rect frame = new Rect();
-    protected List<IMarker> markerList;
+    final protected Rect frame = new Rect();
+    final protected List<IMarker> markerList = new ArrayList<>();
 
 
     public AbstractMarkerPainter(View parent, IExperimentFrameView runView, MarkerDataModel model) {
@@ -290,7 +290,6 @@ abstract class AbstractMarkerPainter implements IMarkerDataModelPainter, MarkerD
         markerData = model;
         markerData.addListener(this);
 
-        markerList = new ArrayList<IMarker>();
         onViewSizeChanged();
     }
 
@@ -466,7 +465,7 @@ class TagMarkerDataModelPainter extends AbstractMarkerPainter {
     }
 
     public List<IMarker> getSelectableMarkerList() {
-        List<IMarker> returnMarkerList = new ArrayList<IMarker>();
+        List<IMarker> returnMarkerList = new ArrayList<>();
         int currentMarkerRow = markerData.getSelectedMarkerData();
 
         if (currentMarkerRow < 0 || currentMarkerRow >= markerList.size())
@@ -617,8 +616,8 @@ class OriginMarker extends SimpleMarker {
  */
 public class MarkerView extends ViewGroup {
     private IMarker selectedMarker = null;
-    protected List<IMarkerDataModelPainter> markerPainterList;
-    protected Rect viewFrame = null;
+    final protected List<IMarkerDataModelPainter> markerPainterList = new ArrayList<>();
+    final protected Rect viewFrame = new Rect();
 
     private int parentWidth;
     private int parentHeight;
@@ -638,10 +637,7 @@ public class MarkerView extends ViewGroup {
     private void init() {
         setWillNotDraw(false);
 
-        viewFrame = new Rect();
         getDrawingRect(viewFrame);
-
-        markerPainterList = new ArrayList<IMarkerDataModelPainter>();
     }
 
     public void release() {
@@ -688,7 +684,7 @@ public class MarkerView extends ViewGroup {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        List<IMarker> allMarkerList = new ArrayList<IMarker>();
+        List<IMarker> allMarkerList = new ArrayList<>();
         for (IMarkerDataModelPainter markerPainter : markerPainterList)
             allMarkerList.addAll(markerPainter.getSelectableMarkerList());
 

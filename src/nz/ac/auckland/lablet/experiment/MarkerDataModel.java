@@ -78,7 +78,7 @@ public class MarkerDataModel implements Calibration.ICalibrationListener {
     }
 
     public void addListener(IMarkerDataModelListener listener) {
-        listeners.add(new WeakReference<IMarkerDataModelListener>(listener));
+        listeners.add(new WeakReference<>(listener));
     }
 
     public boolean removeListener(IMarkerDataModelListener listener) {

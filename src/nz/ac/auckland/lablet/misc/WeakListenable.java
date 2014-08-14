@@ -15,12 +15,18 @@ import java.util.List;
 
 
 public class WeakListenable<Listener> {
-    private List<WeakReference<Listener>> listeners = new ArrayList<>();
+    final private List<WeakReference<Listener>> listeners = new ArrayList<>();
+
+    public void addListener(int index, Listener listener) {
+        if (hasListener(listener))
+            return;
+        listeners.add(index, new WeakReference<>(listener));
+    }
 
     public void addListener(Listener listener) {
         if (hasListener(listener))
             return;
-        listeners.add(new WeakReference<Listener>(listener));
+        listeners.add(new WeakReference<>(listener));
     }
 
     public boolean hasListener(Listener listener) {
