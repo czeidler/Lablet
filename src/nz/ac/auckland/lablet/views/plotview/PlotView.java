@@ -298,7 +298,7 @@ public class PlotView extends ViewGroup {
                 swapX(oldRange);
                 xFlipped = true;
             }
-            if (oldRange.top > oldRange.bottom) {
+            if (oldRange.top < oldRange.bottom) {
                 swapY(newRange);
                 swapY(oldRange);
                 yFlipped = true;
@@ -313,15 +313,7 @@ public class PlotView extends ViewGroup {
             if (oldRange.bottom < limits.bottom || oldRange.bottom == Float.MAX_VALUE)
                 newRange.bottom = limits.bottom;
 
-            if (newRange.height() == 0) {
-                newRange.top -= 1;
-                newRange.bottom += 1;
-            }
-            if (newRange.width() == 0) {
-                newRange.left -= 1;
-                newRange.right += 1;
-            }
-
+            // in case for pure zoom use the exact new limits
             RectF limitsCopy = new RectF(limits);
             if (behaviourX == AUTO_RANGE_ZOOM) {
                 if (xFlipped)

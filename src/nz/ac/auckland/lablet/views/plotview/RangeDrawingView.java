@@ -107,12 +107,12 @@ public class RangeDrawingView extends ViewGroup {
         float diff = Math.abs(range.end - range.start);
         if (minXRange > 0 && minXRange > diff) {
             final float middle = (range.end + range.start) / 2;
-            if (range.end > range.start) {
-                range.end = middle + diff / 2;
-                range.start = middle - diff / 2;
+            if (range.end >= range.start) {
+                range.end = middle + minXRange / 2;
+                range.start = middle - minXRange / 2;
             } else {
-                range.start = middle + diff / 2;
-                range.end = middle - diff / 2;
+                range.start = middle + minXRange / 2;
+                range.end = middle - minXRange / 2;
             }
         }
     }
@@ -140,12 +140,12 @@ public class RangeDrawingView extends ViewGroup {
         float diff = Math.abs(range.end - range.start);
         if (minYRange > 0 && minYRange > diff) {
             final float middle = (range.end + range.start) / 2;
-            if (range.end > range.start) {
-                range.end = middle + diff / 2;
-                range.start = middle - diff / 2;
+            if (range.end >= range.start) {
+                range.end = middle + minYRange / 2;
+                range.start = middle - minYRange / 2;
             } else {
-                range.start = middle + diff / 2;
-                range.end = middle - diff / 2;
+                range.start = middle + minYRange / 2;
+                range.end = middle - minYRange / 2;
             }
         }
     }

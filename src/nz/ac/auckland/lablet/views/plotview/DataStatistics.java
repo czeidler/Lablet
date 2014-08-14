@@ -75,6 +75,7 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
             dataLimits = new RectF(x, y, x, y);
             sumX = x;
             sumY = y;
+            notifyLimitsChanged();
             return;
         }
 
