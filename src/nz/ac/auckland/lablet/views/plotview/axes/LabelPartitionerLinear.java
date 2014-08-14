@@ -9,48 +9,25 @@ package nz.ac.auckland.lablet.views.plotview.axes;
 
 
 public class LabelPartitionerLinear extends LabelPartitioner {
-    boolean finishingLabelsMatchEnds = true;
 
     private float toScreen(float realValue) {
         return axisExtent * realValue / Math.abs(realEnd - realStart);
     }
 
-    private void fillLabelList(int bestFoundLabelNumber, float stepSize, LabelMetric labelMetric) {
-        float realDiff = Math.abs(realEnd - realStart);
+    private void fillLabelList(final int bestFoundLabelNumber, final float stepSize, LabelMetric labelMetric) {
+        final float realDiff = Math.abs(realEnd - realStart);
         labels.clear();
-        float realLabelStart = (int)(Math.min(realStart, realEnd) / stepSize) * stepSize;
-        float realLabelStartOffset = realLabelStart - Math.min(realStart, realEnd);
+        final float realLabelStart = (int)(Math.min(realStart, realEnd) / stepSize) * stepSize;
+        final float realLabelStartOffset = realLabelStart - Math.min(realStart, realEnd);
+
         for (int i = 0; i < bestFoundLabelNumber; i++) {
             LabelEntry entry = new LabelEntry();
-            float realValue = realLabelStart + i * stepSize;
+            final float realValue = realLabelStart + i * stepSize;
             entry.realValue = realValue;
             entry.relativePosition = (realLabelStartOffset + i * stepSize) / realDiff;
             entry.label = LabelPartitionerHelper.createLabel(realValue, labelMetric);
 
             labels.add(entry);
-        }
-    }
-
-    private void updateFinishingLabels(float minSpacing, LabelMetric labelMetric) {
-        // fill finishing labels
-        if (finishingLabelsMatchEnds && labels.size() >= 2) {
-            LabelEntry entryEnd = labels.get(labels.size() - 1);
-            if (Math.abs(toScreen(entryEnd.realValue) - toScreen(realEnd)) > minSpacing) {
-                entryEnd = new LabelEntry();
-                labels.add(entryEnd);
-            }
-            entryEnd.realValue = realEnd;
-            entryEnd.relativePosition = 1;
-            entryEnd.label = LabelPartitionerHelper.createLabel(realEnd, labelMetric);
-
-            LabelEntry entryStart = labels.get(0);
-            if (Math.abs(toScreen(entryStart.realValue) - toScreen(realStart)) > minSpacing) {
-                entryStart = new LabelEntry();
-                labels.add(0, entryStart);
-            }
-            entryStart.realValue = realStart;
-            entryStart.relativePosition = 0;
-            entryStart.label = LabelPartitionerHelper.createLabel(realStart, labelMetric);
         }
     }
 
@@ -86,8 +63,6 @@ public class LabelPartitionerLinear extends LabelPartitioner {
         LabelMetric labelMetric = LabelPartitionerHelper.calculateLabelMetric(stepFactor, realStart, realEnd);
 
         fillLabelList(bestFoundLabelNumber, stepSize, labelMetric);
-
-        updateFinishingLabels(minSpacing, labelMetric);
     }
 
     private float getStepFactor(int index) {

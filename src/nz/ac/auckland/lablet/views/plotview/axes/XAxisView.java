@@ -96,29 +96,23 @@ public class XAxisView extends AbstractXAxis {
             else
                 position = getAxisLeftOffset() + entry.relativePosition * getAxisLength();
 
-            // fix first and last title position
-            if (i == 0)
-                drawLabel(canvas, entry, position, true, false);
-            else if (i == labels.size() - 1)
-                drawLabel(canvas, entry, position, false, true);
-            else
-                drawLabel(canvas, entry, position, false, false);
+            drawLabel(canvas, entry, position);
         }
     }
 
-    private void drawLabel(Canvas canvas, LabelPartitioner.LabelEntry labelEntry, float xPosition, boolean isFirst,
-                           boolean isLast) {
+    private void drawLabel(Canvas canvas, LabelPartitioner.LabelEntry labelEntry, float xPosition) {
+        if (xPosition < getAxisLeftOffset() || xPosition > getWidth() - getAxisRightOffset())
+            return;
+
         String labelText = labelEntry.label;
         Rect labelRect = new Rect();
         titlePaint.getTextBounds(labelText, 0, labelText.length(), labelRect);
 
-        float labelPosition = xPosition;
-        if (isFirst)
-            labelPosition = xPosition;
-        else if (isLast)
-            labelPosition -= labelRect.width();
-        else
-            labelPosition -= labelRect.width() / 2;
+        float labelPosition = xPosition - labelRect.width() / 2;
+        if (labelPosition > getWidth() - labelRect.width())
+            labelPosition = getWidth() - labelRect.width();
+        else if (labelPosition < 0)
+            labelPosition = 0;
 
         canvas.drawText(labelText, labelPosition, settings.getFullTickSize() - titlePaint.ascent(), titlePaint);
 
