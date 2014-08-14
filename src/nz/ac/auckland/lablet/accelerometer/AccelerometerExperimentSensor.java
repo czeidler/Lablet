@@ -43,13 +43,15 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
         view.getTitleView().setTitle("Accelerometer");
         view.setXRange(0, 20000);
         view.setYRange(-0.5f, 0.5f);
-        view.setDraggable(true);
+        view.getBackgroundPainter().setShowXGrid(true);
+        view.getBackgroundPainter().setShowYGrid(true);
 
         XYPainter painter = new XYPainter();
         painter.setDataAdapter(xData);
         view.addPlotPainter(painter);
 
         view.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_ZOOM_EXTENDING);
+        //setListener(view);
         return view;
     }
 

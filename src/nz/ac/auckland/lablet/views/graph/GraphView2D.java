@@ -188,6 +188,9 @@ public class GraphView2D extends PlotView {
         setMinXRange(this.adapter.getXAxis().getMinRange().floatValue());
         setMinYRange(this.adapter.getYAxis().getMinRange().floatValue());
 
+        getBackgroundPainter().setShowXGrid(true);
+        getBackgroundPainter().setShowYGrid(true);
+
         painter = new XYPainter();
         painter.setDataAdapter(adapter);
         addPlotPainter(painter);
