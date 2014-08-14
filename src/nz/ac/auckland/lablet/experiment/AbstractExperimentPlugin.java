@@ -19,24 +19,46 @@ import java.util.List;
  * Abstract base class for experiment plugins.
  */
 abstract public class AbstractExperimentPlugin implements IExperimentPlugin {
+
+    static public void packStartExperimentIntent(Intent intent, List<IExperimentPlugin> plugins, Bundle options) {
+        String[] pluginNames = null;
+        if (plugins.size() > 0) {
+            pluginNames = new String[plugins.size()];
+            for (int i = 0; i < plugins.size(); i++) {
+                IExperimentPlugin plugin = plugins.get(i);
+                pluginNames[i] = plugin.getName();
+            }
+        }
+
+        packStartExperimentIntent(intent, pluginNames, options);
+    }
+
     /**
      * Helper method to pack the option bundle correctly.
      * @param intent the Intent where the data should be packed to
      * @param plugins
      * @param options the options for the activity
      */
-    static public void packStartExperimentIntent(Intent intent, List<IExperimentPlugin> plugins, Bundle options) {
-        if (plugins.size() > 0) {
-            String[] pluginNames = new String[plugins.size()];
-            for (int i = 0; i < plugins.size(); i++) {
-                IExperimentPlugin plugin = plugins.get(i);
-                pluginNames[i] = plugin.getName();
-            }
-            intent.putExtra("plugins", pluginNames);
-        }
+    static public void packStartExperimentIntent(Intent intent, String[] plugins, Bundle options) {
+        if (plugins != null)
+            intent.putExtra("plugins", plugins);
 
         if (options != null)
             intent.putExtra("options", options);
+    }
+
+    static public String[] unpackStartExperimentPlugins(Intent intent) {
+        Bundle extras = intent.getExtras();
+        if (extras == null)
+            return null;
+        return extras.getStringArray("plugins");
+    }
+
+    static public Bundle unpackStartExperimentOptions(Intent intent) {
+        Bundle extras = intent.getExtras();
+        if (extras == null)
+            return null;
+        return extras.getBundle("options");
     }
 
     /**

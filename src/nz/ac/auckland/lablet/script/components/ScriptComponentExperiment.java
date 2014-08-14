@@ -37,7 +37,6 @@ public class ScriptComponentExperiment {
     }
     public void setExperimentPath(String path) {
         experimentPath = path;
-
     }
 
     public SensorAnalysis getExperimentAnalysis(Context context) {

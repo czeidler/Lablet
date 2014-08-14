@@ -17,7 +17,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.*;
+import nz.ac.auckland.lablet.camera.CameraExperimentPlugin;
 import nz.ac.auckland.lablet.camera.CameraSensorData;
+import nz.ac.auckland.lablet.experiment.AbstractExperimentPlugin;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentLoader;
 import nz.ac.auckland.lablet.experiment.SensorData;
@@ -132,7 +134,8 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
         takenExperimentInfo = (CheckedTextView)view.findViewById(R.id.takenExperimentInfo);
         assert takenExperimentInfo != null;
 
-        updateExperimentPath();
+        if (!cameraComponent.getExperiment().getExperimentPath().equals(""))
+            updateExperimentPath();
     }
 
     @Override
@@ -147,6 +150,8 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
         Intent intent = new Intent(getContext(), ExperimentActivity.class);
         Bundle options = new Bundle();
         options.putBoolean("show_analyse_menu", false);
+        options.putBoolean("sensors_editable", false);
+        options.putInt("max_number_of_runs", 1);
         // requested resolution
         int requestedWidth = cameraComponent.getRequestedVideoWidth();
         int requestedHeight = cameraComponent.getRequestedVideoHeight();
@@ -155,7 +160,11 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
             options.putInt("requested_video_height", requestedHeight);
         }
         options.putString("experiment_base_directory", getScriptExperimentsDir().getPath());
+
+        String[] pluginName = new String[] {new CameraExperimentPlugin().getName()};
+        AbstractExperimentPlugin.packStartExperimentIntent(intent, pluginName, options);
         intent.putExtras(options);
+
         startActivityForResult(intent, PERFORM_EXPERIMENT);
     }
 
@@ -193,8 +202,7 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
     }
 
     private void setExperimentPath(String experimentPath) {
-        ScriptComponentExperiment experiment = cameraComponent.getExperiment();
-        experiment.setExperimentPath(experimentPath);
+        cameraComponent.getExperiment().setExperimentPath(experimentPath);
 
         updateExperimentPath();
     }
@@ -212,8 +220,8 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
 
                 // TODO fix if there are more than one runs or sensors
                 SensorData sensorData = experimentData.getRuns().get(0).sensors.get(0).sensorData;
-                CameraSensorData experiment = (CameraSensorData)sensorData;
-                return new File(experiment.getStorageDir(), experiment.getVideoFileName());
+                CameraSensorData cameraSensorData = (CameraSensorData)sensorData;
+                return new File(cameraSensorData.getStorageDir(), cameraSensorData.getVideoFileName());
             }
 
             @Override

@@ -27,6 +27,7 @@ import java.util.*;
 
 
 class ExperimentRunViewManager {
+    private int maxNumberOfRuns = -1;
     final private Experiment experiment;
 
     private ImageButton addRunGroupButton = null;
@@ -51,7 +52,8 @@ class ExperimentRunViewManager {
         }
     };
 
-    public ExperimentRunViewManager(final Activity activity, final Experiment experiment) {
+    public ExperimentRunViewManager(final Activity activity, final int maxNumberOfRuns, final Experiment experiment) {
+        this.maxNumberOfRuns = maxNumberOfRuns;
         this.experiment = experiment;
 
         addRunGroupButton = (ImageButton)activity.findViewById(R.id.addRunButton);
@@ -71,6 +73,13 @@ class ExperimentRunViewManager {
 
                 experiment.addExperimentRunGroup(experimentRun);
                 setCurrentExperimentRunGroup(experimentRun);
+
+                if (maxNumberOfRuns > 0) {
+                    // check if we have the maximal number of runs
+                    List<ExperimentRun> runGroups = experiment.getExperimentRuns();
+                    if (runGroups.size() >= maxNumberOfRuns)
+                        addRunGroupButton.setEnabled(false);
+                }
             }
         });
 
@@ -100,7 +109,17 @@ class ExperimentRunViewManager {
 
         experiment.addListener(experimentListener);
 
+        if (maxNumberOfRuns == 1)
+            setVisibility(View.INVISIBLE);
+
         updateViews();
+    }
+
+    private void setVisibility(int visibility) {
+        addRunGroupButton.setVisibility(visibility);
+        nextRunGroupButton.setVisibility(visibility);
+        prevRunGroupButton.setVisibility(visibility);
+        runGroupView.setVisibility(visibility);
     }
 
     private void updateViews() {
@@ -229,14 +248,6 @@ public class ExperimentActivity extends FragmentActivity {
                 return true;
             }
         });
-        Intent intent = getIntent();
-        if (intent != null) {
-            Bundle options = intent.getExtras();
-            if (options != null) {
-                boolean showAnalyseMenu = options.getBoolean("show_analyse_menu", true);
-                analyseMenuItem.setVisible(showAnalyseMenu);
-            }
-        }
 
         // settings item
         MenuItem settingsMenu = menu.findItem(R.id.action_settings);
@@ -265,6 +276,20 @@ public class ExperimentActivity extends FragmentActivity {
                 return true;
             }
         });
+
+        // config the menu
+        Bundle options = AbstractExperimentPlugin.unpackStartExperimentOptions(getIntent());
+        if (options != null) {
+            boolean showAnalyseMenu = options.getBoolean("show_analyse_menu", true);
+            analyseMenuItem.setVisible(showAnalyseMenu);
+
+            boolean sensorsEditable = options.getBoolean("sensors_editable", true);
+            sensorMenu.setVisible(sensorsEditable);
+            if (!sensorsEditable) {
+                if (getExperiment().getCurrentExperimentRun().getExperimentSensors().size() == 1)
+                    viewMenu.setVisible(false);
+            }
+        }
 
         return true;
     }
@@ -389,13 +414,12 @@ public class ExperimentActivity extends FragmentActivity {
         if (extras != null) {
             if (extras.containsKey("experiment_base_directory"))
                 experimentBaseDir = new File(extras.getString("experiment_base_directory"));
-
-            String[] pluginNames = extras.getStringArray("plugins");
-            if (pluginNames != null) {
-                for (String pluginName : pluginNames) {
-                    IExperimentPlugin plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(pluginName);
-                    experimentList.add(plugin.getName());
-                }
+        }
+        String[] pluginNames = AbstractExperimentPlugin.unpackStartExperimentPlugins(intent);
+        if (pluginNames != null) {
+            for (String pluginName : pluginNames) {
+                IExperimentPlugin plugin = ExperimentPluginFactory.getFactory().findExperimentPlugin(pluginName);
+                experimentList.add(plugin.getName());
             }
         }
 
@@ -421,8 +445,10 @@ public class ExperimentActivity extends FragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // make sure the experiment gets loaded (but it will be loaded beforehand from the fragments in onCreateView)
-        if (getExperiment() == null)
+        if (getExperiment() == null) {
             finish();
+            return;
+        }
 
         // gui
         setContentView(R.layout.experiment_recording);
@@ -473,7 +499,13 @@ public class ExperimentActivity extends FragmentActivity {
             }
         });
 
-        experimentRunViewManager = new ExperimentRunViewManager(this, experiment);
+        int maxNumberOfRuns = -1;
+        Bundle options = AbstractExperimentPlugin.unpackStartExperimentOptions(getIntent());
+        if (options != null) {
+            maxNumberOfRuns = options.getInt("max_number_of_runs", -1);
+        }
+
+        experimentRunViewManager = new ExperimentRunViewManager(this, maxNumberOfRuns, experiment);
     }
 
     private void updateAdapter() {
