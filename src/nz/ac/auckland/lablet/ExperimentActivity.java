@@ -613,37 +613,19 @@ public class ExperimentActivity extends FragmentActivity {
             builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    try {
-                        experiment.finishExperiment(true);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    setResult(RESULT_OK);
-                    finish();
+                    finishExperiment(false);
                 }
             });
             builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    try {
-                        experiment.finishExperiment(false);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    setResult(RESULT_CANCELED);
-                    finish();
+                    finishDiscardExperiment();
                 }
             });
 
             builder.create().show();
         } else {
-            try {
-                experiment.finishExperiment(false);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            setResult(RESULT_CANCELED);
-            finish();
+            finishDiscardExperiment();
         }
     }
 
@@ -672,6 +654,17 @@ public class ExperimentActivity extends FragmentActivity {
                 dataTaken = false;
         }
         return dataTaken;
+    }
+
+    private void finishDiscardExperiment() {
+        try {
+            experiment.finishExperiment(false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        setResult(RESULT_CANCELED);
+        finish();
     }
 
     private void finishExperiment(boolean startAnalysis) {
