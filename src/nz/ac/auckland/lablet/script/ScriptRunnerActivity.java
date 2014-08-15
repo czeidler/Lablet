@@ -33,7 +33,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
     private Script script = null;
     private ViewPager pager = null;
     private ScriptFragmentPagerAdapter pagerAdapter = null;
-    private List<ScriptComponentTree> activeChain = new ArrayList<ScriptComponentTree>();
+    private List<ScriptComponentTree> activeChain = new ArrayList<>();
 
     private File scriptUserDataDir = null;
     private File scriptFile = null;
@@ -106,11 +106,6 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
 
     private int createFormIntent() {
         Intent intent = getIntent();
-        if (intent == null) {
-            lastErrorMessage = "intent is null";
-            return -1;
-        }
-
         final String scriptPath = intent.getStringExtra("script_path");
         final String userDataDir = intent.getStringExtra("script_user_data_dir");
 
@@ -146,7 +141,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
         saveScriptStateToFile();
     }
 
-    protected boolean loadScript(File scriptFile) {
+    private boolean loadScript(File scriptFile) {
         ScriptComponentFragmentFactory factory = new ScriptComponentFragmentFactory();
         LuaScriptLoader loader = new LuaScriptLoader(factory);
         script = loader.load(scriptFile);
@@ -284,8 +279,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
 
     private class ScriptFragmentPagerAdapter extends FragmentStatePagerAdapter {
         private List<ScriptComponentTree> components;
-        private Map<ScriptComponentTree, ScriptComponentGenericFragment> fragmentMap
-                = new HashMap<ScriptComponentTree, ScriptComponentGenericFragment>();
+        private Map<ScriptComponentTree, ScriptComponentGenericFragment> fragmentMap = new HashMap<>();
 
         public ScriptFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager,
                                           List<ScriptComponentTree> components) {
