@@ -20,12 +20,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.misc.StorageLib;
-import nz.ac.auckland.lablet.views.CheckBoxAdapter;
+import nz.ac.auckland.lablet.views.*;
 import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptRunnerActivity;
-import nz.ac.auckland.lablet.views.CheckBoxListEntry;
-import nz.ac.auckland.lablet.views.InfoBarBackgroundDrawable;
-import nz.ac.auckland.lablet.views.InfoSideBar;
 
 import java.io.*;
 import java.util.ArrayList;

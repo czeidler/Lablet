@@ -34,26 +34,23 @@ public class ExperimentRunFragment extends android.support.v4.app.Fragment {
 
     private IExperimentSensor findExperimentFromArguments(Activity activity) {
         String name = getArguments().getString("experiment_name", "");
-        ExperimentActivity experimentActivity = (ExperimentActivity)activity;
-        List<IExperimentSensor> list = experimentActivity.getActiveSensors();
-        for (IExperimentSensor experimentRun : list) {
-            if (experimentRun.getClass().getSimpleName().equals(name))
-                return experimentRun;
+        List<IExperimentSensor> activeSensors = ((ExperimentActivity)activity).getActiveSensors();
+        IExperimentSensor foundSensor = null;
+        for (IExperimentSensor sensor : activeSensors) {
+            String sensorName = sensor.getClass().getSimpleName();
+            if (sensorName.equals(name)) {
+                foundSensor = sensor;
+                break;
+            }
         }
-        return null;
+        return foundSensor;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        experimentRun = findExperimentFromArguments(getActivity());
         return experimentRun.createExperimentView(getActivity());
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        experimentRun = findExperimentFromArguments(activity);
     }
 
     public IExperimentSensor getExperimentRun() {

@@ -35,7 +35,7 @@ public class ExportDirDialog extends AlertDialog {
     private List<String> outputFiles = new ArrayList<>();
     private boolean canceled = false;
 
-    protected ExportDirDialog(Activity activity, File[] directories) {
+    public ExportDirDialog(Activity activity, File[] directories) {
         super(activity);
 
         setCancelable(false);

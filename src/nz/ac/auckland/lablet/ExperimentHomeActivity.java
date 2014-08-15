@@ -21,10 +21,7 @@ import nz.ac.auckland.lablet.experiment.AbstractExperimentPlugin;
 import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
 import nz.ac.auckland.lablet.experiment.ExperimentPluginFactory;
 import nz.ac.auckland.lablet.misc.StorageLib;
-import nz.ac.auckland.lablet.views.CheckBoxAdapter;
-import nz.ac.auckland.lablet.views.CheckBoxListEntry;
-import nz.ac.auckland.lablet.views.InfoBarBackgroundDrawable;
-import nz.ac.auckland.lablet.views.InfoSideBar;
+import nz.ac.auckland.lablet.views.*;
 
 import java.io.File;
 import java.util.ArrayList;
