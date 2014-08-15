@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet;
+package nz.ac.auckland.lablet.views;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -18,8 +18,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.misc.LabletDataProvider;
 import nz.ac.auckland.lablet.misc.StreamHelper;
+import nz.ac.auckland.lablet.misc.ZipHelper;
 
 import java.io.File;
 import java.io.IOException;
