@@ -47,7 +47,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
 
         int lastSelectedFragment;
 
-        // if we get restored, first of all load the script since the fragments rely on the script components...
+        // load the script
         if (savedInstanceState != null) {
             final String userDataDir = savedInstanceState.getString("script_user_data_dir");
             if (userDataDir == null) {
@@ -68,6 +68,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             }
         }
 
+        // gui
         setContentView(R.layout.experiment_analyser);
         // Instantiate a ViewPager and a PagerAdapter.
         pager = (ViewPager)findViewById(R.id.pager);
