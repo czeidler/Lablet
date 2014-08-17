@@ -307,6 +307,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         if (savedInstanceState.containsKey("unsaved_recording")) {
             String filePath = savedInstanceState.getString("unsaved_recording");
             videoFile = new File(filePath);
+            unsavedExperimentData = true;
         }
     }
 
