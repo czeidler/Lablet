@@ -517,6 +517,10 @@ public class ExperimentActivity extends FragmentActivity {
         }
     }
 
+    public List<IExperimentSensor> getCurrentSensors() {
+        return activeExperimentRun.getExperimentSensors();
+    }
+
     private void setCurrentSensor(IExperimentSensor sensor) {
         sensor.getExperimentRun().setCurrentExperimentRun(sensor);
         invalidateOptionsMenu();
@@ -840,7 +844,7 @@ class ExperimentRunFragmentPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public android.support.v4.app.Fragment getItem(int position) {
         List<IExperimentSensor> list = experimentRun.getExperimentSensors();
-        return new ExperimentRunFragment(list.get(position).getClass().getSimpleName());
+        return new ExperimentRunFragment(list.get(position));
     }
 
     @Override

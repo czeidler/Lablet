@@ -18,14 +18,12 @@ import java.util.List;
 
 
 public class ExperimentRunFragment extends android.support.v4.app.Fragment {
-    private IExperimentSensor experimentRun;
+    private IExperimentSensor sensor;
 
-    public ExperimentRunFragment(String experimentRunName) {
+    public ExperimentRunFragment(IExperimentSensor sensor) {
         super();
 
-        Bundle args = new Bundle();
-        args.putString("experiment_name", experimentRunName);
-        setArguments(args);
+        this.sensor = sensor;
     }
 
     public ExperimentRunFragment() {
@@ -49,11 +47,25 @@ public class ExperimentRunFragment extends android.support.v4.app.Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        experimentRun = findExperimentFromArguments(getActivity());
-        return experimentRun.createExperimentView(getActivity());
+        if (savedInstanceState != null) {
+            ExperimentActivity activity = (ExperimentActivity)getActivity();
+            int index = savedInstanceState.getInt("component", -1);
+            if (index < 0)
+                return null;
+            sensor = activity.getCurrentSensors().get(index);
+        }
+        return sensor.createExperimentView(getActivity());
     }
 
-    public IExperimentSensor getExperimentRun() {
-        return experimentRun;
+    @Override
+    public void onSaveInstanceState (Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        ExperimentActivity activity = (ExperimentActivity)getActivity();
+        outState.putInt("component", activity.getCurrentSensors().indexOf(sensor));
+    }
+
+    public IExperimentSensor getSensor() {
+        return sensor;
     }
 }
