@@ -762,6 +762,8 @@ public class ExperimentActivity extends FragmentActivity {
         public void enterState() {
             startButton.setEnabled(false);
             stopButton.setEnabled(true);
+            settingsMenuItem.setEnabled(false);
+            sensorMenuItem.setEnabled(false);
             newButton.setVisibility(View.INVISIBLE);
 
             analyseMenuItem.setEnabled(false);
@@ -803,6 +805,8 @@ public class ExperimentActivity extends FragmentActivity {
         public void enterState() {
             startButton.setEnabled(false);
             stopButton.setEnabled(false);
+            settingsMenuItem.setEnabled(false);
+            sensorMenuItem.setEnabled(false);
             newButton.setVisibility(View.VISIBLE);
 
             for (IExperimentSensor experiment : getActiveSensors())
