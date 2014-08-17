@@ -86,9 +86,10 @@ public class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGe
     private GraphView2D graphView = null;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
+        if (component == null)
+            return view;
 
         View child = setChild(R.layout.script_component_analyze_experiment);
         assert child != null;

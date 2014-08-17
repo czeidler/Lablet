@@ -43,33 +43,30 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         int lastSelectedFragment;
 
         // if we get restored, first of all load the script since the fragments rely on the script components...
         if (savedInstanceState != null) {
             final String userDataDir = savedInstanceState.getString("script_user_data_dir");
             if (userDataDir == null) {
-                super.onCreate(savedInstanceState);
                 showErrorAndFinish("Can't start script from saved instance state (user data directory is null)");
                 return;
             }
             scriptUserDataDir = new File(userDataDir);
             lastSelectedFragment = loadScriptStateFromFile(scriptUserDataDir);
             if (lastSelectedFragment < 0) {
-                super.onCreate(savedInstanceState);
                 showErrorAndFinish("Can't continue script:", lastErrorMessage);
                 return;
             }
         } else {
             lastSelectedFragment = createFormIntent();
             if (lastSelectedFragment < 0) {
-                super.onCreate(savedInstanceState);
                 showErrorAndFinish("Can't start script", lastErrorMessage);
                 return;
             }
         }
-
-        super.onCreate(savedInstanceState);
 
         setContentView(R.layout.experiment_analyser);
         // Instantiate a ViewPager and a PagerAdapter.

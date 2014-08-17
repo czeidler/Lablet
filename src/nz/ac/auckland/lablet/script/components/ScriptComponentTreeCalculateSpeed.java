@@ -216,11 +216,12 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     protected MarkerDataModel tagMarker = null;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        ScriptComponentTreeCalculateSpeed speedComponent = (ScriptComponentTreeCalculateSpeed)component;
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
+        if (component == null)
+            return view;
+
+        ScriptComponentTreeCalculateSpeed speedComponent = (ScriptComponentTreeCalculateSpeed)component;
 
         View child = setChild(R.layout.script_component_calculate_speed);
         assert child != null;

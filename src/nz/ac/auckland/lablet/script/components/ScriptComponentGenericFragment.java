@@ -50,14 +50,19 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
             component.setListener(this);
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    protected boolean ensureScriptComponent(Bundle savedInstanceState) {
+        if (component != null)
+            return true;
         if (savedInstanceState == null)
-            return;
+            return false;
 
-        setScriptComponent(savedInstanceState.getInt("componentIndex"));
+        int index = savedInstanceState.getInt("componentIndex", -1);
+        if (index < 0)
+            return false;
+        setScriptComponent(index);
+        if (component == null)
+            return false;
+        return true;
     }
 
     @Override
@@ -73,12 +78,11 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.script_component_generic_fragment, container, false);
         assert view != null;
 
-        if (component == null)
+        if (!ensureScriptComponent(savedInstanceState))
             return view;
 
         titleView = (TextView)view.findViewById(R.id.titleTextView);

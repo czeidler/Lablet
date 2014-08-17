@@ -25,8 +25,7 @@ public class ScriptComponentSheetFragment extends ScriptComponentGenericFragment
     private int childViewId;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         childViewId = -1;
 
         View view = super.onCreateView(inflater, container, savedInstanceState);
