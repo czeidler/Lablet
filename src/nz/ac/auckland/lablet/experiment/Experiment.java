@@ -20,9 +20,9 @@ import java.util.List;
 
 public class Experiment {
     public interface IExperimentListener {
-        public void onExperimentRunGroupAdded(ExperimentRun runGroup);
-        public void onExperimentRunGroupRemoved(ExperimentRun runGroup);
-        public void onCurrentRunGroupChanged(ExperimentRun newGroup, ExperimentRun oldGroup);
+        public void onExperimentRunAdded(ExperimentRun runGroup);
+        public void onExperimentRunRemoved(ExperimentRun runGroup);
+        public void onCurrentRunChanged(ExperimentRun newGroup, ExperimentRun oldGroup);
     }
 
     final private List<ExperimentRun> experimentRuns = new ArrayList<>();
@@ -45,7 +45,7 @@ public class Experiment {
     }
 
     public void addListener(IExperimentListener listener) {
-        listeners.add(new WeakReference<IExperimentListener>(listener));
+        listeners.add(new WeakReference<>(listener));
     }
 
     public Activity getActivity() {
@@ -96,7 +96,7 @@ public class Experiment {
         runGroup.setExperiment(this, "run" + Integer.toString(createRunGroupId()));
         experimentRuns.add(runGroup);
 
-        notifyExperimentRunGroupAdded(runGroup);
+        notifyExperimentRunAdded(runGroup);
         return true;
     }
 
@@ -116,14 +116,14 @@ public class Experiment {
                 setCurrentExperimentRun(null);
         }
 
-        notifyExperimentRunGroupRemoved(runGroup);
+        notifyExperimentRunRemoved(runGroup);
     }
 
-    public void setCurrentExperimentRun(ExperimentRun runGroup) {
-        ExperimentRun oldGroup = currentExperimentRun;
-        currentExperimentRun = runGroup;
+    public void setCurrentExperimentRun(ExperimentRun experimentRun) {
+        ExperimentRun oldRun = currentExperimentRun;
+        currentExperimentRun = experimentRun;
 
-        notifyCurrentExperimentRunGroupChanged(runGroup, oldGroup);
+        notifyCurrentExperimentRunChanged(experimentRun, oldRun);
     }
 
     public ExperimentRun getCurrentExperimentRun() {
@@ -177,18 +177,18 @@ public class Experiment {
         return hardListeners;
     }
 
-    private void notifyCurrentExperimentRunGroupChanged(ExperimentRun runGroup, ExperimentRun oldGroup) {
+    private void notifyCurrentExperimentRunChanged(ExperimentRun runGroup, ExperimentRun oldGroup) {
         for (IExperimentListener listener : getListeners())
-            listener.onCurrentRunGroupChanged(runGroup, oldGroup);
+            listener.onCurrentRunChanged(runGroup, oldGroup);
     }
 
-    private void notifyExperimentRunGroupAdded(ExperimentRun runGroup) {
+    private void notifyExperimentRunAdded(ExperimentRun runGroup) {
         for (IExperimentListener listener : getListeners())
-            listener.onExperimentRunGroupAdded(runGroup);
+            listener.onExperimentRunAdded(runGroup);
     }
 
-    private void notifyExperimentRunGroupRemoved(ExperimentRun runGroup) {
+    private void notifyExperimentRunRemoved(ExperimentRun runGroup) {
         for (IExperimentListener listener : getListeners())
-            listener.onExperimentRunGroupRemoved(runGroup);
+            listener.onExperimentRunRemoved(runGroup);
     }
 }

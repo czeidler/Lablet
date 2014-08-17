@@ -96,7 +96,7 @@ public class ExperimentData {
 
     private ExperimentData.RunEntry loadRunData(Context context, File runDir) {
         ExperimentRunData groupData = new ExperimentRunData();
-        File groupFile = new File(runDir, ExperimentRun.EXPERIMENT_RUN_GROUP_FILE_NAME);
+        File groupFile = new File(runDir, ExperimentRun.EXPERIMENT_RUN_FILE_NAME);
         try {
             groupData.loadFromFile(groupFile);
         } catch (IOException e) {

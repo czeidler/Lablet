@@ -74,12 +74,12 @@ public class ExperimentRun {
     private ExperimentRunData data = new ExperimentRunData();
 
     final private List<IExperimentSensor> experimentSensors = new ArrayList<>();
-    private IExperimentSensor currentExperimentRun = null;
+    private IExperimentSensor currentSensor = null;
     private Experiment experiment;
     private String subStorageDirectory;
     private Activity experimentActivity;
 
-    final static public String EXPERIMENT_RUN_GROUP_FILE_NAME = "experiment_run_group.xml";
+    final static public String EXPERIMENT_RUN_FILE_NAME = "experiment_run.xml";
 
     static public ExperimentRun createExperimentRunGroup(List<String> experimentRuns, Activity activity) {
         String[] experimentRunsArray = new String[experimentRuns.size()];
@@ -111,8 +111,8 @@ public class ExperimentRun {
 
     public void activateSensors(Activity activity) {
         if (experimentActivity != null) {
-            for (IExperimentSensor experimentRun : experimentSensors)
-                experimentRun.destroy();
+            for (IExperimentSensor experimentSensor : experimentSensors)
+                experimentSensor.destroy();
         }
         experimentActivity = activity;
         if (experimentActivity != null) {
@@ -125,26 +125,26 @@ public class ExperimentRun {
         return experimentActivity != null;
     }
 
-    public int getExperimentRunCount() {
+    public int getSensorCount() {
         return experimentSensors.size();
     }
 
-    public void setCurrentExperimentRun(int i) {
-        currentExperimentRun = getExperimentRunAt(i);
+    public void setCurrentSensor(int i) {
+        currentSensor = getExperimentSensorAt(i);
     }
 
-    public boolean setCurrentExperimentRun(IExperimentSensor experimentRun) {
-        if (!experimentSensors.contains(experimentRun))
+    public boolean setCurrentSensor(IExperimentSensor sensor) {
+        if (!experimentSensors.contains(sensor))
             return false;
-        currentExperimentRun = experimentRun;
+        currentSensor = sensor;
         return true;
     }
 
     public IExperimentSensor getCurrentExperimentSensor() {
-        return currentExperimentRun;
+        return currentSensor;
     }
 
-    public IExperimentSensor getExperimentRunAt(int i) {
+    public IExperimentSensor getExperimentSensorAt(int i) {
         return experimentSensors.get(i);
     }
 
@@ -163,21 +163,21 @@ public class ExperimentRun {
         return true;
     }
 
-    public void removeExperimentSensor(IExperimentSensor experimentRun) {
-        // update the current experiment run first if necessary
-        if (experimentRun == getCurrentExperimentSensor()) {
-            int index = experimentSensors.indexOf(experimentRun);
+    public void removeExperimentSensor(IExperimentSensor experimentSensor) {
+        // update the current sensor first if necessary
+        if (experimentSensor == getCurrentExperimentSensor()) {
+            int index = experimentSensors.indexOf(experimentSensor);
             if (index > 0)
-                setCurrentExperimentRun(0);
+                setCurrentSensor(0);
             else if (index + 1 < experimentSensors.size())
-                setCurrentExperimentRun(index + 1);
+                setCurrentSensor(index + 1);
             else
-                setCurrentExperimentRun(null);
+                setCurrentSensor(null);
         }
-        experimentSensors.remove(experimentRun);
+        experimentSensors.remove(experimentSensor);
 
         if (experimentActivity != null)
-            experimentRun.destroy();
+            experimentSensor.destroy();
     }
 
     public void onSaveInstanceState(Bundle outState) {
@@ -185,37 +185,46 @@ public class ExperimentRun {
 
         int i = 0;
         for (IExperimentSensor experimentSensor : experimentSensors) {
-            Bundle runBundle = new Bundle();
-            experimentSensor.onSaveInstanceState(runBundle);
-            outState.putBundle(Integer.toString(i), runBundle);
+            Bundle bundle = new Bundle();
+            experimentSensor.onSaveInstanceState(bundle);
+            outState.putBundle(Integer.toString(i), bundle);
             i++;
         }
 
+        if (currentSensor != null) {
+            int index = getExperimentSensors().indexOf(currentSensor);
+            outState.putInt("current_sensor", index);
+        }
+
         // store plugin information
-        Bundle experimentRunClasses = new Bundle();
+        Bundle experimentSensorClasses = new Bundle();
         i = 0;
         for (IExperimentSensor experimentSensor : experimentSensors) {
-            experimentRunClasses.putString(Integer.toString(i), experimentSensor.getPlugin().getName());
+            experimentSensorClasses.putString(Integer.toString(i), experimentSensor.getPlugin().getName());
             i++;
         }
-        outState.putBundle("run_plugins", experimentRunClasses);
-        outState.putInt("run_plugin_count", experimentSensors.size());
+        outState.putBundle("plugins", experimentSensorClasses);
+        outState.putInt("plugin_count", experimentSensors.size());
     }
 
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         data.onRestoreInstanceState(savedInstanceState);
 
-        int runClassesCount = savedInstanceState.getInt("run_plugin_count");
-        Bundle experimentRunClasses = savedInstanceState.getBundle("run_plugins");
+        int sensorClassesCount = savedInstanceState.getInt("plugin_count");
+        Bundle pluginClasses = savedInstanceState.getBundle("plugins");
         ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
-        for (int i = 0; i < runClassesCount; i++) {
-            String runName = experimentRunClasses.getString(Integer.toString(i));
-            IExperimentPlugin plugin = factory.findExperimentPlugin(runName);
+        for (int i = 0; i < sensorClassesCount; i++) {
+            String pluginName = pluginClasses.getString(Integer.toString(i));
+            IExperimentPlugin plugin = factory.findExperimentPlugin(pluginName);
             IExperimentSensor experimentSensor = plugin.createExperimentSensor(experiment.getActivity());
             Bundle state = savedInstanceState.getBundle(Integer.toString(i));
             experimentSensor.onRestoreInstanceState(state);
             addExperimentSensor(experimentSensor);
         }
+
+        int index = savedInstanceState.getInt("current_sensor", -1);
+        if (index >= 0)
+            setCurrentSensor(index);
     }
 
     public Experiment getExperiment() {
@@ -223,8 +232,8 @@ public class ExperimentRun {
     }
 
     public boolean dataTaken() {
-        for (IExperimentSensor experimentRun : experimentSensors) {
-            if (experimentRun.dataTaken())
+        for (IExperimentSensor experimentSensor : experimentSensors) {
+            if (experimentSensor.dataTaken())
                 return true;
         }
         return false;
@@ -233,7 +242,7 @@ public class ExperimentRun {
     public void finishExperiment(boolean saveData, File storageDir) throws IOException {
         if (saveData) {
             storageDir.mkdirs();
-            data.saveToFile(new File(storageDir, EXPERIMENT_RUN_GROUP_FILE_NAME));
+            data.saveToFile(new File(storageDir, EXPERIMENT_RUN_FILE_NAME));
         }
 
         for (IExperimentSensor experimentSensor : experimentSensors) {
