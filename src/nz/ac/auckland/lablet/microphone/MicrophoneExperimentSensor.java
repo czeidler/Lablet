@@ -21,7 +21,6 @@ import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-import edu.emory.mathcs.jtransforms.dct.FloatDCT_1D;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensorView;
@@ -35,7 +34,6 @@ import nz.ac.auckland.lablet.views.plotview.PlotView;
 
 import java.io.*;
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -44,11 +42,12 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
     private ViewGroup previewView;
     private ViewGroup playbackView;
 
-    public MicrophoneExperimentSensorView(final Context context, final MicrophoneExperimentSensor experimentRun) {
+    public MicrophoneExperimentSensorView(final Context context, final MicrophoneExperimentSensor experimentSensor) {
         super(context);
 
         final LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final ViewGroup view = (ViewGroup)inflater.inflate(R.layout.microphone_run_view, null, false);
+        assert view != null;
         addView(view);
 
         previewView = (ViewGroup)view.findViewById(R.id.previewView);
@@ -71,13 +70,13 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
             private MicrophoneExperimentSensor.ISensorDataListener listener = new MicrophoneExperimentSensor.ISensorDataListener() {
                 @Override
                 public void onNewAudioData(float[] amplitudes, float[] frequencies) {
-                    if (audioAmplitudePlotAdapter.getSize() / experimentRun.SAMPLE_RATE >= amplitudeTimeSpan)
+                    if (audioAmplitudePlotAdapter.getSize() / experimentSensor.SAMPLE_RATE >= amplitudeTimeSpan)
                         audioAmplitudePlotAdapter.clear();
                     audioAmplitudePlotAdapter.addData(amplitudes);
 
                     audioFrequencyView.addData(frequencies);
 
-                    if (audioFrequencyMapAdapter.getSize() * experimentRun.FRAME_SIZE / experimentRun.SAMPLE_RATE
+                    if (audioFrequencyMapAdapter.getSize() * experimentSensor.FRAME_SIZE / experimentSensor.SAMPLE_RATE
                             >= frequencyMapTimeSpan)
                         audioFrequencyMapAdapter.clear();
                     audioFrequencyMapAdapter.addData(frequencies);
@@ -105,9 +104,9 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 audioFrequencyMapPainter.setDataAdapter(audioFrequencyMapAdapter);
                 frequencyMapPlotView.addPlotPainter(audioFrequencyMapPainter);
                 frequencyMapPlotView.setXRange(0, frequencyMapTimeSpan);
-                frequencyMapPlotView.setYRange(1, experimentRun.SAMPLE_RATE / 2);
+                frequencyMapPlotView.setYRange(1, experimentSensor.SAMPLE_RATE / 2);
                 frequencyMapPlotView.setMaxXRange(0, frequencyMapTimeSpan);
-                frequencyMapPlotView.setMaxYRange(1, experimentRun.SAMPLE_RATE / 2);
+                frequencyMapPlotView.setMaxYRange(1, experimentSensor.SAMPLE_RATE / 2);
                 //frequencyMapPlotView.getBackgroundPainter().setShowGrid(true);
                 //frequencyMapPlotView.setYScale(PlotView.log10Scale());
                 frequencyMapPlotView.setXDraggable(true);
@@ -119,7 +118,7 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 frequencyMapPlotView.getXAxisView().setUnit("s");
                 frequencyMapPlotView.getXAxisView().setTitle("Time");
 
-                experimentRun.setSensorDataListener(listener);
+                experimentSensor.setSensorDataListener(listener);
             }
 
             @Override
@@ -231,7 +230,7 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                         audioAmplitudePlotAdapter.addData(AudioWavInputStream.toAmplitudeData(data, data.length));
                     }
                 };
-                asyncTask.execute(experimentRun.getAudioFile());
+                asyncTask.execute(experimentSensor.getAudioFile());
             }
 
             @Override
@@ -250,7 +249,7 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                         }
                     });
 
-                    mediaPlayer.setDataSource(experimentRun.getAudioFile().getPath());
+                    mediaPlayer.setDataSource(experimentSensor.getAudioFile().getPath());
                     mediaPlayer.prepare();
 
                 } catch (IOException e) {
@@ -286,8 +285,6 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
 }
 
 public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
-    private Activity activity;
-
     private WeakReference<ISensorDataListener> softListener = null;
 
     final public int SAMPLE_RATE = 44100;
@@ -314,7 +311,7 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
         if (softListener == null)
             return;
 
-        float[] frequencies = fourier(amplitudes);
+        float[] frequencies = Fourier.transform(amplitudes);
 
         ISensorDataListener listener = softListener.get();
         if (listener != null)
@@ -345,8 +342,6 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public void init(final Activity activity) {
-        this.activity = activity;
-
         experimentData = new MicrophoneSensorData(activity);
 
         previewState = new State() {
@@ -542,23 +537,5 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     @Override
     public SensorData getExperimentData() {
         return null;
-    }
-
-    private void hammingWindow(float[] samples) {
-        for (int i = 0; i < samples.length; i++)
-            samples[i] *= (0.54f - 0.46f * Math.cos(2 * Math.PI * i / (samples.length - 1)));
-    }
-
-    private float[] fourier(float[] in) {
-        float trafo[] = Arrays.copyOf(in, in.length);
-
-        FloatDCT_1D dct = new FloatDCT_1D(trafo.length);
-        // in place window
-        hammingWindow(trafo);
-
-        // in place transform: timeData becomes frequency data
-        dct.forward(trafo, false);
-
-        return trafo;
     }
 }
