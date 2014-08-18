@@ -15,7 +15,7 @@ import java.io.File;
 
 
 public class MicrophoneSensorData extends SensorData {
-    private String audioFileName = "";
+    private String audioFileName;
 
     public MicrophoneSensorData(Context experimentContext, Bundle bundle, File storageDir) {
         super(experimentContext, bundle, storageDir);
@@ -86,5 +86,9 @@ public class MicrophoneSensorData extends SensorData {
 
     public void setAudioFileName(String fileName) {
         audioFileName = fileName;
+    }
+
+    public File getAudioFile() {
+        return new File(getStorageDir(), audioFileName);
     }
 }

@@ -56,6 +56,6 @@ public class MicrophoneExperimentPlugin extends AbstractExperimentPlugin {
 
     @Override
     public View createSensorAnalysisView(Context context, SensorData sensorData) {
-        return null;
+        return new MicrophoneAnalysisView(context, sensorData);
     }
 }
