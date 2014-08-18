@@ -7,6 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.plotview;
 
+import android.animation.*;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PointF;
@@ -14,6 +15,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.*;
+import android.view.animation.DecelerateInterpolator;
 import nz.ac.auckland.lablet.views.plotview.axes.*;
 
 import java.util.ArrayList;
@@ -198,7 +200,7 @@ public class PlotView extends ViewGroup {
     class AutoRange implements DataStatistics.IListener {
         final private List<DataStatistics> dataStatisticsList = new ArrayList<>();
 
-        private float offsetRatio = 0.25f;
+        private float offsetRatio = 0.4f;
 
         private ResizePolicy xPolicy = null;
         private ResizePolicy yPolicy = null;
@@ -361,7 +363,7 @@ public class PlotView extends ViewGroup {
                 if (flippedAxis)
                     xOffset *= -1;
                 if (xOffset != 0)
-                    offsetXRange(oldRange.width() * xOffset * offsetRatio);
+                    scrollXBy(oldRange.width() * xOffset * offsetRatio);
             }
         }
 
@@ -381,7 +383,7 @@ public class PlotView extends ViewGroup {
                 if (flippedAxis)
                     yOffset *= -1;
                 if (yOffset != 0)
-                    offsetXRange(oldRange.height() * yOffset * offsetRatio);
+                    scrollYBy(oldRange.height() * yOffset * offsetRatio);
             }
         }
 
@@ -607,6 +609,69 @@ public class PlotView extends ViewGroup {
 
     public boolean offsetYRange(float offset) {
         return setYRange(mainView.getRangeBottom() + offset, mainView.getRangeTop() + offset, true);
+    }
+
+    public boolean scrollXBy(float offset) {
+        scrollAnimator.animateXScroll(offset);
+        return true;
+    }
+
+    public boolean scrollYBy(float offset) {
+        scrollAnimator.animateYScroll(offset);
+        return true;
+    }
+
+    ScrollAnimator scrollAnimator = new ScrollAnimator();
+    class ScrollAnimator {
+        final private int DURATION = 500;
+        private AnimatorSet animator = null;
+
+        public void animateXScroll(float offset) {
+            ValueAnimator valueAnimator = ObjectAnimator.ofFloat(mainView.getRangeLeft(), mainView.getRangeLeft()
+                    + offset);
+            valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    Float value = (Float) animation.getAnimatedValue();
+                    setXRange(value, value + mainView.getRangeRight() - mainView.getRangeLeft(), true);
+                }
+            });
+            animate(valueAnimator);
+        }
+
+        public void animateYScroll(float offset) {
+            ValueAnimator valueAnimator = ObjectAnimator.ofFloat(mainView.getRangeBottom(), mainView.getRangeBottom()
+                    + offset);
+            valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    Float value = (Float) animation.getAnimatedValue();
+                    setXRange(value, value + mainView.getRangeTop() - mainView.getRangeBottom(), true);
+                }
+            });
+            animate(valueAnimator);
+        }
+
+        private void animate(Animator newAnimator) {
+            if (animator != null)
+                animator.cancel();
+
+            final AnimatorSet set = new AnimatorSet();
+            set.play(newAnimator);
+            set.setDuration(DURATION);
+            set.setInterpolator(new DecelerateInterpolator());
+            set.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    animator = null;
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                    animator = null;
+                }
+            });
+            set.start();
+            animator = set;
+        }
     }
 
     private boolean setXRange(float left, float right, boolean keepDistance) {
