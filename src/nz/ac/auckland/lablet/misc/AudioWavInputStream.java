@@ -16,6 +16,7 @@ public class AudioWavInputStream extends InputStream implements Closeable {
     private InputStream inputStream;
     private int channelCount;
     private int sampleRate;
+    private int byteRate;
     private int audioDataSize;
 
     public AudioWavInputStream(File file) throws IOException {
@@ -41,6 +42,22 @@ public class AudioWavInputStream extends InputStream implements Closeable {
 
     public int getSize() {
         return audioDataSize;
+    }
+
+    public int getChannelCount() {
+        return channelCount;
+    }
+
+    public int getSampleRate() {
+        return sampleRate;
+    }
+
+    public int getDurationMilliSeconds() {
+        return 1000 * audioDataSize / getByteRate();
+    }
+
+    public int getByteRate() {
+        return byteRate;
     }
 
     private void readHeader() throws IOException {
@@ -71,6 +88,9 @@ public class AudioWavInputStream extends InputStream implements Closeable {
         // byte rate
         if (inputStream.read(buffer32) != 4)
             throw new IOException();
+        buffer = ByteBuffer.wrap(buffer32);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        byteRate = buffer.getInt();
         // some other data...
         if (inputStream.read(buffer32) != 4)
             throw new IOException();
