@@ -53,7 +53,7 @@ public class AudioWavInputStream extends InputStream implements Closeable {
     }
 
     public int getDurationMilliSeconds() {
-        return 1000 * audioDataSize / getByteRate();
+        return (int)(1000f / getByteRate() * audioDataSize);
     }
 
     public int getByteRate() {
