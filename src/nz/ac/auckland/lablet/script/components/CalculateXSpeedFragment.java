@@ -14,7 +14,7 @@ import nz.ac.auckland.lablet.views.table.*;
 /**
  * Fragment component to calculate x speed and acceleration.
  */
-public class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalculateSpeedFragment {
+public class CalculateXSpeedFragment extends CalculateSpeedFragment {
     private XSpeedDataTableColumn speedDataTableColumn;
 
     @Override
@@ -29,7 +29,7 @@ public class ScriptComponentCalculateXSpeedFragment extends ScriptComponentCalcu
 
     @Override
     String getPositionUnit() {
-        ScriptComponentExperiment experiment = ((ScriptComponentTreeCalculateSpeed)component).getExperiment();
+        ScriptExperimentRef experiment = ((ScriptTreeNodeCalculateSpeed)component).getExperiment();
         SensorAnalysis sensorAnalysis = experiment.getExperimentAnalysis(getActivity());
         if (sensorAnalysis == null)
             return "";

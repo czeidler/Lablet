@@ -11,5 +11,5 @@ package nz.ac.auckland.lablet.script;
  * Interface to create script component by name.
  */
 public interface IScriptComponentFactory {
-    public ScriptComponentTree create(String componentName, Script script);
+    public ScriptTreeNode create(String componentName, Script script);
 }

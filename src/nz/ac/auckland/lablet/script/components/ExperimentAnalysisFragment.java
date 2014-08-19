@@ -22,7 +22,7 @@ import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptComponent;
-import nz.ac.auckland.lablet.script.ScriptComponentTreeFragmentHolder;
+import nz.ac.auckland.lablet.script.ScriptTreeNodeFragmentHolder;
 import nz.ac.auckland.lablet.views.graph.GraphView2D;
 import nz.ac.auckland.lablet.views.graph.MarkerGraphAdapter;
 import nz.ac.auckland.lablet.views.graph.XPositionMarkerGraphAxis;
@@ -34,11 +34,11 @@ import java.io.File;
 /**
  * Script component that can create a fragment for the experiment analysis.
  */
-class ScriptComponentTreeExperimentAnalysis extends ScriptComponentTreeFragmentHolder {
-    private ScriptComponentExperiment experiment;
+class ScriptTreeNodeExperimentAnalysis extends ScriptTreeNodeFragmentHolder {
+    private ScriptExperimentRef experiment;
     private String descriptionText = "";
 
-    public ScriptComponentTreeExperimentAnalysis(Script script) {
+    public ScriptTreeNodeExperimentAnalysis(Script script) {
         super(script);
     }
 
@@ -53,16 +53,16 @@ class ScriptComponentTreeExperimentAnalysis extends ScriptComponentTreeFragmentH
 
     @Override
     public ScriptComponentGenericFragment createFragment() {
-        ScriptComponentGenericFragment fragment = new ScriptComponentExperimentAnalysisFragment();
+        ScriptComponentGenericFragment fragment = new ExperimentAnalysisFragment();
         fragment.setScriptComponent(this);
         return fragment;
     }
 
-    public void setExperiment(ScriptComponentExperiment experiment) {
+    public void setExperiment(ScriptExperimentRef experiment) {
         this.experiment = experiment;
     }
 
-    public ScriptComponentExperiment getExperiment() {
+    public ScriptExperimentRef getExperiment() {
         return experiment;
     }
 
@@ -79,7 +79,7 @@ class ScriptComponentTreeExperimentAnalysis extends ScriptComponentTreeFragmentH
 /**
  * Fragment to start an experiment analysis.
  */
-public class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGenericFragment {
+public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
     static final int ANALYSE_EXPERIMENT = 0;
 
     private CheckedTextView takenExperimentInfo = null;
@@ -94,7 +94,7 @@ public class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGe
         View child = setChild(R.layout.script_component_analyze_experiment);
         assert child != null;
 
-        ScriptComponentTreeExperimentAnalysis analysisComponent = (ScriptComponentTreeExperimentAnalysis)this.component;
+        ScriptTreeNodeExperimentAnalysis analysisComponent = (ScriptTreeNodeExperimentAnalysis)this.component;
 
         TextView descriptionTextView = (TextView)child.findViewById(R.id.descriptionText);
         assert descriptionTextView != null;
@@ -108,7 +108,7 @@ public class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGe
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), ExperimentAnalyserActivity.class);
                 intent.putExtra("experiment_path",
-                        ((ScriptComponentTreeExperimentAnalysis)component).getExperiment().getExperimentPath());
+                        ((ScriptTreeNodeExperimentAnalysis)component).getExperiment().getExperimentPath());
                 intent.putExtra("first_start_with_run_settings", true);
                 intent.putExtra("first_start_with_run_settings_help", true);
                 startActivityForResult(intent, ANALYSE_EXPERIMENT);
@@ -136,7 +136,7 @@ public class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGe
 
         Activity activity = getActivity();
 
-        ScriptComponentExperiment experiment = ((ScriptComponentTreeExperimentAnalysis)component).getExperiment();
+        ScriptExperimentRef experiment = ((ScriptTreeNodeExperimentAnalysis)component).getExperiment();
         experiment.reloadExperimentAnalysis(activity);
 
         if (!validateAnalysis()) {
@@ -159,7 +159,7 @@ public class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGe
     }
 
     private boolean validateAnalysis() {
-        ScriptComponentExperiment experiment = ((ScriptComponentTreeExperimentAnalysis)component).getExperiment();
+        ScriptExperimentRef experiment = ((ScriptTreeNodeExperimentAnalysis)component).getExperiment();
         SensorAnalysis sensorAnalysis = experiment.getExperimentAnalysis(getActivity());
         if (sensorAnalysis == null)
             return false;
@@ -183,7 +183,7 @@ public class ScriptComponentExperimentAnalysisFragment extends ScriptComponentGe
 
         if (component.getState() == ScriptComponent.SCRIPT_STATE_DONE) {
             takenExperimentInfo.setChecked(true);
-            ScriptComponentExperiment experiment = ((ScriptComponentTreeExperimentAnalysis)component).getExperiment();
+            ScriptExperimentRef experiment = ((ScriptTreeNodeExperimentAnalysis)component).getExperiment();
             SensorAnalysis sensorAnalysis = experiment.getExperimentAnalysis(getActivity());
             if (sensorAnalysis == null)
                 return;

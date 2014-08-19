@@ -38,7 +38,7 @@ public class ScriptComponentSheetFragment extends ScriptComponentGenericFragment
         sheetLayout = (FrameLayout)child.findViewById(R.id.sheetLayout);
         assert sheetLayout != null;
 
-        ScriptComponentTreeSheet sheetComponent = (ScriptComponentTreeSheet)component;
+        ScriptTreeNodeSheet sheetComponent = (ScriptTreeNodeSheet)component;
         sheetComponent.resetCounter();
         View sheetView = sheetComponent.getSheetLayout().buildLayout(getActivity(), this);
         sheetLayout.addView(sheetView);

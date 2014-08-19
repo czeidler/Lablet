@@ -16,8 +16,8 @@ import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import nz.ac.auckland.lablet.script.ScriptComponent;
-import nz.ac.auckland.lablet.script.ScriptComponentTree;
-import nz.ac.auckland.lablet.script.ScriptComponentTreeFragmentHolder;
+import nz.ac.auckland.lablet.script.ScriptTreeNode;
+import nz.ac.auckland.lablet.script.ScriptTreeNodeFragmentHolder;
 import nz.ac.auckland.lablet.script.ScriptRunnerActivity;
 import nz.ac.auckland.lablet.R;
 
@@ -32,12 +32,12 @@ import nz.ac.auckland.lablet.R;
  */
 public class ScriptComponentGenericFragment extends android.support.v4.app.Fragment
         implements ScriptComponent.IScriptComponentListener {
-    protected ScriptComponentTree component;
+    protected ScriptTreeNode component;
     protected TextView titleView = null;
     protected Button finishComponentButton = null;
     protected ScrollView containerView = null;
 
-    public void setScriptComponent(ScriptComponentTree component) {
+    public void setScriptComponent(ScriptTreeNode component) {
         this.component = component;
         component.setListener(this);
     }
@@ -86,7 +86,7 @@ public class ScriptComponentGenericFragment extends android.support.v4.app.Fragm
             return view;
 
         titleView = (TextView)view.findViewById(R.id.titleTextView);
-        String title = ((ScriptComponentTreeFragmentHolder)component).getTitle();
+        String title = ((ScriptTreeNodeFragmentHolder)component).getTitle();
         if (title.equals(""))
             setTitle(this.getClass().getSimpleName());
         else

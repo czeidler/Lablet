@@ -13,10 +13,10 @@ import nz.ac.auckland.lablet.script.components.ScriptComponentGenericFragment;
 /**
  * Abstract base class for a component that is visualized by a Fragment.
  */
-abstract public class ScriptComponentTreeFragmentHolder extends ScriptComponentTree {
+abstract public class ScriptTreeNodeFragmentHolder extends ScriptTreeNode {
     protected String title = "";
 
-    public ScriptComponentTreeFragmentHolder(Script script) {
+    public ScriptTreeNodeFragmentHolder(Script script) {
         super(script);
     }
 

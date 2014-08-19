@@ -33,7 +33,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
     private Script script = null;
     private ViewPager pager = null;
     private ScriptFragmentPagerAdapter pagerAdapter = null;
-    private List<ScriptComponentTree> activeChain = new ArrayList<>();
+    private List<ScriptTreeNode> activeChain = new ArrayList<>();
 
     private File scriptUserDataDir = null;
     private File scriptFile = null;
@@ -88,13 +88,13 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
         outState.putString("script_user_data_dir", scriptUserDataDir.getPath());
     }
 
-    public ScriptComponentTree getScriptComponentTreeAt(int index) {
+    public ScriptTreeNode getScriptComponentTreeAt(int index) {
         if (index < 0 || index >= activeChain.size())
             return null;
         return activeChain.get(index);
     }
 
-    public int getScriptComponentIndex(ScriptComponentTree component) {
+    public int getScriptComponentIndex(ScriptTreeNode component) {
         return activeChain.indexOf(component);
     }
 
@@ -192,6 +192,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
 
         if (!script.loadScriptState(bundle)) {
             lastErrorMessage = script.getLastError();
+            script = null;
             return -1;
         }
 
@@ -205,7 +206,7 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
      * Saves the state of the current script to the current {@link #scriptUserDataDir}.
      * @return false if an error occurred.
      */
-    protected boolean saveScriptStateToFile() {
+    public boolean saveScriptStateToFile() {
         if (scriptFile == null || scriptUserDataDir == null)
             return false;
         if (script == null)
@@ -252,11 +253,11 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
     }
 
     @Override
-    public void onComponentStateChanged(ScriptComponentTree current, int state) {
+    public void onComponentStateChanged(ScriptTreeNode current, int state) {
         if (pagerAdapter == null)
             return;
 
-        ScriptComponentTree lastSelectedComponent = null;
+        ScriptTreeNode lastSelectedComponent = null;
         if (activeChain.size() > 0)
             lastSelectedComponent = activeChain.get(pager.getCurrentItem());
         activeChain = script.getActiveChain();
@@ -269,31 +270,31 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             pager.setCurrentItem(index);
     }
 
-    public void setNextComponent(ScriptComponentTree next) {
+    public void setNextComponent(ScriptTreeNode next) {
         int index = activeChain.indexOf(next);
         if (index >0)
             pager.setCurrentItem(index);
     }
 
     private class ScriptFragmentPagerAdapter extends FragmentStatePagerAdapter {
-        private List<ScriptComponentTree> components;
-        private Map<ScriptComponentTree, ScriptComponentGenericFragment> fragmentMap = new HashMap<>();
+        private List<ScriptTreeNode> components;
+        private Map<ScriptTreeNode, ScriptComponentGenericFragment> fragmentMap = new HashMap<>();
 
         public ScriptFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager,
-                                          List<ScriptComponentTree> components) {
+                                          List<ScriptTreeNode> components) {
             super(fragmentManager);
             this.components = components;
         }
 
-        public void setComponents(List<ScriptComponentTree> components) {
+        public void setComponents(List<ScriptTreeNode> components) {
             this.components = components;
             notifyDataSetChanged();
         }
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            ScriptComponentTreeFragmentHolder fragmentCreator
-                    = (ScriptComponentTreeFragmentHolder)components.get(position);
+            ScriptTreeNodeFragmentHolder fragmentCreator
+                    = (ScriptTreeNodeFragmentHolder)components.get(position);
             ScriptComponentGenericFragment fragment = fragmentCreator.createFragment();
             fragmentMap.put(components.get(position), fragment);
             return fragment;
@@ -310,8 +311,8 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             fragmentMap.remove(findComponentFor((Fragment)object));
         }
 
-        private ScriptComponentTree findComponentFor(Fragment fragment) {
-            for (Map.Entry<ScriptComponentTree, ScriptComponentGenericFragment> entry : fragmentMap.entrySet()) {
+        private ScriptTreeNode findComponentFor(Fragment fragment) {
+            for (Map.Entry<ScriptTreeNode, ScriptComponentGenericFragment> entry : fragmentMap.entrySet()) {
                 if (entry.getValue() == fragment)
                     return entry.getKey();
             }

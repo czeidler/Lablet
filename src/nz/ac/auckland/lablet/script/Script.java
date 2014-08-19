@@ -18,7 +18,7 @@ import java.util.List;
  * Representation of the script, holds all script components.
  */
 public class Script {
-    private ScriptComponentTree root = null;
+    private ScriptTreeNode root = null;
     private IScriptListener listener = null;
     private String lastError = "";
 
@@ -31,7 +31,7 @@ public class Script {
      *
      * @param component root component tree
      */
-    public void setRoot(ScriptComponentTree component) {
+    public void setRoot(ScriptTreeNode component) {
         root = component;
     }
 
@@ -40,7 +40,7 @@ public class Script {
      *
      * @return root component tree
      */
-    public ScriptComponentTree getRoot() {
+    public ScriptTreeNode getRoot() {
         return root;
     }
 
@@ -50,11 +50,11 @@ public class Script {
      * @return true if script is ok
      */
     public boolean initCheck() {
-        java.util.Iterator<ScriptComponentTree> iterator = root.iterator();
+        java.util.Iterator<ScriptTreeNode> iterator = root.iterator();
         while (true) {
             if (!iterator.hasNext())
                 break;
-            ScriptComponentTree component = iterator.next();
+            ScriptTreeNode component = iterator.next();
             if (!component.initCheck()) {
                 lastError = "In Component \"" + component.getName() + "\": ";
                 lastError += component.getLastErrorMessage();
@@ -80,9 +80,9 @@ public class Script {
      *
      * @return returns the active chain of the root tree component
      */
-    public List<ScriptComponentTree> getActiveChain() {
+    public List<ScriptTreeNode> getActiveChain() {
         if (root == null)
-            return new ArrayList<ScriptComponentTree>();
+            return new ArrayList<ScriptTreeNode>();
 
         return root.getActiveChain();
     }
@@ -116,9 +116,9 @@ public class Script {
     public boolean start() {
         if (root == null)
             return false;
-        if (root.getState() > ScriptComponentTree.SCRIPT_STATE_ONGOING)
+        if (root.getState() > ScriptTreeNode.SCRIPT_STATE_ONGOING)
             return false;
-        root.setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
+        root.setState(ScriptTreeNode.SCRIPT_STATE_ONGOING);
         return true;
     }
 
@@ -127,7 +127,7 @@ public class Script {
      * @param component the component that changed its state
      * @param state new state
      */
-    public void onComponentStateChanged(ScriptComponentTree component, int state) {
+    public void onComponentStateChanged(ScriptTreeNode component, int state) {
         if (listener != null)
             listener.onComponentStateChanged(component, state);
     }
@@ -141,17 +141,17 @@ public class Script {
         if (root == null)
             return false;
 
-        bundle.putString("scriptId", ScriptComponentTree.getTreeHash(root));
+        bundle.putString("scriptId", ScriptTreeNode.getTreeHash(root));
 
         if (!saveScriptComponentState(root, 0, bundle))
             return false;
 
         int componentId = 0;
-        java.util.Iterator<ScriptComponentTree> iterator = root.iterator();
+        java.util.Iterator<ScriptTreeNode> iterator = root.iterator();
         while (true) {
             if (!iterator.hasNext())
                 break;
-            ScriptComponentTree component = iterator.next();
+            ScriptTreeNode component = iterator.next();
             componentId++;
 
             if (!saveScriptComponentState(component, componentId, bundle))
@@ -170,7 +170,7 @@ public class Script {
         if (root == null)
             return false;
 
-        String scriptId = ScriptComponentTree.getTreeHash(root);
+        String scriptId = ScriptTreeNode.getTreeHash(root);
         if (!bundle.get("scriptId").equals(scriptId)) {
             lastError = "Script has been updated and is now incompatible to the saved state.";
             return false;
@@ -180,11 +180,11 @@ public class Script {
             return false;
 
         int componentId = 0;
-        java.util.Iterator<ScriptComponentTree> iterator = root.iterator();
+        java.util.Iterator<ScriptTreeNode> iterator = root.iterator();
         while (true) {
             if (!iterator.hasNext())
                 break;
-            ScriptComponentTree component = iterator.next();
+            ScriptTreeNode component = iterator.next();
             componentId++;
 
             if (!loadScriptComponentState(component, componentId, bundle))
@@ -194,7 +194,7 @@ public class Script {
         return true;
     }
 
-    private boolean saveScriptComponentState(ScriptComponentTree component, int componentId, Bundle bundle) {
+    private boolean saveScriptComponentState(ScriptTreeNode component, int componentId, Bundle bundle) {
         Bundle componentBundle = new Bundle();
         component.toBundle(componentBundle);
 
@@ -203,7 +203,7 @@ public class Script {
         return true;
     }
 
-    private boolean loadScriptComponentState(ScriptComponentTree component, int componentId, Bundle bundle) {
+    private boolean loadScriptComponentState(ScriptTreeNode component, int componentId, Bundle bundle) {
         String bundleKey = Integer.toString(componentId);
         if (!bundle.containsKey(bundleKey)) {
             lastError = "Script component state can't be restored.";

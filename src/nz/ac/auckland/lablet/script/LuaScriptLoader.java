@@ -28,7 +28,7 @@ public class LuaScriptLoader {
     private class ScriptBuilder {
         private IScriptComponentFactory factory;
         private Script script = new Script();
-        private ScriptComponentTree lastComponent;
+        private ScriptTreeNode lastComponent;
 
         public ScriptBuilder(IScriptComponentFactory factory) {
             this.factory = factory;
@@ -39,8 +39,8 @@ public class LuaScriptLoader {
          *
          * @param component to be added
          */
-        public void add(ScriptComponentTree component) {
-            add(ScriptComponentTree.SCRIPT_STATE_DONE, component);
+        public void add(ScriptTreeNode component) {
+            add(ScriptTreeNode.SCRIPT_STATE_DONE, component);
         }
 
         /**
@@ -50,7 +50,7 @@ public class LuaScriptLoader {
          * @param state the slot where the component will be inserted
          * @param component to be added
          */
-        public void add(int state, ScriptComponentTree component) {
+        public void add(int state, ScriptTreeNode component) {
             if (lastComponent == null) {
                 script.setRoot(component);
                 lastComponent = component;
@@ -64,7 +64,7 @@ public class LuaScriptLoader {
             return script;
         }
 
-        public ScriptComponentTree create(String componentName) {
+        public ScriptTreeNode create(String componentName) {
             return factory.create(componentName, script);
         }
     }

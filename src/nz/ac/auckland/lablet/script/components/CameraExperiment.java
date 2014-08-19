@@ -21,10 +21,9 @@ import nz.ac.auckland.lablet.camera.CameraExperimentPlugin;
 import nz.ac.auckland.lablet.camera.CameraSensorData;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentPlugin;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
-import nz.ac.auckland.lablet.experiment.ExperimentLoader;
 import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.misc.StorageLib;
-import nz.ac.auckland.lablet.script.ScriptComponentTree;
+import nz.ac.auckland.lablet.script.ScriptTreeNode;
 import nz.ac.auckland.lablet.script.ScriptComponentViewHolder;
 import nz.ac.auckland.lablet.script.ScriptRunnerActivity;
 
@@ -34,8 +33,8 @@ import java.io.File;
 /**
  * Script component that has view for starting  a camera experiment.
  */
-public class ScriptComponentCameraExperiment extends ScriptComponentViewHolder {
-    private ScriptComponentExperiment experiment = new ScriptComponentExperiment();
+public class CameraExperiment extends ScriptComponentViewHolder {
+    private ScriptExperimentRef experiment = new ScriptExperimentRef();
     private String descriptionText = "Please take a video:";
     private int requestedVideoWidth = -1;
     private int requestedVideoHeight = -1;
@@ -50,7 +49,7 @@ public class ScriptComponentCameraExperiment extends ScriptComponentViewHolder {
         return true;
     }
 
-    public ScriptComponentExperiment getExperiment() {
+    public ScriptExperimentRef getExperiment() {
         return experiment;
     }
 
@@ -96,12 +95,12 @@ public class ScriptComponentCameraExperiment extends ScriptComponentViewHolder {
 class ScriptComponentCameraExperimentView extends ActivityStarterView {
     static final int PERFORM_EXPERIMENT = 0;
 
-    private ScriptComponentCameraExperiment cameraComponent;
+    private CameraExperiment cameraComponent;
     private CheckedTextView takenExperimentInfo = null;
     private VideoView videoView = null;
 
     public ScriptComponentCameraExperimentView(Context context, ScriptComponentSheetFragment sheetFragment,
-                                               ScriptComponentCameraExperiment cameraComponent) {
+                                               CameraExperiment cameraComponent) {
         super(context, sheetFragment);
         this.cameraComponent = cameraComponent;
 
@@ -194,7 +193,7 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
 
                 String experimentPath = data.getStringExtra("experiment_path");
                 cameraComponent.getExperiment().setExperimentPath(experimentPath);
-                cameraComponent.setState(ScriptComponentTree.SCRIPT_STATE_DONE);
+                cameraComponent.setState(ScriptTreeNode.SCRIPT_STATE_DONE);
 
                 setExperimentPath(experimentPath);
             }

@@ -33,7 +33,7 @@ class TextComponent extends ScriptComponentViewHolder {
 
     public TextComponent(String text) {
         this.text = text;
-        setState(ScriptComponentTree.SCRIPT_STATE_DONE);
+        setState(ScriptTreeNode.SCRIPT_STATE_DONE);
     }
 
     public void setTypeface(int typeface) {
@@ -63,7 +63,7 @@ class CheckBoxQuestion extends ScriptComponentViewHolder {
     private String text = "";
     public CheckBoxQuestion(String text) {
         this.text = text;
-        setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
+        setState(ScriptTreeNode.SCRIPT_STATE_ONGOING);
     }
 
     @Override
@@ -73,16 +73,16 @@ class CheckBoxQuestion extends ScriptComponentViewHolder {
         view.setBackgroundColor(context.getResources().getColor(R.color.sc_question_background_color));
         view.setText(text);
 
-        if (getState() == ScriptComponentTree.SCRIPT_STATE_DONE)
+        if (getState() == ScriptTreeNode.SCRIPT_STATE_DONE)
             view.setChecked(true);
 
         view.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
                 if (checked)
-                    setState(ScriptComponentTree.SCRIPT_STATE_DONE);
+                    setState(ScriptTreeNode.SCRIPT_STATE_DONE);
                 else
-                    setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
+                    setState(ScriptTreeNode.SCRIPT_STATE_ONGOING);
             }
         });
         return view;
@@ -98,22 +98,22 @@ class CheckBoxQuestion extends ScriptComponentViewHolder {
 /**
  * View holder for a view with just a question.
  */
-class ScriptComponentQuestion extends ScriptComponentViewHolder {
+class Question extends ScriptComponentViewHolder {
     private String text = "";
-    private ScriptComponentTreeSheetBase component;
+    private ScriptTreeNodeSheetBase component;
 
-    public ScriptComponentQuestion(String text, ScriptComponentTreeSheetBase component) {
+    public Question(String text, ScriptTreeNodeSheetBase component) {
         this.text = text;
         this.component = component;
 
-        setState(ScriptComponentTree.SCRIPT_STATE_DONE);
+        setState(ScriptTreeNode.SCRIPT_STATE_DONE);
     }
 
     @Override
     public View createView(Context context, android.support.v4.app.Fragment parent) {
         // we have to get a fresh counter here, if we cache it we will miss that it has been deleted in the sheet
         // component
-        ScriptComponentTreeSheetBase.Counter counter = this.component.getCounter("QuestionCounter");
+        ScriptTreeNodeSheetBase.Counter counter = this.component.getCounter("QuestionCounter");
 
         TextView textView = new TextView(context);
         textView.setTextAppearance(context, android.R.style.TextAppearance_Medium);
@@ -137,17 +137,17 @@ class ScriptComponentQuestion extends ScriptComponentViewHolder {
  * question is answered correctly.
  * </p>
  */
-class ScriptComponentTextQuestion extends ScriptComponentViewHolder {
+class TextQuestion extends ScriptComponentViewHolder {
     private String text = "";
     private String answer = "";
     private boolean optional = false;
-    private ScriptComponentTreeSheetBase component;
+    private ScriptTreeNodeSheetBase component;
 
-    public ScriptComponentTextQuestion(String text, ScriptComponentTreeSheetBase component) {
+    public TextQuestion(String text, ScriptTreeNodeSheetBase component) {
         this.text = text;
         this.component = component;
 
-        setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
+        setState(ScriptTreeNode.SCRIPT_STATE_ONGOING);
     }
 
     public void setOptional(boolean optional) {
@@ -157,7 +157,7 @@ class ScriptComponentTextQuestion extends ScriptComponentViewHolder {
 
     @Override
     public View createView(Context context, android.support.v4.app.Fragment parent) {
-        ScriptComponentTreeSheetBase.Counter counter = this.component.getCounter("QuestionCounter");
+        ScriptTreeNodeSheetBase.Counter counter = this.component.getCounter("QuestionCounter");
 
         // Note: we have to do this programmatically cause findViewById would find the wrong child items if there are
         // more than one text question.
@@ -220,11 +220,11 @@ class ScriptComponentTextQuestion extends ScriptComponentViewHolder {
 
     private void update() {
         if (optional)
-            setState(ScriptComponentTree.SCRIPT_STATE_DONE);
+            setState(ScriptTreeNode.SCRIPT_STATE_DONE);
         else if (!answer.equals(""))
-            setState(ScriptComponentTree.SCRIPT_STATE_DONE);
+            setState(ScriptTreeNode.SCRIPT_STATE_DONE);
         else
-            setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
+            setState(ScriptTreeNode.SCRIPT_STATE_ONGOING);
     }
 }
 
@@ -232,19 +232,19 @@ class ScriptComponentTextQuestion extends ScriptComponentViewHolder {
 /**
  * View holder for a graph view that shows some experiment analysis results.
  */
-class GraphViewHolder extends ScriptComponentViewHolder {
-    private ScriptComponentTreeSheet experimentSheet;
-    private ScriptComponentExperiment experiment;
+class GraphView extends ScriptComponentViewHolder {
+    private ScriptTreeNodeSheet experimentSheet;
+    private ScriptExperimentRef experiment;
     private MarkerGraphAdapter adapter;
     private String xAxisContentId = "x-position";
     private String yAxisContentId = "y-position";
     private String title = "Position Data";
-    private ScriptComponentExperiment.IScriptComponentExperimentListener experimentListener;
+    private ScriptExperimentRef.IScriptExperimentRefListener experimentListener;
 
-    public GraphViewHolder(ScriptComponentTreeSheet experimentSheet, ScriptComponentExperiment experiment) {
+    public GraphView(ScriptTreeNodeSheet experimentSheet, ScriptExperimentRef experiment) {
         this.experimentSheet = experimentSheet;
         this.experiment = experiment;
-        setState(ScriptComponentTree.SCRIPT_STATE_DONE);
+        setState(ScriptTreeNode.SCRIPT_STATE_DONE);
     }
 
     @Override
@@ -273,7 +273,7 @@ class GraphViewHolder extends ScriptComponentViewHolder {
 
         // install listener
         final Context contextFinal = context;
-        experimentListener = new ScriptComponentExperiment.IScriptComponentExperimentListener() {
+        experimentListener = new ScriptExperimentRef.IScriptExperimentRefListener() {
             @Override
             public void onExperimentAnalysisUpdated() {
                 adapter.setSensorAnalysis(experiment.getExperimentAnalysis(contextFinal));
@@ -339,12 +339,12 @@ class GraphViewHolder extends ScriptComponentViewHolder {
 
 
 /**
- * Base class for the {@link ScriptComponentTreeSheet} class.
+ * Base class for the {@link ScriptTreeNodeSheet} class.
  * <p>
  * All important logic is done here. ScriptComponentTreeSheet only has an interface to add different child components.
  * </p>
  */
-class ScriptComponentTreeSheetBase extends ScriptComponentTreeFragmentHolder {
+class ScriptTreeNodeSheetBase extends ScriptTreeNodeFragmentHolder {
     /**
      * Page wide counter.
      * <p>
@@ -369,16 +369,16 @@ class ScriptComponentTreeSheetBase extends ScriptComponentTreeFragmentHolder {
             = new ScriptComponentContainer<ScriptComponentViewHolder>();
     private Map<String, Counter> mapOfCounter = new HashMap<String, Counter>();
 
-    public ScriptComponentTreeSheetBase(Script script) {
+    public ScriptTreeNodeSheetBase(Script script) {
         super(script);
 
         itemContainer.setListener(new ScriptComponentContainer.IItemContainerListener() {
             @Override
             public void onAllItemStatusChanged(boolean allDone) {
                 if (allDone)
-                    setState(ScriptComponentTree.SCRIPT_STATE_DONE);
+                    setState(ScriptTreeNode.SCRIPT_STATE_DONE);
                 else
-                    setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
+                    setState(ScriptTreeNode.SCRIPT_STATE_ONGOING);
             }
         });
     }
@@ -473,9 +473,9 @@ class ScriptComponentTreeSheetBase extends ScriptComponentTreeFragmentHolder {
 /**
  * Powerful script component that can holds a various kind of child components, e.g., questions or text.
  */
-public class ScriptComponentTreeSheet extends ScriptComponentTreeSheetBase {
+public class ScriptTreeNodeSheet extends ScriptTreeNodeSheetBase {
 
-    public ScriptComponentTreeSheet(Script script) {
+    public ScriptTreeNodeSheet(Script script) {
         super(script);
     }
 
@@ -493,13 +493,13 @@ public class ScriptComponentTreeSheet extends ScriptComponentTreeSheetBase {
     }
 
     public ScriptComponentViewHolder addQuestion(String text, SheetGroupLayout parent) {
-        ScriptComponentQuestion component = new ScriptComponentQuestion(text, this);
+        Question component = new Question(text, this);
         addItemViewHolder(component, parent);
         return component;
     }
 
     public ScriptComponentViewHolder addTextQuestion(String text, SheetGroupLayout parent) {
-        ScriptComponentTextQuestion component = new ScriptComponentTextQuestion(text, this);
+        TextQuestion component = new TextQuestion(text, this);
         addItemViewHolder(component, parent);
         return component;
     }
@@ -510,42 +510,47 @@ public class ScriptComponentTreeSheet extends ScriptComponentTreeSheetBase {
         return question;
     }
 
-    public ScriptComponentCameraExperiment addCameraExperiment(SheetGroupLayout parent) {
-        ScriptComponentCameraExperiment cameraExperiment = new ScriptComponentCameraExperiment();
+    public CameraExperiment addCameraExperiment(SheetGroupLayout parent) {
+        CameraExperiment cameraExperiment = new CameraExperiment();
         addItemViewHolder(cameraExperiment, parent);
         return cameraExperiment;
     }
 
-    public ScriptComponentPotentialEnergy1 addPotentialEnergy1Question(SheetGroupLayout parent) {
-        ScriptComponentPotentialEnergy1 question = new ScriptComponentPotentialEnergy1();
+    public PotentialEnergy1 addPotentialEnergy1Question(SheetGroupLayout parent) {
+        PotentialEnergy1 question = new PotentialEnergy1();
         addItemViewHolder(question, parent);
         return question;
     }
 
-    public GraphViewHolder addGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
-        GraphViewHolder item = new GraphViewHolder(this, experiment);
+    public GraphView addGraph(ScriptExperimentRef experiment, SheetGroupLayout parent) {
+        GraphView item = new GraphView(this, experiment);
         addItemViewHolder(item, parent);
         return item;
     }
 
-    public void addPositionGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
-        GraphViewHolder item = new GraphViewHolder(this, experiment);
+    public void addPositionGraph(ScriptExperimentRef experiment, SheetGroupLayout parent) {
+        GraphView item = new GraphView(this, experiment);
         addItemViewHolder(item, parent);
     }
 
-    public void addXSpeedGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
-        GraphViewHolder item = new GraphViewHolder(this, experiment);
+    public void addXSpeedGraph(ScriptExperimentRef experiment, SheetGroupLayout parent) {
+        GraphView item = new GraphView(this, experiment);
         item.setTitle("X-Velocity vs. Time");
         item.setXAxisContent("time_v");
         item.setYAxisContent("x-velocity");
         addItemViewHolder(item, parent);
     }
 
-    public void addYSpeedGraph(ScriptComponentExperiment experiment, SheetGroupLayout parent) {
-        GraphViewHolder item = new GraphViewHolder(this, experiment);
+    public void addYSpeedGraph(ScriptExperimentRef experiment, SheetGroupLayout parent) {
+        GraphView item = new GraphView(this, experiment);
         item.setTitle("Y-Velocity vs. Time");
         item.setXAxisContent("time_v");
         item.setYAxisContent("y-velocity");
+        addItemViewHolder(item, parent);
+    }
+
+    public void addExportButton(SheetGroupLayout parent) {
+        Export item = new Export();
         addItemViewHolder(item, parent);
     }
 }

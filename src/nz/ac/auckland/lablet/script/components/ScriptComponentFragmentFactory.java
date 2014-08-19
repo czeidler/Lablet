@@ -18,15 +18,15 @@ import nz.ac.auckland.lablet.script.*;
  * </p>
  */
 public class ScriptComponentFragmentFactory implements IScriptComponentFactory {
-    public ScriptComponentTree create(String componentName, Script script) {
+    public ScriptTreeNode create(String componentName, Script script) {
         if (componentName.equals("Sheet"))
-            return new ScriptComponentTreeSheet(script);
+            return new ScriptTreeNodeSheet(script);
         if (componentName.equals("ExperimentAnalysis"))
-            return new ScriptComponentTreeExperimentAnalysis(script);
+            return new ScriptTreeNodeExperimentAnalysis(script);
         if (componentName.equals("CalculateXSpeed"))
-            return new ScriptComponentTreeCalculateSpeed(script, true);
+            return new ScriptTreeNodeCalculateSpeed(script, true);
         if (componentName.equals("CalculateYSpeed"))
-            return new ScriptComponentTreeCalculateSpeed(script, false);
+            return new ScriptTreeNodeCalculateSpeed(script, false);
 
         return null;
     }

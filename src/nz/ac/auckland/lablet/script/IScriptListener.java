@@ -9,5 +9,5 @@ package nz.ac.auckland.lablet.script;
 
 
 public interface IScriptListener {
-    public void onComponentStateChanged(ScriptComponentTree current, int state);
+    public void onComponentStateChanged(ScriptTreeNode current, int state);
 }

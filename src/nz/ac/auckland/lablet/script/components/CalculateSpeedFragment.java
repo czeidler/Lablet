@@ -20,7 +20,7 @@ import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptComponent;
-import nz.ac.auckland.lablet.script.ScriptComponentTreeFragmentHolder;
+import nz.ac.auckland.lablet.script.ScriptTreeNodeFragmentHolder;
 import nz.ac.auckland.lablet.views.table.*;
 
 import java.util.ArrayList;
@@ -33,8 +33,8 @@ import java.util.List;
  * It can hold a fragment for either the x or the y direction.
  * </p>
  */
-class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragmentHolder {
-    private ScriptComponentExperiment experiment;
+class ScriptTreeNodeCalculateSpeed extends ScriptTreeNodeFragmentHolder {
+    private ScriptExperimentRef experiment;
 
     private boolean isXSpeed;
 
@@ -64,7 +64,7 @@ class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragmentHolde
         this.selectedAccelerationUnitIndex = selectedAccelerationUnitIndex;
     }
 
-    public ScriptComponentTreeCalculateSpeed(Script script, boolean xSpeed) {
+    public ScriptTreeNodeCalculateSpeed(Script script, boolean xSpeed) {
         super(script);
 
         isXSpeed = xSpeed;
@@ -92,18 +92,18 @@ class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragmentHolde
     public ScriptComponentGenericFragment createFragment() {
         ScriptComponentGenericFragment fragment;
         if (isXSpeed)
-            fragment = new ScriptComponentCalculateXSpeedFragment();
+            fragment = new CalculateXSpeedFragment();
         else
-            fragment = new ScriptComponentCalculateYSpeedFragment();
+            fragment = new CalculateYSpeedFragment();
         fragment.setScriptComponent(this);
         return fragment;
     }
 
-    public void setExperiment(ScriptComponentExperiment experiment) {
+    public void setExperiment(ScriptExperimentRef experiment) {
         this.experiment = experiment;
     }
 
-    public ScriptComponentExperiment getExperiment() {
+    public ScriptExperimentRef getExperiment() {
         return experiment;
     }
 
@@ -187,7 +187,7 @@ class ScriptComponentTreeCalculateSpeed extends ScriptComponentTreeFragmentHolde
 /**
  * Abstract base class for a script component that ask the user to calculate speed and acceleration of a dataset.
  */
-abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGenericFragment {
+abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
     private EditText time1EditText = null;
     private EditText time2EditText = null;
     private EditText time3EditText = null;
@@ -221,7 +221,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
         if (component == null)
             return view;
 
-        ScriptComponentTreeCalculateSpeed speedComponent = (ScriptComponentTreeCalculateSpeed)component;
+        ScriptTreeNodeCalculateSpeed speedComponent = (ScriptTreeNodeCalculateSpeed)component;
 
         View child = setChild(R.layout.script_component_calculate_speed);
         assert child != null;
@@ -323,7 +323,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
 
     @Override
     public void onPause() {
-        ScriptComponentTreeCalculateSpeed speedComponent = (ScriptComponentTreeCalculateSpeed)component;
+        ScriptTreeNodeCalculateSpeed speedComponent = (ScriptTreeNodeCalculateSpeed)component;
 
         float position1 = Float.parseFloat(String.valueOf(position1EditText.getText()));
         float position2 = Float.parseFloat(String.valueOf(position2EditText.getText()));
@@ -360,7 +360,7 @@ abstract class ScriptComponentCalculateSpeedFragment extends ScriptComponentGene
     public void onResume() {
         super.onResume();
 
-        ScriptComponentTreeCalculateSpeed speedComponent = (ScriptComponentTreeCalculateSpeed)component;
+        ScriptTreeNodeCalculateSpeed speedComponent = (ScriptTreeNodeCalculateSpeed)component;
 
         SensorAnalysis sensorAnalysis = speedComponent.getExperiment().getExperimentAnalysis(getActivity());
         if (sensorAnalysis == null)

@@ -17,7 +17,7 @@ import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.script.ScriptComponent;
-import nz.ac.auckland.lablet.script.ScriptComponentTree;
+import nz.ac.auckland.lablet.script.ScriptTreeNode;
 import nz.ac.auckland.lablet.script.ScriptComponentViewHolder;
 
 
@@ -25,10 +25,10 @@ import nz.ac.auckland.lablet.script.ScriptComponentViewHolder;
  * View for the peanut butter jelly question (PotentialEnergy1).
  */
 class ScriptComponentPotentialEnergy1View extends FrameLayout {
-    private ScriptComponentPotentialEnergy1 component;
+    private PotentialEnergy1 component;
     private CheckBox doneCheckBox;
 
-    public ScriptComponentPotentialEnergy1View(Context context, ScriptComponentPotentialEnergy1 component) {
+    public ScriptComponentPotentialEnergy1View(Context context, PotentialEnergy1 component) {
         super(context);
         this.component = component;
 
@@ -225,7 +225,7 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
  *
  * Loads the {@link ScriptComponentPotentialEnergy1View}.
  */
-public class ScriptComponentPotentialEnergy1 extends ScriptComponentViewHolder {
+public class PotentialEnergy1 extends ScriptComponentViewHolder {
     private String massQuestionText = "Mass:";
     private String heightQuestionText = "Height of the of the mass:";
     private String energyQuestionText = "What is its energy?";
@@ -238,8 +238,8 @@ public class ScriptComponentPotentialEnergy1 extends ScriptComponentViewHolder {
     private float energy = 0.0f;
     private float pbjValue = 0.0f;
 
-    public ScriptComponentPotentialEnergy1() {
-        setState(ScriptComponentTree.SCRIPT_STATE_ONGOING);
+    public PotentialEnergy1() {
+        setState(ScriptTreeNode.SCRIPT_STATE_ONGOING);
     }
 
     public String getMassQuestionText() {

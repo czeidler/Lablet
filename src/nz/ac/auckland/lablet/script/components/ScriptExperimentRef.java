@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.script.components;
 
-
 import android.content.Context;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentLoader;
@@ -18,17 +17,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+
 /**
  * Reference to an experiment conducted in the script.
  * Also caches the experiment analysis and notifies listeners if the experiment has been updated.
  */
-public class ScriptComponentExperiment {
-    public interface IScriptComponentExperimentListener {
+public class ScriptExperimentRef {
+    public interface IScriptExperimentRefListener {
         public void onExperimentAnalysisUpdated();
     }
 
-    private List<WeakReference<IScriptComponentExperimentListener>> listeners
-            = new ArrayList<WeakReference<IScriptComponentExperimentListener>>();
+    private List<WeakReference<IScriptExperimentRefListener>> listeners = new ArrayList<>();
     private String experimentPath = "";
     private ExperimentData experimentData;
 
@@ -43,24 +42,22 @@ public class ScriptComponentExperiment {
         if (experimentData == null)
             experimentData = loadSensorAnalysis(context);
 
-        ExperimentData.SensorEntry entry = new ExperimentData.SensorEntry();
-
         return ExperimentLoader.getSensorAnalysis(experimentData.getRuns().get(0).sensors.get(0));
     }
 
-    public void addListener(IScriptComponentExperimentListener listener) {
-        listeners.add(new WeakReference<IScriptComponentExperimentListener>(listener));
+    public void addListener(IScriptExperimentRefListener listener) {
+        listeners.add(new WeakReference<>(listener));
     }
 
-    public boolean removeListener(IScriptComponentExperimentListener listener) {
+    public boolean removeListener(IScriptExperimentRefListener listener) {
         return listeners.remove(listener);
     }
 
     public void reloadExperimentAnalysis(Context context) {
         experimentData = loadSensorAnalysis(context);
-        for (ListIterator<WeakReference<IScriptComponentExperimentListener>> it = listeners.listIterator();
+        for (ListIterator<WeakReference<IScriptExperimentRefListener>> it = listeners.listIterator();
              it.hasNext();) {
-            IScriptComponentExperimentListener listener = it.next().get();
+            IScriptExperimentRefListener listener = it.next().get();
             if (listener != null)
                 listener.onExperimentAnalysisUpdated();
             else

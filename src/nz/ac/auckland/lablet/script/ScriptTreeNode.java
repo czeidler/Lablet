@@ -11,14 +11,14 @@ import java.util.Map;
 /**
  * Abstract base class for a component that has child components. A tree component can have multiple child. Each child
  * is assigned to a component state. For example, a script can be continued depending on the state of the current
- * component. A {@link nz.ac.auckland.lablet.script.ScriptComponentTree} has a link to its parent (if it exists).
+ * component. A {@link ScriptTreeNode} has a link to its parent (if it exists).
  */
-abstract public class ScriptComponentTree extends ScriptComponent implements Iterable<ScriptComponentTree> {
+abstract public class ScriptTreeNode extends ScriptComponent implements Iterable<ScriptTreeNode> {
     private Script script = null;
-    private ScriptComponentTree parent = null;
-    private Map<Integer, ScriptComponentTree> connections = new HashMap<Integer, ScriptComponentTree>();
+    private ScriptTreeNode parent = null;
+    private Map<Integer, ScriptTreeNode> connections = new HashMap<Integer, ScriptTreeNode>();
 
-    public ScriptComponentTree(Script script) {
+    public ScriptTreeNode(Script script) {
         this.script = script;
     }
 
@@ -32,7 +32,7 @@ abstract public class ScriptComponentTree extends ScriptComponent implements Ite
      * @return iterator for all child and their child
      */
     @Override
-    public java.util.Iterator<ScriptComponentTree> iterator() {
+    public java.util.Iterator<ScriptTreeNode> iterator() {
         return new Iterator(this);
     }
 
@@ -42,14 +42,14 @@ abstract public class ScriptComponentTree extends ScriptComponent implements Ite
      * @param component
      * @return the hash of the whole tree
      */
-    static public String getTreeHash(ScriptComponentTree component) {
+    static public String getTreeHash(ScriptTreeNode component) {
         String hashData = component.getName();
-        java.util.Iterator<ScriptComponentTree> iterator = component.connections.values().iterator();
+        java.util.Iterator<ScriptTreeNode> iterator = component.connections.values().iterator();
         int childId = -1;
         while (true) {
             if (!iterator.hasNext())
                 break;
-            ScriptComponentTree child = iterator.next();
+            ScriptTreeNode child = iterator.next();
             childId++;
 
             hashData += childId;
@@ -65,10 +65,10 @@ abstract public class ScriptComponentTree extends ScriptComponent implements Ite
      *
      * @return an ordered list of active child components
      */
-    public List<ScriptComponentTree> getActiveChain() {
-        List<ScriptComponentTree> list = new ArrayList<ScriptComponentTree>();
+    public List<ScriptTreeNode> getActiveChain() {
+        List<ScriptTreeNode> list = new ArrayList<ScriptTreeNode>();
         list.add(this);
-        ScriptComponentTree current = this;
+        ScriptTreeNode current = this;
         while (true) {
             current = current.connections.get(current.getState());
             if (current == null)
@@ -92,7 +92,7 @@ abstract public class ScriptComponentTree extends ScriptComponent implements Ite
      * @param state
      * @param component
      */
-    public void setChildComponent(int state, ScriptComponentTree component) {
+    public void setChildComponent(int state, ScriptTreeNode component) {
         connections.put(state, component);
         component.setParent(this);
     }
@@ -102,7 +102,7 @@ abstract public class ScriptComponentTree extends ScriptComponent implements Ite
      *
      * @return the component associated with the current state
      */
-    public ScriptComponentTree getActiveChild() {
+    public ScriptTreeNode getActiveChild() {
         int state = getState();
         if (state < 0)
             return null;
@@ -120,7 +120,7 @@ abstract public class ScriptComponentTree extends ScriptComponent implements Ite
         script.onComponentStateChanged(this, state);
     }
 
-    public ScriptComponentTree getParent() {
+    public ScriptTreeNode getParent() {
         return parent;
     }
 
@@ -131,7 +131,7 @@ abstract public class ScriptComponentTree extends ScriptComponent implements Ite
      */
     public int getStepsToRootParent() {
         int stepsToRoot = 1;
-        ScriptComponentTree currentParent = parent;
+        ScriptTreeNode currentParent = parent;
         while (currentParent != null) {
             stepsToRoot++;
             currentParent = currentParent.getParent();
@@ -145,31 +145,31 @@ abstract public class ScriptComponentTree extends ScriptComponent implements Ite
         return false;
     }
 
-    private void setParent(ScriptComponentTree parent) {
+    private void setParent(ScriptTreeNode parent) {
         this.parent = parent;
     }
 
     /**
      * Recursive iterator for all child. Starting at the first child all child are recursively listed.
      */
-    static private class Iterator implements java.util.Iterator<ScriptComponentTree> {
-        private ScriptComponentTree currentComponent;
-        private java.util.Iterator<ScriptComponentTree> currentComponentIterator;
-        private java.util.Iterator<ScriptComponentTree> childIterator;
+    static private class Iterator implements java.util.Iterator<ScriptTreeNode> {
+        private ScriptTreeNode currentComponent;
+        private java.util.Iterator<ScriptTreeNode> currentComponentIterator;
+        private java.util.Iterator<ScriptTreeNode> childIterator;
 
-        Iterator(ScriptComponentTree root) {
+        Iterator(ScriptTreeNode root) {
             currentComponent = root;
             currentComponentIterator = currentComponent.connections.values().iterator();
         }
 
         @Override
-        public ScriptComponentTree next() {
+        public ScriptTreeNode next() {
             if (childIterator == null) {
-                ScriptComponentTree child = currentComponentIterator.next();
+                ScriptTreeNode child = currentComponentIterator.next();
                 childIterator = child.iterator();
                 return child;
             } else {
-                ScriptComponentTree child = childIterator.next();
+                ScriptTreeNode child = childIterator.next();
                 if (!childIterator.hasNext())
                     childIterator = null;
 
