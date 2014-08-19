@@ -1,6 +1,5 @@
 
 function onBuildExperimentScript(scriptBuilder)
-	
 	local takeVideoSheet = scriptBuilder:create("Sheet")
 	scriptBuilder:add(takeVideoSheet)
 	takeVideoSheet:setTitle("Camera Experiment:")
@@ -41,9 +40,11 @@ function onBuildExperimentScript(scriptBuilder)
 	graph:setTitle("Height vs. Time")
 	graph:setXAxisContent("time")
 	graph:setYAxisContent("y-position")
-	pbjQuestion = question:addPotentialEnergy1Question();
-	pbjQuestion:setMass(1);
+	pbjQuestion = question:addPotentialEnergy1Question()
+	pbjQuestion:setMass(1)
 	pbjQuestion:setHeightQuestionText("What was the height of the ball at its peak?")
 	pbjQuestion:setEnergyQuestionText("How much energy input enabled the ball to reach this height?")
-		
+	question:addText("Please export your data:")
+	question:addExportButton()
+
 end
