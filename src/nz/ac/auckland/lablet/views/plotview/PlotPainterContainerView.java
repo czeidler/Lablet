@@ -9,6 +9,8 @@ package nz.ac.auckland.lablet.views.plotview;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -63,8 +65,12 @@ public class PlotPainterContainerView extends RangeDrawingView {
     final private List<IPlotPainter> backgroundPainters = new ArrayList();
     final private List<IPlotPainter> plotPainters = new ArrayList();
     final private List<IPlotPainter> foregroundPainters = new ArrayList();
-    final private JoinedList<IPlotPainter> allPainters = new JoinedList(backgroundPainters, plotPainters,
+    final protected JoinedList<IPlotPainter> allPainters = new JoinedList(backgroundPainters, plotPainters,
             foregroundPainters);
+
+    public PlotPainterContainerView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
 
     public PlotPainterContainerView(Context context) {
         super(context);
@@ -82,7 +88,7 @@ public class PlotPainterContainerView extends RangeDrawingView {
             painter.onSizeChanged(getWidth(), getHeight(), 0, 0);
     }
 
-    public void removePlotPainter(XYPainter painter) {
+    public void removePlotPainter(IPlotPainter painter) {
         plotPainters.remove(painter);
         invalidate();
     }
@@ -99,6 +105,15 @@ public class PlotPainterContainerView extends RangeDrawingView {
             painter.onDraw(canvas);
             canvas.restore();
         }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        for (IPlotPainter painter : allPainters) {
+            if (painter.onTouchEvent(event))
+                return true;
+        }
+        return super.dispatchTouchEvent(event);
     }
 
     @Override

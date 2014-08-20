@@ -10,7 +10,7 @@ package nz.ac.auckland.lablet.views.plotview;
 import android.graphics.*;
 
 
-public class RangeInfoPainter implements IPlotPainter {
+public class RangeInfoPainter extends AbstractPlotPainter {
     final private PlotView plotView;
     private PlotPainterContainerView containerView;
     private Paint rangePaint = new Paint();
@@ -62,23 +62,8 @@ public class RangeInfoPainter implements IPlotPainter {
         canvas.restore();
     }
 
-    @Override
-    public void invalidate() {
-
-    }
-
     private float getRelativePosition(float value, float start, float end) {
         return (value - start) / (end - start);
-    }
-
-    @Override
-    public void setXScale(IScale xScale) {
-
-    }
-
-    @Override
-    public void setYScale(IScale yScale) {
-
     }
 
     @Override

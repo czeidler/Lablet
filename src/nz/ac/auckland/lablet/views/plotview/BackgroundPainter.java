@@ -11,6 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.view.MotionEvent;
 import nz.ac.auckland.lablet.views.plotview.axes.LabelPartitioner;
 import nz.ac.auckland.lablet.views.plotview.axes.XAxisView;
 import nz.ac.auckland.lablet.views.plotview.axes.YAxisView;
@@ -18,7 +19,7 @@ import nz.ac.auckland.lablet.views.plotview.axes.YAxisView;
 import java.util.List;
 
 
-public class BackgroundPainter implements IPlotPainter {
+public class BackgroundPainter extends AbstractPlotPainter {
     final int DEFAULT_BACKGROUND_COLOR = Color.DKGRAY;
     final int DEFAULT_MAIN_GRID_COLOR = Color.LTGRAY;
 
@@ -103,31 +104,6 @@ public class BackgroundPainter implements IPlotPainter {
                 canvas.drawLine(0, position, bounds.width(), position, mainGridPaint);
             }
         }
-
-    }
-
-    @Override
-    public void invalidate() {
-
-    }
-
-    @Override
-    public void setXScale(IScale xScale) {
-
-    }
-
-    @Override
-    public void setYScale(IScale yScale) {
-
-    }
-
-    @Override
-    public void onXRangeChanged(float left, float right, float oldLeft, float oldRight) {
-
-    }
-
-    @Override
-    public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop) {
 
     }
 }

@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 import android.graphics.Canvas;
+import android.view.MotionEvent;
 
 
 public interface IPlotPainter {
@@ -15,7 +16,7 @@ public interface IPlotPainter {
 
     public void onSizeChanged(int width, int height, int oldw, int oldh);
     public void onDraw(Canvas canvas);
-
+    public boolean onTouchEvent(MotionEvent event);
     /**
      * Invalidate the state of the painter.
      *

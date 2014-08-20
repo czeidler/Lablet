@@ -211,10 +211,10 @@ public class PlotView extends ViewGroup {
             setBehaviour(behaviourX, behaviourY);
 
             for (IPlotPainter painter : painters) {
-                AbstractPlotPainter abstractPlotPainter = (AbstractPlotPainter)painter;
-                if (abstractPlotPainter == null)
+                AbstractPlotDataPainter abstractPlotDataPainter = (AbstractPlotDataPainter)painter;
+                if (abstractPlotDataPainter == null)
                     continue;
-                AbstractXYDataAdapter adapter = (AbstractXYDataAdapter)abstractPlotPainter.dataAdapter;
+                AbstractXYDataAdapter adapter = (AbstractXYDataAdapter) abstractPlotDataPainter.dataAdapter;
                 if (adapter == null)
                     continue;
 
@@ -410,7 +410,7 @@ public class PlotView extends ViewGroup {
                 yPolicy.onLimitsChanged(limits, oldRange, yFlipped);
 
             previousLimits = new RectF(limits);
-        };
+        }
 
         public void setBehaviour(int behaviourX, int behaviourY) {
             switch (behaviourX) {
@@ -524,10 +524,7 @@ public class PlotView extends ViewGroup {
         if (behaviourX == AUTO_RANGE_DISABLED && behaviourY == AUTO_RANGE_DISABLED)
             return;
 
-        if (autoRange == null)
-            autoRange = new AutoRange(mainView.getPlotPainters(), behaviourX, behaviourY);
-        else
-            autoRange.setBehaviour(behaviourX, behaviourY);
+        autoRange = new AutoRange(mainView.getPlotPainters(), behaviourX, behaviourY);
     }
 
     public void autoZoom() {
@@ -801,6 +798,6 @@ public class PlotView extends ViewGroup {
         } else
             return super.dispatchTouchEvent(event);
 
-        return handled;
+        return true;
     }
 }

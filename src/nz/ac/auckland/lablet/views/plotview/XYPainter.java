@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 import android.graphics.*;
+import android.view.MotionEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,5 +118,6 @@ public class XYPainter extends ArrayOffScreenPlotPainter {
             pointRenderer.drawPoint(bitmapCanvas, new PointF(point[0], point[1]), drawConfig);
         }
     }
+
 }
 

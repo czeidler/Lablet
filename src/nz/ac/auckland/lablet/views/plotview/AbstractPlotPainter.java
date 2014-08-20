@@ -8,30 +8,13 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 
+import android.view.MotionEvent;
+
 abstract public class AbstractPlotPainter implements IPlotPainter {
-    protected AbstractPlotDataAdapter dataAdapter;
-    protected AbstractPlotDataAdapter.IListener listener = null;
     protected PlotPainterContainerView containerView;
 
     protected IScale xScale = new LinearScale();
     protected IScale yScale = new LinearScale();
-
-    abstract protected AbstractPlotDataAdapter.IListener createListener();
-
-    public void setDataAdapter(AbstractPlotDataAdapter adapter) {
-        if (this.dataAdapter != null)
-            this.dataAdapter.removeListener(listener);
-
-        this.dataAdapter = adapter;
-        listener = createListener();
-        this.dataAdapter.addListener(listener);
-
-        invalidate();
-    }
-
-    public AbstractPlotDataAdapter getDataAdapter() {
-        return dataAdapter;
-    }
 
     public void setContainer(PlotPainterContainerView view) {
         this.containerView = view;
@@ -56,5 +39,15 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
     @Override
     public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop) {
 
+    }
+
+    @Override
+    public void invalidate() {
+
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return false;
     }
 }

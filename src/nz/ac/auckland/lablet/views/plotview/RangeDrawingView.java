@@ -9,20 +9,27 @@ package nz.ac.auckland.lablet.views.plotview;
 
 import android.content.Context;
 import android.graphics.*;
+import android.util.AttributeSet;
 import android.view.ViewGroup;
 
 
 public class RangeDrawingView extends ViewGroup {
     // Float.MAX_VALUE means unset
-    final private RectF rangeRect = new RectF(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
+    final protected RectF rangeRect = new RectF(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
 
-    private int viewWidth;
-    private int viewHeight;
+    protected int viewWidth;
+    protected int viewHeight;
     private float minXRange = -1;
     private float minYRange = -1;
 
     // Float.MAX_VALUE means there there is no end range (negative or positive)
     private RectF maxRange = new RectF(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
+
+    public RangeDrawingView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+
+        setWillNotDraw(false);
+    }
 
     public RangeDrawingView(Context context) {
         super(context);
@@ -52,6 +59,11 @@ public class RangeDrawingView extends ViewGroup {
 
         // reset range
         setYRange(getRangeBottom(), getRangeTop());
+    }
+
+    final public void setMaxRange(RectF range) {
+        setMaxXRange(range.left, range.right);
+        setMaxYRange(range.bottom, range.top);
     }
 
     public RectF getMaxRange() {
@@ -162,6 +174,11 @@ public class RangeDrawingView extends ViewGroup {
         return setYRange(bottom, top, false);
     }
 
+    final public void setRange(RectF range) {
+        setXRange(range.left, range.right);
+        setYRange(range.bottom, range.top);
+    }
+
     public boolean setXRange(float left, float right, boolean keepDistance) {
         float oldLeft = getRangeLeft();
         float oldRight = getRangeRight();
@@ -227,12 +244,22 @@ public class RangeDrawingView extends ViewGroup {
         return (1.f - (real - rangeRect.bottom) / (rangeRect.top - rangeRect.bottom)) * viewHeight;
     }
 
+    public void toScreen(PointF real, PointF screen) {
+        screen.x = toScreenX(real.x);
+        screen.y = toScreenY(real.y);
+    }
+
     public float fromScreenX(float screen) {
         return rangeRect.left + screen * (rangeRect.right - rangeRect.left) / viewWidth;
     }
 
     public float fromScreenY(float screen) {
         return rangeRect.top - screen * (rangeRect.top - rangeRect.bottom) / viewHeight;
+    }
+
+    public void fromScreen(PointF newPosition, PointF newReal) {
+        newReal.x = fromScreenX(newPosition.x);
+        newReal.y = fromScreenY(newPosition.y);
     }
 
     public Rect toScreen(RectF real) {

@@ -98,7 +98,7 @@ class RenderTask {
 }
 
 
-abstract public class OffScreenPlotPainter extends AbstractPlotPainter {
+abstract public class OffScreenPlotPainter extends AbstractPlotDataPainter {
     // the bitmap holding the results for the
     private Bitmap bitmap = null;
     // what the bitmap is showing
