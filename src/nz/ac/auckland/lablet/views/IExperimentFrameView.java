@@ -1,6 +1,7 @@
 package nz.ac.auckland.lablet.views;
 
 import android.graphics.PointF;
+import android.graphics.RectF;
 
 
 /**
@@ -9,10 +10,5 @@ import android.graphics.PointF;
 public interface IExperimentFrameView {
     public void setCurrentFrame(int frame);
 
-    // convert a coordinate on the screen to the real value of the measurement
-    public void fromScreen(PointF screen, PointF real);
-    public void toScreen(PointF real, PointF screen);
-
-    public float getMaxRawX();
-    public float getMaxRawY();
+    public RectF getDataRange();
 }

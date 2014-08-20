@@ -42,9 +42,8 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
     private final float ARROW_AXIS_OVERLAP;
     private final float LABEL_TO_AXIS_END_DISTANCE;
 
-    public OriginMarkerPainter(View parent, IExperimentFrameView runView, MarkerDataModel model,
-                               Calibration calibration) {
-        super(parent, runView, model);
+    public OriginMarkerPainter(MarkerDataModel model, Calibration calibration) {
+        super(model);
         this.calibration = calibration;
         this.calibration.addListener(this);
 
@@ -71,7 +70,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
     }
 
     @Override
-    public void draw(Canvas canvas, float priority) {
+    public void onDraw(Canvas canvas) {
         if (firstDraw) {
             firstDraw = false;
             setToScreenFromReal(markerData.getMarkerDataAt(0).getPosition(),
@@ -79,12 +78,12 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
 
             // also init the correct y axis marker position
             PointF yAxis = new PointF();
-            experimentRunView.fromScreen(getScreenPos(2), yAxis);
+            containerView.fromScreen(getScreenPos(2), yAxis);
             markerData.setMarkerPosition(yAxis, 2);
         }
 
         for (IMarker marker : markerList)
-            marker.onDraw(canvas, priority);
+            marker.onDraw(canvas, 1);
 
         if (markerData.getMarkerCount() != 3)
             return;
@@ -231,9 +230,9 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         PointF origin = new PointF();
         PointF xAxis = new PointF();
         PointF yAxis = new PointF();
-        experimentRunView.fromScreen(getScreenPos(0), origin);
-        experimentRunView.fromScreen(getScreenPos(1), xAxis);
-        experimentRunView.fromScreen(getScreenPos(2), yAxis);
+        containerView.fromScreen(getScreenPos(0), origin);
+        containerView.fromScreen(getScreenPos(1), xAxis);
+        containerView.fromScreen(getScreenPos(2), yAxis);
 
         markerData.setMarkerPosition(origin, 0);
         markerData.setMarkerPosition(xAxis, 1);
@@ -262,7 +261,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
             PointF origin = new PointF();
             origin.set(markerData.getMarkerDataAt(0).getPosition());
             PointF originScreen = new PointF();
-            experimentRunView.toScreen(origin, originScreen);
+            containerView.toScreen(origin, originScreen);
             float angle = Calibration.getAngle(originScreen, newPosition);
             if (row == 2)
                 angle += 90;
@@ -293,9 +292,9 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
 
     private void setToScreenFromReal(PointF origin, PointF axis1) {
         PointF originScreen = new PointF();
-        experimentRunView.toScreen(origin, originScreen);
+        containerView.toScreen(origin, originScreen);
         PointF xAxisScreen = new PointF();
-        experimentRunView.toScreen(axis1, xAxisScreen);
+        containerView.toScreen(axis1, xAxisScreen);
         angleScreen = Calibration.getAngle(originScreen, xAxisScreen);
 
         setToScreenFromScreen(originScreen, angleScreen);
@@ -304,7 +303,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
     private float getScreenAxisLength() {
         final PointF axisLengthPoint = new PointF(25, 0);
         PointF screen = new PointF();
-        experimentRunView.toScreen(axisLengthPoint, screen);
+        containerView.toScreen(axisLengthPoint, screen);
         return screen.x;
     }
 
@@ -320,6 +319,6 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
     @Override
     public void onCalibrationChanged() {
         // just trigger a redraw
-        markerView.invalidate();
+        containerView.invalidate();
     }
 }

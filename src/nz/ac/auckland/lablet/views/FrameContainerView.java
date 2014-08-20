@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views;
 
 import android.content.Context;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -90,31 +91,32 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
 
         markerView = new MarkerView(getContext());
         addView(markerView, makerViewParams);
+
+        RectF range = ((IExperimentFrameView) sensorAnalysisView).getDataRange();
+        markerView.setRange(range);
+        markerView.setMaxRange(range);
     }
 
     public void addTagMarkerData(MarkerDataModel data) {
-        IMarkerDataModelPainter painter = new TagMarkerDataModelPainter(markerView,
-                (IExperimentFrameView) sensorAnalysisView, data);
-        markerView.addMarkerPainter(painter);
+        TagMarkerDataModelPainter painter = new TagMarkerDataModelPainter(data);
+        markerView.addPlotPainter(painter);
 
         onFrameChanged(frameDataModel.getCurrentFrame());
     }
 
     public void addXYCalibrationData(MarkerDataModel data) {
-        IMarkerDataModelPainter painter = new CalibrationMarkerPainter(markerView,
-                (IExperimentFrameView) sensorAnalysisView, data);
-        markerView.addMarkerPainter(painter);
+        CalibrationMarkerPainter painter = new CalibrationMarkerPainter(data);
+        markerView.addPlotPainter(painter);
     }
 
     public void removeOriginData() {
-        markerView.removeMarkerPainter(originMarkerPainter);
+        markerView.removePlotPainter(originMarkerPainter);
     }
 
     public void addOriginData(MarkerDataModel data, Calibration calibration) {
-        originMarkerPainter = new OriginMarkerPainter(markerView, (IExperimentFrameView) sensorAnalysisView, data,
-                calibration);
+        originMarkerPainter = new OriginMarkerPainter(data, calibration);
         if (sensorAnalysis.getShowCoordinateSystem())
-            markerView.addMarkerPainter(originMarkerPainter);
+            markerView.addPlotPainter(originMarkerPainter);
     }
 
     public void release() {
@@ -142,9 +144,9 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
     @Override
     public void onShowCoordinateSystem(boolean show) {
         if (show)
-            markerView.addMarkerPainter(originMarkerPainter);
+            markerView.addPlotPainter(originMarkerPainter);
         else
-            markerView.removeMarkerPainter(originMarkerPainter);
+            markerView.removePlotPainter(originMarkerPainter);
     }
 
     /**

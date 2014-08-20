@@ -9,6 +9,7 @@ package nz.ac.auckland.lablet.microphone;
 
 import android.content.Context;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.widget.FrameLayout;
 import nz.ac.auckland.lablet.experiment.SensorData;
@@ -118,22 +119,8 @@ public class MicrophoneAnalysisView extends FrameLayout implements IExperimentFr
     }
 
     @Override
-    public void fromScreen(PointF screen, PointF real) {
-        real.set(screen);
+    public RectF getDataRange() {
+        return new RectF(0, 100, 100, 0);
     }
 
-    @Override
-    public void toScreen(PointF real, PointF screen) {
-        screen.set(real);
-    }
-
-    @Override
-    public float getMaxRawX() {
-        return 100;
-    }
-
-    @Override
-    public float getMaxRawY() {
-        return 100;
-    }
 }

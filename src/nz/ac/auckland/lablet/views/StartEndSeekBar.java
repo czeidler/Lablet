@@ -10,9 +10,13 @@ package nz.ac.auckland.lablet.views;
 import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.plotview.IPlotPainter;
+import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
+import nz.ac.auckland.lablet.views.plotview.RangeDrawingView;
 
 
 /**
@@ -136,12 +140,10 @@ class StartEndPainter extends AbstractMarkerPainter {
     /**
      * Constructor.
      *
-     * @param parent view
-     * @param runView run view interface
      * @param data should contain exactly two data points, one for the start and one for the end marker
      */
-    public StartEndPainter(View parent, IExperimentFrameView runView, MarkerDataModel data) {
-        super(parent, runView, data);
+    public StartEndPainter(MarkerDataModel data) {
+        super(data);
     }
 
     @Override
@@ -153,9 +155,9 @@ class StartEndPainter extends AbstractMarkerPainter {
     }
 
     @Override
-    public void draw(Canvas canvas, float priority) {
+    public void onDraw(Canvas canvas) {
         for (IMarker marker : markerList)
-            marker.onDraw(canvas, priority);
+            marker.onDraw(canvas, 1);
     }
 
     @Override
@@ -166,7 +168,7 @@ class StartEndPainter extends AbstractMarkerPainter {
 
         PointF newReal = new PointF();
         sanitizeScreenPoint(newPosition);
-        experimentRunView.fromScreen(newPosition, newReal);
+        containerView.fromScreen(newPosition, newReal);
         newReal.x = toStepPosition(newReal.x);
 
         if (row == 0) {
@@ -206,7 +208,7 @@ class StartEndPainter extends AbstractMarkerPainter {
 /**
  * A seek bar with a start and an end marker. For example, used to select video start and end point.
  */
-public class StartEndSeekBar extends MarkerView implements IExperimentFrameView {
+public class StartEndSeekBar extends PlotPainterContainerView {
     private MarkerDataModel markerDataModel;
     private StartEndPainter startEndPainter;
 
@@ -220,15 +222,15 @@ public class StartEndSeekBar extends MarkerView implements IExperimentFrameView 
         markerDataModel.addMarkerData(new MarkerData(0));
         markerDataModel.addMarkerData(new MarkerData(1));
 
-        startEndPainter = new StartEndPainter(this, this, markerDataModel);
-        addMarkerPainter(startEndPainter);
+        startEndPainter = new StartEndPainter(markerDataModel);
+        addPlotPainter(startEndPainter);
         invalidate();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        for (IMarkerDataModelPainter markerPainter : markerPainterList)
-            markerPainter.draw(canvas, 1);
+        for (IPlotPainter markerPainter : allPainters)
+            markerPainter.onDraw(canvas);
     }
 
     @Override
@@ -243,45 +245,19 @@ public class StartEndSeekBar extends MarkerView implements IExperimentFrameView 
     }
 
     @Override
-    public void setCurrentFrame(int frame) {
-
+    public float toScreenX(float real) {
+        float paddingLeft = getPaddingLeft();
+        float paddingRight = getPaddingRight();
+        float width = viewWidth - paddingLeft - paddingRight;
+        return paddingLeft + (real - rangeRect.left) / (rangeRect.right - rangeRect.left) * width;
     }
 
     @Override
-    public void fromScreen(PointF screen, PointF real) {
-        int paddingLeft = getPaddingLeft();
-        int paddingRight = getPaddingRight();
-        int barWidth = viewFrame.width() - paddingLeft - paddingRight;
-
-        if (screen.x < paddingLeft)
-            screen.x = paddingLeft;
-        if (screen.x > viewFrame.width() - paddingRight)
-            screen.x = viewFrame.width() - paddingRight;
-
-        screen.x -= paddingLeft;
-
-        real.x = screen.x / barWidth;
-        real.y = 0;
-    }
-
-    @Override
-    public void toScreen(PointF real, PointF screen) {
-        int paddingLeft = getPaddingLeft();
-        int paddingRight = getPaddingRight();
-        int barWidth = viewFrame.width() - paddingLeft - paddingRight;
-
-        screen.x = paddingLeft + real.x * barWidth;
-        screen.y = 0;
-    }
-
-    @Override
-    public float getMaxRawX() {
-        return 100;
-    }
-
-    @Override
-    public float getMaxRawY() {
-        return 100;
+    public float toScreenY(float real) {
+        float paddingTop = getPaddingTop();
+        float paddingBottom = getPaddingBottom();
+        float height = viewHeight - paddingTop - paddingBottom;
+        return paddingTop + (1.f - (real - rangeRect.bottom) / (rangeRect.top - rangeRect.bottom)) * height;
     }
 
     /**

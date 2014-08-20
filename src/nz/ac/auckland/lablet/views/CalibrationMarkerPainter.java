@@ -31,8 +31,8 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
     private float LINE_WIDTH;
     private float WING_LENGTH;
 
-    public CalibrationMarkerPainter(View parent, IExperimentFrameView runView, MarkerDataModel model) {
-        super(parent, runView, model);
+    public CalibrationMarkerPainter(MarkerDataModel model) {
+        super(model);
 
         FONT_SIZE = toPixel(FONT_SIZE_DP);
         LINE_WIDTH = toPixel(LINE_WIDTH_DP);
@@ -54,9 +54,9 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
     }
 
     @Override
-    public void draw(Canvas canvas, float priority) {
+    public void onDraw(Canvas canvas) {
         for (IMarker marker : markerList)
-            marker.onDraw(canvas, priority);
+            marker.onDraw(canvas, 1);
 
         if (markerData.getMarkerCount() != 2)
             return;
@@ -101,10 +101,9 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
         String text = "Scale length [pixel]: ";
         text += scaleLength;
         float marginPercent = 0.01f;
-        PointF textPosition = new PointF(experimentRunView.getMaxRawX() * marginPercent,
-                experimentRunView.getMaxRawY() - experimentRunView.getMaxRawX() * marginPercent);
-        PointF screenTextPosition = new PointF();
-        experimentRunView.toScreen(textPosition, screenTextPosition);
+
+        float inset = containerView.getWidth() * marginPercent;
+        PointF screenTextPosition = new PointF(inset, containerView.getHeight() - inset);
         screenTextPosition.y -= paint.ascent();
 
         // draw text background box
@@ -119,8 +118,6 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
         // draw text
         paint.setColor(Color.GREEN);
         canvas.drawText(text, screenTextPosition.x, screenTextPosition.y, paint);
-
-
     }
 
     private PointF getScreenPos(int markerIndex) {

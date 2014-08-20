@@ -66,28 +66,12 @@ public class CameraExperimentFrameView extends VideoFrameView implements IExperi
     }
 
     @Override
-    public void fromScreen(PointF screen, PointF real) {
-        float xMax = getMaxRawX();
-        float yMax = getMaxRawY();
-        real.x = screen.x / frame.width() * xMax;
-        real.y = yMax - screen.y / frame.height() * yMax;
-    }
-
-    @Override
-    public void toScreen(PointF real, PointF screen) {
-        float xMax = getMaxRawX();
-        float yMax = getMaxRawY();
-        screen.x = real.x * frame.width() / xMax;
-        screen.y = (yMax - real.y) * frame.height() / yMax;
-    }
-
-    @Override
-    public float getMaxRawX() {
-        return experiment.getMaxRawX();
-    }
-
-    @Override
-    public float getMaxRawY() {
-        return experiment.getMaxRawY();
+    public RectF getDataRange() {
+        RectF range = new RectF();
+        range.left = 0;
+        range.right = experiment.getMaxRawX();
+        range.top = experiment.getMaxRawY();
+        range.bottom = 0;
+        return range;
     }
 }
