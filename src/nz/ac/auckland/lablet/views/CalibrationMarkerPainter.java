@@ -11,6 +11,7 @@ import nz.ac.auckland.lablet.experiment.Calibration;
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 
 /**
@@ -33,6 +34,11 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
 
     public CalibrationMarkerPainter(MarkerDataModel model) {
         super(model);
+    }
+
+    @Override
+    public void setContainer(PlotPainterContainerView view) {
+        super.setContainer(view);
 
         FONT_SIZE = toPixel(FONT_SIZE_DP);
         LINE_WIDTH = toPixel(LINE_WIDTH_DP);

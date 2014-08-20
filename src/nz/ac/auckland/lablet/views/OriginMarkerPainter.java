@@ -14,6 +14,7 @@ import nz.ac.auckland.lablet.experiment.Calibration;
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 
 /**
@@ -35,17 +36,22 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
     private final float ARROW_AXIS_OVERLAP_DP = 10f;
 
     // pixel sizes, set in the constructor
-    private final int FONT_SIZE;
-    private final float LINE_WIDTH;
-    private final float ARROW_WIDTH;
-    private final float ARROW_LENGTH;
-    private final float ARROW_AXIS_OVERLAP;
-    private final float LABEL_TO_AXIS_END_DISTANCE;
+    private int FONT_SIZE;
+    private float LINE_WIDTH;
+    private float ARROW_WIDTH;
+    private float ARROW_LENGTH;
+    private float ARROW_AXIS_OVERLAP;
+    private float LABEL_TO_AXIS_END_DISTANCE;
 
     public OriginMarkerPainter(MarkerDataModel model, Calibration calibration) {
         super(model);
         this.calibration = calibration;
         this.calibration.addListener(this);
+    }
+
+    @Override
+    public void setContainer(PlotPainterContainerView view) {
+        super.setContainer(view);
 
         FONT_SIZE = toPixel(FONT_SIZE_DP);
         LINE_WIDTH = toPixel(LINE_WIDTH_DP);

@@ -1,6 +1,5 @@
 package nz.ac.auckland.lablet.views;
 
-import android.graphics.PointF;
 import android.graphics.RectF;
 
 
