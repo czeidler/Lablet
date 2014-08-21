@@ -13,6 +13,19 @@ import nz.ac.auckland.lablet.experiment.Calibration;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
+import java.util.List;
+
+
+/**
+ * Marker for the calibration length scale.
+ */
+class CalibrationMarker extends SimpleMarker {
+    @Override
+    public void onDraw(Canvas canvas, float priority) {
+        if (isSelectedForDrag())
+            super.onDraw(canvas, priority);
+    }
+}
 
 /**
  * Responsible to draw a calibration scale.
@@ -47,7 +60,7 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
 
     @Override
     protected DraggableMarker createMarkerForRow(int row) {
-        return new CalibrationMarker(this);
+        return new CalibrationMarker();
     }
 
     private void rotate(PointF point, PointF origin, float angleScreen) {
@@ -68,8 +81,8 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
             return;
 
         // draw scale
-        PointF screenPos1 = getScreenPos(0);
-        PointF screenPos2 = getScreenPos(1);
+        PointF screenPos1 = getMarkerScreenPosition(0);
+        PointF screenPos2 = getMarkerScreenPosition(1);
         Paint paint = new Paint();
         paint.setStrokeCap(Paint.Cap.BUTT);
         paint.setStrokeWidth(LINE_WIDTH);
@@ -124,9 +137,5 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
         // draw text
         paint.setColor(Color.GREEN);
         canvas.drawText(text, screenTextPosition.x, screenTextPosition.y, paint);
-    }
-
-    private PointF getScreenPos(int markerIndex) {
-        return markerList.get(markerIndex).getPosition();
     }
 }

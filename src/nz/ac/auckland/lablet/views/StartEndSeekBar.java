@@ -34,9 +34,7 @@ abstract class StartEndMarker extends DraggableMarker {
     protected Paint lightColor = new Paint();
     protected Paint darkenColor = new Paint();
 
-    public StartEndMarker(AbstractMarkerPainter parentContainer) {
-        super(parentContainer);
-
+    public StartEndMarker() {
         lightColor.setColor(Color.rgb(97, 204, 238));
         lightColor.setAntiAlias(true);
         lightColor.setStyle(Paint.Style.FILL);
@@ -45,6 +43,11 @@ abstract class StartEndMarker extends DraggableMarker {
         darkenColor.setAntiAlias(true);
         darkenColor.setStyle(Paint.Style.FILL);
         darkenColor.setPathEffect(new CornerPathEffect(2));
+    }
+
+    @Override
+    public void setTo(AbstractMarkerPainter painter, int markerIndex) {
+        super.setTo(painter, markerIndex);
 
         WIDTH = parent.toPixel(WIDTH_DP);
         HEIGHT = parent.toPixel(StartEndSeekBar.HEIGHT_DP);
@@ -53,6 +56,7 @@ abstract class StartEndMarker extends DraggableMarker {
 
     @Override
     protected boolean isPointOnSelectArea(PointF point) {
+        PointF position = parent.getMarkerScreenPosition(index);
         // build a marker rect with increased width
         final float touchWidth = (float)parent.toPixel(60);
         RectF rect = new RectF();
@@ -71,12 +75,10 @@ abstract class StartEndMarker extends DraggableMarker {
  */
 class StartMarker extends StartEndMarker {
 
-    public StartMarker(AbstractMarkerPainter parentContainer) {
-        super(parentContainer);
-    }
-
     @Override
     public void onDraw(Canvas canvas, float priority) {
+        PointF position = parent.getMarkerScreenPosition(index);
+
         // Note: don't use drawRectangle because in some cases it does not align with drawPath for the triangle...
 
         // darken bottom
@@ -102,12 +104,10 @@ class StartMarker extends StartEndMarker {
  */
 class EndMarker extends StartEndMarker {
 
-    public EndMarker(AbstractMarkerPainter parentContainer) {
-        super(parentContainer);
-    }
-
     @Override
     public void onDraw(Canvas canvas, float priority) {
+        PointF position = parent.getMarkerScreenPosition(index);
+
         // Note: don't use drawRectangle because in some cases it does not align with drawPath for the triangle...
 
         // darken bottom
@@ -149,9 +149,9 @@ class StartEndPainter extends AbstractMarkerPainter {
     @Override
     protected DraggableMarker createMarkerForRow(int row) {
         if (row == 0)
-            return new StartMarker(this);
+            return new StartMarker();
         else
-            return new EndMarker(this);
+            return new EndMarker();
     }
 
     @Override

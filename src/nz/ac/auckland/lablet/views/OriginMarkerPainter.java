@@ -4,7 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.view.View;
 import nz.ac.auckland.lablet.experiment.Calibration;
 /*
  * Copyright 2013-2014.
@@ -15,6 +14,33 @@ import nz.ac.auckland.lablet.experiment.Calibration;
  */
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
+
+
+/**
+ * Marker for the origin coordinate system.
+ */
+class OriginMarker extends SimpleMarker {
+
+    @Override
+    public void onDraw(Canvas canvas, float priority) {
+        if (isSelectedForDrag())
+            super.onDraw(canvas, priority);
+    }
+
+    /**
+     * Dragging a origin marker needs special treatment since it also affects the other two markers in the coordinate
+     * system.
+     * <p>
+     * Call the painter class that then updates all the markers.
+     * </p>
+     * @param point the new position the marker was dragged to
+     */
+    @Override
+    protected void onDraggedTo(PointF point) {
+        OriginMarkerPainter originMarkerPainter = (OriginMarkerPainter)parent;
+        originMarkerPainter.onDraggedTo(this, point);
+    }
+}
 
 
 /**
@@ -72,20 +98,14 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
 
     @Override
     protected DraggableMarker createMarkerForRow(int row) {
-        return new OriginMarker(this);
+        return new OriginMarker();
     }
 
     @Override
     public void onDraw(Canvas canvas) {
         if (firstDraw) {
             firstDraw = false;
-            setToScreenFromReal(markerData.getMarkerDataAt(0).getPosition(),
-                    markerData.getMarkerDataAt(1).getPosition());
-
-            // also init the correct y axis marker position
-            PointF yAxis = new PointF();
-            containerView.fromScreen(getScreenPos(2), yAxis);
-            markerData.setMarkerPosition(yAxis, 2);
+            setRealFromScreen(getMarkerScreenPosition(0));
         }
 
         for (IMarker marker : markerList)
@@ -94,9 +114,9 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         if (markerData.getMarkerCount() != 3)
             return;
 
-        PointF origin = getScreenPos(0);
-        PointF xAxis = getScreenPos(1);
-        PointF yAxis = getScreenPos(2);
+        PointF origin = getMarkerScreenPosition(0);
+        PointF xAxis = getMarkerScreenPosition(1);
+        PointF yAxis = getMarkerScreenPosition(2);
 
         Paint paint = new Paint();
         paint.setStrokeWidth(LINE_WIDTH);
@@ -111,7 +131,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         String label2;
         String labelOrigin = "0";
         float textAngle = angleScreen;
-        PointF originPosition = new PointF();
+        PointF labelOriginPosition = new PointF();
         PointF label1Position = new PointF();
         PointF label2Position = new PointF();
         // text height from baseline to top:
@@ -124,9 +144,9 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
             label2 = "X";
             textAngle += 90;
 
-            originPosition.set(origin);
-            originPosition.x -= textHeight + textYOffset;
-            originPosition.y -= paint.measureText(labelOrigin) / 2;
+            labelOriginPosition.set(origin);
+            labelOriginPosition.x -= textHeight + textYOffset;
+            labelOriginPosition.y -= paint.measureText(labelOrigin) / 2;
 
             label1Position.set(origin);
             label1Position.x += labelAxisLength;
@@ -141,9 +161,9 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
             label1 = "X";
             label2 = "Y";
 
-            originPosition.set(origin);
-            originPosition.x -= paint.measureText(labelOrigin) / 2;
-            originPosition.y += textHeight + textYOffset;
+            labelOriginPosition.set(origin);
+            labelOriginPosition.x -= paint.measureText(labelOrigin) / 2;
+            labelOriginPosition.y += textHeight + textYOffset;
 
             label1Position.set(origin);
             label1Position.x += labelAxisLength;
@@ -156,18 +176,18 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
             label2Position.y += textHeight;
         }
 
-        transform(originPosition);
-        transform(label1Position);
-        transform(label2Position);
+        transform(labelOriginPosition, origin);
+        transform(label1Position, origin);
+        transform(label2Position, origin);
 
         // 0-title
-        drawLabel(canvas, paint, labelOrigin, originPosition, textAngle);
+        drawLabel(canvas, paint, labelOrigin, labelOriginPosition, textAngle);
         // x-title
         drawLabel(canvas, paint, label1, label1Position, textAngle);
         // y-title
         drawLabel(canvas, paint, label2, label2Position, textAngle);
 
-        drawArrows(canvas, paint);
+        drawArrows(canvas, origin, paint);
     }
 
     private void drawLabel(Canvas canvas, Paint paint, String label, PointF position, float textAngle) {
@@ -178,7 +198,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         canvas.restore();
     }
 
-    private void drawArrows(Canvas canvas, Paint paint) {
+    private void drawArrows(Canvas canvas, PointF origin, Paint paint) {
         // do a prototype arrow in x direction
         PointF xArrowTip = new PointF();
         xArrowTip.x += getScreenAxisLength() + ARROW_LENGTH - ARROW_AXIS_OVERLAP;
@@ -191,9 +211,6 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         xArrowBottomEnd.set(xArrowTip);
         xArrowBottomEnd.x -= ARROW_LENGTH;
         xArrowBottomEnd.y -= ARROW_WIDTH;
-
-        // draw the prototype at the x and the y axises.
-        PointF origin = getScreenPos(0);
 
         canvas.save();
         canvas.translate(origin.x, origin.y);
@@ -210,8 +227,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         canvas.restore();
     }
 
-    private void transform(PointF point) {
-        PointF origin = getScreenPos(0);
+    private void transform(PointF point, PointF origin) {
         PointF diff = new PointF();
         diff.x = point.x - origin.x;
         diff.y = point.y - origin.y;
@@ -232,17 +248,6 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
             return;
 
         onDraggedTo(marker, newPosition);
-
-        PointF origin = new PointF();
-        PointF xAxis = new PointF();
-        PointF yAxis = new PointF();
-        containerView.fromScreen(getScreenPos(0), origin);
-        containerView.fromScreen(getScreenPos(1), xAxis);
-        containerView.fromScreen(getScreenPos(2), yAxis);
-
-        markerData.setMarkerPosition(origin, 0);
-        markerData.setMarkerPosition(xAxis, 1);
-        markerData.setMarkerPosition(yAxis, 2);
     }
 
     /**
@@ -254,56 +259,45 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
      * @param newPosition the new position of the dragged marker
      */
     protected void onDraggedTo(DraggableMarker marker, PointF newPosition) {
-        int row = markerList.lastIndexOf(marker);
+        int row = markerList.indexOf(marker);
         if (row < 0)
             return;
 
         if (row == 0) {
             // translation
             sanitizeScreenPoint(newPosition);
-            setToScreenFromScreen(newPosition);
+            setRealFromScreen(newPosition);
         } else {
             // x rotation
             PointF origin = new PointF();
             origin.set(markerData.getMarkerDataAt(0).getPosition());
             PointF originScreen = new PointF();
             containerView.toScreen(origin, originScreen);
-            float angle = Calibration.getAngle(originScreen, newPosition);
+            angleScreen = Calibration.getAngle(originScreen, newPosition);
             if (row == 2)
-                angle += 90;
+                angleScreen += 90;
 
-            setToScreenFromScreen(originScreen, angle);
+            setRealFromScreen(originScreen);
         }
     }
 
-    private void setToScreenFromScreen(PointF originScreen, float angleScreen) {
-        this.angleScreen = angleScreen;
-
-        setToScreenFromScreen(originScreen);
-    }
-
-    private void setToScreenFromScreen(PointF originScreen) {
-        // we have to set the origin before calculating the axis since the origin is used in transform
-        setScreenPos(0, originScreen);
-
+    private void setRealFromScreen(PointF originScreen) {
         float axisLength = getScreenAxisLength();
         PointF xAxisScreen = new PointF(originScreen.x + axisLength, originScreen.y);
-        transform(xAxisScreen);
+        transform(xAxisScreen, originScreen);
         PointF yAxisScreen = new PointF(originScreen.x, originScreen.y - axisLength);
-        transform(yAxisScreen);
+        transform(yAxisScreen, originScreen);
 
-        setScreenPos(1, xAxisScreen);
-        setScreenPos(2, yAxisScreen);
-    }
+        PointF origin = new PointF();
+        PointF xAxis = new PointF();
+        PointF yAxis = new PointF();
+        containerView.fromScreen(originScreen, origin);
+        containerView.fromScreen(xAxisScreen, xAxis);
+        containerView.fromScreen(yAxisScreen, yAxis);
 
-    private void setToScreenFromReal(PointF origin, PointF axis1) {
-        PointF originScreen = new PointF();
-        containerView.toScreen(origin, originScreen);
-        PointF xAxisScreen = new PointF();
-        containerView.toScreen(axis1, xAxisScreen);
-        angleScreen = Calibration.getAngle(originScreen, xAxisScreen);
-
-        setToScreenFromScreen(originScreen, angleScreen);
+        markerData.setMarkerPosition(origin, 0);
+        markerData.setMarkerPosition(xAxis, 1);
+        markerData.setMarkerPosition(yAxis, 2);
     }
 
     private float getScreenAxisLength() {
@@ -311,15 +305,6 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         PointF screen = new PointF();
         containerView.toScreen(axisLengthPoint, screen);
         return screen.x;
-    }
-
-
-    private PointF getScreenPos(int markerIndex) {
-        return markerList.get(markerIndex).getPosition();
-    }
-
-    private void setScreenPos(int markerIndex, PointF point) {
-        markerList.get(markerIndex).setPosition(point);
     }
 
     @Override
