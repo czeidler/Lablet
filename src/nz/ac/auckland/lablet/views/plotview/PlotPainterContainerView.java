@@ -36,20 +36,29 @@ class JoinedList<T> implements Iterable<T> {
             Iterator<? extends T> currentListIterator = null;
 
             {
-                if (allListIterator.hasNext())
+                advanceToNextNoneEmptyList();
+            }
+
+            private void advanceToNextNoneEmptyList() {
+                while (allListIterator.hasNext()) {
                     currentListIterator = allListIterator.next().iterator();
+                    if (currentListIterator.hasNext())
+                        break;
+                }
             }
 
             @Override
             public boolean hasNext() {
+                if (currentListIterator == null)
+                    return false;
                 return currentListIterator.hasNext();
             }
 
             @Override
             public T next() {
                 T next = currentListIterator.next();
-                if (!currentListIterator.hasNext() && allListIterator.hasNext())
-                    currentListIterator = allListIterator.next().iterator();
+                if (!currentListIterator.hasNext())
+                    advanceToNextNoneEmptyList();
                 return next;
             }
 
