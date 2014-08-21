@@ -48,7 +48,7 @@ interface IMarker {
 abstract class DraggableMarker implements IMarker {
     protected AbstractMarkerPainter parent = null;
     protected int index;
-    protected PointF dragOffset = new PointF(0, 0);;
+    protected PointF dragOffset = new PointF(0, 0);
     protected boolean isSelectedForDragging = false;
     protected boolean isDragging = false;
 
@@ -73,7 +73,7 @@ abstract class DraggableMarker implements IMarker {
 
         if (!isSelectedForDrag()) {
             if (isPointOnSelectArea(point))
-                setSelectedForDrag(true);
+                setSelectedForDragIntern(true);
             if (isSelectedForDrag() && isPointOnDragArea(point))
                 isDragging = true;
 
@@ -83,7 +83,7 @@ abstract class DraggableMarker implements IMarker {
             isDragging = true;
             return true;
         }
-        setSelectedForDrag(false);
+        setSelectedForDragIntern(false);
         isDragging = false;
         return false;
     }
@@ -126,10 +126,14 @@ abstract class DraggableMarker implements IMarker {
         return point;
     }
 
+    private void setSelectedForDragIntern(boolean selectedForDrag) {
+        setSelectedForDrag(selectedForDrag);
+        parent.getMarkerPainterGroup().selectForDrag(this, parent);
+    }
+
     @Override
     public void setSelectedForDrag(boolean selectedForDrag) {
         this.isSelectedForDragging = selectedForDrag;
-        parent.getMarkerPainterGroup().selectForDrag(this, parent);
     }
 
     @Override
@@ -175,10 +179,12 @@ abstract class DraggableMarker implements IMarker {
  */
 class SimpleMarker extends DraggableMarker {
     // device independent pixels
-    private final float INNER_RING_RADIUS_DP = 30;
-    private final float INNER_RING_WIDTH_DP = 2;
-    private final float RING_RADIUS_DP = 100;
-    private final float RING_WIDTH_DP = 40;
+    private class Const {
+        static public final float INNER_RING_RADIUS_DP = 30;
+        static public final float INNER_RING_WIDTH_DP = 2;
+        static public final float RING_RADIUS_DP = 100;
+        static public final float RING_WIDTH_DP = 40;
+    }
 
     private float INNER_RING_RADIUS;
     private float INNER_RING_WIDTH;
@@ -197,10 +203,10 @@ class SimpleMarker extends DraggableMarker {
     public void setTo(AbstractMarkerPainter painter, int markerIndex) {
         super.setTo(painter, markerIndex);
 
-        INNER_RING_RADIUS = parent.toPixel(INNER_RING_RADIUS_DP);
-        INNER_RING_WIDTH = parent.toPixel(INNER_RING_WIDTH_DP);
-        RING_RADIUS = parent.toPixel(RING_RADIUS_DP);
-        RING_WIDTH = parent.toPixel(RING_WIDTH_DP);
+        INNER_RING_RADIUS = parent.toPixel(Const.INNER_RING_RADIUS_DP);
+        INNER_RING_WIDTH = parent.toPixel(Const.INNER_RING_WIDTH_DP);
+        RING_RADIUS = parent.toPixel(Const.RING_RADIUS_DP);
+        RING_WIDTH = parent.toPixel(Const.RING_WIDTH_DP);
     }
 
     @Override
@@ -299,10 +305,6 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
             selectedForDragPainter = painter;
             selectedForDragMarker = marker;
         }
-
-        public AbstractMarkerPainter getPainter() {
-            return selectedForDragPainter;
-        }
     }
 
     private MarkerPainterGroup markerPainterGroup = new MarkerPainterGroup();
@@ -329,14 +331,6 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
         markerData = null;
     }
 
-    public MarkerDataModel getMarkerModel() {
-        return markerData;
-    }
-
-    public MarkerData getMarkerData(int index) {
-        return markerData.getMarkerDataAt(index);
-    }
-
     public List<IMarker> getSelectableMarkerList() {
         return markerList;
     }
@@ -350,6 +344,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
 
     @Override
     public void onSizeChanged(int width, int height, int oldw, int oldh) {
+        frame.set(0, 0, width, height);
         markerList.clear();
         for (int i = 0; i < markerData.getMarkerCount(); i++)
             addMarker(i);
@@ -357,10 +352,11 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        List<IMarker> selectableMarkers = getSelectableMarkerList();
         int action = event.getActionMasked();
         boolean handled = false;
         if (action == MotionEvent.ACTION_DOWN) {
-            for (IMarker marker : markerList) {
+            for (IMarker marker : selectableMarkers) {
                 if (marker.handleActionDown(event)) {
                     handled = true;
                     break;
@@ -373,14 +369,14 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
             }
 
         } else if (action == MotionEvent.ACTION_UP) {
-            for (IMarker marker : markerList) {
+            for (IMarker marker : selectableMarkers) {
                 if (marker.handleActionUp(event)) {
                     handled = true;
                     break;
                 }
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
-            for (IMarker marker : markerList) {
+            for (IMarker marker : selectableMarkers) {
                 if (marker.handleActionMove(event)) {
                     handled = true;
                     break;
@@ -443,7 +439,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
     abstract protected DraggableMarker createMarkerForRow(int row);
 
     public void addMarker(int row) {
-        DraggableMarker marker = createMarkerForRow(row);
+        IMarker marker = createMarkerForRow(row);
         marker.setTo(this, row);
         markerList.add(row, marker);
     }
@@ -642,7 +638,7 @@ public class MarkerView extends PlotPainterContainerView {
     @Override
     public void addPlotPainter(IPlotPainter painter) {
         super.addPlotPainter(painter);
-        
+
         if (painter instanceof AbstractMarkerPainter) {
             AbstractMarkerPainter markerPainter = (AbstractMarkerPainter)painter;
             if (markerPainterGroup == null)
