@@ -721,9 +721,9 @@ public class MarkerView extends PlotPainterContainerView {
 
     public void release() {
         for (IPlotPainter painter : allPainters) {
-            TagMarkerDataModelPainter tagMarkerDataModelPainter = (TagMarkerDataModelPainter)painter;
-            if (tagMarkerDataModelPainter == null)
+            if (!(painter instanceof TagMarkerDataModelPainter))
                 continue;
+            TagMarkerDataModelPainter tagMarkerDataModelPainter = (TagMarkerDataModelPainter)painter;
             tagMarkerDataModelPainter.release();
         }
     }
