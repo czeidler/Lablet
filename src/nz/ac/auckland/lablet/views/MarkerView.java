@@ -48,6 +48,7 @@ interface IMarker {
 abstract class DraggableMarker implements IMarker {
     protected AbstractMarkerPainter parent = null;
     protected int index;
+    protected PointF currentPosition;
     protected PointF dragOffset = new PointF(0, 0);
     protected boolean isSelectedForDragging = false;
     protected boolean isDragging = false;
@@ -65,7 +66,7 @@ abstract class DraggableMarker implements IMarker {
      * @return return true if the event has been handled, i.e., the marker has been touched in th drag area
      */
     public boolean handleActionDown(MotionEvent event) {
-        PointF position = getScreenPosition();
+        PointF position = getCachedPosition();
 
         PointF point = new PointF(event.getX(), event.getY());
         dragOffset.x = point.x - position.x;
@@ -113,7 +114,8 @@ abstract class DraggableMarker implements IMarker {
      */
     public boolean handleActionMove(MotionEvent event) {
         if (isDragging) {
-            onDraggedTo(getDragPoint(event));
+            currentPosition = getDragPoint(event);
+            onDraggedTo(currentPosition);
             return true;
         }
         return false;
@@ -141,8 +143,11 @@ abstract class DraggableMarker implements IMarker {
         return isSelectedForDragging;
     }
 
-    protected PointF getScreenPosition() {
-        return parent.getMarkerScreenPosition(index);
+    public PointF getCachedPosition() {
+        if (currentPosition == null)
+            currentPosition = parent.getMarkerScreenPosition(index);
+
+        return currentPosition;
     }
 
     /**
@@ -171,6 +176,7 @@ abstract class DraggableMarker implements IMarker {
     protected boolean isPointOnDragArea(PointF point) {
         return isPointOnSelectArea(point);
     }
+
 }
 
 
@@ -211,7 +217,7 @@ class SimpleMarker extends DraggableMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
-        PointF position = getScreenPosition();
+        PointF position = getCachedPosition();
 
         if (priority >= 0. && priority <= 1.)
             mainAlpha = (int)(priority * 255.);
@@ -242,14 +248,14 @@ class SimpleMarker extends DraggableMarker {
 
     @Override
     protected boolean isPointOnSelectArea(PointF point) {
-        PointF position = getScreenPosition();
+        PointF position = getCachedPosition();
         float distance = (float)Math.sqrt(Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2));
         return distance <= INNER_RING_RADIUS;
     }
 
     @Override
     protected boolean isPointOnDragArea(PointF point) {
-        PointF position = getScreenPosition();
+        PointF position = getCachedPosition();
         float distance = (float)Math.sqrt(Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2));
         if (distance < RING_RADIUS + RING_WIDTH / 2)
             return true;
@@ -289,15 +295,15 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
                 if (selectedForDragPainter == null)
                     return;
 
-                if (selectedForDragPainter == painter) {
+                if (selectedForDragPainter == painter && selectedForDragMarker == marker) {
                     selectedForDragPainter.containerView.invalidate();
                     selectedForDragPainter = null;
                     selectedForDragMarker = null;
                 }
                 return;
             }
-            // marker has been selected; deselect old marker from different painter
-            if (selectedForDragPainter != null && selectedForDragPainter != painter) {
+            // marker has been selected; deselect old marker
+            if (selectedForDragMarker != null && selectedForDragMarker != marker) {
                 selectedForDragMarker.setSelectedForDrag(false);
                 selectedForDragPainter.containerView.invalidate();
             }
@@ -305,6 +311,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
             selectedForDragPainter = painter;
             selectedForDragMarker = marker;
         }
+
     }
 
     private MarkerPainterGroup markerPainterGroup = new MarkerPainterGroup();

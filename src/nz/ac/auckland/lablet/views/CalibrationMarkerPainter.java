@@ -1,7 +1,6 @@
 package nz.ac.auckland.lablet.views;
 
 import android.graphics.*;
-import android.view.View;
 import nz.ac.auckland.lablet.experiment.Calibration;
 /*
  * Copyright 2013-2014.
@@ -12,8 +11,6 @@ import nz.ac.auckland.lablet.experiment.Calibration;
  */
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
-
-import java.util.List;
 
 
 /**
@@ -72,6 +69,10 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
         point.y += origin.y;
     }
 
+    private PointF getCurrentScreenPos(int markerIndex) {
+        return ((DraggableMarker)markerList.get(markerIndex)).getCachedPosition();
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         for (IMarker marker : markerList)
@@ -81,8 +82,8 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
             return;
 
         // draw scale
-        PointF screenPos1 = getMarkerScreenPosition(0);
-        PointF screenPos2 = getMarkerScreenPosition(1);
+        PointF screenPos1 = getCurrentScreenPos(0);
+        PointF screenPos2 = getCurrentScreenPos(1);
         Paint paint = new Paint();
         paint.setStrokeCap(Paint.Cap.BUTT);
         paint.setStrokeWidth(LINE_WIDTH);
@@ -110,7 +111,8 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
         rotate(wing2Bottom, screenPos2, angleScreen);
         canvas.drawLine(wing2Top.x, wing2Top.y, wing2Bottom.x, wing2Bottom.y, paint);
 
-        if (markerData.getSelectedMarkerData() < 0)
+        // draw pixel display when one marker is selected for dragging
+        if (!markerList.get(0).isSelectedForDrag() && !markerList.get(1).isSelectedForDrag())
             return;
 
         paint.setStyle(Paint.Style.FILL);
@@ -122,7 +124,7 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
         float marginPercent = 0.01f;
 
         float inset = containerView.getWidth() * marginPercent;
-        PointF screenTextPosition = new PointF(inset, containerView.getHeight() - inset);
+        PointF screenTextPosition = new PointF(inset, inset);
         screenTextPosition.y -= paint.ascent();
 
         // draw text background box

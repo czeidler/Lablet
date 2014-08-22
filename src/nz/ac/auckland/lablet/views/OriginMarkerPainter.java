@@ -40,6 +40,10 @@ class OriginMarker extends SimpleMarker {
         OriginMarkerPainter originMarkerPainter = (OriginMarkerPainter)parent;
         originMarkerPainter.onDraggedTo(this, point);
     }
+
+    public void setScreenPosition(PointF screenPosition) {
+        currentPosition = screenPosition;
+    }
 }
 
 
@@ -105,7 +109,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
     public void onDraw(Canvas canvas) {
         if (firstDraw) {
             firstDraw = false;
-            setRealFromScreen(getMarkerScreenPosition(0));
+            updateMarkerScreenPositions(getMarkerScreenPosition(0));
         }
 
         for (IMarker marker : markerList)
@@ -114,9 +118,9 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         if (markerData.getMarkerCount() != 3)
             return;
 
-        PointF origin = getMarkerScreenPosition(0);
-        PointF xAxis = getMarkerScreenPosition(1);
-        PointF yAxis = getMarkerScreenPosition(2);
+        PointF origin = getOriginMarker(0).getCachedPosition();
+        PointF xAxis = getOriginMarker(1).getCachedPosition();
+        PointF yAxis = getOriginMarker(2).getCachedPosition();
 
         Paint paint = new Paint();
         paint.setStrokeWidth(LINE_WIDTH);
@@ -243,11 +247,13 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
 
     @Override
     public void markerMoveRequest(DraggableMarker marker, PointF newPosition, boolean isDragging) {
+        onDraggedTo(marker, newPosition);
+
         // don't update all the time
         if (isDragging)
             return;
 
-        onDraggedTo(marker, newPosition);
+        updateTagMarkerPositions();
     }
 
     /**
@@ -266,27 +272,37 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         if (row == 0) {
             // translation
             sanitizeScreenPoint(newPosition);
-            setRealFromScreen(newPosition);
+            updateMarkerScreenPositions(newPosition);
         } else {
             // x rotation
-            PointF origin = new PointF();
-            origin.set(markerData.getMarkerDataAt(0).getPosition());
-            PointF originScreen = new PointF();
-            containerView.toScreen(origin, originScreen);
+            PointF originScreen = getOriginMarker(0).getCachedPosition();
             angleScreen = Calibration.getAngle(originScreen, newPosition);
             if (row == 2)
                 angleScreen += 90;
 
-            setRealFromScreen(originScreen);
+            updateMarkerScreenPositions(originScreen);
         }
     }
 
-    private void setRealFromScreen(PointF originScreen) {
+    private OriginMarker getOriginMarker(int index) {
+        return (OriginMarker)markerList.get(index);
+    }
+
+    private void updateMarkerScreenPositions(PointF originScreen) {
         float axisLength = getScreenAxisLength();
         PointF xAxisScreen = new PointF(originScreen.x + axisLength, originScreen.y);
         transform(xAxisScreen, originScreen);
         PointF yAxisScreen = new PointF(originScreen.x, originScreen.y - axisLength);
         transform(yAxisScreen, originScreen);
+
+        getOriginMarker(1).setScreenPosition(xAxisScreen);
+        getOriginMarker(2).setScreenPosition(yAxisScreen);
+    }
+
+    private void updateTagMarkerPositions() {
+        PointF originScreen = getOriginMarker(0).getCachedPosition();
+        PointF xAxisScreen = getOriginMarker(1).getCachedPosition();
+        PointF yAxisScreen = getOriginMarker(2).getCachedPosition();
 
         PointF origin = new PointF();
         PointF xAxis = new PointF();
