@@ -61,9 +61,9 @@ abstract class StartEndMarker extends DraggableMarker {
         final float touchWidth = (float)parent.toPixel(60);
         RectF rect = new RectF();
         rect.left = position.x - touchWidth / 2;
-        rect.top = position.y;
+        rect.top = 0;
         rect.right = position.x + touchWidth / 2;
-        rect.bottom = position.y + HEIGHT;
+        rect.bottom = HEIGHT + 1;
 
         return rect.contains(point.x, point.y);
     }
@@ -221,6 +221,9 @@ public class StartEndSeekBar extends PlotPainterContainerView {
         markerDataModel = new MarkerDataModel();
         markerDataModel.addMarkerData(new MarkerData(0));
         markerDataModel.addMarkerData(new MarkerData(1));
+
+        setXRange(0, 1);
+        setYRange(0, 1);
 
         startEndPainter = new StartEndPainter(markerDataModel);
         addPlotPainter(startEndPainter);
