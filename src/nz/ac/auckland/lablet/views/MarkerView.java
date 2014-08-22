@@ -289,6 +289,15 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
         private AbstractMarkerPainter selectedForDragPainter = null;
         private IMarker selectedForDragMarker = null;
 
+        public void deselect() {
+            if (selectedForDragMarker == null)
+                return;
+            selectedForDragMarker.setSelectedForDrag(false);
+            selectedForDragPainter.containerView.invalidate();
+            selectedForDragPainter = null;
+            selectedForDragMarker = null;
+        }
+
         public void selectForDrag(IMarker marker, AbstractMarkerPainter painter) {
             if (marker == null || !marker.isSelectedForDrag()) {
                 // already deselected?
@@ -311,7 +320,6 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
             selectedForDragPainter = painter;
             selectedForDragMarker = marker;
         }
-
     }
 
     private MarkerPainterGroup markerPainterGroup = new MarkerPainterGroup();
@@ -661,6 +669,8 @@ public class MarkerView extends PlotPainterContainerView {
                 continue;
             TagMarkerDataModelPainter tagMarkerDataModelPainter = (TagMarkerDataModelPainter)painter;
             tagMarkerDataModelPainter.setCurrentRun(run);
+            // deselect any marker
+            tagMarkerDataModelPainter.getMarkerPainterGroup().deselect();
         }
         invalidate();
     }
