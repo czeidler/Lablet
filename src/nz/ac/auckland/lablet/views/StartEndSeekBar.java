@@ -10,13 +10,10 @@ package nz.ac.auckland.lablet.views;
 import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.View;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.plotview.IPlotPainter;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
-import nz.ac.auckland.lablet.views.plotview.RangeDrawingView;
 
 
 /**
@@ -33,6 +30,7 @@ abstract class StartEndMarker extends DraggableMarker {
 
     protected Paint lightColor = new Paint();
     protected Paint darkenColor = new Paint();
+    protected Paint selectedGlowPaint = new Paint();
 
     public StartEndMarker() {
         lightColor.setColor(Color.rgb(97, 204, 238));
@@ -43,6 +41,8 @@ abstract class StartEndMarker extends DraggableMarker {
         darkenColor.setAntiAlias(true);
         darkenColor.setStyle(Paint.Style.FILL);
         darkenColor.setPathEffect(new CornerPathEffect(2));
+
+        selectedGlowPaint.setColor(lightColor.getColor());
     }
 
     @Override
@@ -67,6 +67,23 @@ abstract class StartEndMarker extends DraggableMarker {
 
         return rect.contains(point.x, point.y);
     }
+
+    protected void drawGlow(Canvas canvas, float position) {
+        final float x = position;
+        final float y = 0;
+        final float radius = 3 * HEIGHT;
+
+        canvas.save();
+        canvas.translate(0, HEIGHT);
+        canvas.scale(1f, 0.2f);
+
+        Shader shader = new RadialGradient(x, y, radius, lightColor.getColor(),
+                Color.TRANSPARENT, Shader.TileMode.CLAMP);
+        selectedGlowPaint.setShader(shader);
+        canvas.drawCircle(x, y, radius, selectedGlowPaint);
+
+        canvas.restore();
+    }
 }
 
 
@@ -78,6 +95,11 @@ class StartMarker extends StartEndMarker {
     @Override
     public void onDraw(Canvas canvas, float priority) {
         PointF position = parent.getMarkerScreenPosition(index);
+
+        if (isDragging) {
+            PointF dragPosition = getTouchPosition();
+            drawGlow(canvas, dragPosition.x);
+        }
 
         // Note: don't use drawRectangle because in some cases it does not align with drawPath for the triangle...
 
@@ -107,6 +129,11 @@ class EndMarker extends StartEndMarker {
     @Override
     public void onDraw(Canvas canvas, float priority) {
         PointF position = parent.getMarkerScreenPosition(index);
+
+        if (isDragging) {
+            PointF dragPosition = getTouchPosition();
+            drawGlow(canvas, dragPosition.x);
+        }
 
         // Note: don't use drawRectangle because in some cases it does not align with drawPath for the triangle...
 

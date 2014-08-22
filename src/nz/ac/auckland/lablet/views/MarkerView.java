@@ -150,6 +150,14 @@ abstract class DraggableMarker implements IMarker {
         return currentPosition;
     }
 
+
+    public PointF getTouchPosition() {
+        PointF position = getCachedPosition();
+        position.x += dragOffset.x;
+        position.y += dragOffset.y;
+        return position;
+    }
+
     /**
      * Notifies a derived class that the user performed a drag operation.
      *
