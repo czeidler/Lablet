@@ -789,15 +789,17 @@ public class PlotView extends ViewGroup {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        boolean handled = plotGestureDetector.onTouchEvent(event);
+        boolean handled = super.dispatchTouchEvent(event);
+        if (handled)
+            return true;
 
+        handled = plotGestureDetector.onTouchEvent(event);
         if (handled) {
             ViewParent parent = getParent();
             if (parent != null)
                 parent.requestDisallowInterceptTouchEvent(true);
-        } else
-            return super.dispatchTouchEvent(event);
+        }
 
-        return true;
+        return handled;
     }
 }
