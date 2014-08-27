@@ -46,7 +46,7 @@ public class ExperimentLoader {
     // Creates a new ExperimentAnalysis and tries to load an existing analysis.
     static public SensorAnalysis getSensorAnalysis(ExperimentData.SensorEntry sensorEntry) {
         SensorData sensorData = sensorEntry.sensorData;
-        SensorAnalysis sensorAnalysis = sensorEntry.plugin.createSensorAnalysis(sensorData);
+        SensorAnalysis sensorAnalysis = sensorEntry.plugin.getAnalysis().createSensorAnalysis(sensorData);
 
         // try to load old analysis
         File projectFile = new File(sensorData.getStorageDir(), SensorAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);

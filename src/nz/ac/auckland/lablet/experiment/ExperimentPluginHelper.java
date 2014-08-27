@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Abstract base class for experiment plugins.
  */
-abstract public class AbstractExperimentPlugin implements IExperimentPlugin {
+public class ExperimentPluginHelper {
 
     static public void packStartExperimentIntent(Intent intent, List<IExperimentPlugin> plugins, Bundle options) {
         String[] pluginNames = null;

@@ -97,7 +97,7 @@ public class ExperimentRun {
             IExperimentPlugin plugin = factory.findExperimentPlugin(pluginName);
             if (plugin == null)
                 continue;
-            IExperimentSensor experimentRun = plugin.createExperimentSensor(activity);
+            IExperimentSensor experimentRun = plugin.getExperimenter().createExperimentSensor(activity);
             experimentRunGroup.addExperimentSensor(experimentRun);
         }
 
@@ -216,7 +216,8 @@ public class ExperimentRun {
         for (int i = 0; i < sensorClassesCount; i++) {
             String pluginName = pluginClasses.getString(Integer.toString(i));
             IExperimentPlugin plugin = factory.findExperimentPlugin(pluginName);
-            IExperimentSensor experimentSensor = plugin.createExperimentSensor(experiment.getActivity());
+            IExperimentSensor experimentSensor = plugin.getExperimenter().createExperimentSensor(
+                    experiment.getActivity());
             Bundle state = savedInstanceState.getBundle(Integer.toString(i));
             experimentSensor.onRestoreInstanceState(state);
             addExperimentSensor(experimentSensor);

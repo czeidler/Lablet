@@ -19,8 +19,8 @@ import android.widget.*;
 import nz.ac.auckland.lablet.*;
 import nz.ac.auckland.lablet.camera.CameraExperimentPlugin;
 import nz.ac.auckland.lablet.camera.CameraSensorData;
-import nz.ac.auckland.lablet.experiment.AbstractExperimentPlugin;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
+import nz.ac.auckland.lablet.experiment.ExperimentPluginHelper;
 import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.script.ScriptTreeNode;
@@ -161,7 +161,7 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
         options.putString("experiment_base_directory", getScriptExperimentsDir().getPath());
 
         String[] pluginName = new String[] {new CameraExperimentPlugin().getName()};
-        AbstractExperimentPlugin.packStartExperimentIntent(intent, pluginName, options);
+        ExperimentPluginHelper.packStartExperimentIntent(intent, pluginName, options);
         intent.putExtras(options);
 
         startActivityForResult(intent, PERFORM_EXPERIMENT);

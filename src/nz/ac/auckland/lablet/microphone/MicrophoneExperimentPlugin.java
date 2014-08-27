@@ -16,20 +16,14 @@ import nz.ac.auckland.lablet.experiment.*;
 import java.io.File;
 
 
-public class MicrophoneExperimentPlugin extends AbstractExperimentPlugin {
-    @Override
-    public String getName() {
-        return MicrophoneSensorData.class.getSimpleName();
-    }
-
-    @Override
-    public String toString() {
-        return "Microphone Experiment";
+class MicrophoneExperimenter extends AbstractPluginExperimenter {
+    public MicrophoneExperimenter(IExperimentPlugin plugin) {
+        super(plugin);
     }
 
     @Override
     public IExperimentSensor createExperimentSensor(Activity parentActivity) {
-        return new MicrophoneExperimentSensor(this);
+        return new MicrophoneExperimentSensor(plugin);
     }
 
     @Override
@@ -44,6 +38,10 @@ public class MicrophoneExperimentPlugin extends AbstractExperimentPlugin {
         return false;
     }
 
+}
+
+
+class MicrophoneAnalysis implements IExperimentPlugin.IAnalysis {
     @Override
     public SensorData loadSensorData(Context context, Bundle data, File storageDir) {
         return new MicrophoneSensorData(context, data, storageDir);
@@ -57,5 +55,28 @@ public class MicrophoneExperimentPlugin extends AbstractExperimentPlugin {
     @Override
     public View createSensorAnalysisView(Context context, SensorData sensorData) {
         return new MicrophoneAnalysisView(context, sensorData);
+    }
+}
+
+
+public class MicrophoneExperimentPlugin implements IExperimentPlugin {
+    @Override
+    public String getName() {
+        return MicrophoneSensorData.class.getSimpleName();
+    }
+
+    @Override
+    public IExperimenter getExperimenter() {
+        return new MicrophoneExperimenter(this);
+    }
+
+    @Override
+    public IAnalysis getAnalysis() {
+        return new MicrophoneAnalysis();
+    }
+
+    @Override
+    public String toString() {
+        return "Microphone Experiment";
     }
 }

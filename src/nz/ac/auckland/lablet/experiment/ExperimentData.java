@@ -85,7 +85,8 @@ public class ExperimentData {
             loadError = "failed to load experiment data";
             return null;
         }
-        sensorEntry.sensorData = sensorEntry.plugin.loadSensorData(context, experimentData, sensorDirectory);
+        IExperimentPlugin.IAnalysis analysisPlugin = sensorEntry.plugin.getAnalysis();
+        sensorEntry.sensorData = analysisPlugin.loadSensorData(context, experimentData, sensorDirectory);
         if (sensorEntry.sensorData == null) {
             loadError = "can't load experiment";
             return null;

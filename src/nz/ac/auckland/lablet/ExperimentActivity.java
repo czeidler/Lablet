@@ -276,7 +276,7 @@ public class ExperimentActivity extends FragmentActivity {
         });
 
         // config the menu
-        Bundle options = AbstractExperimentPlugin.unpackStartExperimentOptions(getIntent());
+        Bundle options = ExperimentPluginHelper.unpackStartExperimentOptions(getIntent());
         if (options != null) {
             boolean showAnalyseMenu = options.getBoolean("show_analyse_menu", true);
             analyseMenuItem.setVisible(showAnalyseMenu);
@@ -380,7 +380,7 @@ public class ExperimentActivity extends FragmentActivity {
     }
 
     private void addExperiment(IExperimentPlugin plugin) {
-        IExperimentSensor experimentRun = plugin.createExperimentSensor(this);
+        IExperimentSensor experimentRun = plugin.getExperimenter().createExperimentSensor(this);
         experiment.getCurrentExperimentRun().addExperimentSensor(experimentRun);
 
         experimentRun.startPreview();
@@ -402,7 +402,7 @@ public class ExperimentActivity extends FragmentActivity {
             if (extras.containsKey("experiment_base_directory"))
                 experimentBaseDir = new File(extras.getString("experiment_base_directory"));
         }
-        final String[] pluginNames = AbstractExperimentPlugin.unpackStartExperimentPlugins(intent);
+        final String[] pluginNames = ExperimentPluginHelper.unpackStartExperimentPlugins(intent);
 
         if (experimentBaseDir == null)
             experimentBaseDir = new File(getExternalFilesDir(null), "experiments");
@@ -484,7 +484,7 @@ public class ExperimentActivity extends FragmentActivity {
         });
 
         int maxNumberOfRuns = -1;
-        Bundle options = AbstractExperimentPlugin.unpackStartExperimentOptions(getIntent());
+        Bundle options = ExperimentPluginHelper.unpackStartExperimentOptions(getIntent());
         if (options != null) {
             maxNumberOfRuns = options.getInt("max_number_of_runs", -1);
         }

@@ -61,7 +61,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
         final MenuItem settingsItem = menu.findItem(R.id.action_run_settings);
         assert settingsItem != null;
         final StringBuilder settingsName = new StringBuilder();
-        if (currentAnalysisSensor.plugin.hasSensorSettingsActivity(settingsName)) {
+        if (currentAnalysisSensor.plugin.getExperimenter().hasSensorSettingsActivity(settingsName)) {
             settingsItem.setTitle(settingsName);
             settingsItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
@@ -143,9 +143,10 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
 
 
     private void startRunSettingsActivity(Bundle analysisSpecificData, Bundle options) {
-        IExperimentPlugin plugin = currentAnalysisSensor.plugin;
+        IExperimentPlugin.IExperimenter experimenter = currentAnalysisSensor.plugin.getExperimenter();
         ExperimentData.SensorDataRef sensorDataRef = getSensorDataRef(currentAnalysisSensor);
-        plugin.startSensorSettingsActivity(this, PERFORM_RUN_SETTINGS, sensorDataRef, analysisSpecificData, options);
+        experimenter.startSensorSettingsActivity(this, PERFORM_RUN_SETTINGS, sensorDataRef, analysisSpecificData,
+                options);
     }
 
     @Override

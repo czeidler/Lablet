@@ -159,7 +159,8 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         tableView = (TableView)mainView.findViewById(R.id.tagMarkerTableView);
         assert tableView != null;
 
-        final View sensorAnalysisView = plugin.createSensorAnalysisView(activity, sensorAnalysis.getSensorData());
+        final View sensorAnalysisView = plugin.getAnalysis().createSensorAnalysisView(activity,
+                sensorAnalysis.getSensorData());
         if (sensorAnalysisView == null)
             return mainView;
 

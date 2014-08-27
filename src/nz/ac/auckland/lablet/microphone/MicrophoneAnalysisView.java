@@ -12,11 +12,14 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.widget.FrameLayout;
+import nz.ac.auckland.lablet.experiment.MarkerData;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.views.AudioFrequencyMapAdapter;
 import nz.ac.auckland.lablet.views.AudioFrequencyMapPainter;
 import nz.ac.auckland.lablet.views.IExperimentFrameView;
+import nz.ac.auckland.lablet.views.TagMarkerDataModelPainter;
 import nz.ac.auckland.lablet.views.plotview.PlotView;
 
 import java.io.BufferedInputStream;
@@ -65,6 +68,12 @@ public class MicrophoneAnalysisView extends FrameLayout implements IExperimentFr
         frequencyMapPlotView.getYAxisView().setTitle("Frequency");
         frequencyMapPlotView.getXAxisView().setUnit("s");
         frequencyMapPlotView.getXAxisView().setTitle("Time");
+
+        MarkerDataModel markerModel = new MarkerDataModel();
+        markerModel.addMarkerData(new MarkerData(0));
+        markerModel.selectMarkerData(0);
+        TagMarkerDataModelPainter markerDataModelPainter = new TagMarkerDataModelPainter(markerModel);
+        frequencyMapPlotView.addPlotPainter(markerDataModelPainter);
 
         return frequencyMapPlotView;
     }
