@@ -135,4 +135,19 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
             lastInsertMarkerManager.onNewMarkerInserted(newIndex, data);
         }
     }
+
+    @Override
+    public void onXRangeChanged(float left, float right, float oldLeft, float oldRight) {
+        invalidateMarker();
+    }
+
+    @Override
+    public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop) {
+        invalidateMarker();
+    }
+
+    private void invalidateMarker() {
+        for (IMarker marker : markerList)
+            marker.invalidate();
+    }
 }

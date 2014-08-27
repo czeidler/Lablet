@@ -118,9 +118,9 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         if (markerData.getMarkerCount() != 3)
             return;
 
-        PointF origin = getOriginMarker(0).getCachedPosition();
-        PointF xAxis = getOriginMarker(1).getCachedPosition();
-        PointF yAxis = getOriginMarker(2).getCachedPosition();
+        PointF origin = getOriginMarker(0).getCachedScreenPosition();
+        PointF xAxis = getOriginMarker(1).getCachedScreenPosition();
+        PointF yAxis = getOriginMarker(2).getCachedScreenPosition();
 
         Paint paint = new Paint();
         paint.setStrokeWidth(LINE_WIDTH);
@@ -275,7 +275,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
             updateMarkerScreenPositions(newPosition);
         } else {
             // x rotation
-            PointF originScreen = getOriginMarker(0).getCachedPosition();
+            PointF originScreen = getOriginMarker(0).getCachedScreenPosition();
             angleScreen = Calibration.getAngle(originScreen, newPosition);
             if (row == 2)
                 angleScreen += 90;
@@ -300,9 +300,9 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
     }
 
     private void updateTagMarkerPositions() {
-        PointF originScreen = getOriginMarker(0).getCachedPosition();
-        PointF xAxisScreen = getOriginMarker(1).getCachedPosition();
-        PointF yAxisScreen = getOriginMarker(2).getCachedPosition();
+        PointF originScreen = getOriginMarker(0).getCachedScreenPosition();
+        PointF xAxisScreen = getOriginMarker(1).getCachedScreenPosition();
+        PointF yAxisScreen = getOriginMarker(2).getCachedScreenPosition();
 
         PointF origin = new PointF();
         PointF xAxis = new PointF();

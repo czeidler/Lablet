@@ -70,7 +70,7 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
     }
 
     private PointF getCurrentScreenPos(int markerIndex) {
-        return ((DraggableMarker)markerList.get(markerIndex)).getCachedPosition();
+        return ((DraggableMarker)markerList.get(markerIndex)).getCachedScreenPosition();
     }
 
     @Override

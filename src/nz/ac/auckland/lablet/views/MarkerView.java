@@ -35,6 +35,8 @@ interface IMarker {
 
     public void setSelectedForDrag(boolean selectedForDrag);
     public boolean isSelectedForDrag();
+
+    public void invalidate();
 }
 
 /**
@@ -66,7 +68,7 @@ abstract class DraggableMarker implements IMarker {
      * @return return true if the event has been handled, i.e., the marker has been touched in th drag area
      */
     public boolean handleActionDown(MotionEvent event) {
-        PointF position = getCachedPosition();
+        PointF position = getCachedScreenPosition();
 
         PointF point = new PointF(event.getX(), event.getY());
         dragOffset.x = point.x - position.x;
@@ -102,6 +104,8 @@ abstract class DraggableMarker implements IMarker {
 
         if (wasDragging)
             parent.markerMoveRequest(this, getDragPoint(event), isDragging);
+
+        invalidate();
 
         return wasDragging;
     }
@@ -143,16 +147,20 @@ abstract class DraggableMarker implements IMarker {
         return isSelectedForDragging;
     }
 
-    public PointF getCachedPosition() {
+    public PointF getCachedScreenPosition() {
         if (currentPosition == null)
             currentPosition = parent.getMarkerScreenPosition(index);
 
         return currentPosition;
     }
 
+    @Override
+    public void invalidate() {
+        currentPosition = null;
+    }
 
     public PointF getTouchPosition() {
-        PointF position = getCachedPosition();
+        PointF position = getCachedScreenPosition();
         position.x += dragOffset.x;
         position.y += dragOffset.y;
         return position;
@@ -225,7 +233,7 @@ class SimpleMarker extends DraggableMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
-        PointF position = getCachedPosition();
+        PointF position = getCachedScreenPosition();
 
         if (priority >= 0. && priority <= 1.)
             mainAlpha = (int)(priority * 255.);
@@ -256,14 +264,14 @@ class SimpleMarker extends DraggableMarker {
 
     @Override
     protected boolean isPointOnSelectArea(PointF point) {
-        PointF position = getCachedPosition();
+        PointF position = getCachedScreenPosition();
         float distance = (float)Math.sqrt(Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2));
         return distance <= INNER_RING_RADIUS;
     }
 
     @Override
     protected boolean isPointOnDragArea(PointF point) {
-        PointF position = getCachedPosition();
+        PointF position = getCachedScreenPosition();
         float distance = (float)Math.sqrt(Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2));
         if (distance < RING_RADIUS + RING_WIDTH / 2)
             return true;
