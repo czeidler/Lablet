@@ -10,6 +10,7 @@ package nz.ac.auckland.lablet.microphone;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import nz.ac.auckland.lablet.experiment.*;
 
@@ -53,8 +54,8 @@ class MicrophoneAnalysis implements IExperimentPlugin.IAnalysis {
     }
 
     @Override
-    public View createSensorAnalysisView(Context context, SensorData sensorData) {
-        return new MicrophoneAnalysisView(context, sensorData);
+    public View createSensorAnalysisView(Context context, SensorAnalysis sensorAnalysis) {
+        return new MicrophoneAnalysisView(context, sensorAnalysis);
     }
 }
 

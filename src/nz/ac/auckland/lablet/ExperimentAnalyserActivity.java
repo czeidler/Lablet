@@ -316,7 +316,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            return new AnalysisMixedDataFragment(position);
+            return new ExperimentAnalysisFragment(position);
         }
 
         @Override

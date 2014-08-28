@@ -53,7 +53,7 @@ class AccelerometerAnalysis implements IExperimentPlugin.IAnalysis {
     }
 
     @Override
-    public View createSensorAnalysisView(Context context, SensorData sensorData) {
+    public View createSensorAnalysisView(Context context, SensorAnalysis sensorAnalysis) {
         return null;
     }
 }

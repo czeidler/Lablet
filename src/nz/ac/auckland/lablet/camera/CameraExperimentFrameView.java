@@ -24,7 +24,7 @@ import java.io.File;
  * Displays the video at a certain frame, depending on the current run value.
  * </p>
  */
-public class CameraExperimentFrameView extends VideoFrameView implements IExperimentFrameView {
+class CameraExperimentFrameView extends VideoFrameView implements IExperimentFrameView {
     private CameraSensorData experiment;
     private int currentRun = -1;
 

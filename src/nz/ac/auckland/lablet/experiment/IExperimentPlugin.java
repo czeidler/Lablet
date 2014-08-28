@@ -118,9 +118,10 @@ public interface IExperimentPlugin {
          * {@link nz.ac.auckland.lablet.ExperimentAnalyserActivity}.
          *
          * @param context context of the view
-         * @param sensorData experiment that should be used
+         * @param sensorAnalysis sensor analysis that should be used
          * @return a newly created view
          */
-        public View createSensorAnalysisView(Context context, SensorData sensorData);
+        public View createSensorAnalysisView(Context context, SensorAnalysis sensorAnalysis);
+
     }
 }

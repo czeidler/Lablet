@@ -58,8 +58,8 @@ class CameraAnalysis implements IExperimentPlugin.IAnalysis {
     }
 
     @Override
-    public View createSensorAnalysisView(Context context, SensorData sensorData) {
-        return new CameraExperimentFrameView(context, sensorData);
+    public View createSensorAnalysisView(Context context, SensorAnalysis sensorAnalysis) {
+        return new CameraAnalysisFragmentView(context, sensorAnalysis);
     }
 }
 

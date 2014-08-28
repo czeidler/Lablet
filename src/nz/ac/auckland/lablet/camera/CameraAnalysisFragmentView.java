@@ -5,19 +5,20 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet;
+package nz.ac.auckland.lablet.camera;
 
-import android.app.Activity;
 import android.content.Context;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.Spinner;
+import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.SensorAnalysis;
-import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
-import nz.ac.auckland.lablet.views.FrameDataSeekBar;
 import nz.ac.auckland.lablet.views.FrameContainerView;
+import nz.ac.auckland.lablet.views.FrameDataSeekBar;
 import nz.ac.auckland.lablet.views.graph.*;
 import nz.ac.auckland.lablet.views.table.*;
 
@@ -25,10 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**
- * Fragment that displays a run view container and a tag data graph/table.
- */
-public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
+class CameraAnalysisFragmentView extends FrameLayout {
     class Layout extends ViewGroup {
         private FrameDataSeekBar runViewControl = null;
         private FrameContainerView sensorContainerView = null;
@@ -94,7 +92,6 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
     private GraphView2D graphView = null;
     private Spinner graphSpinner = null;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
-    private ExperimentDataActivity.AnalysisEntry analysisEntry;
 
     private class GraphSpinnerEntry {
         private String name;
@@ -114,43 +111,13 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         }
     }
 
-    public AnalysisMixedDataFragment() {
-        super();
-    }
 
-    public AnalysisMixedDataFragment(int position) {
-        super();
+    public CameraAnalysisFragmentView(Context context, SensorAnalysis sensorAnalysis) {
+        super(context);
 
-        Bundle args = new Bundle();
-        args.putInt("analysisRunId", position);
-        setArguments(args);
-    }
-
-    private ExperimentDataActivity.AnalysisEntry findExperimentFromArguments(Activity activity) {
-        int position = getArguments().getInt("analysisRunId", 0);
-
-        ExperimentAnalyserActivity experimentActivity = (ExperimentAnalyserActivity)activity;
-        List<ExperimentDataActivity.AnalysisEntry> list = experimentActivity.getCurrentAnalysisRun();
-        return list.get(position);
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        analysisEntry = findExperimentFromArguments(activity);
-    }
-
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        final ExperimentAnalyserActivity activity = (ExperimentAnalyserActivity)getActivity();
-        final IExperimentPlugin plugin = analysisEntry.plugin;
-        final SensorAnalysis sensorAnalysis = analysisEntry.analysis;
-
-        final Layout mainView = new Layout(getActivity());
+        final Layout mainView = new Layout(getContext());
         assert mainView != null;
+        addView(mainView);
 
         runContainerView = mainView.getSensorContainerView();
         // marker graph view
@@ -159,10 +126,9 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
         tableView = (TableView)mainView.findViewById(R.id.tagMarkerTableView);
         assert tableView != null;
 
-        final View sensorAnalysisView = plugin.getAnalysis().createSensorAnalysisView(activity,
-                sensorAnalysis.getSensorData());
+        final View sensorAnalysisView = new CameraExperimentFrameView(context, sensorAnalysis.getSensorData());
         if (sensorAnalysisView == null)
-            return mainView;
+            return;
 
         final FrameDataSeekBar runViewControl = mainView.getRunViewControl();
         runViewControl.setTo(sensorAnalysis.getFrameDataModel());
@@ -190,7 +156,7 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
                 "y-Velocity", new TimeMarkerGraphAxis(), new YSpeedMarkerGraphAxis())));
 
         graphSpinner = (Spinner)mainView.findViewById(R.id.graphSpinner);
-        graphSpinner.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item,
+        graphSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
                 graphSpinnerEntryList));
         graphSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -205,17 +171,12 @@ public class AnalysisMixedDataFragment extends android.support.v4.app.Fragment {
             }
         });
         graphSpinner.setSelection(0);
-
-        return mainView;
     }
 
     @Override
-    public void onDestroyView() {
+    public void finalize() {
         runContainerView.release();
         tableView.setAdapter(null);
         graphView.setAdapter(null);
-
-        super.onDestroyView();
     }
 }
-
