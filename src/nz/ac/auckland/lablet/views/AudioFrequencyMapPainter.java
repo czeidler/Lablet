@@ -14,37 +14,48 @@ import java.util.Arrays;
 
 
 public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
-    final private double maxFrequencyAmplitude = 1000000;
+    final private double maxFrequencyAmplitude = 500000;
+    final private int[] heatMap = new int[256];
 
     public AudioFrequencyMapPainter() {
         setMaxDirtyRanges(3);
+
+        preCalculateHeatMap();
+    }
+
+    private void preCalculateHeatMap() {
+        final int[] colors = {
+                Color.rgb(191, 191, 191), // light gray
+                Color.rgb(77, 153, 255), // light blue
+                Color.rgb(230, 26, 230), // violet
+                Color.RED,
+                Color.WHITE,
+                Color.YELLOW
+        };
+
+        // last color is for overflow
+        final int nColors = colors.length - 1;
+        for (int i = 0; i < heatMap.length - 1; i++) {
+            final float value = ((float)i) / (heatMap.length - 1);
+            final int index = (int)(value * (nColors - 1)) + 1;
+
+            int red = (int)((1.d - value) * Color.red(colors[index - 1]) + value * Color.red(colors[index]));
+            int green = (int)((1.d - value) * Color.green(colors[index - 1]) + value * Color.green(colors[index]));
+            int blue = (int)((1.d - value) * Color.blue(colors[index - 1]) + value * Color.blue(colors[index]));
+
+            heatMap[i] = Color.rgb(red, green, blue);
+        }
+
+        heatMap[heatMap.length - 1] = colors[nColors];
     }
 
     private int heatMap(double value) {
-        if (value > 1.)
-            return Color.WHITE;
+        if (value >= 1)
+            return heatMap[heatMap.length - 1];
+        if (value < 0)
+            return heatMap[0];
 
-        int[] colors = {
-                Color.BLUE,
-                Color.CYAN,
-                Color.GREEN,
-                Color.YELLOW,
-                Color.RED,
-                };
-
-        int index = 1;
-        if (value > 0.25)
-            index = 2;
-        if (value > 0.5)
-            index = 3;
-        if (value > 0.75)
-            index = 4;
-
-        int red = (int)((1.d - value) * Color.red(colors[index - 1]) + value * Color.red(colors[index]));
-        int green = (int)((1.d - value) * Color.green(colors[index - 1]) + value * Color.green(colors[index]));
-        int blue = (int)((1.d - value) * Color.blue(colors[index - 1]) + value * Color.blue(colors[index]));
-
-        return Color.rgb(red, green, blue);
+        return heatMap[(int)(value * heatMap.length)];
     }
 
     @Override
@@ -144,7 +155,10 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
                 perPixelCount++;
             } else {
                 float frequencyAmpAverage = frequencyAmpSum / perPixelCount;
-                double amplitude = Math.log10(Math.abs(frequencyAmpAverage)) / Math.log10(maxFrequencyAmplitude);
+                final float maxDB = -60;
+                double amplitude = 1d - 10 * Math.log10(frequencyAmpAverage / 20000000) / maxDB;
+                //double amplitude = 1d - 10 * Math.log10(frequencyAmpAverage / maxFrequencyAmplitude) / maxDB;
+                //double amplitude = Math.log10(Math.abs(frequencyAmpAverage)) / Math.log10(maxFrequencyAmplitude);
                 //double amplitude = Math.abs(frequencyAmpAverage) / maxFrequencyAmplitude;
                 int colorIndex = colors.length - 1 - currentPixel;
                 colors[colorIndex] = heatMap(amplitude);
