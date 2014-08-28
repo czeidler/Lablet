@@ -23,9 +23,21 @@ public class Fourier {
     }
 
     static public float[] transform(float[] in, int offset, int length) {
-        float trafo[] = Arrays.copyOfRange(in, offset, offset + length);
+        final float trafo[] = Arrays.copyOfRange(in, offset, offset + length);
+        return transformInternal(trafo);
+    }
 
-        FloatDCT_1D dct = new FloatDCT_1D(trafo.length);
+    static public float[] transform(float[] prevAmplitudes, float[] amplitudes) {
+        final int length = amplitudes.length;
+        final int half = length / 2;
+        final float trafo[] = new float[length];
+        System.arraycopy(prevAmplitudes, half, trafo, 0, half);
+        System.arraycopy(amplitudes, 0, trafo, half, half);
+        return transformInternal(trafo);
+    }
+
+    static private float[] transformInternal(float[] trafo) {
+        final FloatDCT_1D dct = new FloatDCT_1D(trafo.length);
         // in place window
         hammingWindow(trafo);
 

@@ -106,7 +106,8 @@ public class MicrophoneAnalysisView extends FrameLayout implements IExperimentFr
 
                 float amplitudes[] = AudioWavInputStream.toAmplitudeData(data, data.length);
                 final int frameSize = 4096;
-                for (int i = 0; i < amplitudes.length; i += frameSize) {
+                final int half = frameSize / 2;
+                for (int i = 0; i < amplitudes.length; i += half) {
                     float frequencies[] = Fourier.transform(amplitudes, i, frameSize);
                     publishProgress(new DataContainer(frequencies));
                 }

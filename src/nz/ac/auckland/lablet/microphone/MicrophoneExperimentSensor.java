@@ -69,15 +69,18 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
 
             private MicrophoneExperimentSensor.ISensorDataListener listener = new MicrophoneExperimentSensor.ISensorDataListener() {
                 @Override
-                public void onNewAudioData(float[] amplitudes, float[] frequencies) {
+                public void onNewAmplitudeData(float[] amplitudes) {
                     if (audioAmplitudePlotAdapter.getSize() / experimentSensor.SAMPLE_RATE >= amplitudeTimeSpan)
                         audioAmplitudePlotAdapter.clear();
                     audioAmplitudePlotAdapter.addData(amplitudes);
+                }
 
+                @Override
+                public void onNewFrequencyData(float[] frequencies) {
                     audioFrequencyView.addData(frequencies);
 
-                    if (audioFrequencyMapAdapter.getSize() * experimentSensor.FRAME_SIZE / experimentSensor.SAMPLE_RATE
-                            >= frequencyMapTimeSpan)
+                    if (audioFrequencyMapAdapter.getSize() * experimentSensor.FRAME_SIZE / 2
+                            / experimentSensor.SAMPLE_RATE >= frequencyMapTimeSpan)
                         audioFrequencyMapAdapter.clear();
                     audioFrequencyMapAdapter.addData(frequencies);
                 }
@@ -90,7 +93,7 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 audioAmplitudePainter.setDataAdapter(audioAmplitudePlotAdapter);
                 audioAmplitudePlotView.addPlotPainter(audioAmplitudePainter);
                 audioAmplitudePlotView.setXRange(0, amplitudeTimeSpan);
-                audioAmplitudePlotView.setYRange(-1, 1);
+                audioAmplitudePlotView.setYRange(-0.6f, 0.6f);
                 audioAmplitudePlotView.getTitleView().setTitle("Signal Strength Vs Time");
                 audioAmplitudePlotView.getXAxisView().setUnit("s");
                 audioAmplitudePlotView.getXAxisView().setTitle("Time");
@@ -290,6 +293,7 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     final public int SAMPLE_RATE = 44100;
     final public int FRAME_SIZE = 4096;//8192;//16384;
 
+    float[] prevAmplitudes = null;
     final String audioFileName = "audio.wav";
     private File audioFile = null;
 
@@ -300,7 +304,8 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     }
 
     public interface ISensorDataListener {
-        public void onNewAudioData(float[] amplitudes, float[] frequencies);
+        public void onNewAmplitudeData(float[] amplitudes);
+        public void onNewFrequencyData(float[] frequencies);
     }
 
     public void setSensorDataListener(ISensorDataListener listener) {
@@ -311,11 +316,20 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
         if (softListener == null)
             return;
 
-        float[] frequencies = Fourier.transform(amplitudes);
-
         ISensorDataListener listener = softListener.get();
-        if (listener != null)
-            listener.onNewAudioData(amplitudes, frequencies);
+        if (listener == null)
+            return;
+
+        listener.onNewAmplitudeData(amplitudes);
+
+        if (prevAmplitudes != null) {
+            float[] frequencies = Fourier.transform(prevAmplitudes, amplitudes);
+            listener.onNewFrequencyData(frequencies);
+        }
+
+        float[] frequencies = Fourier.transform(amplitudes);
+        listener.onNewFrequencyData(frequencies);
+        prevAmplitudes = amplitudes;
     }
 
     @Override

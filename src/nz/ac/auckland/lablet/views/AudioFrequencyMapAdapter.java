@@ -39,7 +39,7 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
     }
 
     public float getX(int index) {
-        float time = (float)data.getBunchSize() / sampleRate * index;
+        float time = (float)data.getBunchSize() / 2 / sampleRate * index;
         return time;
     }
 
