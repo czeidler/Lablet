@@ -19,7 +19,6 @@ import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 
 import java.io.*;
-import java.util.List;
 
 
 /**
@@ -145,7 +144,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
     private void startRunSettingsActivity(Bundle analysisSpecificData, Bundle options) {
         IExperimentPlugin.IExperimenter experimenter = currentAnalysisSensor.plugin.getExperimenter();
         ExperimentData.SensorDataRef sensorDataRef = getSensorDataRef(currentAnalysisSensor);
-        experimenter.startSensorSettingsActivity(this, PERFORM_RUN_SETTINGS, sensorDataRef, analysisSpecificData,
+        experimenter.startAnalysisSettingsActivity(this, PERFORM_RUN_SETTINGS, sensorDataRef, analysisSpecificData,
                 options);
     }
 
@@ -155,7 +154,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
             return;
 
         if (requestCode == PERFORM_RUN_SETTINGS) {
-            SensorAnalysis sensorAnalysis = currentAnalysisSensor.analysis;
+            CameraSensorAnalysis sensorAnalysis = currentAnalysisSensor.analysis;
 
             Bundle extras = data.getExtras();
             if (extras != null) {
@@ -238,7 +237,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
 
         if (currentAnalysisSensor == null)
             return;
-        SensorAnalysis sensorAnalysis = currentAnalysisSensor.analysis;
+        CameraSensorAnalysis sensorAnalysis = currentAnalysisSensor.analysis;
         if (sensorAnalysis != null)
             sensorAnalysis.getFrameDataModel().setCurrentFrame(sensorAnalysis.getFrameDataModel().getCurrentFrame());
 
@@ -273,7 +272,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
         exportTagMarkerCSVData();
     }
 
-    private File getTagMarkerCSVFile(SensorAnalysis analysis) {
+    private File getTagMarkerCSVFile(CameraSensorAnalysis analysis) {
         SensorData sensorData = analysis.getSensorData();
         return new File(sensorData.getStorageDir(), sensorData.getUid() + "_tag_markers.csv");
     }
@@ -286,7 +285,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
         }
     }
 
-    private void exportTagMarkerCSVData(SensorAnalysis sensorAnalysis) {
+    private void exportTagMarkerCSVData(CameraSensorAnalysis sensorAnalysis) {
         File csvFile = getTagMarkerCSVFile(sensorAnalysis);
         if (!csvFile.exists()) {
             try {

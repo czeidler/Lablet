@@ -35,6 +35,8 @@ abstract public class SensorData {
      */
     final static public String EXPERIMENT_DATA_FILE_NAME = "experiment_data.xml";
 
+    abstract public String getDataType();
+
     /**
      * Constructor to load an existing experiment.
      *
@@ -118,7 +120,7 @@ abstract public class SensorData {
         this.storageDir = storageDir;
 
         Bundle bundle = new Bundle();
-        bundle.putString("experiment_identifier", getIdentifier());
+        bundle.putString("sensor_name", getIdentifier());
         Bundle experimentData = experimentDataToBundle();
         bundle.putBundle("data", experimentData);
 
@@ -168,16 +170,6 @@ abstract public class SensorData {
     protected String getIdentifier() {
         return this.getClass().getSimpleName();
     }
-
-    abstract public int getNumberOfRuns();
-    abstract public Bundle getRunAt(int i);
-    abstract public float getRunValueAt(int i);
-    abstract public String getRunValueBaseUnit();
-    abstract public String getRunValueUnitPrefix();
-    public String getRunValueUnit() {
-        return getRunValueUnitPrefix() + getRunValueBaseUnit();
-    }
-    abstract public String getRunValueLabel();
 
     protected String generateNewUid() {
         CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", new java.util.Date());

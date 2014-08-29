@@ -18,8 +18,9 @@ import android.os.FileObserver;
 import android.view.*;
 import android.widget.*;
 import nz.ac.auckland.lablet.experiment.ExperimentPluginHelper;
-import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
 import nz.ac.auckland.lablet.experiment.ExperimentPluginFactory;
+import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
+import nz.ac.auckland.lablet.experiment.ISensorPlugin;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.*;
 
@@ -89,7 +90,7 @@ class InfoHelper {
  * </p>
  */
 public class ExperimentHomeActivity extends Activity {
-    private List<IExperimentPlugin> experimentPluginList = null;
+    private List<ISensorPlugin> sensorPlugins = null;
     private ArrayList<CheckBoxListEntry> experimentList = null;
     private CheckBoxListEntry.OnCheckBoxListEntryListener checkBoxListEntryListener;
     private CheckBoxAdapter experimentListAdaptor = null;
@@ -249,21 +250,21 @@ public class ExperimentHomeActivity extends Activity {
         infoSideBar.setBackground(new InfoBarBackgroundDrawable(Color.argb(255, 75, 140, 20)));
 
         // plugin list
-        experimentPluginList = ExperimentPluginFactory.getFactory().getPluginList();
+        sensorPlugins = ExperimentPluginFactory.getFactory().getSensorPlugins();
 
         int grey = 70;
         int listBackgroundColor = Color.rgb(grey, grey, grey);
 
         ListView newExperimentList = (ListView)findViewById(R.id.newExperiments);
         newExperimentList.setBackgroundColor(listBackgroundColor);
-        newExperimentList.setAdapter(new ArrayAdapter<IExperimentPlugin>(this,
-                android.R.layout.simple_list_item_1, experimentPluginList));
+        newExperimentList.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, sensorPlugins));
 
         newExperimentList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                List<IExperimentPlugin> pluginList = new ArrayList<IExperimentPlugin>();
-                pluginList.add(experimentPluginList.get(i));
+                List<ISensorPlugin> pluginList = new ArrayList<>();
+                pluginList.add(sensorPlugins.get(i));
                 startExperiment(pluginList);
             }
         });
@@ -271,7 +272,7 @@ public class ExperimentHomeActivity extends Activity {
         // experiment list
         ListView experimentListView = (ListView)findViewById(R.id.existingExperimentListView);
         experimentListView.setBackgroundColor(listBackgroundColor);
-        experimentList = new ArrayList<CheckBoxListEntry>();
+        experimentList = new ArrayList<>();
         experimentListAdaptor = new CheckBoxAdapter(this, R.layout.check_box_list_item, experimentList);
         experimentListView.setAdapter(experimentListAdaptor);
 
@@ -364,7 +365,7 @@ public class ExperimentHomeActivity extends Activity {
         }
     }
 
-    private void startExperiment(List<IExperimentPlugin> plugins) {
+    private void startExperiment(List<ISensorPlugin> plugins) {
         Intent intent = new Intent(this, ExperimentActivity.class);
         ExperimentPluginHelper.packStartExperimentIntent(intent, plugins, null);
         startActivityForResult(intent, PERFORM_EXPERIMENT);

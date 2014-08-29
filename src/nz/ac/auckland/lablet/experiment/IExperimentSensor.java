@@ -18,8 +18,6 @@ import java.io.IOException;
 
 
 public interface IExperimentSensor {
-    IExperimentPlugin getPlugin();
-
     public interface IExperimentSensorListener {
         public void onStartPreview();
         public void onStopPreview();
@@ -29,6 +27,8 @@ public interface IExperimentSensor {
         public void onStopPlayback();
         public void onSettingsChanged();
     }
+
+    public String getName();
 
     public View createExperimentView(Context context);
 

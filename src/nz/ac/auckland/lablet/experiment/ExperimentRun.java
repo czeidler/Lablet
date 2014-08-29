@@ -15,6 +15,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 class ExperimentRunData {
     private String description = "";
     private Bundle runInformation = new Bundle();
@@ -81,23 +82,23 @@ public class ExperimentRun {
 
     final static public String EXPERIMENT_RUN_FILE_NAME = "experiment_run.xml";
 
-    static public ExperimentRun createExperimentRunGroup(List<String> experimentRuns, Activity activity) {
+    static public ExperimentRun createExperimentRunGroup(List<String> experimentRuns) {
         String[] experimentRunsArray = new String[experimentRuns.size()];
         for (int i = 0; i < experimentRunsArray.length; i++)
             experimentRunsArray[i] = experimentRuns.get(i);
 
-        return createExperimentRunGroup(experimentRunsArray, activity);
+        return createExperimentRunGroup(experimentRunsArray);
     }
 
-    static public ExperimentRun createExperimentRunGroup(String[] plugins, Activity activity) {
+    static public ExperimentRun createExperimentRunGroup(String[] plugins) {
         ExperimentRun experimentRunGroup = new ExperimentRun();
 
         ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
         for (String pluginName : plugins) {
-            IExperimentPlugin plugin = factory.findExperimentPlugin(pluginName);
+            ISensorPlugin plugin = factory.findSensorPlugin(pluginName);
             if (plugin == null)
                 continue;
-            IExperimentSensor experimentRun = plugin.getExperimenter().createExperimentSensor(activity);
+            IExperimentSensor experimentRun = plugin.createExperimentSensor();
             experimentRunGroup.addExperimentSensor(experimentRun);
         }
 
@@ -200,24 +201,23 @@ public class ExperimentRun {
         Bundle experimentSensorClasses = new Bundle();
         i = 0;
         for (IExperimentSensor experimentSensor : experimentSensors) {
-            experimentSensorClasses.putString(Integer.toString(i), experimentSensor.getPlugin().getName());
+            experimentSensorClasses.putString(Integer.toString(i), experimentSensor.getName());
             i++;
         }
-        outState.putBundle("plugins", experimentSensorClasses);
-        outState.putInt("plugin_count", experimentSensors.size());
+        outState.putBundle("sensors", experimentSensorClasses);
+        outState.putInt("sensor_count", experimentSensors.size());
     }
 
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         data.onRestoreInstanceState(savedInstanceState);
 
-        int sensorClassesCount = savedInstanceState.getInt("plugin_count");
-        Bundle pluginClasses = savedInstanceState.getBundle("plugins");
+        int sensorClassesCount = savedInstanceState.getInt("sensor_count");
+        Bundle sensorsBundle = savedInstanceState.getBundle("sensors");
         ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
         for (int i = 0; i < sensorClassesCount; i++) {
-            String pluginName = pluginClasses.getString(Integer.toString(i));
-            IExperimentPlugin plugin = factory.findExperimentPlugin(pluginName);
-            IExperimentSensor experimentSensor = plugin.getExperimenter().createExperimentSensor(
-                    experiment.getActivity());
+            String pluginName = sensorsBundle.getString(Integer.toString(i));
+            ISensorPlugin plugin = factory.findSensorPlugin(pluginName);
+            IExperimentSensor experimentSensor = plugin.createExperimentSensor();
             Bundle state = savedInstanceState.getBundle(Integer.toString(i));
             experimentSensor.onRestoreInstanceState(state);
             addExperimentSensor(experimentSensor);

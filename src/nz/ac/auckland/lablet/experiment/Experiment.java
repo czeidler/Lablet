@@ -28,20 +28,24 @@ public class Experiment {
     final private List<ExperimentRun> experimentRuns = new ArrayList<>();
     private ExperimentRun currentExperimentRun;
     final private Activity activity;
-    final private File storageDirectory;
     private int runGroupId = -1;
 
     private List<WeakReference<IExperimentListener>> listeners = new ArrayList<>();
 
-    public Experiment(Activity activity, File storageDirectory) {
+    public Experiment(Activity activity) {
         this.activity = activity;
-        this.storageDirectory = new File(storageDirectory, generateNewUid());
     }
 
-    private String generateNewUid() {
+    public String generateNewUid() {
         CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", new java.util.Date());
 
-        return "Experiment_" + dateString;
+        String sensorsString = "";
+        if (experimentRuns.size() > 0) {
+            List<IExperimentSensor> sensorList = experimentRuns.get(0).getExperimentSensors();
+            for (IExperimentSensor sensor : sensorList)
+                sensorsString += sensor.getName() + "_";
+        }
+        return "Experiment_" + sensorsString + dateString;
     }
 
     public void addListener(IExperimentListener listener) {
@@ -142,14 +146,10 @@ public class Experiment {
         return runGroup.getCurrentExperimentSensor();
     }
 
-    public File getStorageDir() {
-        return storageDirectory;
-    }
-
-    public void finishExperiment(boolean saveData) throws IOException {
+    public void finishExperiment(boolean saveData, File storageDir) throws IOException {
         int i = 0;
         for (ExperimentRun experimentRun : experimentRuns) {
-            experimentRun.finishExperiment(saveData, new File(getStorageDir(), "run" + Integer.toString(i)));
+            experimentRun.finishExperiment(saveData, new File(storageDir, "run" + Integer.toString(i)));
             i++;
         }
     }

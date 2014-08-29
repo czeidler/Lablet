@@ -11,7 +11,6 @@ package nz.ac.auckland.lablet.experiment;
 import android.content.Intent;
 import android.os.Bundle;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -20,13 +19,13 @@ import java.util.List;
  */
 public class ExperimentPluginHelper {
 
-    static public void packStartExperimentIntent(Intent intent, List<IExperimentPlugin> plugins, Bundle options) {
+    static public void packStartExperimentIntent(Intent intent, List<ISensorPlugin> plugins, Bundle options) {
         String[] pluginNames = null;
         if (plugins.size() > 0) {
             pluginNames = new String[plugins.size()];
             for (int i = 0; i < plugins.size(); i++) {
-                IExperimentPlugin plugin = plugins.get(i);
-                pluginNames[i] = plugin.getName();
+                ISensorPlugin plugin = plugins.get(i);
+                pluginNames[i] = plugin.getSensorName();
             }
         }
 

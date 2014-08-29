@@ -28,14 +28,12 @@ public class ExperimentData {
             this.sensor = sensor;
         }
     }
-    public static class SensorEntry {
-        public IExperimentPlugin plugin;
-        public SensorData sensorData;
-    }
+
+    public SensorData sensorData;
 
     public static class RunEntry {
         public ExperimentRunData runData;
-        public List<SensorEntry> sensors = new ArrayList<>();
+        public List<SensorData> sensorDataList = new ArrayList<>();
     }
 
     private File storageDir;
@@ -54,9 +52,7 @@ public class ExperimentData {
         return loadError;
     }
 
-    private ExperimentData.SensorEntry loadSensorData(Context context, File sensorDirectory) {
-        ExperimentData.SensorEntry sensorEntry = new ExperimentData.SensorEntry();
-
+    private SensorData loadSensorData(Context context, File sensorDirectory) {
         Bundle bundle = null;
 
         File file = new File(sensorDirectory, SensorData.EXPERIMENT_DATA_FILE_NAME);
@@ -67,15 +63,15 @@ public class ExperimentData {
             return null;
         }
 
-        String experimentIdentifier = bundle.getString("experiment_identifier");
+        String experimentIdentifier = bundle.getString("sensor_name");
         if (experimentIdentifier == null) {
             loadError = "invalid experiment data";
             return null;
         }
 
         ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
-        sensorEntry.plugin = factory.findExperimentPlugin(experimentIdentifier);
-        if (sensorEntry.plugin == null) {
+        ISensorPlugin plugin = factory.findSensorPlugin(experimentIdentifier);
+        if (plugin == null) {
             loadError = "unknown experiment type";
             return null;
         }
@@ -85,42 +81,41 @@ public class ExperimentData {
             loadError = "failed to load experiment data";
             return null;
         }
-        IExperimentPlugin.IAnalysis analysisPlugin = sensorEntry.plugin.getAnalysis();
-        sensorEntry.sensorData = analysisPlugin.loadSensorData(context, experimentData, sensorDirectory);
-        if (sensorEntry.sensorData == null) {
+        SensorData sensorData = plugin.loadSensorData(context, experimentData, sensorDirectory);
+        if (sensorData == null) {
             loadError = "can't load experiment";
             return null;
         }
 
-        return sensorEntry;
+        return sensorData;
     }
 
     private ExperimentData.RunEntry loadRunData(Context context, File runDir) {
-        ExperimentRunData groupData = new ExperimentRunData();
-        File groupFile = new File(runDir, ExperimentRun.EXPERIMENT_RUN_FILE_NAME);
+        ExperimentRunData runData = new ExperimentRunData();
+        File runDataFile = new File(runDir, ExperimentRun.EXPERIMENT_RUN_FILE_NAME);
         try {
-            groupData.loadFromFile(groupFile);
+            runData.loadFromFile(runDataFile);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
 
         ExperimentData.RunEntry runEntry = new ExperimentData.RunEntry();
-        runEntry.runData = groupData;
+        runEntry.runData = runData;
 
         for (File runDirectory : runDir.listFiles()) {
             if (!runDirectory.isDirectory())
                 continue;
-            ExperimentData.SensorEntry sensorEntry = loadSensorData(context, runDirectory);
-            if (sensorEntry == null)
+            SensorData sensorData = loadSensorData(context, runDirectory);
+            if (sensorData == null)
                 return null;
-            runEntry.sensors.add(sensorEntry);
+            runEntry.sensorDataList.add(sensorData);
         }
         return runEntry;
     }
 
-    public boolean load(Context context, String experimentPath) {
-        storageDir = new File(experimentPath);
+    public boolean load(Context context, File storageDir) {
+        this.storageDir = storageDir;
 
         for (File groupDir : storageDir.listFiles()) {
             if (!groupDir.isDirectory())

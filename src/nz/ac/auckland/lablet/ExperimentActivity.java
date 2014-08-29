@@ -67,8 +67,7 @@ class ExperimentRunViewManager {
                 List<String> experimentNamesList = new ArrayList<>();
                 for (IExperimentSensor experimentRun : oldGroup.getExperimentSensors())
                     experimentNamesList.add(experimentRun.getClass().getSimpleName());
-                ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(
-                        experimentNamesList, activity);
+                ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(experimentNamesList);
 
                 experiment.addExperimentRunGroup(experimentRun);
                 setCurrentExperimentRunGroup(experimentRun);
@@ -263,7 +262,7 @@ public class ExperimentActivity extends FragmentActivity {
             }
         });
 
-        // activate sensors item
+        // activate sensorDataList item
         MenuItem sensorMenu = menu.findItem(R.id.action_sensors);
         assert sensorMenu != null;
         sensorMenuItem.setMenuItem(sensorMenu);
@@ -340,9 +339,9 @@ public class ExperimentActivity extends FragmentActivity {
         popup.show();
     }
 
-    private IExperimentSensor getExperiment(IExperimentPlugin plugin) {
+    private IExperimentSensor getExperiment(ISensorPlugin plugin) {
         for (IExperimentSensor experiment : getActiveSensors()) {
-            if (experiment.getPlugin() == plugin)
+            if (experiment.getName() == plugin.getSensorName())
                 return experiment;
         }
         return null;
@@ -352,11 +351,11 @@ public class ExperimentActivity extends FragmentActivity {
         View menuView = findViewById(R.id.action_view);
         PopupMenu popup = new PopupMenu(menuView.getContext(), menuView);
 
-        final List<IExperimentPlugin> plugins = ExperimentPluginFactory.getFactory().getPluginList();
+        final List<ISensorPlugin> plugins = ExperimentPluginFactory.getFactory().getSensorPlugins();
         for (int i = 0; i < plugins.size(); i++) {
-            IExperimentPlugin plugin = plugins.get(i);
+            ISensorPlugin plugin = plugins.get(i);
 
-            MenuItem item = popup.getMenu().add(1, i, i, plugin.getName());
+            MenuItem item = popup.getMenu().add(1, i, i, plugin.getSensorName());
             item.setCheckable(true);
 
             if (getExperiment(plugin) != null)
@@ -366,10 +365,10 @@ public class ExperimentActivity extends FragmentActivity {
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                IExperimentPlugin plugin = plugins.get(menuItem.getItemId());
-                IExperimentSensor experimentRun = getExperiment(plugin);
-                if (experimentRun != null)
-                    removeExperimentRun(experimentRun);
+                ISensorPlugin plugin = plugins.get(menuItem.getItemId());
+                IExperimentSensor experimentSensor = getExperiment(plugin);
+                if (experimentSensor != null)
+                    removeExperimentRun(experimentSensor);
                 else
                     addExperiment(plugin);
                 return true;
@@ -379,8 +378,8 @@ public class ExperimentActivity extends FragmentActivity {
         popup.show();
     }
 
-    private void addExperiment(IExperimentPlugin plugin) {
-        IExperimentSensor experimentRun = plugin.getExperimenter().createExperimentSensor(this);
+    private void addExperiment(ISensorPlugin plugin) {
+        IExperimentSensor experimentRun = plugin.createExperimentSensor();
         experiment.getCurrentExperimentRun().addExperimentSensor(experimentRun);
 
         experimentRun.startPreview();
@@ -410,9 +409,9 @@ public class ExperimentActivity extends FragmentActivity {
         if (pluginNames.length == 0)
             return;
 
-        experiment = new Experiment(this, experimentBaseDir);
+        experiment = new Experiment(this);
 
-        final ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(pluginNames, this);
+        final ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(pluginNames);
         experiment.addExperimentRunGroup(experimentRun);
         experiment.setCurrentExperimentRun(experimentRun);
         activateExperimentRun(experiment.getCurrentExperimentRun(), true);
@@ -545,7 +544,7 @@ public class ExperimentActivity extends FragmentActivity {
 
         experimentBaseDir = new File(path);
 
-        experiment = new Experiment(this, experimentBaseDir);
+        experiment = new Experiment(this);
         experiment.onRestoreInstanceState(savedInstanceState);
     }
 
@@ -642,7 +641,7 @@ public class ExperimentActivity extends FragmentActivity {
 
     private void finishDiscardExperiment() {
         try {
-            experiment.finishExperiment(false);
+            experiment.finishExperiment(false, null);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -653,10 +652,12 @@ public class ExperimentActivity extends FragmentActivity {
 
     private void finishExperiment(boolean startAnalysis) {
         try {
-            experiment.finishExperiment(true);
+            File storageDir = new File(experimentBaseDir, experiment.generateNewUid());
+
+            experiment.finishExperiment(true, storageDir);
 
             Intent data = new Intent();
-            File outputDir = experiment.getStorageDir();
+            File outputDir = storageDir;
             data.putExtra("experiment_path", outputDir.getPath());
             data.putExtra("start_analysis", startAnalysis);
             setResult(RESULT_OK, data);

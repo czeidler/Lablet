@@ -11,12 +11,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import nz.ac.auckland.lablet.experiment.ExperimentData;
-import nz.ac.auckland.lablet.experiment.ExperimentLoader;
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
-import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
+import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -27,21 +23,12 @@ import java.util.List;
  * Abstract base class for activities that analyze an experiment.
  */
 abstract public class ExperimentDataActivity extends FragmentActivity {
-    protected class AnalysisEntry {
-        final public SensorAnalysis analysis;
-        final public IExperimentPlugin plugin;
-
-        public AnalysisEntry(ExperimentData.SensorEntry sensorEntry) {
-            this.plugin = sensorEntry.plugin;
-            this.analysis = ExperimentLoader.getSensorAnalysis(sensorEntry);
-        }
-    }
 
     protected ExperimentData experimentData = null;
 
-    final protected List<List<AnalysisEntry>> analysisRuns = new ArrayList<>();
-    protected List<AnalysisEntry> currentAnalysisRun;
-    protected AnalysisEntry currentAnalysisSensor;
+    final protected List<List<ISensorAnalysis>> analysisRuns = new ArrayList<>();
+    protected List<ISensorAnalysis> currentAnalysisRun;
+    protected ISensorAnalysis currentAnalysisSensor;
 
     protected void setCurrentAnalysisRun(int index) {
         currentAnalysisRun = analysisRuns.get(index);
@@ -52,20 +39,37 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
         currentAnalysisSensor = currentAnalysisRun.get(index);
     }
 
-    public List<AnalysisEntry> getCurrentAnalysisRun() {
+    public List<ISensorAnalysis> getCurrentAnalysisRun() {
         return currentAnalysisRun;
+    }
+
+
+    private File getAnalysisStorageFor(ExperimentData.RunEntry runEntry, SensorData sensorData, IAnalysisPlugin plugin) {
+        File dir = sensorData.getStorageDir().getParentFile();
+        dir = new File(dir, "analysis");
+        dir = new File(dir, Integer.toString(runEntry.sensorDataList.indexOf(sensorData)));
+        dir = new File(dir, sensorData.getDataType());
+        dir = new File(dir, plugin.getName());
+        return dir;
     }
 
     private void setExperimentData(ExperimentData experimentData) {
         this.experimentData = experimentData;
 
         for (ExperimentData.RunEntry runEntry : experimentData.getRuns()) {
-            List<AnalysisEntry> analysisEntryList = new ArrayList<>();
-            for (ExperimentData.SensorEntry sensor : runEntry.sensors) {
-                AnalysisEntry entry = new AnalysisEntry(sensor);
-                if (entry.analysis == null)
+            List<ISensorAnalysis> analysisEntryList = new ArrayList<>();
+            for (SensorData sensorData : runEntry.sensorDataList) {
+                ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
+                List<IAnalysisPlugin> pluginList = factory.analysisPluginsFor(sensorData);
+                if (pluginList.size() == 0)
                     continue;
-                analysisEntryList.add(entry);
+                IAnalysisPlugin plugin = pluginList.get(0);
+
+                File storage = getAnalysisStorageFor(runEntry, sensorData, plugin);
+                ISensorAnalysis sensorAnalysis = ExperimentLoader.setupSensorAnalysis(sensorData, plugin, storage);
+                if (sensorAnalysis == null)
+                    continue;
+                analysisEntryList.add(sensorAnalysis);
             }
             analysisRuns.add(analysisEntryList);
         }
@@ -94,7 +98,7 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
         int sensorId = intent.getIntExtra("sensor_id", 0);
 
         ExperimentData experimentData = new ExperimentData();
-        if (!experimentData.load(this, experimentPath)) {
+        if (!experimentData.load(this, new File(experimentPath, "data"))) {
             showErrorAndFinish(experimentData.getLoadError());
             return false;
         }
