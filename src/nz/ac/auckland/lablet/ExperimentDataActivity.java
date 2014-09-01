@@ -23,64 +23,92 @@ import java.util.List;
  * Abstract base class for activities that analyze an experiment.
  */
 abstract public class ExperimentDataActivity extends FragmentActivity {
+    class AnalysisEntry {
+        public ISensorAnalysis analysis;
+        public IAnalysisPlugin plugin;
+
+        public AnalysisEntry(ISensorAnalysis analysis, IAnalysisPlugin plugin) {
+            this.analysis = analysis;
+            this.plugin = plugin;
+        }
+    }
+
+    class AnalysisSensorEntry {
+        public List<AnalysisEntry> analysisList = new ArrayList<>();
+    }
+
+    class AnalysisRunEntry {
+        public List<AnalysisSensorEntry> sensorList = new ArrayList();
+    }
 
     protected ExperimentData experimentData = null;
 
-    final protected List<List<ISensorAnalysis>> analysisRuns = new ArrayList<>();
-    protected List<ISensorAnalysis> currentAnalysisRun;
+    protected List<AnalysisRunEntry> analysisRuns = new ArrayList<>();
+    protected AnalysisRunEntry currentAnalysisRun;
     protected ISensorAnalysis currentAnalysisSensor;
 
     protected void setCurrentAnalysisRun(int index) {
         currentAnalysisRun = analysisRuns.get(index);
-        setCurrentAnalysisSensor(0);
+        setCurrentSensorAnalysis(0, 0);
     }
 
-    protected void setCurrentAnalysisSensor(int index) {
-        currentAnalysisSensor = currentAnalysisRun.get(index);
+    protected void setCurrentSensorAnalysis(int sensor, int analysis) {
+        currentAnalysisSensor = currentAnalysisRun.sensorList.get(sensor).analysisList.get(analysis).analysis;
     }
 
-    public List<ISensorAnalysis> getCurrentAnalysisRun() {
+    public AnalysisRunEntry getCurrentAnalysisRun() {
         return currentAnalysisRun;
     }
 
-
-    private File getAnalysisStorageFor(ExperimentData.RunEntry runEntry, SensorData sensorData, IAnalysisPlugin plugin) {
+    protected File getAnalysisStorageFor(int run, ISensorAnalysis analysis) {
+        SensorData sensorData = analysis.getData();
         File dir = sensorData.getStorageDir().getParentFile();
         dir = new File(dir, "analysis");
-        dir = new File(dir, Integer.toString(runEntry.sensorDataList.indexOf(sensorData)));
+        dir = new File(dir, Integer.toString(run));
         dir = new File(dir, sensorData.getDataType());
-        dir = new File(dir, plugin.getName());
+        dir = new File(dir, analysis.getIdentifier());
         return dir;
     }
 
+    /**
+     * Set the experiment data and load a sensor analysis for each sensor.
+     *
+     * For now it is assumed that each sensor only has one analysis.
+     *
+     * @param experimentData the experiment data
+     */
     private void setExperimentData(ExperimentData experimentData) {
         this.experimentData = experimentData;
 
-        for (ExperimentData.RunEntry runEntry : experimentData.getRuns()) {
-            List<ISensorAnalysis> analysisEntryList = new ArrayList<>();
+        List<ExperimentData.RunEntry> runs = experimentData.getRuns();
+        for (ExperimentData.RunEntry runEntry : runs) {
+            AnalysisRunEntry analysisRunEntry = new AnalysisRunEntry();
             for (SensorData sensorData : runEntry.sensorDataList) {
+                AnalysisSensorEntry analysisSensorEntry = new AnalysisSensorEntry();
                 ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
                 List<IAnalysisPlugin> pluginList = factory.analysisPluginsFor(sensorData);
                 if (pluginList.size() == 0)
                     continue;
                 IAnalysisPlugin plugin = pluginList.get(0);
 
-                File storage = getAnalysisStorageFor(runEntry, sensorData, plugin);
-                ISensorAnalysis sensorAnalysis = ExperimentLoader.setupSensorAnalysis(sensorData, plugin, storage);
+                ISensorAnalysis sensorAnalysis = plugin.createSensorAnalysis(sensorData);
+                File storage = getAnalysisStorageFor(runs.indexOf(runEntry), sensorAnalysis);
+                ExperimentLoader.setupSensorAnalysis(sensorData, sensorAnalysis, storage);
                 if (sensorAnalysis == null)
                     continue;
-                analysisEntryList.add(sensorAnalysis);
+                analysisSensorEntry.analysisList.add(new AnalysisEntry(sensorAnalysis, plugin));
+                analysisRunEntry.sensorList.add(analysisSensorEntry);
             }
-            analysisRuns.add(analysisEntryList);
+            analysisRuns.add(analysisRunEntry);
         }
 
-        if (analysisRuns.size() == 0 || analysisRuns.get(0).size() == 0) {
+        if (analysisRuns.size() == 0 || analysisRuns.get(0).sensorList.size() == 0) {
             showErrorAndFinish("No experiment found.");
             return;
         }
 
         setCurrentAnalysisRun(0);
-        setCurrentAnalysisSensor(0);
+        setCurrentSensorAnalysis(0, 0);
     }
 
     public ExperimentData getExperimentData() {
@@ -105,7 +133,7 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
         setExperimentData(experimentData);
 
         setCurrentAnalysisRun(runId);
-        setCurrentAnalysisSensor(sensorId);
+        setCurrentSensorAnalysis(sensorId, 0);
         return true;
     }
 

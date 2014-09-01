@@ -45,22 +45,20 @@ public class ExperimentLoader {
     }
 
     // Creates a new ExperimentAnalysis and tries to load an existing analysis.
-    static public ISensorAnalysis setupSensorAnalysis(SensorData sensorData, IAnalysisPlugin plugin, File analysisDir) {
-        ISensorAnalysis sensorAnalysis = plugin.createSensorAnalysis(sensorData);
-
+    static public void setupSensorAnalysis(SensorData sensorData, ISensorAnalysis sensorAnalysis, File storageDir) {
         // try to load old analysis
-        File projectFile = new File(analysisDir, ISensorAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
+        File projectFile = new File(storageDir, ISensorAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
         Bundle bundle = ExperimentLoader.loadBundleFromFile(projectFile);
         if (bundle == null)
-            return sensorAnalysis;
+            return;
 
         Bundle analysisDataBundle = bundle.getBundle("analysis_data");
         if (analysisDataBundle == null)
-            return sensorAnalysis;
+            return;
 
-        sensorAnalysis.loadAnalysisData(analysisDataBundle, analysisDir);
+        sensorAnalysis.loadAnalysisData(analysisDataBundle, storageDir);
 
-        return sensorAnalysis;
+        return;
     }
 }
 

@@ -18,7 +18,7 @@ import java.util.List;
 
 public class ExperimentData {
     public static class SensorDataRef {
-        final ExperimentData experimentData;
+        final public ExperimentData experimentData;
         final public int run;
         final public int sensor;
 
@@ -28,8 +28,6 @@ public class ExperimentData {
             this.sensor = sensor;
         }
     }
-
-    public SensorData sensorData;
 
     public static class RunEntry {
         public ExperimentRunData runData;
@@ -53,7 +51,7 @@ public class ExperimentData {
     }
 
     private SensorData loadSensorData(Context context, File sensorDirectory) {
-        Bundle bundle = null;
+        Bundle bundle;
 
         File file = new File(sensorDirectory, SensorData.EXPERIMENT_DATA_FILE_NAME);
         bundle = ExperimentLoader.loadBundleFromFile(file);

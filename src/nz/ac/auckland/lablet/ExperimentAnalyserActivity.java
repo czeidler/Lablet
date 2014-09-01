@@ -7,18 +7,17 @@
  */
 package nz.ac.auckland.lablet;
 
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.*;
-import android.widget.PopupMenu;
-import nz.ac.auckland.lablet.experiment.*;
-import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
+import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
+import nz.ac.auckland.lablet.experiment.SensorData;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 
 /**
@@ -32,148 +31,6 @@ import java.io.*;
  * </p>
  */
 public class ExperimentAnalyserActivity extends ExperimentDataActivity {
-    static final int PERFORM_RUN_SETTINGS = 0;
-
-    final public static int MARKER_COLOR = Color.argb(255, 100, 200, 20);
-
-    private boolean resumeWithRunSettings = false;
-    private boolean resumeWithRunSettingsHelp = false;
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        if (getExperimentData() == null)
-            return false;
-
-        menu.clear();
-        getMenuInflater().inflate(R.menu.experiment_analyser_activity_actions, menu);
-
-        final MenuItem backItem = menu.findItem(R.id.action_back);
-        assert backItem != null;
-        backItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                setResult(RESULT_OK);
-                finish();
-                return true;
-            }
-        });
-        final MenuItem settingsItem = menu.findItem(R.id.action_run_settings);
-        assert settingsItem != null;
-        final StringBuilder settingsName = new StringBuilder();
-        if (currentAnalysisSensor.plugin.getExperimenter().hasSensorSettingsActivity(settingsName)) {
-            settingsItem.setTitle(settingsName);
-            settingsItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
-                    startRunSettingsActivity(currentAnalysisSensor.analysis.getExperimentSpecificData(), null);
-                    return true;
-                }
-            });
-        } else {
-            settingsItem.setVisible(false);
-        }
-
-        final MenuItem calibrationMenu = menu.findItem(R.id.action_calibration_settings);
-        assert calibrationMenu != null;
-        calibrationMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                showCalibrationMenu();
-                return true;
-            }
-        });
-
-        final MenuItem originMenu = menu.findItem(R.id.action_origin_settings);
-        assert originMenu != null;
-        originMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                showOriginPopup();
-                return true;
-            }
-        });
-
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    public void onBackPressed() {
-        setResult(RESULT_OK);
-        super.onBackPressed();
-    }
-
-    private void showCalibrationMenu() {
-        ScaleSettingsDialog scaleSettingsDialog = new ScaleSettingsDialog(this, currentAnalysisSensor.analysis);
-        scaleSettingsDialog.show();
-    }
-
-    private void showOriginPopup() {
-        final View menuView = findViewById(R.id.action_origin_settings);
-        final PopupMenu popup = new PopupMenu(this, menuView);
-        popup.inflate(R.menu.origin_popup);
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                int item = menuItem.getItemId();
-                if (item == R.id.showCoordinateSystem) {
-                    currentAnalysisSensor.analysis.setShowCoordinateSystem(!menuItem.isChecked());
-                } else if (item == R.id.swapAxis) {
-                    currentAnalysisSensor.analysis.getCalibration().setSwapAxis(!menuItem.isChecked());
-                }
-                return false;
-            }
-        });
-        popup.getMenu().getItem(0).setChecked(currentAnalysisSensor.analysis.getShowCoordinateSystem());
-        popup.getMenu().getItem(1).setChecked(currentAnalysisSensor.analysis.getCalibration().getSwapAxis());
-        popup.show();
-    }
-
-    private ExperimentData.SensorDataRef getSensorDataRef(AnalysisEntry analysisEntry) {
-        for (int run = 0; run < analysisRuns.size(); run++) {
-            List<AnalysisEntry> analysisList = analysisRuns.get(run);
-            for (int sensor = 0; sensor < analysisList.size(); sensor++) {
-                AnalysisEntry entry = analysisList.get(sensor);
-                if (entry == analysisEntry)
-                    return new ExperimentData.SensorDataRef(experimentData, run, sensor);
-            }
-        }
-        return null;
-    }
-
-
-    private void startRunSettingsActivity(Bundle analysisSpecificData, Bundle options) {
-        IExperimentPlugin.IExperimenter experimenter = currentAnalysisSensor.plugin.getExperimenter();
-        ExperimentData.SensorDataRef sensorDataRef = getSensorDataRef(currentAnalysisSensor);
-        experimenter.startAnalysisSettingsActivity(this, PERFORM_RUN_SETTINGS, sensorDataRef, analysisSpecificData,
-                options);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode != RESULT_OK)
-            return;
-
-        if (requestCode == PERFORM_RUN_SETTINGS) {
-            CameraSensorAnalysis sensorAnalysis = currentAnalysisSensor.analysis;
-
-            Bundle extras = data.getExtras();
-            if (extras != null) {
-                Bundle settings = extras.getBundle("run_settings");
-                if (settings != null) {
-                    Bundle specificData = sensorAnalysis.getExperimentSpecificData();
-                    if (specificData == null)
-                        specificData = new Bundle();
-                    specificData.putBundle("run_settings", settings);
-                    sensorAnalysis.setExperimentSpecificData(specificData);
-                }
-                boolean settingsChanged = extras.getBoolean("run_settings_changed", false);
-                if (settingsChanged) {
-                    sensorAnalysis.getTagMarkers().clear();
-                    sensorAnalysis.getFrameDataModel().setCurrentFrame(0);
-                }
-            }
-        }
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -182,21 +39,6 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
         if (!loadExperiment(getIntent())) {
             showErrorAndFinish("Unable to load the experiment.");
             return;
-        }
-
-        final Intent intent = getIntent();
-        if (intent != null) {
-            Bundle extras = intent.getExtras();
-            if (extras != null) {
-                if (extras.getBoolean("first_start_with_run_settings", false)
-                        && currentAnalysisSensor.analysis.getTagMarkers().getMarkerCount() == 0) {
-                    resumeWithRunSettings = true;
-                }
-                if (extras.getBoolean("first_start_with_run_settings_help", false)) {
-                    resumeWithRunSettings = true;
-                    resumeWithRunSettingsHelp = true;
-                }
-            }
         }
 
         // gui stuff:
@@ -216,7 +58,7 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
 
             @Override
             public void onPageSelected(int position) {
-                setCurrentAnalysisSensor(position);
+                setCurrentSensorAnalysis(position, 0);
 
                 // repopulate the menu
                 invalidateOptionsMenu();
@@ -232,61 +74,41 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (currentAnalysisSensor == null)
-            return;
-        CameraSensorAnalysis sensorAnalysis = currentAnalysisSensor.analysis;
-        if (sensorAnalysis != null)
-            sensorAnalysis.getFrameDataModel().setCurrentFrame(sensorAnalysis.getFrameDataModel().getCurrentFrame());
-
-        if (resumeWithRunSettings) {
-            Bundle options = null;
-            if (resumeWithRunSettingsHelp) {
-                options = new Bundle();
-                options.putBoolean("start_with_help", true);
-            }
-            startRunSettingsActivity(sensorAnalysis.getExperimentSpecificData(), options);
-            resumeWithRunSettings = false;
-        }
+    public void onBackPressed() {
+        setResult(RESULT_OK);
+        super.onBackPressed();
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
 
         if (analysisRuns.size() == 0)
             return;
 
-        for (List<AnalysisEntry> entries : analysisRuns) {
-            for (AnalysisEntry entry : entries) {
-                try {
-                    entry.analysis.saveAnalysisDataToFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
+        for (AnalysisRunEntry analysisRun : analysisRuns) {
+            for (AnalysisSensorEntry sensorEntry : analysisRun.sensorList) {
+                for (AnalysisEntry analysisEntry : sensorEntry.analysisList) {
+                    try {
+                        ISensorAnalysis analysis = analysisEntry.analysis;
+                        File storageDir = getAnalysisStorageFor(analysisRuns.indexOf(analysisRun), analysis);
+                        analysis.saveAnalysisData(storageDir);
+                        exportTagMarkerCSVData(analysis, storageDir);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
-
-        exportTagMarkerCSVData();
     }
 
-    private File getTagMarkerCSVFile(CameraSensorAnalysis analysis) {
-        SensorData sensorData = analysis.getSensorData();
-        return new File(sensorData.getStorageDir(), sensorData.getUid() + "_tag_markers.csv");
+    private File getTagMarkerCSVFile(ISensorAnalysis analysis, File storageDir) {
+        SensorData sensorData = analysis.getData();
+        return new File(storageDir, sensorData.getUid() + "_tag_markers.csv");
     }
 
-    private void exportTagMarkerCSVData() {
-        for (List<AnalysisEntry> entries : analysisRuns) {
-            for (AnalysisEntry entry : entries) {
-                exportTagMarkerCSVData(entry.analysis);
-            }
-        }
-    }
-
-    private void exportTagMarkerCSVData(CameraSensorAnalysis sensorAnalysis) {
-        File csvFile = getTagMarkerCSVFile(sensorAnalysis);
+    private void exportTagMarkerCSVData(ISensorAnalysis sensorAnalysis, File storageDir) throws IOException {
+        File csvFile = getTagMarkerCSVFile(sensorAnalysis, storageDir);
         if (!csvFile.exists()) {
             try {
                 if (!csvFile.createNewFile())
@@ -315,12 +137,13 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            return new ExperimentAnalysisFragment(position);
+            AnalysisEntry analysisEntry = currentAnalysisRun.sensorList.get(position).analysisList.get(0);
+            return analysisEntry.plugin.createSensorAnalysisFragment(analysisEntry.analysis);
         }
 
         @Override
         public int getCount() {
-            return currentAnalysisRun.size();
+            return currentAnalysisRun.sensorList.size();
         }
     }
 }
