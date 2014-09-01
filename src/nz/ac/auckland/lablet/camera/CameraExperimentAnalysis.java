@@ -16,7 +16,7 @@ import nz.ac.auckland.lablet.experiment.*;
 /**
  * Class for the camera experiment analysis.
  */
-public class CameraExperimentAnalysis extends SensorAnalysis {
+public class CameraExperimentAnalysis extends VideoAnalysis {
 
     public CameraExperimentAnalysis(SensorData sensorData) {
         super(sensorData);

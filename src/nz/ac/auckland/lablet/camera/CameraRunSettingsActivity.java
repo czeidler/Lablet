@@ -16,7 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.*;
-import nz.ac.auckland.lablet.ExperimentDataActivity;
+import nz.ac.auckland.lablet.ExperimentAnalysisBaseActivity;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.StartEndSeekBar;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * The user is able to set video start and end point and set the analysis video frame rate.
  * </p>
  */
-public class CameraRunSettingsActivity extends ExperimentDataActivity {
+public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
     private CameraSensorData cameraSensorData;
     private VideoFrameView videoFrameView;
 
@@ -141,7 +141,7 @@ public class CameraRunSettingsActivity extends ExperimentDataActivity {
             return;
 
 
-        cameraSensorData = (CameraSensorData)currentAnalysisSensor.analysis.getSensorData();
+        cameraSensorData = (CameraSensorData)currentSensorAnalysis.getData();
 
         setContentView(R.layout.camera_run_settings);
 

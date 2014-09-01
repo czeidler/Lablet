@@ -17,18 +17,6 @@ import java.util.List;
 
 
 public class ExperimentData {
-    public static class SensorDataRef {
-        final public ExperimentData experimentData;
-        final public int run;
-        final public int sensor;
-
-        public SensorDataRef(ExperimentData experimentData, int run, int sensor) {
-            this.experimentData = experimentData;
-            this.run = run;
-            this.sensor = sensor;
-        }
-    }
-
     public static class RunEntry {
         public ExperimentRunData runData;
         public List<SensorData> sensorDataList = new ArrayList<>();

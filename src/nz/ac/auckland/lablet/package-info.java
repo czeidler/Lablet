@@ -9,7 +9,7 @@
  * <p>
  * New experiments can be implemented using the plugin architecture:
  * {@link nz.ac.auckland.lablet.experiment.IExperimentPlugin}. There is currently one common
- * {@link nz.ac.auckland.lablet.ExperimentAnalyserActivity} to analyze the experiments. However, since there
+ * {@link nz.ac.auckland.lablet.ExperimentAnalysisActivity} to analyze the experiments. However, since there
  * is currently only on {@link nz.ac.auckland.lablet.camera.CameraSensorData} this is not well tested to
  * work with different experiments.
  * </p>

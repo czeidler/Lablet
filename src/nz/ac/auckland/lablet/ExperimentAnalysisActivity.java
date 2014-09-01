@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import nz.ac.auckland.lablet.experiment.IAnalysisPlugin;
 import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
 import nz.ac.auckland.lablet.experiment.SensorData;
 
@@ -30,8 +31,7 @@ import java.io.IOException;
  * </ul>
  * </p>
  */
-public class ExperimentAnalyserActivity extends ExperimentDataActivity {
-
+public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -136,9 +136,13 @@ public class ExperimentAnalyserActivity extends ExperimentDataActivity {
         }
 
         @Override
-        public android.support.v4.app.Fragment getItem(int position) {
-            AnalysisEntry analysisEntry = currentAnalysisRun.sensorList.get(position).analysisList.get(0);
-            return analysisEntry.plugin.createSensorAnalysisFragment(analysisEntry.analysis);
+        public android.support.v4.app.Fragment getItem(int sensor) {
+            int run = getCurrentAnalysisRunIndex();
+            int analysisIndex = 0;
+            AnalysisEntry analysisEntry = currentAnalysisRun.sensorList.get(sensor).analysisList.get(analysisIndex);
+            AnalysisRef analysisRef = new AnalysisRef(getExperimentData().getStorageDir().getPath(), run, sensor,
+                    analysisEntry.analysis.getIdentifier());
+            return analysisEntry.plugin.createSensorAnalysisFragment(analysisRef);
         }
 
         @Override

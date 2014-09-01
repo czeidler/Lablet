@@ -44,7 +44,7 @@ class CameraExperimentFrameView extends VideoFrameView implements IExperimentFra
     @Override
     public void setCurrentFrame(int frame) {
         currentRun = frame;
-        Bundle bundle = experiment.getRunAt(frame);
+        Bundle bundle = experiment.getFrameAt(frame);
         if (bundle == null) {
             toastMessage("can't get run information!");
             return;

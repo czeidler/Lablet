@@ -10,6 +10,7 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class ExperimentPluginHelper {
             pluginNames = new String[plugins.size()];
             for (int i = 0; i < plugins.size(); i++) {
                 ISensorPlugin plugin = plugins.get(i);
-                pluginNames[i] = plugin.getSensorName();
+                pluginNames[i] = plugin.getIdentifier();
             }
         }
 
@@ -64,19 +65,17 @@ public class ExperimentPluginHelper {
      * Helper method to pack the analysis specific data and the options bundles correctly.
      *
      * @param intent the Intent where the data should be packed to
-     * @param sensorDataRef the target sensor
-     * @param analysisSpecificData analysis specific data bundle
+     * @param analysisRef the target analysis
      * @param options the options for the activity
      */
-    static public void packStartRunSettingsIntent(Intent intent, ExperimentData.SensorDataRef sensorDataRef,
-                                                  Bundle analysisSpecificData, Bundle options) {
+    static public void packStartAnalysisSettingsIntent(Intent intent, ExperimentAnalysisActivity.AnalysisRef analysisRef,
+                                                       String experimentPath, Bundle options) {
 
-        intent.putExtra("run_id", sensorDataRef.run);
-        intent.putExtra("sensor_id", sensorDataRef.sensor);
+        intent.putExtra("run_id", analysisRef.run);
+        intent.putExtra("sensor_id", analysisRef.sensor);
+        intent.putExtra("analysis_id", analysisRef.analysisId);
 
-        intent.putExtra("experiment_path", sensorDataRef.experimentData.getStorageDir().getPath());
-        if (analysisSpecificData != null)
-            intent.putExtra("analysisSpecificData", analysisSpecificData);
+        intent.putExtra("experiment_path", experimentPath);
         if (options != null)
             intent.putExtra("options", options);
     }

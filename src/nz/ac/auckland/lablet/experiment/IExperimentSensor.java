@@ -28,7 +28,7 @@ public interface IExperimentSensor {
         public void onSettingsChanged();
     }
 
-    public String getName();
+    public String getIdentifier();
 
     public View createExperimentView(Context context);
 

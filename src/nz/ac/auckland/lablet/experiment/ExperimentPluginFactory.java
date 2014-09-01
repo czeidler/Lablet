@@ -7,6 +7,9 @@
  */
 package nz.ac.auckland.lablet.experiment;
 
+import nz.ac.auckland.lablet.camera.VideoAnalysisPlugin;
+import nz.ac.auckland.lablet.camera.CameraSensorPlugin;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +24,8 @@ public class ExperimentPluginFactory {
     private List<IAnalysisPlugin> analysisPlugins = new ArrayList<>();
 
     private ExperimentPluginFactory() {
-        //analysisPlugins.add(new CameraExperimentPlugin());
+        analysisPlugins.add(new VideoAnalysisPlugin());
+        sensorPlugins.add(new CameraSensorPlugin());
         //analysisPlugins.add(new AccelerometerExperimentPlugin());
         //analysisPlugins.add(new MicrophoneExperimentPlugin());
     }
@@ -61,7 +65,7 @@ public class ExperimentPluginFactory {
             return null;
 
         for (ISensorPlugin plugin : sensorPlugins) {
-            if (plugin.getSensorName().equals(pluginName))
+            if (plugin.getIdentifier().equals(pluginName))
                 return plugin;
         }
         return null;
@@ -72,7 +76,7 @@ public class ExperimentPluginFactory {
             return null;
 
         for (IAnalysisPlugin plugin : analysisPlugins) {
-            if (plugin.getName().equals(pluginName))
+            if (plugin.getIdentifier().equals(pluginName))
                 return plugin;
         }
         return null;

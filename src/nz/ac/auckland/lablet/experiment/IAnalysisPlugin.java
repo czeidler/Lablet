@@ -10,6 +10,7 @@ package nz.ac.auckland.lablet.experiment;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
 
 
 public interface IAnalysisPlugin {
@@ -18,12 +19,12 @@ public interface IAnalysisPlugin {
      *
      * @return the name of the plugin
      */
-    public String getName();
+    public String getIdentifier();
 
     public String supportedDataType();
 
     /**
-     * Creates an {@link nz.ac.auckland.lablet.camera.CameraSensorAnalysis} object for the given
+     * Creates an {@link nz.ac.auckland.lablet.experiment.ISensorAnalysis} object for the given
      * {@link nz.ac.auckland.lablet.experiment.SensorData}.
      *
      * @param sensorData usually loaded with the loadSensorData method
@@ -33,12 +34,12 @@ public interface IAnalysisPlugin {
 
     /**
      * Creates the view that displays the results in the
-     * {@link nz.ac.auckland.lablet.ExperimentAnalyserActivity}.
+     * {@link nz.ac.auckland.lablet.ExperimentAnalysisActivity}.
      *
-     * @param sensorAnalysis sensor analysis that should be used
+     * @param analysisRef analysis ref
      * @return a newly created view
      */
-    public Fragment createSensorAnalysisFragment(ISensorAnalysis sensorAnalysis);
+    public Fragment createSensorAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef analysisRef);
 
     /**
      * Starts an activity to config the experiment analysis.
@@ -68,13 +69,13 @@ public interface IAnalysisPlugin {
      *
      * @param parentActivity the parent activity
      * @param requestCode request code for the activity
-     * @param sensorDataRef the sensor that should be configured
-     * @param analysisSpecificData bundle with the analysis specific data (the analysis settings)
+     * @param analysisRef the analysis that should be configured
+     * @param experimentPath path to the experiment data
      * @param options bundle with options for the run settings activity
      */
     public void startAnalysisSettingsActivity(Activity parentActivity, int requestCode,
-                                              ExperimentData.SensorDataRef sensorDataRef,
-                                              Bundle analysisSpecificData, Bundle options);
+                                              ExperimentAnalysisActivity.AnalysisRef analysisRef,
+                                              String experimentPath, Bundle options);
 
     /**
      * Check if a run settings activity exist.

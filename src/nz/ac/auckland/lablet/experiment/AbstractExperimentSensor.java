@@ -18,7 +18,6 @@ abstract public class AbstractExperimentSensor implements IExperimentSensor {
         public boolean stop();
     }
 
-    private IExperimentPlugin plugin;
     private ExperimentRun experimentRun;
     private WeakReference<IExperimentSensorListener> softListener = null;
     protected boolean unsavedExperimentData = false;
@@ -58,15 +57,6 @@ abstract public class AbstractExperimentSensor implements IExperimentSensor {
         public void notifyCurrentState() {
             notifyStartPlayback();
         }
-    }
-
-    public AbstractExperimentSensor(IExperimentPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    @Override
-    public IExperimentPlugin getPlugin() {
-        return plugin;
     }
 
     @Override

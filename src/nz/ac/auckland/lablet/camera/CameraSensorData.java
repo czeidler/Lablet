@@ -21,7 +21,7 @@ import java.io.File;
  */
 public class CameraSensorData extends SensorData {
     private String videoFileName;
-    private int numberOfRuns;
+    private int numberOfFrames;
 
     // milli seconds
     private int videoDuration;
@@ -37,9 +37,18 @@ public class CameraSensorData extends SensorData {
         super(experimentContext);
     }
 
+    @Override
+    public String getDataType() {
+        return "Video";
+    }
+
     public CameraSensorData(Context experimentContext, Bundle bundle, File storageDir) {
         super(experimentContext, bundle, storageDir);
 
+    }
+
+    public String getRunValueUnit() {
+        return getFrameValueUnitPrefix() + getFrameValueBaseUnit();
     }
 
     @Override
@@ -64,17 +73,15 @@ public class CameraSensorData extends SensorData {
         return xMax / xToYRatio;
     }
 
-    @Override
-    public int getNumberOfRuns() {
-        return numberOfRuns;
+    public int getNumberOfFrames() {
+        return numberOfFrames;
     }
 
-    @Override
-    public Bundle getRunAt(int i) {
-        if (i < 0 || i >= numberOfRuns)
+    public Bundle getFrameAt(int i) {
+        if (i < 0 || i >= numberOfFrames)
             return null;
 
-        int position = (int)getRunValueAt(i);
+        int position = (int) getFrameValueAt(i);
 
         Bundle bundle = new Bundle();
         bundle.putInt("frame_position", position);
@@ -82,23 +89,19 @@ public class CameraSensorData extends SensorData {
         return bundle;
     }
 
-    @Override
-    public float getRunValueAt(int i) {
+    public float getFrameValueAt(int i) {
         return analysisVideoStart + (float)1000 / analysisFrameRate * i;
     }
 
-    @Override
-    public String getRunValueBaseUnit() {
+    public String getFrameValueBaseUnit() {
         return "s";
     }
 
-    @Override
-    public String getRunValueUnitPrefix() {
+    public String getFrameValueUnitPrefix() {
         return "m";
     }
 
-    @Override
-    public String getRunValueLabel() {
+    public String getFrameValueLabel() {
         return "time [" + getRunValueUnit() + "]";
     }
 
@@ -178,8 +181,8 @@ public class CameraSensorData extends SensorData {
      * Set the frame rate at which the video should be analysed.
      * <p>
      * This method should only be called from the {@link nz.ac.auckland.lablet.camera.CameraExperimentAnalysis}. The
-     * frame rate determined how many sensors are returned by the experiments, i.e., a higher frame rate results in more
-     * sensors.
+     * frame rate determined how many sensorDataList are returned by the experiments, i.e., a higher frame rate results in more
+     * sensorDataList.
      * </p>
      * <p>
      * The analysis frame rate should be smaller or equal to the frame rate of the recorded video. Furthermore, the
@@ -194,7 +197,7 @@ public class CameraSensorData extends SensorData {
             analysisFrameRate = 10;
 
         int runTime = analysisVideoEnd - analysisVideoStart;
-        numberOfRuns = runTime * analysisFrameRate / 1000 + 1;
+        numberOfFrames = runTime * analysisFrameRate / 1000 + 1;
     }
 
     /**
@@ -210,7 +213,7 @@ public class CameraSensorData extends SensorData {
      * Sets the start time of the video analysis.
      * <p>
      * This value should only be set by {@link nz.ac.auckland.lablet.camera.CameraExperimentAnalysis}. The analysis
-     * start point affects the number of returned sensors.
+     * start point affects the number of returned sensorDataList.
      * </p>
      * @param startTime the time for the analysis start
      */
@@ -231,7 +234,7 @@ public class CameraSensorData extends SensorData {
      * Sets the end time for the video analysis.
      * <p>
      * This value should only be set by {@link nz.ac.auckland.lablet.camera.CameraExperimentAnalysis}. The analysis
-     * end point affects the number of returned sensors.
+     * end point affects the number of returned sensorDataList.
      * </p>
      * @param endTime the time for the analysis end
      */

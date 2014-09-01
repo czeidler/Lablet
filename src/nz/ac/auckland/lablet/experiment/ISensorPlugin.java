@@ -18,11 +18,11 @@ import java.io.File;
  */
 public interface ISensorPlugin {
     /**
-     * The name of the plugin. For example, the name of the experiment class.
+     * The identifier of the sensor.
      *
-     * @return the name of the plugin
+     * @return the identifier of the sensor
      */
-    public String getSensorName();
+    public String getIdentifier();
 
     /**
      * Creates an experiment run object.

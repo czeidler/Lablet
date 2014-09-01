@@ -201,7 +201,7 @@ public class ExperimentRun {
         Bundle experimentSensorClasses = new Bundle();
         i = 0;
         for (IExperimentSensor experimentSensor : experimentSensors) {
-            experimentSensorClasses.putString(Integer.toString(i), experimentSensor.getName());
+            experimentSensorClasses.putString(Integer.toString(i), experimentSensor.getIdentifier());
             i++;
         }
         outState.putBundle("sensors", experimentSensorClasses);

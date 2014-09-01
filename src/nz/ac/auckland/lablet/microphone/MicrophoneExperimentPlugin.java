@@ -11,73 +11,60 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.View;
+import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
 import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.File;
 
 
-class MicrophoneExperimenter extends AbstractPluginExperimenter {
-    public MicrophoneExperimenter(IExperimentPlugin plugin) {
-        super(plugin);
+class MicrophoneSensorPlugin implements ISensorPlugin {
+
+    @Override
+    public String getIdentifier() {
+        return "MicrophoneSensorPlugin";
     }
 
     @Override
-    public IExperimentSensor createExperimentSensor(Activity parentActivity) {
-        return new MicrophoneExperimentSensor(plugin);
+    public IExperimentSensor createExperimentSensor() {
+        return new MicrophoneExperimentSensor();
     }
 
-    @Override
-    public void startSensorSettingsActivity(Activity parentActivity, int requestCode,
-                                            ExperimentData.SensorDataRef sensorDataRef,
-                                            Bundle analysisSpecificData, Bundle options) {
-
-    }
-
-    @Override
-    public boolean hasSensorSettingsActivity(StringBuilder menuName) {
-        return false;
-    }
-
-}
-
-
-class MicrophoneAnalysis implements IExperimentPlugin.IAnalysis {
     @Override
     public SensorData loadSensorData(Context context, Bundle data, File storageDir) {
         return new MicrophoneSensorData(context, data, storageDir);
     }
-
-    @Override
-    public SensorAnalysis createSensorAnalysis(SensorData sensorData) {
-        return new SensorAnalysis(sensorData);
-    }
-
-    @Override
-    public View createSensorAnalysisView(Context context, SensorAnalysis sensorAnalysis) {
-        return new MicrophoneAnalysisView(context, sensorAnalysis);
-    }
 }
 
 
-public class MicrophoneExperimentPlugin implements IExperimentPlugin {
+class MicrophoneAnalysisPlugin implements IAnalysisPlugin {
+
     @Override
-    public String getName() {
-        return MicrophoneSensorData.class.getSimpleName();
+    public String getIdentifier() {
+        return "MicrophoneAnalysisPlugin";
     }
 
     @Override
-    public IExperimenter getExperimenter() {
-        return new MicrophoneExperimenter(this);
+    public String supportedDataType() {
+        return null;
     }
 
     @Override
-    public IAnalysis getAnalysis() {
-        return new MicrophoneAnalysis();
+    public ISensorAnalysis createSensorAnalysis(SensorData sensorData) {
+        return null;
     }
 
     @Override
-    public String toString() {
-        return "Microphone Experiment";
+    public boolean hasAnalysisSettingsActivity(StringBuilder menuName) {
+        return false;
+    }
+
+    @Override
+    public void startAnalysisSettingsActivity(Activity parentActivity, int requestCode, ExperimentAnalysisActivity.AnalysisRef analysisRef, String experimentPath, Bundle options) {
+
+    }
+
+    @Override
+    public Fragment createSensorAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef analysisRef) {
+        return null;
     }
 }

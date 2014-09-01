@@ -341,7 +341,7 @@ public class ExperimentActivity extends FragmentActivity {
 
     private IExperimentSensor getExperiment(ISensorPlugin plugin) {
         for (IExperimentSensor experiment : getActiveSensors()) {
-            if (experiment.getName() == plugin.getSensorName())
+            if (experiment.getIdentifier() == plugin.getIdentifier())
                 return experiment;
         }
         return null;
@@ -355,7 +355,7 @@ public class ExperimentActivity extends FragmentActivity {
         for (int i = 0; i < plugins.size(); i++) {
             ISensorPlugin plugin = plugins.get(i);
 
-            MenuItem item = popup.getMenu().add(1, i, i, plugin.getSensorName());
+            MenuItem item = popup.getMenu().add(1, i, i, plugin.getIdentifier());
             item.setCheckable(true);
 
             if (getExperiment(plugin) != null)

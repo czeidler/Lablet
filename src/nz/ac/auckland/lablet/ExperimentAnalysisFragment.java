@@ -11,34 +11,37 @@ import android.app.Activity;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
 
-import java.util.List;
-
 
 /**
  * Fragment that displays a run view container and a tag data graph/table.
  */
 public class ExperimentAnalysisFragment extends android.support.v4.app.Fragment {
-    private ISensorAnalysis sensorAnalysis;
+    protected ISensorAnalysis sensorAnalysis;
+    protected ExperimentAnalysisActivity.AnalysisRef analysisRef;
 
     public ExperimentAnalysisFragment() {
         super();
     }
 
-    public ExperimentAnalysisFragment(int position) {
+    public ExperimentAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef ref) {
         super();
 
         Bundle args = new Bundle();
-        args.putInt("sensorAnalysisIndex", position);
+        args.putInt("sensorIndex", ref.sensor);
+        args.putString("analysisIndex", ref.analysisId);
         setArguments(args);
     }
 
-
     private ISensorAnalysis findExperimentFromArguments(Activity activity) {
-        int position = getArguments().getInt("sensorAnalysisIndex", 0);
+        ExperimentAnalysisActivity experimentActivity = (ExperimentAnalysisActivity)activity;
 
-        ExperimentAnalyserActivity experimentActivity = (ExperimentAnalyserActivity) activity;
-        List<ISensorAnalysis> list = experimentActivity.getCurrentAnalysisRun();
-        return list.get(position);
+        int run = experimentActivity.getCurrentAnalysisRunIndex();
+        int position = getArguments().getInt("sensorIndex", 0);
+        String analysis = getArguments().getString("analysisIndex", "");
+        analysisRef = new ExperimentAnalysisActivity.AnalysisRef(run, position, analysis);
+
+        ExperimentAnalysisBaseActivity.AnalysisRunEntry runEntry = experimentActivity.getCurrentAnalysisRun();
+        return runEntry.sensorList.get(position).getAnalysisEntry(analysis).analysis;
     }
 
     @Override

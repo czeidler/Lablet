@@ -8,14 +8,12 @@
 package nz.ac.auckland.lablet.microphone;
 
 import android.content.Context;
-import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.widget.FrameLayout;
+import nz.ac.auckland.lablet.camera.CameraSensorAnalysis;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
-import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.views.AudioFrequencyMapAdapter;
 import nz.ac.auckland.lablet.views.AudioFrequencyMapPainter;
@@ -32,7 +30,7 @@ public class MicrophoneAnalysisView extends FrameLayout implements IExperimentFr
     final private MicrophoneSensorData micSensorData;
     private AudioFrequencyMapAdapter audioFrequencyMapAdapter;
 
-    public MicrophoneAnalysisView(Context context, SensorAnalysis sensorAnalysis) {
+    public MicrophoneAnalysisView(Context context, CameraSensorAnalysis sensorAnalysis) {
         super(context);
 
         this.micSensorData = (MicrophoneSensorData)sensorAnalysis.getSensorData();

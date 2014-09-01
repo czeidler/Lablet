@@ -24,7 +24,6 @@ import android.widget.ToggleButton;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensorView;
-import nz.ac.auckland.lablet.experiment.IExperimentPlugin;
 import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.misc.AudioWavOutputStream;
@@ -299,10 +298,6 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
 
     private MicrophoneSensorData experimentData;
 
-    public MicrophoneExperimentSensor(IExperimentPlugin plugin) {
-        super(plugin);
-    }
-
     public interface ISensorDataListener {
         public void onNewAmplitudeData(float[] amplitudes);
         public void onNewFrequencyData(float[] frequencies);
@@ -330,6 +325,11 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
         float[] frequencies = Fourier.transform(amplitudes);
         listener.onNewFrequencyData(frequencies);
         prevAmplitudes = amplitudes;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return "MicrophoneSensor";
     }
 
     @Override

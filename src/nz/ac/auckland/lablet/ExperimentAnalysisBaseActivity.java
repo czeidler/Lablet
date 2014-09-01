@@ -22,7 +22,19 @@ import java.util.List;
 /**
  * Abstract base class for activities that analyze an experiment.
  */
-abstract public class ExperimentDataActivity extends FragmentActivity {
+abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
+    public static class AnalysisRef {
+        final public int run;
+        final public int sensor;
+        final public String analysisId;
+
+        public AnalysisRef(int run, int sensor, String analysisId) {
+            this.run = run;
+            this.sensor = sensor;
+            this.analysisId = analysisId;
+        }
+    }
+
     class AnalysisEntry {
         public ISensorAnalysis analysis;
         public IAnalysisPlugin plugin;
@@ -35,17 +47,29 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
 
     class AnalysisSensorEntry {
         public List<AnalysisEntry> analysisList = new ArrayList<>();
+
+        public AnalysisEntry getAnalysisEntry(String analysis) {
+            for (AnalysisEntry analysisEntry : analysisList) {
+                if (analysisEntry.analysis.getIdentifier() == analysis)
+                    return analysisEntry;
+            }
+            return null;
+        }
     }
 
     class AnalysisRunEntry {
         public List<AnalysisSensorEntry> sensorList = new ArrayList();
+
+        public AnalysisSensorEntry getSensorEntry(int index) {
+            return sensorList.get(index);
+        }
     }
 
     protected ExperimentData experimentData = null;
 
     protected List<AnalysisRunEntry> analysisRuns = new ArrayList<>();
     protected AnalysisRunEntry currentAnalysisRun;
-    protected ISensorAnalysis currentAnalysisSensor;
+    protected ISensorAnalysis currentSensorAnalysis;
 
     protected void setCurrentAnalysisRun(int index) {
         currentAnalysisRun = analysisRuns.get(index);
@@ -53,11 +77,23 @@ abstract public class ExperimentDataActivity extends FragmentActivity {
     }
 
     protected void setCurrentSensorAnalysis(int sensor, int analysis) {
-        currentAnalysisSensor = currentAnalysisRun.sensorList.get(sensor).analysisList.get(analysis).analysis;
+        currentSensorAnalysis = currentAnalysisRun.sensorList.get(sensor).analysisList.get(analysis).analysis;
     }
 
     public AnalysisRunEntry getCurrentAnalysisRun() {
         return currentAnalysisRun;
+    }
+
+    public AnalysisEntry getAnalysisEntry(AnalysisRef ref) {
+        return analysisRuns.get(ref.run).getSensorEntry(ref.sensor).getAnalysisEntry(ref.analysisId);
+    }
+
+    public IAnalysisPlugin getAnalysisPlugin(AnalysisRef analysisRef) {
+        return getAnalysisEntry(analysisRef).plugin;
+    }
+
+    public int getCurrentAnalysisRunIndex() {
+        return analysisRuns.indexOf(currentAnalysisRun);
     }
 
     protected File getAnalysisStorageFor(int run, ISensorAnalysis analysis) {

@@ -16,7 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.views.FrameContainerView;
 import nz.ac.auckland.lablet.views.FrameDataSeekBar;
 import nz.ac.auckland.lablet.views.graph.*;
@@ -44,8 +43,7 @@ class CameraAnalysisFragmentView extends FrameLayout {
             runViewControl = new FrameDataSeekBar(context);
             sensorContainerView = new FrameContainerView(context);
 
-            LayoutInflater inflater = (LayoutInflater)context.getSystemService
-                    (Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             experimentDataView = (ViewGroup)inflater.inflate(R.layout.analysis_data_side_bar, null, false);
 
             addView(runViewControl);
@@ -112,7 +110,7 @@ class CameraAnalysisFragmentView extends FrameLayout {
     }
 
 
-    public CameraAnalysisFragmentView(Context context, SensorAnalysis sensorAnalysis) {
+    public CameraAnalysisFragmentView(Context context, VideoAnalysis sensorAnalysis) {
         super(context);
 
         final Layout mainView = new Layout(getContext());

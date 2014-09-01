@@ -167,8 +167,8 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
     static final String videoFileName = "video.mp4";
 
-    public CameraExperimentSensor(IExperimentPlugin plugin) {
-        super(plugin);
+    public CameraExperimentSensor() {
+        super();
     }
 
     public Camera getCamera() {
@@ -185,6 +185,11 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
     class VideoSettings {
         public Integer cameraProfile;
         public Camera.Size videoSize;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return "Camera Sensor";
     }
 
     @Override

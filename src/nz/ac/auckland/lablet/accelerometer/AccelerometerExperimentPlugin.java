@@ -10,74 +10,62 @@ package nz.ac.auckland.lablet.accelerometer;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
+import android.support.v4.app.Fragment;
+import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
 import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.File;
 
 
-class AccelerometerExperimenter extends AbstractPluginExperimenter {
-    public AccelerometerExperimenter(IExperimentPlugin plugin) {
-        super(plugin);
+class AccelerometerSensorPlugin implements ISensorPlugin {
+
+    @Override
+    public String getIdentifier() {
+        return "AccelerometerSensorPlugin";
     }
 
     @Override
-    public IExperimentSensor createExperimentSensor(Activity parentActivity) {
-        IExperimentSensor experiment = new AccelerometerExperimentSensor(plugin);
-        return experiment;
+    public IExperimentSensor createExperimentSensor() {
+        return new AccelerometerExperimentSensor();
     }
-
-    @Override
-    public void startSensorSettingsActivity(Activity parentActivity, int requestCode,
-                                            ExperimentData.SensorDataRef sensorDataRef,
-                                            Bundle analysisSpecificData, Bundle options) {
-
-    }
-
-    @Override
-    public boolean hasSensorSettingsActivity(StringBuilder menuName) {
-        return false;
-    }
-}
-
-class AccelerometerAnalysis implements IExperimentPlugin.IAnalysis {
 
     @Override
     public SensorData loadSensorData(Context context, Bundle data, File storageDir) {
         return null;
     }
-
-    @Override
-    public SensorAnalysis createSensorAnalysis(SensorData sensorData) {
-        return null;
-    }
-
-    @Override
-    public View createSensorAnalysisView(Context context, SensorAnalysis sensorAnalysis) {
-        return null;
-    }
 }
 
 
-public class AccelerometerExperimentPlugin implements IExperimentPlugin {
+class AccelerometerAnalysisPlugin implements IAnalysisPlugin {
+
     @Override
-    public String getName() {
-        return AccelerometerSensorData.class.getSimpleName();
+    public String getIdentifier() {
+        return "AccelerometerAnalysisPlugin";
     }
 
     @Override
-    public IExperimenter getExperimenter() {
-        return new AccelerometerExperimenter(this);
+    public String supportedDataType() {
+        return "Vector3D/Accelerometer";
     }
 
     @Override
-    public IAnalysis getAnalysis() {
-        return new AccelerometerAnalysis();
+    public ISensorAnalysis createSensorAnalysis(SensorData sensorData) {
+        return null;
     }
 
     @Override
-    public String toString() {
-        return "Accelerometer Experiment";
+    public boolean hasAnalysisSettingsActivity(StringBuilder menuName) {
+        return false;
+    }
+
+    @Override
+    public void startAnalysisSettingsActivity(Activity parentActivity, int requestCode, ExperimentAnalysisActivity.AnalysisRef analysisRef, String experimentPath, Bundle options) {
+
+    }
+
+    @Override
+    public Fragment createSensorAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef analysisRef) {
+        return null;
     }
 }
 

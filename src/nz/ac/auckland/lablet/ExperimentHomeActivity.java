@@ -19,7 +19,6 @@ import android.view.*;
 import android.widget.*;
 import nz.ac.auckland.lablet.experiment.ExperimentPluginHelper;
 import nz.ac.auckland.lablet.experiment.ExperimentPluginFactory;
-import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
 import nz.ac.auckland.lablet.experiment.ISensorPlugin;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.*;
@@ -197,7 +196,7 @@ public class ExperimentHomeActivity extends Activity {
     private void exportSelection() {
         List<File> exportList = new ArrayList<>();
 
-        File experimentBaseDir = ExperimentDataActivity.getDefaultExperimentBaseDir(this);
+        File experimentBaseDir = ExperimentAnalysisBaseActivity.getDefaultExperimentBaseDir(this);
         for (CheckBoxListEntry entry : experimentList) {
             if (!entry.getSelected())
                 continue;
@@ -225,7 +224,7 @@ public class ExperimentHomeActivity extends Activity {
     }
 
     private void deleteSelectedExperiments() {
-        File experimentBaseDir = ExperimentDataActivity.getDefaultExperimentBaseDir(this);
+        File experimentBaseDir = ExperimentAnalysisBaseActivity.getDefaultExperimentBaseDir(this);
         for (CheckBoxListEntry entry : experimentList) {
             if (!entry.getSelected())
                 continue;
@@ -301,7 +300,7 @@ public class ExperimentHomeActivity extends Activity {
             }
         };
 
-        File experimentDir = ExperimentDataActivity.getDefaultExperimentBaseDir(this);
+        File experimentDir = ExperimentAnalysisBaseActivity.getDefaultExperimentBaseDir(this);
         if (experimentDir.exists()) {
             // TODO: Events are never received, check why. Manually call updateExperimentList in onResume for now.
             experimentDirObserver = new ExperimentDirObserver(experimentDir.getPath());
@@ -314,13 +313,13 @@ public class ExperimentHomeActivity extends Activity {
     }
 
     private void startAnalyzeActivityById(String id) {
-        File experimentDir = ExperimentDataActivity.getDefaultExperimentBaseDir(this);
+        File experimentDir = ExperimentAnalysisBaseActivity.getDefaultExperimentBaseDir(this);
         File experimentPath = new File(experimentDir, id);
         startAnalyzeActivity(experimentPath.getPath());
     }
 
     private void startAnalyzeActivity(String experimentPath) {
-        Intent intent = new Intent(this, ExperimentAnalyserActivity.class);
+        Intent intent = new Intent(this, ExperimentAnalysisActivity.class);
         intent.putExtra("experiment_path", experimentPath);
         startActivityForResult(intent, ANALYSE_EXPERIMENT);
     }
@@ -380,7 +379,7 @@ public class ExperimentHomeActivity extends Activity {
 
     private void updateExperimentList() {
         experimentList.clear();
-        File experimentDir = ExperimentDataActivity.getDefaultExperimentBaseDir(this);
+        File experimentDir = ExperimentAnalysisBaseActivity.getDefaultExperimentBaseDir(this);
         if (experimentDir.isDirectory()) {
             File[] children = experimentDir.listFiles();
             for (File child : children != null ? children : new File[0])
