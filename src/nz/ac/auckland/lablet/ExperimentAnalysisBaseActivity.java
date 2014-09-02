@@ -37,8 +37,8 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
     }
 
     class AnalysisEntry {
-        public ISensorAnalysis analysis;
-        public IAnalysisPlugin plugin;
+        final public ISensorAnalysis analysis;
+        final public IAnalysisPlugin plugin;
 
         public AnalysisEntry(ISensorAnalysis analysis, IAnalysisPlugin plugin) {
             this.analysis = analysis;
@@ -47,11 +47,11 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
     }
 
     class AnalysisSensorEntry {
-        public List<AnalysisEntry> analysisList = new ArrayList<>();
+        final public List<AnalysisEntry> analysisList = new ArrayList<>();
 
         public AnalysisEntry getAnalysisEntry(String analysis) {
             for (AnalysisEntry analysisEntry : analysisList) {
-                if (analysisEntry.analysis.getIdentifier() == analysis)
+                if (analysisEntry.analysis.getIdentifier().equals(analysis))
                     return analysisEntry;
             }
             return null;
@@ -59,7 +59,7 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
     }
 
     class AnalysisRunEntry {
-        public List<AnalysisSensorEntry> sensorList = new ArrayList();
+        final public List<AnalysisSensorEntry> sensorList = new ArrayList<>();
 
         public AnalysisSensorEntry getSensorEntry(int index) {
             return sensorList.get(index);
@@ -147,10 +147,6 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
 
         setCurrentAnalysisRun(0);
         setCurrentSensorAnalysis(0, 0);
-    }
-
-    public ExperimentData getExperimentData() {
-        return experimentData;
     }
 
     protected boolean loadExperiment(Intent intent) {
