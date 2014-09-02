@@ -31,10 +31,10 @@ public class LengthCalibrationSetter implements MarkerDataModel.IListener {
 
     private float calibrationValue;
 
-    public LengthCalibrationSetter(MarkerDataModel data) {
-        this.calibrationXY = data.getCalibrationXY();
-        this.calibrationMarkers = data;
+    public LengthCalibrationSetter(MarkerDataModel lengthCalibrationMarkers, CalibrationXY calibrationXY) {
+        this.calibrationMarkers = lengthCalibrationMarkers;
         this.calibrationMarkers.addListener(this);
+        this.calibrationXY = calibrationXY;
 
         calibrationValue = 1;
         calibrate();

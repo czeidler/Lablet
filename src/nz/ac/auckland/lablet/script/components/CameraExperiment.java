@@ -160,7 +160,7 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
         }
         options.putString("experiment_base_directory", getScriptExperimentsDir().getPath());
 
-        String[] pluginName = new String[] {new CameraSensorPlugin().getIdentifier()};
+        String[] pluginName = new String[] {new CameraSensorPlugin().getSensorIdentifier()};
         ExperimentPluginHelper.packStartExperimentIntent(intent, pluginName, options);
         intent.putExtras(options);
 

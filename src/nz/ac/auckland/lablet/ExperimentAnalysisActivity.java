@@ -11,7 +11,6 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import nz.ac.auckland.lablet.experiment.IAnalysisPlugin;
 import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
 import nz.ac.auckland.lablet.experiment.SensorData;
 
@@ -91,7 +90,9 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
                 for (AnalysisEntry analysisEntry : sensorEntry.analysisList) {
                     try {
                         ISensorAnalysis analysis = analysisEntry.analysis;
-                        File storageDir = getAnalysisStorageFor(analysisRuns.indexOf(analysisRun), analysis);
+                        File storageDir = getAnalysisStorageFor(experimentData, analysisRuns.indexOf(analysisRun),
+                                analysis);
+                        storageDir.mkdirs();
                         analysis.saveAnalysisData(storageDir);
                         exportTagMarkerCSVData(analysis, storageDir);
                     } catch (IOException e) {

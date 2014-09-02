@@ -20,8 +20,8 @@ import java.io.File;
 class MicrophoneSensorPlugin implements ISensorPlugin {
 
     @Override
-    public String getIdentifier() {
-        return getClass().getSimpleName();
+    public String getSensorIdentifier() {
+        return MicrophoneExperimentSensor.class.getSimpleName();
     }
 
     @Override

@@ -9,6 +9,8 @@ package nz.ac.auckland.lablet.microphone;
 
 import android.content.Context;
 import android.os.Bundle;
+import nz.ac.auckland.lablet.experiment.IExperimentSensor;
+import nz.ac.auckland.lablet.experiment.ISensorPlugin;
 import nz.ac.auckland.lablet.experiment.SensorData;
 
 import java.io.File;
@@ -26,8 +28,8 @@ public class MicrophoneSensorData extends SensorData {
         super(experimentContext, bundle, storageDir);
     }
 
-    public MicrophoneSensorData(Context experimentContext) {
-        super(experimentContext);
+    public MicrophoneSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
+        super(experimentContext, sourceSensor);
     }
 
     @Override

@@ -11,6 +11,8 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import nz.ac.auckland.lablet.experiment.IExperimentSensor;
+import nz.ac.auckland.lablet.experiment.ISensorPlugin;
 import nz.ac.auckland.lablet.experiment.SensorData;
 
 import java.io.File;
@@ -27,8 +29,8 @@ public class CameraSensorData extends SensorData {
     private int videoWidth;
     private int videoHeight;
 
-    public CameraSensorData(Context experimentContext) {
-        super(experimentContext);
+    public CameraSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
+        super(experimentContext, sourceSensor);
     }
 
     @Override

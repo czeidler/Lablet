@@ -12,7 +12,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
-import nz.ac.auckland.lablet.camera.VideoAnalysis;
+import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.*;
@@ -70,15 +70,18 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
 
     protected List<AnalysisRunEntry> analysisRuns = new ArrayList<>();
     protected AnalysisRunEntry currentAnalysisRun;
-    protected VideoAnalysis currentSensorAnalysis;
+    protected MotionAnalysis currentSensorAnalysis;
 
-    protected void setCurrentAnalysisRun(int index) {
+    protected boolean setCurrentAnalysisRun(int index) {
+        if (index >= analysisRuns.size())
+            return false;
         currentAnalysisRun = analysisRuns.get(index);
         setCurrentSensorAnalysis(0, 0);
+        return true;
     }
 
     protected void setCurrentSensorAnalysis(int sensor, int analysis) {
-        currentSensorAnalysis = (VideoAnalysis)currentAnalysisRun.sensorList.get(sensor).analysisList.get(analysis).analysis;
+        currentSensorAnalysis = (MotionAnalysis)currentAnalysisRun.sensorList.get(sensor).analysisList.get(analysis).analysis;
     }
 
     public AnalysisRunEntry getCurrentAnalysisRun() {
@@ -97,11 +100,11 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
         return analysisRuns.indexOf(currentAnalysisRun);
     }
 
-    static public File getAnalysisStorageFor(int run, ISensorAnalysis analysis) {
-        SensorData sensorData = analysis.getData();
-        File dir = sensorData.getStorageDir().getParentFile();
+    static public File getAnalysisStorageFor(ExperimentData experimentData, int run, ISensorAnalysis analysis) {
+        File dir = experimentData.getStorageDir().getParentFile();
         dir = new File(dir, "analysis");
-        dir = new File(dir, Integer.toString(run));
+        dir = new File(dir, "run" + Integer.toString(run));
+        SensorData sensorData = analysis.getData();
         dir = new File(dir, sensorData.getDataType());
         dir = new File(dir, analysis.getIdentifier());
         return dir;
@@ -129,10 +132,8 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
                 IAnalysisPlugin plugin = pluginList.get(0);
 
                 ISensorAnalysis sensorAnalysis = plugin.createSensorAnalysis(sensorData);
-                File storage = getAnalysisStorageFor(runs.indexOf(runEntry), sensorAnalysis);
+                File storage = getAnalysisStorageFor(experimentData, runs.indexOf(runEntry), sensorAnalysis);
                 ExperimentLoader.loadSensorAnalysis(sensorAnalysis, storage);
-                if (sensorAnalysis == null)
-                    continue;
                 analysisSensorEntry.analysisList.add(new AnalysisEntry(sensorAnalysis, plugin));
                 analysisRunEntry.sensorList.add(analysisSensorEntry);
             }

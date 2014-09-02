@@ -43,9 +43,9 @@ public class Experiment {
         if (experimentRuns.size() > 0) {
             List<IExperimentSensor> sensorList = experimentRuns.get(0).getExperimentSensors();
             for (IExperimentSensor sensor : sensorList)
-                sensorsString += sensor.getIdentifier() + "_";
+                sensorsString += "_" + sensor.getIdentifier();
         }
-        return "Experiment_" + sensorsString + dateString;
+        return dateString + sensorsString;
     }
 
     public void addListener(IExperimentListener listener) {
@@ -147,6 +147,7 @@ public class Experiment {
     }
 
     public void finishExperiment(boolean saveData, File storageDir) throws IOException {
+        storageDir = new File(storageDir, "data");
         int i = 0;
         for (ExperimentRun experimentRun : experimentRuns) {
             experimentRun.finishExperiment(saveData, new File(storageDir, "run" + Integer.toString(i)));

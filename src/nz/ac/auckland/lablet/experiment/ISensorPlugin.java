@@ -22,7 +22,7 @@ public interface ISensorPlugin {
      *
      * @return the identifier of the sensor
      */
-    public String getIdentifier();
+    public String getSensorIdentifier();
 
     public String getDisplayName();
     /**

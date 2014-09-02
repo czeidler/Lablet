@@ -34,7 +34,7 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public String getIdentifier() {
-        return "AccelerometerSensor";
+        return getClass().getSimpleName();
     }
 
     @Override

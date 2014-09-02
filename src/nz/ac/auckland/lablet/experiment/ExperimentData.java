@@ -101,6 +101,9 @@ public class ExperimentData {
     }
 
     public boolean load(Context context, File storageDir) {
+        if (storageDir == null)
+            return false;
+
         this.storageDir = storageDir;
 
         for (File groupDir : storageDir.listFiles()) {

@@ -65,7 +65,7 @@ public class ExperimentPluginFactory {
             return null;
 
         for (ISensorPlugin plugin : sensorPlugins) {
-            if (plugin.getIdentifier().equals(pluginName))
+            if (plugin.getSensorIdentifier().equals(pluginName))
                 return plugin;
         }
         return null;

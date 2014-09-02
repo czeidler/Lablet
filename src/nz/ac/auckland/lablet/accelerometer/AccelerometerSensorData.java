@@ -9,6 +9,8 @@ package nz.ac.auckland.lablet.accelerometer;
 
 import android.content.Context;
 import android.os.Bundle;
+import nz.ac.auckland.lablet.experiment.IExperimentSensor;
+import nz.ac.auckland.lablet.experiment.ISensorPlugin;
 import nz.ac.auckland.lablet.experiment.SensorData;
 
 import java.io.File;
@@ -24,8 +26,8 @@ public class AccelerometerSensorData extends SensorData {
         super(experimentContext, bundle, storageDir);
     }
 
-    public AccelerometerSensorData(Context experimentContext) {
-        super(experimentContext);
+    public AccelerometerSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
+        super(experimentContext, sourceSensor);
     }
 
 }

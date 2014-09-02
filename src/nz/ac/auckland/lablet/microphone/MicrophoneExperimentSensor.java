@@ -329,7 +329,7 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public String getIdentifier() {
-        return "MicrophoneSensor";
+        return getClass().getSimpleName();
     }
 
     @Override
@@ -356,7 +356,7 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public void init(final Activity activity) {
-        experimentData = new MicrophoneSensorData(activity);
+        experimentData = new MicrophoneSensorData(activity, this);
 
         previewState = new State() {
             private AudioRecordingTask audioRecordingTask = null;

@@ -9,7 +9,6 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.text.format.Time;
 import nz.ac.auckland.lablet.misc.PersistentBundle;
 
 import java.io.File;
@@ -25,6 +24,8 @@ abstract public class SensorData {
     protected Context context;
 
     private File storageDir;
+
+    private IExperimentSensor sourceSensor;
 
     /**
      * The default file name where the experiment data is stored.
@@ -56,10 +57,11 @@ abstract public class SensorData {
      *
      * @param experimentContext the experiment context
      */
-    public SensorData(Context experimentContext) {
+    public SensorData(Context experimentContext, IExperimentSensor sourceSensor) {
         init(experimentContext);
 
         uid = generateNewUid();
+        this.sourceSensor = sourceSensor;
     }
 
     public File getStorageDir() {
@@ -82,15 +84,17 @@ abstract public class SensorData {
     }
 
     /**
+     * /**
      * Saves the experiment to the path specified in {@see setStorageDir}.
      *
+     * @param storageDir
      * @throws IOException
      */
     public void saveExperimentDataToFile(File storageDir) throws IOException {
         this.storageDir = storageDir;
 
         Bundle bundle = new Bundle();
-        bundle.putString("sensor_name", getIdentifier());
+        bundle.putString("sensor_name", sourceSensor.getIdentifier());
         Bundle experimentData = experimentDataToBundle();
         bundle.putBundle("data", experimentData);
 

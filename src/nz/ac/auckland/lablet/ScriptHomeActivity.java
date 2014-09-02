@@ -181,8 +181,8 @@ public class ScriptHomeActivity extends Activity {
         ListView scriptListView = (ListView)findViewById(R.id.scriptList);
         assert(scriptListView != null);
         scriptListView.setBackgroundColor(listBackgroundColor);
-        scriptList = new ArrayList<String>();
-        scriptListAdaptor = new ArrayAdapter<String>(this,
+        scriptList = new ArrayList<>();
+        scriptListAdaptor = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1, scriptList);
 
         scriptListView.setAdapter(scriptListAdaptor);
@@ -208,7 +208,7 @@ public class ScriptHomeActivity extends Activity {
 
         ListView existingScriptListView = (ListView)findViewById(R.id.existingScriptListView);
         existingScriptListView.setBackgroundColor(listBackgroundColor);
-        existingScriptList = new ArrayList<CheckBoxListEntry>();
+        existingScriptList = new ArrayList<>();
         existingScriptListAdaptor = new CheckBoxAdapter(this, R.layout.check_box_list_item, existingScriptList);
         existingScriptListView.setAdapter(existingScriptListAdaptor);
 

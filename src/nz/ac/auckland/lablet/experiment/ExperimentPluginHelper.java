@@ -26,7 +26,7 @@ public class ExperimentPluginHelper {
             pluginNames = new String[plugins.size()];
             for (int i = 0; i < plugins.size(); i++) {
                 ISensorPlugin plugin = plugins.get(i);
-                pluginNames[i] = plugin.getIdentifier();
+                pluginNames[i] = plugin.getSensorIdentifier();
             }
         }
 

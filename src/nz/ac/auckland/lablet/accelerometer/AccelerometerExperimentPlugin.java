@@ -20,8 +20,8 @@ import java.io.File;
 class AccelerometerSensorPlugin implements ISensorPlugin {
 
     @Override
-    public String getIdentifier() {
-        return getClass().getSimpleName();
+    public String getSensorIdentifier() {
+        return AccelerometerExperimentSensor.class.getSimpleName();
     }
 
     @Override

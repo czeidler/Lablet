@@ -16,7 +16,7 @@ public class Unit extends WeakListenable<Unit.IListener> {
     }
 
     final private String base;
-    private String prefix;
+    private String prefix = "";
 
     public Unit(String base) {
         this.base = base;

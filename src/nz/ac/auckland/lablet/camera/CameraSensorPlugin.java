@@ -18,8 +18,8 @@ import java.io.File;
 
 public class CameraSensorPlugin implements ISensorPlugin {
     @Override
-    public String getIdentifier() {
-        return getClass().getSimpleName();
+    public String getSensorIdentifier() {
+        return CameraExperimentSensor.class.getSimpleName();
     }
 
     @Override

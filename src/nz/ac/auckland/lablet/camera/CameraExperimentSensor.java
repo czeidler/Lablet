@@ -189,7 +189,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public String getIdentifier() {
-        return "Camera Sensor";
+        return getClass().getSimpleName();
     }
 
     @Override
@@ -221,7 +221,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             requestedVideoHeight = intent.getIntExtra("requested_video_height", -1);
         }
 
-        experimentData = new CameraSensorData(activity);
+        experimentData = new CameraSensorData(activity, this);
 
         recorder = new MediaRecorder();
 

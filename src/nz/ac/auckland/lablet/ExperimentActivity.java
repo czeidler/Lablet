@@ -341,7 +341,7 @@ public class ExperimentActivity extends FragmentActivity {
 
     private IExperimentSensor getExperiment(ISensorPlugin plugin) {
         for (IExperimentSensor experiment : getActiveSensors()) {
-            if (experiment.getIdentifier() == plugin.getIdentifier())
+            if (experiment.getIdentifier() == plugin.getSensorIdentifier())
                 return experiment;
         }
         return null;
@@ -355,7 +355,7 @@ public class ExperimentActivity extends FragmentActivity {
         for (int i = 0; i < plugins.size(); i++) {
             ISensorPlugin plugin = plugins.get(i);
 
-            MenuItem item = popup.getMenu().add(1, i, i, plugin.getIdentifier());
+            MenuItem item = popup.getMenu().add(1, i, i, plugin.getSensorIdentifier());
             item.setCheckable(true);
 
             if (getExperiment(plugin) != null)
@@ -657,8 +657,7 @@ public class ExperimentActivity extends FragmentActivity {
             experiment.finishExperiment(true, storageDir);
 
             Intent data = new Intent();
-            File outputDir = storageDir;
-            data.putExtra("experiment_path", outputDir.getPath());
+            data.putExtra("experiment_path", storageDir.getPath());
             data.putExtra("start_analysis", startAnalysis);
             setResult(RESULT_OK, data);
         } catch (IOException e) {
