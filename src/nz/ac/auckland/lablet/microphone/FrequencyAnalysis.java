@@ -25,7 +25,7 @@ public class FrequencyAnalysis implements ISensorAnalysis {
 
     @Override
     public String getIdentifier() {
-        return "FrequencyAnalysis";
+        return getClass().getSimpleName();
     }
 
     @Override
