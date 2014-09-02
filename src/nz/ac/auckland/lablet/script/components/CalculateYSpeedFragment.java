@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.script.components;
 
-import nz.ac.auckland.lablet.camera.VideoAnalysis;
 import nz.ac.auckland.lablet.views.table.*;
 
 

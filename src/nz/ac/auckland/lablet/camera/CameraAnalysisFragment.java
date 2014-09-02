@@ -29,8 +29,8 @@ public class CameraAnalysisFragment extends ExperimentAnalysisFragment {
         super(ref);
     }
 
-    private VideoAnalysis getSensorAnalysis() {
-        return (VideoAnalysis)sensorAnalysis;
+    private MotionAnalysis getSensorAnalysis() {
+        return (MotionAnalysis)sensorAnalysis;
     }
 
     @Override
@@ -126,7 +126,7 @@ public class CameraAnalysisFragment extends ExperimentAnalysisFragment {
             return;
 
         if (requestCode == PERFORM_RUN_SETTINGS) {
-            VideoAnalysis sensorAnalysis = getSensorAnalysis();
+            MotionAnalysis sensorAnalysis = getSensorAnalysis();
 
             Bundle extras = data.getExtras();
             if (extras != null) {
@@ -150,6 +150,8 @@ public class CameraAnalysisFragment extends ExperimentAnalysisFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
 
         final Intent intent = getActivity().getIntent();
         if (intent != null) {
@@ -176,7 +178,7 @@ public class CameraAnalysisFragment extends ExperimentAnalysisFragment {
     public void onResume() {
         super.onResume();
 
-        VideoAnalysis sensorAnalysis = getSensorAnalysis();
+        MotionAnalysis sensorAnalysis = getSensorAnalysis();
         if (getSensorAnalysis() == null)
             return;
         sensorAnalysis.getFrameDataModel().setCurrentFrame(sensorAnalysis.getFrameDataModel().getCurrentFrame());

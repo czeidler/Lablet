@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
-import nz.ac.auckland.lablet.camera.VideoAnalysis;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.LengthCalibrationSetter;
 import nz.ac.auckland.lablet.R;

@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Base class for everything that is related to analysing an experiment.
  */
-public class VideoAnalysis implements ISensorAnalysis {
+public class MotionAnalysis implements ISensorAnalysis {
     public interface IListener {
         void onShowCoordinateSystem(boolean show);
     }
@@ -48,7 +48,7 @@ public class VideoAnalysis implements ISensorAnalysis {
 
     private List<IListener> listenerList = new ArrayList<IListener>();
 
-    public VideoAnalysis(CameraSensorData sensorData) {
+    public MotionAnalysis(CameraSensorData sensorData) {
         this.sensorData = sensorData;
 
         tUnit.setPrefix("m");
@@ -72,7 +72,7 @@ public class VideoAnalysis implements ISensorAnalysis {
         MarkerData point2 = new MarkerData(-2);
         point2.setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.9f));
         lengthCalibrationMarkers.addMarkerData(point2);
-        lengthCalibrationSetter = new LengthCalibrationSetter(lengthCalibrationMarkers);
+        lengthCalibrationSetter = new LengthCalibrationSetter(lengthCalibrationMarkers, calibrationXY);
 
         PointF origin = calibrationXY.getOrigin();
         PointF axis1 = calibrationXY.getAxis1();
@@ -100,7 +100,7 @@ public class VideoAnalysis implements ISensorAnalysis {
 
     @Override
     public String getIdentifier() {
-        return "VideoAnalysis";
+        return "MotionAnalysis";
     }
 
     public SensorData getData() { return sensorData; }

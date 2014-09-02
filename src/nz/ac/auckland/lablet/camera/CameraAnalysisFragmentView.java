@@ -111,7 +111,7 @@ class CameraAnalysisFragmentView extends FrameLayout {
     }
 
 
-    public CameraAnalysisFragmentView(Context context, VideoAnalysis sensorAnalysis) {
+    public CameraAnalysisFragmentView(Context context, MotionAnalysis sensorAnalysis) {
         super(context);
 
         final Layout mainView = new Layout(getContext());

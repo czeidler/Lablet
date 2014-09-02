@@ -29,7 +29,7 @@ public class VideoAnalysisPlugin implements IAnalysisPlugin {
     @Override
     public ISensorAnalysis createSensorAnalysis(SensorData sensorData) {
         assert sensorData instanceof CameraSensorData;
-        return new VideoAnalysis((CameraSensorData)sensorData);
+        return new MotionAnalysis((CameraSensorData)sensorData);
     }
 
     @Override

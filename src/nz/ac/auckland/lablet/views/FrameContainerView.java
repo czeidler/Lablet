@@ -12,7 +12,7 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
-import nz.ac.auckland.lablet.camera.VideoAnalysis;
+import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
@@ -26,11 +26,11 @@ import nz.ac.auckland.lablet.experiment.MarkerDataModel;
  * </p>
  */
 public class FrameContainerView extends RelativeLayout implements FrameDataModel.IFrameDataModelListener,
-        VideoAnalysis.IListener {
+        MotionAnalysis.IListener {
     private View sensorAnalysisView = null;
     private MarkerView markerView = null;
     private FrameDataModel frameDataModel = null;
-    private VideoAnalysis sensorAnalysis = null;
+    private MotionAnalysis sensorAnalysis = null;
     private OriginMarkerPainter originMarkerPainter = null;
 
     public FrameContainerView(Context context) {
@@ -54,7 +54,7 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
         }
     }
 
-    public void setTo(View runView, VideoAnalysis analysis) {
+    public void setTo(View runView, MotionAnalysis analysis) {
         if (sensorAnalysis != null)
             sensorAnalysis.removeListener(this);
         sensorAnalysis = analysis;

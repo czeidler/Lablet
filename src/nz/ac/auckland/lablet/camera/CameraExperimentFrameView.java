@@ -9,9 +9,7 @@ package nz.ac.auckland.lablet.camera;
 
 import android.content.Context;
 import android.graphics.*;
-import android.os.Bundle;
 import android.view.View;
-import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.views.IExperimentFrameView;
 import nz.ac.auckland.lablet.views.VideoFrameView;
 
@@ -25,19 +23,19 @@ import java.io.File;
  * </p>
  */
 class CameraExperimentFrameView extends VideoFrameView implements IExperimentFrameView {
-    final private VideoAnalysis videoAnalysis;
+    final private MotionAnalysis motionAnalysis;
     final private CameraSensorData sensorData;
     private int currentRun = -1;
 
-    public CameraExperimentFrameView(Context context, VideoAnalysis videoAnalysis) {
+    public CameraExperimentFrameView(Context context, MotionAnalysis motionAnalysis) {
         super(context);
 
         setWillNotDraw(false);
 
-        this.videoAnalysis = videoAnalysis;
-        this.sensorData = (CameraSensorData)videoAnalysis.getData();
+        this.motionAnalysis = motionAnalysis;
+        this.sensorData = (CameraSensorData) motionAnalysis.getData();
 
-        File storageDir = videoAnalysis.getData().getStorageDir();
+        File storageDir = motionAnalysis.getData().getStorageDir();
         File videoFile = new File(storageDir, sensorData.getVideoFileName());
         setVideoFilePath(videoFile.getPath());
     }
@@ -45,7 +43,7 @@ class CameraExperimentFrameView extends VideoFrameView implements IExperimentFra
     @Override
     public void setCurrentFrame(int frame) {
         currentRun = frame;
-        int positionMicroSeconds = (int)videoAnalysis.getCalibrationVideoFrame().getTimeFromRaw(frame);
+        int positionMicroSeconds = (int) motionAnalysis.getCalibrationVideoFrame().getTimeFromRaw(frame);
         positionMicroSeconds *= 1000;
 
         seekToFrame(positionMicroSeconds);

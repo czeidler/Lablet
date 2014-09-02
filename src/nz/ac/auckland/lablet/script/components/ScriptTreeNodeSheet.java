@@ -15,7 +15,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.*;
 import android.widget.*;
-import nz.ac.auckland.lablet.camera.VideoAnalysis;
+import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.script.*;
 import nz.ac.auckland.lablet.views.graph.*;
 import nz.ac.auckland.lablet.R;
@@ -258,7 +258,7 @@ class GraphView extends ScriptComponentViewHolder {
 
         graphView2D.setMaxWidth(500);
 
-        VideoAnalysis sensorAnalysis = experiment.getVideoAnalysis(context);
+        MotionAnalysis sensorAnalysis = experiment.getVideoAnalysis(context);
         if (sensorAnalysis != null) {
             MarkerGraphAxis xAxis = createAxis(xAxisContentId);
             if (xAxis == null)
@@ -277,8 +277,8 @@ class GraphView extends ScriptComponentViewHolder {
         experimentListener = new ScriptExperimentRef.IScriptExperimentRefListener() {
             @Override
             public void onExperimentAnalysisUpdated() {
-                VideoAnalysis videoAnalysis = experiment.getVideoAnalysis(contextFinal);
-                adapter.setTo(videoAnalysis.getTagMarkers(), videoAnalysis.getCalibrationVideoFrame());
+                MotionAnalysis motionAnalysis = experiment.getVideoAnalysis(contextFinal);
+                adapter.setTo(motionAnalysis.getTagMarkers(), motionAnalysis.getCalibrationVideoFrame());
             }
         };
         experiment.addListener(experimentListener);

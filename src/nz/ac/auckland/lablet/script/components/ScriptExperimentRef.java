@@ -10,7 +10,7 @@ package nz.ac.auckland.lablet.script.components;
 import android.content.Context;
 import nz.ac.auckland.lablet.ExperimentAnalysisBaseActivity;
 import nz.ac.auckland.lablet.camera.CameraSensorData;
-import nz.ac.auckland.lablet.camera.VideoAnalysis;
+import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentLoader;
 import nz.ac.auckland.lablet.experiment.SensorData;
@@ -33,7 +33,7 @@ public class ScriptExperimentRef {
 
     private List<WeakReference<IScriptExperimentRefListener>> listeners = new ArrayList<>();
     private String experimentPath = "";
-    private VideoAnalysis videoAnalysis;
+    private MotionAnalysis motionAnalysis;
 
     public String getExperimentPath() {
         return experimentPath;
@@ -42,10 +42,10 @@ public class ScriptExperimentRef {
         experimentPath = path;
     }
 
-    public VideoAnalysis getVideoAnalysis(Context context) {
-        if (videoAnalysis == null)
-            videoAnalysis = loadSensorAnalysis(context);
-        return videoAnalysis;
+    public MotionAnalysis getVideoAnalysis(Context context) {
+        if (motionAnalysis == null)
+            motionAnalysis = loadSensorAnalysis(context);
+        return motionAnalysis;
     }
 
     public void addListener(IScriptExperimentRefListener listener) {
@@ -57,7 +57,7 @@ public class ScriptExperimentRef {
     }
 
     public void reloadExperimentAnalysis(Context context) {
-        videoAnalysis = loadSensorAnalysis(context);
+        motionAnalysis = loadSensorAnalysis(context);
         for (ListIterator<WeakReference<IScriptExperimentRefListener>> it = listeners.listIterator();
              it.hasNext();) {
             IScriptExperimentRefListener listener = it.next().get();
@@ -68,17 +68,17 @@ public class ScriptExperimentRef {
         }
     }
 
-    private VideoAnalysis loadSensorAnalysis(Context context) {
+    private MotionAnalysis loadSensorAnalysis(Context context) {
         ExperimentData experimentData = new ExperimentData();
         if (!experimentData.load(context, new File(getExperimentPath())))
             return null;
         SensorData sensorData = experimentData.getRuns().get(0).sensorDataList.get(0);
         if (!(sensorData instanceof CameraSensorData))
             return null;
-        VideoAnalysis videoAnalysis = new VideoAnalysis((CameraSensorData)sensorData);
-        File analysisDir = ExperimentAnalysisBaseActivity.getAnalysisStorageFor(0, videoAnalysis);
-        if (!ExperimentLoader.loadSensorAnalysis(videoAnalysis, analysisDir))
+        MotionAnalysis motionAnalysis = new MotionAnalysis((CameraSensorData)sensorData);
+        File analysisDir = ExperimentAnalysisBaseActivity.getAnalysisStorageFor(experimentData, 0, motionAnalysis);
+        if (!ExperimentLoader.loadSensorAnalysis(motionAnalysis, analysisDir))
             return null;
-        return videoAnalysis;
+        return motionAnalysis;
     }
 }

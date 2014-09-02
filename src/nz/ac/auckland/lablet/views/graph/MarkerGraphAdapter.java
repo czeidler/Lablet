@@ -8,7 +8,6 @@
 package nz.ac.auckland.lablet.views.graph;
 
 import nz.ac.auckland.lablet.camera.ITimeCalibration;
-import nz.ac.auckland.lablet.camera.VideoAnalysis;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 

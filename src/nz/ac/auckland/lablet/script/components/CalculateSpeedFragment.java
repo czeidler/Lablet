@@ -16,8 +16,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import nz.ac.auckland.lablet.*;
 import nz.ac.auckland.lablet.camera.ITimeCalibration;
-import nz.ac.auckland.lablet.camera.VideoAnalysis;
-import nz.ac.auckland.lablet.experiment.SensorData;
+import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptComponent;
@@ -364,7 +363,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
 
         ScriptTreeNodeCalculateSpeed speedComponent = (ScriptTreeNodeCalculateSpeed)component;
 
-        VideoAnalysis sensorAnalysis = speedComponent.getExperiment().getVideoAnalysis(getActivity());
+        MotionAnalysis sensorAnalysis = speedComponent.getExperiment().getVideoAnalysis(getActivity());
         if (sensorAnalysis == null)
             return;
         tagMarker = sensorAnalysis.getTagMarkers();

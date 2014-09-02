@@ -17,7 +17,7 @@ import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
 import android.widget.Toast;
-import nz.ac.auckland.lablet.camera.VideoAnalysis;
+import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.camera.VideoAnalysisPlugin;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.script.Script;
@@ -160,7 +160,7 @@ public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
 
     private boolean validateAnalysis() {
         ScriptExperimentRef experiment = ((ScriptTreeNodeExperimentAnalysis)component).getExperiment();
-        VideoAnalysis sensorAnalysis = experiment.getVideoAnalysis(getActivity());
+        MotionAnalysis sensorAnalysis = experiment.getVideoAnalysis(getActivity());
         if (sensorAnalysis == null)
             return false;
 
@@ -184,7 +184,7 @@ public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
         if (component.getState() == ScriptComponent.SCRIPT_STATE_DONE) {
             takenExperimentInfo.setChecked(true);
             ScriptExperimentRef experiment = ((ScriptTreeNodeExperimentAnalysis)component).getExperiment();
-            VideoAnalysis sensorAnalysis = experiment.getVideoAnalysis(getActivity());
+            MotionAnalysis sensorAnalysis = experiment.getVideoAnalysis(getActivity());
             if (sensorAnalysis == null)
                 return;
             MarkerGraphAdapter adapter = new MarkerGraphAdapter(sensorAnalysis.getTagMarkers(),
