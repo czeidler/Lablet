@@ -250,6 +250,9 @@ public class ExperimentHomeActivity extends Activity {
 
         // plugin list
         sensorPlugins = ExperimentPluginFactory.getFactory().getSensorPlugins();
+        List<String> sensorPluginStrings = new ArrayList<>();
+        for (ISensorPlugin plugin : sensorPlugins)
+            sensorPluginStrings.add(plugin.getDisplayName());
 
         int grey = 70;
         int listBackgroundColor = Color.rgb(grey, grey, grey);
@@ -257,7 +260,7 @@ public class ExperimentHomeActivity extends Activity {
         ListView newExperimentList = (ListView)findViewById(R.id.newExperiments);
         newExperimentList.setBackgroundColor(listBackgroundColor);
         newExperimentList.setAdapter(new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, sensorPlugins));
+                android.R.layout.simple_list_item_1, sensorPluginStrings));
 
         newExperimentList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

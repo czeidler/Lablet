@@ -24,6 +24,7 @@ public interface ISensorPlugin {
      */
     public String getIdentifier();
 
+    public String getDisplayName();
     /**
      * Creates an experiment run object.
      * <p>

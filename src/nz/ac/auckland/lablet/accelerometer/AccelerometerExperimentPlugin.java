@@ -21,7 +21,12 @@ class AccelerometerSensorPlugin implements ISensorPlugin {
 
     @Override
     public String getIdentifier() {
-        return "AccelerometerSensorPlugin";
+        return getClass().getSimpleName();
+    }
+
+    @Override
+    public String getDisplayName() {
+        return "Accelerometer";
     }
 
     @Override

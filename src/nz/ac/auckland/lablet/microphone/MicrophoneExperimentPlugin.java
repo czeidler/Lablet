@@ -21,7 +21,12 @@ class MicrophoneSensorPlugin implements ISensorPlugin {
 
     @Override
     public String getIdentifier() {
-        return "MicrophoneSensorPlugin";
+        return getClass().getSimpleName();
+    }
+
+    @Override
+    public String getDisplayName() {
+        return "Microphone";
     }
 
     @Override
