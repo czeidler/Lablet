@@ -17,8 +17,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.*;
-import nz.ac.auckland.lablet.camera.CameraExperimentPlugin;
 import nz.ac.auckland.lablet.camera.CameraSensorData;
+import nz.ac.auckland.lablet.camera.CameraSensorPlugin;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentPluginHelper;
 import nz.ac.auckland.lablet.experiment.SensorData;
@@ -160,7 +160,7 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
         }
         options.putString("experiment_base_directory", getScriptExperimentsDir().getPath());
 
-        String[] pluginName = new String[] {new CameraExperimentPlugin().getName()};
+        String[] pluginName = new String[] {new CameraSensorPlugin().getIdentifier()};
         ExperimentPluginHelper.packStartExperimentIntent(intent, pluginName, options);
         intent.putExtras(options);
 
@@ -214,11 +214,11 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
             @Override
             protected Object doInBackground(Object... objects) {
                 ExperimentData experimentData = new ExperimentData();
-                if (!experimentData.load(getContext(), experimentPath))
+                if (!experimentData.load(getContext(), new File(experimentPath)))
                     return null;
 
                 // TODO fix if there are more than one runs or sensors
-                SensorData sensorData = experimentData.getRuns().get(0).sensors.get(0).sensorData;
+                SensorData sensorData = experimentData.getRuns().get(0).sensorDataList.get(0);
                 CameraSensorData cameraSensorData = (CameraSensorData)sensorData;
                 return new File(cameraSensorData.getStorageDir(), cameraSensorData.getVideoFileName());
             }

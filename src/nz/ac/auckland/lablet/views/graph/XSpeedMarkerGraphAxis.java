@@ -7,8 +7,6 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
@@ -23,22 +21,19 @@ public class XSpeedMarkerGraphAxis extends MarkerGraphAxis {
 
     @Override
     public Number getValue(int index) {
-        SensorAnalysis sensorAnalysis = getExperimentAnalysis();
         MarkerDataModel data = getData();
 
-        SensorData sensorData = sensorAnalysis.getSensorData();
         float deltaX = data.getCalibratedMarkerPositionAt(index + 1).x - data.getCalibratedMarkerPositionAt(index).x;
-        float deltaT = sensorData.getRunValueAt(index + 1) - sensorData.getRunValueAt(index);
-        if (sensorAnalysis.getSensorData().getRunValueUnitPrefix().equals("m"))
+        float deltaT = getTimeCalibration().getTimeFromRaw(index + 1) - getTimeCalibration().getTimeFromRaw(index);
+        if (getTimeCalibration().getUnit().getPrefix().equals("m"))
             deltaT /= 1000;
         return deltaX / deltaT;
     }
 
     @Override
     public String getLabel() {
-        SensorAnalysis sensorAnalysis = getExperimentAnalysis();
-        return "velocity [" + sensorAnalysis.getXUnit() + "/"
-                + sensorAnalysis.getSensorData().getRunValueBaseUnit() + "]";
+        return "velocity [" + getData().getCalibrationXY().getXUnit().getUnit() + "/"
+                + getTimeCalibration().getUnit().getBase() + "]";
     }
 
     @Override

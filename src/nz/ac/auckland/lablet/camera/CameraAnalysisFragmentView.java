@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
 import nz.ac.auckland.lablet.R;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.FrameContainerView;
 import nz.ac.auckland.lablet.views.FrameDataSeekBar;
 import nz.ac.auckland.lablet.views.graph.*;
@@ -124,7 +125,7 @@ class CameraAnalysisFragmentView extends FrameLayout {
         tableView = (TableView)mainView.findViewById(R.id.tagMarkerTableView);
         assert tableView != null;
 
-        final View sensorAnalysisView = new CameraExperimentFrameView(context, sensorAnalysis.getSensorData());
+        final View sensorAnalysisView = new CameraExperimentFrameView(context, sensorAnalysis);
         if (sensorAnalysisView == null)
             return;
 
@@ -134,24 +135,26 @@ class CameraAnalysisFragmentView extends FrameLayout {
         runContainerView.setTo(sensorAnalysisView, sensorAnalysis);
         runContainerView.addTagMarkerData(sensorAnalysis.getTagMarkers());
         runContainerView.addXYCalibrationData(sensorAnalysis.getXYCalibrationMarkers());
-        runContainerView.addOriginData(sensorAnalysis.getOriginMarkers(), sensorAnalysis.getCalibration());
+        runContainerView.addOriginData(sensorAnalysis.getOriginMarkers(), sensorAnalysis.getCalibrationXY());
 
         // marker table view
-        final ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(sensorAnalysis.getTagMarkers(),
-                sensorAnalysis);
+        final MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(sensorAnalysis.getTagMarkers(),
+                sensorAnalysis.getCalibrationVideoFrame());
         adapter.addColumn(new RunIdDataTableColumn());
         adapter.addColumn(new TimeDataTableColumn());
         adapter.addColumn(new XPositionDataTableColumn());
         adapter.addColumn(new YPositionDataTableColumn());
         tableView.setAdapter(adapter);
 
+        MarkerDataModel markerDataModel = sensorAnalysis.getTagMarkers();
+        ITimeCalibration timeCalibration = sensorAnalysis.getCalibrationVideoFrame();
         // graph spinner
-        graphSpinnerEntryList.add(new GraphSpinnerEntry("Position Data", new MarkerGraphAdapter(sensorAnalysis,
-                "Position Data", new XPositionMarkerGraphAxis(), new YPositionMarkerGraphAxis())));
-        graphSpinnerEntryList.add(new GraphSpinnerEntry("x-Velocity", new MarkerGraphAdapter(sensorAnalysis,
-                "x-Velocity", new TimeMarkerGraphAxis(), new XSpeedMarkerGraphAxis())));
-        graphSpinnerEntryList.add(new GraphSpinnerEntry("y-Velocity", new MarkerGraphAdapter(sensorAnalysis,
-                "y-Velocity", new TimeMarkerGraphAxis(), new YSpeedMarkerGraphAxis())));
+        graphSpinnerEntryList.add(new GraphSpinnerEntry("Position Data", new MarkerGraphAdapter(markerDataModel,
+                timeCalibration, "Position Data", new XPositionMarkerGraphAxis(), new YPositionMarkerGraphAxis())));
+        graphSpinnerEntryList.add(new GraphSpinnerEntry("x-Velocity", new MarkerGraphAdapter(markerDataModel,
+                timeCalibration, "x-Velocity", new TimeMarkerGraphAxis(), new XSpeedMarkerGraphAxis())));
+        graphSpinnerEntryList.add(new GraphSpinnerEntry("y-Velocity", new MarkerGraphAdapter(markerDataModel,
+                timeCalibration, "y-Velocity", new TimeMarkerGraphAxis(), new YSpeedMarkerGraphAxis())));
 
         graphSpinner = (Spinner)mainView.findViewById(R.id.graphSpinner);
         graphSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,

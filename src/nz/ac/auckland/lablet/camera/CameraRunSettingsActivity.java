@@ -40,7 +40,7 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
     private StartEndSeekBar startEndSeekBar = null;
 
     // The marker data model keeps listeners as weak references. Thus we have to maintain our own hard reference.
-    private MarkerDataModel.IMarkerDataModelListener startEndSeekBarListener = null;
+    private MarkerDataModel.IListener startEndSeekBarListener = null;
 
     private NumberPicker frameRatePicker = null;
     private EditText editVideoStart = null;
@@ -179,7 +179,7 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
         startEndSeekBar.setPadding(seekBar.getPaddingLeft(), seekBar.getPaddingTop(), seekBar.getPaddingRight(),
                 seekBar.getPaddingBottom());
 
-        startEndSeekBarListener = new MarkerDataModel.IMarkerDataModelListener() {
+        startEndSeekBarListener = new MarkerDataModel.IListener() {
             @Override
             public void onDataAdded(MarkerDataModel model, int index) {
 
@@ -248,12 +248,13 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
         Bundle analysisSpecificData = extras.getBundle("analysisSpecificData");
         if (analysisSpecificData != null)
             runSettings = analysisSpecificData.getBundle("run_settings");
+        CalibrationVideoFrame calibrationVideoFrame = currentSensorAnalysis.getCalibrationVideoFrame();
         if (runSettings != null) {
-            cameraSensorData.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
-            cameraSensorData.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
-            cameraSensorData.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
+            calibrationVideoFrame.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
+            calibrationVideoFrame.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
+            calibrationVideoFrame.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
         }
-        int analysisFrameRate = cameraSensorData.getAnalysisFrameRate();
+        int analysisFrameRate = calibrationVideoFrame.getAnalysisFrameRate();
 
         // initial views with values
         calculateFrameRateValues(videoFrameView.getVideoFrameRate());
@@ -263,8 +264,8 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
         int pickerFrameRateIndex = getNumberPickerIndexForFrameRate(analysisFrameRate);
         frameRatePicker.setValue(pickerFrameRateIndex);
 
-        videoStartValue = cameraSensorData.getAnalysisVideoStart();
-        videoEndValue = cameraSensorData.getAnalysisVideoEnd();
+        videoStartValue = calibrationVideoFrame.getAnalysisVideoStart();
+        videoEndValue = calibrationVideoFrame.getAnalysisVideoEnd();
         setVideoStart(videoStartValue);
         setVideoEnd(videoEndValue);
         PointF point = new PointF();

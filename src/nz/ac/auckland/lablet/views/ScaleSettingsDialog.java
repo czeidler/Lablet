@@ -13,7 +13,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
+import nz.ac.auckland.lablet.camera.VideoAnalysis;
+import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.LengthCalibrationSetter;
 import nz.ac.auckland.lablet.R;
 
@@ -26,15 +27,15 @@ import java.util.List;
  */
 public class ScaleSettingsDialog extends AlertDialog {
     private LengthCalibrationSetter calibrationSetter;
-    private SensorAnalysis sensorAnalysis;
+    private CalibrationXY calibrationXY;
     private EditText lengthEditText;
     private Spinner spinnerUnit;
 
-    public ScaleSettingsDialog(Context context, SensorAnalysis analysis) {
+    public ScaleSettingsDialog(Context context, LengthCalibrationSetter lengthCalibrationSetter) {
         super(context);
 
-        this.calibrationSetter = analysis.getLengthCalibrationSetter();
-        this.sensorAnalysis = analysis;
+        this.calibrationSetter = lengthCalibrationSetter;
+        calibrationXY = calibrationSetter.getCalibrationXY();
     }
 
     @Override
@@ -59,9 +60,9 @@ public class ScaleSettingsDialog extends AlertDialog {
         ArrayAdapter<String> unitsAdapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item, list);
         spinnerUnit.setAdapter(unitsAdapter);
-        if (sensorAnalysis.getXUnitPrefix().equals("c"))
+        if (calibrationXY.getXUnit().getPrefix().equals("c"))
             spinnerUnit.setSelection(1);
-        if (sensorAnalysis.getXUnitPrefix().equals("m"))
+        if (calibrationXY.getXUnit().getPrefix().equals("m"))
             spinnerUnit.setSelection(2);
 
         // button bar
@@ -82,14 +83,14 @@ public class ScaleSettingsDialog extends AlertDialog {
 
                 int spinnerPosition = spinnerUnit.getSelectedItemPosition();
                 if (spinnerPosition == 0) {
-                    sensorAnalysis.setXUnitPrefix("");
-                    sensorAnalysis.setYUnitPrefix("");
+                    calibrationXY.getXUnit().setPrefix("");
+                    calibrationXY.getYUnit().setPrefix("");
                 } else if (spinnerPosition == 1) {
-                    sensorAnalysis.setXUnitPrefix("c");
-                    sensorAnalysis.setYUnitPrefix("c");
+                    calibrationXY.getXUnit().setPrefix("c");
+                    calibrationXY.getYUnit().setPrefix("c");
                 } else if (spinnerPosition == 2) {
-                    sensorAnalysis.setXUnitPrefix("m");
-                    sensorAnalysis.setYUnitPrefix("m");
+                    calibrationXY.getXUnit().setPrefix("m");
+                    calibrationXY.getYUnit().setPrefix("m");
                 }
 
                 dismiss();

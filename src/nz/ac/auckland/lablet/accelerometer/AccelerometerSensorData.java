@@ -15,6 +15,11 @@ import java.io.File;
 
 
 public class AccelerometerSensorData extends SensorData {
+    @Override
+    public String getDataType() {
+        return "3DVector/accelerometer";
+    }
+
     public AccelerometerSensorData(Context experimentContext, Bundle bundle, File storageDir) {
         super(experimentContext, bundle, storageDir);
     }
@@ -23,43 +28,4 @@ public class AccelerometerSensorData extends SensorData {
         super(experimentContext);
     }
 
-    @Override
-    public float getMaxRawX() {
-        return 0;
-    }
-
-    @Override
-    public float getMaxRawY() {
-        return 0;
-    }
-
-    @Override
-    public int getNumberOfRuns() {
-        return 0;
-    }
-
-    @Override
-    public Bundle getRunAt(int i) {
-        return null;
-    }
-
-    @Override
-    public float getRunValueAt(int i) {
-        return 0;
-    }
-
-    @Override
-    public String getRunValueBaseUnit() {
-        return null;
-    }
-
-    @Override
-    public String getRunValueUnitPrefix() {
-        return null;
-    }
-
-    @Override
-    public String getRunValueLabel() {
-        return null;
-    }
 }

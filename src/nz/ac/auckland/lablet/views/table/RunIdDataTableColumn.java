@@ -13,11 +13,11 @@ package nz.ac.auckland.lablet.views.table;
  */
 public class RunIdDataTableColumn extends DataTableColumn {
     public int size() {
-        return markerDataModel.getMarkerCount();
+        return dataModel.getMarkerCount();
     }
 
     public Number getValue(int index) {
-        return markerDataModel.getMarkerDataAt(index).getRunId();
+        return dataModel.getMarkerDataAt(index).getRunId();
     }
 
     public String getStringValue(int index) {

@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.script.components;
 
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
+import nz.ac.auckland.lablet.camera.VideoAnalysis;
 import nz.ac.auckland.lablet.views.table.*;
 
 
@@ -29,11 +29,7 @@ public class CalculateYSpeedFragment extends CalculateSpeedFragment {
 
     @Override
     String getPositionUnit() {
-        ScriptExperimentRef experiment = ((ScriptTreeNodeCalculateSpeed)component).getExperiment();
-        SensorAnalysis sensorAnalysis = experiment.getExperimentAnalysis(getActivity());
-        if (sensorAnalysis == null)
-            return "";
-        return sensorAnalysis.getYUnit();
+        return tagMarker.getCalibrationXY().getYUnit().getUnit();
     }
 
     @Override
@@ -42,8 +38,8 @@ public class CalculateYSpeedFragment extends CalculateSpeedFragment {
     }
 
     @Override
-    ColumnMarkerDataTableAdapter createSpeedTableAdapter(SensorAnalysis sensorAnalysis) {
-        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, sensorAnalysis);
+    MarkerDataTableAdapter createSpeedTableAdapter() {
+        MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(tagMarker, timeCalibration);
         speedDataTableColumn = new YSpeedDataTableColumn();
         adapter.addColumn(new SpeedTimeDataTableColumn());
         adapter.addColumn(speedDataTableColumn);
@@ -52,8 +48,8 @@ public class CalculateYSpeedFragment extends CalculateSpeedFragment {
     }
 
     @Override
-    ColumnMarkerDataTableAdapter createAccelerationTableAdapter(SensorAnalysis sensorAnalysis) {
-        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, sensorAnalysis);
+    MarkerDataTableAdapter createAccelerationTableAdapter() {
+        MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(tagMarker, timeCalibration);
         YAccelerationDataTableColumn accelerationDataTableColumn = new YAccelerationDataTableColumn();
         adapter.addColumn(new AccelerationTimeDataTableColumn());
         adapter.addColumn(accelerationDataTableColumn);

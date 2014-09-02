@@ -44,7 +44,7 @@ public class WeakListenable<Listener> {
         return false;
     }
 
-    public void removeListener(Listener listener) {
+    public boolean removeListener(Listener listener) {
         Iterator<WeakReference<Listener>> it = listeners.iterator();
         while (it.hasNext()) {
             WeakReference<Listener> listenerWeak = it.next();
@@ -55,9 +55,10 @@ public class WeakListenable<Listener> {
             }
             if (listenerStrong == listener) {
                 it.remove();
-                return;
+                return true;
             }
         }
+        return false;
     }
 
     protected List<Listener> getListeners() {

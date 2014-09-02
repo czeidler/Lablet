@@ -14,16 +14,16 @@ package nz.ac.auckland.lablet.views.table;
 public class XPositionDataTableColumn extends DataTableColumn {
     @Override
     public int size() {
-        return markerDataModel.getMarkerCount();
+        return dataModel.getMarkerCount();
     }
 
     @Override
     public Number getValue(int index) {
-        return markerDataModel.getCalibratedMarkerPositionAt(index).x;
+        return dataModel.getCalibratedMarkerPositionAt(index).x;
     }
 
     @Override
     public String getHeader() {
-        return "x [" + sensorAnalysis.getXUnit() + "]";
+        return "x [" + dataModel.getCalibrationXY().getXUnit().getUnit() + "]";
     }
 }

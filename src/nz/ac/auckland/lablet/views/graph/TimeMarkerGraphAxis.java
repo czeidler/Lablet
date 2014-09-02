@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
+import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 
@@ -22,15 +22,14 @@ public class TimeMarkerGraphAxis extends MarkerGraphAxis {
 
     @Override
     public Number getValue(int index) {
-        MarkerDataModel markerData = getExperimentAnalysis().getTagMarkers();
+        MarkerDataModel markerData = getData();
         int runId = markerData.getMarkerDataAt(index).getRunId();
-        return getExperimentAnalysis().getSensorData().getRunValueAt(runId);
+        return getTimeCalibration().getTimeFromRaw(runId);
     }
 
     @Override
     public String getLabel() {
-        SensorAnalysis sensorAnalysis = getExperimentAnalysis();
-        return "time [" + sensorAnalysis.getSensorData().getRunValueUnit() + "]";
+        return "time [" + getTimeCalibration().getUnit().getUnit() + "]";
     }
 
     @Override

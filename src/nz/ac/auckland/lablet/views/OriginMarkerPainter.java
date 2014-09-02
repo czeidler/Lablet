@@ -4,7 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import nz.ac.auckland.lablet.experiment.Calibration;
+import nz.ac.auckland.lablet.experiment.CalibrationXY;
 /*
  * Copyright 2013-2014.
  * Distributed under the terms of the GPLv3 License.
@@ -53,8 +53,8 @@ class OriginMarker extends SimpleMarker {
  * Expects a MarkerDataModel with two data points. One for the origin and one for the first axis.
  * </p>
  */
-public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibration.ICalibrationListener {
-    private Calibration calibration;
+public class OriginMarkerPainter extends AbstractMarkerPainter implements CalibrationXY.IListener {
+    private CalibrationXY calibrationXY;
     private float angleScreen;
     private boolean firstDraw = true;
 
@@ -73,10 +73,10 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
     private float ARROW_AXIS_OVERLAP;
     private float LABEL_TO_AXIS_END_DISTANCE;
 
-    public OriginMarkerPainter(MarkerDataModel model, Calibration calibration) {
+    public OriginMarkerPainter(MarkerDataModel model, CalibrationXY calibrationXY) {
         super(model);
-        this.calibration = calibration;
-        this.calibration.addListener(this);
+        this.calibrationXY = calibrationXY;
+        this.calibrationXY.addListener(this);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
     }
 
     protected void finalize() {
-        calibration.removeListener(this);
+        calibrationXY.removeListener(this);
         try {
             super.finalize();
         } catch (Throwable throwable) {
@@ -143,7 +143,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         final float textXOffset = 1;
         final float textYOffset = 0;
         final float labelAxisLength = getScreenAxisLength() - LABEL_TO_AXIS_END_DISTANCE;
-        if (calibration.getSwapAxis()) {
+        if (calibrationXY.getSwapAxis()) {
             label1 = "Y";
             label2 = "X";
             textAngle += 90;
@@ -276,7 +276,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         } else {
             // x rotation
             PointF originScreen = getOriginMarker(0).getCachedScreenPosition();
-            angleScreen = Calibration.getAngle(originScreen, newPosition);
+            angleScreen = CalibrationXY.getAngle(originScreen, newPosition);
             if (row == 2)
                 angleScreen += 90;
 

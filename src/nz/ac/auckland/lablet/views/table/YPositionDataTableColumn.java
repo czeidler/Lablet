@@ -14,16 +14,16 @@ package nz.ac.auckland.lablet.views.table;
 public class YPositionDataTableColumn extends DataTableColumn {
     @Override
     public int size() {
-        return markerDataModel.getMarkerCount();
+        return dataModel.getMarkerCount();
     }
 
     @Override
     public Number getValue(int index) {
-        return markerDataModel.getCalibratedMarkerPositionAt(index).y;
+        return dataModel.getCalibratedMarkerPositionAt(index).y;
     }
 
     @Override
     public String getHeader() {
-        return "y [" + sensorAnalysis.getYUnit() + "]";
+        return "y [" + dataModel.getCalibrationXY().getYUnit().getUnit() + "]";
     }
 }

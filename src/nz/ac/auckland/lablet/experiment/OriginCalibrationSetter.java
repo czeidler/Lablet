@@ -25,12 +25,12 @@ import android.graphics.PointF;
  * </ol>
  * </p>
  */
-public class OriginCalibrationSetter implements MarkerDataModel.IMarkerDataModelListener {
-    private Calibration calibration;
+public class OriginCalibrationSetter implements MarkerDataModel.IListener {
+    private CalibrationXY calibrationXY;
     private MarkerDataModel calibrationMarkers;
 
-    public OriginCalibrationSetter(Calibration calibration, MarkerDataModel data) {
-        this.calibration = calibration;
+    public OriginCalibrationSetter(CalibrationXY calibrationXY, MarkerDataModel data) {
+        this.calibrationXY = calibrationXY;
         this.calibrationMarkers = data;
         this.calibrationMarkers.addListener(this);
 
@@ -38,7 +38,7 @@ public class OriginCalibrationSetter implements MarkerDataModel.IMarkerDataModel
     }
 
     public void setOrigin(PointF origin, PointF axis1) {
-        calibration.setOrigin(origin, axis1);
+        calibrationXY.setOrigin(origin, axis1);
         calibrationMarkers.setMarkerPosition(origin, 0);
         calibrationMarkers.setMarkerPosition(axis1, 1);
     }
@@ -49,7 +49,7 @@ public class OriginCalibrationSetter implements MarkerDataModel.IMarkerDataModel
         PointF origin = calibrationMarkers.getMarkerDataAt(0).getPosition();
         PointF axis1 = calibrationMarkers.getMarkerDataAt(1).getPosition();
 
-        calibration.setOrigin(origin, axis1);
+        calibrationXY.setOrigin(origin, axis1);
     }
 
     @Override

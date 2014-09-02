@@ -140,8 +140,7 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
             int run = getCurrentAnalysisRunIndex();
             int analysisIndex = 0;
             AnalysisEntry analysisEntry = currentAnalysisRun.sensorList.get(sensor).analysisList.get(analysisIndex);
-            AnalysisRef analysisRef = new AnalysisRef(getExperimentData().getStorageDir().getPath(), run, sensor,
-                    analysisEntry.analysis.getIdentifier());
+            AnalysisRef analysisRef = new AnalysisRef(run, sensor, analysisEntry.analysis.getIdentifier());
             return analysisEntry.plugin.createSensorAnalysisFragment(analysisRef);
         }
 

@@ -7,8 +7,6 @@
  */
 package nz.ac.auckland.lablet.views.table;
 
-import nz.ac.auckland.lablet.experiment.SensorData;
-
 
 /**
  * Table column for the marker data table adapter. Provides a time column for the use in combination with an
@@ -17,14 +15,13 @@ import nz.ac.auckland.lablet.experiment.SensorData;
 public class AccelerationTimeDataTableColumn extends TimeDataTableColumn {
     @Override
     public int size() {
-        return markerDataModel.getMarkerCount() - 2;
+        return dataModel.getMarkerCount() - 2;
     }
 
     @Override
     public Number getValue(int index) {
-        SensorData sensorData = sensorAnalysis.getSensorData();
-        float t0 = sensorData.getRunValueAt(index);
-        float t2 = sensorData.getRunValueAt(index + 2);
+        float t0 = timeCalibration.getTimeFromRaw(index);
+        float t2 = timeCalibration.getTimeFromRaw(index + 2);
         return t0 + (t2 - t0) / 2.f;
     }
 }

@@ -24,10 +24,10 @@ public interface ITableAdapter<T> {
     public void selectRow(int row);
     public int getSelectedRow();
 
-    public void addListener(ITableAdapterListener listener);
-    public boolean removeListener(ITableAdapterListener listener);
+    public void addListener(IListener listener);
+    public boolean removeListener(IListener listener);
 
-    public interface ITableAdapterListener {
+    public interface IListener {
         public void onRowAdded(ITableAdapter<?> table, int row);
         public void onRowRemoved(ITableAdapter<?> table, int row);
         public void onRowUpdated(ITableAdapter<?> table, int row, int number);

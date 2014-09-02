@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
+import nz.ac.auckland.lablet.camera.ITimeCalibration;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 
@@ -25,7 +25,7 @@ public abstract class MarkerGraphAxis implements AbstractGraphAdapter.IGraphData
         return markerGraphAdapter.getData();
     }
 
-    public SensorAnalysis getExperimentAnalysis() {
-        return markerGraphAdapter.getSensorAnalysis();
+    public ITimeCalibration getTimeCalibration() {
+        return markerGraphAdapter.getTimeCalibration();
     }
 }

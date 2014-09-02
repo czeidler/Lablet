@@ -87,7 +87,8 @@ public class CameraAnalysisFragment extends ExperimentAnalysisFragment {
     }
 
     private void showCalibrationMenu() {
-        ScaleSettingsDialog scaleSettingsDialog = new ScaleSettingsDialog(getActivity(), getSensorAnalysis());
+        ScaleSettingsDialog scaleSettingsDialog = new ScaleSettingsDialog(getActivity(),
+                getSensorAnalysis().getLengthCalibrationSetter());
         scaleSettingsDialog.show();
     }
 
@@ -102,13 +103,13 @@ public class CameraAnalysisFragment extends ExperimentAnalysisFragment {
                 if (item == R.id.showCoordinateSystem) {
                     getSensorAnalysis().setShowCoordinateSystem(!menuItem.isChecked());
                 } else if (item == R.id.swapAxis) {
-                    getSensorAnalysis().getCalibration().setSwapAxis(!menuItem.isChecked());
+                    getSensorAnalysis().getCalibrationXY().setSwapAxis(!menuItem.isChecked());
                 }
                 return false;
             }
         });
         popup.getMenu().getItem(0).setChecked(getSensorAnalysis().getShowCoordinateSystem());
-        popup.getMenu().getItem(1).setChecked(getSensorAnalysis().getCalibration().getSwapAxis());
+        popup.getMenu().getItem(1).setChecked(getSensorAnalysis().getCalibrationXY().getSwapAxis());
         popup.show();
     }
 

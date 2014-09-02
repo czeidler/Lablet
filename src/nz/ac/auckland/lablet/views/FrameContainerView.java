@@ -12,8 +12,8 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
-import nz.ac.auckland.lablet.experiment.Calibration;
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
+import nz.ac.auckland.lablet.camera.VideoAnalysis;
+import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
@@ -26,11 +26,11 @@ import nz.ac.auckland.lablet.experiment.MarkerDataModel;
  * </p>
  */
 public class FrameContainerView extends RelativeLayout implements FrameDataModel.IFrameDataModelListener,
-        SensorAnalysis.IExperimentAnalysisListener {
+        VideoAnalysis.IListener {
     private View sensorAnalysisView = null;
     private MarkerView markerView = null;
     private FrameDataModel frameDataModel = null;
-    private SensorAnalysis sensorAnalysis = null;
+    private VideoAnalysis sensorAnalysis = null;
     private OriginMarkerPainter originMarkerPainter = null;
 
     public FrameContainerView(Context context) {
@@ -54,7 +54,7 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
         }
     }
 
-    public void setTo(View runView, SensorAnalysis analysis) {
+    public void setTo(View runView, VideoAnalysis analysis) {
         if (sensorAnalysis != null)
             sensorAnalysis.removeListener(this);
         sensorAnalysis = analysis;
@@ -113,8 +113,8 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
         markerView.removePlotPainter(originMarkerPainter);
     }
 
-    public void addOriginData(MarkerDataModel data, Calibration calibration) {
-        originMarkerPainter = new OriginMarkerPainter(data, calibration);
+    public void addOriginData(MarkerDataModel data, CalibrationXY calibrationXY) {
+        originMarkerPainter = new OriginMarkerPainter(data, calibrationXY);
         if (sensorAnalysis.getShowCoordinateSystem())
             markerView.addPlotPainter(originMarkerPainter);
     }
@@ -133,11 +133,6 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
 
     @Override
     public void onNumberOfFramesChanged() {
-
-    }
-
-    @Override
-    public void onUnitPrefixChanged() {
 
     }
 

@@ -7,8 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.table;
 
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
-import nz.ac.auckland.lablet.experiment.SensorData;
+import nz.ac.auckland.lablet.camera.ITimeCalibration;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 
@@ -18,26 +17,25 @@ import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 public class XSpeedDataTableColumn extends DataTableColumn {
     @Override
     public int size() {
-        return markerDataModel.getMarkerCount() - 1;
+        return dataModel.getMarkerCount() - 1;
     }
 
     @Override
     public Number getValue(int index) {
-        return getSpeed(index, markerDataModel, sensorAnalysis);
+        return getSpeed(index, dataModel, timeCalibration);
     }
 
     @Override
     public String getHeader() {
-        return "velocity [" + sensorAnalysis.getXUnit() + "/"
-                + sensorAnalysis.getSensorData().getRunValueBaseUnit() + "]";
+        return "velocity [" + dataModel.getCalibrationXY().getXUnit().getUnit() + "/"
+                + timeCalibration.getUnit().getBase() + "]";
     }
 
-    public static Number getSpeed(int index, MarkerDataModel markersDataModel, SensorAnalysis sensorAnalysis) {
-        SensorData sensorData = sensorAnalysis.getSensorData();
+    public static Number getSpeed(int index, MarkerDataModel markersDataModel, ITimeCalibration timeCalibration) {
         float delta = markersDataModel.getCalibratedMarkerPositionAt(index + 1).x
                 - markersDataModel.getCalibratedMarkerPositionAt(index).x;
-        float deltaT = sensorData.getRunValueAt(index + 1) - sensorData.getRunValueAt(index);
-        if (sensorAnalysis.getSensorData().getRunValueUnitPrefix().equals("m"))
+        float deltaT = timeCalibration.getTimeFromRaw(index + 1) - timeCalibration.getTimeFromRaw(index);
+        if (timeCalibration.getUnit().getPrefix().equals("m"))
             deltaT /= 1000;
         return delta / deltaT;
     }

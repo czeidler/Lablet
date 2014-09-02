@@ -17,8 +17,8 @@ import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
 import android.widget.Toast;
-import nz.ac.auckland.lablet.ExperimentAnalyserActivity;
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
+import nz.ac.auckland.lablet.camera.VideoAnalysis;
+import nz.ac.auckland.lablet.camera.VideoAnalysisPlugin;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptComponent;
@@ -106,7 +106,7 @@ public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
         takeExperiment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), ExperimentAnalyserActivity.class);
+                Intent intent = new Intent(getActivity(), VideoAnalysisPlugin.class);
                 intent.putExtra("experiment_path",
                         ((ScriptTreeNodeExperimentAnalysis)component).getExperiment().getExperimentPath());
                 intent.putExtra("first_start_with_run_settings", true);
@@ -160,7 +160,7 @@ public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
 
     private boolean validateAnalysis() {
         ScriptExperimentRef experiment = ((ScriptTreeNodeExperimentAnalysis)component).getExperiment();
-        SensorAnalysis sensorAnalysis = experiment.getExperimentAnalysis(getActivity());
+        VideoAnalysis sensorAnalysis = experiment.getVideoAnalysis(getActivity());
         if (sensorAnalysis == null)
             return false;
 
@@ -184,10 +184,11 @@ public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
         if (component.getState() == ScriptComponent.SCRIPT_STATE_DONE) {
             takenExperimentInfo.setChecked(true);
             ScriptExperimentRef experiment = ((ScriptTreeNodeExperimentAnalysis)component).getExperiment();
-            SensorAnalysis sensorAnalysis = experiment.getExperimentAnalysis(getActivity());
+            VideoAnalysis sensorAnalysis = experiment.getVideoAnalysis(getActivity());
             if (sensorAnalysis == null)
                 return;
-            MarkerGraphAdapter adapter = new MarkerGraphAdapter(sensorAnalysis, "Position Data:",
+            MarkerGraphAdapter adapter = new MarkerGraphAdapter(sensorAnalysis.getTagMarkers(),
+                    sensorAnalysis.getCalibrationVideoFrame(), "Position Data:",
                     new XPositionMarkerGraphAxis(), new YPositionMarkerGraphAxis());
             graphView.setAdapter(adapter);
             graphView.setVisibility(View.VISIBLE);

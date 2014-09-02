@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.camera;
 
 import android.graphics.PointF;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.PersistentBundle;
@@ -20,19 +21,20 @@ import java.util.List;
 /**
  * Base class for everything that is related to analysing an experiment.
  */
-class VideoAnalysis implements ISensorAnalysis {
-    public interface IExperimentAnalysisListener {
-        void onUnitPrefixChanged();
+public class VideoAnalysis implements ISensorAnalysis {
+    public interface IListener {
         void onShowCoordinateSystem(boolean show);
     }
 
     private CameraSensorData sensorData;
 
     private FrameDataModel frameDataModel;
-    private Calibration calibration;
+    private CalibrationXY calibrationXY;
+    private CalibrationVideoFrame calibrationVideoFrame;
 
-    private String xUnitPrefix = "";
-    private String yUnitPrefix = "";
+    private Unit xUnit = new Unit("m");
+    private Unit yUnit = new Unit("m");
+    private Unit tUnit = new Unit("s");
 
     private MarkerDataModel tagMarkers;
     private MarkerDataModel lengthCalibrationMarkers;
@@ -44,18 +46,22 @@ class VideoAnalysis implements ISensorAnalysis {
 
     private Bundle experimentSpecificData = null;
 
-    private List<IExperimentAnalysisListener> listenerList = new ArrayList<IExperimentAnalysisListener>();
+    private List<IListener> listenerList = new ArrayList<IListener>();
 
     public VideoAnalysis(CameraSensorData sensorData) {
         this.sensorData = sensorData;
 
-        frameDataModel = new FrameDataModel();
-        frameDataModel.setNumberOfFrames(sensorData.getNumberOfFrames());
+        tUnit.setPrefix("m");
 
-        calibration = new Calibration();
+        calibrationXY = new CalibrationXY(xUnit, yUnit);
+        calibrationVideoFrame = new CalibrationVideoFrame(sensorData.getVideoDuration(), tUnit);
+
+        frameDataModel = new FrameDataModel();
+        frameDataModel.setNumberOfFrames(calibrationVideoFrame.getNumberOfFrames());
 
         tagMarkers = new MarkerDataModel();
-        tagMarkers.setCalibration(calibration);
+        tagMarkers.setCalibrationXY(calibrationXY);
+        tagMarkers.setMaxRangeRaw(sensorData.getMaxRawX(), sensorData.getMaxRawY());
 
         float maxXValue = sensorData.getMaxRawX();
         float maxYValue = sensorData.getMaxRawY();
@@ -66,10 +72,10 @@ class VideoAnalysis implements ISensorAnalysis {
         MarkerData point2 = new MarkerData(-2);
         point2.setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.9f));
         lengthCalibrationMarkers.addMarkerData(point2);
-        lengthCalibrationSetter = new LengthCalibrationSetter(calibration, lengthCalibrationMarkers);
+        lengthCalibrationSetter = new LengthCalibrationSetter(lengthCalibrationMarkers);
 
-        PointF origin = calibration.getOrigin();
-        PointF axis1 = calibration.getAxis1();
+        PointF origin = calibrationXY.getOrigin();
+        PointF axis1 = calibrationXY.getAxis1();
         originMarkers = new MarkerDataModel();
         // y-axis
         point1 = new MarkerData(-1);
@@ -83,7 +89,9 @@ class VideoAnalysis implements ISensorAnalysis {
         MarkerData point3 = new MarkerData(-3);
         point3.setPosition(origin);
         originMarkers.addMarkerData(point3);
-        originCalibrationSetter = new OriginCalibrationSetter(calibration, originMarkers);
+        originCalibrationSetter = new OriginCalibrationSetter(calibrationXY, originMarkers);
+
+        updateOriginFromVideoRotation();
     }
 
     protected void setOrigin(PointF origin, PointF axis1) {
@@ -99,11 +107,14 @@ class VideoAnalysis implements ISensorAnalysis {
     public FrameDataModel getFrameDataModel() {
         return frameDataModel;
     }
-    public Calibration getCalibration() {
-        return calibration;
-    }
     public LengthCalibrationSetter getLengthCalibrationSetter() {
         return lengthCalibrationSetter;
+    }
+    public CalibrationXY getCalibrationXY() {
+        return calibrationXY;
+    }
+    public CalibrationVideoFrame getCalibrationVideoFrame() {
+        return calibrationVideoFrame;
     }
     public MarkerDataModel getTagMarkers() {
         return tagMarkers;
@@ -125,36 +136,26 @@ class VideoAnalysis implements ISensorAnalysis {
         onRunSpecificDataChanged();
     }
     public String getXUnitPrefix() {
-        return xUnitPrefix;
+        return xUnit.getPrefix();
     }
 
     public String getYUnitPrefix() {
-        return yUnitPrefix;
+        return yUnit.getPrefix();
     }
 
-    public void addListener(IExperimentAnalysisListener listener) {
+    public void addListener(IListener listener) {
         listenerList.add(listener);
     }
 
-    public boolean removeListener(IExperimentAnalysisListener listener) {
+    public boolean removeListener(IListener listener) {
         return listenerList.remove(listener);
     }
 
     public void setXUnitPrefix(String xUnitPrefix) {
-        this.xUnitPrefix = xUnitPrefix;
-        notifyUnitPrefixChanged();
+        this.xUnit.setPrefix(xUnitPrefix);
     }
     public void setYUnitPrefix(String yUnitPrefix) {
-        this.yUnitPrefix = yUnitPrefix;
-        notifyUnitPrefixChanged();
-    }
-
-    public String getXUnit() {
-        return getXUnitPrefix() + sensorData.getXBaseUnit();
-    }
-
-    public String getYUnit() {
-        return getYUnitPrefix() + sensorData.getYBaseUnit();
+        this.yUnit.setPrefix(yUnitPrefix);
     }
 
     public Bundle analysisDataToBundle() {
@@ -189,11 +190,11 @@ class VideoAnalysis implements ISensorAnalysis {
         analysisDataBundle.putFloat("lengthCalibrationPoint2y", point2.y);
         analysisDataBundle.putFloat("lengthCalibrationValue", lengthCalibrationSetter.getCalibrationValue());
 
-        analysisDataBundle.putFloat("originX", calibration.getOrigin().x);
-        analysisDataBundle.putFloat("originY", calibration.getOrigin().y);
-        analysisDataBundle.putFloat("originAxis1x", calibration.getAxis1().x);
-        analysisDataBundle.putFloat("originAxis1y", calibration.getAxis1().y);
-        analysisDataBundle.putBoolean("originSwapAxis", calibration.getSwapAxis());
+        analysisDataBundle.putFloat("originX", calibrationXY.getOrigin().x);
+        analysisDataBundle.putFloat("originY", calibrationXY.getOrigin().y);
+        analysisDataBundle.putFloat("originAxis1x", calibrationXY.getAxis1().x);
+        analysisDataBundle.putFloat("originAxis1y", calibrationXY.getAxis1().y);
+        analysisDataBundle.putBoolean("originSwapAxis", calibrationXY.getSwapAxis());
         analysisDataBundle.putBoolean("showCoordinateSystem", showCoordinateSystem);
 
         analysisDataBundle.putString("xUnitPrefix", getXUnitPrefix());
@@ -240,8 +241,8 @@ class VideoAnalysis implements ISensorAnalysis {
         if (bundle.containsKey("lengthCalibrationValue"))
             lengthCalibrationSetter.setCalibrationValue(bundle.getFloat("lengthCalibrationValue"));
 
-        PointF origin = calibration.getOrigin();
-        PointF axis1 = calibration.getAxis1();
+        PointF origin = calibrationXY.getOrigin();
+        PointF axis1 = calibrationXY.getAxis1();
         boolean swapAxis = false;
         if (bundle.containsKey("originX"))
             origin.x = bundle.getFloat("originX");
@@ -256,7 +257,7 @@ class VideoAnalysis implements ISensorAnalysis {
         if (bundle.containsKey("showCoordinateSystem"))
             showCoordinateSystem = bundle.getBoolean("showCoordinateSystem");
         originCalibrationSetter.setOrigin(origin, axis1);
-        calibration.setSwapAxis(swapAxis);
+        calibrationXY.setSwapAxis(swapAxis);
 
         if (bundle.containsKey("xUnitPrefix"))
             setXUnitPrefix(bundle.getString("xUnitPrefix"));
@@ -280,8 +281,8 @@ class VideoAnalysis implements ISensorAnalysis {
 
     public void exportTagMarkerCSVData(OutputStream outputStream) {
         try {
-            String header = "id, x [" + getXUnit() + "], y [" + getYUnit()
-                    + "], " + sensorData.getFrameValueLabel() + "\n";
+            String header = "id, x [" + xUnit.getUnit()+ "], y [" + yUnit.getUnit() + "], time [" + tUnit.getUnit()
+                    + "]\n";
             outputStream.write(header.getBytes());
             for (int i = 0; i < tagMarkers.getMarkerCount(); i++) {
                 MarkerData markerData = tagMarkers.getMarkerDataAt(i);
@@ -302,7 +303,7 @@ class VideoAnalysis implements ISensorAnalysis {
                 outputStream.write(",".getBytes());
 
                 string = "";
-                string += sensorData.getFrameValueAt(i);
+                string += calibrationVideoFrame.getTimeFromRaw(i);
                 outputStream.write(string.getBytes());
 
                 outputStream.write("\n".getBytes());
@@ -313,15 +314,66 @@ class VideoAnalysis implements ISensorAnalysis {
         }
     }
 
-    protected void onRunSpecificDataChanged() {}
-
-    private void notifyUnitPrefixChanged() {
-        for (IExperimentAnalysisListener listener : listenerList)
-            listener.onUnitPrefixChanged();
+    private void notifyShowCoordinateSystem(boolean show) {
+        for (IListener listener : listenerList)
+            listener.onShowCoordinateSystem(show);
     }
 
-    private void notifyShowCoordinateSystem(boolean show) {
-        for (IExperimentAnalysisListener listener : listenerList)
-            listener.onShowCoordinateSystem(show);
+    private void updateOriginFromVideoRotation() {
+        CameraSensorData cameraExperiment = (CameraSensorData)getData();
+        CalibrationXY calibrationXY = getCalibrationXY();
+
+        // read rotation from video
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        mediaMetadataRetriever.setDataSource(cameraExperiment.getVideoFile().getPath());
+        String rotationString = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
+
+        PointF origin = new PointF();
+        origin.set(calibrationXY.getOrigin());
+        float xOffset = origin.x;
+        float yOffset = origin.y;
+        PointF axis1 = new PointF();
+        axis1.set(calibrationXY.getAxis1());
+        switch (rotationString) {
+            case "90":
+                origin.x = cameraExperiment.getMaxRawX() - xOffset;
+                origin.y = yOffset;
+                axis1.x = origin.x;
+                axis1.y = origin.y + 10;
+                break;
+            case "180":
+                origin.x = cameraExperiment.getMaxRawX() - xOffset;
+                origin.y = cameraExperiment.getMaxRawY() - yOffset;
+                axis1.x = origin.x - 10;
+                axis1.y = origin.y;
+                break;
+            case "270":
+                origin.x = xOffset;
+                origin.y = cameraExperiment.getMaxRawY() - yOffset;
+                axis1.x = origin.x;
+                axis1.y = origin.y - 10;
+                break;
+        }
+
+        setOrigin(origin, axis1);
+    }
+
+    protected void onRunSpecificDataChanged() {
+        CameraSensorData cameraExperiment = (CameraSensorData) getData();
+        Bundle experimentSpecificData = getExperimentSpecificData();
+        if (experimentSpecificData == null)
+            return;
+        Bundle runSettings = experimentSpecificData.getBundle("run_settings");
+        if (runSettings == null)
+            return;
+
+        calibrationVideoFrame.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
+        calibrationVideoFrame.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
+        calibrationVideoFrame.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
+
+        int numberOfRuns = calibrationVideoFrame.getNumberOfFrames();
+        getFrameDataModel().setNumberOfFrames(numberOfRuns);
+        if (numberOfRuns <= getFrameDataModel().getCurrentFrame())
+            getFrameDataModel().setCurrentFrame(numberOfRuns - 1);
     }
 }

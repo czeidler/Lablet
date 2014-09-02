@@ -11,7 +11,6 @@ import android.content.Context;
 import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.widget.FrameLayout;
-import nz.ac.auckland.lablet.camera.CameraSensorAnalysis;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
@@ -30,10 +29,10 @@ public class MicrophoneAnalysisView extends FrameLayout implements IExperimentFr
     final private MicrophoneSensorData micSensorData;
     private AudioFrequencyMapAdapter audioFrequencyMapAdapter;
 
-    public MicrophoneAnalysisView(Context context, CameraSensorAnalysis sensorAnalysis) {
+    public MicrophoneAnalysisView(Context context, FrequencyAnalysis analysis) {
         super(context);
 
-        this.micSensorData = (MicrophoneSensorData)sensorAnalysis.getSensorData();
+        this.micSensorData = (MicrophoneSensorData)analysis.getData();
 
         File audioFile = micSensorData.getAudioFile();
         AudioWavInputStream audioWavInputStream = null;

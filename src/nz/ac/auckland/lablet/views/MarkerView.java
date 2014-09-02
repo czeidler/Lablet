@@ -12,7 +12,6 @@ import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewParent;
-import nz.ac.auckland.lablet.*;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.plotview.*;
@@ -208,6 +207,8 @@ class SimpleMarker extends DraggableMarker {
         static public final float RING_WIDTH_DP = 40;
     }
 
+    final public static int MARKER_COLOR = Color.argb(255, 100, 200, 20);
+
     private float INNER_RING_RADIUS;
     private float INNER_RING_WIDTH;
     private float RING_RADIUS;
@@ -247,7 +248,7 @@ class SimpleMarker extends DraggableMarker {
         canvas.drawLine(position.x + crossR, position.y - crossR, position.x - crossR, position.y + crossR, paint);
 
         if (priority == 1.)
-            paint.setColor(ExperimentAnalyserActivity.MARKER_COLOR);
+            paint.setColor(MARKER_COLOR);
         else
             paint.setColor(makeColor(255, 200, 200, 200));
         paint.setStyle(Paint.Style.STROKE);
@@ -299,7 +300,7 @@ class SimpleMarker extends DraggableMarker {
  * Abstract base class to draw a {@link nz.ac.auckland.lablet.experiment.MarkerDataModel} in a
  * {@link nz.ac.auckland.lablet.views.MarkerView}.
  */
-abstract class AbstractMarkerPainter extends AbstractPlotPainter implements MarkerDataModel.IMarkerDataModelListener {
+abstract class AbstractMarkerPainter extends AbstractPlotPainter implements MarkerDataModel.IListener {
 
     public class MarkerPainterGroup {
         private AbstractMarkerPainter selectedForDragPainter = null;

@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
+import nz.ac.auckland.lablet.camera.VideoAnalysis;
 import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.*;
@@ -69,7 +70,7 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
 
     protected List<AnalysisRunEntry> analysisRuns = new ArrayList<>();
     protected AnalysisRunEntry currentAnalysisRun;
-    protected ISensorAnalysis currentSensorAnalysis;
+    protected VideoAnalysis currentSensorAnalysis;
 
     protected void setCurrentAnalysisRun(int index) {
         currentAnalysisRun = analysisRuns.get(index);
@@ -77,7 +78,7 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
     }
 
     protected void setCurrentSensorAnalysis(int sensor, int analysis) {
-        currentSensorAnalysis = currentAnalysisRun.sensorList.get(sensor).analysisList.get(analysis).analysis;
+        currentSensorAnalysis = (VideoAnalysis)currentAnalysisRun.sensorList.get(sensor).analysisList.get(analysis).analysis;
     }
 
     public AnalysisRunEntry getCurrentAnalysisRun() {
@@ -96,7 +97,7 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
         return analysisRuns.indexOf(currentAnalysisRun);
     }
 
-    protected File getAnalysisStorageFor(int run, ISensorAnalysis analysis) {
+    static public File getAnalysisStorageFor(int run, ISensorAnalysis analysis) {
         SensorData sensorData = analysis.getData();
         File dir = sensorData.getStorageDir().getParentFile();
         dir = new File(dir, "analysis");
@@ -129,7 +130,7 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
 
                 ISensorAnalysis sensorAnalysis = plugin.createSensorAnalysis(sensorData);
                 File storage = getAnalysisStorageFor(runs.indexOf(runEntry), sensorAnalysis);
-                ExperimentLoader.setupSensorAnalysis(sensorData, sensorAnalysis, storage);
+                ExperimentLoader.loadSensorAnalysis(sensorAnalysis, storage);
                 if (sensorAnalysis == null)
                     continue;
                 analysisSensorEntry.analysisList.add(new AnalysisEntry(sensorAnalysis, plugin));

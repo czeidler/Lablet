@@ -19,8 +19,8 @@ import java.util.List;
  * This includes the x and y scale, the origin and the rotation of the screen.
  * </p>
  */
-public class Calibration {
-    public interface ICalibrationListener {
+public class CalibrationXY {
+    public interface IListener {
         public void onCalibrationChanged();
     }
 
@@ -32,23 +32,36 @@ public class Calibration {
     private float angle;
     private boolean swapAxis = false;
 
-    private List<ICalibrationListener> listeners;
+    final private List<IListener> listeners = new ArrayList<>();
 
-    public Calibration() {
-        listeners = new ArrayList<ICalibrationListener>();
+    final private Unit xUnit;
+    final private Unit yUnit;
+
+    public CalibrationXY(Unit xUnit, Unit yUnit) {
         xScale = 1;
         yScale = 1;
+
+        this.xUnit = xUnit;
+        this.yUnit = yUnit;
+    }
+
+    public Unit getXUnit() {
+        return xUnit;
+    }
+
+    public Unit getYUnit() {
+        return yUnit;
     }
 
     /**
      * Add listener to listen for calibration changes.
      * @param listener the interested object
      */
-    public void addListener(ICalibrationListener listener) {
+    public void addListener(IListener listener) {
         listeners.add(listener);
     }
 
-    public boolean removeListener(ICalibrationListener listener) {
+    public boolean removeListener(IListener listener) {
         return listeners.remove(listener);
     }
 
@@ -179,7 +192,7 @@ public class Calibration {
     }
 
     private void notifyCalibrationChanged() {
-        for (ICalibrationListener listener : listeners)
+        for (IListener listener : listeners)
             listener.onCalibrationChanged();
     }
 

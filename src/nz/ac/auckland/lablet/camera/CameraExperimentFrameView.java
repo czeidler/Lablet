@@ -25,31 +25,27 @@ import java.io.File;
  * </p>
  */
 class CameraExperimentFrameView extends VideoFrameView implements IExperimentFrameView {
-    private CameraSensorData experiment;
+    final private VideoAnalysis videoAnalysis;
+    final private CameraSensorData sensorData;
     private int currentRun = -1;
 
-    public CameraExperimentFrameView(Context context, SensorData sensorData) {
+    public CameraExperimentFrameView(Context context, VideoAnalysis videoAnalysis) {
         super(context);
 
         setWillNotDraw(false);
 
-        assert(sensorData instanceof CameraSensorData);
-        this.experiment = (CameraSensorData) sensorData;
+        this.videoAnalysis = videoAnalysis;
+        this.sensorData = (CameraSensorData)videoAnalysis.getData();
 
-        File storageDir = sensorData.getStorageDir();
-        File videoFile = new File(storageDir, this.experiment.getVideoFileName());
+        File storageDir = videoAnalysis.getData().getStorageDir();
+        File videoFile = new File(storageDir, sensorData.getVideoFileName());
         setVideoFilePath(videoFile.getPath());
     }
 
     @Override
     public void setCurrentFrame(int frame) {
         currentRun = frame;
-        Bundle bundle = experiment.getFrameAt(frame);
-        if (bundle == null) {
-            toastMessage("can't get run information!");
-            return;
-        }
-        int positionMicroSeconds = bundle.getInt("frame_position");
+        int positionMicroSeconds = (int)videoAnalysis.getCalibrationVideoFrame().getTimeFromRaw(frame);
         positionMicroSeconds *= 1000;
 
         seekToFrame(positionMicroSeconds);
@@ -69,8 +65,8 @@ class CameraExperimentFrameView extends VideoFrameView implements IExperimentFra
     public RectF getDataRange() {
         RectF range = new RectF();
         range.left = 0;
-        range.right = experiment.getMaxRawX();
-        range.top = experiment.getMaxRawY();
+        range.right = sensorData.getMaxRawX();
+        range.top = sensorData.getMaxRawY();
         range.bottom = 0;
         return range;
     }

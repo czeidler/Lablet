@@ -15,7 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import nz.ac.auckland.lablet.*;
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
+import nz.ac.auckland.lablet.camera.ITimeCalibration;
+import nz.ac.auckland.lablet.camera.VideoAnalysis;
 import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.script.Script;
@@ -213,7 +214,8 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
     private String correctSpeedUnit = "[m/s]";
     private String correctAccelerationUnit = "[m/s^2]";
 
-    protected MarkerDataModel tagMarker = null;
+    protected MarkerDataModel tagMarker;
+    protected ITimeCalibration timeCalibration;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -362,36 +364,36 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
 
         ScriptTreeNodeCalculateSpeed speedComponent = (ScriptTreeNodeCalculateSpeed)component;
 
-        SensorAnalysis sensorAnalysis = speedComponent.getExperiment().getExperimentAnalysis(getActivity());
+        VideoAnalysis sensorAnalysis = speedComponent.getExperiment().getVideoAnalysis(getActivity());
         if (sensorAnalysis == null)
             return;
         tagMarker = sensorAnalysis.getTagMarkers();
+        timeCalibration = sensorAnalysis.getCalibrationVideoFrame();
 
         // first update the tables because otherwise update() can cause a crash when accessing data (an update is
         // triggered when changing a text view)
-        speedTable.setAdapter(createSpeedTableAdapter(sensorAnalysis));
-        accelerationTable.setAdapter(createAccelerationTableAdapter(sensorAnalysis));
+        speedTable.setAdapter(createSpeedTableAdapter());
+        accelerationTable.setAdapter(createAccelerationTableAdapter());
 
         positionUnitTextView.setText("[" + getPositionUnit() + "]");
 
-        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, sensorAnalysis);
+        MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(tagMarker, timeCalibration);
         adapter.addColumn(new TimeDataTableColumn());
         adapter.addColumn(new XPositionDataTableColumn());
         adapter.addColumn(new YPositionDataTableColumn());
         rawDataTable.setAdapter(adapter);
 
-        SensorData sensorData = sensorAnalysis.getSensorData();
         if (tagMarker.getMarkerCount() < 3)
             return;
 
         String text = "";
-        text += sensorData.getRunValueAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex()).getRunId());
+        text += timeCalibration.getTimeFromRaw(tagMarker.getMarkerDataAt(getFirstDataPointIndex()).getRunId());
         time1EditText.setText(text);
         text = "";
-        text += sensorData.getRunValueAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 1).getRunId());
+        text += timeCalibration.getTimeFromRaw(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 1).getRunId());
         time2EditText.setText(text);
         text = "";
-        text += sensorData.getRunValueAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 2).getRunId());
+        text += timeCalibration.getTimeFromRaw(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 2).getRunId());
         time3EditText.setText(text);
 
         text = "";
@@ -719,8 +721,8 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
     abstract float getPosition(int index);
     abstract String getPositionUnit();
     abstract float getSpeed(int index);
-    abstract ColumnMarkerDataTableAdapter createSpeedTableAdapter(SensorAnalysis sensorAnalysis);
-    abstract ColumnMarkerDataTableAdapter createAccelerationTableAdapter(SensorAnalysis sensorAnalysis);
+    abstract MarkerDataTableAdapter createSpeedTableAdapter();
+    abstract MarkerDataTableAdapter createAccelerationTableAdapter();
 }
 
 

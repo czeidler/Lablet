@@ -19,20 +19,20 @@ import android.graphics.PointF;
  * </li>
  * <li>
  * One can set the length of the calibration scale and LengthCalibrationSetter automatically sets the x and y scale
- * values of the {@link nz.ac.auckland.lablet.experiment.Calibration} class. For example, the length has been
+ * values of the {@link CalibrationXY} class. For example, the length has been
  * updated in the calibration dialog.
  * </li>
  * </ol>
  * </p>
  */
-public class LengthCalibrationSetter implements MarkerDataModel.IMarkerDataModelListener {
-    private Calibration calibration;
+public class LengthCalibrationSetter implements MarkerDataModel.IListener {
+    private CalibrationXY calibrationXY;
     private MarkerDataModel calibrationMarkers;
 
     private float calibrationValue;
 
-    public LengthCalibrationSetter(Calibration calibration, MarkerDataModel data) {
-        this.calibration = calibration;
+    public LengthCalibrationSetter(MarkerDataModel data) {
+        this.calibrationXY = data.getCalibrationXY();
         this.calibrationMarkers = data;
         this.calibrationMarkers.addListener(this);
 
@@ -49,6 +49,10 @@ public class LengthCalibrationSetter implements MarkerDataModel.IMarkerDataModel
         return calibrationValue;
     }
 
+    public CalibrationXY getCalibrationXY() {
+        return calibrationXY;
+    }
+
     public float scaleLength() {
         PointF point1 = calibrationMarkers.getMarkerDataAt(0).getPosition();
         PointF point2 = calibrationMarkers.getMarkerDataAt(1).getPosition();
@@ -60,7 +64,7 @@ public class LengthCalibrationSetter implements MarkerDataModel.IMarkerDataModel
         if (calibrationMarkers.getMarkerCount() != 2)
             return;
         float value = calibrationValue / scaleLength();
-        calibration.setScale(value, value);
+        calibrationXY.setScale(value, value);
     }
 
     @Override

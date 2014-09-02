@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.script.components;
 
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
 import nz.ac.auckland.lablet.views.table.*;
 
 
@@ -29,11 +28,7 @@ public class CalculateXSpeedFragment extends CalculateSpeedFragment {
 
     @Override
     String getPositionUnit() {
-        ScriptExperimentRef experiment = ((ScriptTreeNodeCalculateSpeed)component).getExperiment();
-        SensorAnalysis sensorAnalysis = experiment.getExperimentAnalysis(getActivity());
-        if (sensorAnalysis == null)
-            return "";
-        return sensorAnalysis.getXUnit();
+        return tagMarker.getCalibrationXY().getXUnit().getUnit();
     }
 
     @Override
@@ -42,8 +37,8 @@ public class CalculateXSpeedFragment extends CalculateSpeedFragment {
     }
 
     @Override
-    ColumnMarkerDataTableAdapter createSpeedTableAdapter(SensorAnalysis sensorAnalysis) {
-        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, sensorAnalysis);
+    MarkerDataTableAdapter createSpeedTableAdapter() {
+        MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(tagMarker, timeCalibration);
         speedDataTableColumn = new XSpeedDataTableColumn();
         adapter.addColumn(new SpeedTimeDataTableColumn());
         adapter.addColumn(speedDataTableColumn);
@@ -52,8 +47,8 @@ public class CalculateXSpeedFragment extends CalculateSpeedFragment {
     }
 
     @Override
-    ColumnMarkerDataTableAdapter createAccelerationTableAdapter(SensorAnalysis sensorAnalysis) {
-        ColumnMarkerDataTableAdapter adapter = new ColumnMarkerDataTableAdapter(tagMarker, sensorAnalysis);
+    MarkerDataTableAdapter createAccelerationTableAdapter() {
+        MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(tagMarker, timeCalibration);
         XAccelerationDataTableColumn accelerationDataTableColumn = new XAccelerationDataTableColumn();
         adapter.addColumn(new AccelerationTimeDataTableColumn());
         adapter.addColumn(accelerationDataTableColumn);

@@ -8,7 +8,7 @@
 package nz.ac.auckland.lablet.views.graph;
 
 import android.graphics.PointF;
-import nz.ac.auckland.lablet.experiment.Calibration;
+import nz.ac.auckland.lablet.experiment.CalibrationXY;
 
 
 /**
@@ -27,15 +27,14 @@ public class YPositionMarkerGraphAxis extends MarkerGraphAxis {
 
     @Override
     public String getLabel() {
-        return "y [" + getExperimentAnalysis().getYUnit() + "]";
+        return "y [" + getData().getCalibrationXY().getYUnit().getUnit() + "]";
     }
 
     @Override
     public Number getMinRange() {
-        Calibration calibration = getExperimentAnalysis().getCalibration();
         PointF point = new PointF();
-        point.y = getExperimentAnalysis().getSensorData().getMaxRawY();
-        point = calibration.fromRawLength(point);
+        point.y = getData().getMaxRangeRaw().x;
+        point = getData().getCalibrationXY().fromRawLength(point);
         return point.y * 0.2f;
     }
 }

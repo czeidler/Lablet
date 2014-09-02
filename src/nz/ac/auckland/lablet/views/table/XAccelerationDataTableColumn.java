@@ -7,8 +7,6 @@
  */
 package nz.ac.auckland.lablet.views.table;
 
-import nz.ac.auckland.lablet.experiment.SensorData;
-
 
 /**
  * Table column for the marker data table adapter. Provides the x-acceleration.
@@ -16,18 +14,17 @@ import nz.ac.auckland.lablet.experiment.SensorData;
 public class XAccelerationDataTableColumn extends DataTableColumn {
     @Override
     public int size() {
-        return markerDataModel.getMarkerCount() - 2;
+        return dataModel.getMarkerCount() - 2;
     }
 
     @Override
     public Number getValue(int index) {
-        float speed0 = XSpeedDataTableColumn.getSpeed(index, markerDataModel, sensorAnalysis).floatValue();
-        float speed1 = XSpeedDataTableColumn.getSpeed(index + 1, markerDataModel, sensorAnalysis).floatValue();
+        float speed0 = XSpeedDataTableColumn.getSpeed(index, dataModel, timeCalibration).floatValue();
+        float speed1 = XSpeedDataTableColumn.getSpeed(index + 1, dataModel, timeCalibration).floatValue();
         float delta = speed1 - speed0;
 
-        SensorData sensorData = sensorAnalysis.getSensorData();
-        float deltaT = (sensorData.getRunValueAt(index + 2) - sensorData.getRunValueAt(index)) / 2;
-        if (sensorAnalysis.getSensorData().getRunValueUnitPrefix().equals("m"))
+        float deltaT = (timeCalibration.getTimeFromRaw(index + 2) - timeCalibration.getTimeFromRaw(index)) / 2;
+        if (timeCalibration.getUnit().getPrefix().equals("m"))
             deltaT /= 1000;
 
         return delta / deltaT;
@@ -35,7 +32,7 @@ public class XAccelerationDataTableColumn extends DataTableColumn {
 
     @Override
     public String getHeader() {
-        return "acceleration [" + sensorAnalysis.getXUnit() + "/"
-                + sensorAnalysis.getSensorData().getRunValueBaseUnit() + "^2]";
+        return "acceleration [" + dataModel.getCalibrationXY().getXUnit().getUnit() + "/"
+                + timeCalibration.getUnit().getBase() + "^2]";
     }
 }

@@ -17,52 +17,17 @@ import java.io.File;
 public class MicrophoneSensorData extends SensorData {
     private String audioFileName;
 
+    @Override
+    public String getDataType() {
+        return "Audio";
+    }
+
     public MicrophoneSensorData(Context experimentContext, Bundle bundle, File storageDir) {
         super(experimentContext, bundle, storageDir);
     }
 
     public MicrophoneSensorData(Context experimentContext) {
         super(experimentContext);
-    }
-
-    @Override
-    public float getMaxRawX() {
-        return 100;
-    }
-
-    @Override
-    public float getMaxRawY() {
-        return 100;
-    }
-
-    @Override
-    public int getNumberOfRuns() {
-        return 0;
-    }
-
-    @Override
-    public Bundle getRunAt(int i) {
-        return null;
-    }
-
-    @Override
-    public float getRunValueAt(int i) {
-        return 0;
-    }
-
-    @Override
-    public String getRunValueBaseUnit() {
-        return "";
-    }
-
-    @Override
-    public String getRunValueUnitPrefix() {
-        return "";
-    }
-
-    @Override
-    public String getRunValueLabel() {
-        return "time";
     }
 
     @Override

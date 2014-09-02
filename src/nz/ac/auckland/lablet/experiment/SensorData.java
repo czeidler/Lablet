@@ -65,36 +65,6 @@ abstract public class SensorData {
     public File getStorageDir() {
         return storageDir;
     }
-    
-    /**
-     * Gets a string of the used base unit.
-     * <p>
-     * The unit should be without a prefix. For example, if the unit is meter, "m" should be returned. This string can,
-     * for example, be used
-     * </p>
-     * @return the x unit string
-     */
-    public String getXBaseUnit() {
-        return "";
-    }
-
-    /**
-     * See getXBaseUnit.
-     *
-     * @return the y unit string
-     */
-    public String getYBaseUnit() {
-        return "";
-    }
-
-    /**
-     * The raw data is stored in internal units starting at (0,0). These methods return the max values.
-     * The max values ratio should be the same as the screen ratio.
-     *
-     * @return the max raw value
-     */
-    abstract public float getMaxRawX();
-    abstract public float getMaxRawY();
 
     /**
      * Load a previously conducted experiment from a Bundle and sets the storage directory.

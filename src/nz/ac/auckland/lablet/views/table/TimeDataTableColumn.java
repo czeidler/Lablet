@@ -7,9 +7,6 @@
  */
 package nz.ac.auckland.lablet.views.table;
 
-import nz.ac.auckland.lablet.experiment.SensorData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
-
 
 /**
  * Table column for the marker data table adapter. Provides a time column for the use in combination with an
@@ -18,15 +15,13 @@ import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 public class TimeDataTableColumn extends DataTableColumn {
     @Override
     public int size() {
-        return markerDataModel.getMarkerCount();
+        return dataModel.getMarkerCount();
     }
 
     @Override
     public Number getValue(int index) {
-        SensorData sensorData = sensorAnalysis.getSensorData();
-        MarkerDataModel markerData = sensorAnalysis.getTagMarkers();
-        int runId = markerData.getMarkerDataAt(index).getRunId();
-        return sensorData.getRunValueAt(runId);
+        int runId = dataModel.getMarkerDataAt(index).getRunId();
+        return timeCalibration.getTimeFromRaw(runId);
     }
 
     @Override
@@ -37,6 +32,6 @@ public class TimeDataTableColumn extends DataTableColumn {
 
     @Override
     public String getHeader() {
-        return "time [" + sensorAnalysis.getSensorData().getRunValueUnit() + "]";
+        return "time [" + timeCalibration.getUnit().getUnit() + "]";
     }
 }

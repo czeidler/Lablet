@@ -18,7 +18,7 @@ import android.widget.TableRow;
 /**
  * Implementation of a table view. Uses the {@link nz.ac.auckland.lablet.views.table.ITableAdapter}.
  */
-public class TableView extends TableLayout implements ITableAdapter.ITableAdapterListener {
+public class TableView extends TableLayout implements ITableAdapter.IListener {
     protected ITableAdapter<?> adapter = null;
     TableRow selectedRow = null;
     final int rowBackgroundColor = Color.WHITE;

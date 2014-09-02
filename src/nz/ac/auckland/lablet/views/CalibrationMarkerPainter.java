@@ -1,7 +1,7 @@
 package nz.ac.auckland.lablet.views;
 
 import android.graphics.*;
-import nz.ac.auckland.lablet.experiment.Calibration;
+import nz.ac.auckland.lablet.experiment.CalibrationXY;
 /*
  * Copyright 2013-2014.
  * Distributed under the terms of the GPLv3 License.
@@ -99,7 +99,7 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
         canvas.drawLine(screenPos1.x + normedVector.x * LINE_WIDTH / 2, screenPos1.y + normedVector.y * LINE_WIDTH / 2,
                 screenPos2.x - normedVector.x * LINE_WIDTH / 2, screenPos2.y - normedVector.y * LINE_WIDTH / 2, paint);
         // draw wings
-        float angleScreen = Calibration.getAngle(screenPos1, screenPos2);
+        float angleScreen = CalibrationXY.getAngle(screenPos1, screenPos2);
         PointF wing1Top = new PointF(screenPos1.x + LINE_WIDTH / 2, screenPos1.y + WING_LENGTH / 2);
         rotate(wing1Top, screenPos1, angleScreen);
         PointF wing1Bottom = new PointF(screenPos1.x + LINE_WIDTH / 2, screenPos1.y - WING_LENGTH / 2);

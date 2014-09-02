@@ -7,7 +7,8 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.SensorAnalysis;
+import nz.ac.auckland.lablet.camera.ITimeCalibration;
+import nz.ac.auckland.lablet.camera.VideoAnalysis;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
@@ -15,15 +16,16 @@ import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 /**
  * Marker data adapter for the graphs.
  */
-public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDataModel.IMarkerDataModelListener {
+public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDataModel.IListener {
     protected String title;
     protected MarkerDataModel data;
-    protected SensorAnalysis sensorAnalysis;
+    protected ITimeCalibration timeCalibration;
 
-    public MarkerGraphAdapter(SensorAnalysis sensorAnalysis, String title, MarkerGraphAxis xAxis,
-                              MarkerGraphAxis yAxis) {
+    public MarkerGraphAdapter(MarkerDataModel data, ITimeCalibration timeCalibration, String title,
+                              MarkerGraphAxis xAxis, MarkerGraphAxis yAxis) {
         this.title = title;
-        setSensorAnalysis(sensorAnalysis);
+
+        setTo(data, timeCalibration);
 
         xAxis.setMarkerGraphAdapter(this);
         yAxis.setMarkerGraphAdapter(this);
@@ -31,14 +33,14 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
         setYAxis(yAxis);
     }
 
-    public void setSensorAnalysis(SensorAnalysis sensorAnalysis) {
-        if (data != null)
-            data.removeListener(this);
-        this.sensorAnalysis = sensorAnalysis;
-        data = sensorAnalysis.getTagMarkers();
-        data.addListener(this);
+    public void setTo(MarkerDataModel data, ITimeCalibration timeCalibration) {
+        if (this.data != null)
+            this.data.removeListener(this);
 
-        notifyAllDataChanged();
+        this.data = data;
+        this.timeCalibration = timeCalibration;
+
+        data.addListener(this);
     }
 
     @Override
@@ -46,18 +48,18 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
         data.removeListener(this);
     }
 
-    public static MarkerGraphAdapter createPositionAdapter(SensorAnalysis sensorAnalysis, String title) {
-        return new MarkerGraphAdapter(sensorAnalysis, title, new XPositionMarkerGraphAxis(),
+    public static MarkerGraphAdapter createPositionAdapter(MarkerDataModel data, ITimeCalibration timeCalibration, String title) {
+        return new MarkerGraphAdapter(data, timeCalibration, title, new XPositionMarkerGraphAxis(),
                 new YPositionMarkerGraphAxis());
     }
 
-    public static MarkerGraphAdapter createXSpeedAdapter(SensorAnalysis sensorAnalysis, String title) {
-        return new MarkerGraphAdapter(sensorAnalysis, title, new SpeedTimeMarkerGraphAxis(),
+    public static MarkerGraphAdapter createXSpeedAdapter(MarkerDataModel data, ITimeCalibration timeCalibration, String title) {
+        return new MarkerGraphAdapter(data, timeCalibration, title, new SpeedTimeMarkerGraphAxis(),
                 new XSpeedMarkerGraphAxis());
     }
 
-    public static MarkerGraphAdapter createYSpeedAdapter(SensorAnalysis sensorAnalysis, String title) {
-        return new MarkerGraphAdapter(sensorAnalysis, title, new SpeedTimeMarkerGraphAxis(),
+    public static MarkerGraphAdapter createYSpeedAdapter(MarkerDataModel data, ITimeCalibration timeCalibration, String title) {
+        return new MarkerGraphAdapter(data, timeCalibration, title, new SpeedTimeMarkerGraphAxis(),
                 new YSpeedMarkerGraphAxis());
     }
 
@@ -65,8 +67,8 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
         return data;
     }
 
-    public SensorAnalysis getSensorAnalysis() {
-        return sensorAnalysis;
+    public ITimeCalibration getTimeCalibration() {
+        return timeCalibration;
     }
 
     @Override

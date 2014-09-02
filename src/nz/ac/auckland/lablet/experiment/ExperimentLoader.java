@@ -12,7 +12,6 @@ import nz.ac.auckland.lablet.misc.PersistentBundle;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.*;
-import java.util.List;
 
 
 /**
@@ -45,20 +44,18 @@ public class ExperimentLoader {
     }
 
     // Creates a new ExperimentAnalysis and tries to load an existing analysis.
-    static public void setupSensorAnalysis(SensorData sensorData, ISensorAnalysis sensorAnalysis, File storageDir) {
+    static public boolean loadSensorAnalysis(ISensorAnalysis sensorAnalysis, File storageDir) {
         // try to load old analysis
         File projectFile = new File(storageDir, ISensorAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
         Bundle bundle = ExperimentLoader.loadBundleFromFile(projectFile);
         if (bundle == null)
-            return;
+            return false;
 
         Bundle analysisDataBundle = bundle.getBundle("analysis_data");
         if (analysisDataBundle == null)
-            return;
+            return false;
 
-        sensorAnalysis.loadAnalysisData(analysisDataBundle, storageDir);
-
-        return;
+        return sensorAnalysis.loadAnalysisData(analysisDataBundle, storageDir);
     }
 }
 

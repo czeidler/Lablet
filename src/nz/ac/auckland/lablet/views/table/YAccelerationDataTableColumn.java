@@ -16,18 +16,17 @@ import nz.ac.auckland.lablet.experiment.SensorData;
 public class YAccelerationDataTableColumn extends DataTableColumn {
     @Override
     public int size() {
-        return markerDataModel.getMarkerCount() - 2;
+        return dataModel.getMarkerCount() - 2;
     }
 
     @Override
     public Number getValue(int index) {
-        float speed0 = YSpeedDataTableColumn.getSpeed(index, markerDataModel, sensorAnalysis).floatValue();
-        float speed1 = YSpeedDataTableColumn.getSpeed(index + 1, markerDataModel, sensorAnalysis).floatValue();
+        float speed0 = YSpeedDataTableColumn.getSpeed(index, dataModel, timeCalibration).floatValue();
+        float speed1 = YSpeedDataTableColumn.getSpeed(index + 1, dataModel, timeCalibration).floatValue();
         float delta = speed1 - speed0;
 
-        SensorData sensorData = sensorAnalysis.getSensorData();
-        float deltaT = (sensorData.getRunValueAt(index + 2) - sensorData.getRunValueAt(index)) / 2;
-        if (sensorAnalysis.getSensorData().getRunValueUnitPrefix().equals("m"))
+        float deltaT = (timeCalibration.getTimeFromRaw(index + 2) - timeCalibration.getTimeFromRaw(index)) / 2;
+        if (timeCalibration.getUnit().getPrefix().equals("m"))
             deltaT /= 1000;
 
         return delta / deltaT;
@@ -35,7 +34,7 @@ public class YAccelerationDataTableColumn extends DataTableColumn {
 
     @Override
     public String getHeader() {
-        return "acceleration [" + sensorAnalysis.getYUnit() + "/"
-                + sensorAnalysis.getSensorData().getRunValueBaseUnit() + "^2]";
+        return "acceleration [" + dataModel.getCalibrationXY().getYUnit().getUnit() + "/"
+                + timeCalibration.getUnit().getBase() + "^2]";
     }
 }
