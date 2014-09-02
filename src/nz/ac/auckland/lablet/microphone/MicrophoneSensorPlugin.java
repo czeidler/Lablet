@@ -17,7 +17,7 @@ import nz.ac.auckland.lablet.experiment.*;
 import java.io.File;
 
 
-class MicrophoneSensorPlugin implements ISensorPlugin {
+public class MicrophoneSensorPlugin implements ISensorPlugin {
 
     @Override
     public String getSensorIdentifier() {
@@ -41,35 +41,3 @@ class MicrophoneSensorPlugin implements ISensorPlugin {
 }
 
 
-class MicrophoneAnalysisPlugin implements IAnalysisPlugin {
-
-    @Override
-    public String getIdentifier() {
-        return "MicrophoneAnalysisPlugin";
-    }
-
-    @Override
-    public String supportedDataType() {
-        return null;
-    }
-
-    @Override
-    public ISensorAnalysis createSensorAnalysis(SensorData sensorData) {
-        return null;
-    }
-
-    @Override
-    public boolean hasAnalysisSettingsActivity(StringBuilder menuName) {
-        return false;
-    }
-
-    @Override
-    public void startAnalysisSettingsActivity(Activity parentActivity, int requestCode, ExperimentAnalysisActivity.AnalysisRef analysisRef, String experimentPath, Bundle options) {
-
-    }
-
-    @Override
-    public Fragment createSensorAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef analysisRef) {
-        return null;
-    }
-}

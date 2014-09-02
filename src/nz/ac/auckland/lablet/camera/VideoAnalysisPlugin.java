@@ -34,7 +34,7 @@ public class VideoAnalysisPlugin implements IAnalysisPlugin {
 
     @Override
     public Fragment createSensorAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef analysisRef) {
-        return new CameraAnalysisFragment(analysisRef);
+        return new MotionAnalysisFragment(analysisRef);
     }
 
     @Override

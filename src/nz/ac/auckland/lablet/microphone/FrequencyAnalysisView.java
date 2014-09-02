@@ -25,11 +25,11 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class MicrophoneAnalysisView extends FrameLayout implements IExperimentFrameView {
+public class FrequencyAnalysisView extends FrameLayout implements IExperimentFrameView {
     final private MicrophoneSensorData micSensorData;
     private AudioFrequencyMapAdapter audioFrequencyMapAdapter;
 
-    public MicrophoneAnalysisView(Context context, FrequencyAnalysis analysis) {
+    public FrequencyAnalysisView(Context context, FrequencyAnalysis analysis) {
         super(context);
 
         this.micSensorData = (MicrophoneSensorData)analysis.getData();

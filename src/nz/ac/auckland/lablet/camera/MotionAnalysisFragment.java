@@ -19,13 +19,13 @@ import nz.ac.auckland.lablet.experiment.IAnalysisPlugin;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 
 
-public class CameraAnalysisFragment extends ExperimentAnalysisFragment {
+public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
     static final int PERFORM_RUN_SETTINGS = 0;
 
     private boolean resumeWithRunSettings = false;
     private boolean resumeWithRunSettingsHelp = false;
 
-    public CameraAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef ref) {
+    public MotionAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef ref) {
         super(ref);
     }
 
