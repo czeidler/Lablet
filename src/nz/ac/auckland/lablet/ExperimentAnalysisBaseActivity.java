@@ -70,7 +70,7 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
 
     protected List<AnalysisRunEntry> analysisRuns = new ArrayList<>();
     protected AnalysisRunEntry currentAnalysisRun;
-    protected MotionAnalysis currentSensorAnalysis;
+    protected ISensorAnalysis currentSensorAnalysis;
 
     protected boolean setCurrentAnalysisRun(int index) {
         if (index >= analysisRuns.size())
@@ -81,7 +81,7 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
     }
 
     protected void setCurrentSensorAnalysis(int sensor, int analysis) {
-        currentSensorAnalysis = (MotionAnalysis)currentAnalysisRun.sensorList.get(sensor).analysisList.get(analysis).analysis;
+        currentSensorAnalysis = currentAnalysisRun.sensorList.get(sensor).analysisList.get(analysis).analysis;
     }
 
     public AnalysisRunEntry getCurrentAnalysisRun() {
