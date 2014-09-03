@@ -11,8 +11,9 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import nz.ac.auckland.lablet.experiment.ExperimentHelper;
 import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
-import nz.ac.auckland.lablet.experiment.SensorData;
+import nz.ac.auckland.lablet.experiment.ISensorData;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -93,7 +94,7 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
                         File storageDir = getAnalysisStorageFor(experimentData, analysisRuns.indexOf(analysisRun),
                                 analysis);
                         storageDir.mkdirs();
-                        analysis.saveAnalysisData(storageDir);
+                        ExperimentHelper.saveAnalysisData(analysis, storageDir);
                         exportTagMarkerCSVData(analysis, storageDir);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -104,7 +105,7 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
     }
 
     private File getTagMarkerCSVFile(ISensorAnalysis analysis, File storageDir) {
-        SensorData sensorData = analysis.getData();
+        ISensorData sensorData = analysis.getData();
         return new File(storageDir, sensorData.getUid() + "_tag_markers.csv");
     }
 

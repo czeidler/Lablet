@@ -18,9 +18,9 @@ public interface ISensorAnalysis {
     final public static String EXPERIMENT_ANALYSIS_FILE_NAME = "experiment_analysis.xml";
 
     public String getIdentifier();
-    public SensorData getData();
+    public ISensorData getData();
     public boolean loadAnalysisData(Bundle bundle, File storageDir);
 
-    public void saveAnalysisData(File directory) throws IOException;
+    public Bundle exportAnalysisData(File additionalStorageDir) throws IOException;
     public void exportTagMarkerCSVData(OutputStream outputStream) throws IOException;
 }

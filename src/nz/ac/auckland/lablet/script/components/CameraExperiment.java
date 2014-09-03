@@ -21,7 +21,7 @@ import nz.ac.auckland.lablet.camera.CameraSensorData;
 import nz.ac.auckland.lablet.camera.CameraSensorPlugin;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
-import nz.ac.auckland.lablet.experiment.SensorData;
+import nz.ac.auckland.lablet.experiment.ISensorData;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.script.ScriptTreeNode;
 import nz.ac.auckland.lablet.script.ScriptComponentViewHolder;
@@ -218,7 +218,7 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
                     return null;
 
                 // TODO fix if there are more than one runs or sensors
-                SensorData sensorData = experimentData.getRuns().get(0).sensorDataList.get(0);
+                ISensorData sensorData = experimentData.getRuns().get(0).sensorDataList.get(0);
                 CameraSensorData cameraSensorData = (CameraSensorData)sensorData;
                 return new File(cameraSensorData.getStorageDir(), cameraSensorData.getVideoFileName());
             }

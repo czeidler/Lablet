@@ -19,7 +19,7 @@ import java.util.List;
 public class ExperimentData {
     public static class RunEntry {
         public ExperimentRunData runData;
-        public List<SensorData> sensorDataList = new ArrayList<>();
+        public List<ISensorData> sensorDataList = new ArrayList<>();
     }
 
     private File storageDir;
@@ -38,11 +38,11 @@ public class ExperimentData {
         return loadError;
     }
 
-    private SensorData loadSensorData(Context context, File sensorDirectory) {
+    private ISensorData loadSensorData(Context context, File sensorDirectory) {
         Bundle bundle;
 
-        File file = new File(sensorDirectory, SensorData.EXPERIMENT_DATA_FILE_NAME);
-        bundle = ExperimentLoader.loadBundleFromFile(file);
+        File file = new File(sensorDirectory, ISensorData.EXPERIMENT_DATA_FILE_NAME);
+        bundle = ExperimentHelper.loadBundleFromFile(file);
 
         if (bundle == null) {
             loadError = "can't read experiment file";
@@ -67,7 +67,7 @@ public class ExperimentData {
             loadError = "failed to load experiment data";
             return null;
         }
-        SensorData sensorData = plugin.loadSensorData(context, experimentData, sensorDirectory);
+        ISensorData sensorData = plugin.loadSensorData(context, experimentData, sensorDirectory);
         if (sensorData == null) {
             loadError = "can't load experiment";
             return null;
@@ -92,7 +92,7 @@ public class ExperimentData {
         for (File runDirectory : runDir.listFiles()) {
             if (!runDirectory.isDirectory())
                 continue;
-            SensorData sensorData = loadSensorData(context, runDirectory);
+            ISensorData sensorData = loadSensorData(context, runDirectory);
             if (sensorData == null)
                 return null;
             runEntry.sensorDataList.add(sensorData);

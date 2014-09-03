@@ -11,7 +11,6 @@ import android.graphics.PointF;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.*;
-import nz.ac.auckland.lablet.misc.PersistentBundle;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -103,7 +102,7 @@ public class MotionAnalysis implements ISensorAnalysis {
         return "MotionAnalysis";
     }
 
-    public SensorData getData() { return sensorData; }
+    public ISensorData getData() { return sensorData; }
     public FrameDataModel getFrameDataModel() {
         return frameDataModel;
     }
@@ -158,39 +157,6 @@ public class MotionAnalysis implements ISensorAnalysis {
         this.yUnit.setPrefix(yUnitPrefix);
     }
 
-    private Bundle analysisDataToBundle() {
-        Bundle analysisDataBundle = new Bundle();
-
-        analysisDataBundle.putInt("currentRun", frameDataModel.getCurrentFrame());
-
-        if (tagMarkers.getMarkerCount() > 0) {
-            Bundle tagMarkerBundle = tagMarkers.toBundle();
-            analysisDataBundle.putBundle("tagMarkers", tagMarkerBundle);
-        }
-
-        PointF point1 = lengthCalibrationMarkers.getMarkerDataAt(0).getPosition();
-        PointF point2 = lengthCalibrationMarkers.getMarkerDataAt(1).getPosition();
-        analysisDataBundle.putFloat("lengthCalibrationPoint1x", point1.x);
-        analysisDataBundle.putFloat("lengthCalibrationPoint1y", point1.y);
-        analysisDataBundle.putFloat("lengthCalibrationPoint2x", point2.x);
-        analysisDataBundle.putFloat("lengthCalibrationPoint2y", point2.y);
-        analysisDataBundle.putFloat("lengthCalibrationValue", lengthCalibrationSetter.getCalibrationValue());
-
-        analysisDataBundle.putFloat("originX", calibrationXY.getOrigin().x);
-        analysisDataBundle.putFloat("originY", calibrationXY.getOrigin().y);
-        analysisDataBundle.putFloat("originAxis1x", calibrationXY.getAxis1().x);
-        analysisDataBundle.putFloat("originAxis1y", calibrationXY.getAxis1().y);
-        analysisDataBundle.putBoolean("originSwapAxis", calibrationXY.getSwapAxis());
-        analysisDataBundle.putBoolean("showCoordinateSystem", showCoordinateSystem);
-
-        analysisDataBundle.putString("xUnitPrefix", getXUnitPrefix());
-        analysisDataBundle.putString("yUnitPrefix", getYUnitPrefix());
-
-        if (experimentSpecificData != null)
-            analysisDataBundle.putBundle("experiment_specific_data", experimentSpecificData);
-        return analysisDataBundle;
-    }
-
     public boolean loadAnalysisData(Bundle bundle, File storageDir) {
         tagMarkers.clear();
 
@@ -240,16 +206,38 @@ public class MotionAnalysis implements ISensorAnalysis {
         return true;
     }
 
-    public void saveAnalysisData(File storageDir) throws IOException {
-        Bundle bundle = new Bundle();
-        Bundle experimentData = analysisDataToBundle();
-        bundle.putBundle("analysis_data", experimentData);
+    @Override
+    public Bundle exportAnalysisData(File storageDir) throws IOException {
+        Bundle analysisDataBundle = new Bundle();
 
-        // save the bundle
-        File projectFile = new File(storageDir, EXPERIMENT_ANALYSIS_FILE_NAME);
-        FileWriter fileWriter = new FileWriter(projectFile);
-        PersistentBundle persistentBundle = new PersistentBundle();
-        persistentBundle.flattenBundle(bundle, fileWriter);
+        analysisDataBundle.putInt("currentRun", frameDataModel.getCurrentFrame());
+
+        if (tagMarkers.getMarkerCount() > 0) {
+            Bundle tagMarkerBundle = tagMarkers.toBundle();
+            analysisDataBundle.putBundle("tagMarkers", tagMarkerBundle);
+        }
+
+        PointF point1 = lengthCalibrationMarkers.getMarkerDataAt(0).getPosition();
+        PointF point2 = lengthCalibrationMarkers.getMarkerDataAt(1).getPosition();
+        analysisDataBundle.putFloat("lengthCalibrationPoint1x", point1.x);
+        analysisDataBundle.putFloat("lengthCalibrationPoint1y", point1.y);
+        analysisDataBundle.putFloat("lengthCalibrationPoint2x", point2.x);
+        analysisDataBundle.putFloat("lengthCalibrationPoint2y", point2.y);
+        analysisDataBundle.putFloat("lengthCalibrationValue", lengthCalibrationSetter.getCalibrationValue());
+
+        analysisDataBundle.putFloat("originX", calibrationXY.getOrigin().x);
+        analysisDataBundle.putFloat("originY", calibrationXY.getOrigin().y);
+        analysisDataBundle.putFloat("originAxis1x", calibrationXY.getAxis1().x);
+        analysisDataBundle.putFloat("originAxis1y", calibrationXY.getAxis1().y);
+        analysisDataBundle.putBoolean("originSwapAxis", calibrationXY.getSwapAxis());
+        analysisDataBundle.putBoolean("showCoordinateSystem", showCoordinateSystem);
+
+        analysisDataBundle.putString("xUnitPrefix", getXUnitPrefix());
+        analysisDataBundle.putString("yUnitPrefix", getYUnitPrefix());
+
+        if (experimentSpecificData != null)
+            analysisDataBundle.putBundle("experiment_specific_data", experimentSpecificData);
+        return analysisDataBundle;
     }
 
     public void exportTagMarkerCSVData(OutputStream outputStream) {
@@ -332,7 +320,6 @@ public class MotionAnalysis implements ISensorAnalysis {
     }
 
     protected void onRunSpecificDataChanged() {
-        CameraSensorData cameraExperiment = (CameraSensorData) getData();
         Bundle experimentSpecificData = getExperimentSpecificData();
         if (experimentSpecificData == null)
             return;

@@ -32,7 +32,7 @@ public class MicrophoneSensorPlugin implements ISensorPlugin {
     }
 
     @Override
-    public SensorData loadSensorData(Context context, Bundle data, File storageDir) {
+    public ISensorData loadSensorData(Context context, Bundle data, File storageDir) {
         return new MicrophoneSensorData(context, data, storageDir);
     }
 }

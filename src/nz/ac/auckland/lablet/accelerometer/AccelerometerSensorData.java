@@ -9,14 +9,13 @@ package nz.ac.auckland.lablet.accelerometer;
 
 import android.content.Context;
 import android.os.Bundle;
+import nz.ac.auckland.lablet.experiment.AbstractSensorData;
 import nz.ac.auckland.lablet.experiment.IExperimentSensor;
-import nz.ac.auckland.lablet.experiment.ISensorPlugin;
-import nz.ac.auckland.lablet.experiment.SensorData;
 
 import java.io.File;
 
 
-public class AccelerometerSensorData extends SensorData {
+public class AccelerometerSensorData extends AbstractSensorData {
     @Override
     public String getDataType() {
         return "3DVector/accelerometer";

@@ -14,10 +14,7 @@ import android.widget.FrameLayout;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
-import nz.ac.auckland.lablet.views.AudioFrequencyMapAdapter;
-import nz.ac.auckland.lablet.views.AudioFrequencyMapPainter;
-import nz.ac.auckland.lablet.views.IExperimentFrameView;
-import nz.ac.auckland.lablet.views.TagMarkerDataModelPainter;
+import nz.ac.auckland.lablet.views.*;
 import nz.ac.auckland.lablet.views.plotview.PlotView;
 
 import java.io.BufferedInputStream;
@@ -26,16 +23,18 @@ import java.io.IOException;
 
 
 public class FrequencyAnalysisView extends FrameLayout implements IExperimentFrameView {
+    final private FrequencyAnalysis frequencyAnalysis;
     final private MicrophoneSensorData micSensorData;
     private AudioFrequencyMapAdapter audioFrequencyMapAdapter;
 
     public FrequencyAnalysisView(Context context, FrequencyAnalysis analysis) {
         super(context);
 
+        this.frequencyAnalysis = analysis;
         this.micSensorData = (MicrophoneSensorData)analysis.getData();
 
         File audioFile = micSensorData.getAudioFile();
-        AudioWavInputStream audioWavInputStream = null;
+        AudioWavInputStream audioWavInputStream;
         try {
             audioWavInputStream = new AudioWavInputStream(audioFile);
         } catch (IOException e) {
@@ -54,7 +53,7 @@ public class FrequencyAnalysisView extends FrameLayout implements IExperimentFra
         AudioFrequencyMapPainter audioFrequencyMapPainter = new AudioFrequencyMapPainter();
         audioFrequencyMapPainter.setDataAdapter(audioFrequencyMapAdapter);
         frequencyMapPlotView.addPlotPainter(audioFrequencyMapPainter);
-        frequencyMapPlotView.setXRange(0, audioWavInputStream.getDurationMilliSeconds() / 1000);
+        frequencyMapPlotView.setXRange(0, audioWavInputStream.getDurationMilliSeconds());
         frequencyMapPlotView.setYRange(1, audioWavInputStream.getSampleRate() / 2);
         frequencyMapPlotView.setMaxXRange(0, audioWavInputStream.getDurationMilliSeconds() / 1000);
         frequencyMapPlotView.setMaxYRange(1, audioWavInputStream.getSampleRate() / 2);
@@ -62,15 +61,17 @@ public class FrequencyAnalysisView extends FrameLayout implements IExperimentFra
         frequencyMapPlotView.setYDraggable(true);
         frequencyMapPlotView.setXZoomable(true);
         frequencyMapPlotView.setYZoomable(true);
+        frequencyMapPlotView.getXAxisView().setUnit("ms");
+        frequencyMapPlotView.getXAxisView().setTitle("Time");
         frequencyMapPlotView.getYAxisView().setUnit("Hz");
         frequencyMapPlotView.getYAxisView().setTitle("Frequency");
-        frequencyMapPlotView.getXAxisView().setUnit("s");
-        frequencyMapPlotView.getXAxisView().setTitle("Time");
 
-        MarkerDataModel markerModel = new MarkerDataModel();
+        MarkerDataModel markerModel = frequencyAnalysis.getTagMarkerModel();
         markerModel.addMarkerData(new MarkerData(0));
+        markerModel.addMarkerData(new MarkerData(1));
+        markerModel.addMarkerData(new MarkerData(2));
         markerModel.selectMarkerData(0);
-        TagMarkerDataModelPainter markerDataModelPainter = new TagMarkerDataModelPainter(markerModel);
+        EditMarkerDataModelPainter markerDataModelPainter = new EditMarkerDataModelPainter(markerModel);
         frequencyMapPlotView.addPlotPainter(markerDataModelPainter);
 
         return frequencyMapPlotView;

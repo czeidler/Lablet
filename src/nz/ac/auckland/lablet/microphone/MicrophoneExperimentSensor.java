@@ -24,7 +24,7 @@ import android.widget.ToggleButton;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensorView;
-import nz.ac.auckland.lablet.experiment.SensorData;
+import nz.ac.auckland.lablet.experiment.ISensorData;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.misc.AudioWavOutputStream;
 import nz.ac.auckland.lablet.misc.StorageLib;
@@ -549,7 +549,7 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     }
 
     @Override
-    public SensorData getExperimentData() {
-        return null;
+    public ISensorData getExperimentData() {
+        return experimentData;
     }
 }

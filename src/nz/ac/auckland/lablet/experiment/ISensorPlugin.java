@@ -50,6 +50,6 @@ public interface ISensorPlugin {
      * @param storageDir directory where additional data may have been stored
      * @return the loaded experiment or null on failure
      */
-    public SensorData loadSensorData(Context context, Bundle data, File storageDir);
+    public ISensorData loadSensorData(Context context, Bundle data, File storageDir);
 }
 

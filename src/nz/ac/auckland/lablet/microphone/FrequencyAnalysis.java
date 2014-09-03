@@ -7,15 +7,12 @@
  */
 package nz.ac.auckland.lablet.microphone;
 
-import android.graphics.PointF;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
+import nz.ac.auckland.lablet.experiment.ISensorData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
-import nz.ac.auckland.lablet.experiment.SensorData;
-import nz.ac.auckland.lablet.misc.PersistentBundle;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -35,7 +32,7 @@ public class FrequencyAnalysis implements ISensorAnalysis {
     }
 
     @Override
-    public SensorData getData() {
+    public ISensorData getData() {
         return sensorData;
     }
 
@@ -48,19 +45,7 @@ public class FrequencyAnalysis implements ISensorAnalysis {
     }
 
     @Override
-    public void saveAnalysisData(File directory) throws IOException {
-        Bundle bundle = new Bundle();
-        Bundle experimentData = analysisDataToBundle();
-        bundle.putBundle("analysis_data", experimentData);
-
-        // save the bundle
-        File projectFile = new File(directory, EXPERIMENT_ANALYSIS_FILE_NAME);
-        FileWriter fileWriter = new FileWriter(projectFile);
-        PersistentBundle persistentBundle = new PersistentBundle();
-        persistentBundle.flattenBundle(bundle, fileWriter);
-    }
-
-    private Bundle analysisDataToBundle() {
+    public Bundle exportAnalysisData(File additionalStorageDir) throws IOException {
         Bundle analysisDataBundle = new Bundle();
 
         if (tagMarkerModel.getMarkerCount() > 0) {

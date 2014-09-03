@@ -23,12 +23,12 @@ public interface IAnalysisPlugin {
 
     /**
      * Creates an {@link nz.ac.auckland.lablet.experiment.ISensorAnalysis} object for the given
-     * {@link nz.ac.auckland.lablet.experiment.SensorData}.
+     * {@link nz.ac.auckland.lablet.experiment.ISensorData}.
      *
      * @param sensorData usually loaded with the loadSensorData method
      * @return pointer to the created experiment analysis
      */
-    public ISensorAnalysis createSensorAnalysis(SensorData sensorData);
+    public ISensorAnalysis createSensorAnalysis(ISensorData sensorData);
 
     /**
      * Creates the view that displays the results in the

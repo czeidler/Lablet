@@ -12,7 +12,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
-import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.*;
@@ -108,7 +107,7 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
         File dir = experimentData.getStorageDir().getParentFile();
         dir = new File(dir, "analysis");
         dir = new File(dir, "run" + Integer.toString(run));
-        SensorData sensorData = analysis.getData();
+        ISensorData sensorData = analysis.getData();
         dir = new File(dir, sensorData.getDataType());
         dir = new File(dir, analysis.getIdentifier());
         return dir;
@@ -127,7 +126,7 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
         List<ExperimentData.RunEntry> runs = experimentData.getRuns();
         for (ExperimentData.RunEntry runEntry : runs) {
             AnalysisRunEntry analysisRunEntry = new AnalysisRunEntry();
-            for (SensorData sensorData : runEntry.sensorDataList) {
+            for (ISensorData sensorData : runEntry.sensorDataList) {
                 AnalysisSensorEntry analysisSensorEntry = new AnalysisSensorEntry();
                 ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
                 List<IAnalysisPlugin> pluginList = factory.analysisPluginsFor(sensorData);
@@ -137,7 +136,7 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
 
                 ISensorAnalysis sensorAnalysis = plugin.createSensorAnalysis(sensorData);
                 File storage = getAnalysisStorageFor(experimentData, runs.indexOf(runEntry), sensorAnalysis);
-                ExperimentLoader.loadSensorAnalysis(sensorAnalysis, storage);
+                ExperimentHelper.loadSensorAnalysis(sensorAnalysis, storage);
                 analysisSensorEntry.analysisList.add(new AnalysisEntry(sensorAnalysis, plugin));
                 analysisRunEntry.sensorList.add(analysisSensorEntry);
             }

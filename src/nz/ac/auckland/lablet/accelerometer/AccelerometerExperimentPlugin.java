@@ -34,7 +34,7 @@ class AccelerometerSensorPlugin implements ISensorPlugin {
     }
 
     @Override
-    public SensorData loadSensorData(Context context, Bundle data, File storageDir) {
+    public ISensorData loadSensorData(Context context, Bundle data, File storageDir) {
         return null;
     }
 }
@@ -53,7 +53,7 @@ class AccelerometerAnalysisPlugin implements IAnalysisPlugin {
     }
 
     @Override
-    public ISensorAnalysis createSensorAnalysis(SensorData sensorData) {
+    public ISensorAnalysis createSensorAnalysis(ISensorData sensorData) {
         return null;
     }
 

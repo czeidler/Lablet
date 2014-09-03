@@ -11,9 +11,8 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import nz.ac.auckland.lablet.experiment.AbstractSensorData;
 import nz.ac.auckland.lablet.experiment.IExperimentSensor;
-import nz.ac.auckland.lablet.experiment.ISensorPlugin;
-import nz.ac.auckland.lablet.experiment.SensorData;
 
 import java.io.File;
 
@@ -21,7 +20,7 @@ import java.io.File;
 /**
  * Holds all important data for the camera experiment.
  */
-public class CameraSensorData extends SensorData {
+public class CameraSensorData extends AbstractSensorData {
     private String videoFileName;
 
     // milli seconds
@@ -54,7 +53,7 @@ public class CameraSensorData extends SensorData {
     }
 
     @Override
-    protected boolean loadExperimentData(Bundle bundle, File storageDir) {
+    public boolean loadExperimentData(Bundle bundle, File storageDir) {
         if (!super.loadExperimentData(bundle, storageDir))
             return false;
 
@@ -63,7 +62,7 @@ public class CameraSensorData extends SensorData {
     }
 
     @Override
-    public Bundle experimentDataToBundle() {
+    protected Bundle experimentDataToBundle() {
         Bundle bundle = super.experimentDataToBundle();
 
         bundle.putString("videoName", videoFileName);

@@ -13,8 +13,7 @@ import nz.ac.auckland.lablet.camera.CameraSensorData;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
-import nz.ac.auckland.lablet.experiment.ExperimentLoader;
-import nz.ac.auckland.lablet.experiment.SensorData;
+import nz.ac.auckland.lablet.experiment.ISensorData;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -73,12 +72,12 @@ public class ScriptExperimentRef {
         ExperimentData experimentData = ExperimentHelper.loadExperimentData(context, getExperimentPath());
         if (experimentData == null)
             return null;
-        SensorData sensorData = experimentData.getRuns().get(0).sensorDataList.get(0);
+        ISensorData sensorData = experimentData.getRuns().get(0).sensorDataList.get(0);
         if (!(sensorData instanceof CameraSensorData))
             return null;
         MotionAnalysis motionAnalysis = new MotionAnalysis((CameraSensorData)sensorData);
         File analysisDir = ExperimentAnalysisBaseActivity.getAnalysisStorageFor(experimentData, 0, motionAnalysis);
-        if (!ExperimentLoader.loadSensorAnalysis(motionAnalysis, analysisDir))
+        if (!ExperimentHelper.loadSensorAnalysis(motionAnalysis, analysisDir))
             return null;
         return motionAnalysis;
     }

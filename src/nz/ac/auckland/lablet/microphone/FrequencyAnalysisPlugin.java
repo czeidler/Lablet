@@ -11,7 +11,7 @@ import android.support.v4.app.Fragment;
 import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
 import nz.ac.auckland.lablet.experiment.IAnalysisPlugin;
 import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
-import nz.ac.auckland.lablet.experiment.SensorData;
+import nz.ac.auckland.lablet.experiment.ISensorData;
 
 
 public class FrequencyAnalysisPlugin implements IAnalysisPlugin {
@@ -27,7 +27,7 @@ public class FrequencyAnalysisPlugin implements IAnalysisPlugin {
     }
 
     @Override
-    public ISensorAnalysis createSensorAnalysis(SensorData sensorData) {
+    public ISensorAnalysis createSensorAnalysis(ISensorData sensorData) {
         assert sensorData instanceof MicrophoneSensorData;
         return new FrequencyAnalysis((MicrophoneSensorData)sensorData);
     }

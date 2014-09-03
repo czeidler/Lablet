@@ -427,7 +427,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
     }
 
     @Override
-    public SensorData getExperimentData() {
+    public ISensorData getExperimentData() {
         return experimentData;
     }
 

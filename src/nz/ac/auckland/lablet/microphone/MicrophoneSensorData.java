@@ -9,14 +9,13 @@ package nz.ac.auckland.lablet.microphone;
 
 import android.content.Context;
 import android.os.Bundle;
+import nz.ac.auckland.lablet.experiment.AbstractSensorData;
 import nz.ac.auckland.lablet.experiment.IExperimentSensor;
-import nz.ac.auckland.lablet.experiment.ISensorPlugin;
-import nz.ac.auckland.lablet.experiment.SensorData;
 
 import java.io.File;
 
 
-public class MicrophoneSensorData extends SensorData {
+public class MicrophoneSensorData extends AbstractSensorData {
     private String audioFileName;
 
     @Override
@@ -33,7 +32,7 @@ public class MicrophoneSensorData extends SensorData {
     }
 
     @Override
-    protected boolean loadExperimentData(Bundle bundle, File storageDir) {
+    public boolean loadExperimentData(Bundle bundle, File storageDir) {
         if (!super.loadExperimentData(bundle, storageDir))
             return false;
 

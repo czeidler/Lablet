@@ -19,7 +19,7 @@ import java.io.IOException;
 /**
  * Abstract base class for experiments.
  */
-abstract public class SensorData {
+abstract public class AbstractSensorData implements ISensorData {
     private String uid;
     protected Context context;
 
@@ -28,24 +28,13 @@ abstract public class SensorData {
     private IExperimentSensor sourceSensor;
 
     /**
-     * The default file name where the experiment data is stored.
-     * <p>
-     * The data is first stored into a bundle and then transformed to xml using a
-     * {@link nz.ac.auckland.lablet.misc.PersistentBundle}.
-     * </p>
-     */
-    final static public String EXPERIMENT_DATA_FILE_NAME = "experiment_data.xml";
-
-    abstract public String getDataType();
-
-    /**
      * Constructor to load an existing experiment.
      *
      * @param experimentContext the context of the experiment
      * @param bundle the experiment data that fits into a bundle
      * @param storageDir the storage directory of the experiment
      */
-    public SensorData(Context experimentContext, Bundle bundle, File storageDir) {
+    public AbstractSensorData(Context experimentContext, Bundle bundle, File storageDir) {
         init(experimentContext);
 
         this.storageDir = storageDir;
@@ -57,39 +46,31 @@ abstract public class SensorData {
      *
      * @param experimentContext the experiment context
      */
-    public SensorData(Context experimentContext, IExperimentSensor sourceSensor) {
+    public AbstractSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
         init(experimentContext);
 
         uid = generateNewUid();
         this.sourceSensor = sourceSensor;
     }
 
+    @Override
+    public String getUid() {
+        return uid;
+    }
+
+    @Override
     public File getStorageDir() {
         return storageDir;
     }
 
-    /**
-     * Load a previously conducted experiment from a Bundle and sets the storage directory.
-     * <p>
-     * The storage directory contains, for example, the video file from a camera experiment.
-     * </p>
-     * @param bundle the where all experiment information is stored
-     * @param storageDir the storage directory of the experiment
-     * @return
-     */
-    protected boolean loadExperimentData(Bundle bundle, File storageDir) {
+    @Override
+    public boolean loadExperimentData(Bundle bundle, File storageDir) {
         this.storageDir = storageDir;
         uid = bundle.getString("uid");
         return true;
     }
 
-    /**
-     * /**
-     * Saves the experiment to the path specified in {@see setStorageDir}.
-     *
-     * @param storageDir
-     * @throws IOException
-     */
+    @Override
     public void saveExperimentDataToFile(File storageDir) throws IOException {
         this.storageDir = storageDir;
 
@@ -116,7 +97,7 @@ abstract public class SensorData {
      *
      * * @param dir directory where data can be stored
      */
-    public void onSaveAdditionalData(File dir) {}
+    protected void onSaveAdditionalData(File dir) {}
 
     /**
      * Here, derived classes can make their data persistent.
@@ -125,20 +106,11 @@ abstract public class SensorData {
      *
      * @return a bundle containing the experiment data
      */
-    public Bundle experimentDataToBundle() {
+    protected Bundle experimentDataToBundle() {
         Bundle bundle = new Bundle();
         bundle.putString("uid", uid);
 
         return bundle;
-    }
-
-    /**
-     * Gets the unique experiment identifier.
-     *
-     * @return the unique id of this experiment
-     */
-    public String getUid() {
-        return uid;
     }
 
     protected String getIdentifier() {
