@@ -10,7 +10,7 @@ package nz.ac.auckland.lablet.views.graph;
 /**
  * Graph axis for the marker data graph adapter. Provides the y-speed.
  */
-public class YSpeedMarkerGraphAxis extends MarkerGraphAxis {
+public class YSpeedMarkerGraphAxis extends MarkerTimeGraphAxis {
     @Override
     public int size() {
         return getData().getMarkerCount() - 1;

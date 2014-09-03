@@ -1,3 +1,6 @@
+package nz.ac.auckland.lablet.views.graph;
+
+import nz.ac.auckland.lablet.experiment.MarkerData;
 /*
  * Copyright 2013-2014.
  * Distributed under the terms of the GPLv3 License.
@@ -5,26 +8,17 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views.graph;
-
-import nz.ac.auckland.lablet.camera.ITimeCalibration;
-import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 
-/**
- * Marker data adapter for the graphs.
- */
 public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDataModel.IListener {
     protected String title;
     protected MarkerDataModel data;
-    protected ITimeCalibration timeCalibration;
 
-    public MarkerGraphAdapter(MarkerDataModel data, ITimeCalibration timeCalibration, String title,
-                              MarkerGraphAxis xAxis, MarkerGraphAxis yAxis) {
+    public MarkerGraphAdapter(MarkerDataModel data, String title, MarkerGraphAxis xAxis, MarkerGraphAxis yAxis) {
         this.title = title;
 
-        setTo(data, timeCalibration);
+        setTo(data);
 
         xAxis.setMarkerGraphAdapter(this);
         yAxis.setMarkerGraphAdapter(this);
@@ -32,51 +26,37 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
         setYAxis(yAxis);
     }
 
-    public void setTo(MarkerDataModel data, ITimeCalibration timeCalibration) {
-        if (this.data != null)
-            this.data.removeListener(this);
-
-        this.data = data;
-        this.timeCalibration = timeCalibration;
-
-        data.addListener(this);
-    }
-
     @Override
     protected void finalize() {
         data.removeListener(this);
     }
 
-    public static MarkerGraphAdapter createPositionAdapter(MarkerDataModel data, ITimeCalibration timeCalibration, String title) {
-        return new MarkerGraphAdapter(data, timeCalibration, title, new XPositionMarkerGraphAxis(),
-                new YPositionMarkerGraphAxis());
-    }
+    public void setTo(MarkerDataModel data) {
+        if (this.data != null)
+            this.data.removeListener(this);
 
-    public static MarkerGraphAdapter createXSpeedAdapter(MarkerDataModel data, ITimeCalibration timeCalibration, String title) {
-        return new MarkerGraphAdapter(data, timeCalibration, title, new SpeedTimeMarkerGraphAxis(),
-                new XSpeedMarkerGraphAxis());
-    }
+        this.data = data;
 
-    public static MarkerGraphAdapter createYSpeedAdapter(MarkerDataModel data, ITimeCalibration timeCalibration, String title) {
-        return new MarkerGraphAdapter(data, timeCalibration, title, new SpeedTimeMarkerGraphAxis(),
-                new YSpeedMarkerGraphAxis());
-    }
-
-    public MarkerDataModel getData() {
-        return data;
-    }
-
-    public ITimeCalibration getTimeCalibration() {
-        return timeCalibration;
+        data.addListener(this);
     }
 
     @Override
     public void setTitle(String title) {
         this.title = title;
     }
+
     @Override
     public String getTitle() {
         return title;
+    }
+
+    public MarkerDataModel getData() {
+        return data;
+    }
+
+    public static MarkerGraphAdapter createPositionAdapter(MarkerDataModel data, String title) {
+        return new MarkerGraphAdapter(data, title, new XPositionMarkerGraphAxis(),
+                new YPositionMarkerGraphAxis());
     }
 
     @Override

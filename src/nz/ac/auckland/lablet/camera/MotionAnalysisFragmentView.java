@@ -94,9 +94,9 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
     private class GraphSpinnerEntry {
         private String name;
-        private MarkerGraphAdapter markerGraphAdapter;
+        private MarkerTimeGraphAdapter markerGraphAdapter;
 
-        public GraphSpinnerEntry(String name, MarkerGraphAdapter adapter) {
+        public GraphSpinnerEntry(String name, MarkerTimeGraphAdapter adapter) {
             this.name = name;
             this.markerGraphAdapter = adapter;
         }
@@ -105,7 +105,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
             return name;
         }
 
-        public MarkerGraphAdapter getMarkerGraphAdapter() {
+        public MarkerTimeGraphAdapter getMarkerGraphAdapter() {
             return markerGraphAdapter;
         }
     }
@@ -149,11 +149,11 @@ class MotionAnalysisFragmentView extends FrameLayout {
         MarkerDataModel markerDataModel = sensorAnalysis.getTagMarkers();
         ITimeCalibration timeCalibration = sensorAnalysis.getCalibrationVideoFrame();
         // graph spinner
-        graphSpinnerEntryList.add(new GraphSpinnerEntry("Position Data", new MarkerGraphAdapter(markerDataModel,
+        graphSpinnerEntryList.add(new GraphSpinnerEntry("Position Data", new MarkerTimeGraphAdapter(markerDataModel,
                 timeCalibration, "Position Data", new XPositionMarkerGraphAxis(), new YPositionMarkerGraphAxis())));
-        graphSpinnerEntryList.add(new GraphSpinnerEntry("x-Velocity", new MarkerGraphAdapter(markerDataModel,
+        graphSpinnerEntryList.add(new GraphSpinnerEntry("x-Velocity", new MarkerTimeGraphAdapter(markerDataModel,
                 timeCalibration, "x-Velocity", new TimeMarkerGraphAxis(), new XSpeedMarkerGraphAxis())));
-        graphSpinnerEntryList.add(new GraphSpinnerEntry("y-Velocity", new MarkerGraphAdapter(markerDataModel,
+        graphSpinnerEntryList.add(new GraphSpinnerEntry("y-Velocity", new MarkerTimeGraphAdapter(markerDataModel,
                 timeCalibration, "y-Velocity", new TimeMarkerGraphAxis(), new YSpeedMarkerGraphAxis())));
 
         graphSpinner = (Spinner)mainView.findViewById(R.id.graphSpinner);

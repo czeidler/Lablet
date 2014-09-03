@@ -383,6 +383,11 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
     }
 
     @Override
+    public void invalidate() {
+
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         List<IMarker> selectableMarkers = getSelectableMarkerList();
         int action = event.getActionMasked();
@@ -507,6 +512,21 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
     @Override
     public void onDataSelected(MarkerDataModel model, int index) {
         containerView.invalidate();
+    }
+
+    @Override
+    public void onXRangeChanged(float left, float right, float oldLeft, float oldRight) {
+        invalidateMarker();
+    }
+
+    @Override
+    public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop) {
+        invalidateMarker();
+    }
+
+    private void invalidateMarker() {
+        for (IMarker marker : markerList)
+            marker.invalidate();
     }
 }
 

@@ -7,13 +7,12 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 /**
  * Graph axis for the marker data graph adapter. Provides the x-speed.
  */
-public class XSpeedMarkerGraphAxis extends MarkerGraphAxis {
+public class XSpeedMarkerGraphAxis extends MarkerTimeGraphAxis {
     @Override
     public int size() {
         return getData().getMarkerCount() - 1;

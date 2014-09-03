@@ -7,8 +7,6 @@
  */
 package nz.ac.auckland.lablet.views.table;
 
-import nz.ac.auckland.lablet.experiment.SensorData;
-
 
 /**
  * Table column for the marker data table adapter. Provides the y-acceleration.

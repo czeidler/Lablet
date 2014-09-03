@@ -19,13 +19,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
-import nz.ac.auckland.lablet.camera.MotionAnalysisPlugin;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptComponent;
 import nz.ac.auckland.lablet.script.ScriptTreeNodeFragmentHolder;
 import nz.ac.auckland.lablet.views.graph.GraphView2D;
-import nz.ac.auckland.lablet.views.graph.MarkerGraphAdapter;
+import nz.ac.auckland.lablet.views.graph.MarkerTimeGraphAdapter;
 import nz.ac.auckland.lablet.views.graph.XPositionMarkerGraphAxis;
 import nz.ac.auckland.lablet.views.graph.YPositionMarkerGraphAxis;
 
@@ -188,7 +187,7 @@ public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
             MotionAnalysis sensorAnalysis = experiment.getVideoAnalysis(getActivity());
             if (sensorAnalysis == null)
                 return;
-            MarkerGraphAdapter adapter = new MarkerGraphAdapter(sensorAnalysis.getTagMarkers(),
+            MarkerTimeGraphAdapter adapter = new MarkerTimeGraphAdapter(sensorAnalysis.getTagMarkers(),
                     sensorAnalysis.getCalibrationVideoFrame(), "Position Data:",
                     new XPositionMarkerGraphAxis(), new YPositionMarkerGraphAxis());
             graphView.setAdapter(adapter);

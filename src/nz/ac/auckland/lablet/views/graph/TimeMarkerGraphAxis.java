@@ -7,14 +7,13 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 
 /**
  * Graph axis for the marker data graph adapter. Provides the time.
  */
-public class TimeMarkerGraphAxis extends MarkerGraphAxis {
+public class TimeMarkerGraphAxis extends MarkerTimeGraphAxis {
     @Override
     public int size() {
         return getData().getMarkerCount();

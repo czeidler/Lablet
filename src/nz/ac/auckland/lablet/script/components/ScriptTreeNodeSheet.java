@@ -235,7 +235,7 @@ class TextQuestion extends ScriptComponentViewHolder {
 class GraphView extends ScriptComponentViewHolder {
     private ScriptTreeNodeSheet experimentSheet;
     private ScriptExperimentRef experiment;
-    private MarkerGraphAdapter adapter;
+    private MarkerTimeGraphAdapter adapter;
     private String xAxisContentId = "x-position";
     private String yAxisContentId = "y-position";
     private String title = "Position Data";
@@ -267,7 +267,7 @@ class GraphView extends ScriptComponentViewHolder {
             if (yAxis == null)
                 yAxis = new XPositionMarkerGraphAxis();
 
-            adapter = new MarkerGraphAdapter(sensorAnalysis.getTagMarkers(), sensorAnalysis.getCalibrationVideoFrame(),
+            adapter = new MarkerTimeGraphAdapter(sensorAnalysis.getTagMarkers(), sensorAnalysis.getCalibrationVideoFrame(),
                     title, xAxis, yAxis);
             graphView2D.setAdapter(adapter);
         }
@@ -325,7 +325,7 @@ class GraphView extends ScriptComponentViewHolder {
         return null;
     }
 
-    public MarkerGraphAdapter getAdapter() {
+    public MarkerTimeGraphAdapter getAdapter() {
         return adapter;
     }
 
