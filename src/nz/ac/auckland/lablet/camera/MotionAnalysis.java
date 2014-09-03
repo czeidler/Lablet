@@ -158,29 +158,15 @@ public class MotionAnalysis implements ISensorAnalysis {
         this.yUnit.setPrefix(yUnitPrefix);
     }
 
-    public Bundle analysisDataToBundle() {
+    private Bundle analysisDataToBundle() {
         Bundle analysisDataBundle = new Bundle();
 
         analysisDataBundle.putInt("currentRun", frameDataModel.getCurrentFrame());
 
         if (tagMarkers.getMarkerCount() > 0) {
-            Bundle tagMarkerBundle = new Bundle();
-            int[] runIds = new int[tagMarkers.getMarkerCount()];
-            float[] xPositions = new float[tagMarkers.getMarkerCount()];
-            float[] yPositions = new float[tagMarkers.getMarkerCount()];
-            for (int i = 0; i < tagMarkers.getMarkerCount(); i++) {
-                MarkerData data = tagMarkers.getMarkerDataAt(i);
-                runIds[i] = data.getRunId();
-                xPositions[i] = data.getPosition().x;
-                yPositions[i] = data.getPosition().y;
-            }
-            tagMarkerBundle.putIntArray("runIds", runIds);
-            tagMarkerBundle.putFloatArray("xPositions", xPositions);
-            tagMarkerBundle.putFloatArray("yPositions", yPositions);
-
+            Bundle tagMarkerBundle = tagMarkers.toBundle();
             analysisDataBundle.putBundle("tagMarkers", tagMarkerBundle);
         }
-
 
         PointF point1 = lengthCalibrationMarkers.getMarkerDataAt(0).getPosition();
         PointF point2 = lengthCalibrationMarkers.getMarkerDataAt(1).getPosition();
@@ -212,21 +198,8 @@ public class MotionAnalysis implements ISensorAnalysis {
         frameDataModel.setCurrentFrame(bundle.getInt("currentRun"));
 
         Bundle tagMarkerBundle = bundle.getBundle("tagMarkers");
-        if (tagMarkerBundle != null) {
-            tagMarkers.clear();
-            int[] runIds = tagMarkerBundle.getIntArray("runIds");
-            float[] xPositions = tagMarkerBundle.getFloatArray("xPositions");
-            float[] yPositions = tagMarkerBundle.getFloatArray("yPositions");
-
-            if (runIds != null && xPositions != null && yPositions != null && runIds.length == xPositions.length
-                && xPositions.length == yPositions.length) {
-                for (int i = 0; i < runIds.length; i++) {
-                    MarkerData data = new MarkerData(runIds[i]);
-                    data.getPosition().set(xPositions[i], yPositions[i]);
-                    tagMarkers.addMarkerData(data);
-                }
-            }
-        }
+        if (tagMarkerBundle != null)
+            tagMarkers.fromBundle(tagMarkerBundle);
 
         PointF point1 = lengthCalibrationMarkers.getMarkerDataAt(0).getPosition();
         PointF point2 = lengthCalibrationMarkers.getMarkerDataAt(1).getPosition();
