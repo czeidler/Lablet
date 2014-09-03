@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-class CameraAnalysisFragmentView extends FrameLayout {
+class MotionAnalysisFragmentView extends FrameLayout {
     class Layout extends ViewGroup {
         private FrameDataSeekBar runViewControl = null;
         private FrameContainerView sensorContainerView = null;
@@ -111,7 +111,7 @@ class CameraAnalysisFragmentView extends FrameLayout {
     }
 
 
-    public CameraAnalysisFragmentView(Context context, MotionAnalysis sensorAnalysis) {
+    public MotionAnalysisFragmentView(Context context, MotionAnalysis sensorAnalysis) {
         super(context);
 
         final Layout mainView = new Layout(getContext());

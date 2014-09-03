@@ -15,6 +15,7 @@ import android.widget.PopupMenu;
 import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
 import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 import nz.ac.auckland.lablet.R;
+import nz.ac.auckland.lablet.experiment.ExperimentPluginHelper;
 import nz.ac.auckland.lablet.experiment.IAnalysisPlugin;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 
@@ -54,9 +55,6 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         });
         final MenuItem settingsItem = menu.findItem(R.id.action_run_settings);
         assert settingsItem != null;
-        final StringBuilder settingsName = new StringBuilder();
-
-        settingsItem.setTitle(settingsName);
         settingsItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -113,15 +111,46 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         popup.show();
     }
 
+    /**
+     * Starts an activity to config the experiment analysis.
+     * <p>
+     * For example, the camera experiment uses it to set the framerate and the video start and end point.
+     * </p>
+     * <p>
+     * Important: the analysisSpecificData and the options bundles have to be put as extras into the intent:
+     * <ul>
+     * <li>bundle field "analysisSpecificData" -> analysisSpecificData</li>
+     * <li>bundle field "options" -> options</li>
+     * </ul>
+     * </p>
+     * <p>
+     * The following options can be put into the option bundle:
+     * <ul>
+     * <li>boolean field "start_with_help", to start with help screen</li>
+     * </ul>
+     * </p>
+     * <p>
+     * The Activity should return an Intent containing the following fields:
+     * <ul>
+     * <li>bundle field "run_settings", the updated run settings</li>
+     * <li>boolean field "run_settings_changed", if the run settings have been changed</li>
+     * </ul>
+     * </p>
+     *
+     * @param options bundle with options for the run settings activity
+     */
     private void startRunSettingsActivity(Bundle options) {
-        ExperimentAnalysisActivity activity = (ExperimentAnalysisActivity)getActivity();
-        IAnalysisPlugin plugin = activity.getAnalysisPlugin(analysisRef);
-        plugin.startAnalysisSettingsActivity(activity, PERFORM_RUN_SETTINGS, analysisRef,
-                sensorAnalysis.getData().getStorageDir().getPath(), options);
+        String experimentPath = getExperimentData().getStorageDir().getParentFile().getPath();
+
+        Intent intent = new Intent(getActivity(), CameraRunSettingsActivity.class);
+        ExperimentPluginHelper.packStartAnalysisSettingsIntent(intent, analysisRef, experimentPath, options);
+        startActivityForResult(intent, PERFORM_RUN_SETTINGS);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, requestCode, data);
+
         if (resultCode != Activity.RESULT_OK)
             return;
 
@@ -171,7 +200,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return new CameraAnalysisFragmentView(getActivity(), getSensorAnalysis());
+        return new MotionAnalysisFragmentView(getActivity(), getSensorAnalysis());
     }
 
     @Override

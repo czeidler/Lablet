@@ -84,6 +84,10 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
         currentSensorAnalysis = currentAnalysisRun.sensorList.get(sensor).analysisList.get(analysis).analysis;
     }
 
+    public ExperimentData getExperimentData() {
+        return experimentData;
+    }
+
     public AnalysisRunEntry getCurrentAnalysisRun() {
         return currentAnalysisRun;
     }

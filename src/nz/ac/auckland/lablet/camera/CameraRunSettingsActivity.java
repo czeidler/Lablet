@@ -140,7 +140,6 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
         if (!loadExperiment(intent))
             return;
 
-
         cameraSensorData = (CameraSensorData)currentSensorAnalysis.getData();
 
         setContentView(R.layout.camera_run_settings);
@@ -300,7 +299,8 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
     public void onResume() {
         super.onResume();
 
-        videoFrameView.seekToFrame(0);
+        if (videoFrameView != null)
+            videoFrameView.seekToFrame(0);
     }
 
     @Override

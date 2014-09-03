@@ -9,6 +9,7 @@ package nz.ac.auckland.lablet;
 
 import android.app.Activity;
 import android.os.Bundle;
+import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
 
 
@@ -49,5 +50,9 @@ public class ExperimentAnalysisFragment extends android.support.v4.app.Fragment 
         super.onAttach(activity);
 
         sensorAnalysis = findExperimentFromArguments(activity);
+    }
+
+    public ExperimentData getExperimentData() {
+        return ((ExperimentAnalysisActivity)getActivity()).getExperimentData();
     }
 }

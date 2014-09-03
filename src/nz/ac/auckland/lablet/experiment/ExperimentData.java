@@ -101,7 +101,7 @@ public class ExperimentData {
     }
 
     public boolean load(Context context, File storageDir) {
-        if (storageDir == null)
+        if (storageDir == null || !storageDir.exists())
             return false;
 
         this.storageDir = storageDir;

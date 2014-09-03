@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.accelerometer;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -45,7 +44,7 @@ class AccelerometerAnalysisPlugin implements IAnalysisPlugin {
 
     @Override
     public String getIdentifier() {
-        return "AccelerometerAnalysisPlugin";
+        return getClass().getSimpleName();
     }
 
     @Override
@@ -56,16 +55,6 @@ class AccelerometerAnalysisPlugin implements IAnalysisPlugin {
     @Override
     public ISensorAnalysis createSensorAnalysis(SensorData sensorData) {
         return null;
-    }
-
-    @Override
-    public boolean hasAnalysisSettingsActivity(StringBuilder menuName) {
-        return false;
-    }
-
-    @Override
-    public void startAnalysisSettingsActivity(Activity parentActivity, int requestCode, ExperimentAnalysisActivity.AnalysisRef analysisRef, String experimentPath, Bundle options) {
-
     }
 
     @Override

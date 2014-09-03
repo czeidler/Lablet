@@ -5,17 +5,14 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.microphone;
+package nz.ac.auckland.lablet.camera;
 
 import android.support.v4.app.Fragment;
 import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
-import nz.ac.auckland.lablet.experiment.IAnalysisPlugin;
-import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
-import nz.ac.auckland.lablet.experiment.SensorData;
+import nz.ac.auckland.lablet.experiment.*;
 
 
-public class FrequencyAnalysisPlugin implements IAnalysisPlugin {
-
+public class MotionAnalysisPlugin implements IAnalysisPlugin {
     @Override
     public String getIdentifier() {
         return getClass().getSimpleName();
@@ -23,17 +20,17 @@ public class FrequencyAnalysisPlugin implements IAnalysisPlugin {
 
     @Override
     public String supportedDataType() {
-        return "Audio";
+        return "Video";
     }
 
     @Override
     public ISensorAnalysis createSensorAnalysis(SensorData sensorData) {
-        assert sensorData instanceof MicrophoneSensorData;
-        return new FrequencyAnalysis((MicrophoneSensorData)sensorData);
+        assert sensorData instanceof CameraSensorData;
+        return new MotionAnalysis((CameraSensorData)sensorData);
     }
 
     @Override
     public Fragment createSensorAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef analysisRef) {
-        return new FrequencyAnalysisFragment(analysisRef);
+        return new MotionAnalysisFragment(analysisRef);
     }
 }

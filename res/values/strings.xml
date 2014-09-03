@@ -3,7 +3,7 @@
     <string name="app_name">Lablet</string>
     <string name="script_activity_name">Lablet</string>
     <string name="action_done">Done</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Video Settings</string>
     <string name="action_sensors">Sensors</string>
     <string name="action_view">View</string>
     <string name="action_origin">Origin</string>

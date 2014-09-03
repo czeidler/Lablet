@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.experiment;
 
-import nz.ac.auckland.lablet.camera.VideoAnalysisPlugin;
+import nz.ac.auckland.lablet.camera.MotionAnalysisPlugin;
 import nz.ac.auckland.lablet.camera.CameraSensorPlugin;
 import nz.ac.auckland.lablet.microphone.FrequencyAnalysisPlugin;
 import nz.ac.auckland.lablet.microphone.MicrophoneSensorPlugin;
@@ -26,7 +26,7 @@ public class ExperimentPluginFactory {
     private List<IAnalysisPlugin> analysisPlugins = new ArrayList<>();
 
     private ExperimentPluginFactory() {
-        analysisPlugins.add(new VideoAnalysisPlugin());
+        analysisPlugins.add(new MotionAnalysisPlugin());
         analysisPlugins.add(new FrequencyAnalysisPlugin());
 
         sensorPlugins.add(new CameraSensorPlugin());
