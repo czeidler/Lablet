@@ -65,7 +65,8 @@ class ExperimentRunData {
             e.printStackTrace();
             return;
         } finally {
-            inStream.close();
+            if (inStream!= null)
+                inStream.close();
         }
         onRestoreInstanceState(bundle);
     }

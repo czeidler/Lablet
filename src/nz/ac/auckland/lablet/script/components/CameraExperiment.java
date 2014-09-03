@@ -20,7 +20,7 @@ import nz.ac.auckland.lablet.*;
 import nz.ac.auckland.lablet.camera.CameraSensorData;
 import nz.ac.auckland.lablet.camera.CameraSensorPlugin;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
-import nz.ac.auckland.lablet.experiment.ExperimentPluginHelper;
+import nz.ac.auckland.lablet.experiment.ExperimentHelper;
 import nz.ac.auckland.lablet.experiment.SensorData;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.script.ScriptTreeNode;
@@ -161,7 +161,7 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
         options.putString("experiment_base_directory", getScriptExperimentsDir().getPath());
 
         String[] pluginName = new String[] {new CameraSensorPlugin().getSensorIdentifier()};
-        ExperimentPluginHelper.packStartExperimentIntent(intent, pluginName, options);
+        ExperimentHelper.packStartExperimentIntent(intent, pluginName, options);
         intent.putExtras(options);
 
         startActivityForResult(intent, PERFORM_EXPERIMENT);
@@ -213,10 +213,10 @@ class ScriptComponentCameraExperimentView extends ActivityStarterView {
         AsyncTask task = new AsyncTask() {
             @Override
             protected Object doInBackground(Object... objects) {
-                ExperimentData experimentData = new ExperimentData();
-                if (!experimentData.load(getContext(), new File(experimentPath)))
+                ExperimentData experimentData = ExperimentHelper.loadExperimentData(getContext(), experimentPath);
+                if (experimentData == null)
                     return null;
-
+                
                 // TODO fix if there are more than one runs or sensors
                 SensorData sensorData = experimentData.getRuns().get(0).sensorDataList.get(0);
                 CameraSensorData cameraSensorData = (CameraSensorData)sensorData;

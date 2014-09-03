@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
 import android.widget.Toast;
+import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.camera.MotionAnalysisPlugin;
 import nz.ac.auckland.lablet.R;
@@ -106,7 +107,7 @@ public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
         takeExperiment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), MotionAnalysisPlugin.class);
+                Intent intent = new Intent(getActivity(), ExperimentAnalysisActivity.class);
                 intent.putExtra("experiment_path",
                         ((ScriptTreeNodeExperimentAnalysis)component).getExperiment().getExperimentPath());
                 intent.putExtra("first_start_with_run_settings", true);

@@ -12,6 +12,7 @@ import nz.ac.auckland.lablet.ExperimentAnalysisBaseActivity;
 import nz.ac.auckland.lablet.camera.CameraSensorData;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
+import nz.ac.auckland.lablet.experiment.ExperimentHelper;
 import nz.ac.auckland.lablet.experiment.ExperimentLoader;
 import nz.ac.auckland.lablet.experiment.SensorData;
 
@@ -69,8 +70,8 @@ public class ScriptExperimentRef {
     }
 
     private MotionAnalysis loadSensorAnalysis(Context context) {
-        ExperimentData experimentData = new ExperimentData();
-        if (!experimentData.load(context, new File(getExperimentPath())))
+        ExperimentData experimentData = ExperimentHelper.loadExperimentData(context, getExperimentPath());
+        if (experimentData == null)
             return null;
         SensorData sensorData = experimentData.getRuns().get(0).sensorDataList.get(0);
         if (!(sensorData instanceof CameraSensorData))

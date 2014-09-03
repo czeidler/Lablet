@@ -15,8 +15,7 @@ import android.widget.PopupMenu;
 import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
 import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.ExperimentPluginHelper;
-import nz.ac.auckland.lablet.experiment.IAnalysisPlugin;
+import nz.ac.auckland.lablet.experiment.ExperimentHelper;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 
 
@@ -143,7 +142,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         String experimentPath = getExperimentData().getStorageDir().getParentFile().getPath();
 
         Intent intent = new Intent(getActivity(), CameraRunSettingsActivity.class);
-        ExperimentPluginHelper.packStartAnalysisSettingsIntent(intent, analysisRef, experimentPath, options);
+        ExperimentHelper.packStartAnalysisSettingsIntent(intent, analysisRef, experimentPath, options);
         startActivityForResult(intent, PERFORM_RUN_SETTINGS);
     }
 

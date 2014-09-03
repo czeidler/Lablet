@@ -8,17 +8,25 @@
 package nz.ac.auckland.lablet.experiment;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
 
+import java.io.File;
 import java.util.List;
 
 
 /**
  * Abstract base class for experiment plugins.
  */
-public class ExperimentPluginHelper {
+public class ExperimentHelper {
+    static public ExperimentData loadExperimentData(Context context, String experimentMainDir) {
+        ExperimentData experimentData = new ExperimentData();
+        if (!experimentData.load(context, new File(experimentMainDir, "data")))
+            return null;
+        return experimentData;
+    }
 
     static public void packStartExperimentIntent(Intent intent, List<ISensorPlugin> plugins, Bundle options) {
         String[] pluginNames = null;

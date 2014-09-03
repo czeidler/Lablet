@@ -17,7 +17,7 @@ import android.os.Bundle;
 import android.os.FileObserver;
 import android.view.*;
 import android.widget.*;
-import nz.ac.auckland.lablet.experiment.ExperimentPluginHelper;
+import nz.ac.auckland.lablet.experiment.ExperimentHelper;
 import nz.ac.auckland.lablet.experiment.ExperimentPluginFactory;
 import nz.ac.auckland.lablet.experiment.ISensorPlugin;
 import nz.ac.auckland.lablet.misc.StorageLib;
@@ -369,7 +369,7 @@ public class ExperimentHomeActivity extends Activity {
 
     private void startExperiment(List<ISensorPlugin> plugins) {
         Intent intent = new Intent(this, ExperimentActivity.class);
-        ExperimentPluginHelper.packStartExperimentIntent(intent, plugins, null);
+        ExperimentHelper.packStartExperimentIntent(intent, plugins, null);
         startActivityForResult(intent, PERFORM_EXPERIMENT);
     }
 
