@@ -8,9 +8,7 @@
 package nz.ac.auckland.lablet.microphone;
 
 import android.os.Bundle;
-import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
-import nz.ac.auckland.lablet.experiment.ISensorData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,10 +18,17 @@ import java.io.OutputStream;
 public class FrequencyAnalysis implements ISensorAnalysis {
     final private MicrophoneSensorData sensorData;
 
-    final private MarkerDataModel tagMarkerModel = new MarkerDataModel();
+    final private MarkerDataModel tagMarkerModel;
+    final private Unit xUnit = new Unit("s");
+    final private Unit yUnit = new Unit("Hz");
+    final private CalibrationXY calibrationXY;
 
     public FrequencyAnalysis(MicrophoneSensorData sensorData) {
         this.sensorData = sensorData;
+
+        tagMarkerModel = new MarkerDataModel();
+        calibrationXY = new CalibrationXY(xUnit, yUnit);
+        tagMarkerModel.setCalibrationXY(calibrationXY);
     }
 
     @Override

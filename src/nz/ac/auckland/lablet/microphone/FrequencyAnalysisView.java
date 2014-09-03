@@ -10,11 +10,15 @@ package nz.ac.auckland.lablet.microphone;
 import android.content.Context;
 import android.graphics.RectF;
 import android.os.AsyncTask;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.views.*;
+import nz.ac.auckland.lablet.views.graph.*;
 import nz.ac.auckland.lablet.views.plotview.PlotView;
 
 import java.io.BufferedInputStream;
@@ -30,6 +34,9 @@ public class FrequencyAnalysisView extends FrameLayout implements IExperimentFra
     public FrequencyAnalysisView(Context context, FrequencyAnalysis analysis) {
         super(context);
 
+        LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        ViewGroup view = (ViewGroup)inflater.inflate(R.layout.frequency_analysis, this, true);
+
         this.frequencyAnalysis = analysis;
         this.micSensorData = (MicrophoneSensorData)analysis.getData();
 
@@ -41,14 +48,18 @@ public class FrequencyAnalysisView extends FrameLayout implements IExperimentFra
             e.printStackTrace();
             return;
         }
-        addView(createFrequencyView(audioWavInputStream));
 
+        PlotView frequencyView = (PlotView)view.findViewById(R.id.frequencyMapView);
+        setupFrequencyView(frequencyView, audioWavInputStream);
+
+        GraphView2D tagMarkerView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
+        tagMarkerView.setAdapter(new MarkerGraphAdapter(analysis.getTagMarkerModel(), "Position Data",
+                new XPositionMarkerGraphAxis(), new YPositionMarkerGraphAxis()));
 
         loadWavFileAsync(audioWavInputStream);
     }
 
-    private PlotView createFrequencyView(AudioWavInputStream audioWavInputStream) {
-        PlotView frequencyMapPlotView = new PlotView(getContext());
+    private void setupFrequencyView(PlotView frequencyMapPlotView, AudioWavInputStream audioWavInputStream) {
         audioFrequencyMapAdapter = new AudioFrequencyMapAdapter();
         AudioFrequencyMapPainter audioFrequencyMapPainter = new AudioFrequencyMapPainter();
         audioFrequencyMapPainter.setDataAdapter(audioFrequencyMapAdapter);
@@ -73,8 +84,6 @@ public class FrequencyAnalysisView extends FrameLayout implements IExperimentFra
         markerModel.selectMarkerData(0);
         EditMarkerDataModelPainter markerDataModelPainter = new EditMarkerDataModelPainter(markerModel);
         frequencyMapPlotView.addPlotPainter(markerDataModelPainter);
-
-        return frequencyMapPlotView;
     }
 
     private void loadWavFileAsync(final AudioWavInputStream audioWavInputStream) {
