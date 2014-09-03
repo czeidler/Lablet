@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.experiment;
 
 import android.graphics.PointF;
+import android.os.Bundle;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 
 import java.util.ArrayList;
@@ -126,6 +127,39 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> i
     public void clear() {
         markerDataList.clear();
         notifyAllDataChanged();
+    }
+
+    public Bundle toBundle() {
+        Bundle bundle = new Bundle();
+        int[] runIds = new int[getMarkerCount()];
+        float[] xPositions = new float[getMarkerCount()];
+        float[] yPositions = new float[getMarkerCount()];
+        for (int i = 0; i < getMarkerCount(); i++) {
+            MarkerData data = getMarkerDataAt(i);
+            runIds[i] = data.getRunId();
+            xPositions[i] = data.getPosition().x;
+            yPositions[i] = data.getPosition().y;
+        }
+        bundle.putIntArray("runIds", runIds);
+        bundle.putFloatArray("xPositions", xPositions);
+        bundle.putFloatArray("yPositions", yPositions);
+        return bundle;
+    }
+
+    public void fromBundle(Bundle bundle) {
+        clear();
+        int[] runIds = bundle.getIntArray("runIds");
+        float[] xPositions = bundle.getFloatArray("xPositions");
+        float[] yPositions = bundle.getFloatArray("yPositions");
+
+        if (runIds != null && xPositions != null && yPositions != null && runIds.length == xPositions.length
+                && xPositions.length == yPositions.length) {
+            for (int i = 0; i < runIds.length; i++) {
+                MarkerData data = new MarkerData(runIds[i]);
+                data.getPosition().set(xPositions[i], yPositions[i]);
+                addMarkerData(data);
+            }
+        }
     }
 
     public void notifyDataAdded(int index) {
