@@ -110,6 +110,8 @@ public class YAxisView extends AbstractYAxis {
         canvas.drawLine(getWidth() - 1, getAxisTopOffset(), getWidth() - 1, getHeight() - getAxisBottomOffset(),
                 axisPaint);
 
+        if (labels == null)
+            return;
         for (int i = 0; i < labels.size(); i++) {
             LabelPartitioner.LabelEntry entry = labels.get(i);
             float position = 0;

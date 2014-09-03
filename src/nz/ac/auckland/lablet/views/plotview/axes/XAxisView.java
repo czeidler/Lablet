@@ -88,6 +88,8 @@ public class XAxisView extends AbstractXAxis {
         }
         canvas.drawLine(getAxisLeftOffset(), 1, getWidth() - getAxisRightOffset(), 1, axisPaint);
 
+        if (labels == null)
+            return;
         for (int i = 0; i < labels.size(); i++) {
             LabelPartitioner.LabelEntry entry = labels.get(i);
             float position = 0;
