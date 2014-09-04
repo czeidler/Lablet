@@ -63,7 +63,7 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
             private PlotView frequencyMapPlotView;
             private AudioFrequencyMapAdapter audioFrequencyMapAdapter;
 
-            private int frequencyMapTimeSpan = 30;
+            private int frequencyMapTimeSpan = 30 * 1000;
             private int amplitudeTimeSpan = 3;
 
             private MicrophoneExperimentSensor.ISensorDataListener listener = new MicrophoneExperimentSensor.ISensorDataListener() {
@@ -78,7 +78,7 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 public void onNewFrequencyData(float[] frequencies) {
                     audioFrequencyView.addData(frequencies);
 
-                    if (audioFrequencyMapAdapter.getSize() * experimentSensor.FRAME_SIZE / 2
+                    if (audioFrequencyMapAdapter.getSize() * experimentSensor.FRAME_SIZE / 2 * 1000
                             / experimentSensor.SAMPLE_RATE >= frequencyMapTimeSpan)
                         audioFrequencyMapAdapter.clear();
                     audioFrequencyMapAdapter.addData(frequencies);
@@ -94,7 +94,7 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 audioAmplitudePlotView.setXRange(0, amplitudeTimeSpan);
                 audioAmplitudePlotView.setYRange(-0.6f, 0.6f);
                 audioAmplitudePlotView.getTitleView().setTitle("Signal Strength Vs Time");
-                audioAmplitudePlotView.getXAxisView().setUnit("s");
+                audioAmplitudePlotView.getXAxisView().setUnit("ms");
                 audioAmplitudePlotView.getXAxisView().setTitle("Time");
                 audioAmplitudePlotView.getBackgroundPainter().setShowYGrid(true);
 
