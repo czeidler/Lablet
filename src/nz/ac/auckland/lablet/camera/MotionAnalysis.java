@@ -35,7 +35,7 @@ public class MotionAnalysis implements ISensorAnalysis {
     private Unit yUnit = new Unit("m");
     private Unit tUnit = new Unit("s");
 
-    private MarkerDataModel tagMarkers;
+    private CalibratedMarkerDataModel tagMarkers;
     private MarkerDataModel lengthCalibrationMarkers;
     private MarkerDataModel originMarkers;
 
@@ -58,7 +58,7 @@ public class MotionAnalysis implements ISensorAnalysis {
         frameDataModel = new FrameDataModel();
         frameDataModel.setNumberOfFrames(calibrationVideoFrame.getNumberOfFrames());
 
-        tagMarkers = new MarkerDataModel();
+        tagMarkers = new CalibratedMarkerDataModel(calibrationXY);
         tagMarkers.setCalibrationXY(calibrationXY);
         tagMarkers.setMaxRangeRaw(sensorData.getMaxRawX(), sensorData.getMaxRawY());
 
@@ -115,7 +115,7 @@ public class MotionAnalysis implements ISensorAnalysis {
     public CalibrationVideoFrame getCalibrationVideoFrame() {
         return calibrationVideoFrame;
     }
-    public MarkerDataModel getTagMarkers() {
+    public CalibratedMarkerDataModel getTagMarkers() {
         return tagMarkers;
     }
     public MarkerDataModel getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
@@ -252,7 +252,7 @@ public class MotionAnalysis implements ISensorAnalysis {
                 outputStream.write(string.getBytes());
                 outputStream.write(",".getBytes());
 
-                PointF position = tagMarkers.getCalibratedMarkerPositionAt(i);
+                PointF position = tagMarkers.getRealMarkerPositionAt(i);
                 string = "";
                 string += position.x;
                 outputStream.write(string.getBytes());

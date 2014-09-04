@@ -22,7 +22,7 @@ public class XPositionMarkerGraphAxis extends MarkerGraphAxis {
 
     @Override
     public Number getValue(int index) {
-        return getData().getCalibratedMarkerPositionAt(index).x;
+        return getData().getRealMarkerPositionAt(index).x;
     }
 
     @Override

@@ -9,8 +9,8 @@ package nz.ac.auckland.lablet.views;
 
 import android.graphics.Canvas;
 import android.graphics.PointF;
+import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
 public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
     private LastInsertMarkerManager lastInsertMarkerManager = new LastInsertMarkerManager();
 
-    public TagMarkerDataModelPainter(MarkerDataModel data) {
+    public TagMarkerDataModelPainter(CalibratedMarkerDataModel data) {
         super(data);
     }
 
@@ -56,10 +56,6 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
     }
 
     @Override
-    public void invalidate() {
-
-    }
-
     protected DraggableMarker createMarkerForRow(int row) {
         return new SimpleMarker();
     }
@@ -71,7 +67,7 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
         private int markerInsertedInLastRun = -1;
         private PointF lastMarkerPosition = new PointF();
 
-        void onCurrentRunChanging(MarkerDataModel markersDataModel) {
+        void onCurrentRunChanging(CalibratedMarkerDataModel markersDataModel) {
             // Index could be out of bounds, e.g., when the marker data has been cleared.
             if (markerInsertedInLastRun >= markerData.getMarkerCount()) {
                 markerInsertedInLastRun =-1;
@@ -98,7 +94,7 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
     }
 
     public void setCurrentRun(int run) {
-        lastInsertMarkerManager.onCurrentRunChanging(markerData);
+        lastInsertMarkerManager.onCurrentRunChanging((CalibratedMarkerDataModel)markerData);
 
         // check if we have the run in the data list
         MarkerData data = null;
@@ -134,20 +130,5 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
 
             lastInsertMarkerManager.onNewMarkerInserted(newIndex, data);
         }
-    }
-
-    @Override
-    public void onXRangeChanged(float left, float right, float oldLeft, float oldRight) {
-        invalidateMarker();
-    }
-
-    @Override
-    public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop) {
-        invalidateMarker();
-    }
-
-    private void invalidateMarker() {
-        for (IMarker marker : markerList)
-            marker.invalidate();
     }
 }

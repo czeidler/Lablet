@@ -8,8 +8,7 @@
 package nz.ac.auckland.lablet.views.graph;
 
 import nz.ac.auckland.lablet.camera.ITimeCalibration;
-import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
 
 
 /**
@@ -18,14 +17,14 @@ import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 public class MarkerTimeGraphAdapter extends MarkerGraphAdapter {
     protected ITimeCalibration timeCalibration;
 
-    public MarkerTimeGraphAdapter(MarkerDataModel data, ITimeCalibration timeCalibration, String title,
+    public MarkerTimeGraphAdapter(CalibratedMarkerDataModel data, ITimeCalibration timeCalibration, String title,
                                   MarkerGraphAxis xAxis, MarkerGraphAxis yAxis) {
         super(data, title, xAxis, yAxis);
 
         this.timeCalibration = timeCalibration;
     }
 
-    public void setTo(MarkerDataModel data,  ITimeCalibration timeCalibration) {
+    public void setTo(CalibratedMarkerDataModel data,  ITimeCalibration timeCalibration) {
         setTo(data);
 
         this.timeCalibration = timeCalibration;
@@ -35,12 +34,12 @@ public class MarkerTimeGraphAdapter extends MarkerGraphAdapter {
         return timeCalibration;
     }
 
-    public static MarkerTimeGraphAdapter createXSpeedAdapter(MarkerDataModel data, ITimeCalibration timeCalibration, String title) {
+    public static MarkerTimeGraphAdapter createXSpeedAdapter(CalibratedMarkerDataModel data, ITimeCalibration timeCalibration, String title) {
         return new MarkerTimeGraphAdapter(data, timeCalibration, title, new SpeedTimeMarkerGraphAxis(),
                 new XSpeedMarkerGraphAxis());
     }
 
-    public static MarkerTimeGraphAdapter createYSpeedAdapter(MarkerDataModel data, ITimeCalibration timeCalibration, String title) {
+    public static MarkerTimeGraphAdapter createYSpeedAdapter(CalibratedMarkerDataModel data, ITimeCalibration timeCalibration, String title) {
         return new MarkerTimeGraphAdapter(data, timeCalibration, title, new SpeedTimeMarkerGraphAxis(),
                 new YSpeedMarkerGraphAxis());
     }

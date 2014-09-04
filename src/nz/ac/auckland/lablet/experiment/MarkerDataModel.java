@@ -15,10 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**
- * Data model for the a list of {@link MarkerData}.
- */
-public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> implements CalibrationXY.IListener {
+public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
     public interface IListener {
         public void onDataAdded(MarkerDataModel model, int index);
         public void onDataRemoved(MarkerDataModel model, int index, MarkerData data);
@@ -27,29 +24,9 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> i
         public void onDataSelected(MarkerDataModel model, int index);
     }
 
-    final private List<MarkerData> markerDataList = new ArrayList<>();
+    final protected List<MarkerData> markerDataList = new ArrayList<>();
     private int selectedDataIndex = -1;
-    private CalibrationXY calibrationXY;
     private PointF maxRangeRaw = new PointF(100, 100);
-
-    public MarkerDataModel() {
-    }
-
-    /**
-     * If calibration is set, listeners get an onAllDataChanged notification when the calibration changed.
-     * @param calibrationXY the calibration to use in getCalibratedMarkerPositionAt
-     */
-    public void setCalibrationXY(CalibrationXY calibrationXY) {
-        if (this.calibrationXY != null)
-            this.calibrationXY.removeListener(this);
-        this.calibrationXY = calibrationXY;
-        this.calibrationXY.addListener(this);
-        onCalibrationChanged();
-    }
-
-    public CalibrationXY getCalibrationXY() {
-        return calibrationXY;
-    }
 
     public PointF getMaxRangeRaw() {
         return maxRangeRaw;
@@ -57,19 +34,6 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> i
 
     public void setMaxRangeRaw(float x, float y) {
         this.maxRangeRaw.set(x, y);
-    }
-
-    @Override
-    public void onCalibrationChanged() {
-        notifyDataChanged(0, markerDataList.size());
-    }
-
-    public PointF getCalibratedMarkerPositionAt(int index) {
-        MarkerData data = getMarkerDataAt(index);
-        PointF raw = data.getPosition();
-        if (calibrationXY == null)
-            return raw;
-        return calibrationXY.fromRaw(raw);
     }
 
     public void selectMarkerData(int index) {
@@ -109,26 +73,6 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> i
         return markerDataList.get(index);
     }
 
-    public int findMarkerDataByRun(int run) {
-        for (int i = 0; i < getMarkerCount(); i++) {
-            MarkerData data = getMarkerDataAt(i);
-            if (data.getRunId() == run)
-                return i;
-        }
-        return -1;
-    }
-
-    public MarkerData removeMarkerData(int index) {
-        MarkerData data = markerDataList.remove(index);
-        notifyDataRemoved(index, data);
-        return data;
-    }
-
-    public void clear() {
-        markerDataList.clear();
-        notifyAllDataChanged();
-    }
-
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
         int[] runIds = new int[getMarkerCount()];
@@ -162,27 +106,52 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> i
         }
     }
 
-    public void notifyDataAdded(int index) {
+    public int findMarkerDataByRun(int run) {
+        for (int i = 0; i < getMarkerCount(); i++) {
+            MarkerData data = getMarkerDataAt(i);
+            if (data.getRunId() == run)
+                return i;
+        }
+        return -1;
+    }
+
+    public PointF getRealMarkerPositionAt(int index) {
+        MarkerData data = getMarkerDataAt(index);
+        return data.getPosition();
+    }
+
+    public MarkerData removeMarkerData(int index) {
+        MarkerData data = markerDataList.remove(index);
+        notifyDataRemoved(index, data);
+        return data;
+    }
+
+    public void clear() {
+        markerDataList.clear();
+        notifyAllDataChanged();
+    }
+
+    protected void notifyDataAdded(int index) {
         for (IListener listener : getListeners())
             listener.onDataAdded(this, index);
     }
 
-    public void notifyDataRemoved(int index, MarkerData data) {
+    protected void notifyDataRemoved(int index, MarkerData data) {
         for (IListener listener : getListeners())
             listener.onDataRemoved(this, index, data);
     }
 
-    public void notifyDataChanged(int index, int number) {
+    protected void notifyDataChanged(int index, int number) {
         for (IListener listener : getListeners())
             listener.onDataChanged(this, index, number);
     }
 
-    public void notifyAllDataChanged() {
+    protected void notifyAllDataChanged() {
         for (IListener listener : getListeners())
             listener.onAllDataChanged(this);
     }
 
-    private void notifyDataSelected(int index) {
+    protected void notifyDataSelected(int index) {
         for (IListener listener : getListeners())
             listener.onDataSelected(this, index);
     }

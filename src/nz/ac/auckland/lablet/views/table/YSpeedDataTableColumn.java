@@ -8,7 +8,7 @@
 package nz.ac.auckland.lablet.views.table;
 
 import nz.ac.auckland.lablet.camera.ITimeCalibration;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
 
 
 /**
@@ -31,9 +31,9 @@ public class YSpeedDataTableColumn extends DataTableColumn {
                 + timeCalibration.getUnit().getBase() + "]";
     }
 
-    public static Number getSpeed(int index, MarkerDataModel markersDataModel, ITimeCalibration timeCalibration) {
-        float delta = markersDataModel.getCalibratedMarkerPositionAt(index + 1).y
-                - markersDataModel.getCalibratedMarkerPositionAt(index).y;
+    public static Number getSpeed(int index, CalibratedMarkerDataModel markersDataModel, ITimeCalibration timeCalibration) {
+        float delta = markersDataModel.getRealMarkerPositionAt(index + 1).y
+                - markersDataModel.getRealMarkerPositionAt(index).y;
         float deltaT = timeCalibration.getTimeFromRaw(index + 1) - timeCalibration.getTimeFromRaw(index);
         if (timeCalibration.getUnit().getPrefix().equals("m"))
             deltaT /= 1000;

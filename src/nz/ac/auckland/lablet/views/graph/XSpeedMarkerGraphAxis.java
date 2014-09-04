@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
 
 /**
  * Graph axis for the marker data graph adapter. Provides the x-speed.
@@ -20,9 +20,9 @@ public class XSpeedMarkerGraphAxis extends MarkerTimeGraphAxis {
 
     @Override
     public Number getValue(int index) {
-        MarkerDataModel data = getData();
+        CalibratedMarkerDataModel data = getData();
 
-        float deltaX = data.getCalibratedMarkerPositionAt(index + 1).x - data.getCalibratedMarkerPositionAt(index).x;
+        float deltaX = data.getRealMarkerPositionAt(index + 1).x - data.getRealMarkerPositionAt(index).x;
         float deltaT = getTimeCalibration().getTimeFromRaw(index + 1) - getTimeCalibration().getTimeFromRaw(index);
         if (getTimeCalibration().getUnit().getPrefix().equals("m"))
             deltaT /= 1000;

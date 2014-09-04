@@ -17,7 +17,7 @@ import android.widget.*;
 import nz.ac.auckland.lablet.*;
 import nz.ac.auckland.lablet.camera.ITimeCalibration;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
 import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptComponent;
 import nz.ac.auckland.lablet.script.ScriptTreeNodeFragmentHolder;
@@ -213,7 +213,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
     private String correctSpeedUnit = "[m/s]";
     private String correctAccelerationUnit = "[m/s^2]";
 
-    protected MarkerDataModel tagMarker;
+    protected CalibratedMarkerDataModel tagMarker;
     protected ITimeCalibration timeCalibration;
 
     @Override

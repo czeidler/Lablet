@@ -19,7 +19,7 @@ public class XPositionDataTableColumn extends DataTableColumn {
 
     @Override
     public Number getValue(int index) {
-        return dataModel.getCalibratedMarkerPositionAt(index).x;
+        return dataModel.getRealMarkerPositionAt(index).x;
     }
 
     @Override

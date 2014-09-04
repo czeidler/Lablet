@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.*;
 import nz.ac.auckland.lablet.ExperimentAnalysisBaseActivity;
+import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.StartEndSeekBar;
@@ -40,7 +41,7 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
     private StartEndSeekBar startEndSeekBar = null;
 
     // The marker data model keeps listeners as weak references. Thus we have to maintain our own hard reference.
-    private MarkerDataModel.IListener startEndSeekBarListener = null;
+    private CalibratedMarkerDataModel.IListener startEndSeekBarListener = null;
 
     private NumberPicker frameRatePicker = null;
     private EditText editVideoStart = null;
@@ -178,7 +179,7 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
         startEndSeekBar.setPadding(seekBar.getPaddingLeft(), seekBar.getPaddingTop(), seekBar.getPaddingRight(),
                 seekBar.getPaddingBottom());
 
-        startEndSeekBarListener = new MarkerDataModel.IListener() {
+        startEndSeekBarListener = new CalibratedMarkerDataModel.IListener() {
             @Override
             public void onDataAdded(MarkerDataModel model, int index) {
 

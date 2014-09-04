@@ -8,7 +8,6 @@
 package nz.ac.auckland.lablet.views.graph;
 
 import android.graphics.PointF;
-import nz.ac.auckland.lablet.experiment.CalibrationXY;
 
 
 /**
@@ -22,7 +21,7 @@ public class YPositionMarkerGraphAxis extends MarkerGraphAxis {
 
     @Override
     public Number getValue(int index) {
-        return getData().getCalibratedMarkerPositionAt(index).y;
+        return getData().getRealMarkerPositionAt(index).y;
     }
 
     @Override

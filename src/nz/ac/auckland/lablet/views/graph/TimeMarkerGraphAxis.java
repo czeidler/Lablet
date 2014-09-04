@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
 
 
 /**
@@ -21,7 +21,7 @@ public class TimeMarkerGraphAxis extends MarkerTimeGraphAxis {
 
     @Override
     public Number getValue(int index) {
-        MarkerDataModel markerData = getData();
+        CalibratedMarkerDataModel markerData = getData();
         int runId = markerData.getMarkerDataAt(index).getRunId();
         return getTimeCalibration().getTimeFromRaw(runId);
     }

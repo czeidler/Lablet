@@ -16,7 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
 import nz.ac.auckland.lablet.views.FrameContainerView;
 import nz.ac.auckland.lablet.views.FrameDataSeekBar;
 import nz.ac.auckland.lablet.views.graph.*;
@@ -146,7 +146,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
         adapter.addColumn(new YPositionDataTableColumn());
         tableView.setAdapter(adapter);
 
-        MarkerDataModel markerDataModel = sensorAnalysis.getTagMarkers();
+        CalibratedMarkerDataModel markerDataModel = sensorAnalysis.getTagMarkers();
         ITimeCalibration timeCalibration = sensorAnalysis.getCalibrationVideoFrame();
         // graph spinner
         graphSpinnerEntryList.add(new GraphSpinnerEntry("Position Data", new MarkerTimeGraphAdapter(markerDataModel,

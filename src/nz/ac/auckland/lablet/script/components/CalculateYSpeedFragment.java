@@ -23,7 +23,7 @@ public class CalculateYSpeedFragment extends CalculateSpeedFragment {
 
     @Override
     float getPosition(int index) {
-        return tagMarker.getCalibratedMarkerPositionAt(index).y;
+        return tagMarker.getRealMarkerPositionAt(index).y;
     }
 
     @Override

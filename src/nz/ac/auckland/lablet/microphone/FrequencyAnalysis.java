@@ -18,7 +18,7 @@ import java.io.OutputStream;
 public class FrequencyAnalysis implements ISensorAnalysis {
     final private MicrophoneSensorData sensorData;
 
-    final private MarkerDataModel tagMarkerModel;
+    final private CalibratedMarkerDataModel tagMarkerModel;
     final private Unit xUnit = new Unit("s");
     final private Unit yUnit = new Unit("Hz");
     final private CalibrationXY calibrationXY;
@@ -26,8 +26,8 @@ public class FrequencyAnalysis implements ISensorAnalysis {
     public FrequencyAnalysis(MicrophoneSensorData sensorData) {
         this.sensorData = sensorData;
 
-        tagMarkerModel = new MarkerDataModel();
         calibrationXY = new CalibrationXY(xUnit, yUnit);
+        tagMarkerModel = new CalibratedMarkerDataModel(calibrationXY);
         tagMarkerModel.setCalibrationXY(calibrationXY);
     }
 
@@ -66,7 +66,7 @@ public class FrequencyAnalysis implements ISensorAnalysis {
 
     }
 
-    public MarkerDataModel getTagMarkerModel() {
+    public CalibratedMarkerDataModel getTagMarkerModel() {
         return tagMarkerModel;
     }
 }

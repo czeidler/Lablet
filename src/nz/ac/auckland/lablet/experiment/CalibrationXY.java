@@ -13,13 +13,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+interface ICalibrationXY {
+    public Unit getXUnit();
+    public Unit getYUnit();
+
+    /**
+     * Raw point from the screen is transformed to real coordinates.
+     * @param raw point on the screen
+     * @return point in real coordinates
+     */
+    public PointF fromRaw(PointF raw);
+
+    /**
+     * A raw length vector is scaled to real length vector. (no rotation or origin are taken into account)
+     *
+     * @param rawLength length vector on the screen
+     * @return length vector in real coordinates.
+     */
+    public PointF fromRawLength(PointF rawLength);
+}
+
 /**
  * Class to map screen coordinates to real coordinates.
  * <p>
  * This includes the x and y scale, the origin and the rotation of the screen.
  * </p>
  */
-public class CalibrationXY {
+public class CalibrationXY implements ICalibrationXY {
     public interface IListener {
         public void onCalibrationChanged();
     }
@@ -45,10 +65,12 @@ public class CalibrationXY {
         this.yUnit = yUnit;
     }
 
+    @Override
     public Unit getXUnit() {
         return xUnit;
     }
 
+    @Override
     public Unit getYUnit() {
         return yUnit;
     }
@@ -78,6 +100,7 @@ public class CalibrationXY {
      * @param raw point on the screen
      * @return point in real coordinates
      */
+    @Override
     public PointF fromRaw(PointF raw) {
         PointF point = new PointF();
         // translation
@@ -111,6 +134,7 @@ public class CalibrationXY {
      * @param rawLength length vector on the screen
      * @return length vector in real coordinates.
      */
+    @Override
     public PointF fromRawLength(PointF rawLength) {
         PointF point = new PointF();
         point.set(rawLength);
