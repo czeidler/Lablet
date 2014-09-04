@@ -13,7 +13,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
-import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
@@ -98,7 +97,7 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
         markerView.setMaxRange(range);
     }
 
-    public void addTagMarkerData(CalibratedMarkerDataModel data) {
+    public void addTagMarkerData(MarkerDataModel data) {
         TagMarkerDataModelPainter painter = new TagMarkerDataModelPainter(data);
         markerView.addPlotPainter(painter);
 

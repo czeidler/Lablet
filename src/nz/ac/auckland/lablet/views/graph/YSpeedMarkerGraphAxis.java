@@ -7,10 +7,20 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
+import nz.ac.auckland.lablet.experiment.Unit;
+
 /**
  * Graph axis for the marker data graph adapter. Provides the y-speed.
  */
 public class YSpeedMarkerGraphAxis extends MarkerTimeGraphAxis {
+    final private Unit yUnit;
+    final private Unit tUnit;
+
+    public YSpeedMarkerGraphAxis(Unit yUnit, Unit tUnit) {
+        this.yUnit = yUnit;
+        this.tUnit = tUnit;
+    }
+
     @Override
     public int size() {
         return getData().getMarkerCount() - 1;
@@ -19,16 +29,16 @@ public class YSpeedMarkerGraphAxis extends MarkerTimeGraphAxis {
     @Override
     public Number getValue(int index) {
         float deltaX = getData().getRealMarkerPositionAt(index + 1).y - getData().getRealMarkerPositionAt(index).y;
-        float deltaT = getTimeCalibration().getTimeFromRaw(index + 1) - getTimeCalibration().getTimeFromRaw(index);
-        if (getTimeCalibration().getUnit().getPrefix().equals("m"))
+        float deltaT = getTimeData().getTimeAt(index + 1) - getTimeData().getTimeAt(index);
+        if (yUnit.getPrefix().equals("m"))
             deltaT /= 1000;
         return deltaX / deltaT;
     }
 
     @Override
     public String getLabel() {
-        return "velocity [" + getData().getCalibrationXY().getXUnit().getUnit() + "/"
-                + getTimeCalibration().getUnit().getBase() + "]";
+        return "velocity [" + yUnit.getUnit() + "/"
+                + tUnit.getBase() + "]";
     }
 
     @Override

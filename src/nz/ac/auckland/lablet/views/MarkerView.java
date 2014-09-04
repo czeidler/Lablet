@@ -12,7 +12,6 @@ import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewParent;
-import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.plotview.*;
@@ -298,10 +297,10 @@ class SimpleMarker extends DraggableMarker {
 
 
 /**
- * Abstract base class to draw a {@link nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel} in a
+ * Abstract base class to draw a {@link nz.ac.auckland.lablet.experiment.MarkerDataModel} in a
  * {@link nz.ac.auckland.lablet.views.MarkerView}.
  */
-abstract class AbstractMarkerPainter extends AbstractPlotPainter implements CalibratedMarkerDataModel.IListener {
+abstract class AbstractMarkerPainter extends AbstractPlotPainter implements MarkerDataModel.IListener {
 
     public class MarkerPainterGroup {
         private AbstractMarkerPainter selectedForDragPainter = null;

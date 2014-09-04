@@ -8,11 +8,20 @@
 package nz.ac.auckland.lablet.views.table;
 
 
+import nz.ac.auckland.lablet.experiment.Unit;
+
 /**
  * Table column for the marker data table adapter. Provides a time column for the use in combination with an
  * position columns.
  */
-public class TimeDataTableColumn extends DataTableColumn {
+public class TimeDataTableColumn extends UnitDataTableColumn {
+    final private Unit tUnit;
+
+    public TimeDataTableColumn(Unit tUnit) {
+        this.tUnit = tUnit;
+        listenTo(tUnit);
+    }
+
     @Override
     public int size() {
         return dataModel.getMarkerCount();
@@ -21,7 +30,7 @@ public class TimeDataTableColumn extends DataTableColumn {
     @Override
     public Number getValue(int index) {
         int runId = dataModel.getMarkerDataAt(index).getRunId();
-        return timeCalibration.getTimeFromRaw(runId);
+        return timeData.getTimeAt(runId);
     }
 
     @Override
@@ -32,6 +41,6 @@ public class TimeDataTableColumn extends DataTableColumn {
 
     @Override
     public String getHeader() {
-        return "time [" + timeCalibration.getUnit().getUnit() + "]";
+        return tUnit.getName() + " [" + tUnit.getUnit() + "]";
     }
 }

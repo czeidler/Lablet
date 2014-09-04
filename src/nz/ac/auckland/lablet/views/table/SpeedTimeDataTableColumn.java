@@ -8,11 +8,18 @@
 package nz.ac.auckland.lablet.views.table;
 
 
+import nz.ac.auckland.lablet.experiment.Unit;
+
 /**
  * Table column for the marker data table adapter. Provides a time column for the use in combination with an
  * speed columns.
  */
 public class SpeedTimeDataTableColumn extends TimeDataTableColumn {
+
+    public SpeedTimeDataTableColumn(Unit tUnit) {
+        super(tUnit);
+    }
+
     @Override
     public int size() {
         return dataModel.getMarkerCount() - 1;
@@ -20,8 +27,8 @@ public class SpeedTimeDataTableColumn extends TimeDataTableColumn {
 
     @Override
     public Number getValue(int index) {
-        float t0 = timeCalibration.getTimeFromRaw(index);
-        float t1 = timeCalibration.getTimeFromRaw(index + 1);
+        float t0 = timeData.getTimeAt(index);
+        float t1 = timeData.getTimeAt(index + 1);
         return t0 + (t1 - t0) / 2.f;
     }
 }

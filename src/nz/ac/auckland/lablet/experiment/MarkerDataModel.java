@@ -131,27 +131,27 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
         notifyAllDataChanged();
     }
 
-    protected void notifyDataAdded(int index) {
+    public void notifyDataAdded(int index) {
         for (IListener listener : getListeners())
             listener.onDataAdded(this, index);
     }
 
-    protected void notifyDataRemoved(int index, MarkerData data) {
+    public void notifyDataRemoved(int index, MarkerData data) {
         for (IListener listener : getListeners())
             listener.onDataRemoved(this, index, data);
     }
 
-    protected void notifyDataChanged(int index, int number) {
+    public void notifyDataChanged(int index, int number) {
         for (IListener listener : getListeners())
             listener.onDataChanged(this, index, number);
     }
 
-    protected void notifyAllDataChanged() {
+    public void notifyAllDataChanged() {
         for (IListener listener : getListeners())
             listener.onAllDataChanged(this);
     }
 
-    protected void notifyDataSelected(int index) {
+    public void notifyDataSelected(int index) {
         for (IListener listener : getListeners())
             listener.onDataSelected(this, index);
     }

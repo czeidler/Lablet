@@ -8,12 +8,22 @@
 package nz.ac.auckland.lablet.views.graph;
 
 import android.graphics.PointF;
+import nz.ac.auckland.lablet.experiment.CalibrationXY;
+import nz.ac.auckland.lablet.experiment.Unit;
 
 
 /**
  * Graph axis for the marker data graph adapter. Provides the y-position.
  */
 public class YPositionMarkerGraphAxis extends MarkerGraphAxis {
+    final private Unit unit;
+    final private CalibrationXY calibrationXY;
+
+    public YPositionMarkerGraphAxis(Unit xUnit, CalibrationXY calibrationXY) {
+        this.unit = xUnit;
+        this.calibrationXY = calibrationXY;
+    }
+
     @Override
     public int size() {
         return getData().getMarkerCount();
@@ -26,14 +36,16 @@ public class YPositionMarkerGraphAxis extends MarkerGraphAxis {
 
     @Override
     public String getLabel() {
-        return "y [" + getData().getCalibrationXY().getYUnit().getUnit() + "]";
+        return unit.getName() + " [" + unit.getUnit() + "]";
     }
 
     @Override
     public Number getMinRange() {
+        if (calibrationXY == null)
+            return -1;
         PointF point = new PointF();
         point.y = getData().getMaxRangeRaw().x;
-        point = getData().getCalibrationXY().fromRawLength(point);
+        point = calibrationXY.fromRawLength(point);
         return point.y * 0.2f;
     }
 }

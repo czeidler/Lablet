@@ -9,8 +9,8 @@ package nz.ac.auckland.lablet.views;
 
 import android.graphics.Canvas;
 import android.graphics.PointF;
-import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerData;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
 public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
     private LastInsertMarkerManager lastInsertMarkerManager = new LastInsertMarkerManager();
 
-    public TagMarkerDataModelPainter(CalibratedMarkerDataModel data) {
+    public TagMarkerDataModelPainter(MarkerDataModel data) {
         super(data);
     }
 
@@ -67,7 +67,7 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
         private int markerInsertedInLastRun = -1;
         private PointF lastMarkerPosition = new PointF();
 
-        void onCurrentRunChanging(CalibratedMarkerDataModel markersDataModel) {
+        void onCurrentRunChanging(MarkerDataModel markersDataModel) {
             // Index could be out of bounds, e.g., when the marker data has been cleared.
             if (markerInsertedInLastRun >= markerData.getMarkerCount()) {
                 markerInsertedInLastRun =-1;
@@ -94,7 +94,7 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
     }
 
     public void setCurrentRun(int run) {
-        lastInsertMarkerManager.onCurrentRunChanging((CalibratedMarkerDataModel)markerData);
+        lastInsertMarkerManager.onCurrentRunChanging(markerData);
 
         // check if we have the run in the data list
         MarkerData data = null;

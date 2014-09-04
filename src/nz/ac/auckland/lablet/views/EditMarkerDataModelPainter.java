@@ -8,14 +8,14 @@
 package nz.ac.auckland.lablet.views;
 
 import android.graphics.Canvas;
-import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 import java.util.List;
 
 
 public class EditMarkerDataModelPainter extends AbstractMarkerPainter {
 
-    public EditMarkerDataModelPainter(CalibratedMarkerDataModel data) {
+    public EditMarkerDataModelPainter(MarkerDataModel data) {
         super(data);
     }
 

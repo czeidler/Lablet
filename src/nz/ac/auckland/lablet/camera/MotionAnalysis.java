@@ -50,10 +50,13 @@ public class MotionAnalysis implements ISensorAnalysis {
     public MotionAnalysis(CameraSensorData sensorData) {
         this.sensorData = sensorData;
 
+        xUnit.setName("x");
+        yUnit.setName("y");
+        tUnit.setName("time");
         tUnit.setPrefix("m");
 
-        calibrationXY = new CalibrationXY(xUnit, yUnit);
-        calibrationVideoFrame = new CalibrationVideoFrame(sensorData.getVideoDuration(), tUnit);
+        calibrationXY = new CalibrationXY();
+        calibrationVideoFrame = new CalibrationVideoFrame(sensorData.getVideoDuration());
 
         frameDataModel = new FrameDataModel();
         frameDataModel.setNumberOfFrames(calibrationVideoFrame.getNumberOfFrames());
@@ -115,7 +118,7 @@ public class MotionAnalysis implements ISensorAnalysis {
     public CalibrationVideoFrame getCalibrationVideoFrame() {
         return calibrationVideoFrame;
     }
-    public CalibratedMarkerDataModel getTagMarkers() {
+    public MarkerDataModel getTagMarkers() {
         return tagMarkers;
     }
     public MarkerDataModel getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
@@ -134,12 +137,17 @@ public class MotionAnalysis implements ISensorAnalysis {
         experimentSpecificData = data;
         onRunSpecificDataChanged();
     }
-    public String getXUnitPrefix() {
-        return xUnit.getPrefix();
+
+    public Unit getXUnit() {
+        return xUnit;
     }
 
-    public String getYUnitPrefix() {
-        return yUnit.getPrefix();
+    public Unit getYUnit() {
+        return yUnit;
+    }
+
+    public Unit getTUnit() {
+        return tUnit;
     }
 
     public void addListener(IListener listener) {
@@ -232,8 +240,8 @@ public class MotionAnalysis implements ISensorAnalysis {
         analysisDataBundle.putBoolean("originSwapAxis", calibrationXY.getSwapAxis());
         analysisDataBundle.putBoolean("showCoordinateSystem", showCoordinateSystem);
 
-        analysisDataBundle.putString("xUnitPrefix", getXUnitPrefix());
-        analysisDataBundle.putString("yUnitPrefix", getYUnitPrefix());
+        analysisDataBundle.putString("xUnitPrefix", getXUnit().getPrefix());
+        analysisDataBundle.putString("yUnitPrefix", getYUnit().getPrefix());
 
         if (experimentSpecificData != null)
             analysisDataBundle.putBundle("experiment_specific_data", experimentSpecificData);
@@ -264,7 +272,7 @@ public class MotionAnalysis implements ISensorAnalysis {
                 outputStream.write(",".getBytes());
 
                 string = "";
-                string += calibrationVideoFrame.getTimeFromRaw(i);
+                string += calibrationVideoFrame.getTimeAt(i);
                 outputStream.write(string.getBytes());
 
                 outputStream.write("\n".getBytes());

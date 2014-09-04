@@ -8,10 +8,20 @@
 package nz.ac.auckland.lablet.views.table;
 
 
+import nz.ac.auckland.lablet.experiment.Unit;
+
 /**
  * Table column for the marker data table adapter. Provides the x-position.
  */
-public class XPositionDataTableColumn extends DataTableColumn {
+public class XPositionDataTableColumn extends UnitDataTableColumn {
+    final private Unit xUnit;
+
+    public XPositionDataTableColumn(Unit xUnit) {
+        this.xUnit = xUnit;
+
+        listenTo(xUnit);
+    }
+
     @Override
     public int size() {
         return dataModel.getMarkerCount();
@@ -24,6 +34,6 @@ public class XPositionDataTableColumn extends DataTableColumn {
 
     @Override
     public String getHeader() {
-        return "x [" + dataModel.getCalibrationXY().getXUnit().getUnit() + "]";
+        return xUnit.getName() + " [" + xUnit.getUnit() + "]";
     }
 }

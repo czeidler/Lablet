@@ -84,8 +84,9 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
     }
 
     private void showCalibrationMenu() {
+        MotionAnalysis analysis = getSensorAnalysis();
         ScaleSettingsDialog scaleSettingsDialog = new ScaleSettingsDialog(getActivity(),
-                getSensorAnalysis().getLengthCalibrationSetter());
+                analysis.getLengthCalibrationSetter(), analysis.getXUnit(), analysis.getYUnit());
         scaleSettingsDialog.show();
     }
 

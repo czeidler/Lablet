@@ -8,10 +8,20 @@
 package nz.ac.auckland.lablet.views.table;
 
 
+import nz.ac.auckland.lablet.experiment.Unit;
+
 /**
  * Table column for the marker data table adapter. Provides the y-position.
  */
-public class YPositionDataTableColumn extends DataTableColumn {
+public class YPositionDataTableColumn extends UnitDataTableColumn {
+    final private Unit yUnit;
+
+    public YPositionDataTableColumn(Unit yUnit) {
+        this.yUnit = yUnit;
+
+        listenTo(yUnit);
+    }
+
     @Override
     public int size() {
         return dataModel.getMarkerCount();
@@ -24,6 +34,6 @@ public class YPositionDataTableColumn extends DataTableColumn {
 
     @Override
     public String getHeader() {
-        return "y [" + dataModel.getCalibrationXY().getYUnit().getUnit() + "]";
+        return yUnit.getName() + " [" + yUnit.getUnit() + "]";
     }
 }

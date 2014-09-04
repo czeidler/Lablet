@@ -1,7 +1,3 @@
-package nz.ac.auckland.lablet.views.graph;
-
-import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
-import nz.ac.auckland.lablet.experiment.MarkerData;
 /*
  * Copyright 2013-2014.
  * Distributed under the terms of the GPLv3 License.
@@ -9,10 +5,12 @@ import nz.ac.auckland.lablet.experiment.MarkerData;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+package nz.ac.auckland.lablet.views.graph;
+
+import nz.ac.auckland.lablet.experiment.*;
 
 
-public class MarkerGraphAdapter extends AbstractGraphAdapter implements CalibratedMarkerDataModel.IListener {
+public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDataModel.IListener {
     protected String title;
     protected MarkerDataModel data;
 
@@ -55,9 +53,10 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements Calibrat
         return data;
     }
 
-    public static MarkerGraphAdapter createPositionAdapter(CalibratedMarkerDataModel data, String title) {
-        return new MarkerGraphAdapter(data, title, new XPositionMarkerGraphAxis(),
-                new YPositionMarkerGraphAxis());
+    public static MarkerGraphAdapter createPositionAdapter(MarkerDataModel data, String title, Unit xUnit,
+                                                           Unit yUnit, CalibrationXY calibrationXY) {
+        return new MarkerGraphAdapter(data, title, new XPositionMarkerGraphAxis(xUnit, calibrationXY),
+                new YPositionMarkerGraphAxis(yUnit, calibrationXY));
     }
 
     @Override

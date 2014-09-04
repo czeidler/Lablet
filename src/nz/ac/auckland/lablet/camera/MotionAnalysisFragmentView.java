@@ -16,7 +16,9 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
+import nz.ac.auckland.lablet.experiment.CalibrationXY;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.Unit;
 import nz.ac.auckland.lablet.views.FrameContainerView;
 import nz.ac.auckland.lablet.views.FrameDataSeekBar;
 import nz.ac.auckland.lablet.views.graph.*;
@@ -137,24 +139,32 @@ class MotionAnalysisFragmentView extends FrameLayout {
         runContainerView.addXYCalibrationData(sensorAnalysis.getXYCalibrationMarkers());
         runContainerView.addOriginData(sensorAnalysis.getOriginMarkers(), sensorAnalysis.getCalibrationXY());
 
+        final Unit xUnit = sensorAnalysis.getXUnit();
+        final Unit yUnit = sensorAnalysis.getYUnit();
+        final Unit tUnit = sensorAnalysis.getTUnit();
+        CalibrationXY calibrationXY = sensorAnalysis.getCalibrationXY();
+
         // marker table view
         final MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(sensorAnalysis.getTagMarkers(),
                 sensorAnalysis.getCalibrationVideoFrame());
         adapter.addColumn(new RunIdDataTableColumn());
-        adapter.addColumn(new TimeDataTableColumn());
-        adapter.addColumn(new XPositionDataTableColumn());
-        adapter.addColumn(new YPositionDataTableColumn());
+        adapter.addColumn(new TimeDataTableColumn(xUnit));
+        adapter.addColumn(new XPositionDataTableColumn(yUnit));
+        adapter.addColumn(new YPositionDataTableColumn(tUnit));
         tableView.setAdapter(adapter);
 
-        CalibratedMarkerDataModel markerDataModel = sensorAnalysis.getTagMarkers();
-        ITimeCalibration timeCalibration = sensorAnalysis.getCalibrationVideoFrame();
+        MarkerDataModel markerDataModel = sensorAnalysis.getTagMarkers();
+        ITimeData timeCalibration = sensorAnalysis.getCalibrationVideoFrame();
         // graph spinner
         graphSpinnerEntryList.add(new GraphSpinnerEntry("Position Data", new MarkerTimeGraphAdapter(markerDataModel,
-                timeCalibration, "Position Data", new XPositionMarkerGraphAxis(), new YPositionMarkerGraphAxis())));
+                timeCalibration, "Position Data", new XPositionMarkerGraphAxis(xUnit, calibrationXY),
+                new YPositionMarkerGraphAxis(yUnit, calibrationXY))));
         graphSpinnerEntryList.add(new GraphSpinnerEntry("x-Velocity", new MarkerTimeGraphAdapter(markerDataModel,
-                timeCalibration, "x-Velocity", new TimeMarkerGraphAxis(), new XSpeedMarkerGraphAxis())));
+                timeCalibration, "x-Velocity", new TimeMarkerGraphAxis(tUnit),
+                new XSpeedMarkerGraphAxis(xUnit, tUnit))));
         graphSpinnerEntryList.add(new GraphSpinnerEntry("y-Velocity", new MarkerTimeGraphAdapter(markerDataModel,
-                timeCalibration, "y-Velocity", new TimeMarkerGraphAxis(), new YSpeedMarkerGraphAxis())));
+                timeCalibration, "y-Velocity", new TimeMarkerGraphAxis(tUnit),
+                new YSpeedMarkerGraphAxis(yUnit, tUnit))));
 
         graphSpinner = (Spinner)mainView.findViewById(R.id.graphSpinner);
         graphSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
@@ -163,7 +173,8 @@ class MotionAnalysisFragmentView extends FrameLayout {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 GraphSpinnerEntry entry = graphSpinnerEntryList.get(i);
-                graphView.setAdapter(entry.getMarkerGraphAdapter());
+                MarkerGraphAdapter adapter = entry.getMarkerGraphAdapter();
+                graphView.setAdapter(adapter);
             }
 
             @Override

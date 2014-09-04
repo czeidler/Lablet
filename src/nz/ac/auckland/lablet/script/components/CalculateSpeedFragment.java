@@ -15,9 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import nz.ac.auckland.lablet.*;
-import nz.ac.auckland.lablet.camera.ITimeCalibration;
+import nz.ac.auckland.lablet.camera.ITimeData;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
-import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptComponent;
 import nz.ac.auckland.lablet.script.ScriptTreeNodeFragmentHolder;
@@ -213,8 +213,8 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
     private String correctSpeedUnit = "[m/s]";
     private String correctAccelerationUnit = "[m/s^2]";
 
-    protected CalibratedMarkerDataModel tagMarker;
-    protected ITimeCalibration timeCalibration;
+    protected MarkerDataModel tagMarker;
+    protected ITimeData timeCalibration;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -357,13 +357,18 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
             return numberOfDataPoints - 3;
     }
 
+    protected MotionAnalysis getMotionAnalysis() {
+        ScriptTreeNodeCalculateSpeed speedComponent = (ScriptTreeNodeCalculateSpeed)component;
+        return speedComponent.getExperiment().getVideoAnalysis(getActivity());
+    }
+
     @Override
     public void onResume() {
         super.onResume();
 
         ScriptTreeNodeCalculateSpeed speedComponent = (ScriptTreeNodeCalculateSpeed)component;
 
-        MotionAnalysis sensorAnalysis = speedComponent.getExperiment().getVideoAnalysis(getActivity());
+        MotionAnalysis sensorAnalysis = getMotionAnalysis();
         if (sensorAnalysis == null)
             return;
         tagMarker = sensorAnalysis.getTagMarkers();
@@ -377,22 +382,22 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
         positionUnitTextView.setText("[" + getPositionUnit() + "]");
 
         MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(tagMarker, timeCalibration);
-        adapter.addColumn(new TimeDataTableColumn());
-        adapter.addColumn(new XPositionDataTableColumn());
-        adapter.addColumn(new YPositionDataTableColumn());
+        adapter.addColumn(new TimeDataTableColumn(sensorAnalysis.getTUnit()));
+        adapter.addColumn(new XPositionDataTableColumn(sensorAnalysis.getXUnit()));
+        adapter.addColumn(new YPositionDataTableColumn(sensorAnalysis.getYUnit()));
         rawDataTable.setAdapter(adapter);
 
         if (tagMarker.getMarkerCount() < 3)
             return;
 
         String text = "";
-        text += timeCalibration.getTimeFromRaw(tagMarker.getMarkerDataAt(getFirstDataPointIndex()).getRunId());
+        text += timeCalibration.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex()).getRunId());
         time1EditText.setText(text);
         text = "";
-        text += timeCalibration.getTimeFromRaw(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 1).getRunId());
+        text += timeCalibration.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 1).getRunId());
         time2EditText.setText(text);
         text = "";
-        text += timeCalibration.getTimeFromRaw(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 2).getRunId());
+        text += timeCalibration.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 2).getRunId());
         time3EditText.setText(text);
 
         text = "";

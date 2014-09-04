@@ -697,6 +697,8 @@ public class PlotView extends ViewGroup {
 
     public void invalidate() {
         mainView.invalidate();
+        if (titleView != null)
+            titleView.invalidate();
         if (xAxisView != null)
             xAxisView.invalidate();
         if (yAxisView != null)

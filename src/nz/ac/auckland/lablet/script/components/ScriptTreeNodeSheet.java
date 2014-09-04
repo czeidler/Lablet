@@ -260,12 +260,12 @@ class GraphView extends ScriptComponentViewHolder {
 
         MotionAnalysis sensorAnalysis = experiment.getVideoAnalysis(context);
         if (sensorAnalysis != null) {
-            MarkerGraphAxis xAxis = createAxis(xAxisContentId);
+            MarkerGraphAxis xAxis = createAxis(xAxisContentId, context);
             if (xAxis == null)
-                xAxis = new XPositionMarkerGraphAxis();
-            MarkerGraphAxis yAxis = createAxis(yAxisContentId);
+                xAxis = new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getCalibrationXY());
+            MarkerGraphAxis yAxis = createAxis(yAxisContentId, context);
             if (yAxis == null)
-                yAxis = new XPositionMarkerGraphAxis();
+                yAxis = new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getCalibrationXY());
 
             adapter = new MarkerTimeGraphAdapter(sensorAnalysis.getTagMarkers(), sensorAnalysis.getCalibrationVideoFrame(),
                     title, xAxis, yAxis);
@@ -292,14 +292,14 @@ class GraphView extends ScriptComponentViewHolder {
     }
 
     public boolean setXAxisContent(String axis) {
-        if (createAxis(axis) == null)
+        if (!isValidAxis(axis))
             return false;
         xAxisContentId = axis;
         return true;
     }
 
     public boolean setYAxisContent(String axis) {
-        if (createAxis(axis) == null)
+        if (!isValidAxis(axis))
             return false;
         yAxisContentId = axis;
         return true;
@@ -309,20 +309,38 @@ class GraphView extends ScriptComponentViewHolder {
         this.title = title;
     }
 
-    private MarkerGraphAxis createAxis(String id) {
+    private MarkerGraphAxis createAxis(String id, Context context) {
+        MotionAnalysis sensorAnalysis = experiment.getVideoAnalysis(context);
+
         if (id.equalsIgnoreCase("x-position"))
-            return new XPositionMarkerGraphAxis();
+            return new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getCalibrationXY());
         if (id.equalsIgnoreCase("y-position"))
-            return new YPositionMarkerGraphAxis();
+            return new YPositionMarkerGraphAxis(sensorAnalysis.getYUnit(), sensorAnalysis.getCalibrationXY());
         if (id.equalsIgnoreCase("x-velocity"))
-            return new XSpeedMarkerGraphAxis();
+            return new XSpeedMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getTUnit());
         if (id.equalsIgnoreCase("y-velocity"))
-            return new YSpeedMarkerGraphAxis();
+            return new YSpeedMarkerGraphAxis(sensorAnalysis.getYUnit(), sensorAnalysis.getTUnit());
         if (id.equalsIgnoreCase("time"))
-            return new TimeMarkerGraphAxis();
+            return new TimeMarkerGraphAxis(sensorAnalysis.getTUnit());
         if (id.equalsIgnoreCase("time_v"))
-            return new SpeedTimeMarkerGraphAxis();
+            return new SpeedTimeMarkerGraphAxis(sensorAnalysis.getTUnit());
         return null;
+    }
+
+    private boolean isValidAxis(String id) {
+        if (id.equalsIgnoreCase("x-position"))
+            return true;
+        if (id.equalsIgnoreCase("y-position"))
+            return true;
+        if (id.equalsIgnoreCase("x-velocity"))
+            return true;
+        if (id.equalsIgnoreCase("y-velocity"))
+            return true;
+        if (id.equalsIgnoreCase("time"))
+            return true;
+        if (id.equalsIgnoreCase("time_v"))
+            return true;
+        return false;
     }
 
     public MarkerTimeGraphAdapter getAdapter() {

@@ -14,9 +14,6 @@ import java.util.List;
 
 
 interface ICalibrationXY {
-    public Unit getXUnit();
-    public Unit getYUnit();
-
     /**
      * Raw point from the screen is transformed to real coordinates.
      * @param raw point on the screen
@@ -54,25 +51,9 @@ public class CalibrationXY implements ICalibrationXY {
 
     final private List<IListener> listeners = new ArrayList<>();
 
-    final private Unit xUnit;
-    final private Unit yUnit;
-
-    public CalibrationXY(Unit xUnit, Unit yUnit) {
+    public CalibrationXY() {
         xScale = 1;
         yScale = 1;
-
-        this.xUnit = xUnit;
-        this.yUnit = yUnit;
-    }
-
-    @Override
-    public Unit getXUnit() {
-        return xUnit;
-    }
-
-    @Override
-    public Unit getYUnit() {
-        return yUnit;
     }
 
     /**

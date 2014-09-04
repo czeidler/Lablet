@@ -8,10 +8,16 @@
 package nz.ac.auckland.lablet.views.graph;
 
 
+import nz.ac.auckland.lablet.experiment.Unit;
+
 /**
  * Graph axis for the marker data graph adapter. Provides the time for a speed vs time graph.
  */
 public class SpeedTimeMarkerGraphAxis extends TimeMarkerGraphAxis {
+    public SpeedTimeMarkerGraphAxis(Unit tUnit) {
+        super(tUnit);
+    }
+
     @Override
     public int size() {
         return getData().getMarkerCount() - 1;
@@ -19,8 +25,8 @@ public class SpeedTimeMarkerGraphAxis extends TimeMarkerGraphAxis {
 
     @Override
     public Number getValue(int index) {
-        float t1 = getTimeCalibration().getTimeFromRaw(index + 1);
-        float t0 = getTimeCalibration().getTimeFromRaw(index);
+        float t1 = getTimeData().getTimeAt(index + 1);
+        float t0 = getTimeData().getTimeAt(index);
         return t0 + (t1 - t0) / 2f;
     }
 

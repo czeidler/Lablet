@@ -8,9 +8,7 @@
 package nz.ac.auckland.lablet.camera;
 
 
-import nz.ac.auckland.lablet.experiment.Unit;
-
-public class CalibrationVideoFrame implements ITimeCalibration {
+public class CalibrationVideoFrame implements ITimeData {
     private int numberOfFrames;
     final private int videoDuration;
 
@@ -19,11 +17,8 @@ public class CalibrationVideoFrame implements ITimeCalibration {
     private int analysisVideoStart;
     private int analysisVideoEnd;
 
-    final private Unit tUnit;
-
-    public CalibrationVideoFrame(int videoDuration, Unit tUnit) {
+    public CalibrationVideoFrame(int videoDuration) {
         this.videoDuration = videoDuration;
-        this.tUnit = tUnit;
 
         setAnalysisVideoStart(0);
         setAnalysisVideoEnd(0);
@@ -32,13 +27,13 @@ public class CalibrationVideoFrame implements ITimeCalibration {
     }
 
     @Override
-    public Unit getUnit() {
-        return tUnit;
+    public int getSize() {
+        return getNumberOfFrames();
     }
 
     @Override
-    public float getTimeFromRaw(float raw) {
-        return getFrameTime(Math.round(raw));
+    public float getTimeAt(float index) {
+        return getFrameTime(Math.round(index));
     }
 
     public int getNumberOfFrames() {

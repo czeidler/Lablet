@@ -26,9 +26,23 @@ public class FrequencyAnalysis implements ISensorAnalysis {
     public FrequencyAnalysis(MicrophoneSensorData sensorData) {
         this.sensorData = sensorData;
 
-        calibrationXY = new CalibrationXY(xUnit, yUnit);
+        xUnit.setName("time");
+        yUnit.setName("frequency");
+        calibrationXY = new CalibrationXY();
         tagMarkerModel = new CalibratedMarkerDataModel(calibrationXY);
         tagMarkerModel.setCalibrationXY(calibrationXY);
+    }
+
+    public Unit getXUnit() {
+        return xUnit;
+    }
+
+    public Unit getYUnit() {
+        return yUnit;
+    }
+
+    public CalibrationXY getCalibrationXY() {
+        return calibrationXY;
     }
 
     @Override
@@ -66,7 +80,7 @@ public class FrequencyAnalysis implements ISensorAnalysis {
 
     }
 
-    public CalibratedMarkerDataModel getTagMarkerModel() {
+    public MarkerDataModel getTagMarkerModel() {
         return tagMarkerModel;
     }
 }

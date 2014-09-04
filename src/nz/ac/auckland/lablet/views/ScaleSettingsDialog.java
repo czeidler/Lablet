@@ -16,6 +16,7 @@ import android.widget.*;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.LengthCalibrationSetter;
 import nz.ac.auckland.lablet.R;
+import nz.ac.auckland.lablet.experiment.Unit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,15 +26,21 @@ import java.util.List;
  * Dialog to calibrate the length scale.
  */
 public class ScaleSettingsDialog extends AlertDialog {
-    private LengthCalibrationSetter calibrationSetter;
+    final private LengthCalibrationSetter calibrationSetter;
+    final private Unit xUnit;
+    final private Unit yUnit;
     private CalibrationXY calibrationXY;
     private EditText lengthEditText;
     private Spinner spinnerUnit;
 
-    public ScaleSettingsDialog(Context context, LengthCalibrationSetter lengthCalibrationSetter) {
+    public ScaleSettingsDialog(Context context, LengthCalibrationSetter lengthCalibrationSetter, Unit xUnit,
+                               Unit yUnit) {
         super(context);
 
         this.calibrationSetter = lengthCalibrationSetter;
+        this.xUnit = xUnit;
+        this.yUnit = yUnit;
+
         calibrationXY = calibrationSetter.getCalibrationXY();
     }
 
@@ -59,9 +66,9 @@ public class ScaleSettingsDialog extends AlertDialog {
         ArrayAdapter<String> unitsAdapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item, list);
         spinnerUnit.setAdapter(unitsAdapter);
-        if (calibrationXY.getXUnit().getPrefix().equals("c"))
+        if (xUnit.getPrefix().equals("c"))
             spinnerUnit.setSelection(1);
-        if (calibrationXY.getXUnit().getPrefix().equals("m"))
+        if (xUnit.getPrefix().equals("m"))
             spinnerUnit.setSelection(2);
 
         // button bar
@@ -82,14 +89,14 @@ public class ScaleSettingsDialog extends AlertDialog {
 
                 int spinnerPosition = spinnerUnit.getSelectedItemPosition();
                 if (spinnerPosition == 0) {
-                    calibrationXY.getXUnit().setPrefix("");
-                    calibrationXY.getYUnit().setPrefix("");
+                    xUnit.setPrefix("");
+                    yUnit.setPrefix("");
                 } else if (spinnerPosition == 1) {
-                    calibrationXY.getXUnit().setPrefix("c");
-                    calibrationXY.getYUnit().setPrefix("c");
+                    xUnit.setPrefix("c");
+                    yUnit.setPrefix("c");
                 } else if (spinnerPosition == 2) {
-                    calibrationXY.getXUnit().setPrefix("m");
-                    calibrationXY.getYUnit().setPrefix("m");
+                    xUnit.setPrefix("m");
+                    yUnit.setPrefix("m");
                 }
 
                 dismiss();

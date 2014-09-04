@@ -14,8 +14,8 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerData;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.views.*;
 import nz.ac.auckland.lablet.views.graph.*;
@@ -54,7 +54,8 @@ public class FrequencyAnalysisView extends FrameLayout implements IExperimentFra
 
         GraphView2D tagMarkerView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
         tagMarkerView.setAdapter(new MarkerGraphAdapter(analysis.getTagMarkerModel(), "Position Data",
-                new XPositionMarkerGraphAxis(), new YPositionMarkerGraphAxis()));
+                new XPositionMarkerGraphAxis(frequencyAnalysis.getXUnit(), frequencyAnalysis.getCalibrationXY()),
+                new YPositionMarkerGraphAxis(frequencyAnalysis.getYUnit(), frequencyAnalysis.getCalibrationXY())));
 
         loadWavFileAsync(audioWavInputStream);
     }
@@ -77,7 +78,7 @@ public class FrequencyAnalysisView extends FrameLayout implements IExperimentFra
         frequencyMapPlotView.getYAxisView().setUnit("Hz");
         frequencyMapPlotView.getYAxisView().setTitle("Frequency");
 
-        CalibratedMarkerDataModel markerModel = frequencyAnalysis.getTagMarkerModel();
+        MarkerDataModel markerModel = frequencyAnalysis.getTagMarkerModel();
         markerModel.addMarkerData(new MarkerData(0));
         markerModel.addMarkerData(new MarkerData(1));
         markerModel.addMarkerData(new MarkerData(2));

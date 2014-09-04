@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.camera.ITimeCalibration;
+import nz.ac.auckland.lablet.camera.ITimeData;
 
 
 public abstract class MarkerTimeGraphAxis extends MarkerGraphAxis {
@@ -17,7 +17,7 @@ public abstract class MarkerTimeGraphAxis extends MarkerGraphAxis {
         super.setMarkerGraphAdapter(adapter);
     }
 
-    public ITimeCalibration getTimeCalibration() {
+    public ITimeData getTimeData() {
         return ((MarkerTimeGraphAdapter)markerGraphAdapter).getTimeCalibration();
     }
 }

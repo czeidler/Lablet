@@ -7,40 +7,43 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.camera.ITimeCalibration;
-import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
+import nz.ac.auckland.lablet.camera.ITimeData;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.Unit;
 
 
 /**
  * Marker data adapter for the graphs.
  */
 public class MarkerTimeGraphAdapter extends MarkerGraphAdapter {
-    protected ITimeCalibration timeCalibration;
+    protected ITimeData timeCalibration;
 
-    public MarkerTimeGraphAdapter(CalibratedMarkerDataModel data, ITimeCalibration timeCalibration, String title,
+    public MarkerTimeGraphAdapter(MarkerDataModel data, ITimeData timeCalibration, String title,
                                   MarkerGraphAxis xAxis, MarkerGraphAxis yAxis) {
         super(data, title, xAxis, yAxis);
 
         this.timeCalibration = timeCalibration;
     }
 
-    public void setTo(CalibratedMarkerDataModel data,  ITimeCalibration timeCalibration) {
+    public void setTo(MarkerDataModel data,  ITimeData timeCalibration) {
         setTo(data);
 
         this.timeCalibration = timeCalibration;
     }
 
-    public ITimeCalibration getTimeCalibration() {
+    public ITimeData getTimeCalibration() {
         return timeCalibration;
     }
 
-    public static MarkerTimeGraphAdapter createXSpeedAdapter(CalibratedMarkerDataModel data, ITimeCalibration timeCalibration, String title) {
-        return new MarkerTimeGraphAdapter(data, timeCalibration, title, new SpeedTimeMarkerGraphAxis(),
-                new XSpeedMarkerGraphAxis());
+    public static MarkerTimeGraphAdapter createXSpeedAdapter(MarkerDataModel data, ITimeData timeCalibration,
+                                                             String title, Unit xUnit, Unit tUnit) {
+        return new MarkerTimeGraphAdapter(data, timeCalibration, title, new SpeedTimeMarkerGraphAxis(tUnit),
+                new XSpeedMarkerGraphAxis(xUnit, tUnit));
     }
 
-    public static MarkerTimeGraphAdapter createYSpeedAdapter(CalibratedMarkerDataModel data, ITimeCalibration timeCalibration, String title) {
-        return new MarkerTimeGraphAdapter(data, timeCalibration, title, new SpeedTimeMarkerGraphAxis(),
-                new YSpeedMarkerGraphAxis());
+    public static MarkerTimeGraphAdapter createYSpeedAdapter(MarkerDataModel data, ITimeData timeCalibration,
+                                                             String title, Unit yUnit, Unit tUnit) {
+        return new MarkerTimeGraphAdapter(data, timeCalibration, title, new SpeedTimeMarkerGraphAxis(tUnit),
+                new YSpeedMarkerGraphAxis(yUnit, tUnit));
     }
 }

@@ -7,12 +7,22 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.Unit;
+
 
 /**
  * Graph axis for the marker data graph adapter. Provides the x-speed.
  */
 public class XSpeedMarkerGraphAxis extends MarkerTimeGraphAxis {
+    final private Unit xUnit;
+    final private Unit tUnit;
+
+    public XSpeedMarkerGraphAxis(Unit xUnit, Unit tUnit) {
+        this.xUnit = xUnit;
+        this.tUnit = tUnit;
+    }
+
     @Override
     public int size() {
         return getData().getMarkerCount() - 1;
@@ -20,19 +30,18 @@ public class XSpeedMarkerGraphAxis extends MarkerTimeGraphAxis {
 
     @Override
     public Number getValue(int index) {
-        CalibratedMarkerDataModel data = getData();
+        MarkerDataModel data = getData();
 
         float deltaX = data.getRealMarkerPositionAt(index + 1).x - data.getRealMarkerPositionAt(index).x;
-        float deltaT = getTimeCalibration().getTimeFromRaw(index + 1) - getTimeCalibration().getTimeFromRaw(index);
-        if (getTimeCalibration().getUnit().getPrefix().equals("m"))
+        float deltaT = getTimeData().getTimeAt(index + 1) - getTimeData().getTimeAt(index);
+        if (tUnit.getPrefix().equals("m"))
             deltaT /= 1000;
         return deltaX / deltaT;
     }
 
     @Override
     public String getLabel() {
-        return "velocity [" + getData().getCalibrationXY().getXUnit().getUnit() + "/"
-                + getTimeCalibration().getUnit().getBase() + "]";
+        return "velocity [" + xUnit.getUnit() + "/" + tUnit.getBase() + "]";
     }
 
     @Override

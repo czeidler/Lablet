@@ -7,13 +7,20 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.Unit;
 
 
 /**
  * Graph axis for the marker data graph adapter. Provides the time.
  */
 public class TimeMarkerGraphAxis extends MarkerTimeGraphAxis {
+    final private Unit tUnit;
+
+    public TimeMarkerGraphAxis(Unit tUnit) {
+        this.tUnit = tUnit;
+    }
+
     @Override
     public int size() {
         return getData().getMarkerCount();
@@ -21,14 +28,14 @@ public class TimeMarkerGraphAxis extends MarkerTimeGraphAxis {
 
     @Override
     public Number getValue(int index) {
-        CalibratedMarkerDataModel markerData = getData();
+        MarkerDataModel markerData = getData();
         int runId = markerData.getMarkerDataAt(index).getRunId();
-        return getTimeCalibration().getTimeFromRaw(runId);
+        return getTimeData().getTimeAt(runId);
     }
 
     @Override
     public String getLabel() {
-        return "time [" + getTimeCalibration().getUnit().getUnit() + "]";
+        return tUnit.getName() + " [" + tUnit.getUnit() + "]";
     }
 
     @Override

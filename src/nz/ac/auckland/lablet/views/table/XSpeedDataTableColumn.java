@@ -7,14 +7,26 @@
  */
 package nz.ac.auckland.lablet.views.table;
 
-import nz.ac.auckland.lablet.camera.ITimeCalibration;
-import nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel;
+import nz.ac.auckland.lablet.camera.ITimeData;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.Unit;
 
 
 /**
  * Table column for the marker data table adapter. Provides the x-speed.
  */
-public class XSpeedDataTableColumn extends DataTableColumn {
+public class XSpeedDataTableColumn extends UnitDataTableColumn {
+    final private Unit xUnit;
+    final private Unit tUnit;
+
+    public XSpeedDataTableColumn(Unit xUnit, Unit tUnit) {
+        this.xUnit = xUnit;
+        this.tUnit = tUnit;
+
+        listenTo(xUnit);
+        listenTo(tUnit);
+    }
+
     @Override
     public int size() {
         return dataModel.getMarkerCount() - 1;
@@ -22,20 +34,19 @@ public class XSpeedDataTableColumn extends DataTableColumn {
 
     @Override
     public Number getValue(int index) {
-        return getSpeed(index, dataModel, timeCalibration);
+        return getSpeed(index, dataModel, timeData, tUnit);
     }
 
     @Override
     public String getHeader() {
-        return "velocity [" + dataModel.getCalibrationXY().getXUnit().getUnit() + "/"
-                + timeCalibration.getUnit().getBase() + "]";
+        return "velocity [" + xUnit.getUnit() + "/" + tUnit.getBase() + "]";
     }
 
-    public static Number getSpeed(int index, CalibratedMarkerDataModel markersDataModel, ITimeCalibration timeCalibration) {
+    public static Number getSpeed(int index, MarkerDataModel markersDataModel, ITimeData timeCalibration, Unit tUnit) {
         float delta = markersDataModel.getRealMarkerPositionAt(index + 1).x
                 - markersDataModel.getRealMarkerPositionAt(index).x;
-        float deltaT = timeCalibration.getTimeFromRaw(index + 1) - timeCalibration.getTimeFromRaw(index);
-        if (timeCalibration.getUnit().getPrefix().equals("m"))
+        float deltaT = timeCalibration.getTimeAt(index + 1) - timeCalibration.getTimeAt(index);
+        if (tUnit.getPrefix().equals("m"))
             deltaT /= 1000;
         return delta / deltaT;
     }

@@ -27,7 +27,7 @@ class CalibrationMarker extends SimpleMarker {
 /**
  * Responsible to draw a calibration scale.
  * <p>
- * The painter expect a {@link nz.ac.auckland.lablet.experiment.CalibratedMarkerDataModel} with two data points; one
+ * The painter expect a {@link nz.ac.auckland.lablet.experiment.MarkerDataModel} with two data points; one
  * for the start and one for the end of the scale.
  * </p>
  */

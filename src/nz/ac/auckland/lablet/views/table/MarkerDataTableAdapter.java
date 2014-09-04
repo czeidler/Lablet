@@ -11,7 +11,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.TextView;
-import nz.ac.auckland.lablet.camera.ITimeCalibration;
+import nz.ac.auckland.lablet.camera.ITimeData;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 
@@ -103,25 +103,21 @@ abstract class ColumnDataTableAdapter extends WeakListenable<ITableAdapter.IList
 }
 
 
-public class MarkerDataTableAdapter extends ColumnDataTableAdapter implements CalibratedMarkerDataModel.IListener,
+public class MarkerDataTableAdapter extends ColumnDataTableAdapter implements MarkerDataModel.IListener,
         Unit.IListener {
-    protected CalibratedMarkerDataModel model;
-    protected ITimeCalibration timeCalibration;
+    protected MarkerDataModel model;
+    protected ITimeData timeCalibration;
 
-    public MarkerDataTableAdapter(CalibratedMarkerDataModel model, ITimeCalibration timeCalibration) {
+    public MarkerDataTableAdapter(MarkerDataModel model, ITimeData timeCalibration) {
         this.model = model;
         this.timeCalibration = timeCalibration;
         model.addListener(this);
-        CalibrationXY calibrationXY = model.getCalibrationXY();
-        calibrationXY.getXUnit().addListener(this);
-        calibrationXY.getYUnit().addListener(this);
-        timeCalibration.getUnit().addListener(this);
     }
 
     @Override
     public void addColumn(DataTableColumn column) {
         column.setDataModel(model);
-        column.setTimeCalibration(timeCalibration);
+        column.setTimeData(timeCalibration);
         super.addColumn(column);
     }
 
@@ -211,8 +207,8 @@ public class MarkerDataTableAdapter extends ColumnDataTableAdapter implements Ca
  * Abstract base class for table columns.
  */
 abstract class DataTableColumn {
-    protected CalibratedMarkerDataModel dataModel;
-    protected ITimeCalibration timeCalibration;
+    protected MarkerDataModel dataModel;
+    protected ITimeData timeData;
 
     abstract public int size();
     abstract public Number getValue(int index);
@@ -222,14 +218,34 @@ abstract class DataTableColumn {
     }
     abstract public String getHeader();
 
-    public void setDataModel(CalibratedMarkerDataModel dataModel) {
+    public void setDataModel(MarkerDataModel dataModel) {
         this.dataModel = dataModel;
     }
 
-    public void setTimeCalibration(ITimeCalibration timeCalibration) {
-        this.timeCalibration = timeCalibration;
+    public void setTimeData(ITimeData timeData) {
+        this.timeData = timeData;
     }
 }
 
 
+abstract class UnitDataTableColumn extends DataTableColumn implements Unit.IListener {
+    private List<Unit> units = new ArrayList<>();
 
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+
+        for (Unit unit : units)
+            unit.removeListener(this);
+    }
+
+    protected void listenTo(Unit unit) {
+        unit.addListener(this);
+        units.add(unit);
+    }
+
+    @Override
+    public void onPrefixChanged() {
+        dataModel.notifyAllDataChanged();
+    }
+}

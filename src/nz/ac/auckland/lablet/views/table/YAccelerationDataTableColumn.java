@@ -8,10 +8,23 @@
 package nz.ac.auckland.lablet.views.table;
 
 
+import nz.ac.auckland.lablet.experiment.Unit;
+
 /**
  * Table column for the marker data table adapter. Provides the y-acceleration.
  */
-public class YAccelerationDataTableColumn extends DataTableColumn {
+public class YAccelerationDataTableColumn extends UnitDataTableColumn {
+    final private Unit yUnit;
+    final private Unit tUnit;
+
+    public YAccelerationDataTableColumn(Unit yUnit, Unit tUnit) {
+        this.yUnit = yUnit;
+        this.tUnit = tUnit;
+
+        listenTo(yUnit);
+        listenTo(tUnit);
+    }
+
     @Override
     public int size() {
         return dataModel.getMarkerCount() - 2;
@@ -19,12 +32,12 @@ public class YAccelerationDataTableColumn extends DataTableColumn {
 
     @Override
     public Number getValue(int index) {
-        float speed0 = YSpeedDataTableColumn.getSpeed(index, dataModel, timeCalibration).floatValue();
-        float speed1 = YSpeedDataTableColumn.getSpeed(index + 1, dataModel, timeCalibration).floatValue();
+        float speed0 = YSpeedDataTableColumn.getSpeed(index, dataModel, timeData, tUnit).floatValue();
+        float speed1 = YSpeedDataTableColumn.getSpeed(index + 1, dataModel, timeData, tUnit).floatValue();
         float delta = speed1 - speed0;
 
-        float deltaT = (timeCalibration.getTimeFromRaw(index + 2) - timeCalibration.getTimeFromRaw(index)) / 2;
-        if (timeCalibration.getUnit().getPrefix().equals("m"))
+        float deltaT = (timeData.getTimeAt(index + 2) - timeData.getTimeAt(index)) / 2;
+        if (tUnit.getPrefix().equals("m"))
             deltaT /= 1000;
 
         return delta / deltaT;
@@ -32,7 +45,7 @@ public class YAccelerationDataTableColumn extends DataTableColumn {
 
     @Override
     public String getHeader() {
-        return "acceleration [" + dataModel.getCalibrationXY().getYUnit().getUnit() + "/"
-                + timeCalibration.getUnit().getBase() + "^2]";
+        return "acceleration [" + yUnit.getUnit() + "/"
+                + tUnit.getBase() + "^2]";
     }
 }

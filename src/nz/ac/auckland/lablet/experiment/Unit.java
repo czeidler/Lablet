@@ -15,11 +15,20 @@ public class Unit extends WeakListenable<Unit.IListener> {
         public void onPrefixChanged();
     }
 
+    private String name = "";
     final private String base;
     private String prefix = "";
 
     public Unit(String base) {
         this.base = base;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getBase() {

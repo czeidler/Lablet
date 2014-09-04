@@ -7,10 +7,8 @@
  */
 package nz.ac.auckland.lablet.camera;
 
-import nz.ac.auckland.lablet.experiment.Unit;
 
-
-public interface ITimeCalibration {
-    public Unit getUnit();
-    public float getTimeFromRaw(float raw);
+public interface ITimeData {
+    public int getSize();
+    public float getTimeAt(float index);
 }
