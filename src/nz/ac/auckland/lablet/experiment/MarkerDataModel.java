@@ -26,15 +26,6 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
 
     final protected List<MarkerData> markerDataList = new ArrayList<>();
     private int selectedDataIndex = -1;
-    private PointF maxRangeRaw = new PointF(100, 100);
-
-    public PointF getMaxRangeRaw() {
-        return maxRangeRaw;
-    }
-
-    public void setMaxRangeRaw(float x, float y) {
-        this.maxRangeRaw.set(x, y);
-    }
 
     public void selectMarkerData(int index) {
         selectedDataIndex = index;

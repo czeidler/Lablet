@@ -262,10 +262,10 @@ class GraphView extends ScriptComponentViewHolder {
         if (sensorAnalysis != null) {
             MarkerGraphAxis xAxis = createAxis(xAxisContentId, context);
             if (xAxis == null)
-                xAxis = new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getCalibrationXY());
+                xAxis = new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getXMinRangeGetter());
             MarkerGraphAxis yAxis = createAxis(yAxisContentId, context);
             if (yAxis == null)
-                yAxis = new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getCalibrationXY());
+                yAxis = new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getYMinRangeGetter());
 
             adapter = new MarkerTimeGraphAdapter(sensorAnalysis.getTagMarkers(), sensorAnalysis.getCalibrationVideoFrame(),
                     title, xAxis, yAxis);
@@ -313,9 +313,9 @@ class GraphView extends ScriptComponentViewHolder {
         MotionAnalysis sensorAnalysis = experiment.getVideoAnalysis(context);
 
         if (id.equalsIgnoreCase("x-position"))
-            return new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getCalibrationXY());
+            return new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getXMinRangeGetter());
         if (id.equalsIgnoreCase("y-position"))
-            return new YPositionMarkerGraphAxis(sensorAnalysis.getYUnit(), sensorAnalysis.getCalibrationXY());
+            return new YPositionMarkerGraphAxis(sensorAnalysis.getYUnit(), sensorAnalysis.getYMinRangeGetter());
         if (id.equalsIgnoreCase("x-velocity"))
             return new XSpeedMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getTUnit());
         if (id.equalsIgnoreCase("y-velocity"))

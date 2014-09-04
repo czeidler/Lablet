@@ -18,19 +18,16 @@ import java.io.OutputStream;
 public class FrequencyAnalysis implements ISensorAnalysis {
     final private MicrophoneSensorData sensorData;
 
-    final private CalibratedMarkerDataModel tagMarkerModel;
+    final private MarkerDataModel tagMarkerModel;
     final private Unit xUnit = new Unit("s");
     final private Unit yUnit = new Unit("Hz");
-    final private CalibrationXY calibrationXY;
 
     public FrequencyAnalysis(MicrophoneSensorData sensorData) {
         this.sensorData = sensorData;
 
         xUnit.setName("time");
         yUnit.setName("frequency");
-        calibrationXY = new CalibrationXY();
-        tagMarkerModel = new CalibratedMarkerDataModel(calibrationXY);
-        tagMarkerModel.setCalibrationXY(calibrationXY);
+        tagMarkerModel = new MarkerDataModel();
     }
 
     public Unit getXUnit() {
@@ -39,10 +36,6 @@ public class FrequencyAnalysis implements ISensorAnalysis {
 
     public Unit getYUnit() {
         return yUnit;
-    }
-
-    public CalibrationXY getCalibrationXY() {
-        return calibrationXY;
     }
 
     @Override

@@ -21,10 +21,10 @@ import nz.ac.auckland.lablet.views.plotview.*;
  */
 abstract class AbstractGraphAdapter extends AbstractXYDataAdapter {
     public interface IGraphDataAxis {
-        public int size();
-        public Number getValue(int index);
-        public String getLabel();
-        public Number getMinRange();
+        int size();
+        Number getValue(int index);
+        String getLabel();
+        Number getMinRange();
     }
 
     protected IGraphDataAxis xAxis;

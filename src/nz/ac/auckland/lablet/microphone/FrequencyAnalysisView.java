@@ -54,8 +54,8 @@ public class FrequencyAnalysisView extends FrameLayout implements IExperimentFra
 
         GraphView2D tagMarkerView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
         tagMarkerView.setAdapter(new MarkerGraphAdapter(analysis.getTagMarkerModel(), "Position Data",
-                new XPositionMarkerGraphAxis(frequencyAnalysis.getXUnit(), frequencyAnalysis.getCalibrationXY()),
-                new YPositionMarkerGraphAxis(frequencyAnalysis.getYUnit(), frequencyAnalysis.getCalibrationXY())));
+                new XPositionMarkerGraphAxis(frequencyAnalysis.getXUnit(), null),
+                new YPositionMarkerGraphAxis(frequencyAnalysis.getYUnit(), null)));
 
         loadWavFileAsync(audioWavInputStream);
     }

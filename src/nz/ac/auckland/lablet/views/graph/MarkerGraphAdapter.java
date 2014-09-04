@@ -54,9 +54,10 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
     }
 
     public static MarkerGraphAdapter createPositionAdapter(MarkerDataModel data, String title, Unit xUnit,
-                                                           Unit yUnit, CalibrationXY calibrationXY) {
-        return new MarkerGraphAdapter(data, title, new XPositionMarkerGraphAxis(xUnit, calibrationXY),
-                new YPositionMarkerGraphAxis(yUnit, calibrationXY));
+                                                           Unit yUnit, IMinRangeGetter xMinRangeGetter,
+                                                           IMinRangeGetter yMinRangeGetter) {
+        return new MarkerGraphAdapter(data, title, new XPositionMarkerGraphAxis(xUnit, xMinRangeGetter),
+                new YPositionMarkerGraphAxis(yUnit, yMinRangeGetter));
     }
 
     @Override

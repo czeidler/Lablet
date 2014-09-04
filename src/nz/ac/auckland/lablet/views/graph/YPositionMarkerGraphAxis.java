@@ -7,8 +7,6 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import android.graphics.PointF;
-import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.Unit;
 
 
@@ -17,11 +15,11 @@ import nz.ac.auckland.lablet.experiment.Unit;
  */
 public class YPositionMarkerGraphAxis extends MarkerGraphAxis {
     final private Unit unit;
-    final private CalibrationXY calibrationXY;
+    final private IMinRangeGetter minRangeGetter;
 
-    public YPositionMarkerGraphAxis(Unit xUnit, CalibrationXY calibrationXY) {
-        this.unit = xUnit;
-        this.calibrationXY = calibrationXY;
+    public YPositionMarkerGraphAxis(Unit yUnit, IMinRangeGetter minRangeGetter) {
+        this.unit = yUnit;
+        this.minRangeGetter = minRangeGetter;
     }
 
     @Override
@@ -41,11 +39,8 @@ public class YPositionMarkerGraphAxis extends MarkerGraphAxis {
 
     @Override
     public Number getMinRange() {
-        if (calibrationXY == null)
+        if (minRangeGetter == null)
             return -1;
-        PointF point = new PointF();
-        point.y = getData().getMaxRangeRaw().x;
-        point = calibrationXY.fromRawLength(point);
-        return point.y * 0.2f;
+        return minRangeGetter.getMinRange();
     }
 }

@@ -11,6 +11,7 @@ import android.graphics.PointF;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.*;
+import nz.ac.auckland.lablet.views.graph.IMinRangeGetter;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class MotionAnalysis implements ISensorAnalysis {
 
     private Bundle experimentSpecificData = null;
 
-    private List<IListener> listenerList = new ArrayList<IListener>();
+    private List<IListener> listenerList = new ArrayList<>();
 
     public MotionAnalysis(CameraSensorData sensorData) {
         this.sensorData = sensorData;
@@ -63,7 +64,6 @@ public class MotionAnalysis implements ISensorAnalysis {
 
         tagMarkers = new CalibratedMarkerDataModel(calibrationXY);
         tagMarkers.setCalibrationXY(calibrationXY);
-        tagMarkers.setMaxRangeRaw(sensorData.getMaxRawX(), sensorData.getMaxRawY());
 
         float maxXValue = sensorData.getMaxRawX();
         float maxYValue = sensorData.getMaxRawY();
@@ -163,6 +163,30 @@ public class MotionAnalysis implements ISensorAnalysis {
     }
     public void setYUnitPrefix(String yUnitPrefix) {
         this.yUnit.setPrefix(yUnitPrefix);
+    }
+
+    public IMinRangeGetter getXMinRangeGetter() {
+        return new IMinRangeGetter() {
+            @Override
+            public Number getMinRange() {
+                PointF point = new PointF();
+                point.x = sensorData.getMaxRawX();
+                point = calibrationXY.fromRawLength(point);
+                return point.x * 0.2f;
+            }
+        };
+    }
+
+    public IMinRangeGetter getYMinRangeGetter() {
+        return new IMinRangeGetter() {
+            @Override
+            public Number getMinRange() {
+                PointF point = new PointF();
+                point.y = sensorData.getMaxRawY();
+                point = calibrationXY.fromRawLength(point);
+                return point.y * 0.2f;
+            }
+        };
     }
 
     public boolean loadAnalysisData(Bundle bundle, File storageDir) {
@@ -290,7 +314,6 @@ public class MotionAnalysis implements ISensorAnalysis {
 
     private void updateOriginFromVideoRotation() {
         CameraSensorData cameraExperiment = (CameraSensorData)getData();
-        CalibrationXY calibrationXY = getCalibrationXY();
 
         // read rotation from video
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();

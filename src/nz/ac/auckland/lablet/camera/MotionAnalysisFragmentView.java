@@ -142,7 +142,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
         final Unit xUnit = sensorAnalysis.getXUnit();
         final Unit yUnit = sensorAnalysis.getYUnit();
         final Unit tUnit = sensorAnalysis.getTUnit();
-        CalibrationXY calibrationXY = sensorAnalysis.getCalibrationXY();
 
         // marker table view
         final MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(sensorAnalysis.getTagMarkers(),
@@ -157,8 +156,9 @@ class MotionAnalysisFragmentView extends FrameLayout {
         ITimeData timeCalibration = sensorAnalysis.getCalibrationVideoFrame();
         // graph spinner
         graphSpinnerEntryList.add(new GraphSpinnerEntry("Position Data", new MarkerTimeGraphAdapter(markerDataModel,
-                timeCalibration, "Position Data", new XPositionMarkerGraphAxis(xUnit, calibrationXY),
-                new YPositionMarkerGraphAxis(yUnit, calibrationXY))));
+                timeCalibration, "Position Data",
+                new XPositionMarkerGraphAxis(xUnit, sensorAnalysis.getXMinRangeGetter()),
+                new YPositionMarkerGraphAxis(yUnit, sensorAnalysis.getYMinRangeGetter()))));
         graphSpinnerEntryList.add(new GraphSpinnerEntry("x-Velocity", new MarkerTimeGraphAdapter(markerDataModel,
                 timeCalibration, "x-Velocity", new TimeMarkerGraphAxis(tUnit),
                 new XSpeedMarkerGraphAxis(xUnit, tUnit))));

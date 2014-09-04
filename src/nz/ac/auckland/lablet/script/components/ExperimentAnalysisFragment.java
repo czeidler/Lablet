@@ -189,8 +189,8 @@ public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
                 return;
             MarkerTimeGraphAdapter adapter = new MarkerTimeGraphAdapter(sensorAnalysis.getTagMarkers(),
                     sensorAnalysis.getCalibrationVideoFrame(), "Position Data:",
-                    new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getCalibrationXY()),
-                    new YPositionMarkerGraphAxis(sensorAnalysis.getYUnit(), sensorAnalysis.getCalibrationXY()));
+                    new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getXMinRangeGetter()),
+                    new YPositionMarkerGraphAxis(sensorAnalysis.getYUnit(), sensorAnalysis.getYMinRangeGetter()));
             graphView.setAdapter(adapter);
             graphView.setVisibility(View.VISIBLE);
         } else {
