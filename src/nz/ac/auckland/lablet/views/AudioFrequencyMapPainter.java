@@ -14,7 +14,6 @@ import java.util.Arrays;
 
 
 public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
-    final private double maxFrequencyAmplitude = 500000;
     final private int[] heatMap = new int[256];
 
     public AudioFrequencyMapPainter() {
@@ -29,8 +28,8 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
                 Color.rgb(77, 153, 255), // light blue
                 Color.rgb(230, 26, 230), // violet
                 Color.RED,
-                Color.WHITE,
-                Color.YELLOW
+                Color.BLACK,
+                Color.GREEN
         };
 
         // last color is for overflow
@@ -39,9 +38,9 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
             final float value = ((float)i) / (heatMap.length - 1);
             final int index = (int)(value * (nColors - 1)) + 1;
 
-            int red = (int)((1.d - value) * Color.red(colors[index - 1]) + value * Color.red(colors[index]));
-            int green = (int)((1.d - value) * Color.green(colors[index - 1]) + value * Color.green(colors[index]));
-            int blue = (int)((1.d - value) * Color.blue(colors[index - 1]) + value * Color.blue(colors[index]));
+            int red = (int)((1.f - value) * Color.red(colors[index - 1]) + value * Color.red(colors[index]));
+            int green = (int)((1.f - value) * Color.green(colors[index - 1]) + value * Color.green(colors[index]));
+            int blue = (int)((1.f - value) * Color.blue(colors[index - 1]) + value * Color.blue(colors[index]));
 
             heatMap[i] = Color.rgb(red, green, blue);
         }
@@ -156,12 +155,13 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
             } else {
                 float frequencyAmpAverage = frequencyAmpSum / perPixelCount;
                 final float maxDB = -60;
-                double amplitude = 1d - 10 * Math.log10(frequencyAmpAverage / 20000000) / maxDB;
+                float maxFreqAmplitude = 32768 * frequencies.length;
+                double freqAmplitude = 1d - 10 * Math.log10(frequencyAmpAverage / maxFreqAmplitude) / maxDB;
                 //double amplitude = 1d - 10 * Math.log10(frequencyAmpAverage / maxFrequencyAmplitude) / maxDB;
                 //double amplitude = Math.log10(Math.abs(frequencyAmpAverage)) / Math.log10(maxFrequencyAmplitude);
                 //double amplitude = Math.abs(frequencyAmpAverage) / maxFrequencyAmplitude;
                 int colorIndex = colors.length - 1 - currentPixel;
-                colors[colorIndex] = heatMap(amplitude);
+                colors[colorIndex] = heatMap(freqAmplitude);
 
                 frequencyAmpSum = frequencyAmp;
                 currentPixel = pixel;
