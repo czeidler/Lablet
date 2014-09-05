@@ -11,6 +11,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import nz.ac.auckland.lablet.experiment.*;
 
@@ -71,6 +72,13 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
     protected AnalysisRunEntry currentAnalysisRun;
     protected ISensorAnalysis currentSensorAnalysis;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        ensureExperimentDataLoaded();
+    }
+
     protected boolean setCurrentAnalysisRun(int index) {
         if (index >= analysisRuns.size())
             return false;
@@ -81,6 +89,12 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
 
     protected void setCurrentSensorAnalysis(int sensor, int analysis) {
         currentSensorAnalysis = currentAnalysisRun.sensorList.get(sensor).analysisList.get(analysis).analysis;
+    }
+
+    public boolean ensureExperimentDataLoaded() {
+        if (experimentData != null)
+            return true;
+        return loadExperiment();
     }
 
     public ExperimentData getExperimentData() {
@@ -152,11 +166,8 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
         setCurrentSensorAnalysis(0, 0);
     }
 
-    protected boolean loadExperiment(Intent intent) {
-        if (intent == null) {
-            showErrorAndFinish("can't load experiment (Intent is null)");
-            return false;
-        }
+    private boolean loadExperiment() {
+        Intent intent = getIntent();
 
         String experimentPath = intent.getStringExtra("experiment_path");
         int runId = intent.getIntExtra("run_id", 0);

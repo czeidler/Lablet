@@ -35,6 +35,8 @@ public class ExperimentAnalysisFragment extends android.support.v4.app.Fragment 
 
     private ISensorAnalysis findExperimentFromArguments(Activity activity) {
         ExperimentAnalysisActivity experimentActivity = (ExperimentAnalysisActivity)activity;
+        if (!experimentActivity.ensureExperimentDataLoaded())
+            return null;
 
         int run = experimentActivity.getCurrentAnalysisRunIndex();
         int position = getArguments().getInt("sensorIndex", 0);

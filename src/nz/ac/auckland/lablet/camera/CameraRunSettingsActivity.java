@@ -136,10 +136,6 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
 
         frameRateList = new ArrayList<>();
 
-        Intent intent = getIntent();
-        if (!loadExperiment(intent))
-            return;
-
         cameraSensorData = (CameraSensorData)currentSensorAnalysis.getData();
 
         setContentView(R.layout.camera_run_settings);
@@ -242,7 +238,7 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
 
         // get initial values
         Bundle runSettings = null;
-        Bundle extras = intent.getExtras();
+        Bundle extras = getIntent().getExtras();
         assert extras != null;
         Bundle analysisSpecificData = extras.getBundle("analysisSpecificData");
         if (analysisSpecificData != null)
@@ -281,7 +277,7 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
 
         helpView = (CameraRunSettingsHelpView)findViewById(R.id.cameraSettingsHelp);
         assert helpView != null;
-        Bundle options = intent.getBundleExtra("options");
+        Bundle options = getIntent().getBundleExtra("options");
         if (options != null && options.getBoolean("start_with_help", false))
             helpView.setVisibility(View.VISIBLE);
 

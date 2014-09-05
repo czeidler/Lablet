@@ -25,6 +25,10 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
     private boolean resumeWithRunSettings = false;
     private boolean resumeWithRunSettingsHelp = false;
 
+    public MotionAnalysisFragment() {
+        super();
+    }
+
     public MotionAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef ref) {
         super(ref);
     }

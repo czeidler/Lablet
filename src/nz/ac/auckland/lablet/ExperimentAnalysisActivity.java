@@ -36,11 +36,6 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!loadExperiment(getIntent())) {
-            showErrorAndFinish("Unable to load the experiment.");
-            return;
-        }
-
         // gui stuff:
 
         setContentView(R.layout.experiment_analyser);

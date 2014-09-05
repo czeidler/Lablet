@@ -16,6 +16,10 @@ import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 
 
 public class FrequencyAnalysisFragment extends ExperimentAnalysisFragment {
+    public FrequencyAnalysisFragment() {
+        super();
+    }
+
     public FrequencyAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef ref) {
         super(ref);
     }
