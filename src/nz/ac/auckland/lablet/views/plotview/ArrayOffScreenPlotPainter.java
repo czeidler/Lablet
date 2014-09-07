@@ -82,7 +82,6 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
         if (dirtyRegion.getSize() == 0)
             return;
 
-        CloneablePlotDataAdapter adapter = (CloneablePlotDataAdapter)dataAdapter;
         RectF realDataRect = getRealDataRect(dirtyRegion.getMin(), dirtyRegion.getMax());
         Rect screenRect = containerView.toScreen(realDataRect);
 
