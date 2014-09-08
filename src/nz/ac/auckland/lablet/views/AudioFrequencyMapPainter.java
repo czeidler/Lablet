@@ -170,4 +170,47 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
         }
         return colors;
     }
+
+    @Override
+    public void invalidate() {
+        if (containerView == null || getBitmapCanvas() == null || dataAdapter == null)
+            return;
+
+        if (dataAdapter.getSize() == 0)
+            return;
+        emptyOffScreenRenderingQueue();
+
+        AudioFrequencyMapAdapter adapter = (AudioFrequencyMapAdapter)dataAdapter;
+        Region1D regionToRender = new Region1D(0, dataAdapter.getSize() - 1);
+        RectF realDataRect = new RectF(adapter.getX(0), frequencyRang, adapter.getX(adapter.getSize() - 1), 0);
+        Rect screenRect = containerView.toScreen(realDataRect);
+
+        triggerJob(realDataRect, screenRect, regionToRender, true);
+
+        dirtyRegion.clear();
+    }
+
+    @Override
+    protected void onSetupOffScreenBitmap() {
+        final int offScreenFactor = 2;
+
+        RectF bitmapRealRect = containerView.getRange();
+        float widthHalf = Math.abs(bitmapRealRect.width() * (offScreenFactor - 1) / 2);
+        float heightHalf = Math.abs(bitmapRealRect.height() * (offScreenFactor - 1) / 2);
+        bitmapRealRect.left -= widthHalf;
+        bitmapRealRect.right += widthHalf;
+        bitmapRealRect.top += heightHalf;
+        bitmapRealRect.bottom -= heightHalf;
+
+        if (offScreenBitmap.getBitmap() == null) {
+            Bitmap bitmap = Bitmap.createBitmap(offScreenFactor * containerView.getWidth(),
+                    offScreenFactor * containerView.getHeight(), Bitmap.Config.ARGB_8888);
+            bitmap.eraseColor(Color.TRANSPARENT);
+
+
+            offScreenBitmap.setTo(bitmap, bitmapRealRect);
+        } else
+            offScreenBitmap.setRealRect(bitmapRealRect);
+
+    }
 }
