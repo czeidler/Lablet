@@ -107,7 +107,7 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
         dirtyRegion.clear();
     }
 
-    private void triggerJob(RectF realDataRect, Rect screenRect, Region1D regionToRender, boolean clearParentBitmap) {
+    protected void triggerJob(RectF realDataRect, Rect screenRect, Region1D regionToRender, boolean clearParentBitmap) {
         ArrayRenderPayload renderPayload = new ArrayRenderPayload(realDataRect, screenRect,
                 containerView.getRangeMatrixCopy(),
                 ((CloneablePlotDataAdapter)dataAdapter).clone(regionToRender),
@@ -133,8 +133,9 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
         return new AbstractPlotDataAdapter.IListener() {
             @Override
             public void onDataAdded(AbstractPlotDataAdapter plot, int index, int number) {
-                dirtyRegion.addRange(index, index + number - 1);
+                onSetupOffScreenBitmap();
 
+                dirtyRegion.addRange(index, index + number - 1);
                 if ((maxDirtyRanges > 0 && maxDirtyRanges <= dirtyRegion.getSize()) || hasFreeRenderingPipe())
                     flushDirtyRegion();
             }

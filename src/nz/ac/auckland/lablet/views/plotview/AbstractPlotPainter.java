@@ -43,6 +43,7 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
 
     @Override
     public void invalidate() {
+
     }
 
     @Override
