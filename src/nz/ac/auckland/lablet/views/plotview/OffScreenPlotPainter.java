@@ -40,11 +40,12 @@ class RenderTask {
                 OffScreenPlotPainter.RenderPayload payload = payloadList.get(index);
 
                 Rect screenRect = payload.getScreenRect();
-                Bitmap bitmap = null;
+                Bitmap bitmap;
                 if (screenRect.width() > 0 && screenRect.height() > 0) {
                     // create bitmap for drawing
                     bitmap = Bitmap.createBitmap(screenRect.width(), screenRect.height(), Bitmap.Config.ARGB_8888);
                     bitmap.eraseColor(Color.TRANSPARENT);
+                    payload.setResultBitmap(bitmap);
 
                     Canvas bitmapCanvas = new Canvas(bitmap);
                     // move the canvas over the bitmap
@@ -58,13 +59,12 @@ class RenderTask {
                     payloadList = null;
                     running.set(false);
                 }
-                publishBitmap(payload, bitmap);
+                publishBitmap(payload);
             }
         }
     };
 
-    private void publishBitmap(final OffScreenPlotPainter.RenderPayload payload, Bitmap bitmap) {
-        payload.setResultBitmap(bitmap);
+    private void publishBitmap(final OffScreenPlotPainter.RenderPayload payload) {
         uiHandler.post(new Runnable() {
             @Override
             public void run() {
