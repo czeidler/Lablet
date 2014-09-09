@@ -88,6 +88,14 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
         return range;
     }
 
+    private float[] mapPoint(Matrix matrix, float x, float y) {
+        final float[] screenLeftTop = new float[2];
+        screenLeftTop[0] = x;
+        screenLeftTop[1] = y;
+        matrix.mapPoints(screenLeftTop);
+        return screenLeftTop;
+    }
+
     @Override
     protected void drawRange(Canvas canvas, ArrayRenderPayload payload, Range range) {
         AudioFrequencyMapAdapter adapter = (AudioFrequencyMapAdapter)payload.getAdapter();
@@ -97,57 +105,53 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
         int count = range.max - range.min + 1;
         if (start < 0)
             start = 0;
+
         int dataSize = adapter.getSize();
         if (dataSize == 0)
             return;
         if (start + count > dataSize)
             count = dataSize - start;
 
+        float[] startLeftTop = mapPoint(rangeMatrix, adapter.getX(start), payload.getRealDataRect().top);
+        int xStartPixel = (int)startLeftTop[0];
+
         final Rect screenRect = payload.getScreenRect();
         final int[] colors = new int[screenRect.height()];
-
         final int[] bitmapData = new int[screenRect.width() * screenRect.height()];
+        Arrays.fill(bitmapData, Color.TRANSPARENT);
 
-        int lastTimePixel = -1;
-        for (int idx = 0; idx < count; idx++) {
-            final int index = start + idx;
-            final float[] frequencies = adapter.getY(index);
+        for (int index = start; index < start + count; index++) {
 
-            final float time = adapter.getX(index);
-            final float[] screenLeftTop = new float[2];
-            screenLeftTop[0] = time;
-            screenLeftTop[1] = payload.getRealDataRect().top;
-            rangeMatrix.mapPoints(screenLeftTop);
+            final float[] screenLeftTop = mapPoint(rangeMatrix, adapter.getX(index), payload.getRealDataRect().top);
+            int timePixel = (int)screenLeftTop[0] - xStartPixel;
 
-            final int timePixel = (int)screenLeftTop[0];
             if (timePixel < 0)
                 continue;
-            if (lastTimePixel < 0) {
-                getColors(colors, frequencies, payload);
-                lastTimePixel = timePixel;
-                continue;
-            }
-            if (timePixel == lastTimePixel)
-                continue;
+            final int lastTimePixel = timePixel;
 
-            for (int column = lastTimePixel; column < timePixel; column++) {
+            final float[] frequencies = adapter.getY(index);
+            getColors(colors, frequencies, payload);
+
+            // advance till the next pixel
+            for (; index < start + count; index++) {
+                final float[] temp = mapPoint(rangeMatrix, adapter.getX(index), payload.getRealDataRect().top);
+                timePixel = (int)temp[0] - xStartPixel;
+                if (lastTimePixel != timePixel) {
+                    // go back again
+                    timePixel --;
+                    index --;
+                    break;
+                }
+            }
+
+            for (int column = lastTimePixel; column <= timePixel; column++) {
                 if (column >= screenRect.width())
                     break;
                 for (int row = 0; row < colors.length; row++)
                     bitmapData[column + row * screenRect.width()] = colors[row];
             }
-
-            if (timePixel >= screenRect.width())
-                break;
-
-            lastTimePixel = timePixel;
-            getColors(colors, frequencies, payload);
         }
-        float[] screenLeftTop = new float[2];
-        screenLeftTop[0] = adapter.getX(0);
-        screenLeftTop[1] = payload.getRealDataRect().top;
-        rangeMatrix.mapPoints(screenLeftTop);
-        canvas.drawBitmap(bitmapData, 0, screenRect.width(), screenLeftTop[0] - 0.5f, screenLeftTop[1],
+        canvas.drawBitmap(bitmapData, 0, screenRect.width(), startLeftTop[0], startLeftTop[1],
                 screenRect.width(), screenRect.height(), true, null);
     }
 
