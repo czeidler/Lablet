@@ -135,7 +135,10 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
             public void onDataAdded(AbstractPlotDataAdapter plot, int index, int number) {
                 onSetupOffScreenBitmap();
 
-                dirtyRegion.addRange(index, index + number - 1);
+                int start = index;
+                if (index > 0)
+                    start -= 1;
+                dirtyRegion.addRange(start, index + number - 1);
                 if ((maxDirtyRanges > 0 && maxDirtyRanges <= dirtyRegion.getSize()) || hasFreeRenderingPipe())
                     flushDirtyRegion();
             }
