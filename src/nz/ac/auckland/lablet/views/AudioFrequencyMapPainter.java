@@ -98,24 +98,57 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
         if (start < 0)
             start = 0;
         int dataSize = adapter.getSize();
-        if (count > dataSize)
-            count = dataSize;
+        if (dataSize == 0)
+            return;
+        if (start + count > dataSize)
+            count = dataSize - start;
 
+        final Rect screenRect = payload.getScreenRect();
+        final int[] colors = new int[screenRect.height()];
+
+        final int[] bitmapData = new int[screenRect.width() * screenRect.height()];
+
+        int lastTimePixel = -1;
         for (int idx = 0; idx < count; idx++) {
             final int index = start + idx;
             final float[] frequencies = adapter.getY(index);
+
             final float time = adapter.getX(index);
-
-            final int[] colors = getColors(frequencies, payload);
-
-            float[] screenLeftTop = new float[2];
+            final float[] screenLeftTop = new float[2];
             screenLeftTop[0] = time;
             screenLeftTop[1] = payload.getRealDataRect().top;
             rangeMatrix.mapPoints(screenLeftTop);
 
-            canvas.drawBitmap(colors, 0, 1, screenLeftTop[0] - 0.5f, screenLeftTop[1], 1,
-                    payload.getScreenRect().height(), true, null);
+            final int timePixel = (int)screenLeftTop[0];
+            if (timePixel < 0)
+                continue;
+            if (lastTimePixel < 0) {
+                getColors(colors, frequencies, payload);
+                lastTimePixel = timePixel;
+                continue;
+            }
+            if (timePixel == lastTimePixel)
+                continue;
+
+            for (int column = lastTimePixel; column < timePixel; column++) {
+                if (column >= screenRect.width())
+                    break;
+                for (int row = 0; row < colors.length; row++)
+                    bitmapData[column + row * screenRect.width()] = colors[row];
+            }
+
+            if (timePixel >= screenRect.width())
+                break;
+
+            lastTimePixel = timePixel;
+            getColors(colors, frequencies, payload);
         }
+        float[] screenLeftTop = new float[2];
+        screenLeftTop[0] = adapter.getX(0);
+        screenLeftTop[1] = payload.getRealDataRect().top;
+        rangeMatrix.mapPoints(screenLeftTop);
+        canvas.drawBitmap(bitmapData, 0, screenRect.width(), screenLeftTop[0] - 0.5f, screenLeftTop[1],
+                screenRect.width(), screenRect.height(), true, null);
     }
 
     private int toPixel(float scaledValue, float scaledBottom, float scaledTop, Rect screenRect) {
@@ -127,15 +160,26 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
         return (float)index / arraySize * frequencyRang;
     }
 
-    private int[] getColors(final float[] frequencies, final ArrayRenderPayload payload) {
+    private double getFrequencyAmp(float frequencyAmpRaw, float frequencyAmpMax) {
+        final float maxDB = -60;
+        return 1d - 10 * Math.log10(frequencyAmpRaw / frequencyAmpMax) / maxDB;
+
+        //double amplitude = 1d - 10 * Math.log10(frequencyAmpAverage / maxFrequencyAmplitude) / maxDB;
+        //double amplitude = Math.log10(Math.abs(frequencyAmpAverage)) / Math.log10(maxFrequencyAmplitude);
+        //double amplitude = Math.abs(frequencyAmpAverage) / maxFrequencyAmplitude;
+    }
+
+    private int[] getColors(int[] colors, final float[] frequencies, final ArrayRenderPayload payload) {
         final float scaledBottom = yScale.scale(payload.getRealDataRect().bottom);
         final float scaledTop = yScale.scale(payload.getRealDataRect().top);
         final Rect screenRect = payload.getScreenRect();
-        final int[] colors = new int[screenRect.height()];
+
+        float maxFreqAmplitude = 32768 * frequencies.length;
+
         Arrays.fill(colors, Color.TRANSPARENT);
 
         float frequencyAmpSum = 0;
-        int currentPixel = -1;
+        int lastPixel = -1;
         int perPixelCount = 0;
         for (int i = 0; i < frequencies.length; i++) {
             float frequencyAmp = frequencies[i];
@@ -146,53 +190,41 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
                 continue;
             if (pixel >= colors.length)
                 break;
-            if (currentPixel == -1)
-                currentPixel = pixel;
+            if (lastPixel == -1)
+                lastPixel = pixel;
 
-            if (pixel == currentPixel) {
+            if (pixel == lastPixel) {
                 frequencyAmpSum += frequencyAmp;
                 perPixelCount++;
             } else {
                 float frequencyAmpAverage = frequencyAmpSum / perPixelCount;
-                final float maxDB = -60;
-                float maxFreqAmplitude = 32768 * frequencies.length;
-                double freqAmplitude = 1d - 10 * Math.log10(frequencyAmpAverage / maxFreqAmplitude) / maxDB;
-                //double amplitude = 1d - 10 * Math.log10(frequencyAmpAverage / maxFrequencyAmplitude) / maxDB;
-                //double amplitude = Math.log10(Math.abs(frequencyAmpAverage)) / Math.log10(maxFrequencyAmplitude);
-                //double amplitude = Math.abs(frequencyAmpAverage) / maxFrequencyAmplitude;
-                int colorIndex = colors.length - 1 - currentPixel;
-                colors[colorIndex] = heatMap(freqAmplitude);
+                double freqAmplitude = getFrequencyAmp(frequencyAmpAverage, maxFreqAmplitude);
+                drawFrequencyPixels(colors, freqAmplitude, lastPixel, pixel);
 
                 frequencyAmpSum = frequencyAmp;
-                currentPixel = pixel;
+                lastPixel = pixel;
                 perPixelCount = 1;
             }
+        }
+        if (lastPixel >= 0) {
+            float frequencyAmpAverage = frequencyAmpSum / perPixelCount;
+            double freqAmplitude = getFrequencyAmp(frequencyAmpAverage, maxFreqAmplitude);
+            drawFrequencyPixels(colors, freqAmplitude, lastPixel, colors.length - 1);
         }
         return colors;
     }
 
-    @Override
-    public void invalidate() {
-        if (containerView == null || getBitmapCanvas() == null || dataAdapter == null)
-            return;
-
-        if (dataAdapter.getSize() == 0)
-            return;
-        emptyOffScreenRenderingQueue();
-
-        AudioFrequencyMapAdapter adapter = (AudioFrequencyMapAdapter)dataAdapter;
-        Region1D regionToRender = new Region1D(0, dataAdapter.getSize() - 1);
-        RectF realDataRect = new RectF(adapter.getX(0), frequencyRang, adapter.getX(adapter.getSize() - 1), 0);
-        Rect screenRect = containerView.toScreen(realDataRect);
-
-        triggerJob(realDataRect, screenRect, regionToRender, true);
-
-        dirtyRegion.clear();
+    private void drawFrequencyPixels(int[] colors, double frequencyAmp, int startPixel, int endPixel) {
+        int colorValue = heatMap(frequencyAmp);
+        for (int a = startPixel; a < endPixel; a++) {
+            int colorIndex = colors.length - 1 - a;
+            colors[colorIndex] = colorValue;
+        }
     }
 
     @Override
     protected void onSetupOffScreenBitmap() {
-        final int offScreenFactor = 2;
+        final float offScreenFactor = 2.f;
 
         RectF bitmapRealRect = containerView.getRange();
         float widthHalf = Math.abs(bitmapRealRect.width() * (offScreenFactor - 1) / 2);
@@ -203,14 +235,12 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
         bitmapRealRect.bottom -= heightHalf;
 
         if (offScreenBitmap.getBitmap() == null) {
-            Bitmap bitmap = Bitmap.createBitmap(offScreenFactor * containerView.getWidth(),
-                    offScreenFactor * containerView.getHeight(), Bitmap.Config.ARGB_8888);
+            Bitmap bitmap = Bitmap.createBitmap((int)(offScreenFactor * containerView.getWidth()),
+                    (int)(offScreenFactor * containerView.getHeight()), Bitmap.Config.ARGB_8888);
             bitmap.eraseColor(Color.TRANSPARENT);
-
 
             offScreenBitmap.setTo(bitmap, bitmapRealRect);
         } else
             offScreenBitmap.setRealRect(bitmapRealRect);
-
     }
 }
