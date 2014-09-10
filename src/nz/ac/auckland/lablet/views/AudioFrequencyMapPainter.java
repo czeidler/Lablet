@@ -178,7 +178,7 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
         final float scaledTop = yScale.scale(payload.getRealDataRect().top);
         final Rect screenRect = payload.getScreenRect();
 
-        float maxFreqAmplitude = 32768 * frequencies.length;
+        float maxFreqAmplitude = 32768 * frequencies.length * 2;
 
         Arrays.fill(colors, Color.TRANSPARENT);
 

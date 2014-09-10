@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.microphone;
 
 import edu.emory.mathcs.jtransforms.dct.FloatDCT_1D;
+import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
 
 import java.util.Arrays;
 
@@ -37,13 +38,36 @@ public class Fourier {
     }
 
     static private float[] transformInternal(float[] trafo) {
-        final FloatDCT_1D dct = new FloatDCT_1D(trafo.length);
         // in place window
         hammingWindow(trafo);
+/*
+        float out[] = new float[2 * trafo.length];
+        for (int i = 0; i < trafo.length; i++) {
+            out[i * 2] = trafo[i];
+            out[i * 2 + 1] = 0;
+        }
+        //System.arraycopy(trafo, 0, out, 0, trafo.length);
+        final FloatFFT_1D fft = new FloatFFT_1D(trafo.length);
+
+        fft.complexForward(out);
+        trafo = new float[trafo.length / 2];
+        for (int i = 1; i < out.length / 2; i += 2) {
+            trafo[(i - 1) / 2] = (float)Math.sqrt(Math.pow(out[i], 2) + Math.pow(out[i - 1], 2));
+        }
+
+        return trafo;
+*/
+
+        final FloatDCT_1D dct = new FloatDCT_1D(trafo.length);
 
         // in place transform: timeData becomes frequency data
         dct.forward(trafo, false);
 
-        return trafo;
+        float[] out = new float[trafo.length / 2];
+        for (int i = 1; i < trafo.length; i += 2) {
+            out[(i - 1) / 2] = (float)Math.sqrt(Math.pow(trafo[i], 2) + Math.pow(trafo[i - 1], 2));
+        }
+
+        return out;
     }
 }
