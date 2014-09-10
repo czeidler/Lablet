@@ -92,7 +92,7 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
 
     @Override
     public void invalidate() {
-        if (containerView == null || getBitmapCanvas() == null || dataAdapter == null)
+        if (containerView == null || dataAdapter == null)
             return;
 
         emptyOffScreenRenderingQueue();

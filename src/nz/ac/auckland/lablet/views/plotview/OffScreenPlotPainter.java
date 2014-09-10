@@ -12,6 +12,10 @@ import android.os.Handler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -19,7 +23,8 @@ class RenderTask {
     final private OffScreenPlotPainter plotPainter;
 
     final private AtomicBoolean running = new AtomicBoolean();
-    private Thread thread;
+    private Future thread;
+    private ExecutorService threadPool = Executors.newCachedThreadPool();
     final private Handler uiHandler = new Handler();
     private List<OffScreenPlotPainter.RenderPayload> payloadList;
 
@@ -78,8 +83,7 @@ class RenderTask {
             return false;
         this.payloadList = payloadList;
         running.set(true);
-        thread = new Thread(renderRunnable);
-        thread.start();
+        thread = threadPool.submit(renderRunnable);
         return true;
     }
 
@@ -88,8 +92,10 @@ class RenderTask {
             return;
         running.set(false);
         try {
-            thread.join();
+            thread.get();
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
     }
