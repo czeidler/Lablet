@@ -11,8 +11,12 @@ import android.content.Context;
 import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.Spinner;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
@@ -24,12 +28,20 @@ import nz.ac.auckland.lablet.views.plotview.PlotView;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class FrequencyAnalysisView extends FrameLayout implements IExperimentFrameView {
+public class FrequencyAnalysisView extends FrameLayout {
     final private FrequencyAnalysis frequencyAnalysis;
     final private MicrophoneSensorData micSensorData;
     private AudioFrequencyMapAdapter audioFrequencyMapAdapter;
+    private byte[] wavRawData = null;
+
+    private Spinner sampleSizeSpinner;
+    final private List<String> sampleSizeList = new ArrayList<>();
+
+    final private FreqMapUpdater freqMapUpdater = new FreqMapUpdater();
 
     public FrequencyAnalysisView(Context context, FrequencyAnalysis analysis) {
         super(context);
@@ -56,6 +68,31 @@ public class FrequencyAnalysisView extends FrameLayout implements IExperimentFra
         tagMarkerView.setAdapter(new MarkerGraphAdapter(analysis.getTagMarkerModel(), "Position Data",
                 new XPositionMarkerGraphAxis(frequencyAnalysis.getXUnit(), null),
                 new YPositionMarkerGraphAxis(frequencyAnalysis.getYUnit(), null)));
+
+        sampleSizeSpinner = (Spinner)view.findViewById(R.id.sampleSizeSpinner);
+        sampleSizeSpinner.setEnabled(false);
+        sampleSizeList.add("128");
+        sampleSizeList.add("256");
+        sampleSizeList.add("512");
+        sampleSizeList.add("1024");
+        sampleSizeList.add("2048");
+        sampleSizeList.add("4096");
+        sampleSizeList.add("8192");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(context,
+                android.R.layout.simple_spinner_dropdown_item, sampleSizeList);
+        sampleSizeSpinner.setAdapter(adapter);
+        sampleSizeSpinner.setSelection(sampleSizeList.indexOf("4096"));
+        sampleSizeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    freqMapUpdater.update();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                }
+            });
 
         loadWavFileAsync(audioWavInputStream);
     }
@@ -87,59 +124,100 @@ public class FrequencyAnalysisView extends FrameLayout implements IExperimentFra
         frequencyMapPlotView.addPlotPainter(markerDataModelPainter);
     }
 
-    private void loadWavFileAsync(final AudioWavInputStream audioWavInputStream) {
-        audioFrequencyMapAdapter.clear();
-
-        class DataContainer {
-            public float[] data;
-
-            public DataContainer(float[] data) {
-                this.data = data;
-            }
+    class DataContainer {
+        public float[] data;
+        public DataContainer(float[] data) {
+            this.data = data;
         }
+    }
 
+    private void loadWavFileAsync(final AudioWavInputStream audioWavInputStream) {
         AsyncTask<Void, DataContainer, Void> asyncTask = new AsyncTask<Void, DataContainer, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                byte[] data = null;
                 try {
                     int size = audioWavInputStream.getSize();
                     BufferedInputStream bufferedInputStream = new BufferedInputStream(audioWavInputStream);
-                    data = new byte[size];
+                    wavRawData = new byte[size];
                     for (int i = 0; i < size; i++)
-                        data[i] = (byte)bufferedInputStream.read();
+                        wavRawData[i] = (byte)bufferedInputStream.read();
 
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
-
-                float amplitudes[] = AudioWavInputStream.toAmplitudeData(data, data.length);
-                final int frameSize = 4096;
-                final int half = frameSize / 2;
-                for (int i = 0; i < amplitudes.length; i += half) {
-                    float frequencies[] = Fourier.transform(amplitudes, i, frameSize);
-                    publishProgress(new DataContainer(frequencies));
                 }
                 return null;
             }
 
             @Override
-            protected void onProgressUpdate(DataContainer... values) {
-                audioFrequencyMapAdapter.addData(values[0].data);
-            }
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
 
+                sampleSizeSpinner.setEnabled(true);
+                freqMapUpdater.update();
+            }
         };
         asyncTask.execute();
     }
 
-    @Override
-    public void setCurrentFrame(int frame) {
+    class FreqMapUpdater {
+        private int sampleSize = -1;
+        AsyncTask<Void, DataContainer, Void> asyncTask = null;
 
-    }
+        public void update() {
+            if (wavRawData == null)
+                return;
+            final int newSampleSize = Integer.parseInt(sampleSizeList.get(sampleSizeSpinner.getSelectedItemPosition()));
+            if (sampleSize == newSampleSize)
+                return;
+            // old task running? cancel and return, new job is triggered afterwards
+            if (asyncTask != null) {
+                asyncTask.cancel(false);
+                return;
+            }
 
-    @Override
-    public RectF getDataRange() {
-        return new RectF(0, 100, 100, 0);
+            // do the update
+            audioFrequencyMapAdapter.clear();
+
+            asyncTask = new AsyncTask<Void, DataContainer, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    float amplitudes[] = AudioWavInputStream.toAmplitudeData(wavRawData, wavRawData.length);
+
+                    final int half = newSampleSize / 2;
+                    for (int i = 0; i < amplitudes.length; i += half) {
+                        float frequencies[] = Fourier.transform(amplitudes, i, newSampleSize);
+                        if (isCancelled())
+                            return null;
+                        publishProgress(new DataContainer(frequencies));
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onProgressUpdate(DataContainer... values) {
+                    audioFrequencyMapAdapter.addData(values[0].data);
+                }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    super.onPostExecute(aVoid);
+                    sampleSize = newSampleSize;
+                    onFinished();
+                }
+
+                @Override
+                protected void onCancelled() {
+                    super.onCancelled();
+                    onFinished();
+                }
+            };
+            asyncTask.execute();
+        }
+
+        private void onFinished() {
+            asyncTask = null;
+            update();
+        }
     }
 
 }

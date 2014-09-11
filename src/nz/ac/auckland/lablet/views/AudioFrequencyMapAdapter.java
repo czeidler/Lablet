@@ -16,8 +16,10 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
     private int sampleRate = 44100;
 
     public void clear() {
-        if (data != null)
+        if (data != null) {
             data.clear();
+            data = null;
+        }
         notifyAllDataChanged();
     }
 

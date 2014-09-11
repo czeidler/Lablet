@@ -8,8 +8,56 @@
           android:layout_height="wrap_content"
           class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/frequencyMapView" android:layout_row="0"
           android:layout_column="0" android:layout_rowSpan="2"/>
-    <view android:layout_width="wrap_content"
-          android:layout_height="313dp"
-          class="nz.ac.auckland.lablet.views.graph.GraphView2D" android:id="@+id/tagMarkerGraphView" android:layout_row="0"
-          android:layout_column="1"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <view android:layout_width="wrap_content"
+              android:layout_height="313dp"
+              class="nz.ac.auckland.lablet.views.graph.GraphView2D" android:id="@+id/tagMarkerGraphView" android:layout_row="0"
+              android:layout_column="1"/>
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Sampling Size:"
+                android:id="@+id/textView" android:layout_alignParentTop="true" android:layout_alignParentStart="true"/>
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/sampleSizeSpinner"
+                android:layout_alignStart="@+id/timeResEditText" android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Time Resolution:"
+                android:id="@+id/textView2" android:layout_below="@+id/sampleSizeSpinner" android:layout_alignParentStart="true"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Frequency Resolution: "
+                android:id="@+id/freqResTextEdit"
+                android:layout_below="@+id/timeResEditText" android:layout_alignParentStart="true"/>
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/timeResEditText" android:layout_below="@+id/sampleSizeSpinner"
+                android:layout_toRightOf="@+id/freqResTextEdit" android:layout_alignParentEnd="true"
+                android:editable="false" android:enabled="true"/>
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText2"
+                android:layout_alignTop="@+id/freqResTextEdit"
+                android:layout_alignParentEnd="true"
+                android:layout_toRightOf="@+id/freqResTextEdit"
+                android:editable="false" android:enabled="true"/>
+        </RelativeLayout>
+    </LinearLayout>
 </LinearLayout>
