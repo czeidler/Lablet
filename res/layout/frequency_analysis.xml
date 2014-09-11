@@ -29,13 +29,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/sampleSizeSpinner"
-                android:layout_alignStart="@+id/timeResEditText" android:layout_alignParentTop="true"
+                android:layout_alignStart="@+id/timeStepEditText" android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Time Resolution:"
+                android:text="Time Step Size:"
                 android:id="@+id/textView2" android:layout_below="@+id/sampleSizeSpinner" android:layout_alignParentStart="true"/>
             <TextView
                 android:layout_width="wrap_content"
@@ -43,11 +43,11 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Frequency Resolution: "
                 android:id="@+id/freqResTextEdit"
-                android:layout_below="@+id/timeResEditText" android:layout_alignParentStart="true"/>
+                android:layout_below="@+id/timeStepEditText" android:layout_alignParentStart="true"/>
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/timeResEditText" android:layout_below="@+id/sampleSizeSpinner"
+                android:id="@+id/timeStepEditText" android:layout_below="@+id/sampleSizeSpinner"
                 android:layout_toRightOf="@+id/freqResTextEdit"
                 android:editable="false" android:enabled="true" android:minWidth="80dp"/>
             <TextView
@@ -57,8 +57,8 @@
                 android:text="ms"
                 android:id="@+id/textView3"
                 android:layout_alignParentEnd="true"
-                android:layout_toRightOf="@+id/timeResEditText"
-                android:layout_alignTop="@id/timeResEditText" android:layout_above="@+id/freqResEditText"/>
+                android:layout_toRightOf="@+id/timeStepEditText"
+                android:layout_alignTop="@id/timeStepEditText" android:layout_above="@+id/freqResEditText"/>
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Hz"
-                android:id="@+id/textView4" android:layout_below="@+id/timeResEditText"
+                android:id="@+id/textView4" android:layout_below="@+id/timeStepEditText"
                 android:layout_alignParentEnd="true" android:layout_alignBottom="@+id/freqResEditText"
                 android:layout_alignStart="@+id/textView3"/>
         </RelativeLayout>

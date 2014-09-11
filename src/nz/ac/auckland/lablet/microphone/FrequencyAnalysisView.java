@@ -8,7 +8,6 @@
 package nz.ac.auckland.lablet.microphone;
 
 import android.content.Context;
-import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,7 +67,7 @@ public class FrequencyAnalysisView extends FrameLayout {
                 new YPositionMarkerGraphAxis(frequencyAnalysis.getYUnit(), null)));
 
         final EditText freqResEditText = (EditText)view.findViewById(R.id.freqResEditText);
-        final EditText timeResEditText = (EditText)view.findViewById(R.id.timeResEditText);
+        final EditText timeStepEditText = (EditText)view.findViewById(R.id.timeStepEditText);
 
         sampleSizeSpinner = (Spinner)view.findViewById(R.id.sampleSizeSpinner);
         sampleSizeSpinner.setEnabled(false);
@@ -92,10 +91,11 @@ public class FrequencyAnalysisView extends FrameLayout {
                 int sampleSize = Integer.parseInt(sampleSizeList.get(i));
 
                 float freqResolution = (float) sampleRate / sampleSize;
-                float timeResolution = (float) sampleSize / sampleRate * 1000;
+                float timeResolution = (float) sampleSize / sampleRate * 1000
+                        * audioFrequencyMapAdapter.getStepFactor();
 
                 freqResEditText.setText(String.format("%.2f", freqResolution));
-                timeResEditText.setText(String.format("%.2f", timeResolution));
+                timeStepEditText.setText(String.format("%.2f", timeResolution));
             }
 
             @Override
