@@ -85,31 +85,31 @@ public class FrequencyAnalysisView extends FrameLayout {
                 android.R.layout.simple_spinner_dropdown_item, sampleSizeList);
         sampleSizeSpinner.setAdapter(adapter);
         sampleSizeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                    freqMapUpdater.update();
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                freqMapUpdater.update();
 
-                    int sampleSize = Integer.parseInt(sampleSizeList.get(i));
+                int sampleSize = Integer.parseInt(sampleSizeList.get(i));
 
-                    float freqResolution = (float)sampleRate / sampleSize;
-                    float timeResolution = (float)sampleSize / sampleRate * 1000;
+                float freqResolution = (float) sampleRate / sampleSize;
+                float timeResolution = (float) sampleSize / sampleRate * 1000;
 
-                    freqResEditText.setText(String.format("%.2f", freqResolution));
-                    timeResEditText.setText(String.format("%.2f", timeResolution));
-                }
+                freqResEditText.setText(String.format("%.2f", freqResolution));
+                timeResEditText.setText(String.format("%.2f", timeResolution));
+            }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> adapterView) {
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
 
-                }
-            });
+            }
+        });
         sampleSizeSpinner.setSelection(sampleSizeList.indexOf("4096"));
 
         loadWavFileAsync(audioWavInputStream);
     }
 
     private void setupFrequencyView(PlotView frequencyMapPlotView, AudioWavInputStream audioWavInputStream) {
-        audioFrequencyMapAdapter = new AudioFrequencyMapAdapter();
+        audioFrequencyMapAdapter = new AudioFrequencyMapAdapter(0.5f);
         AudioFrequencyMapPainter audioFrequencyMapPainter = new AudioFrequencyMapPainter();
         audioFrequencyMapPainter.setDataAdapter(audioFrequencyMapAdapter);
         frequencyMapPlotView.addPlotPainter(audioFrequencyMapPainter);
@@ -194,8 +194,8 @@ public class FrequencyAnalysisView extends FrameLayout {
                 protected Void doInBackground(Void... params) {
                     float amplitudes[] = AudioWavInputStream.toAmplitudeData(wavRawData, wavRawData.length);
 
-                    final int half = newSampleSize / 2;
-                    for (int i = 0; i < amplitudes.length; i += half) {
+                    final int step = (int)(newSampleSize * audioFrequencyMapAdapter.getStepFactor());
+                    for (int i = 0; i < amplitudes.length; i += step) {
                         float frequencies[] = Fourier.transform(amplitudes, i, newSampleSize);
                         if (isCancelled())
                             return null;

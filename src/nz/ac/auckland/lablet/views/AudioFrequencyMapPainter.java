@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 
 public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
-    final private int[] heatMap = new int[256];
+    final private int[] heatMap = new int[512];
 
     public AudioFrequencyMapPainter() {
         setMaxDirtyRanges(3);
@@ -166,11 +166,10 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
 
     private double getFrequencyAmp(float frequencyAmpRaw, float frequencyAmpMax) {
         final float maxDB = -60;
-        return 1d - 10 * Math.log10(frequencyAmpRaw / frequencyAmpMax) / maxDB;
+        return 1d - 10d * Math.log10(frequencyAmpRaw / frequencyAmpMax) / maxDB;
 
-        //double amplitude = 1d - 10 * Math.log10(frequencyAmpAverage / maxFrequencyAmplitude) / maxDB;
-        //double amplitude = Math.log10(Math.abs(frequencyAmpAverage)) / Math.log10(maxFrequencyAmplitude);
-        //double amplitude = Math.abs(frequencyAmpAverage) / maxFrequencyAmplitude;
+        //return Math.log10(Math.abs(frequencyAmpRaw)) / Math.log10(frequencyAmpMax);
+        //return Math.abs(frequencyAmpRaw) / frequencyAmpMax;
     }
 
     private int[] getColors(int[] colors, final float[] frequencies, final ArrayRenderPayload payload) {

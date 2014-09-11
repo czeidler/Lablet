@@ -78,8 +78,8 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 public void onNewFrequencyData(float[] frequencies) {
                     audioFrequencyView.addData(frequencies);
 
-                    if (audioFrequencyMapAdapter.getSize() * experimentSensor.FRAME_SIZE / 2 * 1000
-                            / experimentSensor.SAMPLE_RATE >= frequencyMapTimeSpan)
+                    int size = audioFrequencyMapAdapter.getSize();
+                    if (size > 0 && audioFrequencyMapAdapter.getX(size - 1) >= frequencyMapTimeSpan)
                         audioFrequencyMapAdapter.clear();
                     audioFrequencyMapAdapter.addData(frequencies);
                 }
@@ -101,7 +101,7 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 audioFrequencyView = (AudioFrequencyView)view.findViewById(R.id.audioFrequencyView);
 
                 frequencyMapPlotView = (PlotView)view.findViewById(R.id.audioFrequencyMapPlot);
-                audioFrequencyMapAdapter = new AudioFrequencyMapAdapter();
+                audioFrequencyMapAdapter = new AudioFrequencyMapAdapter(0.5f);
                 AudioFrequencyMapPainter audioFrequencyMapPainter = new AudioFrequencyMapPainter();
                 audioFrequencyMapPainter.setDataAdapter(audioFrequencyMapAdapter);
                 frequencyMapPlotView.addPlotPainter(audioFrequencyMapPainter);
@@ -117,7 +117,7 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 frequencyMapPlotView.setYZoomable(true);
                 frequencyMapPlotView.getYAxisView().setUnit("Hz");
                 frequencyMapPlotView.getYAxisView().setTitle("Frequency");
-                frequencyMapPlotView.getXAxisView().setUnit("s");
+                frequencyMapPlotView.getXAxisView().setUnit("ms");
                 frequencyMapPlotView.getXAxisView().setTitle("Time");
 
                 experimentSensor.setSensorDataListener(listener);
@@ -290,7 +290,7 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     private WeakReference<ISensorDataListener> softListener = null;
 
     final public int SAMPLE_RATE = 44100;
-    final public int FRAME_SIZE = 4096;//8192;//16384;
+    final public int FRAME_SIZE = 4096;
 
     float[] prevAmplitudes = null;
     final String audioFileName = "audio.wav";
