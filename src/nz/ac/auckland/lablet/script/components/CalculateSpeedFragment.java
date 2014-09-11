@@ -209,7 +209,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
     private CorrectPosAndVeloValues correctPosAndVeloValues = null;
     private CorrectAccelerationValues correctAccelerationValues = null;
 
-    private List<String> unitList = new ArrayList<String>();
+    private List<String> unitList = new ArrayList<>();
     private String correctSpeedUnit = "[m/s]";
     private String correctAccelerationUnit = "[m/s^2]";
 
@@ -290,7 +290,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
         unitList.add("[m^2/s^2]");
         unitList.add("[s]");
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item, unitList);
 
         speedUnitSpinner.setAdapter(adapter);
