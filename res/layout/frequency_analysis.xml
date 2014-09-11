@@ -48,16 +48,32 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/timeResEditText" android:layout_below="@+id/sampleSizeSpinner"
-                android:layout_toRightOf="@+id/freqResTextEdit" android:layout_alignParentEnd="true"
-                android:editable="false" android:enabled="true"/>
+                android:layout_toRightOf="@+id/freqResTextEdit"
+                android:editable="false" android:enabled="true" android:minWidth="80dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="ms"
+                android:id="@+id/textView3"
+                android:layout_alignParentEnd="true"
+                android:layout_toRightOf="@+id/timeResEditText"
+                android:layout_alignTop="@id/timeResEditText" android:layout_above="@+id/freqResEditText"/>
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/editText2"
+                android:id="@+id/freqResEditText"
                 android:layout_alignTop="@+id/freqResTextEdit"
-                android:layout_alignParentEnd="true"
                 android:layout_toRightOf="@+id/freqResTextEdit"
-                android:editable="false" android:enabled="true"/>
+                android:editable="false" android:enabled="true" android:layout_toLeftOf="@+id/textView3"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Hz"
+                android:id="@+id/textView4" android:layout_below="@+id/timeResEditText"
+                android:layout_alignParentEnd="true" android:layout_alignBottom="@+id/freqResEditText"
+                android:layout_alignStart="@+id/textView3"/>
         </RelativeLayout>
     </LinearLayout>
 </LinearLayout>

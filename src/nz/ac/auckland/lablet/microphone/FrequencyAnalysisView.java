@@ -13,10 +13,7 @@ import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
-import android.widget.Spinner;
+import android.widget.*;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
@@ -63,11 +60,15 @@ public class FrequencyAnalysisView extends FrameLayout {
 
         PlotView frequencyView = (PlotView)view.findViewById(R.id.frequencyMapView);
         setupFrequencyView(frequencyView, audioWavInputStream);
+        final int sampleRate = audioWavInputStream.getSampleRate();
 
         GraphView2D tagMarkerView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
         tagMarkerView.setAdapter(new MarkerGraphAdapter(analysis.getTagMarkerModel(), "Position Data",
                 new XPositionMarkerGraphAxis(frequencyAnalysis.getXUnit(), null),
                 new YPositionMarkerGraphAxis(frequencyAnalysis.getYUnit(), null)));
+
+        final EditText freqResEditText = (EditText)view.findViewById(R.id.freqResEditText);
+        final EditText timeResEditText = (EditText)view.findViewById(R.id.timeResEditText);
 
         sampleSizeSpinner = (Spinner)view.findViewById(R.id.sampleSizeSpinner);
         sampleSizeSpinner.setEnabled(false);
@@ -78,14 +79,23 @@ public class FrequencyAnalysisView extends FrameLayout {
         sampleSizeList.add("2048");
         sampleSizeList.add("4096");
         sampleSizeList.add("8192");
+        sampleSizeList.add("16384");
+        sampleSizeList.add("32768");
         ArrayAdapter<String> adapter = new ArrayAdapter<>(context,
                 android.R.layout.simple_spinner_dropdown_item, sampleSizeList);
         sampleSizeSpinner.setAdapter(adapter);
-        sampleSizeSpinner.setSelection(sampleSizeList.indexOf("4096"));
         sampleSizeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                     freqMapUpdater.update();
+
+                    int sampleSize = Integer.parseInt(sampleSizeList.get(i));
+
+                    float freqResolution = (float)sampleRate / sampleSize;
+                    float timeResolution = (float)sampleSize / sampleRate * 1000;
+
+                    freqResEditText.setText(String.format("%.2f", freqResolution));
+                    timeResEditText.setText(String.format("%.2f", timeResolution));
                 }
 
                 @Override
@@ -93,6 +103,7 @@ public class FrequencyAnalysisView extends FrameLayout {
 
                 }
             });
+        sampleSizeSpinner.setSelection(sampleSizeList.indexOf("4096"));
 
         loadWavFileAsync(audioWavInputStream);
     }
