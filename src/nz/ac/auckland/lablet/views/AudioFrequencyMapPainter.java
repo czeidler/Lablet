@@ -155,8 +155,8 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
                 screenRect.width(), screenRect.height(), true, null);
     }
 
-    private int toPixel(float scaledValue, float scaledBottom, float scaledTop, Rect screenRect) {
-        return (int)((scaledValue - scaledBottom) / (scaledTop - scaledBottom) * screenRect.height());
+    private int toPixel(float scaledValue, float scaledBottom, float scaledTop, int screenRectHeight) {
+        return (int)((scaledValue - scaledBottom) / (scaledTop - scaledBottom) * screenRectHeight);
     }
 
     final float frequencyRang = 22050;
@@ -175,7 +175,7 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
     private int[] getColors(int[] colors, final float[] frequencies, final ArrayRenderPayload payload) {
         final float scaledBottom = yScale.scale(payload.getRealDataRect().bottom);
         final float scaledTop = yScale.scale(payload.getRealDataRect().top);
-        final Rect screenRect = payload.getScreenRect();
+        final int screenRectHeight = payload.getScreenRect().height();
 
         float maxFreqAmplitude = 32768 * frequencies.length * 2;
 
@@ -188,7 +188,7 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
             float frequencyAmp = frequencies[i];
 
             float frequency = getRealValue(i, frequencies.length);
-            int pixel = toPixel(yScale.scale(frequency), scaledBottom, scaledTop, screenRect);
+            int pixel = toPixel(yScale.scale(frequency), scaledBottom, scaledTop, screenRectHeight);
             if (pixel < 0)
                 continue;
             if (pixel >= colors.length)
