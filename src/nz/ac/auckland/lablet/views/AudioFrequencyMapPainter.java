@@ -225,10 +225,10 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
         }
     }
 
+    final private float offScreenFactor = 1.5f;
+
     @Override
     protected void onSetupOffScreenBitmap() {
-        final float offScreenFactor = 2.f;
-
         RectF bitmapRealRect = containerView.getRange();
         float widthHalf = Math.abs(bitmapRealRect.width() * (offScreenFactor - 1) / 2);
         float heightHalf = Math.abs(bitmapRealRect.height() * (offScreenFactor - 1) / 2);
@@ -245,5 +245,32 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
             offScreenBitmap.setTo(bitmap, bitmapRealRect);
         } else
             offScreenBitmap.setRealRect(bitmapRealRect);
+    }
+
+    @Override
+    public void invalidate() {
+        if (containerView == null || dataAdapter == null)
+            return;
+
+        emptyOffScreenRenderingQueue();
+
+        RectF realDataRect = containerView.getRange();
+        // enlarge
+        float widthHalf = Math.abs(realDataRect.width() * (offScreenFactor - 1) / 2);
+        float heightHalf = Math.abs(realDataRect.height() * (offScreenFactor - 1) / 2);
+        realDataRect.left -= widthHalf;
+        realDataRect.right += widthHalf;
+        realDataRect.top += heightHalf;
+        realDataRect.bottom -= heightHalf;
+        containerView.ensureRectInMaxRange(realDataRect);
+
+        Rect screenRect = containerView.toScreen(realDataRect);
+
+        Range dirty = getDataRangeFor(realDataRect.left, realDataRect.right);
+        Region1D regionToRender = new Region1D(dirty);
+
+        triggerJob(realDataRect, screenRect, regionToRender, true);
+
+        dirtyRegion.clear();
     }
 }

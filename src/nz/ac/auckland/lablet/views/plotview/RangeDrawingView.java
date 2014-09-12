@@ -66,6 +66,31 @@ public class RangeDrawingView extends ViewGroup {
         setMaxYRange(range.bottom, range.top);
     }
 
+    public void ensureRectInMaxRange(RectF realDataRect) {
+        if (rangeRect.width() > 0) {
+            if (realDataRect.left < maxRange.left)
+                realDataRect.left = maxRange.left;
+            if (realDataRect.right > maxRange.right)
+                realDataRect.right = maxRange.right;
+        } else {
+            if (realDataRect.left > maxRange.left)
+                realDataRect.left = maxRange.left;
+            if (realDataRect.right < maxRange.right)
+                realDataRect.right = maxRange.right;
+        }
+        if (rangeRect.height() < 0) {
+            if (realDataRect.bottom < maxRange.bottom)
+                realDataRect.bottom = maxRange.bottom;
+            if (realDataRect.top > maxRange.top)
+                realDataRect.top = maxRange.top;
+        } else {
+            if (realDataRect.bottom > maxRange.bottom)
+                realDataRect.bottom = maxRange.bottom;
+            if (realDataRect.top < maxRange.top)
+                realDataRect.top = maxRange.top;
+        }
+
+    }
     public RectF getMaxRange() {
         return new RectF(maxRange);
     }
