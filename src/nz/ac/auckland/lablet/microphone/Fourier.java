@@ -124,6 +124,7 @@ class FourierRenderScript {
         inAllocation.copyFrom(inStartValues);
 
         script.set_gWindowSize(windowSize);
+        script.set_gStepWidth(stepWidth);
         script.bind_gData(dataAllocation);
         script.bind_gOutput(outAllocation);
         script.forEach_root(inAllocation, inAllocation);

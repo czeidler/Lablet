@@ -3,6 +3,7 @@
 //#pragma rs_fp_relaxed
 
 uint32_t gWindowSize;
+uint32_t gStepWidth;
 const float* gData;
 float* gOutput;
 
@@ -11,7 +12,6 @@ static void hammingWindow(float* samples, uint32_t length) {
     for (int i = 0; i < length; i++)
         samples[2 * i] *= (0.54f - 0.46f * cos(2 * M_PI * i / (length - 1)));
 }
-
 
 static void swap(float* array, int i, int j) {
     float temp = array[i];
@@ -80,12 +80,12 @@ void root(const int *in, int *out, const void *usrData, uint32_t x, uint32_t y) 
         trafo[2 * i] = gData[start + i];
         trafo[2 * i + 1] = 0;
     }
-    //for (int i = gWindowSize; i < trafoLength; i++)
-      //  trafo[i] = 0;
     hammingWindow(trafo, gWindowSize);
 
     four1(trafo, gWindowSize);
 
+    int index = start / gStepWidth;
+    int outPosition = gWindowSize / 2 * index;
     for (int i = 1; i < trafoLength / 2; i += 2)
-        gOutput[start + (i - 1) / 2] = sqrt(pow(trafo[i], 2) + pow(trafo[i - 1], 2));
+        gOutput[outPosition + (i - 1) / 2] = sqrt(pow(trafo[i], 2) + pow(trafo[i - 1], 2));
 }
