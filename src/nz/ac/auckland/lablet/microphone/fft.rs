@@ -9,7 +9,7 @@ float* gOutput;
 
 static void hammingWindow(float* samples, uint32_t length) {
     for (int i = 0; i < length; i++)
-        samples[i] *= (0.54f - 0.46f * cos(2 * M_PI * i / (length - 1)));
+        samples[2 * i] *= (0.54f - 0.46f * cos(2 * M_PI * i / (length - 1)));
 }
 
 

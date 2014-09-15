@@ -25,6 +25,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -112,7 +113,7 @@ public class FrequencyAnalysisView extends FrameLayout {
                 float freqResolution = (float) sampleRate / sampleSize;
                 freqResEditText.setText(String.format("%.2f", freqResolution));
 
-                updateTimeStepSizeView(sampleRate, sampleSize);
+                updateTimeStepSizeView(sampleSize, sampleRate);
             }
 
             @Override
@@ -264,13 +265,28 @@ public class FrequencyAnalysisView extends FrameLayout {
                 protected Void doInBackground(Void... params) {
                     float amplitudes[] = AudioWavInputStream.toAmplitudeData(wavRawData, wavRawData.length);
 
+                    final FourierRenderScript fourierRenderScript = new FourierRenderScript(getContext());
+
+                    float[] frequencies = fourierRenderScript.renderScriptFFT(amplitudes, newSampleSize, audioFrequencyMapAdapter.getStepFactor());
+
+                    //=float[] frequencies = Fourier.transform(amplitudes, newSampleSize, audioFrequencyMapAdapter.getStepFactor());
+
+                    int freqSampleSize = newSampleSize / 2;
+                    for (int i = 0; i < frequencies.length; i += freqSampleSize) {
+                        final float[] bunch = Arrays.copyOfRange(frequencies, i, i + freqSampleSize);
+                        if (isCancelled())
+                            return null;
+                        publishProgress(new DataContainer(bunch));
+                    }
+
+                    /*
                     final int step = (int)(newSampleSize * audioFrequencyMapAdapter.getStepFactor());
                     for (int i = 0; i < amplitudes.length; i += step) {
                         float frequencies[] = Fourier.transform(amplitudes, i, newSampleSize);
                         if (isCancelled())
                             return null;
                         publishProgress(new DataContainer(frequencies));
-                    }
+                    }*/
                     return null;
                 }
 

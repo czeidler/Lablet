@@ -42,6 +42,24 @@ public class Fourier {
         return transformInternal(trafo);
     }
 
+    static public float[] transform(float[] data, int windowSize, float stepFactor) {
+        final int stepWidth =  (int)(stepFactor * windowSize);
+        final int nSteps = (data.length - windowSize) / stepWidth + 1;
+        final int outputSize = nSteps * windowSize / 2;
+        final float[] out = new float[outputSize];
+
+        for (int i = 0; i < nSteps; i++) {
+            final int start = i * stepWidth;
+
+            final float[] trafo = transform(data, start, windowSize);
+
+            final int outPosition = windowSize / 2 * i;
+            System.arraycopy(trafo, 0, out, outPosition, windowSize / 2);
+        }
+
+        return out;
+    }
+
     static private float[] transformInternal(float[] trafo) {
         // in place window
         hammingWindow(trafo);
@@ -114,6 +132,7 @@ class FourierRenderScript {
         outAllocation.copyTo(out);
 
         renderScript.finish();
+
         return out;
     }
 }
