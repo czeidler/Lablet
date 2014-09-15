@@ -7,8 +7,13 @@
  */
 package nz.ac.auckland.lablet.microphone;
 
+import android.content.Context;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
 import edu.emory.mathcs.jtransforms.dct.FloatDCT_1D;
 import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
+import nz.ac.auckland.lablet.R;
 
 import java.util.Arrays;
 
@@ -65,9 +70,50 @@ public class Fourier {
 
         float[] out = new float[trafo.length / 2];
         for (int i = 1; i < trafo.length; i += 2) {
-            out[(i - 1) / 2] = (float)Math.sqrt(Math.pow(trafo[i], 2) + Math.pow(trafo[i - 1], 2));
+            out[(i - 1) / 2] = (float) Math.sqrt(Math.pow(trafo[i], 2) + Math.pow(trafo[i - 1], 2));
         }
 
+        return out;
+    }
+
+}
+
+class FourierRenderScript {
+    private Context context;
+    private RenderScript renderScript;
+    private ScriptC_fft script;
+
+    public FourierRenderScript(Context context) {
+        this.context = context;
+        renderScript = RenderScript.create(context);
+        script = new ScriptC_fft(renderScript, context.getResources(), R.raw.fft);
+    }
+
+    public float[] renderScriptFFT(float[] data, int windowSize, float stepFactor) {
+        final int stepWidth =  (int)(stepFactor * windowSize);
+        final int nSteps = (data.length - windowSize) / stepWidth + 1;
+        final int outputSize = nSteps * windowSize / 2;
+
+        Allocation dataAllocation = Allocation.createSized(renderScript, Element.F32(renderScript), data.length);
+        dataAllocation.copyFrom(data);
+        Allocation outAllocation = Allocation.createSized(renderScript, Element.F32(renderScript), outputSize);
+
+        final int[] inStartValues = new int[nSteps];
+        for (int i = 0; i < nSteps; i++)
+            inStartValues[i] = i * stepWidth;
+
+        Allocation inAllocation = Allocation.createSized(renderScript, Element.I32(renderScript), nSteps);
+        inAllocation.copyFrom(inStartValues);
+
+        script.set_gWindowSize(windowSize);
+        script.bind_gData(dataAllocation);
+        script.bind_gOutput(outAllocation);
+        script.forEach_root(inAllocation, inAllocation);
+
+        final float[] out = new float[outputSize];
+        outAllocation.copyTo(out);
+
+        renderScript.finish();
         return out;
     }
 }
