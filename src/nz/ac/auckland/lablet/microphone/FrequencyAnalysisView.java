@@ -42,6 +42,7 @@ public class FrequencyAnalysisView extends FrameLayout {
 
     private EditText freqResEditText;
     private EditText timeStepEditText;
+    private CheckBox renderScriptCheckBox;
 
     final private FreqMapUpdater freqMapUpdater = new FreqMapUpdater();
 
@@ -153,6 +154,15 @@ public class FrequencyAnalysisView extends FrameLayout {
         });
         windowOverlapSpinner.setSelection(4);
 
+        renderScriptCheckBox = (CheckBox)view.findViewById(R.id.renderScriptCheckBox);
+        renderScriptCheckBox.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                freqMapUpdater.update();
+            }
+        });
+        renderScriptCheckBox.setChecked(true);
+
         loadWavFileAsync(audioWavInputStream);
     }
 
@@ -229,6 +239,8 @@ public class FrequencyAnalysisView extends FrameLayout {
         private int sampleSize = -1;
         AsyncTask<Void, DataContainer, Void> asyncTask = null;
 
+        private boolean useRenderScript = false;
+
         private boolean isUpToDate() {
             final int newSampleSize = Integer.parseInt(sampleSizeList.get(sampleSizeSpinner.getSelectedItemPosition()));
             if (sampleSize != newSampleSize)
@@ -238,6 +250,12 @@ public class FrequencyAnalysisView extends FrameLayout {
                     windowOverlapSpinner.getSelectedItemPosition()).stepFactor;
             if (audioFrequencyMapAdapter.getStepFactor() != newStepFactor)
                 return false;
+
+            boolean previousOption = useRenderScript;
+            useRenderScript = renderScriptCheckBox.isChecked();
+            if (previousOption != useRenderScript)
+                return false;
+
             return true;
         }
 
@@ -267,9 +285,11 @@ public class FrequencyAnalysisView extends FrameLayout {
 
                     final FourierRenderScript fourierRenderScript = new FourierRenderScript(getContext());
 
-                    float[] frequencies = fourierRenderScript.renderScriptFFT(amplitudes, newSampleSize, audioFrequencyMapAdapter.getStepFactor());
-
-                    //=float[] frequencies = Fourier.transform(amplitudes, newSampleSize, audioFrequencyMapAdapter.getStepFactor());
+                    float[] frequencies;
+                    if (useRenderScript)
+                        frequencies = fourierRenderScript.renderScriptFFT(amplitudes, newSampleSize, audioFrequencyMapAdapter.getStepFactor());
+                    else
+                        frequencies = Fourier.transform(amplitudes, newSampleSize, audioFrequencyMapAdapter.getStepFactor());
 
                     int freqSampleSize = newSampleSize / 2;
                     for (int i = 0; i < frequencies.length; i += freqSampleSize) {
