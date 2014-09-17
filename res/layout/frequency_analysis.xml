@@ -86,6 +86,13 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/steppingSpinner" android:layout_alignParentEnd="true"
                 android:layout_below="@+id/freqResEditText" android:layout_alignStart="@+id/freqResEditText"/>
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Render Script"
+                android:id="@+id/renderScriptCheckBox"
+                android:checked="false" android:layout_alignParentBottom="true"
+                android:layout_alignEnd="@+id/textView5"/>
         </RelativeLayout>
     </LinearLayout>
 </LinearLayout>
