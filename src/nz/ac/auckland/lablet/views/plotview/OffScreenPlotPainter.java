@@ -113,6 +113,8 @@ abstract public class OffScreenPlotPainter extends AbstractPlotDataPainter {
     private List<RenderPayload> payloadQueue = new ArrayList<>();
     final private IsRenderingDrawer isRenderingDrawer = new IsRenderingDrawer();
 
+    private Paint offScreenPaint = null;
+
     protected class OffScreenBitmap {
         private Bitmap bitmap;
         private Canvas canvas;
@@ -263,12 +265,16 @@ abstract public class OffScreenPlotPainter extends AbstractPlotDataPainter {
             offScreenBitmap.setRealRect(containerView.getRange());
     }
 
+    public void setOffScreenPaint(Paint paint) {
+        this.offScreenPaint = paint;
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         Bitmap bitmap = offScreenBitmap.getBitmap();
         if (bitmap != null) {
             Rect bitmapScreenRect = containerView.toScreen(offScreenBitmap.getRealRect());
-            canvas.drawBitmap(bitmap, null, bitmapScreenRect, null);
+            canvas.drawBitmap(bitmap, null, bitmapScreenRect, offScreenPaint);
         }
 
         isRenderingDrawer.onDraw(canvas);

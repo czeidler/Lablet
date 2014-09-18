@@ -8,6 +8,9 @@
 package nz.ac.auckland.lablet.microphone;
 
 import android.content.Context;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,10 +43,16 @@ public class FrequencyAnalysisView extends FrameLayout {
     private Spinner windowOverlapSpinner;
     final private List<OverlapSpinnerEntry> overlapSpinnerEntryList = new ArrayList<>();
 
+    private AudioFrequencyMapPainter audioFrequencyMapPainter;
+
+    private PlotView frequencyView;
     private ViewGroup loadingView;
     private EditText freqResEditText;
     private EditText timeStepEditText;
     private CheckBox renderScriptCheckBox;
+
+    private SeekBar contrastSeekBar;
+    private SeekBar brightnessSeekBar;
 
     final private FreqMapUpdater freqMapUpdater = new FreqMapUpdater();
 
@@ -80,7 +89,7 @@ public class FrequencyAnalysisView extends FrameLayout {
             return;
         }
 
-        PlotView frequencyView = (PlotView)view.findViewById(R.id.frequencyMapView);
+        frequencyView = (PlotView)view.findViewById(R.id.frequencyMapView);
         FrameLayout frameLayout = (FrameLayout)view.findViewById(R.id.plotViewFrameLayout);
         loadingView = (ViewGroup)inflater.inflate(R.layout.loading_overlay, frameLayout, false);
         loadingView.setMinimumWidth(frequencyView.getLayoutParams().width);
@@ -170,7 +179,57 @@ public class FrequencyAnalysisView extends FrameLayout {
         });
         renderScriptCheckBox.setChecked(true);
 
+        // contrast and brightness
+        SeekBar.OnSeekBarChangeListener colorSeekBarListener = new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                updateContrastBrightness();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        };
+        contrastSeekBar = (SeekBar)view.findViewById(R.id.contrastSeekBar);
+        contrastSeekBar.setOnSeekBarChangeListener(colorSeekBarListener);
+        brightnessSeekBar = (SeekBar)view.findViewById(R.id.brightnessSeekBar);
+        brightnessSeekBar.setOnSeekBarChangeListener(colorSeekBarListener);
+        updateContrastBrightness();
+
         loadWavFileAsync(audioWavInputStream);
+    }
+
+    private void updateContrastBrightness() {
+        int contrast = contrastSeekBar.getProgress();
+        int brightness = brightnessSeekBar.getProgress() - 127;
+
+        ColorMatrix colorMatrix = new ColorMatrix();
+        colorMatrix.set(new float[] {
+                1, 0, 0, 0, brightness,
+                0, 1, 0, 0, brightness,
+                0, 0, 1, 0, brightness,
+                0, 0, 0, 1, 0 });
+
+        ColorMatrix contrastScaleMatrix = new ColorMatrix();
+        float scale = ((float)(contrast - 127)/ 127.f) + 1.f;
+        float translate = (.5f -.5f * scale) * 255.f;
+        contrastScaleMatrix.set(new float[] {
+                scale, 0, 0, 0, translate,
+                0, scale, 0, 0, translate,
+                0, 0, scale, 0, translate,
+                0, 0, 0, 1, 0 });
+
+        colorMatrix.postConcat(contrastScaleMatrix);
+        Paint paint = new Paint();
+        paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
+        audioFrequencyMapPainter.setOffScreenPaint(paint);
+        frequencyView.invalidate();
     }
 
     private void updateTimeStepSizeView(int sampleSize, int sampleRate) {
@@ -181,7 +240,7 @@ public class FrequencyAnalysisView extends FrameLayout {
 
     private void setupFrequencyView(PlotView frequencyMapPlotView, AudioWavInputStream audioWavInputStream) {
         audioFrequencyMapAdapter = new AudioFrequencyMapAdapter(0.5f);
-        AudioFrequencyMapPainter audioFrequencyMapPainter = new AudioFrequencyMapPainter();
+        audioFrequencyMapPainter = new AudioFrequencyMapPainter();
         audioFrequencyMapPainter.setDataAdapter(audioFrequencyMapAdapter);
         frequencyMapPlotView.addPlotPainter(audioFrequencyMapPainter);
         frequencyMapPlotView.setXRange(0, audioWavInputStream.getDurationMilliSeconds());
