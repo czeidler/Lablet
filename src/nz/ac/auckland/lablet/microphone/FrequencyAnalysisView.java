@@ -40,6 +40,7 @@ public class FrequencyAnalysisView extends FrameLayout {
     private Spinner windowOverlapSpinner;
     final private List<OverlapSpinnerEntry> overlapSpinnerEntryList = new ArrayList<>();
 
+    private ViewGroup loadingView;
     private EditText freqResEditText;
     private EditText timeStepEditText;
     private CheckBox renderScriptCheckBox;
@@ -80,6 +81,12 @@ public class FrequencyAnalysisView extends FrameLayout {
         }
 
         PlotView frequencyView = (PlotView)view.findViewById(R.id.frequencyMapView);
+        FrameLayout frameLayout = (FrameLayout)view.findViewById(R.id.plotViewFrameLayout);
+        loadingView = (ViewGroup)inflater.inflate(R.layout.loading_overlay, frameLayout, false);
+        loadingView.setMinimumWidth(frequencyView.getLayoutParams().width);
+        loadingView.setVisibility(INVISIBLE);
+        frameLayout.addView(loadingView);
+
         setupFrequencyView(frequencyView, audioWavInputStream);
         final int sampleRate = audioWavInputStream.getSampleRate();
 
@@ -207,15 +214,19 @@ public class FrequencyAnalysisView extends FrameLayout {
     }
 
     private void loadWavFileAsync(final AudioWavInputStream audioWavInputStream) {
+        loadingView.setVisibility(VISIBLE);
+
         AsyncTask<Void, DataContainer, Void> asyncTask = new AsyncTask<Void, DataContainer, Void>() {
+            byte[] data;
             @Override
             protected Void doInBackground(Void... params) {
                 try {
                     int size = audioWavInputStream.getSize();
                     BufferedInputStream bufferedInputStream = new BufferedInputStream(audioWavInputStream);
-                    wavRawData = new byte[size];
+                    data = new byte[size];
                     for (int i = 0; i < size; i++)
-                        wavRawData[i] = (byte)bufferedInputStream.read();
+                        data[i] = (byte)bufferedInputStream.read();
+
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -227,6 +238,8 @@ public class FrequencyAnalysisView extends FrameLayout {
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
 
+                wavRawData = data;
+                loadingView.setVisibility(INVISIBLE);
                 sampleSizeSpinner.setEnabled(true);
                 windowOverlapSpinner.setEnabled(true);
                 freqMapUpdater.update();
@@ -242,26 +255,25 @@ public class FrequencyAnalysisView extends FrameLayout {
         private boolean useRenderScript = false;
 
         private boolean isUpToDate() {
+            if (wavRawData == null)
+                return true;
+
             final int newSampleSize = Integer.parseInt(sampleSizeList.get(sampleSizeSpinner.getSelectedItemPosition()));
             if (sampleSize != newSampleSize)
                 return false;
 
-            float newStepFactor = overlapSpinnerEntryList.get(
+            final float newStepFactor = overlapSpinnerEntryList.get(
                     windowOverlapSpinner.getSelectedItemPosition()).stepFactor;
             if (audioFrequencyMapAdapter.getStepFactor() != newStepFactor)
                 return false;
 
-            boolean previousOption = useRenderScript;
-            useRenderScript = renderScriptCheckBox.isChecked();
-            if (previousOption != useRenderScript)
+            if (useRenderScript != renderScriptCheckBox.isChecked())
                 return false;
 
             return true;
         }
 
         public void update() {
-            if (wavRawData == null)
-                return;
             if (isUpToDate())
                 return;
             // old task running? cancel and return, new job is triggered afterwards
@@ -271,12 +283,15 @@ public class FrequencyAnalysisView extends FrameLayout {
             }
 
             // do the update
+            loadingView.setVisibility(VISIBLE);
+
             sampleSize = -1;
             final int newSampleSize = Integer.parseInt(sampleSizeList.get(sampleSizeSpinner.getSelectedItemPosition()));
             final float newStepFactor = overlapSpinnerEntryList.get(
                     windowOverlapSpinner.getSelectedItemPosition()).stepFactor;
             audioFrequencyMapAdapter.clear();
             audioFrequencyMapAdapter.setStepFactor(newStepFactor);
+            useRenderScript = renderScriptCheckBox.isChecked();
 
             asyncTask = new AsyncTask<Void, DataContainer, Void>() {
                 @Override
@@ -334,6 +349,7 @@ public class FrequencyAnalysisView extends FrameLayout {
         private void onFinished() {
             asyncTask = null;
             update();
+            loadingView.setVisibility(INVISIBLE);
         }
     }
 
