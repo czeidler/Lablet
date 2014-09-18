@@ -84,7 +84,7 @@ public class FrequencyAnalysisView extends FrameLayout {
         FrameLayout frameLayout = (FrameLayout)view.findViewById(R.id.plotViewFrameLayout);
         loadingView = (ViewGroup)inflater.inflate(R.layout.loading_overlay, frameLayout, false);
         loadingView.setMinimumWidth(frequencyView.getLayoutParams().width);
-        loadingView.setVisibility(INVISIBLE);
+        hideLoadingView();
         frameLayout.addView(loadingView);
 
         setupFrequencyView(frequencyView, audioWavInputStream);
@@ -214,7 +214,7 @@ public class FrequencyAnalysisView extends FrameLayout {
     }
 
     private void loadWavFileAsync(final AudioWavInputStream audioWavInputStream) {
-        loadingView.setVisibility(VISIBLE);
+        showLoadingView("Load WAV file...");
 
         AsyncTask<Void, DataContainer, Void> asyncTask = new AsyncTask<Void, DataContainer, Void>() {
             byte[] data;
@@ -239,7 +239,7 @@ public class FrequencyAnalysisView extends FrameLayout {
                 super.onPostExecute(aVoid);
 
                 wavRawData = data;
-                loadingView.setVisibility(INVISIBLE);
+                hideLoadingView();
                 sampleSizeSpinner.setEnabled(true);
                 windowOverlapSpinner.setEnabled(true);
                 freqMapUpdater.update();
@@ -283,7 +283,7 @@ public class FrequencyAnalysisView extends FrameLayout {
             }
 
             // do the update
-            loadingView.setVisibility(VISIBLE);
+            showLoadingView("Fourier Analysis...");
 
             sampleSize = -1;
             final int newSampleSize = Integer.parseInt(sampleSizeList.get(sampleSizeSpinner.getSelectedItemPosition()));
@@ -349,8 +349,16 @@ public class FrequencyAnalysisView extends FrameLayout {
         private void onFinished() {
             asyncTask = null;
             update();
-            loadingView.setVisibility(INVISIBLE);
+            hideLoadingView();
         }
     }
 
+    private void showLoadingView(String message) {
+        loadingView.setVisibility(VISIBLE);
+        ((TextView)loadingView.findViewById(R.id.loadingTextView)).setText(message);
+    }
+
+    private void hideLoadingView() {
+        loadingView.setVisibility(INVISIBLE);
+    }
 }
