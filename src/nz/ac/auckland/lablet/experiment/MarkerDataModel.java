@@ -12,6 +12,8 @@ import android.os.Bundle;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -122,6 +124,29 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
         notifyAllDataChanged();
     }
 
+    public void sort(Comparator<? super MarkerData> comparator) {
+        Collections.sort(markerDataList, comparator);
+        notifyAllDataChanged();
+    }
+
+    public void sortXAscending() {
+        sort(new Comparator<MarkerData>() {
+            @Override
+            public int compare(MarkerData markerData, MarkerData markerData2) {
+                return (int)(markerData.getPosition().x - markerData2.getPosition().x);
+            }
+        });
+    }
+
+    public void sortYAscending() {
+        sort(new Comparator<MarkerData>() {
+            @Override
+            public int compare(MarkerData markerData, MarkerData markerData2) {
+                return (int)(markerData.getPosition().y - markerData2.getPosition().y);
+            }
+        });
+    }
+
     public void notifyDataAdded(int index) {
         for (IListener listener : getListeners())
             listener.onDataAdded(this, index);
@@ -146,4 +171,5 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
         for (IListener listener : getListeners())
             listener.onDataSelected(this, index);
     }
+
 }
