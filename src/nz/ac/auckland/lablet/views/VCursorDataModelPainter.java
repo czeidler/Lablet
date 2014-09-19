@@ -10,15 +10,14 @@ package nz.ac.auckland.lablet.views;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 
-public class HCursorDataModelPainter extends CursorDataModelPainter {
+public class VCursorDataModelPainter extends CursorDataModelPainter {
 
-    public HCursorDataModelPainter(MarkerDataModel data) {
+    public VCursorDataModelPainter(MarkerDataModel data) {
         super(data);
     }
 
     @Override
     protected DraggableMarker createMarkerForRow(int row) {
-        return new HCursorMarker();
+        return new VCursorMarker();
     }
 }
-

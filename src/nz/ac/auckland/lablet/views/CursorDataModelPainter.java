@@ -112,6 +112,30 @@ class HCursorMarker extends CursorMarker {
     }
 }
 
+
+class VCursorMarker extends CursorMarker {
+    @Override
+    protected float getDirection(PointF point) {
+        return point.x;
+    }
+
+    @Override
+    protected void offsetPoint(Point point, float offset) {
+        point.x += offset;
+    }
+
+    @Override
+    protected Point getStartPoint() {
+        return new Point((int)getCachedScreenPosition().x, parent.getScreenRect().height());
+    }
+
+    @Override
+    protected Point getEndPoint() {
+        return new Point((int)getCachedScreenPosition().x, 0);
+    }
+}
+
+
 abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
 
     public CursorDataModelPainter(MarkerDataModel data) {

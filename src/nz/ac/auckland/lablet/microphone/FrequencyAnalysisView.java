@@ -100,7 +100,7 @@ public class FrequencyAnalysisView extends FrameLayout {
         final int sampleRate = audioWavInputStream.getSampleRate();
 
         GraphView2D tagMarkerView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
-        tagMarkerView.setAdapter(new MarkerGraphAdapter(analysis.getTagMarkerModel(), "Position Data",
+        tagMarkerView.setAdapter(new MarkerGraphAdapter(analysis.getHCursorMarkerModel(), "Position Data",
                 new XPositionMarkerGraphAxis(frequencyAnalysis.getXUnit(), null),
                 new YPositionMarkerGraphAxis(frequencyAnalysis.getYUnit(), null)));
 
@@ -256,12 +256,16 @@ public class FrequencyAnalysisView extends FrameLayout {
         frequencyMapPlotView.getYAxisView().setUnit("Hz");
         frequencyMapPlotView.getYAxisView().setTitle("Frequency");
 
-        MarkerDataModel markerModel = frequencyAnalysis.getTagMarkerModel();
+        MarkerDataModel markerModel = frequencyAnalysis.getHCursorMarkerModel();
         markerModel.addMarkerData(new MarkerData(0));
         markerModel.addMarkerData(new MarkerData(1));
         markerModel.selectMarkerData(0);
-        CursorDataModelPainter markerDataModelPainter = new HCursorDataModelPainter(markerModel);
-        frequencyMapPlotView.addPlotPainter(markerDataModelPainter);
+        frequencyMapPlotView.addPlotPainter(new HCursorDataModelPainter(markerModel));
+
+        markerModel = frequencyAnalysis.getVCursorMarkerModel();
+        markerModel.addMarkerData(new MarkerData(0));
+        markerModel.addMarkerData(new MarkerData(1));
+        frequencyMapPlotView.addPlotPainter(new VCursorDataModelPainter(markerModel));
     }
 
     class DataContainer {

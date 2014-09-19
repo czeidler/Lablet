@@ -18,7 +18,8 @@ import java.io.OutputStream;
 public class FrequencyAnalysis implements ISensorAnalysis {
     final private MicrophoneSensorData sensorData;
 
-    final private MarkerDataModel tagMarkerModel;
+    final private MarkerDataModel hCursorMarkerModel;
+    final private MarkerDataModel vCursorMarkerModel;
     final private Unit xUnit = new Unit("s");
     final private Unit yUnit = new Unit("Hz");
 
@@ -27,7 +28,8 @@ public class FrequencyAnalysis implements ISensorAnalysis {
 
         xUnit.setName("time");
         yUnit.setName("frequency");
-        tagMarkerModel = new MarkerDataModel();
+        hCursorMarkerModel = new MarkerDataModel();
+        vCursorMarkerModel = new MarkerDataModel();
     }
 
     public Unit getXUnit() {
@@ -52,7 +54,7 @@ public class FrequencyAnalysis implements ISensorAnalysis {
     public boolean loadAnalysisData(Bundle bundle, File storageDir) {
         Bundle tagMarkerBundle = bundle.getBundle("tagMarkers");
         if (tagMarkerBundle != null)
-            tagMarkerModel.fromBundle(tagMarkerBundle);
+            hCursorMarkerModel.fromBundle(tagMarkerBundle);
         return true;
     }
 
@@ -60,8 +62,8 @@ public class FrequencyAnalysis implements ISensorAnalysis {
     public Bundle exportAnalysisData(File additionalStorageDir) throws IOException {
         Bundle analysisDataBundle = new Bundle();
 
-        if (tagMarkerModel.getMarkerCount() > 0) {
-            Bundle tagMarkerBundle = tagMarkerModel.toBundle();
+        if (hCursorMarkerModel.getMarkerCount() > 0) {
+            Bundle tagMarkerBundle = hCursorMarkerModel.toBundle();
             analysisDataBundle.putBundle("tagMarkers", tagMarkerBundle);
         }
 
@@ -73,7 +75,11 @@ public class FrequencyAnalysis implements ISensorAnalysis {
 
     }
 
-    public MarkerDataModel getTagMarkerModel() {
-        return tagMarkerModel;
+    public MarkerDataModel getHCursorMarkerModel() {
+        return hCursorMarkerModel;
+    }
+
+    public MarkerDataModel getVCursorMarkerModel() {
+        return vCursorMarkerModel;
     }
 }
