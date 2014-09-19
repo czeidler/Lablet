@@ -21,6 +21,10 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
         containerView.invalidate();
     }
 
+    public PlotPainterContainerView getContainerView() {
+        return containerView;
+    }
+
     @Override
     public void setXScale(IScale xScale) {
         this.xScale = xScale;

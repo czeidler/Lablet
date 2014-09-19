@@ -259,9 +259,8 @@ public class FrequencyAnalysisView extends FrameLayout {
         MarkerDataModel markerModel = frequencyAnalysis.getTagMarkerModel();
         markerModel.addMarkerData(new MarkerData(0));
         markerModel.addMarkerData(new MarkerData(1));
-        markerModel.addMarkerData(new MarkerData(2));
         markerModel.selectMarkerData(0);
-        EditMarkerDataModelPainter markerDataModelPainter = new EditMarkerDataModelPainter(markerModel);
+        CursorDataModelPainter markerDataModelPainter = new HCursorDataModelPainter(markerModel);
         frequencyMapPlotView.addPlotPainter(markerDataModelPainter);
     }
 

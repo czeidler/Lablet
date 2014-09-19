@@ -208,6 +208,7 @@ class SimpleMarker extends DraggableMarker {
     }
 
     final public static int MARKER_COLOR = Color.argb(255, 100, 200, 20);
+    final public static int DRAG_HANDLE_COLOR = Color.argb(100, 0, 200, 100);
 
     private float INNER_RING_RADIUS;
     private float INNER_RING_WIDTH;
@@ -256,7 +257,7 @@ class SimpleMarker extends DraggableMarker {
         canvas.drawCircle(position.x, position.y, INNER_RING_RADIUS, paint);
 
         if (isSelectedForDrag()) {
-            paint.setColor(makeColor(100, 0, 200, 100));
+            paint.setColor(DRAG_HANDLE_COLOR);
             paint.setStrokeWidth(RING_WIDTH);
             paint.setStyle(Paint.Style.STROKE);
             canvas.drawCircle(position.x, position.y, RING_RADIUS, paint);
@@ -374,9 +375,17 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
         return screenPosition;
     }
 
+    public Rect getScreenRect() {
+        return containerView.getScreenRect();
+    }
+
     @Override
     public void onSizeChanged(int width, int height, int oldw, int oldh) {
         frame.set(0, 0, width, height);
+        rebuildMarkerList();
+    }
+
+    private void rebuildMarkerList() {
         markerList.clear();
         for (int i = 0; i < markerData.getMarkerCount(); i++)
             addMarker(i);
@@ -506,6 +515,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
 
     @Override
     public void onAllDataChanged(MarkerDataModel model) {
+        rebuildMarkerList();
         containerView.invalidate();
     }
 
