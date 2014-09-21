@@ -260,12 +260,15 @@ public class FrequencyAnalysisView extends FrameLayout {
         markerModel.addMarkerData(new MarkerData(0));
         markerModel.addMarkerData(new MarkerData(1));
         markerModel.selectMarkerData(0);
-        frequencyMapPlotView.addPlotPainter(new HCursorDataModelPainter(markerModel));
+        HCursorDataModelPainter hCursorDataModelPainter = new HCursorDataModelPainter(markerModel);
+        frequencyMapPlotView.addPlotPainter(hCursorDataModelPainter);
 
         markerModel = frequencyAnalysis.getVCursorMarkerModel();
         markerModel.addMarkerData(new MarkerData(0));
         markerModel.addMarkerData(new MarkerData(1));
-        frequencyMapPlotView.addPlotPainter(new VCursorDataModelPainter(markerModel));
+        VCursorDataModelPainter vCursorDataModelPainter = new VCursorDataModelPainter(markerModel);
+        vCursorDataModelPainter.setMarkerPainterGroup(hCursorDataModelPainter.getMarkerPainterGroup());
+        frequencyMapPlotView.addPlotPainter(vCursorDataModelPainter);
     }
 
     class DataContainer {

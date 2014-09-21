@@ -75,7 +75,7 @@ abstract class DraggableMarker implements IMarker {
 
         if (!isSelectedForDrag()) {
             if (isPointOnSelectArea(point))
-                setSelectedForDragIntern(true);
+                setSelectedForDrag(true);
             if (isSelectedForDrag() && isPointOnDragArea(point))
                 isDragging = true;
 
@@ -85,7 +85,7 @@ abstract class DraggableMarker implements IMarker {
             isDragging = true;
             return true;
         }
-        setSelectedForDragIntern(false);
+        setSelectedForDrag(false);
         isDragging = false;
         return false;
     }
@@ -131,14 +131,10 @@ abstract class DraggableMarker implements IMarker {
         return point;
     }
 
-    private void setSelectedForDragIntern(boolean selectedForDrag) {
-        setSelectedForDrag(selectedForDrag);
-        parent.getMarkerPainterGroup().selectForDrag(this, parent);
-    }
-
     @Override
     public void setSelectedForDrag(boolean selectedForDrag) {
         this.isSelectedForDragging = selectedForDrag;
+        parent.getMarkerPainterGroup().selectForDrag(this, parent);
     }
 
     @Override
@@ -306,6 +302,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
     public class MarkerPainterGroup {
         private AbstractMarkerPainter selectedForDragPainter = null;
         private IMarker selectedForDragMarker = null;
+        private boolean inSelectForDragMethod = false;
 
         public void deselect() {
             if (selectedForDragMarker == null)
@@ -317,26 +314,33 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
         }
 
         public void selectForDrag(IMarker marker, AbstractMarkerPainter painter) {
-            if (marker == null || !marker.isSelectedForDrag()) {
-                // already deselected?
-                if (selectedForDragPainter == null)
-                    return;
-
-                if (selectedForDragPainter == painter && selectedForDragMarker == marker) {
-                    selectedForDragPainter.containerView.invalidate();
-                    selectedForDragPainter = null;
-                    selectedForDragMarker = null;
-                }
+            if (inSelectForDragMethod)
                 return;
-            }
-            // marker has been selected; deselect old marker
-            if (selectedForDragMarker != null && selectedForDragMarker != marker) {
-                selectedForDragMarker.setSelectedForDrag(false);
-                selectedForDragPainter.containerView.invalidate();
-            }
+            inSelectForDragMethod = true;
+            try {
+                if (!marker.isSelectedForDrag()) {
+                    // already deselected?
+                    if (selectedForDragPainter == null)
+                        return;
 
-            selectedForDragPainter = painter;
-            selectedForDragMarker = marker;
+                    if (selectedForDragPainter == painter && selectedForDragMarker == marker) {
+                        selectedForDragPainter.containerView.invalidate();
+                        selectedForDragPainter = null;
+                        selectedForDragMarker = null;
+                    }
+                    return;
+                }
+                // marker has been selected; deselect old marker
+                if (selectedForDragMarker != null && selectedForDragMarker != marker) {
+                    selectedForDragMarker.setSelectedForDrag(false);
+                    selectedForDragPainter.containerView.invalidate();
+                }
+
+                selectedForDragPainter = painter;
+                selectedForDragMarker = marker;
+            } finally {
+                inSelectForDragMethod = false;
+            }
         }
     }
 

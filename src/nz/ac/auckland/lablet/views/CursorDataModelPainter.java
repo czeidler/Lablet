@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views;
 
 import android.graphics.*;
+import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 import java.util.List;
@@ -15,33 +16,21 @@ import java.util.List;
 
 abstract class CursorMarker extends DraggableMarker {
     final private Paint cursorPaint = new Paint();
-    final private Paint dragPaint = new Paint();
+    final private Paint textPaint = new Paint();
+    final private Paint textBackgroundPaint = new Paint();
 
     // device independent pixels
     private class Const {
         static public final float SELECT_RADIUS_DP = 30;
-        static public final float DRAG_RADIUS_DP = 50;
-        static public final float DRAG_LINE_WIDTH_DP = 40;
     }
 
     private float SELECT_RADIUS;
-    private float DRAG_RADIUS;
-    private float DRAG_LINE_WIDTH;
 
     @Override
     public void setTo(AbstractMarkerPainter painter, int markerIndex) {
         super.setTo(painter, markerIndex);
 
         SELECT_RADIUS = parent.toPixel(Const.SELECT_RADIUS_DP);
-        DRAG_RADIUS = parent.toPixel(Const.DRAG_RADIUS_DP);
-        DRAG_LINE_WIDTH = parent.toPixel(Const.DRAG_LINE_WIDTH_DP);
-
-        cursorPaint.setColor(Color.BLACK);
-        cursorPaint.setStyle(Paint.Style.STROKE);
-
-        dragPaint.setColor(SimpleMarker.DRAG_HANDLE_COLOR);
-        dragPaint.setStrokeWidth(DRAG_LINE_WIDTH);
-        dragPaint.setStyle(Paint.Style.STROKE);
     }
 
     @Override
@@ -55,7 +44,7 @@ abstract class CursorMarker extends DraggableMarker {
     protected boolean isPointOnDragArea(PointF point) {
         PointF position = getCachedScreenPosition();
         float distance = Math.abs(getDirection(point)- getDirection(position));
-        if (distance < DRAG_RADIUS)
+        if (distance < SELECT_RADIUS)
             return true;
         return false;
     }
@@ -64,24 +53,33 @@ abstract class CursorMarker extends DraggableMarker {
     public void onDraw(Canvas canvas, float priority) {
         Point start = getStartPoint();
         Point end = getEndPoint();
-        cursorPaint.setStrokeWidth(2);
+        cursorPaint.setStyle(Paint.Style.STROKE);
+        cursorPaint.setStrokeWidth(1);
+        if (isSelectedForDrag())
+            cursorPaint.setColor(Color.YELLOW);
+        else
+            cursorPaint.setColor(Color.GREEN);
         canvas.drawLine(start.x, start.y, end.x, end.y, cursorPaint);
 
         if (!isSelectedForDrag())
             return;
 
+        // draw position label
+        textPaint.setColor(Color.BLACK);
+        textPaint.setLinearText(true);
+        textBackgroundPaint.setColor(Color.argb(100, 255, 255, 255));
+        textBackgroundPaint.setStyle(Paint.Style.FILL);
         final PointF realPosition = new PointF();
         parent.getContainerView().fromScreen(getCachedScreenPosition(), realPosition);
-        cursorPaint.setStrokeWidth(1);
-        canvas.drawText(String.format("Position: %d", (int)getDirection(realPosition)), start.x, start.y, cursorPaint);
-
-        offsetPoint(start, DRAG_RADIUS);
-        offsetPoint(end, DRAG_RADIUS);
-        canvas.drawLine(start.x, start.y, end.x, end.y, dragPaint);
-
-        offsetPoint(start, -2 * DRAG_RADIUS);
-        offsetPoint(end, -2 * DRAG_RADIUS);
-        canvas.drawLine(start.x, start.y, end.x, end.y, dragPaint);
+        Point textPosition = new Point(start);
+        textPosition.offset(2, -2);
+        final String positionString = String.format("Position: %d", (int)getDirection(realPosition));
+        final Rect textBounds = new Rect();
+        textPaint.getTextBounds(positionString, 0, positionString.length(), textBounds);
+        textBounds.offset(textPosition.x, textPosition.y);
+        canvas.drawRect(textBounds, textBackgroundPaint);
+        canvas.drawText(positionString, textPosition.x, textPosition.y,
+                textPaint);
     }
 
     abstract protected float getDirection(PointF point);
@@ -149,19 +147,42 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
 
     @Override
     public void onDraw(Canvas canvas) {
+        boolean aMarkerIsSelectedForDrag = false;
         for (int i = 0; i < markerList.size(); i++) {
             IMarker marker = markerList.get(i);
             marker.onDraw(canvas, 1);
+            if (marker.isSelectedForDrag())
+                aMarkerIsSelectedForDrag = true;
         }
+
+        if (!aMarkerIsSelectedForDrag)
+            return;
+
+
     }
 
     @Override
     public void markerMoveRequest(DraggableMarker marker, PointF newPosition, boolean isDragging) {
         super.markerMoveRequest(marker, newPosition, isDragging);
 
+        int selectedMarkerId = -1;
+        if (marker.isSelectedForDrag())
+            selectedMarkerId = markerData.getMarkerDataAt(markerList.indexOf(marker)).getRunId();
+
         if (!isDragging)
             markerData.sortYAscending();
+
+        if (selectedMarkerId >= 0) {
+            for (int i = 0; i < markerData.getMarkerCount(); i++) {
+                MarkerData data = markerData.getMarkerDataAt(i);
+                if (data.getRunId() == selectedMarkerId) {
+                    markerList.get(i).setSelectedForDrag(true);
+                    break;
+                }
+            }
+        }
     }
+
 }
 
 
