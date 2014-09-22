@@ -19,6 +19,7 @@ import android.widget.*;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.misc.AnimatedTabHostListener;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.views.*;
 import nz.ac.auckland.lablet.views.graph.*;
@@ -88,6 +89,26 @@ public class FrequencyAnalysisView extends FrameLayout {
             e.printStackTrace();
             return;
         }
+
+        TabHost.TabContentFactory tabContentFactory = new TabHost.TabContentFactory() {
+            @Override
+            public View createTabContent(String tag) {
+                LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                if (tag.equals("fourier_tab"))
+                    return inflater.inflate(R.layout.frequency_fourier_parameters, null, false);
+                if (tag.equals("cursor_tab"))
+                    return inflater.inflate(R.layout.frequency_cursors, null, false);
+                return null;
+            }
+        };
+        TabHost tabHost = (TabHost)view.findViewById(R.id.tabHost);
+        tabHost.setup();
+        tabHost.addTab(tabHost.newTabSpec("fourier_tab").setIndicator("Fourier").setContent(tabContentFactory));
+        tabHost.addTab(tabHost.newTabSpec("cursor_tab").setIndicator("Cursors").setContent(tabContentFactory));
+        // load tabs now so that we can access the child views now
+        tabHost.setCurrentTab(1);
+        tabHost.setCurrentTab(0);
+        tabHost.setOnTabChangedListener(new AnimatedTabHostListener(tabHost));
 
         frequencyView = (PlotView)view.findViewById(R.id.frequencyMapView);
         FrameLayout frameLayout = (FrameLayout)view.findViewById(R.id.plotViewFrameLayout);
