@@ -200,25 +200,6 @@ public class MarkerDataTableAdapter extends ColumnDataTableAdapter implements Ma
     }
 }
 
-/**
- * Abstract base class for table columns.
- */
-abstract class DataTableColumn {
-    protected MarkerDataModel dataModel;
-
-    abstract public int size();
-    abstract public Number getValue(int index);
-    public String getStringValue(int index) {
-        Number number = getValue(index);
-        return String.format("%.2f", number.floatValue());
-    }
-    abstract public String getHeader();
-
-    public void setDataModel(MarkerDataModel dataModel) {
-        this.dataModel = dataModel;
-    }
-}
-
 
 abstract class UnitDataTableColumn extends DataTableColumn implements Unit.IListener {
     private List<Unit> units = new ArrayList<>();
