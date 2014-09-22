@@ -8,8 +8,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Horizontal Cursors"
-        android:id="@+id/textView"/>
+        android:text="Cursors:"
+        android:id="@+id/titleTextView"/>
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"

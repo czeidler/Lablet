@@ -22,7 +22,6 @@ import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.AnimatedTabHostListener;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.views.*;
-import nz.ac.auckland.lablet.views.graph.*;
 import nz.ac.auckland.lablet.views.plotview.PlotView;
 
 import java.io.BufferedInputStream;
@@ -72,7 +71,7 @@ public class FrequencyAnalysisView extends FrameLayout {
         }
     }
 
-    public FrequencyAnalysisView(Context context, FrequencyAnalysis analysis) {
+    public FrequencyAnalysisView(final Context context, FrequencyAnalysis analysis) {
         super(context);
 
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -96,8 +95,13 @@ public class FrequencyAnalysisView extends FrameLayout {
                 LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 if (tag.equals("fourier_tab"))
                     return inflater.inflate(R.layout.frequency_fourier_parameters, null, false);
-                if (tag.equals("cursor_tab"))
-                    return inflater.inflate(R.layout.frequency_cursors, null, false);
+                if (tag.equals("cursor_tab")) {
+                    CursorView cursorView = new CursorView(context, frequencyAnalysis.getHCursorMarkerModel(),
+                            frequencyAnalysis.getVCursorMarkerModel());
+                    cursorView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT));
+                    return cursorView;
+                }
                 return null;
             }
         };
@@ -119,11 +123,6 @@ public class FrequencyAnalysisView extends FrameLayout {
 
         setupFrequencyView(frequencyView, audioWavInputStream);
         final int sampleRate = audioWavInputStream.getSampleRate();
-
-        GraphView2D tagMarkerView = (GraphView2D)view.findViewById(R.id.tagMarkerGraphView);
-        tagMarkerView.setAdapter(new MarkerGraphAdapter(analysis.getHCursorMarkerModel(), "Position Data",
-                new XPositionMarkerGraphAxis(frequencyAnalysis.getXUnit(), null),
-                new YPositionMarkerGraphAxis(frequencyAnalysis.getYUnit(), null)));
 
         freqResEditText = (EditText)view.findViewById(R.id.freqResEditText);
         timeStepEditText = (EditText)view.findViewById(R.id.timeStepEditText);
@@ -277,17 +276,17 @@ public class FrequencyAnalysisView extends FrameLayout {
         frequencyMapPlotView.getYAxisView().setUnit("Hz");
         frequencyMapPlotView.getYAxisView().setTitle("Frequency");
 
-        MarkerDataModel markerModel = frequencyAnalysis.getHCursorMarkerModel();
-        markerModel.addMarkerData(new MarkerData(0));
-        markerModel.addMarkerData(new MarkerData(1));
-        markerModel.selectMarkerData(0);
-        HCursorDataModelPainter hCursorDataModelPainter = new HCursorDataModelPainter(markerModel);
+        MarkerDataModel hMarkerModel = frequencyAnalysis.getHCursorMarkerModel();
+        hMarkerModel.addMarkerData(new MarkerData(0));
+        hMarkerModel.addMarkerData(new MarkerData(1));
+        hMarkerModel.selectMarkerData(0);
+        HCursorDataModelPainter hCursorDataModelPainter = new HCursorDataModelPainter(hMarkerModel);
         frequencyMapPlotView.addPlotPainter(hCursorDataModelPainter);
 
-        markerModel = frequencyAnalysis.getVCursorMarkerModel();
-        markerModel.addMarkerData(new MarkerData(0));
-        markerModel.addMarkerData(new MarkerData(1));
-        VCursorDataModelPainter vCursorDataModelPainter = new VCursorDataModelPainter(markerModel);
+        MarkerDataModel vMarkerModel = frequencyAnalysis.getVCursorMarkerModel();
+        vMarkerModel.addMarkerData(new MarkerData(0));
+        vMarkerModel.addMarkerData(new MarkerData(1));
+        VCursorDataModelPainter vCursorDataModelPainter = new VCursorDataModelPainter(vMarkerModel);
         vCursorDataModelPainter.setMarkerPainterGroup(hCursorDataModelPainter.getMarkerPainterGroup());
         frequencyMapPlotView.addPlotPainter(vCursorDataModelPainter);
     }
