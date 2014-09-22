@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.table;
 
 
+import nz.ac.auckland.lablet.camera.ITimeData;
 import nz.ac.auckland.lablet.experiment.Unit;
 
 /**
@@ -16,8 +17,8 @@ import nz.ac.auckland.lablet.experiment.Unit;
  */
 public class SpeedTimeDataTableColumn extends TimeDataTableColumn {
 
-    public SpeedTimeDataTableColumn(Unit tUnit) {
-        super(tUnit);
+    public SpeedTimeDataTableColumn(Unit tUnit, ITimeData timeData) {
+        super(tUnit, timeData);
     }
 
     @Override

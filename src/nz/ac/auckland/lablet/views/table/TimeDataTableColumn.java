@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.table;
 
 
+import nz.ac.auckland.lablet.camera.ITimeData;
 import nz.ac.auckland.lablet.experiment.Unit;
 
 /**
@@ -16,9 +17,12 @@ import nz.ac.auckland.lablet.experiment.Unit;
  */
 public class TimeDataTableColumn extends UnitDataTableColumn {
     final private Unit tUnit;
+    final protected ITimeData timeData;
 
-    public TimeDataTableColumn(Unit tUnit) {
+    public TimeDataTableColumn(Unit tUnit, ITimeData timeData) {
         this.tUnit = tUnit;
+        this.timeData = timeData;
+
         listenTo(tUnit);
     }
 

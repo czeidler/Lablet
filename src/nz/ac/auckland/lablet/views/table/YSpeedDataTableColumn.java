@@ -19,10 +19,12 @@ import nz.ac.auckland.lablet.experiment.Unit;
 public class YSpeedDataTableColumn extends UnitDataTableColumn {
     final private Unit yUnit;
     final private Unit tUnit;
+    final private ITimeData timeData;
 
-    public YSpeedDataTableColumn(Unit yUnit, Unit tUnit) {
+    public YSpeedDataTableColumn(Unit yUnit, Unit tUnit, ITimeData timeData) {
         this.yUnit = yUnit;
         this.tUnit = tUnit;
+        this.timeData = timeData;
 
         listenTo(yUnit);
         listenTo(tUnit);

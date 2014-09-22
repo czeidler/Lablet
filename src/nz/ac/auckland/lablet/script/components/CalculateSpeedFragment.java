@@ -381,8 +381,8 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
 
         positionUnitTextView.setText("[" + getPositionUnit() + "]");
 
-        MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(tagMarker, timeCalibration);
-        adapter.addColumn(new TimeDataTableColumn(sensorAnalysis.getTUnit()));
+        MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(tagMarker);
+        adapter.addColumn(new TimeDataTableColumn(sensorAnalysis.getTUnit(), timeCalibration));
         adapter.addColumn(new XPositionDataTableColumn(sensorAnalysis.getXUnit()));
         adapter.addColumn(new YPositionDataTableColumn(sensorAnalysis.getYUnit()));
         rawDataTable.setAdapter(adapter);

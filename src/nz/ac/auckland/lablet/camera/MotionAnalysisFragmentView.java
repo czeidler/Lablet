@@ -144,10 +144,10 @@ class MotionAnalysisFragmentView extends FrameLayout {
         final Unit tUnit = sensorAnalysis.getTUnit();
 
         // marker table view
-        final MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(sensorAnalysis.getTagMarkers(),
-                sensorAnalysis.getCalibrationVideoFrame());
+        final ITimeData timeData = sensorAnalysis.getCalibrationVideoFrame();
+        final MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(sensorAnalysis.getTagMarkers());
         adapter.addColumn(new RunIdDataTableColumn());
-        adapter.addColumn(new TimeDataTableColumn(xUnit));
+        adapter.addColumn(new TimeDataTableColumn(xUnit, timeData));
         adapter.addColumn(new XPositionDataTableColumn(yUnit));
         adapter.addColumn(new YPositionDataTableColumn(tUnit));
         tableView.setAdapter(adapter);

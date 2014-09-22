@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.table;
 
 
+import nz.ac.auckland.lablet.camera.ITimeData;
 import nz.ac.auckland.lablet.experiment.Unit;
 
 /**
@@ -15,8 +16,8 @@ import nz.ac.auckland.lablet.experiment.Unit;
  * acceleration columns.
  */
 public class AccelerationTimeDataTableColumn extends TimeDataTableColumn {
-    public AccelerationTimeDataTableColumn(Unit tUnit) {
-        super(tUnit);
+    public AccelerationTimeDataTableColumn(Unit tUnit, ITimeData timeData) {
+        super(tUnit, timeData);
     }
 
     @Override

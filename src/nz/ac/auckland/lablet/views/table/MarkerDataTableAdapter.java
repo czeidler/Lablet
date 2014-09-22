@@ -106,18 +106,15 @@ abstract class ColumnDataTableAdapter extends WeakListenable<ITableAdapter.IList
 public class MarkerDataTableAdapter extends ColumnDataTableAdapter implements MarkerDataModel.IListener,
         Unit.IListener {
     protected MarkerDataModel model;
-    protected ITimeData timeCalibration;
 
-    public MarkerDataTableAdapter(MarkerDataModel model, ITimeData timeCalibration) {
+    public MarkerDataTableAdapter(MarkerDataModel model) {
         this.model = model;
-        this.timeCalibration = timeCalibration;
         model.addListener(this);
     }
 
     @Override
     public void addColumn(DataTableColumn column) {
         column.setDataModel(model);
-        column.setTimeData(timeCalibration);
         super.addColumn(column);
     }
 
@@ -208,7 +205,6 @@ public class MarkerDataTableAdapter extends ColumnDataTableAdapter implements Ma
  */
 abstract class DataTableColumn {
     protected MarkerDataModel dataModel;
-    protected ITimeData timeData;
 
     abstract public int size();
     abstract public Number getValue(int index);
@@ -220,10 +216,6 @@ abstract class DataTableColumn {
 
     public void setDataModel(MarkerDataModel dataModel) {
         this.dataModel = dataModel;
-    }
-
-    public void setTimeData(ITimeData timeData) {
-        this.timeData = timeData;
     }
 }
 

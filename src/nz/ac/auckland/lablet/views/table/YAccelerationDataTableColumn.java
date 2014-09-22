@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.table;
 
 
+import nz.ac.auckland.lablet.camera.ITimeData;
 import nz.ac.auckland.lablet.experiment.Unit;
 
 /**
@@ -16,10 +17,12 @@ import nz.ac.auckland.lablet.experiment.Unit;
 public class YAccelerationDataTableColumn extends UnitDataTableColumn {
     final private Unit yUnit;
     final private Unit tUnit;
+    final private ITimeData timeData;
 
-    public YAccelerationDataTableColumn(Unit yUnit, Unit tUnit) {
+    public YAccelerationDataTableColumn(Unit yUnit, Unit tUnit, ITimeData timeData) {
         this.yUnit = yUnit;
         this.tUnit = tUnit;
+        this.timeData = timeData;
 
         listenTo(yUnit);
         listenTo(tUnit);

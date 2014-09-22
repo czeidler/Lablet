@@ -18,10 +18,12 @@ import nz.ac.auckland.lablet.experiment.Unit;
 public class XSpeedDataTableColumn extends UnitDataTableColumn {
     final private Unit xUnit;
     final private Unit tUnit;
+    final private ITimeData timeData;
 
-    public XSpeedDataTableColumn(Unit xUnit, Unit tUnit) {
+    public XSpeedDataTableColumn(Unit xUnit, Unit tUnit, ITimeData timeData) {
         this.xUnit = xUnit;
         this.tUnit = tUnit;
+        this.timeData = timeData;
 
         listenTo(xUnit);
         listenTo(tUnit);
