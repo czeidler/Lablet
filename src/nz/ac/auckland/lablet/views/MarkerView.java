@@ -375,6 +375,11 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
         markerData.addListener(this);
     }
 
+
+    public MarkerDataModel getMarkerModel() {
+        return markerData;
+    }
+
     public MarkerPainterGroup getMarkerPainterGroup() {
         return markerPainterGroup;
     }
@@ -517,7 +522,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
     public void removeMarker(int row) {
         markerList.remove(row);
         if (row == markerData.getSelectedMarkerData())
-            markerData.selectMarkerData(0);
+            markerData.selectMarkerData(-1);
     }
 
     @Override
@@ -545,6 +550,9 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
 
     @Override
     public void onDataSelected(MarkerDataModel model, int index) {
+        if (getMarkerPainterGroup().selectOnSelectOnDrag && index >= 0)
+            markerList.get(index).setSelectedForDrag(true);
+
         containerView.invalidate();
     }
 

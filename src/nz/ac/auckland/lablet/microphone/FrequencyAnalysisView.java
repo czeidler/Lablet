@@ -89,15 +89,25 @@ public class FrequencyAnalysisView extends FrameLayout {
             return;
         }
 
+        frequencyView = (PlotView)view.findViewById(R.id.frequencyMapView);
+        FrameLayout frameLayout = (FrameLayout)view.findViewById(R.id.plotViewFrameLayout);
+        loadingView = (ViewGroup)inflater.inflate(R.layout.loading_overlay, frameLayout, false);
+        loadingView.setMinimumWidth(frequencyView.getLayoutParams().width);
+        hideLoadingView();
+        frameLayout.addView(loadingView);
+
+        setupFrequencyView(frequencyView, audioWavInputStream);
+
         TabHost.TabContentFactory tabContentFactory = new TabHost.TabContentFactory() {
             @Override
             public View createTabContent(String tag) {
-                LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(
+                        Context.LAYOUT_INFLATER_SERVICE);
                 if (tag.equals("fourier_tab"))
                     return inflater.inflate(R.layout.frequency_fourier_parameters, null, false);
                 if (tag.equals("cursor_tab")) {
-                    CursorView cursorView = new CursorView(context, frequencyAnalysis.getHCursorMarkerModel(),
-                            frequencyAnalysis.getVCursorMarkerModel());
+                    CursorView cursorView = new CursorView(context, frequencyView,
+                            frequencyAnalysis.getHCursorMarkerModel(), frequencyAnalysis.getVCursorMarkerModel());
                     cursorView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT));
                     return cursorView;
@@ -114,16 +124,12 @@ public class FrequencyAnalysisView extends FrameLayout {
         tabHost.setCurrentTab(0);
         tabHost.setOnTabChangedListener(new AnimatedTabHostListener(tabHost));
 
-        frequencyView = (PlotView)view.findViewById(R.id.frequencyMapView);
-        FrameLayout frameLayout = (FrameLayout)view.findViewById(R.id.plotViewFrameLayout);
-        loadingView = (ViewGroup)inflater.inflate(R.layout.loading_overlay, frameLayout, false);
-        loadingView.setMinimumWidth(frequencyView.getLayoutParams().width);
-        hideLoadingView();
-        frameLayout.addView(loadingView);
+        setupFourierControls(view, audioWavInputStream.getSampleRate());
 
-        setupFrequencyView(frequencyView, audioWavInputStream);
-        final int sampleRate = audioWavInputStream.getSampleRate();
+        loadWavFileAsync(audioWavInputStream);
+    }
 
+    private void setupFourierControls(ViewGroup view, final int sampleRate) {
         freqResEditText = (EditText)view.findViewById(R.id.freqResEditText);
         timeStepEditText = (EditText)view.findViewById(R.id.timeStepEditText);
 
@@ -138,7 +144,7 @@ public class FrequencyAnalysisView extends FrameLayout {
         sampleSizeList.add("8192");
         sampleSizeList.add("16384");
         sampleSizeList.add("32768");
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(context,
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_dropdown_item, sampleSizeList);
         sampleSizeSpinner.setAdapter(adapter);
         sampleSizeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -172,7 +178,7 @@ public class FrequencyAnalysisView extends FrameLayout {
         overlapSpinnerEntryList.add(new OverlapSpinnerEntry(0.8f, "20%"));
         overlapSpinnerEntryList.add(new OverlapSpinnerEntry(0.9f, "10%"));
         overlapSpinnerEntryList.add(new OverlapSpinnerEntry(1.0f, "0%"));
-        windowOverlapSpinner.setAdapter(new ArrayAdapter<>(context,
+        windowOverlapSpinner.setAdapter(new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_dropdown_item, overlapSpinnerEntryList));
         windowOverlapSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -221,8 +227,6 @@ public class FrequencyAnalysisView extends FrameLayout {
         brightnessSeekBar = (SeekBar)view.findViewById(R.id.brightnessSeekBar);
         brightnessSeekBar.setOnSeekBarChangeListener(colorSeekBarListener);
         updateContrastBrightness();
-
-        loadWavFileAsync(audioWavInputStream);
     }
 
     private void updateContrastBrightness() {
@@ -277,14 +281,10 @@ public class FrequencyAnalysisView extends FrameLayout {
         frequencyMapPlotView.getYAxisView().setTitle("Frequency");
 
         MarkerDataModel hMarkerModel = frequencyAnalysis.getHCursorMarkerModel();
-        hMarkerModel.addMarkerData(new MarkerData(0));
-        hMarkerModel.addMarkerData(new MarkerData(1));
         HCursorDataModelPainter hCursorDataModelPainter = new HCursorDataModelPainter(hMarkerModel);
         frequencyMapPlotView.addPlotPainter(hCursorDataModelPainter);
 
         MarkerDataModel vMarkerModel = frequencyAnalysis.getVCursorMarkerModel();
-        vMarkerModel.addMarkerData(new MarkerData(0));
-        vMarkerModel.addMarkerData(new MarkerData(1));
         VCursorDataModelPainter vCursorDataModelPainter = new VCursorDataModelPainter(vMarkerModel);
         vCursorDataModelPainter.setMarkerPainterGroup(hCursorDataModelPainter.getMarkerPainterGroup());
         frequencyMapPlotView.addPlotPainter(vCursorDataModelPainter);

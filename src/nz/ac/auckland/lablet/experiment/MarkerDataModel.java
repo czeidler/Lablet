@@ -34,6 +34,13 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
         notifyDataSelected(index);
     }
 
+    public void selectMarkerData(MarkerData markerData) {
+        int index = markerDataList.indexOf(markerData);
+        if (index < 0)
+            return;
+        selectMarkerData(index);
+    }
+
     public int getSelectedMarkerData() {
         return selectedDataIndex;
     }
@@ -45,17 +52,34 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
     }
 
     public int addMarkerData(MarkerData data) {
+        return addMarkerData(data, true);
+    }
+
+    public int addMarkerData(MarkerData data, boolean sort) {
         int i = 0;
-        for (; i < markerDataList.size(); i++) {
-            MarkerData current = markerDataList.get(i);
-            if (current.getRunId() == data.getRunId())
-                return -1;
-            if (current.getRunId() > data.getRunId())
-                break;
-        }
+        if (sort) {
+            for (; i < markerDataList.size(); i++) {
+                MarkerData current = markerDataList.get(i);
+                if (current.getRunId() == data.getRunId())
+                    return -1;
+                if (current.getRunId() > data.getRunId())
+                    break;
+            }
+        } else
+            i = markerDataList.size();
+
         markerDataList.add(i, data);
         notifyDataAdded(i);
         return i;
+    }
+
+    public int getLargestRunId() {
+        int runId = -1;
+        for (MarkerData markerData : markerDataList) {
+            if (markerData.getRunId() > runId)
+                runId = markerData.getRunId();
+        }
+        return runId;
     }
 
     public int getMarkerCount() {
@@ -94,7 +118,7 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
             for (int i = 0; i < runIds.length; i++) {
                 MarkerData data = new MarkerData(runIds[i]);
                 data.getPosition().set(xPositions[i], yPositions[i]);
-                addMarkerData(data);
+                addMarkerData(data, false);
             }
         }
     }

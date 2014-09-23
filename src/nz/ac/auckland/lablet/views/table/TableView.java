@@ -68,9 +68,11 @@ public class TableView extends TableLayout implements ITableAdapter.IListener {
 
     @Override
     public void onRowRemoved(ITableAdapter<?> table, int row) {
-        row ++;
+        //row ++;
         // TODO check if that selects the right row
-        removeViewAt(row);
+        //removeViewAt(row);
+
+        onAllRowsUpdated(table);
     }
 
     @Override

@@ -111,6 +111,10 @@ public class RangeDrawingView extends ViewGroup {
         this.minYRange = minYRange;
     }
 
+    public PointF getRangeMiddle() {
+        return new PointF(rangeRect.left + rangeRect.width() / 2, rangeRect.top + rangeRect.height() / 2);
+    }
+
     static class RangeF {
         public RangeF(float start, float end) {
             this.start = start;

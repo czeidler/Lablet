@@ -494,6 +494,10 @@ public class PlotView extends ViewGroup {
         return mainView.getRange();
     }
 
+    public PointF getRangeMiddle() {
+        return mainView.getRangeMiddle();
+    }
+
     public boolean isXDraggable() {
         return xDraggable;
     }

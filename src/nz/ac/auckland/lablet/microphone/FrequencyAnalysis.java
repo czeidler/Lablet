@@ -52,9 +52,12 @@ public class FrequencyAnalysis implements ISensorAnalysis {
 
     @Override
     public boolean loadAnalysisData(Bundle bundle, File storageDir) {
-        Bundle tagMarkerBundle = bundle.getBundle("tagMarkers");
-        if (tagMarkerBundle != null)
-            hCursorMarkerModel.fromBundle(tagMarkerBundle);
+        Bundle hCursorsBundle = bundle.getBundle("hCursors");
+        if (hCursorsBundle != null)
+            hCursorMarkerModel.fromBundle(hCursorsBundle);
+        Bundle vCursorsBundle = bundle.getBundle("vCursors");
+        if (vCursorsBundle != null)
+            vCursorMarkerModel.fromBundle(vCursorsBundle);
         return true;
     }
 
@@ -62,10 +65,10 @@ public class FrequencyAnalysis implements ISensorAnalysis {
     public Bundle exportAnalysisData(File additionalStorageDir) throws IOException {
         Bundle analysisDataBundle = new Bundle();
 
-        if (hCursorMarkerModel.getMarkerCount() > 0) {
-            Bundle tagMarkerBundle = hCursorMarkerModel.toBundle();
-            analysisDataBundle.putBundle("tagMarkers", tagMarkerBundle);
-        }
+        if (hCursorMarkerModel.getMarkerCount() > 0)
+            analysisDataBundle.putBundle("hCursors", hCursorMarkerModel.toBundle());
+        if (vCursorMarkerModel.getMarkerCount() > 0)
+            analysisDataBundle.putBundle("vCursors", vCursorMarkerModel.toBundle());
 
         return analysisDataBundle;
     }

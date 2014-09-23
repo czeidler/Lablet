@@ -177,7 +177,7 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
         }
     }
 
-    abstract protected void sort();
+    abstract public void sort();
 }
 
 
