@@ -131,7 +131,7 @@ public class TableView extends TableLayout implements ITableAdapter.IListener {
 
         // take header into account
         row ++;
-        if (row < 0 || row >= adapter.getRowCount())
+        if (row <= 0 || row >= adapter.getRowCount())
             return;
 
         selectedRow = (TableRow)getChildAt(row);
