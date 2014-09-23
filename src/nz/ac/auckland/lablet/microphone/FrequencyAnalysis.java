@@ -7,6 +7,7 @@
  */
 package nz.ac.auckland.lablet.microphone;
 
+import android.graphics.RectF;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.*;
 
@@ -29,6 +30,7 @@ public class FrequencyAnalysis implements ISensorAnalysis {
         private float stepFactor = 0.5f;
         private int contrast = 127;
         private int brightness = 127;
+        private RectF range = new RectF();
 
         public int getWindowSize() {
             return windowSize;
@@ -62,12 +64,24 @@ public class FrequencyAnalysis implements ISensorAnalysis {
             this.brightness = brightness;
         }
 
+        public RectF getRange() {
+            return range;
+        }
+
+        public void setRange(RectF range) {
+            this.range.set(range);
+        }
+
         public Bundle toBundle() {
             Bundle bundle = new Bundle();
             bundle.putInt("windowSize", windowSize);
             bundle.putFloat("stepFactor", stepFactor);
             bundle.putInt("contrast", contrast);
             bundle.putInt("brightness", brightness);
+            bundle.putFloat("rangeLeft", range.left);
+            bundle.putFloat("rangeTop", range.top);
+            bundle.putFloat("rangeRight", range.right);
+            bundle.putFloat("rangeBottom", range.bottom);
             return bundle;
         }
 
@@ -76,6 +90,10 @@ public class FrequencyAnalysis implements ISensorAnalysis {
             stepFactor = bundle.getFloat("stepFactor", stepFactor);
             contrast = bundle.getInt("contrast", contrast);
             brightness = bundle.getInt("brightness", brightness);
+            range.left = bundle.getFloat("rangeLeft", range.left);
+            range.top = bundle.getFloat("rangeTop", range.top);
+            range.right = bundle.getFloat("rangeRight", range.right);
+            range.bottom = bundle.getFloat("rangeBottom", range.bottom);
         }
     }
 
