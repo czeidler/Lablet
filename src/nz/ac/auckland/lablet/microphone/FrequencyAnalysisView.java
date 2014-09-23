@@ -34,6 +34,7 @@ import java.util.List;
 
 public class FrequencyAnalysisView extends FrameLayout {
     final private FrequencyAnalysis frequencyAnalysis;
+    final private FrequencyAnalysis.FreqMapDisplaySettings freqMapDisplaySettings;
     final private MicrophoneSensorData micSensorData;
     private AudioFrequencyMapAdapter audioFrequencyMapAdapter;
     private byte[] wavRawData = null;
@@ -78,6 +79,7 @@ public class FrequencyAnalysisView extends FrameLayout {
         ViewGroup view = (ViewGroup)inflater.inflate(R.layout.frequency_analysis, this, true);
 
         this.frequencyAnalysis = analysis;
+        this.freqMapDisplaySettings = analysis.getFreqMapDisplaySettings();
         this.micSensorData = (MicrophoneSensorData)analysis.getData();
 
         File audioFile = micSensorData.getAudioFile();
@@ -164,7 +166,8 @@ public class FrequencyAnalysisView extends FrameLayout {
 
             }
         });
-        sampleSizeSpinner.setSelection(sampleSizeList.indexOf("4096"));
+        sampleSizeSpinner.setSelection(sampleSizeList.indexOf(String.format("%d",
+                freqMapDisplaySettings.getWindowSize())));
 
         windowOverlapSpinner = (Spinner)view.findViewById(R.id.steppingSpinner);
         windowOverlapSpinner.setEnabled(false);
@@ -194,7 +197,15 @@ public class FrequencyAnalysisView extends FrameLayout {
 
             }
         });
-        windowOverlapSpinner.setSelection(4);
+        // set step factor from settings
+        int stepFactorIndex = 4;
+        for (OverlapSpinnerEntry entry : overlapSpinnerEntryList) {
+            if (entry.stepFactor == freqMapDisplaySettings.getStepFactor()) {
+                stepFactorIndex = overlapSpinnerEntryList.indexOf(entry);
+                break;
+            }
+        }
+        windowOverlapSpinner.setSelection(stepFactorIndex);
 
         renderScriptCheckBox = (CheckBox)view.findViewById(R.id.renderScriptCheckBox);
         renderScriptCheckBox.setOnClickListener(new OnClickListener() {
@@ -209,6 +220,8 @@ public class FrequencyAnalysisView extends FrameLayout {
         SeekBar.OnSeekBarChangeListener colorSeekBarListener = new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                freqMapDisplaySettings.setContrast(contrastSeekBar.getProgress());
+                freqMapDisplaySettings.setBrightness(brightnessSeekBar.getProgress());
                 updateContrastBrightness();
             }
 
@@ -223,15 +236,19 @@ public class FrequencyAnalysisView extends FrameLayout {
             }
         };
         contrastSeekBar = (SeekBar)view.findViewById(R.id.contrastSeekBar);
-        contrastSeekBar.setOnSeekBarChangeListener(colorSeekBarListener);
         brightnessSeekBar = (SeekBar)view.findViewById(R.id.brightnessSeekBar);
+        // set progress before setting the colorSeekBarListener otherwise the settings would get overwritten
+        contrastSeekBar.setProgress(freqMapDisplaySettings.getContrast());
+        brightnessSeekBar.setProgress(freqMapDisplaySettings.getBrightness());
+        contrastSeekBar.setOnSeekBarChangeListener(colorSeekBarListener);
         brightnessSeekBar.setOnSeekBarChangeListener(colorSeekBarListener);
+
         updateContrastBrightness();
     }
 
     private void updateContrastBrightness() {
-        int contrast = contrastSeekBar.getProgress();
-        int brightness = brightnessSeekBar.getProgress() - 127;
+        int contrast = freqMapDisplaySettings.getContrast();
+        int brightness = freqMapDisplaySettings.getBrightness() - 127;
 
         ColorMatrix colorMatrix = new ColorMatrix();
         colorMatrix.set(new float[] {
@@ -263,7 +280,7 @@ public class FrequencyAnalysisView extends FrameLayout {
     }
 
     private void setupFrequencyView(PlotView frequencyMapPlotView, AudioWavInputStream audioWavInputStream) {
-        audioFrequencyMapAdapter = new AudioFrequencyMapAdapter(0.5f);
+        audioFrequencyMapAdapter = new AudioFrequencyMapAdapter(freqMapDisplaySettings.getStepFactor());
         audioFrequencyMapPainter = new AudioFrequencyMapPainter();
         audioFrequencyMapPainter.setDataAdapter(audioFrequencyMapAdapter);
         frequencyMapPlotView.addPlotPainter(audioFrequencyMapPainter);
@@ -333,7 +350,6 @@ public class FrequencyAnalysisView extends FrameLayout {
     }
 
     class FreqMapUpdater {
-        private int sampleSize = -1;
         AsyncTask<Void, DataContainer, Void> asyncTask = null;
 
         private boolean useRenderScript = false;
@@ -342,13 +358,13 @@ public class FrequencyAnalysisView extends FrameLayout {
             if (wavRawData == null)
                 return true;
 
-            final int newSampleSize = Integer.parseInt(sampleSizeList.get(sampleSizeSpinner.getSelectedItemPosition()));
-            if (sampleSize != newSampleSize)
+            final int newWindowSize = Integer.parseInt(sampleSizeList.get(sampleSizeSpinner.getSelectedItemPosition()));
+            if (freqMapDisplaySettings.getWindowSize() != newWindowSize)
                 return false;
 
             final float newStepFactor = overlapSpinnerEntryList.get(
                     windowOverlapSpinner.getSelectedItemPosition()).stepFactor;
-            if (audioFrequencyMapAdapter.getStepFactor() != newStepFactor)
+            if (freqMapDisplaySettings.getStepFactor() != newStepFactor)
                 return false;
 
             if (useRenderScript != renderScriptCheckBox.isChecked())
@@ -369,7 +385,7 @@ public class FrequencyAnalysisView extends FrameLayout {
             // do the update
             showLoadingView("Fourier Analysis...");
 
-            sampleSize = -1;
+            freqMapDisplaySettings.setWindowSize(-1);
             final int newSampleSize = Integer.parseInt(sampleSizeList.get(sampleSizeSpinner.getSelectedItemPosition()));
             final float newStepFactor = overlapSpinnerEntryList.get(
                     windowOverlapSpinner.getSelectedItemPosition()).stepFactor;
@@ -417,7 +433,9 @@ public class FrequencyAnalysisView extends FrameLayout {
                 @Override
                 protected void onPostExecute(Void aVoid) {
                     super.onPostExecute(aVoid);
-                    sampleSize = newSampleSize;
+                    freqMapDisplaySettings.setWindowSize(newSampleSize);
+                    freqMapDisplaySettings.setStepFactor(newStepFactor);
+
                     onFinished();
                 }
 

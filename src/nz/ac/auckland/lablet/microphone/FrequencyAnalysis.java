@@ -22,6 +22,62 @@ public class FrequencyAnalysis implements ISensorAnalysis {
     final private MarkerDataModel vCursorMarkerModel;
     final private Unit xUnit = new Unit("s");
     final private Unit yUnit = new Unit("Hz");
+    final private FreqMapDisplaySettings freqMapDisplaySettings = new FreqMapDisplaySettings();
+
+    public class FreqMapDisplaySettings {
+        private int windowSize = 4096;
+        private float stepFactor = 0.5f;
+        private int contrast = 127;
+        private int brightness = 127;
+
+        public int getWindowSize() {
+            return windowSize;
+        }
+
+        public void setWindowSize(int windowSize) {
+            this.windowSize = windowSize;
+        }
+
+        public float getStepFactor() {
+            return stepFactor;
+        }
+
+        public void setStepFactor(float stepFactor) {
+            this.stepFactor = stepFactor;
+        }
+
+        public int getContrast() {
+            return contrast;
+        }
+
+        public void setContrast(int contrast) {
+            this.contrast = contrast;
+        }
+
+        public int getBrightness() {
+            return brightness;
+        }
+
+        public void setBrightness(int brightness) {
+            this.brightness = brightness;
+        }
+
+        public Bundle toBundle() {
+            Bundle bundle = new Bundle();
+            bundle.putInt("windowSize", windowSize);
+            bundle.putFloat("stepFactor", stepFactor);
+            bundle.putInt("contrast", contrast);
+            bundle.putInt("brightness", brightness);
+            return bundle;
+        }
+
+        public void fromBundle(Bundle bundle) {
+            windowSize = bundle.getInt("windowSize", windowSize);
+            stepFactor = bundle.getFloat("stepFactor", stepFactor);
+            contrast = bundle.getInt("contrast", contrast);
+            brightness = bundle.getInt("brightness", brightness);
+        }
+    }
 
     public FrequencyAnalysis(MicrophoneSensorData sensorData) {
         this.sensorData = sensorData;
@@ -38,6 +94,10 @@ public class FrequencyAnalysis implements ISensorAnalysis {
 
     public Unit getYUnit() {
         return yUnit;
+    }
+
+    public FreqMapDisplaySettings getFreqMapDisplaySettings() {
+        return freqMapDisplaySettings;
     }
 
     @Override
@@ -58,6 +118,11 @@ public class FrequencyAnalysis implements ISensorAnalysis {
         Bundle vCursorsBundle = bundle.getBundle("vCursors");
         if (vCursorsBundle != null)
             vCursorMarkerModel.fromBundle(vCursorsBundle);
+
+        Bundle freqMapDisplaySettingsBundle = bundle.getBundle("freqMapDisplaySettings");
+        if (freqMapDisplaySettingsBundle != null)
+            freqMapDisplaySettings.fromBundle(freqMapDisplaySettingsBundle);
+
         return true;
     }
 
@@ -70,6 +135,7 @@ public class FrequencyAnalysis implements ISensorAnalysis {
         if (vCursorMarkerModel.getMarkerCount() > 0)
             analysisDataBundle.putBundle("vCursors", vCursorMarkerModel.toBundle());
 
+        analysisDataBundle.putBundle("freqMapDisplaySettings", getFreqMapDisplaySettings().toBundle());
         return analysisDataBundle;
     }
 
