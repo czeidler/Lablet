@@ -17,6 +17,11 @@ public class VCursorDataModelPainter extends CursorDataModelPainter {
     }
 
     @Override
+    protected void sort() {
+        markerData.sortXAscending();
+    }
+
+    @Override
     protected DraggableMarker createMarkerForRow(int row) {
         return new VCursorMarker();
     }

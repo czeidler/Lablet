@@ -17,8 +17,15 @@ public class HCursorDataModelPainter extends CursorDataModelPainter {
     }
 
     @Override
+    protected void sort() {
+        markerData.sortYAscending();
+    }
+
+    @Override
     protected DraggableMarker createMarkerForRow(int row) {
         return new HCursorMarker();
     }
+
+
 }
 

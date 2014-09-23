@@ -116,11 +116,14 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
     public MarkerData removeMarkerData(int index) {
         MarkerData data = markerDataList.remove(index);
         notifyDataRemoved(index, data);
+        if (index == selectedDataIndex)
+            selectMarkerData(-1);
         return data;
     }
 
     public void clear() {
         markerDataList.clear();
+        selectedDataIndex = -1;
         notifyAllDataChanged();
     }
 

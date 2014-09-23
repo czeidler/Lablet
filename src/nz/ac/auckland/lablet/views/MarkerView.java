@@ -303,14 +303,26 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
         private AbstractMarkerPainter selectedForDragPainter = null;
         private IMarker selectedForDragMarker = null;
         private boolean inSelectForDragMethod = false;
+        private boolean selectOnSelectOnDrag = false;
 
         public void deselect() {
             if (selectedForDragMarker == null)
                 return;
             selectedForDragMarker.setSelectedForDrag(false);
+            if (selectOnSelectOnDrag)
+                selectedForDragPainter.markerData.selectMarkerData(-1);
             selectedForDragPainter.containerView.invalidate();
             selectedForDragPainter = null;
             selectedForDragMarker = null;
+        }
+
+        /**
+         * Set if the MarkerData should be marked as selected if the IMarker is selected for drag.
+         *
+         * @param selectOnSelectOnDrag
+         */
+        public void setSelectOnSelectOnDrag(boolean selectOnSelectOnDrag) {
+            this.selectOnSelectOnDrag = selectOnSelectOnDrag;
         }
 
         public void selectForDrag(IMarker marker, AbstractMarkerPainter painter) {
@@ -325,6 +337,8 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
 
                     if (selectedForDragPainter == painter && selectedForDragMarker == marker) {
                         selectedForDragPainter.containerView.invalidate();
+                        if (selectOnSelectOnDrag)
+                            selectedForDragPainter.markerData.selectMarkerData(-1);
                         selectedForDragPainter = null;
                         selectedForDragMarker = null;
                     }
@@ -333,11 +347,17 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
                 // marker has been selected; deselect old marker
                 if (selectedForDragMarker != null && selectedForDragMarker != marker) {
                     selectedForDragMarker.setSelectedForDrag(false);
+                    if (selectOnSelectOnDrag)
+                        selectedForDragPainter.markerData.selectMarkerData(-1);
                     selectedForDragPainter.containerView.invalidate();
                 }
 
                 selectedForDragPainter = painter;
                 selectedForDragMarker = marker;
+                if (selectOnSelectOnDrag) {
+                    int selectedIndex = selectedForDragPainter.getSelectableMarkerList().indexOf(selectedForDragMarker);
+                    selectedForDragPainter.markerData.selectMarkerData(selectedIndex);
+                }
             } finally {
                 inSelectForDragMethod = false;
             }

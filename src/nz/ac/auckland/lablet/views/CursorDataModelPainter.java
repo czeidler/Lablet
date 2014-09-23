@@ -138,6 +138,8 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
 
     public CursorDataModelPainter(MarkerDataModel data) {
         super(data);
+
+        getMarkerPainterGroup().setSelectOnSelectOnDrag(true);
     }
 
     @Override
@@ -147,18 +149,10 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
 
     @Override
     public void onDraw(Canvas canvas) {
-        boolean aMarkerIsSelectedForDrag = false;
         for (int i = 0; i < markerList.size(); i++) {
             IMarker marker = markerList.get(i);
             marker.onDraw(canvas, 1);
-            if (marker.isSelectedForDrag())
-                aMarkerIsSelectedForDrag = true;
         }
-
-        if (!aMarkerIsSelectedForDrag)
-            return;
-
-
     }
 
     @Override
@@ -170,7 +164,7 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
             selectedMarkerId = markerData.getMarkerDataAt(markerList.indexOf(marker)).getRunId();
 
         if (!isDragging)
-            markerData.sortYAscending();
+            sort();
 
         if (selectedMarkerId >= 0) {
             for (int i = 0; i < markerData.getMarkerCount(); i++) {
@@ -183,6 +177,7 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
         }
     }
 
+    abstract protected void sort();
 }
 
 

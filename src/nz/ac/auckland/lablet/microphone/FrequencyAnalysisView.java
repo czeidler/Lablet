@@ -279,7 +279,6 @@ public class FrequencyAnalysisView extends FrameLayout {
         MarkerDataModel hMarkerModel = frequencyAnalysis.getHCursorMarkerModel();
         hMarkerModel.addMarkerData(new MarkerData(0));
         hMarkerModel.addMarkerData(new MarkerData(1));
-        hMarkerModel.selectMarkerData(0);
         HCursorDataModelPainter hCursorDataModelPainter = new HCursorDataModelPainter(hMarkerModel);
         frequencyMapPlotView.addPlotPainter(hCursorDataModelPainter);
 
