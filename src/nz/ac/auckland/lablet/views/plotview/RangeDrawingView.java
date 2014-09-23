@@ -14,9 +14,14 @@ import android.view.ViewGroup;
 
 
 public class RangeDrawingView extends ViewGroup {
+    public interface IRangeListener {
+        void onRangeChanged(RectF range);
+    }
+
     // Float.MAX_VALUE means unset
     final protected RectF rangeRect = new RectF(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
 
+    private IRangeListener rangeListener;
     protected int viewWidth;
     protected int viewHeight;
     private float minXRange = -1;
@@ -35,6 +40,10 @@ public class RangeDrawingView extends ViewGroup {
         super(context);
 
         setWillNotDraw(false);
+    }
+
+    public void setRangeListener(IRangeListener rangeListener) {
+        this.rangeListener = rangeListener;
     }
 
     public RectF getRange() {
@@ -227,6 +236,7 @@ public class RangeDrawingView extends ViewGroup {
 
         rangeRect.left = left;
         rangeRect.right = right;
+        notifyRangeChanged();
         return true;
     }
 
@@ -249,7 +259,13 @@ public class RangeDrawingView extends ViewGroup {
 
         rangeRect.bottom = bottom;
         rangeRect.top = top;
+        notifyRangeChanged();
         return true;
+    }
+
+    private void notifyRangeChanged() {
+        if (rangeListener != null)
+            rangeListener.onRangeChanged(rangeRect);
     }
 
     public boolean offsetXRange(float offset) {

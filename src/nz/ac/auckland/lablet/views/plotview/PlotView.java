@@ -479,6 +479,10 @@ public class PlotView extends ViewGroup {
         plotGestureDetector = new PlotGestureDetector(context, this, mainView);
     }
 
+    public void setRangeListener(RangeDrawingView.IRangeListener listener) {
+        mainView.setRangeListener(listener);
+    }
+
     public void addPlotPainter(IPlotPainter painter) {
         mainView.addPlotPainter(painter);
     }
