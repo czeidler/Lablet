@@ -37,7 +37,7 @@ public class FrequencyAnalysisView extends FrameLayout {
     final private FrequencyAnalysis frequencyAnalysis;
     final private FrequencyAnalysis.FreqMapDisplaySettings freqMapDisplaySettings;
     private AudioFrequencyMapAdapter audioFrequencyMapAdapter;
-    private byte[] wavRawData = null;
+    private float[] amplitudes = null;
 
     private Spinner sampleSizeSpinner;
     final private List<String> sampleSizeList = new ArrayList<>();
@@ -331,16 +331,16 @@ public class FrequencyAnalysisView extends FrameLayout {
         showLoadingView("Load WAV file...");
 
         AsyncTask<Void, DataContainer, Void> asyncTask = new AsyncTask<Void, DataContainer, Void>() {
-            byte[] data;
+            float[] data;
             @Override
             protected Void doInBackground(Void... params) {
                 try {
                     int size = audioWavInputStream.getSize();
                     BufferedInputStream bufferedInputStream = new BufferedInputStream(audioWavInputStream);
-                    data = new byte[size];
+                    byte[] rawData = new byte[size];
                     for (int i = 0; i < size; i++)
-                        data[i] = (byte)bufferedInputStream.read();
-
+                        rawData[i] = (byte)bufferedInputStream.read();
+                    data = AudioWavInputStream.toAmplitudeData(rawData, rawData.length);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -352,7 +352,7 @@ public class FrequencyAnalysisView extends FrameLayout {
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
 
-                wavRawData = data;
+                amplitudes = data;
                 hideLoadingView();
                 sampleSizeSpinner.setEnabled(true);
                 windowOverlapSpinner.setEnabled(true);
@@ -368,7 +368,7 @@ public class FrequencyAnalysisView extends FrameLayout {
         private boolean useRenderScript = false;
 
         private boolean isUpToDate() {
-            if (wavRawData == null)
+            if (amplitudes == null)
                 return true;
 
             final int newWindowSize = Integer.parseInt(sampleSizeList.get(sampleSizeSpinner.getSelectedItemPosition()));
@@ -409,8 +409,6 @@ public class FrequencyAnalysisView extends FrameLayout {
             asyncTask = new AsyncTask<Void, DataContainer, Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
-                    float amplitudes[] = AudioWavInputStream.toAmplitudeData(wavRawData, wavRawData.length);
-
                     final FourierRenderScript fourierRenderScript = new FourierRenderScript(getContext());
 
                     float[] frequencies;
