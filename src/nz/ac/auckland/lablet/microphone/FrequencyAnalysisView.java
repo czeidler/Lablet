@@ -219,7 +219,13 @@ public class FrequencyAnalysisView extends FrameLayout {
         // contrast and brightness
         SeekBar.OnSeekBarChangeListener colorSeekBarListener = new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // magnetic middle
+                final int snap = 5;
+                final int snapPoint = 127;
+                if (Math.abs(progress - snapPoint) < snap)
+                    seekBar.setProgress(snapPoint);
+
                 freqMapDisplaySettings.setContrast(contrastSeekBar.getProgress());
                 freqMapDisplaySettings.setBrightness(brightnessSeekBar.getProgress());
                 updateContrastBrightness();
