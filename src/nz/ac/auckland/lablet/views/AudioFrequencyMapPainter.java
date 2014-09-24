@@ -17,7 +17,7 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
     final private int[] heatMap = new int[512];
 
     public AudioFrequencyMapPainter() {
-        setMaxDirtyRanges(3);
+        setMaxDirtyRanges(-1);
 
         preCalculateHeatMap();
     }

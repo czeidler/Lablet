@@ -59,21 +59,26 @@ class RenderTask {
                     plotPainter.render(bitmapCanvas, payload);
                 }
 
-                // set running to false before notifying the ui thread
+                boolean done = false;
                 if (index == size - 1) {
                     payloadList = null;
-                    running.set(false);
+                    done = true;
                 }
-                publishBitmap(payload);
+                publishBitmap(payload, done);
             }
         }
     };
 
-    private void publishBitmap(final OffScreenPlotPainter.RenderPayload payload) {
+    private void publishBitmap(final OffScreenPlotPainter.RenderPayload payload, final boolean done) {
         uiHandler.post(new Runnable() {
             @Override
             public void run() {
-                plotPainter.onOffScreenRenderingFinished(payload);
+                plotPainter.onMergeOffScreenRendering(payload);
+
+                if (done) {
+                    running.set(false);
+                    plotPainter.onOffScreenRenderingFinished();
+                }
             }
         });
     }
@@ -221,7 +226,7 @@ abstract public class OffScreenPlotPainter extends AbstractPlotDataPainter {
         renderTask.start(payloadsToRender);
     }
 
-    protected void onOffScreenRenderingFinished(RenderPayload payload) {
+    protected void onMergeOffScreenRendering(RenderPayload payload) {
         if (payload.clearParentBitmap) {
             onSetupOffScreenBitmap();
             offScreenBitmap.getBitmap().eraseColor(Color.TRANSPARENT);
@@ -236,7 +241,9 @@ abstract public class OffScreenPlotPainter extends AbstractPlotDataPainter {
             canvas.drawBitmap(resultBitmap, null, targetRect, null);
         }
         containerView.invalidate();
+    }
 
+    protected void onOffScreenRenderingFinished() {
         if (!renderTask.isRendering() && payloadQueue.size() > 0) {
             renderTask.start(payloadQueue);
             payloadQueue = new ArrayList<>();

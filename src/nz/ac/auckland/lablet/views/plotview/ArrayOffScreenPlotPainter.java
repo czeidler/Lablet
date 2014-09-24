@@ -69,8 +69,9 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
             drawRange(bitmapCanvas, renderPayload, range);
     }
 
-    protected void onOffScreenRenderingFinished(RenderPayload payload) {
-        super.onOffScreenRenderingFinished(payload);
+    @Override
+    protected void onOffScreenRenderingFinished() {
+        super.onOffScreenRenderingFinished();
 
         if (!hasFreeRenderingPipe())
             return;
