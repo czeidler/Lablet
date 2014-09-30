@@ -22,8 +22,7 @@ import java.util.List;
 /**
  * MarkerDataTableAdapter that can holds a set of {@link DataTableColumn}s.
  */
-abstract class ColumnDataTableAdapter extends WeakListenable<ITableAdapter.IListener>
-        implements ITableAdapter<MarkerData> {
+abstract class ColumnDataTableAdapter extends WeakListenable<ITableAdapter.IListener> implements ITableAdapter {
 
     private List<DataTableColumn> columns = new ArrayList<>();
 
@@ -126,11 +125,6 @@ public class MarkerDataTableAdapter extends ColumnDataTableAdapter implements Ma
     @Override
     public int getColumnWeight(int column) {
         return 1;
-    }
-
-    @Override
-    public MarkerData getRow(int index) throws IndexOutOfBoundsException {
-        return model.getMarkerDataAt(index);
     }
 
     @Override

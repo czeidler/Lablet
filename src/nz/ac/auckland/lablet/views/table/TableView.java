@@ -19,7 +19,7 @@ import android.widget.TableRow;
  * Implementation of a table view. Uses the {@link nz.ac.auckland.lablet.views.table.ITableAdapter}.
  */
 public class TableView extends TableLayout implements ITableAdapter.IListener {
-    protected ITableAdapter<?> adapter = null;
+    protected ITableAdapter adapter = null;
     TableRow selectedRow = null;
     final int rowBackgroundColor = Color.WHITE;
     final int headerRowBackgroundColor = Color.rgb(100, 100, 100);
@@ -34,7 +34,7 @@ public class TableView extends TableLayout implements ITableAdapter.IListener {
         setAlwaysDrawnWithCacheEnabled(true);
     }
 
-    public void setAdapter(ITableAdapter<?> tableAdapter) {
+    public void setAdapter(ITableAdapter tableAdapter) {
         removeAllViews();
         if (adapter != null)
             adapter.removeListener(this);
@@ -58,7 +58,7 @@ public class TableView extends TableLayout implements ITableAdapter.IListener {
     }
 
     @Override
-    public void onRowAdded(ITableAdapter<?> table, int row) {
+    public void onRowAdded(ITableAdapter table, int row) {
         row ++;
         TableRow tableRow = createRow(row);
         addView(tableRow, row);
@@ -67,7 +67,7 @@ public class TableView extends TableLayout implements ITableAdapter.IListener {
     }
 
     @Override
-    public void onRowRemoved(ITableAdapter<?> table, int row) {
+    public void onRowRemoved(ITableAdapter table, int row) {
         //row ++;
         // TODO check if that selects the right row
         //removeViewAt(row);
@@ -76,7 +76,7 @@ public class TableView extends TableLayout implements ITableAdapter.IListener {
     }
 
     @Override
-    public void onRowUpdated(ITableAdapter<?> table, int row, int number) {
+    public void onRowUpdated(ITableAdapter table, int row, int number) {
         for (int i = row; i < row + number; i++) {
             TableRow tableRow = (TableRow)getChildAt(i);
             if (tableRow == null)
@@ -88,12 +88,12 @@ public class TableView extends TableLayout implements ITableAdapter.IListener {
     }
 
     @Override
-    public void onAllRowsUpdated(ITableAdapter<?> table) {
+    public void onAllRowsUpdated(ITableAdapter table) {
         reload();
     }
 
     @Override
-    public void onRowSelected(ITableAdapter<?> table, int row) {
+    public void onRowSelected(ITableAdapter table, int row) {
         selectRow(row);
     }
 
