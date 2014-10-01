@@ -15,10 +15,7 @@ import nz.ac.auckland.lablet.experiment.ExperimentHelper;
 import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
 import nz.ac.auckland.lablet.experiment.ISensorData;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 
 /**
@@ -116,15 +113,17 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
             }
         }
 
-        FileOutputStream outputStream;
+        Writer writer = null;
         try {
-            outputStream = new FileOutputStream(csvFile);
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(csvFile)));
+            sensorAnalysis.exportTagMarkerCSVData(writer);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return;
+        } finally {
+            if (writer != null)
+                writer.close();
         }
-
-        sensorAnalysis.exportTagMarkerCSVData(outputStream);
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

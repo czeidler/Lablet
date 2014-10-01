@@ -12,6 +12,7 @@ import android.os.Bundle;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 
 
 public interface ISensorAnalysis {
@@ -22,5 +23,5 @@ public interface ISensorAnalysis {
     public boolean loadAnalysisData(Bundle bundle, File storageDir);
 
     public Bundle exportAnalysisData(File additionalStorageDir) throws IOException;
-    public void exportTagMarkerCSVData(OutputStream outputStream) throws IOException;
+    public void exportTagMarkerCSVData(Writer writer) throws IOException;
 }

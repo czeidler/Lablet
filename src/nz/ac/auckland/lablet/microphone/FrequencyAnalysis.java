@@ -10,10 +10,11 @@ package nz.ac.auckland.lablet.microphone;
 import android.graphics.RectF;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.*;
+import nz.ac.auckland.lablet.views.table.CSVWriter;
+import nz.ac.auckland.lablet.views.table.ColumnDataTableAdapter;
+import nz.ac.auckland.lablet.views.table.MarkerDataTableAdapter;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 
 public class FrequencyAnalysis implements ISensorAnalysis {
@@ -158,8 +159,18 @@ public class FrequencyAnalysis implements ISensorAnalysis {
     }
 
     @Override
-    public void exportTagMarkerCSVData(OutputStream outputStream) throws IOException {
+    public void exportTagMarkerCSVData(Writer writer) throws IOException {
+        MarkerDataTableAdapter hTableAdapter = new MarkerDataTableAdapter(hCursorMarkerModel);
+        hTableAdapter.addColumn(new HCursorColumn());
+        hTableAdapter.addColumn(new HCursorDiffToPrevColumn());
+        CSVWriter.writeTable(hTableAdapter, writer, ',');
 
+        writer.write("\n");
+
+        MarkerDataTableAdapter vTableAdapter = new MarkerDataTableAdapter(vCursorMarkerModel);
+        vTableAdapter.addColumn(new VCursorColumn());
+        vTableAdapter.addColumn(new VCursorDiffToPrevColumn());
+        CSVWriter.writeTable(vTableAdapter, writer, ',');
     }
 
     public MarkerDataModel getHCursorMarkerModel() {

@@ -272,36 +272,36 @@ public class MotionAnalysis implements ISensorAnalysis {
         return analysisDataBundle;
     }
 
-    public void exportTagMarkerCSVData(OutputStream outputStream) {
+    @Override
+    public void exportTagMarkerCSVData(Writer writer) {
         try {
             String header = "id, x [" + xUnit.getUnit()+ "], y [" + yUnit.getUnit() + "], time [" + tUnit.getUnit()
                     + "]\n";
-            outputStream.write(header.getBytes());
+            writer.write(header);
             for (int i = 0; i < tagMarkers.getMarkerCount(); i++) {
                 MarkerData markerData = tagMarkers.getMarkerDataAt(i);
                 String string = "";
                 string += markerData.getRunId();
-                outputStream.write(string.getBytes());
-                outputStream.write(",".getBytes());
+                writer.write(string);
+                writer.write(",");
 
                 PointF position = tagMarkers.getRealMarkerPositionAt(i);
                 string = "";
                 string += position.x;
-                outputStream.write(string.getBytes());
-                outputStream.write(",".getBytes());
+                writer.write(string);
+                writer.write(",");
 
                 string = "";
                 string += position.y;
-                outputStream.write(string.getBytes());
-                outputStream.write(",".getBytes());
+                writer.write(string);
+                writer.write(",");
 
                 string = "";
                 string += calibrationVideoFrame.getTimeAt(i);
-                outputStream.write(string.getBytes());
+                writer.write(string);
 
-                outputStream.write("\n".getBytes());
+                writer.write("\n");
             }
-            outputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
