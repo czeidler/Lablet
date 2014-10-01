@@ -223,7 +223,7 @@ public class FrequencyAnalysisView extends FrameLayout {
                 // magnetic middle
                 final int snap = 5;
                 final int snapPoint = 127;
-                if (Math.abs(progress - snapPoint) < snap)
+                if (fromUser && Math.abs(progress - snapPoint) < snap)
                     seekBar.setProgress(snapPoint);
 
                 freqMapDisplaySettings.setContrast(contrastSeekBar.getProgress());
