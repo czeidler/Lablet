@@ -306,12 +306,13 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
         private boolean selectOnSelectOnDrag = false;
 
         public void deselect() {
-            if (selectedForDragMarker == null)
+            if (selectedForDragMarker == null || selectedForDragPainter == null)
                 return;
-            selectedForDragMarker.setSelectedForDrag(false);
+            selectedForDragPainter.containerView.invalidate();
             if (selectOnSelectOnDrag)
                 selectedForDragPainter.markerData.selectMarkerData(-1);
-            selectedForDragPainter.containerView.invalidate();
+
+            selectedForDragMarker.setSelectedForDrag(false);
             selectedForDragPainter = null;
             selectedForDragMarker = null;
         }
