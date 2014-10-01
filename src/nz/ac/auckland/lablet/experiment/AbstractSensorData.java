@@ -27,6 +27,9 @@ abstract public class AbstractSensorData implements ISensorData {
 
     private IExperimentSensor sourceSensor;
 
+    static public String UID_KEY = "uid";
+    static public String DATA_TYPE_KEY = "data_type";
+
     /**
      * Constructor to load an existing experiment.
      *
@@ -108,8 +111,8 @@ abstract public class AbstractSensorData implements ISensorData {
      */
     protected Bundle experimentDataToBundle() {
         Bundle bundle = new Bundle();
-        bundle.putString("uid", uid);
-        bundle.putString("data_type", getDataType());
+        bundle.putString(UID_KEY, uid);
+        bundle.putString(DATA_TYPE_KEY, getDataType());
 
         return bundle;
     }

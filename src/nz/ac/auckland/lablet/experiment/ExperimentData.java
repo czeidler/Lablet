@@ -9,6 +9,8 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.content.Context;
 import android.os.Bundle;
+import nz.ac.auckland.lablet.camera.CameraSensorData;
+import nz.ac.auckland.lablet.microphone.MicrophoneSensorData;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,18 +57,28 @@ public class ExperimentData {
             return null;
         }
 
-        ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
-        ISensorPlugin plugin = factory.findSensorPlugin(experimentIdentifier);
-        if (plugin == null) {
-            loadError = "unknown experiment type";
-            return null;
-        }
-
         Bundle experimentData = bundle.getBundle("data");
         if (experimentData == null) {
             loadError = "failed to load experiment data";
             return null;
         }
+
+        ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
+        ISensorPlugin plugin = factory.findSensorPlugin(experimentIdentifier);
+        if (plugin == null) {
+            // fallback: try to find analysis for the data type
+            if (!experimentData.containsKey(AbstractSensorData.DATA_TYPE_KEY)) {
+                loadError = "experiment data type information is missing";
+                return null;
+            }
+            String dataType = experimentData.getString(AbstractSensorData.DATA_TYPE_KEY);
+            ISensorData sensorData = getSensorDataForType(dataType, context, experimentData, sensorDirectory);
+            if (sensorData == null)
+                loadError = "unknown experiment type";
+            return sensorData;
+        }
+
+
         ISensorData sensorData = plugin.loadSensorData(context, experimentData, sensorDirectory);
         if (sensorData == null) {
             loadError = "can't load experiment";
@@ -74,6 +86,16 @@ public class ExperimentData {
         }
 
         return sensorData;
+    }
+
+    private ISensorData getSensorDataForType(String dataType, Context context, Bundle data, File dir) {
+        switch (dataType) {
+            case "Audio":
+                return new MicrophoneSensorData(context, data, dir);
+            case "Video":
+                return new CameraSensorData(context, data, dir);
+        }
+        return null;
     }
 
     private ExperimentData.RunEntry loadRunData(Context context, File runDir) {
