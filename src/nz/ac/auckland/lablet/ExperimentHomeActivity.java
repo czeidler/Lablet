@@ -252,7 +252,7 @@ public class ExperimentHomeActivity extends Activity {
         sensorPlugins = ExperimentPluginFactory.getFactory().getSensorPlugins();
         List<String> sensorPluginStrings = new ArrayList<>();
         for (ISensorPlugin plugin : sensorPlugins)
-            sensorPluginStrings.add(plugin.getDisplayName());
+            sensorPluginStrings.add(plugin.getSensorName());
 
         int grey = 70;
         int listBackgroundColor = Color.rgb(grey, grey, grey);

@@ -26,7 +26,7 @@ public class ExperimentHelper {
     static public ExperimentData loadExperimentData(Context context, String experimentMainDir) {
         ExperimentData experimentData = new ExperimentData();
         if (!experimentData.load(context, new File(experimentMainDir, "data")))
-            return null;
+            return experimentData;
         return experimentData;
     }
 
@@ -87,7 +87,7 @@ public class ExperimentHelper {
             pluginNames = new String[plugins.size()];
             for (int i = 0; i < plugins.size(); i++) {
                 ISensorPlugin plugin = plugins.get(i);
-                pluginNames[i] = plugin.getSensorIdentifier();
+                pluginNames[i] = plugin.getSensorName();
             }
         }
 

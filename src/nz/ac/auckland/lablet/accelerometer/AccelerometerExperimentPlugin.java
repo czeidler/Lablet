@@ -19,13 +19,8 @@ import java.io.File;
 class AccelerometerSensorPlugin implements ISensorPlugin {
 
     @Override
-    public String getSensorIdentifier() {
+    public String getSensorName() {
         return AccelerometerExperimentSensor.class.getSimpleName();
-    }
-
-    @Override
-    public String getDisplayName() {
-        return "Accelerometer";
     }
 
     @Override

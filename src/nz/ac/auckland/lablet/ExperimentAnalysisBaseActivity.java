@@ -174,7 +174,7 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
         int sensorId = intent.getIntExtra("sensor_id", 0);
 
         ExperimentData experimentData = ExperimentHelper.loadExperimentData(this, experimentPath);
-        if (experimentData == null) {
+        if (!experimentData.getLoadError().equals("")) {
             showErrorAndFinish(experimentData.getLoadError());
             return false;
         }

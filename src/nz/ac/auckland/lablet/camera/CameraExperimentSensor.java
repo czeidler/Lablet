@@ -179,6 +179,8 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         return videoFile;
     }
 
+    final static public String SENSOR_NAME = "Camera";
+
     /**
      * Helper class to match a camera recording size with a camcorder profile matching for that size.
      */
@@ -188,8 +190,8 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
     }
 
     @Override
-    public String getIdentifier() {
-        return getClass().getSimpleName();
+    public String getSensorName() {
+        return SENSOR_NAME;
     }
 
     @Override

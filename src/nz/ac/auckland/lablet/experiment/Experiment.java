@@ -43,7 +43,7 @@ public class Experiment {
         if (experimentRuns.size() > 0) {
             List<IExperimentSensor> sensorList = experimentRuns.get(0).getExperimentSensors();
             for (IExperimentSensor sensor : sensorList)
-                sensorsString += "_" + sensor.getIdentifier();
+                sensorsString += "_" + sensor.getSensorName();
         }
         return dateString + sensorsString;
     }

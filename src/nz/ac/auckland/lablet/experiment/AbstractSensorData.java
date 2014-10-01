@@ -75,7 +75,7 @@ abstract public class AbstractSensorData implements ISensorData {
         this.storageDir = storageDir;
 
         Bundle bundle = new Bundle();
-        bundle.putString("sensor_name", sourceSensor.getIdentifier());
+        bundle.putString("sensor_name", sourceSensor.getSensorName());
         Bundle experimentData = experimentDataToBundle();
         bundle.putBundle("data", experimentData);
 
@@ -109,6 +109,7 @@ abstract public class AbstractSensorData implements ISensorData {
     protected Bundle experimentDataToBundle() {
         Bundle bundle = new Bundle();
         bundle.putString("uid", uid);
+        bundle.putString("data_type", getDataType());
 
         return bundle;
     }

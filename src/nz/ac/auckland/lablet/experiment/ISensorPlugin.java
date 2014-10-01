@@ -22,9 +22,8 @@ public interface ISensorPlugin {
      *
      * @return the identifier of the sensor
      */
-    public String getSensorIdentifier();
+    public String getSensorName();
 
-    public String getDisplayName();
     /**
      * Creates an experiment run object.
      * <p>

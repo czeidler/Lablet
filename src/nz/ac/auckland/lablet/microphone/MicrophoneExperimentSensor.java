@@ -289,6 +289,8 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
 public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     private WeakReference<ISensorDataListener> softListener = null;
 
+    final static public String SENSOR_NAME = "Microphone";
+
     final public int SAMPLE_RATE = 44100;
     final public int FRAME_SIZE = 4096;
 
@@ -328,8 +330,8 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     }
 
     @Override
-    public String getIdentifier() {
-        return getClass().getSimpleName();
+    public String getSensorName() {
+        return SENSOR_NAME;
     }
 
     @Override

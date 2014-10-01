@@ -142,6 +142,8 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
 
         @Override
         public int getCount() {
+            if (currentAnalysisRun == null)
+                return 0;
             return currentAnalysisRun.sensorList.size();
         }
     }

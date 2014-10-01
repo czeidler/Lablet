@@ -17,13 +17,8 @@ import java.io.File;
 public class MicrophoneSensorPlugin implements ISensorPlugin {
 
     @Override
-    public String getSensorIdentifier() {
-        return MicrophoneExperimentSensor.class.getSimpleName();
-    }
-
-    @Override
-    public String getDisplayName() {
-        return "Microphone";
+    public String getSensorName() {
+        return MicrophoneExperimentSensor.SENSOR_NAME;
     }
 
     @Override
