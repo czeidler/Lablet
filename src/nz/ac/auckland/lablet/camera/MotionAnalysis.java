@@ -12,6 +12,7 @@ import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.views.graph.IMinRangeGetter;
+import nz.ac.auckland.lablet.views.table.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -274,37 +275,12 @@ public class MotionAnalysis implements ISensorAnalysis {
 
     @Override
     public void exportTagMarkerCSVData(Writer writer) {
-        try {
-            String header = "id, x [" + xUnit.getUnit()+ "], y [" + yUnit.getUnit() + "], time [" + tUnit.getUnit()
-                    + "]\n";
-            writer.write(header);
-            for (int i = 0; i < tagMarkers.getMarkerCount(); i++) {
-                MarkerData markerData = tagMarkers.getMarkerDataAt(i);
-                String string = "";
-                string += markerData.getRunId();
-                writer.write(string);
-                writer.write(",");
-
-                PointF position = tagMarkers.getRealMarkerPositionAt(i);
-                string = "";
-                string += position.x;
-                writer.write(string);
-                writer.write(",");
-
-                string = "";
-                string += position.y;
-                writer.write(string);
-                writer.write(",");
-
-                string = "";
-                string += calibrationVideoFrame.getTimeAt(i);
-                writer.write(string);
-
-                writer.write("\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        MarkerDataTableAdapter tableAdapter = new MarkerDataTableAdapter(tagMarkers);
+        tableAdapter.addColumn(new RunIdDataTableColumn());
+        tableAdapter.addColumn(new XPositionDataTableColumn(xUnit));
+        tableAdapter.addColumn(new YPositionDataTableColumn(yUnit));
+        tableAdapter.addColumn(new TimeDataTableColumn(tUnit, calibrationVideoFrame));
+        CSVWriter.writeTable(tableAdapter, writer, ',');
     }
 
     private void notifyShowCoordinateSystem(boolean show) {
