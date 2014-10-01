@@ -47,7 +47,7 @@ public class CalibrationVideoFrame implements ITimeData {
     /**
      * Set the frame rate at which the video should be analysed.
      * <p>
-     * This method should only be called from the {@link CameraExperimentAnalysis}. The
+     * This method should only be called from the {@link nz.ac.auckland.lablet.camera.MotionAnalysis}. The
      * frame rate determined how many sensorDataList are returned by the experiments, i.e., a higher frame rate results in more
      * sensorDataList.
      * </p>
@@ -90,7 +90,7 @@ public class CalibrationVideoFrame implements ITimeData {
     /**
      * Sets the start time of the video analysis.
      * <p>
-     * This value should only be set by {@link CameraExperimentAnalysis}. The analysis
+     * This value should only be set by {@link nz.ac.auckland.lablet.camera.MotionAnalysis}. The analysis
      * start point affects the number of returned sensorDataList.
      * </p>
      * @param startTime the time for the analysis start
@@ -111,7 +111,7 @@ public class CalibrationVideoFrame implements ITimeData {
     /**
      * Sets the end time for the video analysis.
      * <p>
-     * This value should only be set by {@link CameraExperimentAnalysis}. The analysis
+     * This value should only be set by {@link nz.ac.auckland.lablet.camera.MotionAnalysis}. The analysis
      * end point affects the number of returned sensorDataList.
      * </p>
      * @param endTime the time for the analysis end
