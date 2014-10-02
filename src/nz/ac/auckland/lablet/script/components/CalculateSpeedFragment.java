@@ -359,7 +359,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
 
     protected MotionAnalysis getMotionAnalysis() {
         ScriptTreeNodeCalculateSpeed speedComponent = (ScriptTreeNodeCalculateSpeed)component;
-        return speedComponent.getExperiment().getVideoAnalysis(getActivity());
+        return speedComponent.getExperiment().getMotionAnalysis(getActivity(), 0);
     }
 
     @Override

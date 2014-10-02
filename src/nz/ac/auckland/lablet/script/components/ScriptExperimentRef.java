@@ -14,7 +14,9 @@ import nz.ac.auckland.lablet.camera.CameraSensorData;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
+import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
 import nz.ac.auckland.lablet.experiment.ISensorData;
+import nz.ac.auckland.lablet.microphone.FrequencyAnalysis;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 
 import java.io.File;
@@ -30,7 +32,7 @@ public class ScriptExperimentRef extends WeakListenable<ScriptExperimentRef.ILis
     }
 
     private String experimentPath = "";
-    private MotionAnalysis motionAnalysis;
+    private ExperimentAnalysis experimentAnalysis;
 
     public String getExperimentPath() {
         return experimentPath;
@@ -39,29 +41,44 @@ public class ScriptExperimentRef extends WeakListenable<ScriptExperimentRef.ILis
         experimentPath = path;
     }
 
-    public MotionAnalysis getVideoAnalysis(Context context) {
-        if (motionAnalysis == null)
-            motionAnalysis = loadSensorAnalysis(context);
-        return motionAnalysis;
+    public MotionAnalysis getMotionAnalysis(Context context, int run) {
+        return getAnalysis(context, run, "MotionAnalysis");
+    }
+
+    public FrequencyAnalysis getFrequencyAnalysis(Context context, int run) {
+        return getAnalysis(context, run, "FrequencyAnalysis");
+    }
+
+    protected <T extends ISensorAnalysis> T getAnalysis(Context context, int run, String analysisIdentifier) {
+        if (experimentAnalysis == null)
+            experimentAnalysis = loadExperimentAnalysis(context);
+        if (experimentAnalysis == null || experimentAnalysis.getNumberOfRuns() <= run)
+            return null;
+
+        ExperimentAnalysis.AnalysisRunEntry experimentRun = experimentAnalysis.getAnalysisRunAt(run);
+        for (ExperimentAnalysis.AnalysisDataEntry analysisDataEntry : experimentRun.analysisDataList) {
+            for (ExperimentAnalysis.AnalysisEntry analysisEntry : analysisDataEntry.analysisList) {
+                if (analysisEntry.analysis.getIdentifier().equals(analysisIdentifier))
+                    return (T)(analysisEntry.analysis);
+            }
+        }
+        return null;
     }
 
     public void reloadExperimentAnalysis(Context context) {
-        motionAnalysis = loadSensorAnalysis(context);
+        experimentAnalysis = loadExperimentAnalysis(context);
+
         for (IListener listener : getListeners())
             listener.onExperimentAnalysisUpdated();
     }
 
-    private MotionAnalysis loadSensorAnalysis(Context context) {
+    private ExperimentAnalysis loadExperimentAnalysis(Context context) {
         ExperimentData experimentData = ExperimentHelper.loadExperimentData(context, getExperimentPath());
         if (experimentData == null)
             return null;
-        ISensorData sensorData = experimentData.getRuns().get(0).sensorDataList.get(0);
-        if (!(sensorData instanceof CameraSensorData))
-            return null;
-        MotionAnalysis motionAnalysis = new MotionAnalysis((CameraSensorData)sensorData);
-        File analysisDir = ExperimentAnalysis.getAnalysisStorageFor(experimentData, 0, motionAnalysis);
-        if (!ExperimentHelper.loadSensorAnalysis(motionAnalysis, analysisDir))
-            return null;
-        return motionAnalysis;
+
+        ExperimentAnalysis analysis = new ExperimentAnalysis();
+        analysis.setExperimentData(experimentData);
+        return analysis;
     }
 }

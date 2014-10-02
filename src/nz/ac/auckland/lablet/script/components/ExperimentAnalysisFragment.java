@@ -160,7 +160,7 @@ public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
 
     private boolean validateAnalysis() {
         ScriptExperimentRef experiment = ((ScriptTreeNodeExperimentAnalysis)component).getExperiment();
-        MotionAnalysis sensorAnalysis = experiment.getVideoAnalysis(getActivity());
+        MotionAnalysis sensorAnalysis = experiment.getMotionAnalysis(getActivity(), 0);
         if (sensorAnalysis == null)
             return false;
 
@@ -184,7 +184,7 @@ public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
         if (component.getState() == ScriptComponent.SCRIPT_STATE_DONE) {
             takenExperimentInfo.setChecked(true);
             ScriptExperimentRef experiment = ((ScriptTreeNodeExperimentAnalysis)component).getExperiment();
-            MotionAnalysis sensorAnalysis = experiment.getVideoAnalysis(getActivity());
+            MotionAnalysis sensorAnalysis = experiment.getMotionAnalysis(getActivity(), 0);
             if (sensorAnalysis == null)
                 return;
             MarkerTimeGraphAdapter adapter = new MarkerTimeGraphAdapter(sensorAnalysis.getTagMarkers(),
