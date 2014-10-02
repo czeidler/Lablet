@@ -118,7 +118,8 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
         final Rect screenRect = payload.getScreenRect();
         final int[] colors = new int[screenRect.height()];
         final int[] bitmapData = new int[screenRect.width() * screenRect.height()];
-        Arrays.fill(bitmapData, Color.TRANSPARENT);
+        // the default int value of 0 is transparent
+        //Arrays.fill(bitmapData, Color.TRANSPARENT);
 
         for (int index = start; index < start + count; index++) {
 
