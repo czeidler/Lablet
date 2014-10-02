@@ -21,8 +21,10 @@ public class ScriptComponentFragmentFactory implements IScriptComponentFactory {
     public ScriptTreeNode create(String componentName, Script script) {
         if (componentName.equals("Sheet"))
             return new ScriptTreeNodeSheet(script);
-        if (componentName.equals("ExperimentAnalysis"))
-            return new ScriptTreeNodeExperimentAnalysis(script);
+        if (componentName.equals("MotionAnalysis"))
+            return new ScriptTreeNodeMotionAnalysis(script);
+        if (componentName.equals("FrequencyAnalysis"))
+            return new ScriptTreeNodeFrequencyAnalysis(script);
         if (componentName.equals("CalculateXSpeed"))
             return new ScriptTreeNodeCalculateSpeed(script, true);
         if (componentName.equals("CalculateYSpeed"))

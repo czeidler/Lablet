@@ -34,11 +34,11 @@ import java.io.File;
 /**
  * Script component that can create a fragment for the experiment analysis.
  */
-class ScriptTreeNodeExperimentAnalysis extends ScriptTreeNodeFragmentHolder {
+class ScriptTreeNodeMotionAnalysis extends ScriptTreeNodeFragmentHolder {
     private ScriptExperimentRef experiment;
     private String descriptionText = "";
 
-    public ScriptTreeNodeExperimentAnalysis(Script script) {
+    public ScriptTreeNodeMotionAnalysis(Script script) {
         super(script);
     }
 
@@ -53,7 +53,7 @@ class ScriptTreeNodeExperimentAnalysis extends ScriptTreeNodeFragmentHolder {
 
     @Override
     public ScriptComponentGenericFragment createFragment() {
-        ScriptComponentGenericFragment fragment = new ExperimentAnalysisFragment();
+        ScriptComponentGenericFragment fragment = new MotionAnalysisFragment();
         fragment.setScriptComponent(this);
         return fragment;
     }
@@ -79,7 +79,7 @@ class ScriptTreeNodeExperimentAnalysis extends ScriptTreeNodeFragmentHolder {
 /**
  * Fragment to start an experiment analysis.
  */
-public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
+public class MotionAnalysisFragment extends ScriptComponentGenericFragment {
     static final int ANALYSE_EXPERIMENT = 0;
 
     private CheckedTextView takenExperimentInfo = null;
@@ -91,10 +91,10 @@ public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
         if (component == null)
             return view;
 
-        View child = setChild(R.layout.script_component_analyze_experiment);
+        View child = setChild(R.layout.script_component_motion_analyze);
         assert child != null;
 
-        ScriptTreeNodeExperimentAnalysis analysisComponent = (ScriptTreeNodeExperimentAnalysis)this.component;
+        ScriptTreeNodeMotionAnalysis analysisComponent = (ScriptTreeNodeMotionAnalysis)this.component;
 
         TextView descriptionTextView = (TextView)child.findViewById(R.id.descriptionText);
         assert descriptionTextView != null;
@@ -108,7 +108,7 @@ public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), ExperimentAnalysisActivity.class);
                 intent.putExtra("experiment_path",
-                        ((ScriptTreeNodeExperimentAnalysis)component).getExperiment().getExperimentPath());
+                        ((ScriptTreeNodeMotionAnalysis) component).getExperiment().getExperimentPath());
                 intent.putExtra("first_start_with_run_settings", true);
                 intent.putExtra("first_start_with_run_settings_help", true);
                 startActivityForResult(intent, ANALYSE_EXPERIMENT);
@@ -136,7 +136,7 @@ public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
 
         Activity activity = getActivity();
 
-        ScriptExperimentRef experiment = ((ScriptTreeNodeExperimentAnalysis)component).getExperiment();
+        ScriptExperimentRef experiment = ((ScriptTreeNodeMotionAnalysis)component).getExperiment();
         experiment.reloadExperimentAnalysis(activity);
 
         if (!validateAnalysis()) {
@@ -159,7 +159,7 @@ public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
     }
 
     private boolean validateAnalysis() {
-        ScriptExperimentRef experiment = ((ScriptTreeNodeExperimentAnalysis)component).getExperiment();
+        ScriptExperimentRef experiment = ((ScriptTreeNodeMotionAnalysis)component).getExperiment();
         MotionAnalysis sensorAnalysis = experiment.getMotionAnalysis(getActivity(), 0);
         if (sensorAnalysis == null)
             return false;
@@ -183,7 +183,7 @@ public class ExperimentAnalysisFragment extends ScriptComponentGenericFragment {
 
         if (component.getState() == ScriptComponent.SCRIPT_STATE_DONE) {
             takenExperimentInfo.setChecked(true);
-            ScriptExperimentRef experiment = ((ScriptTreeNodeExperimentAnalysis)component).getExperiment();
+            ScriptExperimentRef experiment = ((ScriptTreeNodeMotionAnalysis)component).getExperiment();
             MotionAnalysis sensorAnalysis = experiment.getMotionAnalysis(getActivity(), 0);
             if (sensorAnalysis == null)
                 return;

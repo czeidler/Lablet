@@ -7,7 +7,7 @@ function onBuildExperimentScript(scriptBuilder)
 	experimentView:setDescriptionText("Please record some sound:")
 	local micExperiment = experimentView:getExperiment()
 
-	local experimentAnalysis = scriptBuilder:create("ExperimentAnalysis")
+	local experimentAnalysis = scriptBuilder:create("FrequencyAnalysis")
 	scriptBuilder:add(experimentAnalysis)
 	experimentAnalysis:setTitle("Analyze the audio recording:")
 	experimentAnalysis:setExperiment(micExperiment)

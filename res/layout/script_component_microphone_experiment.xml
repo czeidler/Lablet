@@ -20,6 +20,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-        android:text="no video taken"
+        android:text="no audio recorded"
         android:id="@+id/takenExperimentInfo" android:checked="false"/>
 </LinearLayout>
