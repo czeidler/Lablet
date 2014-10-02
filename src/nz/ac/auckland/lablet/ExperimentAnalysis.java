@@ -37,7 +37,7 @@ public class ExperimentAnalysis {
         }
     }
 
-    public static class AnalysisSensorEntry {
+    public static class AnalysisDataEntry {
         final public List<AnalysisEntry> analysisList = new ArrayList<>();
 
         public AnalysisEntry getAnalysisEntry(String analysis) {
@@ -50,10 +50,10 @@ public class ExperimentAnalysis {
     }
 
     public static class AnalysisRunEntry {
-        final public List<AnalysisSensorEntry> sensorList = new ArrayList<>();
+        final public List<AnalysisDataEntry> analysisDataList = new ArrayList<>();
 
-        public AnalysisSensorEntry getSensorEntry(int index) {
-            return sensorList.get(index);
+        public AnalysisDataEntry getSensorEntry(int index) {
+            return analysisDataList.get(index);
         }
     }
 
@@ -95,7 +95,7 @@ public class ExperimentAnalysis {
         for (ExperimentData.RunEntry runEntry : runs) {
             AnalysisRunEntry analysisRunEntry = new AnalysisRunEntry();
             for (ISensorData sensorData : runEntry.sensorDataList) {
-                AnalysisSensorEntry analysisSensorEntry = new AnalysisSensorEntry();
+                AnalysisDataEntry analysisDataEntry = new AnalysisDataEntry();
                 ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
                 List<IAnalysisPlugin> pluginList = factory.analysisPluginsFor(sensorData);
                 if (pluginList.size() == 0)
@@ -104,14 +104,15 @@ public class ExperimentAnalysis {
 
                 ISensorAnalysis sensorAnalysis = plugin.createSensorAnalysis(sensorData);
                 File storage = getAnalysisStorageFor(experimentData, runs.indexOf(runEntry), sensorAnalysis);
+                // if loading fails we add the entry anyway / start a new analysis
                 ExperimentHelper.loadSensorAnalysis(sensorAnalysis, storage);
-                analysisSensorEntry.analysisList.add(new AnalysisEntry(sensorAnalysis, plugin));
-                analysisRunEntry.sensorList.add(analysisSensorEntry);
+                analysisDataEntry.analysisList.add(new AnalysisEntry(sensorAnalysis, plugin));
+                analysisRunEntry.analysisDataList.add(analysisDataEntry);
             }
             analysisRuns.add(analysisRunEntry);
         }
 
-        if (getNumberOfRuns() == 0 || getAnalysisRunAt(0).sensorList.size() == 0)
+        if (getNumberOfRuns() == 0 || getAnalysisRunAt(0).analysisDataList.size() == 0)
             return;
 
         setCurrentAnalysisRun(0);
@@ -156,6 +157,6 @@ public class ExperimentAnalysis {
     }
 
     protected void setCurrentSensorAnalysis(int sensor, int analysis) {
-        currentSensorAnalysis = currentAnalysisRun.sensorList.get(sensor).analysisList.get(analysis).analysis;
+        currentSensorAnalysis = currentAnalysisRun.analysisDataList.get(sensor).analysisList.get(analysis).analysis;
     }
 }

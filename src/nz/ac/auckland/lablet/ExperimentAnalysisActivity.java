@@ -83,7 +83,7 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
         final ExperimentData experimentData = experimentAnalysis.getExperimentData();
         List<ExperimentAnalysis.AnalysisRunEntry> analysisRuns = experimentAnalysis.getAnalysisRuns();
         for (ExperimentAnalysis.AnalysisRunEntry analysisRun : analysisRuns) {
-            for (ExperimentAnalysis.AnalysisSensorEntry sensorEntry : analysisRun.sensorList) {
+            for (ExperimentAnalysis.AnalysisDataEntry sensorEntry : analysisRun.analysisDataList) {
                 for (ExperimentAnalysis.AnalysisEntry analysisEntry : sensorEntry.analysisList) {
                     try {
                         ISensorAnalysis analysis = analysisEntry.analysis;
@@ -140,7 +140,7 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
             int run = experimentAnalysis.getCurrentAnalysisRunIndex();
             int analysisIndex = 0;
             ExperimentAnalysis.AnalysisEntry analysisEntry
-                    = experimentAnalysis.getCurrentAnalysisRun().sensorList.get(sensor).analysisList.get(analysisIndex);
+                    = experimentAnalysis.getCurrentAnalysisRun().analysisDataList.get(sensor).analysisList.get(analysisIndex);
             ExperimentAnalysis.AnalysisRef analysisRef
                     = new ExperimentAnalysis.AnalysisRef(run, sensor, analysisEntry.analysis.getIdentifier());
             return analysisEntry.plugin.createSensorAnalysisFragment(analysisRef);
@@ -151,7 +151,7 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
             ExperimentAnalysis.AnalysisRunEntry currentAnalysisRun = experimentAnalysis.getCurrentAnalysisRun();
             if (currentAnalysisRun == null)
                 return 0;
-            return currentAnalysisRun.sensorList.size();
+            return currentAnalysisRun.analysisDataList.size();
         }
     }
 }

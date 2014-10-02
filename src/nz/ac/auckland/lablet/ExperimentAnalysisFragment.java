@@ -45,7 +45,7 @@ public class ExperimentAnalysisFragment extends android.support.v4.app.Fragment 
         analysisRef = new ExperimentAnalysis.AnalysisRef(run, position, analysis);
 
         ExperimentAnalysis.AnalysisRunEntry runEntry = experimentAnalysis.getCurrentAnalysisRun();
-        return runEntry.sensorList.get(position).getAnalysisEntry(analysis).analysis;
+        return runEntry.analysisDataList.get(position).getAnalysisEntry(analysis).analysis;
     }
 
     @Override

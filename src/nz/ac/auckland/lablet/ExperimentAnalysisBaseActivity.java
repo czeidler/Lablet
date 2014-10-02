@@ -57,7 +57,7 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
         experimentAnalysis.setExperimentData(experimentData);
 
         if (experimentAnalysis.getNumberOfRuns() == 0
-                || experimentAnalysis.getAnalysisRunAt(0).sensorList.size() == 0) {
+                || experimentAnalysis.getAnalysisRunAt(0).analysisDataList.size() == 0) {
             showErrorAndFinish("No experiment found.");
             return false;
         }
