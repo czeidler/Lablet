@@ -239,7 +239,7 @@ class GraphView extends ScriptComponentViewHolder {
     private String xAxisContentId = "x-position";
     private String yAxisContentId = "y-position";
     private String title = "Position Data";
-    private ScriptExperimentRef.IScriptExperimentRefListener experimentListener;
+    private ScriptExperimentRef.IListener experimentListener;
 
     public GraphView(ScriptTreeNodeSheet experimentSheet, ScriptExperimentRef experiment) {
         this.experimentSheet = experimentSheet;
@@ -274,7 +274,7 @@ class GraphView extends ScriptComponentViewHolder {
 
         // install listener
         final Context contextFinal = context;
-        experimentListener = new ScriptExperimentRef.IScriptExperimentRefListener() {
+        experimentListener = new ScriptExperimentRef.IListener() {
             @Override
             public void onExperimentAnalysisUpdated() {
                 MotionAnalysis motionAnalysis = experiment.getVideoAnalysis(contextFinal);
