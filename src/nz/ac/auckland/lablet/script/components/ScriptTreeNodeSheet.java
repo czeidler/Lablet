@@ -232,7 +232,7 @@ class TextQuestion extends ScriptComponentViewHolder {
 /**
  * View holder for a graph view that shows some experiment analysis results.
  */
-class GraphView extends ScriptComponentViewHolder {
+class MotionAnalysisGraphView extends ScriptComponentViewHolder {
     private ScriptTreeNodeSheet experimentSheet;
     private ScriptExperimentRef experiment;
     private MarkerTimeGraphAdapter adapter;
@@ -241,7 +241,7 @@ class GraphView extends ScriptComponentViewHolder {
     private String title = "Position Data";
     private ScriptExperimentRef.IListener experimentListener;
 
-    public GraphView(ScriptTreeNodeSheet experimentSheet, ScriptExperimentRef experiment) {
+    public MotionAnalysisGraphView(ScriptTreeNodeSheet experimentSheet, ScriptExperimentRef experiment) {
         this.experimentSheet = experimentSheet;
         this.experiment = experiment;
         setState(ScriptTreeNode.SCRIPT_STATE_DONE);
@@ -258,7 +258,7 @@ class GraphView extends ScriptComponentViewHolder {
 
         graphView2D.setMaxWidth(500);
 
-        MotionAnalysis sensorAnalysis = experiment.getVideoAnalysis(context);
+        MotionAnalysis sensorAnalysis = experiment.getMotionAnalysis(context, 0);
         if (sensorAnalysis != null) {
             MarkerGraphAxis xAxis = createAxis(xAxisContentId, context);
             if (xAxis == null)
@@ -277,7 +277,7 @@ class GraphView extends ScriptComponentViewHolder {
         experimentListener = new ScriptExperimentRef.IListener() {
             @Override
             public void onExperimentAnalysisUpdated() {
-                MotionAnalysis motionAnalysis = experiment.getVideoAnalysis(contextFinal);
+                MotionAnalysis motionAnalysis = experiment.getMotionAnalysis(contextFinal, 0);
                 adapter.setTo(motionAnalysis.getTagMarkers(), motionAnalysis.getCalibrationVideoFrame());
             }
         };
@@ -305,12 +305,30 @@ class GraphView extends ScriptComponentViewHolder {
         return true;
     }
 
+    public void showXVsYPosition(ScriptExperimentRef experiment, SheetGroupLayout parent) {
+        setTitle("Position Data");
+        setXAxisContent("x-position");
+        setYAxisContent("y-position");
+    }
+
+    public void showTimeVsXSpeed() {
+        setTitle("X-Velocity vs. Time");
+        setXAxisContent("time_v");
+        setYAxisContent("x-velocity");
+    }
+
+    public void showTimeVsYSpeed(ScriptExperimentRef experiment, SheetGroupLayout parent) {
+        setTitle("Y-Velocity vs. Time");
+        setXAxisContent("time_v");
+        setYAxisContent("y-velocity");
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }
 
     private MarkerGraphAxis createAxis(String id, Context context) {
-        MotionAnalysis sensorAnalysis = experiment.getVideoAnalysis(context);
+        MotionAnalysis sensorAnalysis = experiment.getMotionAnalysis(context, 0);
 
         if (id.equalsIgnoreCase("x-position"))
             return new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getXMinRangeGetter());
@@ -542,31 +560,10 @@ public class ScriptTreeNodeSheet extends ScriptTreeNodeSheetBase {
         return question;
     }
 
-    public GraphView addGraph(ScriptExperimentRef experiment, SheetGroupLayout parent) {
-        GraphView item = new GraphView(this, experiment);
+    public MotionAnalysisGraphView addMotionAnalysisGraph(ScriptExperimentRef experiment, SheetGroupLayout parent) {
+        MotionAnalysisGraphView item = new MotionAnalysisGraphView(this, experiment);
         addItemViewHolder(item, parent);
         return item;
-    }
-
-    public void addPositionGraph(ScriptExperimentRef experiment, SheetGroupLayout parent) {
-        GraphView item = new GraphView(this, experiment);
-        addItemViewHolder(item, parent);
-    }
-
-    public void addXSpeedGraph(ScriptExperimentRef experiment, SheetGroupLayout parent) {
-        GraphView item = new GraphView(this, experiment);
-        item.setTitle("X-Velocity vs. Time");
-        item.setXAxisContent("time_v");
-        item.setYAxisContent("x-velocity");
-        addItemViewHolder(item, parent);
-    }
-
-    public void addYSpeedGraph(ScriptExperimentRef experiment, SheetGroupLayout parent) {
-        GraphView item = new GraphView(this, experiment);
-        item.setTitle("Y-Velocity vs. Time");
-        item.setXAxisContent("time_v");
-        item.setYAxisContent("y-velocity");
-        addItemViewHolder(item, parent);
     }
 
     public void addExportButton(SheetGroupLayout parent) {
