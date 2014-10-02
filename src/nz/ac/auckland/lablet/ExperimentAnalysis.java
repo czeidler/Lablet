@@ -104,7 +104,7 @@ public class ExperimentAnalysis {
 
                 ISensorAnalysis sensorAnalysis = plugin.createSensorAnalysis(sensorData);
                 File storage = getAnalysisStorageFor(experimentData, runs.indexOf(runEntry), sensorAnalysis);
-                // if loading fails we add the entry anyway / start a new analysis
+                // if loading fails we add the entry anyway and start a new analysis
                 ExperimentHelper.loadSensorAnalysis(sensorAnalysis, storage);
                 analysisDataEntry.analysisList.add(new AnalysisEntry(sensorAnalysis, plugin));
                 analysisRunEntry.analysisDataList.add(analysisDataEntry);
