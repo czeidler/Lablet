@@ -554,6 +554,12 @@ public class ScriptTreeNodeSheet extends ScriptTreeNodeSheetBase {
         return cameraExperiment;
     }
 
+    public MicrophoneExperiment addMicrophoneExperiment(SheetGroupLayout parent) {
+        MicrophoneExperiment experiment = new MicrophoneExperiment();
+        addItemViewHolder(experiment, parent);
+        return experiment;
+    }
+
     public PotentialEnergy1 addPotentialEnergy1Question(SheetGroupLayout parent) {
         PotentialEnergy1 question = new PotentialEnergy1();
         addItemViewHolder(question, parent);
