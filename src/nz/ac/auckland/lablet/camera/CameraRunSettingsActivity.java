@@ -136,7 +136,7 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
 
         frameRateList = new ArrayList<>();
 
-        cameraSensorData = (CameraSensorData)currentSensorAnalysis.getData();
+        cameraSensorData = (CameraSensorData)experimentAnalysis.getCurrentSensorAnalysis().getData();
 
         setContentView(R.layout.camera_run_settings);
 
@@ -243,7 +243,8 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
         Bundle analysisSpecificData = extras.getBundle("analysisSpecificData");
         if (analysisSpecificData != null)
             runSettings = analysisSpecificData.getBundle("run_settings");
-        CalibrationVideoFrame calibrationVideoFrame = ((MotionAnalysis)currentSensorAnalysis).getCalibrationVideoFrame();
+        CalibrationVideoFrame calibrationVideoFrame
+                = ((MotionAnalysis)experimentAnalysis.getCurrentSensorAnalysis()).getCalibrationVideoFrame();
         if (runSettings != null) {
             calibrationVideoFrame.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
             calibrationVideoFrame.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));

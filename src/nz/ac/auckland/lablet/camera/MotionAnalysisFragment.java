@@ -12,7 +12,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.PopupMenu;
-import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
+import nz.ac.auckland.lablet.ExperimentAnalysis;
 import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
@@ -29,7 +29,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         super();
     }
 
-    public MotionAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef ref) {
+    public MotionAnalysisFragment(ExperimentAnalysis.AnalysisRef ref) {
         super(ref);
     }
 

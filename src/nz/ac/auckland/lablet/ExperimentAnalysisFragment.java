@@ -18,13 +18,13 @@ import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
  */
 public class ExperimentAnalysisFragment extends android.support.v4.app.Fragment {
     protected ISensorAnalysis sensorAnalysis;
-    protected ExperimentAnalysisActivity.AnalysisRef analysisRef;
+    protected ExperimentAnalysis.AnalysisRef analysisRef;
 
     public ExperimentAnalysisFragment() {
         super();
     }
 
-    public ExperimentAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef ref) {
+    public ExperimentAnalysisFragment(ExperimentAnalysis.AnalysisRef ref) {
         super();
 
         Bundle args = new Bundle();
@@ -38,12 +38,13 @@ public class ExperimentAnalysisFragment extends android.support.v4.app.Fragment 
         if (!experimentActivity.ensureExperimentDataLoaded())
             return null;
 
-        int run = experimentActivity.getCurrentAnalysisRunIndex();
-        int position = getArguments().getInt("sensorIndex", 0);
+        final ExperimentAnalysis experimentAnalysis = experimentActivity.getExperimentAnalysis();
+        final int run = experimentAnalysis.getCurrentAnalysisRunIndex();
+        final int position = getArguments().getInt("sensorIndex", 0);
         String analysis = getArguments().getString("analysisIndex", "");
-        analysisRef = new ExperimentAnalysisActivity.AnalysisRef(run, position, analysis);
+        analysisRef = new ExperimentAnalysis.AnalysisRef(run, position, analysis);
 
-        ExperimentAnalysisBaseActivity.AnalysisRunEntry runEntry = experimentActivity.getCurrentAnalysisRun();
+        ExperimentAnalysis.AnalysisRunEntry runEntry = experimentAnalysis.getCurrentAnalysisRun();
         return runEntry.sensorList.get(position).getAnalysisEntry(analysis).analysis;
     }
 
@@ -55,6 +56,6 @@ public class ExperimentAnalysisFragment extends android.support.v4.app.Fragment 
     }
 
     public ExperimentData getExperimentData() {
-        return ((ExperimentAnalysisActivity)getActivity()).getExperimentData();
+        return ((ExperimentAnalysisActivity)getActivity()).getExperimentAnalysis().getExperimentData();
     }
 }

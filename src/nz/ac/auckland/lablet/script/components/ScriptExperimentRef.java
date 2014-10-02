@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.script.components;
 
 import android.content.Context;
+import nz.ac.auckland.lablet.ExperimentAnalysis;
 import nz.ac.auckland.lablet.ExperimentAnalysisBaseActivity;
 import nz.ac.auckland.lablet.camera.CameraSensorData;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
@@ -43,6 +44,7 @@ public class ScriptExperimentRef extends WeakListenable<ScriptExperimentRef.ILis
             motionAnalysis = loadSensorAnalysis(context);
         return motionAnalysis;
     }
+
     public void reloadExperimentAnalysis(Context context) {
         motionAnalysis = loadSensorAnalysis(context);
         for (IListener listener : getListeners())
@@ -57,7 +59,7 @@ public class ScriptExperimentRef extends WeakListenable<ScriptExperimentRef.ILis
         if (!(sensorData instanceof CameraSensorData))
             return null;
         MotionAnalysis motionAnalysis = new MotionAnalysis((CameraSensorData)sensorData);
-        File analysisDir = ExperimentAnalysisBaseActivity.getAnalysisStorageFor(experimentData, 0, motionAnalysis);
+        File analysisDir = ExperimentAnalysis.getAnalysisStorageFor(experimentData, 0, motionAnalysis);
         if (!ExperimentHelper.loadSensorAnalysis(motionAnalysis, analysisDir))
             return null;
         return motionAnalysis;

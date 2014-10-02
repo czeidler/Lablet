@@ -11,7 +11,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
+import nz.ac.auckland.lablet.ExperimentAnalysis;
 import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 
 
@@ -20,7 +20,7 @@ public class FrequencyAnalysisFragment extends ExperimentAnalysisFragment {
         super();
     }
 
-    public FrequencyAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef ref) {
+    public FrequencyAnalysisFragment(ExperimentAnalysis.AnalysisRef ref) {
         super(ref);
     }
 

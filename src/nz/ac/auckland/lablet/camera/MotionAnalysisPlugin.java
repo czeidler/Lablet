@@ -8,7 +8,7 @@
 package nz.ac.auckland.lablet.camera;
 
 import android.support.v4.app.Fragment;
-import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
+import nz.ac.auckland.lablet.ExperimentAnalysis;
 import nz.ac.auckland.lablet.experiment.*;
 
 
@@ -30,7 +30,7 @@ public class MotionAnalysisPlugin implements IAnalysisPlugin {
     }
 
     @Override
-    public Fragment createSensorAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef analysisRef) {
+    public Fragment createSensorAnalysisFragment(ExperimentAnalysis.AnalysisRef analysisRef) {
         return new MotionAnalysisFragment(analysisRef);
     }
 }

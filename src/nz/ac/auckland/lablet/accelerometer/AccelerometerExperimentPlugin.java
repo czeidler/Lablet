@@ -10,7 +10,7 @@ package nz.ac.auckland.lablet.accelerometer;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
+import nz.ac.auckland.lablet.ExperimentAnalysis;
 import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.File;
@@ -53,7 +53,7 @@ class AccelerometerAnalysisPlugin implements IAnalysisPlugin {
     }
 
     @Override
-    public Fragment createSensorAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef analysisRef) {
+    public Fragment createSensorAnalysisFragment(ExperimentAnalysis.AnalysisRef analysisRef) {
         return null;
     }
 }

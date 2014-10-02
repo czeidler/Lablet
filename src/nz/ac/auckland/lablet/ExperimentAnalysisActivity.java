@@ -11,11 +11,13 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
 import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
 import nz.ac.auckland.lablet.experiment.ISensorData;
 
 import java.io.*;
+import java.util.List;
 
 
 /**
@@ -50,7 +52,7 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
 
             @Override
             public void onPageSelected(int position) {
-                setCurrentSensorAnalysis(position, 0);
+                experimentAnalysis.setCurrentSensorAnalysis(position, 0);
 
                 // repopulate the menu
                 invalidateOptionsMenu();
@@ -75,16 +77,18 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
     public void onPause() {
         super.onPause();
 
-        if (analysisRuns.size() == 0)
+        if (experimentAnalysis.getNumberOfRuns() == 0)
             return;
 
-        for (AnalysisRunEntry analysisRun : analysisRuns) {
-            for (AnalysisSensorEntry sensorEntry : analysisRun.sensorList) {
-                for (AnalysisEntry analysisEntry : sensorEntry.analysisList) {
+        final ExperimentData experimentData = experimentAnalysis.getExperimentData();
+        List<ExperimentAnalysis.AnalysisRunEntry> analysisRuns = experimentAnalysis.getAnalysisRuns();
+        for (ExperimentAnalysis.AnalysisRunEntry analysisRun : analysisRuns) {
+            for (ExperimentAnalysis.AnalysisSensorEntry sensorEntry : analysisRun.sensorList) {
+                for (ExperimentAnalysis.AnalysisEntry analysisEntry : sensorEntry.analysisList) {
                     try {
                         ISensorAnalysis analysis = analysisEntry.analysis;
-                        File storageDir = getAnalysisStorageFor(experimentData, analysisRuns.indexOf(analysisRun),
-                                analysis);
+                        File storageDir = ExperimentAnalysis.getAnalysisStorageFor(experimentData,
+                                analysisRuns.indexOf(analysisRun), analysis);
                         storageDir.mkdirs();
                         ExperimentHelper.saveAnalysisData(analysis, storageDir);
                         exportTagMarkerCSVData(analysis, storageDir);
@@ -133,15 +137,18 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
 
         @Override
         public android.support.v4.app.Fragment getItem(int sensor) {
-            int run = getCurrentAnalysisRunIndex();
+            int run = experimentAnalysis.getCurrentAnalysisRunIndex();
             int analysisIndex = 0;
-            AnalysisEntry analysisEntry = currentAnalysisRun.sensorList.get(sensor).analysisList.get(analysisIndex);
-            AnalysisRef analysisRef = new AnalysisRef(run, sensor, analysisEntry.analysis.getIdentifier());
+            ExperimentAnalysis.AnalysisEntry analysisEntry
+                    = experimentAnalysis.getCurrentAnalysisRun().sensorList.get(sensor).analysisList.get(analysisIndex);
+            ExperimentAnalysis.AnalysisRef analysisRef
+                    = new ExperimentAnalysis.AnalysisRef(run, sensor, analysisEntry.analysis.getIdentifier());
             return analysisEntry.plugin.createSensorAnalysisFragment(analysisRef);
         }
 
         @Override
         public int getCount() {
+            ExperimentAnalysis.AnalysisRunEntry currentAnalysisRun = experimentAnalysis.getCurrentAnalysisRun();
             if (currentAnalysisRun == null)
                 return 0;
             return currentAnalysisRun.sensorList.size();

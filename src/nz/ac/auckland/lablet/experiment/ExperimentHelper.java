@@ -11,7 +11,7 @@ package nz.ac.auckland.lablet.experiment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
+import nz.ac.auckland.lablet.ExperimentAnalysis;
 import nz.ac.auckland.lablet.misc.PersistentBundle;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -129,7 +129,7 @@ public class ExperimentHelper {
      * @param analysisRef the target analysis
      * @param options the options for the activity
      */
-    static public void packStartAnalysisSettingsIntent(Intent intent, ExperimentAnalysisActivity.AnalysisRef analysisRef,
+    static public void packStartAnalysisSettingsIntent(Intent intent, ExperimentAnalysis.AnalysisRef analysisRef,
                                                        String experimentPath, Bundle options) {
 
         intent.putExtra("run_id", analysisRef.run);

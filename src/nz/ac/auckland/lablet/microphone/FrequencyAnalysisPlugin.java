@@ -8,7 +8,7 @@
 package nz.ac.auckland.lablet.microphone;
 
 import android.support.v4.app.Fragment;
-import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
+import nz.ac.auckland.lablet.ExperimentAnalysis;
 import nz.ac.auckland.lablet.experiment.IAnalysisPlugin;
 import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
 import nz.ac.auckland.lablet.experiment.ISensorData;
@@ -33,7 +33,7 @@ public class FrequencyAnalysisPlugin implements IAnalysisPlugin {
     }
 
     @Override
-    public Fragment createSensorAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef analysisRef) {
+    public Fragment createSensorAnalysisFragment(ExperimentAnalysis.AnalysisRef analysisRef) {
         return new FrequencyAnalysisFragment(analysisRef);
     }
 }

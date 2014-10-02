@@ -8,7 +8,7 @@
 package nz.ac.auckland.lablet.experiment;
 
 import android.support.v4.app.Fragment;
-import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
+import nz.ac.auckland.lablet.ExperimentAnalysis;
 
 
 public interface IAnalysisPlugin {
@@ -37,6 +37,6 @@ public interface IAnalysisPlugin {
      * @param analysisRef analysis ref
      * @return a newly created view
      */
-    public Fragment createSensorAnalysisFragment(ExperimentAnalysisActivity.AnalysisRef analysisRef);
+    public Fragment createSensorAnalysisFragment(ExperimentAnalysis.AnalysisRef analysisRef);
 
 }

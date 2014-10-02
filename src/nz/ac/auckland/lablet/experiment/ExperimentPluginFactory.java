@@ -85,6 +85,14 @@ public class ExperimentPluginFactory {
         return null;
     }
 
+    public IAnalysisPlugin findAnalysisPluginForData(String dataType) {
+        for (IAnalysisPlugin plugin : analysisPlugins) {
+            if (plugin.supportedDataType().startsWith(dataType))
+                return plugin;
+        }
+        return null;
+    }
+
     public List<IAnalysisPlugin> analysisPluginsFor(ISensorData sensorData) {
         List<IAnalysisPlugin> foundPlugins = new ArrayList<>();
         String dataType = sensorData.getDataType();
