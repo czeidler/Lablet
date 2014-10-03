@@ -148,6 +148,8 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
 
         @Override
         public int getCount() {
+            if (experimentAnalysis == null)
+                return 0;
             ExperimentAnalysis.AnalysisRunEntry currentAnalysisRun = experimentAnalysis.getCurrentAnalysisRun();
             if (currentAnalysisRun == null)
                 return 0;
