@@ -98,7 +98,6 @@ class CameraExperimentView extends AbstractExperimentSensorView {
 
     @Override
     public void onStopPreview() {
-
     }
 
     @Override
@@ -388,12 +387,11 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         recorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
 
-        recorder.setOrientationHint(getHintRotation());
 
         CamcorderProfile profile = CamcorderProfile.get(cameraId, selectedVideoSettings.cameraProfile);
         if (profile == null)
             throw new Exception("no camcorder profile!");
-        recorder.setVideoSize(videoSize.width, videoSize.height);
+        recorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
         recorder.setVideoFrameRate(profile.videoFrameRate);
         recorder.setVideoEncodingBitRate(profile.videoBitRate);
 
@@ -401,6 +399,9 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         videoFile = new File(outputDir, getVideoFileName());
 
         recorder.setOutputFile(videoFile.getPath());
+
+        recorder.setOrientationHint(getHintRotation());
+
         recorder.prepare();
 
         recorder.start();
@@ -452,6 +453,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
         videoSize = selectedVideoSettings.videoSize;
         Camera.Parameters parameters = camera.getParameters();
+        parameters.setRecordingHint(true);
         parameters.setPreviewSize(videoSize.width, videoSize.height);
         camera.setParameters(parameters);
 
@@ -467,7 +469,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         List<Camera.Size> previewSizes = camera.getParameters().getSupportedPreviewSizes();
         assert previewSizes != null;
 
-        Collections.sort(previewSizes, new Comparator<Camera.Size>() {
+        Collections.sort(videoSizes, new Comparator<Camera.Size>() {
             @Override
             public int compare(Camera.Size size, Camera.Size size2) {
                 Integer area1 = size.height * size.width;
@@ -477,10 +479,10 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         });
 
         List<Camera.Size> matches = new ArrayList<>();
-        for (Camera.Size previewSize : previewSizes) {
-            for (Camera.Size videoSize : videoSizes) {
-                if (previewSize.equals(videoSize)) {
-                    matches.add(previewSize);
+        for (Camera.Size videoSize : videoSizes) {
+            for (Camera.Size previewSize : previewSizes) {
+                if ((float)(videoSize.height) / videoSize.width == (float)(previewSize.height) / previewSize.width) {
+                    matches.add(videoSize);
                     break;
                 }
             }
@@ -579,7 +581,6 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
     // partly copied from android dev page
     private void setCameraDisplayOrientation(int cameraId, android.hardware.Camera camera) {
-        int orientation = activity.getResources().getConfiguration().orientation;
         android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
         android.hardware.Camera.getCameraInfo(cameraId, info);
         rotationDegree = 0;
