@@ -176,6 +176,13 @@ public class PlotView extends ViewGroup {
         return plotScale;
     }
 
+    static public PlotScale linearScale() {
+        PlotScale plotScale = new PlotScale();
+        plotScale.scale = new LinearScale();
+        plotScale.labelPartitioner = new LabelPartitionerLinear();
+        return plotScale;
+    }
+
     private TitleView titleView;
     private XAxisView xAxisView;
     private YAxisView yAxisView;
@@ -705,6 +712,8 @@ public class PlotView extends ViewGroup {
 
     public void invalidate() {
         mainView.invalidate();
+        for (IPlotPainter plotPainter : mainView.getPlotPainters())
+            plotPainter.invalidate();
         if (titleView != null)
             titleView.invalidate();
         if (xAxisView != null)

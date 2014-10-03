@@ -110,5 +110,11 @@
             android:id="@+id/textView7"
             android:layout_alignStart="@+id/renderScriptCheckBox" android:layout_below="@+id/brightnessSeekBar"
             android:layout_alignParentEnd="true" android:gravity="center_horizontal"/>
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="y log scale"
+            android:id="@+id/yLogScaleCheckBox"
+            android:layout_below="@+id/textView7" android:layout_alignStart="@+id/textView7" android:checked="false"/>
     </RelativeLayout>
 </FrameLayout>

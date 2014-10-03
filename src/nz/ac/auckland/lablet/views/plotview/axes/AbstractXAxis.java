@@ -34,6 +34,4 @@ abstract public class AbstractXAxis extends AbstractAxis {
     }
 
     abstract public float optimalHeight();
-
-    abstract protected void calculateLabels();
 }

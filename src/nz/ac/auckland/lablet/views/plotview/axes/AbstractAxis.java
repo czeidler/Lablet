@@ -97,7 +97,10 @@ abstract public class AbstractAxis extends ViewGroup {
         this.unit = unit;
     }
 
+    abstract protected void calculateLabels();
+
     public void setLabelPartitioner(LabelPartitioner labelPartitioner) {
         this.labelPartitioner = labelPartitioner;
+        calculateLabels();
     }
 }

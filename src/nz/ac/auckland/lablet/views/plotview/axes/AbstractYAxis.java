@@ -56,8 +56,6 @@ abstract public class AbstractYAxis extends AbstractAxis {
 
     abstract public float optimalWidthForHeight(float height);
 
-    abstract protected void calculateLabels();
-
     protected float getAxisLength() {
         return getHeight() - getAxisBottomOffset() - getAxisTopOffset();
     }

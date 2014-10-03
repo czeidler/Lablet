@@ -22,6 +22,7 @@ import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.AnimatedTabHostListener;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.views.*;
+import nz.ac.auckland.lablet.views.plotview.Log10Scale;
 import nz.ac.auckland.lablet.views.plotview.PlotView;
 import nz.ac.auckland.lablet.views.plotview.RangeDrawingView;
 
@@ -250,6 +251,20 @@ public class FrequencyAnalysisView extends FrameLayout {
         brightnessSeekBar.setOnSeekBarChangeListener(colorSeekBarListener);
 
         updateContrastBrightness();
+
+        CheckBox yScaleCheckBox = (CheckBox)view.findViewById(R.id.yLogScaleCheckBox);
+        yScaleCheckBox.setVisibility(INVISIBLE);
+        yScaleCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                if (checked)
+                    frequencyView.setYScale(PlotView.log10Scale());
+                else
+                    frequencyView.setYScale(PlotView.linearScale());
+
+                frequencyView.invalidate();
+            }
+        });
     }
 
     private void updateContrastBrightness() {
