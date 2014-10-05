@@ -147,7 +147,6 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
     private CameraSensorData experimentData;
 
     private Camera camera = null;
-    private Camera.Size videoSize;
     private MediaRecorder recorder = null;
 
     private int cameraId = 0;
@@ -241,8 +240,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             camera = Camera.open();
 
         // video size
-        supportedVideoSettings = filterCamcorderProfiles(getSupportedCamcorderProfiles(cameraId),
-                getSuitableCameraVideoSizes(camera));
+        supportedVideoSettings = filterCamcorderProfiles(getSupportedCamcorderProfiles(cameraId));
         // select the first or the best matching requested settings
         VideoSettings newVideoSettings = supportedVideoSettings.get(0);
         if (requestedVideoWidth > 0 && requestedVideoHeight > 0) {
@@ -450,44 +448,14 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
     private void selectCamcorderProfile(VideoSettings videoSettings) {
         selectedVideoSettings = videoSettings;
-
-        videoSize = selectedVideoSettings.videoSize;
         Camera.Parameters parameters = camera.getParameters();
         parameters.setRecordingHint(true);
-        parameters.setPreviewSize(videoSize.width, videoSize.height);
+        parameters.setPreviewSize(selectedVideoSettings.videoSize.width, selectedVideoSettings.videoSize.height);
+
+        camera.stopPreview();
         camera.setParameters(parameters);
-
+        camera.startPreview();
         notifySettingsChanged();
-    }
-
-    /**
-     * Use the actual camera preview and video sizes to find the matching sizes for preview and recording.
-     */
-    private List<Camera.Size> getSuitableCameraVideoSizes(Camera camera) {
-        List<Camera.Size> videoSizes = camera.getParameters().getSupportedVideoSizes();
-        assert videoSizes != null;
-        List<Camera.Size> previewSizes = camera.getParameters().getSupportedPreviewSizes();
-        assert previewSizes != null;
-
-        Collections.sort(videoSizes, new Comparator<Camera.Size>() {
-            @Override
-            public int compare(Camera.Size size, Camera.Size size2) {
-                Integer area1 = size.height * size.width;
-                Integer area2 = size2.height * size2.width;
-                return area2.compareTo(area1);
-            }
-        });
-
-        List<Camera.Size> matches = new ArrayList<>();
-        for (Camera.Size videoSize : videoSizes) {
-            for (Camera.Size previewSize : previewSizes) {
-                if ((float)(videoSize.height) / videoSize.width == (float)(previewSize.height) / previewSize.width) {
-                    matches.add(videoSize);
-                    break;
-                }
-            }
-        }
-        return matches;
     }
 
     /**
@@ -526,16 +494,26 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
      * size. It is assumed that the profiles are sorted; lowest quality first.
      *
      * @param profiles list of profiles, has to be sorted low quality comes first
-     * @param cameraSizes list of camera sizes
      * @return the list of found VideoSettings
      */
-    private List<VideoSettings> filterCamcorderProfiles(List<Integer> profiles, List<Camera.Size> cameraSizes) {
+    private List<VideoSettings> filterCamcorderProfiles(List<Integer> profiles) {
+        List<Camera.Size> cameraSizes = camera.getParameters().getSupportedVideoSizes();
+
+        Collections.sort(cameraSizes, new Comparator<Camera.Size>() {
+            @Override
+            public int compare(Camera.Size size, Camera.Size size2) {
+                Integer area1 = size.height * size.width;
+                Integer area2 = size2.height * size2.width;
+                return area2.compareTo(area1);
+            }
+        });
+
         List<VideoSettings> filteredProfiles = new ArrayList<>();
         for (Camera.Size cameraSize : cameraSizes) {
             for (Integer profileId : profiles) {
                 CamcorderProfile profile = CamcorderProfile.get(profileId);
-                if (profile.videoFrameWidth >= cameraSize.width && profile.videoFrameHeight >= cameraSize.height) {
-                    VideoSettings settings = new VideoSettings();
+                VideoSettings settings = new VideoSettings();
+                if (profile.videoFrameWidth == cameraSize.width && profile.videoFrameHeight == cameraSize.height) {
                     settings.cameraProfile = profileId;
                     settings.videoSize = cameraSize;
                     filteredProfiles.add(settings);
@@ -608,12 +586,12 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         switch (rotation) {
             case Surface.ROTATION_90:
             case Surface.ROTATION_270:
-                ratio = (float)videoSize.height / videoSize.width;
+                ratio = (float)selectedVideoSettings.videoSize.height / selectedVideoSettings.videoSize.width;
                 if (orientation == Configuration.ORIENTATION_LANDSCAPE)
                     ratio = 1.f / ratio;
                 break;
             default:
-                ratio = (float)videoSize.width / videoSize.height;
+                ratio = (float)selectedVideoSettings.videoSize.width / selectedVideoSettings.videoSize.height;
                 if (orientation == Configuration.ORIENTATION_PORTRAIT)
                     ratio = 1.f / ratio;
         }
