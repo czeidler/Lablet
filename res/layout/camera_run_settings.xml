@@ -71,7 +71,6 @@
             android:ems="10"
             android:id="@+id/editFrames"
             android:editable="false" android:enabled="true" android:focusable="false"
-            android:layout_alignRight="@+id/frameRateLayout"
             android:layout_alignTop="@+id/editEnd" android:layout_alignParentBottom="true"
             android:layout_toRightOf="@+id/textView5"/>
 

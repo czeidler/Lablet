@@ -14,8 +14,8 @@ public class CalibrationVideoTimeData implements ITimeData {
 
     protected float analysisFrameRate;
     // milli seconds
-    protected int analysisVideoStart;
-    protected int analysisVideoEnd;
+    protected float analysisVideoStart;
+    protected float analysisVideoEnd;
 
     public CalibrationVideoTimeData(int videoDuration) {
         this.videoDuration = videoDuration;
@@ -63,7 +63,7 @@ public class CalibrationVideoTimeData implements ITimeData {
         if (analysisFrameRate <= 0)
             analysisFrameRate = 10;
 
-        int runTime = analysisVideoEnd - analysisVideoStart;
+        float runTime = analysisVideoEnd - analysisVideoStart;
         numberOfFrames = (int)(runTime * analysisFrameRate / 1000 + 1);
     }
 
@@ -83,7 +83,7 @@ public class CalibrationVideoTimeData implements ITimeData {
      *
      * @return the time when the analysis starts
      */
-    public int getAnalysisVideoStart() {
+    public float getAnalysisVideoStart() {
         return analysisVideoStart;
     }
 
@@ -95,7 +95,7 @@ public class CalibrationVideoTimeData implements ITimeData {
      * </p>
      * @param startTime the time for the analysis start
      */
-    public void setAnalysisVideoStart(int startTime) {
+    public void setAnalysisVideoStart(float startTime) {
         this.analysisVideoStart = startTime;
         setAnalysisFrameRate(analysisFrameRate);
     }
@@ -105,7 +105,7 @@ public class CalibrationVideoTimeData implements ITimeData {
      *
      * @return the video analysis end time
      */
-    public int getAnalysisVideoEnd() {
+    public float getAnalysisVideoEnd() {
         return analysisVideoEnd;
     }
 
@@ -117,7 +117,7 @@ public class CalibrationVideoTimeData implements ITimeData {
      * </p>
      * @param endTime the time for the analysis end
      */
-    public void setAnalysisVideoEnd(int endTime) {
+    public void setAnalysisVideoEnd(float endTime) {
         analysisVideoEnd = endTime;
 
         if (analysisVideoEnd <= 0)

@@ -49,13 +49,13 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
     private EditText editFrameLength = null;
     private CameraRunSettingsHelpView helpView = null;
 
-    private int videoStartValue;
-    private int videoEndValue;
+    private float videoStartValue;
+    private float videoEndValue;
 
     // cache initial values to check if values have been changed
     private int initialFrameRate;
-    private int initialVideoStartValue;
-    private int initialVideoEndValue;
+    private float initialVideoStartValue;
+    private float initialVideoEndValue;
 
     private ArrayList<Integer> frameRateList;
 
@@ -190,18 +190,18 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
                 int frameRate = getFrameRateFromPicker();
                 int duration = getDurationAtFrameRate(frameRate);
 
-                int progress = 0;
+                float progress = 0;
                 for (int i = index; i < index + number; i++) {
                     if (i == 0) {
-                        progress = Math.round(model.getMarkerDataAt(i).getPosition().x * duration);
+                        progress = model.getMarkerDataAt(i).getPosition().x * duration;
                         setVideoStart(progress);
                     } else if (i == 1) {
-                        progress = Math.round(model.getMarkerDataAt(i).getPosition().x * duration);
+                        progress = model.getMarkerDataAt(i).getPosition().x * duration;
                         setVideoEnd(progress);
                     }
                 }
                 seekBar.setProgress(findFrame(progress));
-                seekTo(progress);
+                seekTo(Math.round(progress));
 
                 updateEditFrames();
             }
@@ -253,6 +253,9 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
         int analysisFrameRate = (int)calibrationVideoTimeData.getAnalysisFrameRate();
 
         // initial views with values
+        View frameRateLayout = findViewById(R.id.frameRateLayout);
+        if (cameraSensorData.isTimeLapseData())
+            frameRateLayout.setVisibility(View.INVISIBLE);
         calculateFrameRateValues(videoFrameView.getVideoFrameRate());
         frameRatePicker.setMinValue(0);
         frameRatePicker.setMaxValue(frameRateList.size() - 1);
@@ -269,9 +272,9 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
         // because the duration is for a certain frame rate it can be smaller than the actual video length
         if (point.x > 1)
             point.x = 1;
-        point.x = (float)videoStartValue / duration;
+        point.x = videoStartValue / duration;
         startEndSeekBar.getMarkerDataModel().getMarkerDataAt(0).setPosition(point);
-        point.x = (float)videoEndValue / duration;
+        point.x = videoEndValue / duration;
         if (point.x > 1)
             point.x = 1;
         startEndSeekBar.getMarkerDataModel().getMarkerDataAt(1).setPosition(point);
@@ -305,9 +308,9 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
         applySettingsAndFinish();
     }
 
-    private int findFrame(int milliSeconds) {
+    private int findFrame(float milliSeconds) {
         int frameRate = getFrameRateFromPicker();
-        return Math.round((float)(frameRate * milliSeconds) / 1000);
+        return Math.round(frameRate * milliSeconds / 1000);
     }
 
     private int getDurationAtFrameRate(int frameRate) {
@@ -383,17 +386,25 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
         editFrameLength.setText(String.format("%.1f", length));
     }
 
-    private void setVideoStart(int value) {
+    private int toDisplayTime(float videoTime) {
+        final float videoFrameRate = 30f;
+
+        if (cameraSensorData.isTimeLapseData())
+            return (int)(videoTime * videoFrameRate / cameraSensorData.getTimeLapseCaptureRate());
+        return Math.round(videoTime);
+    }
+
+    private void setVideoStart(float value) {
         videoStartValue = value;
         String string = "";
-        string += value;
+        string += toDisplayTime(value);
         editVideoStart.setText(string);
     }
 
-    private void setVideoEnd(int value) {
+    private void setVideoEnd(float value) {
         videoEndValue = value;
         String string = "";
-        string += value;
+        string += toDisplayTime(value);
         editVideoEnd.setText(string);
     }
 
@@ -404,8 +415,8 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
 
         Bundle runSettings = new Bundle();
         runSettings.putInt("analysis_frame_rate", getFrameRateFromPicker());
-        runSettings.putInt("analysis_video_start", videoStartValue);
-        runSettings.putInt("analysis_video_end", videoEndValue);
+        runSettings.putFloat("analysis_video_start", videoStartValue);
+        runSettings.putFloat("analysis_video_end", videoEndValue);
         intent.putExtra("run_settings", runSettings);
 
         setResult(RESULT_OK, intent);

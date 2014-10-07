@@ -342,8 +342,8 @@ public class MotionAnalysis implements ISensorAnalysis {
         if (runSettings == null)
             return;
 
-        calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
-        calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
+        calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getFloat("analysis_video_start"));
+        calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getFloat("analysis_video_end"));
         calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
 
         int numberOfRuns = calibrationVideoTimeData.getNumberOfFrames();
