@@ -17,59 +17,6 @@ import java.util.Iterator;
 import java.util.List;
 
 
-class JoinedList<T> implements Iterable<T> {
-    private List<List<? extends T>> allLists = new ArrayList<>();
-
-    public void addList(List list) {
-        allLists.add(list);
-    }
-
-    public JoinedList(List<? extends T>... lists) {
-        for (List<? extends T> list : lists)
-            addList(list);
-    }
-
-    @Override
-    public Iterator<T> iterator() {
-        return new Iterator<T>() {
-            final Iterator<List<? extends T>> allListIterator = allLists.iterator();
-            Iterator<? extends T> currentListIterator = null;
-
-            {
-                advanceToNextNoneEmptyList();
-            }
-
-            private void advanceToNextNoneEmptyList() {
-                while (allListIterator.hasNext()) {
-                    currentListIterator = allListIterator.next().iterator();
-                    if (currentListIterator.hasNext())
-                        break;
-                }
-            }
-
-            @Override
-            public boolean hasNext() {
-                if (currentListIterator == null)
-                    return false;
-                return currentListIterator.hasNext();
-            }
-
-            @Override
-            public T next() {
-                T next = currentListIterator.next();
-                if (!currentListIterator.hasNext())
-                    advanceToNextNoneEmptyList();
-                return next;
-            }
-
-            @Override
-            public void remove() {
-
-            }
-        };
-    }
-}
-
 public class PlotPainterContainerView extends RangeDrawingView {
     final private List<IPlotPainter> backgroundPainters = new ArrayList();
     final private List<IPlotPainter> plotPainters = new ArrayList();
