@@ -188,7 +188,7 @@ public class MotionAnalysisFragment extends ScriptComponentGenericFragment {
             if (sensorAnalysis == null)
                 return;
             MarkerTimeGraphAdapter adapter = new MarkerTimeGraphAdapter(sensorAnalysis.getTagMarkers(),
-                    sensorAnalysis.getCalibrationVideoFrame(), "Position Data:",
+                    sensorAnalysis.getTimeData(), "Position Data:",
                     new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getXMinRangeGetter()),
                     new YPositionMarkerGraphAxis(sensorAnalysis.getYUnit(), sensorAnalysis.getYMinRangeGetter()));
             graphView.setAdapter(adapter);

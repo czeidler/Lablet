@@ -42,8 +42,8 @@ public class CalculateXSpeedFragment extends CalculateSpeedFragment {
         MotionAnalysis motionAnalysis = getMotionAnalysis();
         MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(tagMarker);
         speedDataTableColumn = new XSpeedDataTableColumn(motionAnalysis.getXUnit(), motionAnalysis.getTUnit(),
-                timeCalibration);
-        adapter.addColumn(new SpeedTimeDataTableColumn(motionAnalysis.getTUnit(), timeCalibration));
+                timeData);
+        adapter.addColumn(new SpeedTimeDataTableColumn(motionAnalysis.getTUnit(), timeData));
         adapter.addColumn(speedDataTableColumn);
 
         return adapter;
@@ -54,8 +54,8 @@ public class CalculateXSpeedFragment extends CalculateSpeedFragment {
         MotionAnalysis motionAnalysis = getMotionAnalysis();
         MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(tagMarker);
         XAccelerationDataTableColumn accelerationDataTableColumn = new XAccelerationDataTableColumn(
-                motionAnalysis.getXUnit(), motionAnalysis.getTUnit(), timeCalibration);
-        adapter.addColumn(new AccelerationTimeDataTableColumn(motionAnalysis.getTUnit(), timeCalibration));
+                motionAnalysis.getXUnit(), motionAnalysis.getTUnit(), timeData);
+        adapter.addColumn(new AccelerationTimeDataTableColumn(motionAnalysis.getTUnit(), timeData));
         adapter.addColumn(accelerationDataTableColumn);
         return adapter;
     }

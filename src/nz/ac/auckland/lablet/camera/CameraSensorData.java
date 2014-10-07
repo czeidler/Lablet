@@ -28,7 +28,7 @@ public class CameraSensorData extends AbstractSensorData {
     private int videoWidth;
     private int videoHeight;
 
-    private float timeLapseCaptureRate = -1f;
+    private float timeLapseCaptureRate;
 
     public CameraSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
         super(experimentContext, sourceSensor);
@@ -119,5 +119,13 @@ public class CameraSensorData extends AbstractSensorData {
 
     public void setTimeLapseCaptureRate(float timeLapseCaptureRate) {
         this.timeLapseCaptureRate = timeLapseCaptureRate;
+    }
+
+    public boolean isTimeLapseData() {
+        return timeLapseCaptureRate > 0;
+    }
+
+    public float getTimeLapseCaptureRate() {
+        return timeLapseCaptureRate;
     }
 }

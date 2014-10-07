@@ -18,7 +18,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Base class for everything that is related to analysing an experiment.
  */
@@ -31,7 +30,8 @@ public class MotionAnalysis implements ISensorAnalysis {
 
     private FrameDataModel frameDataModel;
     private CalibrationXY calibrationXY;
-    private CalibrationVideoFrame calibrationVideoFrame;
+    private CalibrationVideoTimeData calibrationVideoTimeData;
+    private ITimeData timeData;
 
     private Unit xUnit = new Unit("m");
     private Unit yUnit = new Unit("m");
@@ -58,10 +58,15 @@ public class MotionAnalysis implements ISensorAnalysis {
         tUnit.setPrefix("m");
 
         calibrationXY = new CalibrationXY();
-        calibrationVideoFrame = new CalibrationVideoFrame(sensorData.getVideoDuration());
+        calibrationVideoTimeData = new CalibrationVideoTimeData(sensorData.getVideoDuration());
+        if (sensorData.isTimeLapseData()) {
+            calibrationVideoTimeData.setAnalysisFrameRate(30);
+            timeData = new TimeLapseRealTimeData(calibrationVideoTimeData, sensorData.getTimeLapseCaptureRate());
+        } else
+            timeData = calibrationVideoTimeData;
 
         frameDataModel = new FrameDataModel();
-        frameDataModel.setNumberOfFrames(calibrationVideoFrame.getNumberOfFrames());
+        frameDataModel.setNumberOfFrames(calibrationVideoTimeData.getNumberOfFrames());
 
         tagMarkers = new CalibratedMarkerDataModel(calibrationXY);
         tagMarkers.setCalibrationXY(calibrationXY);
@@ -116,8 +121,11 @@ public class MotionAnalysis implements ISensorAnalysis {
     public CalibrationXY getCalibrationXY() {
         return calibrationXY;
     }
-    public CalibrationVideoFrame getCalibrationVideoFrame() {
-        return calibrationVideoFrame;
+    public ITimeData getTimeData() {
+        return timeData;
+    }
+    public CalibrationVideoTimeData getCalibrationVideoTimeData() {
+        return calibrationVideoTimeData;
     }
     public MarkerDataModel getTagMarkers() {
         return tagMarkers;
@@ -279,7 +287,7 @@ public class MotionAnalysis implements ISensorAnalysis {
         tableAdapter.addColumn(new RunIdDataTableColumn());
         tableAdapter.addColumn(new XPositionDataTableColumn(xUnit));
         tableAdapter.addColumn(new YPositionDataTableColumn(yUnit));
-        tableAdapter.addColumn(new TimeDataTableColumn(tUnit, calibrationVideoFrame));
+        tableAdapter.addColumn(new TimeDataTableColumn(tUnit, timeData));
         CSVWriter.writeTable(tableAdapter, writer, ',');
     }
 
@@ -334,11 +342,11 @@ public class MotionAnalysis implements ISensorAnalysis {
         if (runSettings == null)
             return;
 
-        calibrationVideoFrame.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
-        calibrationVideoFrame.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
-        calibrationVideoFrame.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
+        calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
+        calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
+        calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
 
-        int numberOfRuns = calibrationVideoFrame.getNumberOfFrames();
+        int numberOfRuns = calibrationVideoTimeData.getNumberOfFrames();
         getFrameDataModel().setNumberOfFrames(numberOfRuns);
         if (numberOfRuns <= getFrameDataModel().getCurrentFrame())
             getFrameDataModel().setCurrentFrame(numberOfRuns - 1);

@@ -214,7 +214,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
     private String correctAccelerationUnit = "[m/s^2]";
 
     protected MarkerDataModel tagMarker;
-    protected ITimeData timeCalibration;
+    protected ITimeData timeData;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -372,7 +372,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
         if (sensorAnalysis == null)
             return;
         tagMarker = sensorAnalysis.getTagMarkers();
-        timeCalibration = sensorAnalysis.getCalibrationVideoFrame();
+        timeData = sensorAnalysis.getTimeData();
 
         // first update the tables because otherwise update() can cause a crash when accessing data (an update is
         // triggered when changing a text view)
@@ -382,7 +382,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
         positionUnitTextView.setText("[" + getPositionUnit() + "]");
 
         MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(tagMarker);
-        adapter.addColumn(new TimeDataTableColumn(sensorAnalysis.getTUnit(), timeCalibration));
+        adapter.addColumn(new TimeDataTableColumn(sensorAnalysis.getTUnit(), timeData));
         adapter.addColumn(new XPositionDataTableColumn(sensorAnalysis.getXUnit()));
         adapter.addColumn(new YPositionDataTableColumn(sensorAnalysis.getYUnit()));
         rawDataTable.setAdapter(adapter);
@@ -391,13 +391,13 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
             return;
 
         String text = "";
-        text += timeCalibration.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex()).getRunId());
+        text += timeData.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex()).getRunId());
         time1EditText.setText(text);
         text = "";
-        text += timeCalibration.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 1).getRunId());
+        text += timeData.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 1).getRunId());
         time2EditText.setText(text);
         text = "";
-        text += timeCalibration.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 2).getRunId());
+        text += timeData.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 2).getRunId());
         time3EditText.setText(text);
 
         text = "";

@@ -42,8 +42,8 @@ public class CalculateYSpeedFragment extends CalculateSpeedFragment {
         MotionAnalysis motionAnalysis = getMotionAnalysis();
         MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(tagMarker);
         speedDataTableColumn = new YSpeedDataTableColumn(motionAnalysis.getYUnit(), motionAnalysis.getTUnit(),
-                timeCalibration);
-        adapter.addColumn(new SpeedTimeDataTableColumn(motionAnalysis.getTUnit(), timeCalibration));
+                timeData);
+        adapter.addColumn(new SpeedTimeDataTableColumn(motionAnalysis.getTUnit(), timeData));
         adapter.addColumn(speedDataTableColumn);
 
         return adapter;
@@ -54,8 +54,8 @@ public class CalculateYSpeedFragment extends CalculateSpeedFragment {
         MotionAnalysis motionAnalysis = getMotionAnalysis();
         MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(tagMarker);
         YAccelerationDataTableColumn accelerationDataTableColumn = new YAccelerationDataTableColumn(
-                motionAnalysis.getYUnit(), motionAnalysis.getTUnit(), timeCalibration);
-        adapter.addColumn(new AccelerationTimeDataTableColumn(motionAnalysis.getTUnit(), timeCalibration));
+                motionAnalysis.getYUnit(), motionAnalysis.getTUnit(), timeData);
+        adapter.addColumn(new AccelerationTimeDataTableColumn(motionAnalysis.getTUnit(), timeData));
         adapter.addColumn(accelerationDataTableColumn);
         return adapter;
     }

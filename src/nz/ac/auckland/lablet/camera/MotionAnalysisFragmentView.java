@@ -16,7 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.experiment.Unit;
 import nz.ac.auckland.lablet.views.FrameContainerView;
@@ -144,16 +143,16 @@ class MotionAnalysisFragmentView extends FrameLayout {
         final Unit tUnit = sensorAnalysis.getTUnit();
 
         // marker table view
-        final ITimeData timeData = sensorAnalysis.getCalibrationVideoFrame();
+        final ITimeData timeData = sensorAnalysis.getTimeData();
         final MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(sensorAnalysis.getTagMarkers());
         adapter.addColumn(new RunIdDataTableColumn());
-        adapter.addColumn(new TimeDataTableColumn(xUnit, timeData));
-        adapter.addColumn(new XPositionDataTableColumn(yUnit));
-        adapter.addColumn(new YPositionDataTableColumn(tUnit));
+        adapter.addColumn(new TimeDataTableColumn(tUnit, timeData));
+        adapter.addColumn(new XPositionDataTableColumn(xUnit));
+        adapter.addColumn(new YPositionDataTableColumn(yUnit));
         tableView.setAdapter(adapter);
 
         MarkerDataModel markerDataModel = sensorAnalysis.getTagMarkers();
-        ITimeData timeCalibration = sensorAnalysis.getCalibrationVideoFrame();
+        ITimeData timeCalibration = sensorAnalysis.getTimeData();
         // graph spinner
         graphSpinnerEntryList.add(new GraphSpinnerEntry("Position Data", new MarkerTimeGraphAdapter(markerDataModel,
                 timeCalibration, "Position Data",

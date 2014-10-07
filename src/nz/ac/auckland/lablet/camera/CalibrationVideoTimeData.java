@@ -8,16 +8,16 @@
 package nz.ac.auckland.lablet.camera;
 
 
-public class CalibrationVideoFrame implements ITimeData {
-    private int numberOfFrames;
-    final private int videoDuration;
+public class CalibrationVideoTimeData implements ITimeData {
+    protected int numberOfFrames;
+    final protected int videoDuration;
 
-    private int analysisFrameRate;
+    protected float analysisFrameRate;
     // milli seconds
-    private int analysisVideoStart;
-    private int analysisVideoEnd;
+    protected int analysisVideoStart;
+    protected int analysisVideoEnd;
 
-    public CalibrationVideoFrame(int videoDuration) {
+    public CalibrationVideoTimeData(int videoDuration) {
         this.videoDuration = videoDuration;
 
         setAnalysisVideoStart(0);
@@ -40,7 +40,7 @@ public class CalibrationVideoFrame implements ITimeData {
         return numberOfFrames;
     }
 
-    private float getFrameTime(int frame) {
+    protected float getFrameTime(int frame) {
         return analysisVideoStart + (float)1000 / analysisFrameRate * frame;
     }
 
@@ -58,13 +58,13 @@ public class CalibrationVideoFrame implements ITimeData {
      * </p>
      * @param frameRate
      */
-    public void setAnalysisFrameRate(int frameRate) {
+    public void setAnalysisFrameRate(float frameRate) {
         analysisFrameRate = frameRate;
         if (analysisFrameRate <= 0)
             analysisFrameRate = 10;
 
         int runTime = analysisVideoEnd - analysisVideoStart;
-        numberOfFrames = runTime * analysisFrameRate / 1000 + 1;
+        numberOfFrames = (int)(runTime * analysisFrameRate / 1000 + 1);
     }
 
     /**
@@ -72,7 +72,7 @@ public class CalibrationVideoFrame implements ITimeData {
      *
      * @return the analysis frame rate
      */
-    public int getAnalysisFrameRate() {
+    public float getAnalysisFrameRate() {
         return analysisFrameRate;
     }
 
@@ -97,6 +97,7 @@ public class CalibrationVideoFrame implements ITimeData {
      */
     public void setAnalysisVideoStart(int startTime) {
         this.analysisVideoStart = startTime;
+        setAnalysisFrameRate(analysisFrameRate);
     }
 
     /**
@@ -121,5 +122,35 @@ public class CalibrationVideoFrame implements ITimeData {
 
         if (analysisVideoEnd <= 0)
             analysisVideoEnd = videoDuration;
+
+        setAnalysisFrameRate(analysisFrameRate);
     }
+}
+
+
+class TimeLapseRealTimeData implements ITimeData {
+    final private CalibrationVideoTimeData calibrationVideoTimeData;
+    final private float captureRate;
+
+    public TimeLapseRealTimeData(CalibrationVideoTimeData calibrationVideoTimeData, float captureRate) {
+        this.calibrationVideoTimeData = calibrationVideoTimeData;
+        this.captureRate = captureRate;
+    }
+
+    @Override
+    public int getSize() {
+        return calibrationVideoTimeData.getNumberOfFrames();
+    }
+
+    @Override
+    public float getTimeAt(float index) {
+        return getFrameTime(Math.round(index));
+    }
+
+    private float getFrameTime(int frame) {
+        final float videoFrameRate = calibrationVideoTimeData.getAnalysisFrameRate();
+        return (calibrationVideoTimeData.getAnalysisVideoStart() + (float)1000 / videoFrameRate * frame)
+                * videoFrameRate / captureRate;
+    }
+
 }

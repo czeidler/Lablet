@@ -243,14 +243,14 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
         Bundle analysisSpecificData = extras.getBundle("analysisSpecificData");
         if (analysisSpecificData != null)
             runSettings = analysisSpecificData.getBundle("run_settings");
-        CalibrationVideoFrame calibrationVideoFrame
-                = ((MotionAnalysis)experimentAnalysis.getCurrentSensorAnalysis()).getCalibrationVideoFrame();
+        MotionAnalysis motionAnalysis = (MotionAnalysis)experimentAnalysis.getCurrentSensorAnalysis();
+        CalibrationVideoTimeData calibrationVideoTimeData = motionAnalysis.getCalibrationVideoTimeData();
         if (runSettings != null) {
-            calibrationVideoFrame.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
-            calibrationVideoFrame.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
-            calibrationVideoFrame.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
+            calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
+            calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
+            calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
         }
-        int analysisFrameRate = calibrationVideoFrame.getAnalysisFrameRate();
+        int analysisFrameRate = (int)calibrationVideoTimeData.getAnalysisFrameRate();
 
         // initial views with values
         calculateFrameRateValues(videoFrameView.getVideoFrameRate());
@@ -260,8 +260,8 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
         int pickerFrameRateIndex = getNumberPickerIndexForFrameRate(analysisFrameRate);
         frameRatePicker.setValue(pickerFrameRateIndex);
 
-        videoStartValue = calibrationVideoFrame.getAnalysisVideoStart();
-        videoEndValue = calibrationVideoFrame.getAnalysisVideoEnd();
+        videoStartValue = calibrationVideoTimeData.getAnalysisVideoStart();
+        videoEndValue = calibrationVideoTimeData.getAnalysisVideoEnd();
         setVideoStart(videoStartValue);
         setVideoEnd(videoEndValue);
         PointF point = new PointF();
