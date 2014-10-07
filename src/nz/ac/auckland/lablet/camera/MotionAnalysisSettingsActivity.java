@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * The user is able to set video start and end point and set the analysis video frame rate.
  * </p>
  */
-public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
+public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivity {
     private CameraSensorData cameraSensorData;
     private VideoFrameView videoFrameView;
 
@@ -66,7 +66,7 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
 
         MenuItem helpItem = menu.findItem(R.id.action_help);
         assert helpItem != null;
-        final CameraRunSettingsActivity that = this;
+        final MotionAnalysisSettingsActivity that = this;
         helpItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -138,7 +138,7 @@ public class CameraRunSettingsActivity extends ExperimentAnalysisBaseActivity {
 
         cameraSensorData = (CameraSensorData)experimentAnalysis.getCurrentSensorAnalysis().getData();
 
-        setContentView(R.layout.camera_run_settings);
+        setContentView(R.layout.motion_analysis_settings);
 
         videoFrameView = (VideoFrameView)findViewById(R.id.videoFrameView);
         assert videoFrameView != null;

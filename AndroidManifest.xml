@@ -14,7 +14,7 @@
 
         <activity android:name="nz.ac.auckland.lablet.ExperimentActivity"
                   android:icon="@drawable/ic_lab"/>
-        <activity android:name="nz.ac.auckland.lablet.camera.CameraRunSettingsActivity"
+        <activity android:name=".camera.MotionAnalysisSettingsActivity"
                   android:icon="@drawable/ic_cut" />
 
         <activity android:name="nz.ac.auckland.lablet.ScriptHomeActivity"

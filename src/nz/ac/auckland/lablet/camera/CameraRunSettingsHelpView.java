@@ -26,7 +26,7 @@ public class CameraRunSettingsHelpView extends FrameLayout {
         LayoutInflater inflater = (LayoutInflater)context.getSystemService
                 (Context.LAYOUT_INFLATER_SERVICE);
 
-        View view = inflater.inflate(R.layout.camera_run_settings_help, null, false);
+        View view = inflater.inflate(R.layout.motion_analysis_settings_help, null, false);
         addView(view);
 
         frameRateImageView = (ImageView)view.findViewById(R.id.frameRateImageView);
@@ -46,7 +46,7 @@ public class CameraRunSettingsHelpView extends FrameLayout {
      * help text to the right position. Thus the layout of the activity layout must be ready when calling this function.
      * @param parent activity with the layout that should be annotated with help items
      */
-    public void setParent(CameraRunSettingsActivity parent) {
+    public void setParent(MotionAnalysisSettingsActivity parent) {
         Rect framePickerRect = parent.getFramePickerRect();
         Rect rangeSeekBarRect = parent.getRangeSeekBarRect();
 

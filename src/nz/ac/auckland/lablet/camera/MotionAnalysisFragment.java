@@ -146,7 +146,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
     private void startRunSettingsActivity(Bundle options) {
         String experimentPath = getExperimentData().getStorageDir().getParentFile().getPath();
 
-        Intent intent = new Intent(getActivity(), CameraRunSettingsActivity.class);
+        Intent intent = new Intent(getActivity(), MotionAnalysisSettingsActivity.class);
         ExperimentHelper.packStartAnalysisSettingsIntent(intent, analysisRef, experimentPath, options);
         startActivityForResult(intent, PERFORM_RUN_SETTINGS);
     }
