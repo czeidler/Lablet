@@ -24,6 +24,8 @@ public class RangeDrawingView extends ViewGroup {
     private IRangeListener rangeListener;
     protected int viewWidth;
     protected int viewHeight;
+    protected int paddedViewWidth;
+    protected int paddedViewHeight;
     private float minXRange = -1;
     private float minYRange = -1;
 
@@ -282,11 +284,11 @@ public class RangeDrawingView extends ViewGroup {
     }
 
     public float toScreenX(float real) {
-        return (real - rangeRect.left) / (rangeRect.right - rangeRect.left) * viewWidth;
+        return getPaddingLeft() + (real - rangeRect.left) / (rangeRect.right - rangeRect.left) * paddedViewWidth;
     }
 
     public float toScreenY(float real) {
-        return (1.f - (real - rangeRect.bottom) / (rangeRect.top - rangeRect.bottom)) * viewHeight;
+        return getPaddingTop() + (1.f - (real - rangeRect.bottom) / (rangeRect.top - rangeRect.bottom)) * paddedViewHeight;
     }
 
     public void toScreen(PointF real, PointF screen) {
@@ -295,11 +297,11 @@ public class RangeDrawingView extends ViewGroup {
     }
 
     public float fromScreenX(float screen) {
-        return rangeRect.left + screen * (rangeRect.right - rangeRect.left) / viewWidth;
+        return rangeRect.left + (screen - getPaddingLeft()) * (rangeRect.right - rangeRect.left) / paddedViewWidth;
     }
 
     public float fromScreenY(float screen) {
-        return rangeRect.top - screen * (rangeRect.top - rangeRect.bottom) / viewHeight;
+        return rangeRect.top - (screen - getPaddingTop()) * (rangeRect.top - rangeRect.bottom) / paddedViewWidth;
     }
 
     public void fromScreen(PointF newPosition, PointF newReal) {
@@ -336,11 +338,11 @@ public class RangeDrawingView extends ViewGroup {
     }
 
     private float getXScale() {
-        return (float)getWidth() / (rangeRect.right - rangeRect.left);
+        return (float)paddedViewWidth / (rangeRect.right - rangeRect.left);
     }
 
     private float getYScale() {
-        return (float)getHeight() / (rangeRect.bottom - rangeRect.top);
+        return (float)paddedViewHeight / (rangeRect.bottom - rangeRect.top);
     }
 
     @Override
@@ -349,6 +351,8 @@ public class RangeDrawingView extends ViewGroup {
 
         viewWidth = w;
         viewHeight = h;
+        paddedViewWidth = viewWidth - getPaddingRight() - getPaddingLeft();
+        paddedViewHeight = viewHeight - getPaddingTop() - getPaddingBottom();
     }
 
     @Override

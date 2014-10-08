@@ -502,14 +502,14 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
     }
 
     protected void sanitizeScreenPoint(PointF point) {
-        if (frame.left > point.x)
-            point.x = frame.left;
-        if (frame.right < point.x)
-            point.x = frame.right;
-        if (frame.top > point.y)
-            point.y = frame.top;
-        if (frame.bottom < point.y)
-            point.y = frame.bottom;
+        if (frame.left + containerView.getPaddingLeft() > point.x)
+            point.x = frame.left + containerView.getPaddingLeft();
+        if (frame.right - containerView.getPaddingRight()< point.x)
+            point.x = frame.right - containerView.getPaddingRight();
+        if (frame.top + containerView.getPaddingTop() > point.y)
+            point.y = frame.top + containerView.getPaddingTop();
+        if (frame.bottom - containerView.getRangeBottom() < point.y)
+            point.y = frame.bottom - containerView.getRangeBottom();
     }
 
     abstract protected DraggableMarker createMarkerForRow(int row);
