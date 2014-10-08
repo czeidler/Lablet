@@ -223,9 +223,9 @@ class StartEndPainter extends AbstractMarkerPainter {
     }
 
     private float toStepPosition(float floatPosition) {
-        if (numberOfSteps <= 1)
+        if (numberOfSteps <= 2)
             return 0.5f;
-        float stepSize = 1.0f / numberOfSteps;
+        float stepSize = 1.0f / (numberOfSteps - 1);
         int stepPosition = Math.round(floatPosition / stepSize);
         return stepSize * stepPosition;
     }
@@ -296,6 +296,6 @@ public class StartEndSeekBar extends PlotPainterContainerView {
      * @param max the end of the range
      */
     public void setMax(int max) {
-        startEndPainter.setNumberOfSteps(max);
+        startEndPainter.setNumberOfSteps(max + 1);
     }
 }
