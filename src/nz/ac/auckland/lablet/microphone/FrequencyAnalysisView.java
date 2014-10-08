@@ -146,7 +146,7 @@ public class FrequencyAnalysisView extends FrameLayout {
         sampleSizeList.add("4096");
         sampleSizeList.add("8192");
         sampleSizeList.add("16384");
-        sampleSizeList.add("32768");
+        //sampleSizeList.add("32768"); // this is too big for renderscript
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_dropdown_item, sampleSizeList);
         sampleSizeSpinner.setAdapter(adapter);

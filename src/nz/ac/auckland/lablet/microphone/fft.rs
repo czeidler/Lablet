@@ -10,7 +10,7 @@ float* gOutput;
 
 static void hammingWindow(float* samples, uint32_t length) {
     for (int i = 0; i < length; i++)
-        samples[2 * i] *= (0.54f - 0.46f * cos(2 * M_PI * i / (length - 1)));
+        samples[2 * i] *= (0.54f - 0.46f * cos(2.f * M_PI / (length - 1) * i));
 }
 
 static void swap(float* array, int i, int j) {
@@ -75,11 +75,14 @@ void root(const int *in, int *out, const void *usrData, uint32_t x, uint32_t y) 
     int start = in[0];
 
     int trafoLength = 2 * gWindowSize;
-    float trafo[trafoLength];
+    // The size of trafo is actually trafoLength. But this value is not know by the compiler. However, this is still
+    // risky since maxWindowSize might be too big for some platforms...
+    float trafo[32768];
     for (int i = 0; i < gWindowSize; i++) {
         trafo[2 * i] = gData[start + i];
         trafo[2 * i + 1] = 0;
     }
+
     hammingWindow(trafo, gWindowSize);
 
     four1(trafo, gWindowSize);
