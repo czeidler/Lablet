@@ -188,7 +188,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
             @Override
             public void onDataChanged(MarkerDataModel model, int index, int number) {
                 int frameRate = getFrameRateFromPicker();
-                int duration = getDurationAtFrameRate(frameRate);
+                float duration = getDurationAtFrameRate(frameRate);
 
                 float progress = 0;
                 for (int i = index; i < index + number; i++) {
@@ -268,7 +268,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         setVideoStart(videoStartValue);
         setVideoEnd(videoEndValue);
         PointF point = new PointF();
-        int duration = getDurationAtFrameRate(getFrameRateFromPicker());
+        float duration = getDurationAtFrameRate(getFrameRateFromPicker());
         // because the duration is for a certain frame rate it can be smaller than the actual video length
         if (point.x > 1)
             point.x = 1;
@@ -313,17 +313,16 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         return Math.round(frameRate * milliSeconds / 1000);
     }
 
-    private int getDurationAtFrameRate(int frameRate) {
+    private float getDurationAtFrameRate(int frameRate) {
         int duration = cameraSensorData.getVideoDuration();
-        int stepSize = Math.round(1000.0f / frameRate);
+        float stepSize = 1000.0f / frameRate;
         int numberOfSteps = (int)((float)(frameRate * duration) / 1000);
-        duration = stepSize * numberOfSteps;
-        return duration;
+        return stepSize * numberOfSteps;
     }
 
     private void updateEditFrames() {
         int frameRate = getFrameRateFromPicker();
-        int duration = getDurationAtFrameRate(frameRate);
+        float duration = getDurationAtFrameRate(frameRate);
 
         float start = startEndSeekBar.getMarkerDataModel().getMarkerDataAt(0).getPosition().x;
         start *= duration;
@@ -358,8 +357,8 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
 
     private void setFrameRate(int frameRate) {
         setFrameRateLengthEdit(frameRate);
-        int duration = getDurationAtFrameRate(frameRate);
-        int numberOfSteps = Math.round((float) (frameRate * duration) / 1000);
+        float duration = getDurationAtFrameRate(frameRate);
+        int numberOfSteps = Math.round((duration * frameRate) / 1000);
 
         // seek bar
         float oldRelativeProgress = (float)seekBar.getProgress() / seekBar.getMax();
@@ -389,8 +388,11 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     private int toDisplayTime(float videoTime) {
         final float videoFrameRate = 30f;
 
-        if (cameraSensorData.isTimeLapseData())
-            return (int)(videoTime * videoFrameRate / cameraSensorData.getTimeLapseCaptureRate());
+        if (cameraSensorData.isTimeLapseData()) {
+            float value = videoTime * videoFrameRate / cameraSensorData.getTimeLapseCaptureRate();
+            // fix possible rounding errors
+            return Math.round(value / 10) * 10;
+        }
         return Math.round(videoTime);
     }
 
