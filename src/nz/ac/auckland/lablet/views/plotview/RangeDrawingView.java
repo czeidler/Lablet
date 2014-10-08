@@ -301,7 +301,7 @@ public class RangeDrawingView extends ViewGroup {
     }
 
     public float fromScreenY(float screen) {
-        return rangeRect.top - (screen - getPaddingTop()) * (rangeRect.top - rangeRect.bottom) / paddedViewWidth;
+        return rangeRect.top - (screen - getPaddingTop()) * (rangeRect.top - rangeRect.bottom) / paddedViewHeight;
     }
 
     public void fromScreen(PointF newPosition, PointF newReal) {
