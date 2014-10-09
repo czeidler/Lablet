@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!-- The main content view -->
+    <RelativeLayout
+        android:id="@+id/content_frame"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <view android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              class="nz.ac.auckland.lablet.views.FrameDataSeekBar" android:id="@+id/frameDataSeekBar"
+              android:layout_alignParentBottom="true"
+              android:layout_alignParentRight="true"
+              android:layout_alignParentLeft="true"/>
+        <view android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              class="nz.ac.auckland.lablet.views.FrameContainerView" android:id="@+id/frameContainerView"
+              android:layout_alignParentTop="true"
+              android:layout_alignParentLeft="true"
+              android:layout_above="@+id/frameDataSeekBar"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+"
+            android:id="@+id/drawerButton" android:layout_alignParentTop="true" android:layout_alignParentEnd="true"/>
+
+    </RelativeLayout>
+    <!-- The navigation drawer -->
+    <FrameLayout android:id="@+id/left_drawer"
+        android:layout_width="320dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="right">
+    </FrameLayout>
+</android.support.v4.widget.DrawerLayout>
