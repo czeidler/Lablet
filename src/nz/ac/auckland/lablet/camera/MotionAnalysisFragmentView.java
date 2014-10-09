@@ -42,11 +42,12 @@ class MotionAnalysisFragmentView extends FrameLayout {
         public Layout(Context context) {
             super(context);
 
+
             runViewControl = new FrameDataSeekBar(context);
             sensorContainerView = new FrameContainerView(context);
 
             LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            experimentDataView = (ViewGroup)inflater.inflate(R.layout.analysis_data_side_bar, null, false);
+            experimentDataView = (ViewGroup)inflater.inflate(R.layout.motion_analysis_data_side_bar, null, false);
 
             addView(runViewControl);
             addView(sensorContainerView);
