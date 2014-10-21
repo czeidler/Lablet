@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.SensorManager;
 import android.media.CamcorderProfile;
@@ -24,6 +25,7 @@ import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.RatioSurfaceView;
+import nz.ac.auckland.lablet.views.RatioTextureView;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,25 +37,34 @@ import java.util.List;
 
 class CameraExperimentView extends AbstractExperimentSensorView {
     private RatioSurfaceView preview = null;
+    private RatioTextureView texturePreview = null;
     private VideoView videoView = null;
     private SurfaceHolder previewHolder = null;
-    final private CameraExperimentSensor cameraExperimentRun;
+    final private CameraExperimentSensor cameraExperimentSensor;
     final private Camera camera;
 
-    public CameraExperimentView(Context context, CameraExperimentSensor cameraExperimentRun) {
+    public CameraExperimentView(Context context, CameraExperimentSensor cameraExperimentSensor) {
         super(context);
 
-        this.cameraExperimentRun = cameraExperimentRun;
-        this.camera = cameraExperimentRun.getCamera();
+        this.cameraExperimentSensor = cameraExperimentSensor;
+        this.camera = cameraExperimentSensor.getCamera();
 
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.camera_experiment_view, null, false);
         addView(view);
 
         preview = (RatioSurfaceView)view.findViewById(R.id.surfaceView);
-        previewHolder = preview.getHolder();
+        /*previewHolder = preview.getHolder();
         assert previewHolder != null;
         previewHolder.addCallback(surfaceCallback);
+*/
+
+        preview.setVisibility(INVISIBLE);
+
+        texturePreview = (RatioTextureView)view.findViewById(R.id.textureView);
+        //texturePreview.setSurfaceTexture(cameraExperimentSensor.getCameraSurfaceTexture());
+
+        camera.startPreview();
 
         videoView = (VideoView)view.findViewById(R.id.videoView);
         MediaController mediaController = new MediaController(context);
@@ -113,7 +124,7 @@ class CameraExperimentView extends AbstractExperimentSensorView {
 
     @Override
     public void onStartPlayback() {
-        File videoFile = cameraExperimentRun.getVideoFile();
+        File videoFile = cameraExperimentSensor.getVideoFile();
         if (videoFile == null)
             return;
 
@@ -136,8 +147,11 @@ class CameraExperimentView extends AbstractExperimentSensorView {
     }
 
     private void setRatio() {
-        preview.setRatio(cameraExperimentRun.getPreviewRatio());
+        preview.setRatio(cameraExperimentSensor.getPreviewRatio());
         preview.requestLayout();
+
+        texturePreview.setRatio(cameraExperimentSensor.getPreviewRatio());
+        texturePreview.requestLayout();
     }
 }
 
@@ -148,6 +162,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
     private Camera camera = null;
     private MediaRecorder recorder = null;
+    private TimeLapseRecording timeLapseRecording;
 
     private int cameraId = 0;
     private int rotation;
@@ -195,6 +210,10 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
     public boolean isTimeLapseEnabled() {
         return timeLapseEnabled;
+    }
+
+    public SurfaceTexture getCameraSurfaceTexture() {
+        return timeLapseRecording.getCameraSurfaceTexture();
     }
 
     /**
@@ -275,6 +294,13 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         }
         onCamcorderProfileChanged(newVideoSettings);
 
+        try {
+            timeLapseRecording = new TimeLapseRecording(camera,
+                    CamcorderProfile.get(cameraId, selectedVideoSettings.cameraProfile));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         // orientation
         rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
         setCameraDisplayOrientation(cameraId, camera);
@@ -302,6 +328,10 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
         orientationEventListener.disable();
 
+        if (timeLapseRecording != null) {
+            timeLapseRecording.release();
+            timeLapseRecording = null;
+        }
         if (recorder != null) {
             recorder.reset();
             recorder.release();
@@ -429,6 +459,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
     @Override
     public void startRecording() throws Exception {
         camera.unlock();
+/*
         recorder = new MediaRecorder();
         recorder.setCamera(camera);
         recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
@@ -446,10 +477,14 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             recorder.setVideoFrameRate(profile.videoFrameRate);
             recorder.setVideoEncodingBitRate(profile.videoBitRate);
         }
-
+*/
         File outputDir = activity.getExternalCacheDir();
         videoFile = new File(outputDir, getVideoFileName());
 
+//      camera.startPreview();
+
+        timeLapseRecording.startRecording(videoFile.getPath());
+/*
         recorder.setOutputFile(videoFile.getPath());
 
         recorder.setOrientationHint(getHintRotation());
@@ -460,14 +495,14 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         recorder.prepare();
 
         recorder.start();
-
+*/
         super.startRecording();
     }
 
     @Override
     public boolean stopRecording() {
         boolean dataTaken = true;
-        try {
+        /*try {
             recorder.stop();
         } catch (RuntimeException e) {
             // this can happen when the recoding is stopped to quickly and no data has been taken
@@ -475,6 +510,13 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             dataTaken = false;
         }
         recorder.reset();
+*/
+        try {
+            timeLapseRecording.stopRecording();
+            timeLapseRecording.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         try {
             camera.reconnect();
