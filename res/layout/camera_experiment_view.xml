@@ -10,6 +10,11 @@
                     android:layout_height="match_parent"
                     android:id="@+id/surfaceView"
                     android:layout_gravity="center"/>
+            <view class="nz.ac.auckland.lablet.views.RatioGLSurfaceView"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:id="@+id/glSurfaceView"
+                  android:layout_gravity="center"/>
             <VideoView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

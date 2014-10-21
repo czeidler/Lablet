@@ -11,11 +11,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.SensorManager;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.MediaController;
@@ -24,8 +24,8 @@ import android.widget.VideoView;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.StorageLib;
+import nz.ac.auckland.lablet.views.RatioGLSurfaceView;
 import nz.ac.auckland.lablet.views.RatioSurfaceView;
-import nz.ac.auckland.lablet.views.RatioTextureView;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +37,7 @@ import java.util.List;
 
 class CameraExperimentView extends AbstractExperimentSensorView {
     private RatioSurfaceView preview = null;
-    private RatioTextureView texturePreview = null;
+    private RatioGLSurfaceView glSurfaceView = null;
     private VideoView videoView = null;
     private SurfaceHolder previewHolder = null;
     final private CameraExperimentSensor cameraExperimentSensor;
@@ -61,8 +61,13 @@ class CameraExperimentView extends AbstractExperimentSensorView {
 
         preview.setVisibility(INVISIBLE);
 
-        texturePreview = (RatioTextureView)view.findViewById(R.id.textureView);
-        //texturePreview.setSurfaceTexture(cameraExperimentSensor.getCameraSurfaceTexture());
+        glSurfaceView = (RatioGLSurfaceView)view.findViewById(R.id.glSurfaceView);
+        glSurfaceView.setEGLContextClientVersion(2);
+        glSurfaceView.setRenderer(cameraExperimentSensor.createCameraPreviewRender());
+        glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        glSurfaceView.setPreserveEGLContextOnPause(true);
+
+        //glSurfaceView.setSurfaceTexture(cameraExperimentSensor.getCameraSurfaceTexture());
 
         camera.startPreview();
 
@@ -150,8 +155,8 @@ class CameraExperimentView extends AbstractExperimentSensorView {
         preview.setRatio(cameraExperimentSensor.getPreviewRatio());
         preview.requestLayout();
 
-        texturePreview.setRatio(cameraExperimentSensor.getPreviewRatio());
-        texturePreview.requestLayout();
+        glSurfaceView.setRatio(cameraExperimentSensor.getPreviewRatio());
+        glSurfaceView.requestLayout();
     }
 }
 
@@ -212,8 +217,8 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         return timeLapseEnabled;
     }
 
-    public SurfaceTexture getCameraSurfaceTexture() {
-        return timeLapseRecording.getCameraSurfaceTexture();
+    public GLSurfaceView.Renderer createCameraPreviewRender() {
+        return new CameraPreviewRender(timeLapseRecording);
     }
 
     /**
