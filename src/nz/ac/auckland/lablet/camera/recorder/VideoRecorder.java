@@ -1,11 +1,22 @@
 /*
- * Copyright 2013-2014.
- * Distributed under the terms of the GPLv3 License.
+ * Copyright 2013 The Android Open Source Project
  *
- * Authors:
- *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-package nz.ac.auckland.lablet.camera;
+/* Most code is take from http://bigflake.com/mediacodec/CameraToMpegTest.java.txt.
+ * To get the video preview working looking at https://github.com/Kickflip helped a lot.
+ */
+package nz.ac.auckland.lablet.camera.recorder;
 
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -15,6 +26,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
+import nz.ac.auckland.lablet.views.RatioGLSurfaceView;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -37,10 +49,6 @@ class CameraTextureSource {
         camera.startPreview();
     }
 
-    public void updateTexImage() {
-        surfaceTexture.updateTexImage();
-    }
-
     public SurfaceTexture getSurfaceTexture() {
         return surfaceTexture;
     }
@@ -50,8 +58,8 @@ class CameraTextureSource {
 /**
  * Code for rendering a texture onto a surface using OpenGL ES 2.0.
  */
-class STextureRender {
-    private static final String TAG = "STextureRender";
+class TextureRender {
+    private static final String TAG = "TextureRender";
 
     private static final int FLOAT_SIZE_BYTES = 4;
     private static final int TRIANGLE_VERTICES_DATA_STRIDE_BYTES = 5 * FLOAT_SIZE_BYTES;
@@ -97,15 +105,12 @@ class STextureRender {
     private int maPositionHandle;
     private int maTextureHandle;
 
-    public STextureRender() {
-        mTriangleVertices = ByteBuffer.allocateDirect(
-                mTriangleVerticesData.length * FLOAT_SIZE_BYTES)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        mTriangleVertices.put(mTriangleVerticesData).position(0);
+    public TextureRender() {
+        init(mTextureID);
+    }
 
-        Matrix.setIdentityM(mSTMatrix, 0);
-
-        surfaceCreated();
+    public TextureRender(int textureId) {
+        init(textureId);
     }
 
     public int getTextureId() {
@@ -157,7 +162,14 @@ class STextureRender {
     /**
      * Initializes GL state.  Call this after the EGL surface has been created and made current.
      */
-    public void surfaceCreated() {
+    private void init(int textureId) {
+        mTriangleVertices = ByteBuffer.allocateDirect(
+                mTriangleVerticesData.length * FLOAT_SIZE_BYTES)
+                .order(ByteOrder.nativeOrder()).asFloatBuffer();
+        mTriangleVertices.put(mTriangleVerticesData).position(0);
+
+        Matrix.setIdentityM(mSTMatrix, 0);
+
         mProgram = createProgram(VERTEX_SHADER, FRAGMENT_SHADER);
         if (mProgram == 0) {
             throw new RuntimeException("failed creating program");
@@ -172,22 +184,26 @@ class STextureRender {
         muSTMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uSTMatrix");
         checkLocation(muSTMatrixHandle, "uSTMatrix");
 
-        int[] textures = new int[1];
-        GLES20.glGenTextures(1, textures, 0);
+        if (textureId < 0) {
+            int[] textures = new int[1];
+            GLES20.glGenTextures(1, textures, 0);
 
-        mTextureID = textures[0];
-        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, mTextureID);
-        checkGlError("glBindTexture mTextureID");
+            mTextureID = textures[0];
 
-        GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER,
-                GLES20.GL_NEAREST);
-        GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER,
-                GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_S,
-                GLES20.GL_CLAMP_TO_EDGE);
-        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_T,
-                GLES20.GL_CLAMP_TO_EDGE);
-        checkGlError("glTexParameter");
+            GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, mTextureID);
+            checkGlError("glBindTexture mTextureID");
+
+            GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER,
+                    GLES20.GL_NEAREST);
+            GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER,
+                    GLES20.GL_LINEAR);
+            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_S,
+                    GLES20.GL_CLAMP_TO_EDGE);
+            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_T,
+                    GLES20.GL_CLAMP_TO_EDGE);
+            checkGlError("glTexParameter");
+        } else
+            mTextureID = textureId;
     }
 
     private int loadShader(int shaderType, String source) {
@@ -272,19 +288,19 @@ class CodecInputSurface {
     /**
      * Creates a CodecInputSurface from a Surface.
      */
-    public CodecInputSurface(Surface surface) {
+    public CodecInputSurface(Surface surface, EGLContext sharedContext) {
         if (surface == null) {
             throw new NullPointerException();
         }
         mSurface = surface;
 
-        eglSetup();
+        eglSetup(sharedContext);
     }
 
     /**
      * Prepares EGL.  We want a GLES 2.0 context and a surface that supports recording.
      */
-    private void eglSetup() {
+    private void eglSetup(EGLContext sharedContext) {
         mEGLDisplay = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY);
         if (mEGLDisplay == EGL14.EGL_NO_DISPLAY) {
             throw new RuntimeException("unable to get EGL14 display");
@@ -315,8 +331,7 @@ class CodecInputSurface {
                 EGL14.EGL_CONTEXT_CLIENT_VERSION, 2,
                 EGL14.EGL_NONE
         };
-        mEGLContext = EGL14.eglCreateContext(mEGLDisplay, configs[0], EGL14.EGL_NO_CONTEXT,
-                attrib_list, 0);
+        mEGLContext = EGL14.eglCreateContext(mEGLDisplay, configs[0], sharedContext, attrib_list, 0);
         checkEglError("eglCreateContext");
 
         // Create a window surface, and attach it to the Surface we received.
@@ -387,9 +402,20 @@ class CodecInputSurface {
 }
 
 
-//camera draws to SurfaceTexture (assosiated with a gl texture) -> frame available listener
-// -> that updates the gl texture -> glswap tells encoder to onNewFrame
-public class TimeLapseRecording {
+/**
+ * Custom video recording class.
+ *
+ * Brief description how the recording works:
+ * 1) From a GL texture a SurfaceTexture is created. (This happens in the GLSurfaceView)
+ * 2) The camera previews to this SurfaceTexture (setPreviewTexture)
+ * 3) A MediaCodec is created and createInputSurface is used to setup a EGLSurface (using a shared EGLContext from the
+ * GLSurfaceView)
+ * 4) The recorder listens for new frames on the preview SurfaceTexture and draws the SurfaceTexture to the encoder
+ * input surface (EGLSurface).
+ * 5) By calling eglSwapBuffers for the EGLSurface the frame is send to the encoder.
+ * 6) Processed frames from the encoder are fed to a muxer to generate a mp4.
+ */
+public class VideoRecorder {
     // parameters for the encoder
     private static final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
     private static final int FRAME_RATE = 30;               // 30fps
@@ -398,7 +424,7 @@ public class TimeLapseRecording {
     private Camera camera;
     private CamcorderProfile cameraProfile;
 
-    private STextureRender textureRender;
+    private TextureRender textureRender;
     private CameraTextureSource cameraTextureSource;
     private CodecInputSurface codecInputSurface;
     private MediaCodec encoder;
@@ -409,10 +435,14 @@ public class TimeLapseRecording {
     private Looper looper = null;
     private Handler handler = null;
 
+    private GLSurfaceView previewView;
+
     private Object lock = new Object();
 
     private boolean isRecording = false;
     private boolean stopRecording = false;
+
+    private int recordedFrames = 0;
 
     // allocate one of these up front so we don't need to do it every time
     private MediaCodec.BufferInfo bufferInfo;
@@ -434,13 +464,29 @@ public class TimeLapseRecording {
         }
     };
 
-    public TimeLapseRecording(Camera camera, CamcorderProfile camcorderProfile) throws IOException {
+    public VideoRecorder(Camera camera, CamcorderProfile camcorderProfile) throws IOException {
         this.camera = camera;
         this.cameraProfile = camcorderProfile;
 
-        synchronized (lock) {
-            new Thread(recordRunnable, "time lapse recording").start();
+        reset();
+    }
 
+    public SurfaceTexture getCameraSurfaceTexture() {
+        if (cameraTextureSource == null)
+            return null;
+        return cameraTextureSource.getSurfaceTexture();
+    }
+
+    public void reset() {
+        synchronized (lock) {
+            isRecording = false;
+            stopRecording = false;
+            recordedFrames = 0;
+
+            release();
+
+            // start recording thread
+            new Thread(recordRunnable, "VideoRecorder").start();
             while (handler == null) {
                 try {
                     lock.wait();
@@ -451,10 +497,6 @@ public class TimeLapseRecording {
         }
     }
 
-    public SurfaceTexture getCameraSurfaceTexture() {
-        return cameraTextureSource.getSurfaceTexture();
-    }
-
     public void release() {
         synchronized (lock) {
             if (looper != null) {
@@ -463,6 +505,14 @@ public class TimeLapseRecording {
                 looper = null;
             }
         }
+    }
+
+    public void setPreviewSurface(GLSurfaceView preview) {
+        previewView = preview;
+        previewView.setEGLContextClientVersion(2);
+        previewView.setRenderer(new CameraPreviewRender(this));
+        previewView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        previewView.setPreserveEGLContextOnPause(true);
     }
 
     private void prepareEncoder(int width, int height, int bitRate) {
@@ -495,19 +545,6 @@ public class TimeLapseRecording {
         @Override
         public void run() {
             synchronized (lock) {
-                prepareEncoder(cameraProfile.videoFrameWidth, cameraProfile.videoFrameHeight, cameraProfile.videoBitRate);
-
-                codecInputSurface = new CodecInputSurface(encoderInputSurface);
-                codecInputSurface.makeCurrent();
-
-                textureRender = new STextureRender();
-                try {
-                    cameraTextureSource = new CameraTextureSource(camera, textureRender.getTextureId(), cameraInputListener);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
-                }
-
                 Looper.prepare();
                 looper = Looper.myLooper();
                 handler = new Handler(Looper.myLooper());
@@ -538,9 +575,8 @@ public class TimeLapseRecording {
 
 
     private void onNewFrame() {
-        cameraTextureSource.updateTexImage();
-
-        codecInputSurface.makeCurrent();
+        SurfaceTexture surfaceTexture = cameraTextureSource.getSurfaceTexture();
+        surfaceTexture.updateTexImage();
 
         if (isRecording) {
             if (stopRecording) {
@@ -560,42 +596,35 @@ public class TimeLapseRecording {
             // Feed any pending encoder output into the muxer.
             drainEncoder(false);
 
-            int frameCount = 0;
+            if ((recordedFrames % 1) == 0)
+                sendFrameToEncoder(surfaceTexture);
 
-
-            // Switch up the colors every 15 frames.  Besides demonstrating the use of
-            // fragment shaders for video editing, this provides a visual indication of
-            // the frame rate: if the camera is capturing at 15fps, the colors will change
-            // once per second.
-            if ((frameCount % 15) == 0) {
-
-            }
-            frameCount++;
-
-            SurfaceTexture surfaceTexture = cameraTextureSource.getSurfaceTexture();
-            textureRender.drawFrame(surfaceTexture);
-
-            // Set the presentation time stamp from the SurfaceTexture's time stamp.  This
-            // will be used by MediaMuxer to set the PTS in the video.
-            codecInputSurface.setPresentationTime(surfaceTexture.getTimestamp());
-
-            // Submit it to the encoder.  The eglSwapBuffers call will block if the input
-            // is full, which would be bad if it stayed full until we dequeued an output
-            // buffer (which we can't do, since we're stuck here).  So long as we fully drain
-            // the encoder before supplying additional input, the system guarantees that we
-            // can supply another frame without blocking.
-            codecInputSurface.swapBuffers();
+            recordedFrames++;
         }
+
+        if (previewView != null)
+            previewView.requestRender();
+    }
+
+    private void sendFrameToEncoder(SurfaceTexture surfaceTexture) {
+        codecInputSurface.makeCurrent();
+
+        textureRender.drawFrame(surfaceTexture);
+
+        // Set the presentation time stamp from the SurfaceTexture's time stamp.  This
+        // will be used by MediaMuxer to set the PTS in the video.
+        codecInputSurface.setPresentationTime(surfaceTexture.getTimestamp());
+
+        // Submit it to the encoder.  The eglSwapBuffers call will block if the input
+        // is full, which would be bad if it stayed full until we dequeued an output
+        // buffer (which we can't do, since we're stuck here).  So long as we fully drain
+        // the encoder before supplying additional input, the system guarantees that we
+        // can supply another frame without blocking.
+        codecInputSurface.swapBuffers();
     }
 
     public void startRecording(String outputPath) {
         synchronized (lock) {
-            // Create a MediaMuxer.  We can't add the video track and start() the muxer here,
-            // because our MediaFormat doesn't have the Magic Goodies.  These can only be
-            // obtained from the encoder after it has started processing data.
-            //
-            // We're not actually interested in multiplexing audio.  We just want to convert
-            // the raw H.264 elementary stream we get from MediaCodec into a .mp4 file.
             try {
                 muxer = new MediaMuxer(outputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
             } catch (IOException ioe) {
@@ -613,6 +642,31 @@ public class TimeLapseRecording {
             if (isRecording)
                 stopRecording = true;
         }
+    }
+
+
+    public void setInputSurfaceTexture(final int textureId) {
+        final EGLContext sharedContext = EGL14.eglGetCurrentContext();
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (lock) {
+                    try {
+                        prepareEncoder(cameraProfile.videoFrameWidth, cameraProfile.videoFrameHeight, cameraProfile.videoBitRate);
+
+                        codecInputSurface = new CodecInputSurface(encoderInputSurface, sharedContext);
+                        codecInputSurface.makeCurrent();
+
+                        textureRender = new TextureRender(textureId);
+                        cameraTextureSource = new CameraTextureSource(camera, textureId, cameraInputListener);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+        });
     }
 
     /**

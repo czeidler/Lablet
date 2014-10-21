@@ -22,10 +22,11 @@ import android.widget.MediaController;
 import android.widget.PopupMenu;
 import android.widget.VideoView;
 import nz.ac.auckland.lablet.R;
+import nz.ac.auckland.lablet.camera.recorder.CameraPreviewRender;
+import nz.ac.auckland.lablet.camera.recorder.VideoRecorder;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.RatioGLSurfaceView;
-import nz.ac.auckland.lablet.views.RatioSurfaceView;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,8 +37,7 @@ import java.util.List;
 
 
 class CameraExperimentView extends AbstractExperimentSensorView {
-    private RatioSurfaceView preview = null;
-    private RatioGLSurfaceView glSurfaceView = null;
+    private RatioGLSurfaceView preview = null;
     private VideoView videoView = null;
     private SurfaceHolder previewHolder = null;
     final private CameraExperimentSensor cameraExperimentSensor;
@@ -53,21 +53,11 @@ class CameraExperimentView extends AbstractExperimentSensorView {
         View view = inflater.inflate(R.layout.camera_experiment_view, null, false);
         addView(view);
 
-        preview = (RatioSurfaceView)view.findViewById(R.id.surfaceView);
-        /*previewHolder = preview.getHolder();
-        assert previewHolder != null;
-        previewHolder.addCallback(surfaceCallback);
-*/
+
+        preview = (RatioGLSurfaceView)view.findViewById(R.id.glSurfaceView);
+        cameraExperimentSensor.setPreviewSurface(preview);
 
         preview.setVisibility(INVISIBLE);
-
-        glSurfaceView = (RatioGLSurfaceView)view.findViewById(R.id.glSurfaceView);
-        glSurfaceView.setEGLContextClientVersion(2);
-        glSurfaceView.setRenderer(cameraExperimentSensor.createCameraPreviewRender());
-        glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-        glSurfaceView.setPreserveEGLContextOnPause(true);
-
-        //glSurfaceView.setSurfaceTexture(cameraExperimentSensor.getCameraSurfaceTexture());
 
         camera.startPreview();
 
@@ -154,9 +144,6 @@ class CameraExperimentView extends AbstractExperimentSensorView {
     private void setRatio() {
         preview.setRatio(cameraExperimentSensor.getPreviewRatio());
         preview.requestLayout();
-
-        glSurfaceView.setRatio(cameraExperimentSensor.getPreviewRatio());
-        glSurfaceView.requestLayout();
     }
 }
 
@@ -166,8 +153,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
     private CameraSensorData experimentData;
 
     private Camera camera = null;
-    private MediaRecorder recorder = null;
-    private TimeLapseRecording timeLapseRecording;
+    private VideoRecorder videoRecorder;
 
     private int cameraId = 0;
     private int rotation;
@@ -217,8 +203,8 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         return timeLapseEnabled;
     }
 
-    public GLSurfaceView.Renderer createCameraPreviewRender() {
-        return new CameraPreviewRender(timeLapseRecording);
+    public void setPreviewSurface(RatioGLSurfaceView previewSurface) {
+        videoRecorder.setPreviewSurface(previewSurface);
     }
 
     /**
@@ -300,7 +286,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         onCamcorderProfileChanged(newVideoSettings);
 
         try {
-            timeLapseRecording = new TimeLapseRecording(camera,
+            videoRecorder = new VideoRecorder(camera,
                     CamcorderProfile.get(cameraId, selectedVideoSettings.cameraProfile));
         } catch (IOException e) {
             e.printStackTrace();
@@ -333,14 +319,9 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
         orientationEventListener.disable();
 
-        if (timeLapseRecording != null) {
-            timeLapseRecording.release();
-            timeLapseRecording = null;
-        }
-        if (recorder != null) {
-            recorder.reset();
-            recorder.release();
-            recorder = null;
+        if (videoRecorder != null) {
+            videoRecorder.release();
+            videoRecorder = null;
         }
     }
 
@@ -488,7 +469,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
 //      camera.startPreview();
 
-        timeLapseRecording.startRecording(videoFile.getPath());
+        videoRecorder.startRecording(videoFile.getPath());
 /*
         recorder.setOutputFile(videoFile.getPath());
 
@@ -517,8 +498,8 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         recorder.reset();
 */
         try {
-            timeLapseRecording.stopRecording();
-            timeLapseRecording.release();
+            videoRecorder.stopRecording();
+            videoRecorder.release();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
