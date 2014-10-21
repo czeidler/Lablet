@@ -89,7 +89,11 @@ public class VideoFrameView extends RatioSurfaceView {
         videoFilePath = path;
 
         MediaExtractor extractor = new MediaExtractor();
-        extractor.setDataSource(videoFilePath);
+        try {
+            extractor.setDataSource(videoFilePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         for (int i = 0; i < extractor.getTrackCount(); i++) {
             MediaFormat format = extractor.getTrackFormat(i);

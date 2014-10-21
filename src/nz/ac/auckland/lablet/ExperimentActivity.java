@@ -617,7 +617,6 @@ public class ExperimentActivity extends FragmentActivity {
         try {
             for (IExperimentSensor experiment : getActiveSensors())
                 experiment.startRecording();
-
         } catch (Exception e) {
             e.printStackTrace();
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
