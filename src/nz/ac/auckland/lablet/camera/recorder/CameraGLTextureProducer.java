@@ -11,8 +11,6 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.opengl.EGL14;
 import android.opengl.EGLContext;
-import android.opengl.EGLDisplay;
-import android.opengl.EGLSurface;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,18 +20,25 @@ import java.util.List;
 /**
  * Sets up a texture for the camera stream and notifies listeners about new frames that arrived from the camera.
  */
-public class CameraGLTextureProducer {
+public class CameraGLTextureProducer implements IGLContextHost.IChild {
     public interface IListener {
         void onNewFrame();
     }
 
     final List<IListener> listeners = new ArrayList<>();
-    final private int textureId;
-    final private SurfaceTexture surfaceTexture;
-    final private EGLContext sharedContext;
+    private int textureId;
+    private SurfaceTexture surfaceTexture;
+    private EGLContext sharedContext;
+    private Camera camera;
 
+    private IGLContextHost host;
 
-    public CameraGLTextureProducer(Camera camera) throws IOException {
+    public CameraGLTextureProducer(Camera camera) {
+        this.camera = camera;
+    }
+
+    @Override
+    public void onContextReady() throws IOException {
         this.textureId = TextureCreator.create();
         this.surfaceTexture = new SurfaceTexture(textureId);
         this.surfaceTexture.setOnFrameAvailableListener(cameraInputListener);
@@ -42,6 +47,17 @@ public class CameraGLTextureProducer {
         camera.stopPreview();
         camera.setPreviewTexture(surfaceTexture);
         camera.startPreview();
+    }
+
+    @Override
+    public void setHost(IGLContextHost host) {
+        this.host = host;
+    }
+
+    @Override
+    public void onRequestedContextIsCurrent() {
+        if (surfaceTexture != null)
+            surfaceTexture.updateTexImage();
     }
 
     public EGLContext getSharedContext() {
@@ -64,6 +80,8 @@ public class CameraGLTextureProducer {
             = new SurfaceTexture.OnFrameAvailableListener() {
         @Override
         public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+            host.requestContextCurrent();
+
             for (IListener listener : listeners)
                 listener.onNewFrame();
         }

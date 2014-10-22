@@ -22,14 +22,12 @@ import android.widget.PopupMenu;
 import android.widget.VideoView;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.camera.recorder.CameraGLTextureProducer;
-import nz.ac.auckland.lablet.camera.recorder.TextureRender;
+import nz.ac.auckland.lablet.camera.recorder.CameraPreviewRender;
 import nz.ac.auckland.lablet.camera.recorder.VideoRecorder;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.RatioGLSurfaceView;
 
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,48 +42,6 @@ class CameraExperimentView extends AbstractExperimentSensorView {
     final private CameraExperimentSensor cameraExperimentSensor;
     final private Camera camera;
 
-    class CameraPreviewRender implements GLSurfaceView.Renderer {
-        private CameraGLTextureProducer producer;
-        private Camera camera;
-        private VideoRecorder videoRecorder;
-        private TextureRender textureRender;
-
-        public CameraPreviewRender(Camera camera, VideoRecorder videoRecorder) {
-            this.camera = camera;
-            this.videoRecorder = videoRecorder;
-        }
-
-        @Override
-        public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
-            textureRender = new TextureRender();
-            try {
-                producer = new CameraGLTextureProducer(camera);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            }
-            producer.addListener(new CameraGLTextureProducer.IListener() {
-                @Override
-                public void onNewFrame() {
-                    preview.requestRender();
-                }
-            });
-            videoRecorder.setCameraSource(producer);
-        }
-
-        @Override
-        public void onSurfaceChanged(GL10 gl10, int i, int i2) {
-
-        }
-
-        @Override
-        public void onDrawFrame(GL10 gl10) {
-            // not very nice to call it here but it has to be called in a gl thread
-            producer.getSurfaceTexture().updateTexImage();
-            textureRender.render(producer.getGLTextureId(), producer.getSurfaceTexture());
-        }
-    }
-
     public CameraExperimentView(Context context, CameraExperimentSensor cameraExperimentSensor) {
         super(context);
 
@@ -96,11 +52,9 @@ class CameraExperimentView extends AbstractExperimentSensorView {
         View view = inflater.inflate(R.layout.camera_experiment_view, null, false);
         addView(view);
 
-
         preview = (RatioGLSurfaceView)view.findViewById(R.id.glSurfaceView);
         preview.setEGLContextClientVersion(2);
-        preview.setRenderer(new CameraPreviewRender(cameraExperimentSensor.getCamera(),
-                cameraExperimentSensor.getVideoRecorder()));
+        preview.setRenderer(new CameraPreviewRender(preview, cameraExperimentSensor.getCameraGLTextureProducer()));
         preview.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         preview.setPreserveEGLContextOnPause(true);
 
@@ -179,6 +133,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
     private CameraSensorData experimentData;
 
     private Camera camera = null;
+    private CameraGLTextureProducer producer = null;
     private VideoRecorder videoRecorder;
 
     private int cameraId = 0;
@@ -292,6 +247,8 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         if (camera == null)
             camera = Camera.open();
 
+        producer = new CameraGLTextureProducer(camera);
+
         // video size
         supportedVideoSettings = getSupportedCamcorderProfiles();
         // select the first or the best matching requested settings
@@ -312,6 +269,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         onCamcorderProfileChanged(newVideoSettings);
 
         videoRecorder = new VideoRecorder();
+        videoRecorder.setCameraSource(producer);
 
         // orientation
         rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
@@ -328,6 +286,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
                 }
             }
         };
+
         if (orientationEventListener.canDetectOrientation())
             orientationEventListener.enable();
     }
@@ -385,6 +344,10 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             experimentData.saveExperimentDataToFile(storageDir);
         }
         videoFile = null;
+    }
+
+    public CameraGLTextureProducer getCameraGLTextureProducer() {
+        return producer;
     }
 
     private Activity getActivity() {
