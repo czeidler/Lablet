@@ -18,6 +18,7 @@
  */
 package nz.ac.auckland.lablet.camera.recorder;
 
+import android.content.res.Configuration;
 import android.media.*;
 import android.opengl.*;
 import android.os.Handler;
@@ -221,6 +222,7 @@ public class VideoRecorder {
 
     private MediaCodec encoder;
     private Surface encoderInputSurface;
+    private int orientationHintDegrees = 0;
     private MediaMuxer muxer;
     private boolean muxerStarted = false;
     private int trackIndex;
@@ -274,7 +276,8 @@ public class VideoRecorder {
             return;
         codecInputSurface.makeCurrent();
 
-        textureRender.render(cameraGLTextureProducer.getGLTextureId(), cameraGLTextureProducer.getSurfaceTexture());
+        textureRender.render(cameraGLTextureProducer.getGLTextureId(), cameraGLTextureProducer.getSurfaceTexture(),
+                orientationHintDegrees);
 
         // Set the presentation time stamp from the SurfaceTexture's time stamp.  This
         // will be used by MediaMuxer to set the PTS in the video.
@@ -390,6 +393,7 @@ public class VideoRecorder {
                 prepareEncoder(camcorderProfile.videoFrameWidth, camcorderProfile.videoFrameHeight,
                         camcorderProfile.videoBitRate);
                 muxer = new MediaMuxer(outputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+                muxer.setOrientationHint(orientationHintDegrees);
 
                 handler.post(new Runnable() {
                     @Override
@@ -523,5 +527,9 @@ public class VideoRecorder {
                 }
             }
         }
+    }
+
+    public void setOrientationHint(int orientationHintDegrees) {
+        this.orientationHintDegrees = orientationHintDegrees;
     }
 }

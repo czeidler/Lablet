@@ -57,7 +57,9 @@ public class TextureRender {
                     "    gl_FragColor = texture2D(sTexture, vTextureCoord);\n" +
                     "}\n";
 
+    // model view projection
     private float[] mMVPMatrix = new float[16];
+    // texture
     private float[] mSTMatrix = new float[16];
 
     private int mProgram;
@@ -90,6 +92,10 @@ public class TextureRender {
     }
 
     public void render(int textureId, SurfaceTexture st) {
+        render(textureId, st, 0);
+    }
+
+    public void render(int textureId, SurfaceTexture st, int rotation) {
         checkGlError("onDrawFrame start");
         st.getTransformMatrix(mSTMatrix);
 
@@ -118,6 +124,9 @@ public class TextureRender {
         checkGlError("glEnableVertexAttribArray maTextureHandle");
 
         Matrix.setIdentityM(mMVPMatrix, 0);
+        if (rotation != 0)
+            Matrix.rotateM(mMVPMatrix, 0, rotation, 0f, 0f, 1f);
+
         GLES20.glUniformMatrix4fv(muMVPMatrixHandle, 1, false, mMVPMatrix, 0);
         GLES20.glUniformMatrix4fv(muSTMatrixHandle, 1, false, mSTMatrix, 0);
 

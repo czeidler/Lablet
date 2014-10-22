@@ -490,9 +490,9 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         File outputDir = activity.getExternalCacheDir();
         videoFile = new File(outputDir, getVideoFileName());
 
-//      camera.startPreview();
-
+        videoRecorder.setOrientationHint(getHintRotation());
         videoRecorder.startRecording(CamcorderProfile.get(selectedVideoSettings.cameraProfile), videoFile.getPath());
+
 /*
         recorder.setOutputFile(videoFile.getPath());
 
@@ -513,7 +513,6 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         boolean dataTaken = true;
 
         videoRecorder.stopRecording();
-        //videoRecorder.release();
 
         try {
             camera.reconnect();
