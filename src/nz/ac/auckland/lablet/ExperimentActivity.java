@@ -620,7 +620,7 @@ public class ExperimentActivity extends FragmentActivity {
         } catch (Exception e) {
             e.printStackTrace();
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Unable to start recording!");
+            builder.setTitle("Unable to start recording! " + e.getMessage());
             builder.setNeutralButton("Ok", null);
             builder.create().show();
             setState(null);

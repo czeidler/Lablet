@@ -18,251 +18,44 @@
  */
 package nz.ac.auckland.lablet.camera.recorder;
 
-import android.graphics.SurfaceTexture;
-import android.hardware.Camera;
 import android.media.*;
 import android.opengl.*;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
-import nz.ac.auckland.lablet.views.RatioGLSurfaceView;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 
 
-// Fills the surfaceTexture with video frames
-// the texture has to be create using GL
-class CameraTextureSource {
-    final private SurfaceTexture surfaceTexture;
+class TextureCreator {
+    public static int create() {
+        int[] textures = new int[1];
+        GLES20.glGenTextures(1, textures, 0);
+        int textureID = textures[0];
 
-    public CameraTextureSource(Camera camera, int targetGLTextureId,
-                               SurfaceTexture.OnFrameAvailableListener inputListener) throws IOException {
-        this.surfaceTexture = new SurfaceTexture(targetGLTextureId);
-        this.surfaceTexture.setOnFrameAvailableListener(inputListener);
+        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureID);
+        checkGlError("glBindTexture mTextureID");
 
-        camera.stopPreview();
-        camera.setPreviewTexture(surfaceTexture);
-        camera.startPreview();
+        GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER,
+                GLES20.GL_NEAREST);
+        GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER,
+                GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_S,
+                GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_T,
+                GLES20.GL_CLAMP_TO_EDGE);
+        checkGlError("glTexParameter");
+
+        return textureID;
     }
 
-    public SurfaceTexture getSurfaceTexture() {
-        return surfaceTexture;
-    }
-}
-
-
-/**
- * Code for rendering a texture onto a surface using OpenGL ES 2.0.
- */
-class TextureRender {
-    private static final String TAG = "TextureRender";
-
-    private static final int FLOAT_SIZE_BYTES = 4;
-    private static final int TRIANGLE_VERTICES_DATA_STRIDE_BYTES = 5 * FLOAT_SIZE_BYTES;
-    private static final int TRIANGLE_VERTICES_DATA_POS_OFFSET = 0;
-    private static final int TRIANGLE_VERTICES_DATA_UV_OFFSET = 3;
-    private final float[] mTriangleVerticesData = {
-            // X, Y, Z, U, V
-            -1.0f, -1.0f, 0, 0.f, 0.f,
-            1.0f, -1.0f, 0, 1.f, 0.f,
-            -1.0f,  1.0f, 0, 0.f, 1.f,
-            1.0f,  1.0f, 0, 1.f, 1.f,
-    };
-
-    private FloatBuffer mTriangleVertices;
-
-    private static final String VERTEX_SHADER =
-            "uniform mat4 uMVPMatrix;\n" +
-                    "uniform mat4 uSTMatrix;\n" +
-                    "attribute vec4 aPosition;\n" +
-                    "attribute vec4 aTextureCoord;\n" +
-                    "varying vec2 vTextureCoord;\n" +
-                    "void main() {\n" +
-                    "    gl_Position = uMVPMatrix * aPosition;\n" +
-                    "    vTextureCoord = (uSTMatrix * aTextureCoord).xy;\n" +
-                    "}\n";
-
-    private static final String FRAGMENT_SHADER =
-            "#extension GL_OES_EGL_image_external : require\n" +
-                    "precision mediump float;\n" +      // highp here doesn't seem to matter
-                    "varying vec2 vTextureCoord;\n" +
-                    "uniform samplerExternalOES sTexture;\n" +
-                    "void main() {\n" +
-                    "    gl_FragColor = texture2D(sTexture, vTextureCoord);\n" +
-                    "}\n";
-
-    private float[] mMVPMatrix = new float[16];
-    private float[] mSTMatrix = new float[16];
-
-    private int mProgram;
-    private int mTextureID = -12345;
-    private int muMVPMatrixHandle;
-    private int muSTMatrixHandle;
-    private int maPositionHandle;
-    private int maTextureHandle;
-
-    public TextureRender() {
-        init(mTextureID);
-    }
-
-    public TextureRender(int textureId) {
-        init(textureId);
-    }
-
-    public int getTextureId() {
-        return mTextureID;
-    }
-
-    public void drawFrame(SurfaceTexture st) {
-        checkGlError("onDrawFrame start");
-        st.getTransformMatrix(mSTMatrix);
-
-        // (optional) clear to green so we can see if we're failing to set pixels
-        GLES20.glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
-        GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
-
-        GLES20.glUseProgram(mProgram);
-        checkGlError("glUseProgram");
-
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, mTextureID);
-
-        mTriangleVertices.position(TRIANGLE_VERTICES_DATA_POS_OFFSET);
-        GLES20.glVertexAttribPointer(maPositionHandle, 3, GLES20.GL_FLOAT, false,
-                TRIANGLE_VERTICES_DATA_STRIDE_BYTES, mTriangleVertices);
-        checkGlError("glVertexAttribPointer maPosition");
-        GLES20.glEnableVertexAttribArray(maPositionHandle);
-        checkGlError("glEnableVertexAttribArray maPositionHandle");
-
-        mTriangleVertices.position(TRIANGLE_VERTICES_DATA_UV_OFFSET);
-        GLES20.glVertexAttribPointer(maTextureHandle, 2, GLES20.GL_FLOAT, false,
-                TRIANGLE_VERTICES_DATA_STRIDE_BYTES, mTriangleVertices);
-        checkGlError("glVertexAttribPointer maTextureHandle");
-        GLES20.glEnableVertexAttribArray(maTextureHandle);
-        checkGlError("glEnableVertexAttribArray maTextureHandle");
-
-        Matrix.setIdentityM(mMVPMatrix, 0);
-        GLES20.glUniformMatrix4fv(muMVPMatrixHandle, 1, false, mMVPMatrix, 0);
-        GLES20.glUniformMatrix4fv(muSTMatrixHandle, 1, false, mSTMatrix, 0);
-
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
-        checkGlError("glDrawArrays");
-
-        // IMPORTANT: on some devices, if you are sharing the external texture between two
-        // contexts, one context may not see updates to the texture unless you un-bind and
-        // re-bind it.  If you're not using shared EGL contexts, you don't need to bind
-        // texture 0 here.
-        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0);
-    }
-
-    /**
-     * Initializes GL state.  Call this after the EGL surface has been created and made current.
-     */
-    private void init(int textureId) {
-        mTriangleVertices = ByteBuffer.allocateDirect(
-                mTriangleVerticesData.length * FLOAT_SIZE_BYTES)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        mTriangleVertices.put(mTriangleVerticesData).position(0);
-
-        Matrix.setIdentityM(mSTMatrix, 0);
-
-        mProgram = createProgram(VERTEX_SHADER, FRAGMENT_SHADER);
-        if (mProgram == 0) {
-            throw new RuntimeException("failed creating program");
-        }
-        maPositionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
-        checkLocation(maPositionHandle, "aPosition");
-        maTextureHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
-        checkLocation(maTextureHandle, "aTextureCoord");
-
-        muMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
-        checkLocation(muMVPMatrixHandle, "uMVPMatrix");
-        muSTMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uSTMatrix");
-        checkLocation(muSTMatrixHandle, "uSTMatrix");
-
-        if (textureId < 0) {
-            int[] textures = new int[1];
-            GLES20.glGenTextures(1, textures, 0);
-
-            mTextureID = textures[0];
-
-            GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, mTextureID);
-            checkGlError("glBindTexture mTextureID");
-
-            GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER,
-                    GLES20.GL_NEAREST);
-            GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER,
-                    GLES20.GL_LINEAR);
-            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_S,
-                    GLES20.GL_CLAMP_TO_EDGE);
-            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_T,
-                    GLES20.GL_CLAMP_TO_EDGE);
-            checkGlError("glTexParameter");
-        } else
-            mTextureID = textureId;
-    }
-
-    private int loadShader(int shaderType, String source) {
-        int shader = GLES20.glCreateShader(shaderType);
-        checkGlError("glCreateShader type=" + shaderType);
-        GLES20.glShaderSource(shader, source);
-        GLES20.glCompileShader(shader);
-        int[] compiled = new int[1];
-        GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0);
-        if (compiled[0] == 0) {
-            Log.e(TAG, "Could not compile shader " + shaderType + ":");
-            Log.e(TAG, " " + GLES20.glGetShaderInfoLog(shader));
-            GLES20.glDeleteShader(shader);
-            shader = 0;
-        }
-        return shader;
-    }
-
-    private int createProgram(String vertexSource, String fragmentSource) {
-        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexSource);
-        if (vertexShader == 0) {
-            return 0;
-        }
-        int pixelShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentSource);
-        if (pixelShader == 0) {
-            return 0;
-        }
-
-        int program = GLES20.glCreateProgram();
-        if (program == 0) {
-            Log.e(TAG, "Could not create program");
-        }
-        GLES20.glAttachShader(program, vertexShader);
-        checkGlError("glAttachShader");
-        GLES20.glAttachShader(program, pixelShader);
-        checkGlError("glAttachShader");
-        GLES20.glLinkProgram(program);
-        int[] linkStatus = new int[1];
-        GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, 0);
-        if (linkStatus[0] != GLES20.GL_TRUE) {
-            Log.e(TAG, "Could not link program: ");
-            Log.e(TAG, GLES20.glGetProgramInfoLog(program));
-            GLES20.glDeleteProgram(program);
-            program = 0;
-        }
-        return program;
-    }
-
-    public void checkGlError(String op) {
+    public static void checkGlError(String op) {
         int error;
         while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
-            Log.e(TAG, op + ": glError " + error);
+            Log.e("Texture", op + ": glError " + error);
             throw new RuntimeException(op + ": glError " + error);
-        }
-    }
-
-    public static void checkLocation(int location, String label) {
-        if (location < 0) {
-            throw new RuntimeException("Unable to locate '" + label + "' in program");
         }
     }
 }
@@ -421,12 +214,11 @@ public class VideoRecorder {
     private static final int FRAME_RATE = 30;               // 30fps
     private static final int IFRAME_INTERVAL = 5;           // 5 seconds between I-frames
 
-    private Camera camera;
-    private CamcorderProfile cameraProfile;
+    private CameraGLTextureProducer cameraGLTextureProducer;
 
-    private TextureRender textureRender;
-    private CameraTextureSource cameraTextureSource;
     private CodecInputSurface codecInputSurface;
+    private TextureRender textureRender;
+
     private MediaCodec encoder;
     private Surface encoderInputSurface;
     private MediaMuxer muxer;
@@ -435,28 +227,29 @@ public class VideoRecorder {
     private Looper looper = null;
     private Handler handler = null;
 
-    private GLSurfaceView previewView;
-
     private Object lock = new Object();
+    private Object stoppingSem = new Object();
 
     private boolean isRecording = false;
-    private boolean stopRecording = false;
 
     private int recordedFrames = 0;
 
     // allocate one of these up front so we don't need to do it every time
     private MediaCodec.BufferInfo bufferInfo;
 
-    private SurfaceTexture.OnFrameAvailableListener cameraInputListener
-            = new SurfaceTexture.OnFrameAvailableListener() {
+    public VideoRecorder() {
+        reset();
+    }
+
+    private CameraGLTextureProducer.IListener frameListener = new CameraGLTextureProducer.IListener() {
         @Override
-        public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+        public void onNewFrame() {
             synchronized (lock) {
                 if (handler != null) {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            onNewFrame();
+                            handleNewFrame();
                         }
                     });
                 }
@@ -464,26 +257,42 @@ public class VideoRecorder {
         }
     };
 
-    public VideoRecorder(Camera camera, CamcorderProfile camcorderProfile) throws IOException {
-        this.camera = camera;
-        this.cameraProfile = camcorderProfile;
+    private void handleNewFrame() {
+        if (isRecording) {
+            // Feed any pending encoder output into the muxer.
+            drainEncoder(false);
 
-        reset();
+            if ((recordedFrames % 1) == 0)
+                sendFrameToEncoder();
+
+            recordedFrames++;
+        }
     }
 
-    public SurfaceTexture getCameraSurfaceTexture() {
-        if (cameraTextureSource == null)
-            return null;
-        return cameraTextureSource.getSurfaceTexture();
+    private void sendFrameToEncoder() {
+        if (codecInputSurface == null)
+            return;
+        codecInputSurface.makeCurrent();
+
+        textureRender.render(cameraGLTextureProducer.getGLTextureId(), cameraGLTextureProducer.getSurfaceTexture());
+
+        // Set the presentation time stamp from the SurfaceTexture's time stamp.  This
+        // will be used by MediaMuxer to set the PTS in the video.
+        codecInputSurface.setPresentationTime(cameraGLTextureProducer.getSurfaceTexture().getTimestamp());
+
+        // Submit it to the encoder.  The eglSwapBuffers call will block if the input
+        // is full, which would be bad if it stayed full until we dequeued an output
+        // buffer (which we can't do, since we're stuck here).  So long as we fully drain
+        // the encoder before supplying additional input, the system guarantees that we
+        // can supply another frame without blocking.
+        codecInputSurface.swapBuffers();
     }
 
     public void reset() {
         synchronized (lock) {
-            isRecording = false;
-            stopRecording = false;
-            recordedFrames = 0;
-
             release();
+
+            recordedFrames = 0;
 
             // start recording thread
             new Thread(recordRunnable, "VideoRecorder").start();
@@ -494,6 +303,9 @@ public class VideoRecorder {
                     e.printStackTrace();
                 }
             }
+
+            if (cameraGLTextureProducer != null)
+                setCameraSource(cameraGLTextureProducer);
         }
     }
 
@@ -505,14 +317,6 @@ public class VideoRecorder {
                 looper = null;
             }
         }
-    }
-
-    public void setPreviewSurface(GLSurfaceView preview) {
-        previewView = preview;
-        previewView.setEGLContextClientVersion(2);
-        previewView.setRenderer(new CameraPreviewRender(this));
-        previewView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-        previewView.setPreserveEGLContextOnPause(true);
     }
 
     private void prepareEncoder(int width, int height, int bitRate) {
@@ -552,81 +356,52 @@ public class VideoRecorder {
             }
             Looper.loop();
 
-            // clean up
-            if (encoder != null) {
-                encoder.stop();
-                encoder.release();
-                encoder = null;
-            }
-            if (codecInputSurface != null) {
-                codecInputSurface.release();
-                codecInputSurface = null;
-            }
-            if (muxer != null) {
-                if (muxerStarted) {
-                    muxer.stop();
-                    muxerStarted = false;
-                }
-                muxer.release();
-                muxer = null;
-            }
+            cleanUpRecording();
         }
     };
 
-
-    private void onNewFrame() {
-        SurfaceTexture surfaceTexture = cameraTextureSource.getSurfaceTexture();
-        surfaceTexture.updateTexImage();
-
-        if (isRecording) {
-            if (stopRecording) {
-                isRecording = false;
-                // send end-of-stream to encoder, and drain remaining output
-                drainEncoder(true);
-
-                if (muxerStarted) {
-                    muxer.stop();
-                    muxerStarted = false;
-                    muxer.release();
-                    muxer = null;
-                }
-                return;
-            }
-
-            // Feed any pending encoder output into the muxer.
-            drainEncoder(false);
-
-            if ((recordedFrames % 1) == 0)
-                sendFrameToEncoder(surfaceTexture);
-
-            recordedFrames++;
+    private void cleanUpRecording() {
+        // clean up
+        if (encoder != null) {
+            encoder.stop();
+            encoder.release();
+            encoder = null;
         }
 
-        if (previewView != null)
-            previewView.requestRender();
+        if (muxer != null) {
+            if (muxerStarted) {
+                muxer.stop();
+                muxerStarted = false;
+            }
+            muxer.release();
+            muxer = null;
+        }
+
+        if (codecInputSurface != null) {
+            codecInputSurface.release();
+            codecInputSurface = null;
+        }
+        isRecording = false;
     }
 
-    private void sendFrameToEncoder(SurfaceTexture surfaceTexture) {
-        codecInputSurface.makeCurrent();
-
-        textureRender.drawFrame(surfaceTexture);
-
-        // Set the presentation time stamp from the SurfaceTexture's time stamp.  This
-        // will be used by MediaMuxer to set the PTS in the video.
-        codecInputSurface.setPresentationTime(surfaceTexture.getTimestamp());
-
-        // Submit it to the encoder.  The eglSwapBuffers call will block if the input
-        // is full, which would be bad if it stayed full until we dequeued an output
-        // buffer (which we can't do, since we're stuck here).  So long as we fully drain
-        // the encoder before supplying additional input, the system guarantees that we
-        // can supply another frame without blocking.
-        codecInputSurface.swapBuffers();
-    }
-
-    public void startRecording(String outputPath) {
+    public void startRecording(CamcorderProfile camcorderProfile, String outputPath) {
         synchronized (lock) {
             try {
+                prepareEncoder(camcorderProfile.videoFrameWidth, camcorderProfile.videoFrameHeight,
+                        camcorderProfile.videoBitRate);
                 muxer = new MediaMuxer(outputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        synchronized (lock) {
+                            codecInputSurface = new CodecInputSurface(encoderInputSurface,
+                                    cameraGLTextureProducer.getSharedContext());
+                            codecInputSurface.makeCurrent();
+                            textureRender = new TextureRender();
+                        }
+                    }
+                });
             } catch (IOException ioe) {
                 throw new RuntimeException("MediaMuxer creation failed", ioe);
             }
@@ -637,36 +412,37 @@ public class VideoRecorder {
         }
     }
 
-    public void stopRecording() throws InterruptedException {
-        synchronized (lock) {
-            if (isRecording)
-                stopRecording = true;
+    public void stopRecording() {
+        if (!isRecording)
+            return;
+
+        synchronized (stoppingSem) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    isRecording = false;
+                    // send end-of-stream to encoder, and drain remaining output
+                    drainEncoder(true);
+                    cleanUpRecording();
+                    reset();
+
+                    synchronized (stoppingSem) {
+                        stoppingSem.notifyAll();
+                    }
+                }
+            });
+
+            try {
+                stoppingSem.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-
-    public void setInputSurfaceTexture(final int textureId) {
-        final EGLContext sharedContext = EGL14.eglGetCurrentContext();
-
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (lock) {
-                    try {
-                        prepareEncoder(cameraProfile.videoFrameWidth, cameraProfile.videoFrameHeight, cameraProfile.videoBitRate);
-
-                        codecInputSurface = new CodecInputSurface(encoderInputSurface, sharedContext);
-                        codecInputSurface.makeCurrent();
-
-                        textureRender = new TextureRender(textureId);
-                        cameraTextureSource = new CameraTextureSource(camera, textureId, cameraInputListener);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return;
-                    }
-                }
-            }
-        });
+    public void setCameraSource(final CameraGLTextureProducer producer) {
+        cameraGLTextureProducer = producer;
+        cameraGLTextureProducer.addListener(frameListener);
     }
 
     /**
