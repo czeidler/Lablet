@@ -15,13 +15,13 @@
     <option name="OPTION_DOCUMENT_TAG_VERSION" value="false" />
     <option name="OPTION_DOCUMENT_TAG_DEPRECATED" value="true" />
     <option name="OPTION_DEPRECATED_LIST" value="true" />
-    <option name="OTHER_OPTIONS" value="-doclet org.jboss.apiviz.APIviz -docletpath $MAVEN_REPOSITORY$/org/jboss/apiviz/apiviz/1.3.2.GA/apiviz-1.3.2.GA.jar -bootclasspath /home/lec/adt-bundle-linux-x86_64-20131030/sdk/platforms/android-19/android.jar" />
+    <option name="OTHER_OPTIONS" value="-doclet org.jboss.apiviz.APIviz -docletpath /home/lec/.m2/repository/org/jboss/apiviz/apiviz/1.3.2.GA/apiviz-1.3.2.GA.jar -bootclasspath /home/lec/adt-bundle-linux-x86_64-20131030/sdk/platforms/android-19/android.jar" />
     <option name="HEAP_SIZE" />
     <option name="LOCALE" />
     <option name="OPEN_IN_BROWSER" value="true" />
     <option name="OPTION_INCLUDE_LIBS" value="true" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Android API 17 Platform" project-jdk-type="Android SDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" assert-keyword="true" jdk-15="true" project-jdk-name="Android API 18 Platform" project-jdk-type="Android SDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>
