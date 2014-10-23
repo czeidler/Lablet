@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
+import nz.ac.auckland.lablet.misc.NaturalOrderComparator;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.*;
 import nz.ac.auckland.lablet.script.Script;
@@ -26,6 +27,8 @@ import nz.ac.auckland.lablet.script.ScriptRunnerActivity;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -380,8 +383,9 @@ public class ScriptHomeActivity extends Activity {
         existingScriptList.clear();
         File scriptDir = getScriptUserDataDir(this);
         if (scriptDir.isDirectory()) {
-            File[] children = scriptDir.listFiles();
-            for (File child : children != null ? children : new File[0])
+            List<File> children = Arrays.asList(scriptDir.listFiles());
+            Collections.sort(children, Collections.reverseOrder(new NaturalOrderComparator()));
+            for (File child : children)
                 existingScriptList.add(new CheckBoxListEntry(child.getName(), checkBoxListEntryListener));
         }
 

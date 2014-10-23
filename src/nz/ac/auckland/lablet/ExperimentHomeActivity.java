@@ -20,11 +20,14 @@ import android.widget.*;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
 import nz.ac.auckland.lablet.experiment.ExperimentPluginFactory;
 import nz.ac.auckland.lablet.experiment.ISensorPlugin;
+import nz.ac.auckland.lablet.misc.NaturalOrderComparator;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.*;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -384,8 +387,9 @@ public class ExperimentHomeActivity extends Activity {
         experimentList.clear();
         File experimentDir = ExperimentAnalysisBaseActivity.getDefaultExperimentBaseDir(this);
         if (experimentDir.isDirectory()) {
-            File[] children = experimentDir.listFiles();
-            for (File child : children != null ? children : new File[0])
+            List<File> children = Arrays.asList(experimentDir.listFiles());
+            Collections.sort(children, Collections.reverseOrder(new NaturalOrderComparator()));
+            for (File child : children)
                 experimentList.add(new CheckBoxListEntry(child.getName(), checkBoxListEntryListener));
         }
 
