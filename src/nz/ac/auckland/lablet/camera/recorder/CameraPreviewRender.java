@@ -7,6 +7,7 @@
  */
 package nz.ac.auckland.lablet.camera.recorder;
 
+import android.opengl.EGL14;
 import android.opengl.GLSurfaceView;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -33,7 +34,14 @@ public class CameraPreviewRender implements GLSurfaceView.Renderer, IGLContextHo
     }
 
     @Override
-    public void onSurfaceChanged(GL10 gl10, int i, int i2) {
+    public void onSurfaceChanged(GL10 gl10, int width, int height) {
+        gl10.glViewport(0, 0, width, height);
+        // for a fixed camera, set the projection too
+        float ratio = (float) width / height;
+        gl10.glMatrixMode(GL10.GL_PROJECTION);
+        gl10.glLoadIdentity();
+        gl10.glFrustumf(-ratio, ratio, -1, 1, 1, 10);
+
         try {
             child.onContextReady();
         } catch (IOException e) {
