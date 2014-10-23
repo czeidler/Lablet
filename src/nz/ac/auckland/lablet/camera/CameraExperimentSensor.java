@@ -393,7 +393,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
     }
 
     private void showTimeLapseSettingsDialog() {
-        TimeLapseSettingsDialog dialog = new TimeLapseSettingsDialog(getActivity(), this);
+        FrameRateSettingsDialog dialog = new FrameRateSettingsDialog(getActivity(), this);
         dialog.show();
     }
 

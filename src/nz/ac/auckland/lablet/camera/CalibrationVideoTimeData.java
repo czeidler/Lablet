@@ -126,31 +126,3 @@ public class CalibrationVideoTimeData implements ITimeData {
         setAnalysisFrameRate(analysisFrameRate);
     }
 }
-
-
-class TimeLapseRealTimeData implements ITimeData {
-    final private CalibrationVideoTimeData calibrationVideoTimeData;
-    final private float captureRate;
-
-    public TimeLapseRealTimeData(CalibrationVideoTimeData calibrationVideoTimeData, float captureRate) {
-        this.calibrationVideoTimeData = calibrationVideoTimeData;
-        this.captureRate = captureRate;
-    }
-
-    @Override
-    public int getSize() {
-        return calibrationVideoTimeData.getNumberOfFrames();
-    }
-
-    @Override
-    public float getTimeAt(float index) {
-        return getFrameTime(Math.round(index));
-    }
-
-    private float getFrameTime(int frame) {
-        final float videoFrameRate = calibrationVideoTimeData.getAnalysisFrameRate();
-        return (calibrationVideoTimeData.getAnalysisVideoStart() + (float)1000 / videoFrameRate * frame)
-                * videoFrameRate / captureRate;
-    }
-
-}

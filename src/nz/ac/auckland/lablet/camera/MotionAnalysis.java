@@ -59,11 +59,9 @@ public class MotionAnalysis implements ISensorAnalysis {
 
         calibrationXY = new CalibrationXY();
         calibrationVideoTimeData = new CalibrationVideoTimeData(sensorData.getVideoDuration());
-        if (sensorData.isTimeLapseData()) {
-            calibrationVideoTimeData.setAnalysisFrameRate(30);
-            timeData = new TimeLapseRealTimeData(calibrationVideoTimeData, sensorData.getTimeLapseCaptureRate());
-        } else
-            timeData = calibrationVideoTimeData;
+        if ((int)sensorData.getRecordingFrameRate() != 30)
+            calibrationVideoTimeData.setAnalysisFrameRate(sensorData.getRecordingFrameRate());
+        timeData = calibrationVideoTimeData;
 
         frameDataModel = new FrameDataModel();
         frameDataModel.setNumberOfFrames(calibrationVideoTimeData.getNumberOfFrames());

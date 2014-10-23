@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class TimeLapseSettingsDialog extends AlertDialog {
+public class FrameRateSettingsDialog extends AlertDialog {
     private List<Float> intervalList = new ArrayList<>();
     final private CameraExperimentSensor cameraExperimentSensor;
     private NumberPicker numberPicker;
 
-    public TimeLapseSettingsDialog(Context context, CameraExperimentSensor cameraExperimentSensor) {
+    public FrameRateSettingsDialog(Context context, CameraExperimentSensor cameraExperimentSensor) {
         super(context);
 
         this.cameraExperimentSensor = cameraExperimentSensor;

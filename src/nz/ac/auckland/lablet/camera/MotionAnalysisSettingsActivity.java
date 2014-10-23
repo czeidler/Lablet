@@ -47,7 +47,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     private EditText editVideoEnd = null;
     private EditText editFrames = null;
     private EditText editFrameLength = null;
-    private CameraRunSettingsHelpView helpView = null;
+    private MotionAnalysisSettingsHelpView helpView = null;
 
     private float videoStartValue;
     private float videoEndValue;
@@ -254,7 +254,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
 
         // initial views with values
         View frameRateLayout = findViewById(R.id.frameRateLayout);
-        if (cameraSensorData.isTimeLapseData())
+        if ((int)cameraSensorData.getRecordingFrameRate() != 30)
             frameRateLayout.setVisibility(View.INVISIBLE);
         calculateFrameRateValues(videoFrameView.getVideoFrameRate());
         frameRatePicker.setMinValue(0);
@@ -279,7 +279,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
             point.x = 1;
         startEndSeekBar.getMarkerDataModel().getMarkerDataAt(1).setPosition(point);
 
-        helpView = (CameraRunSettingsHelpView)findViewById(R.id.cameraSettingsHelp);
+        helpView = (MotionAnalysisSettingsHelpView)findViewById(R.id.cameraSettingsHelp);
         assert helpView != null;
         Bundle options = getIntent().getBundleExtra("options");
         if (options != null && options.getBoolean("start_with_help", false))
@@ -386,13 +386,6 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     }
 
     private int toDisplayTime(float videoTime) {
-        final float videoFrameRate = 30f;
-
-        if (cameraSensorData.isTimeLapseData()) {
-            float value = videoTime * videoFrameRate / cameraSensorData.getTimeLapseCaptureRate();
-            // fix possible rounding errors
-            return Math.round(value / 10) * 10;
-        }
         return Math.round(videoTime);
     }
 

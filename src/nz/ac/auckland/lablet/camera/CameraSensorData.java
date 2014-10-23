@@ -28,7 +28,7 @@ public class CameraSensorData extends AbstractSensorData {
     private int videoWidth;
     private int videoHeight;
 
-    private float timeLapseCaptureRate;
+    private float recordingFrameRate;
 
     public CameraSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
         super(experimentContext, sourceSensor);
@@ -61,7 +61,7 @@ public class CameraSensorData extends AbstractSensorData {
 
         setVideoFileName(storageDir, bundle.getString("videoName"));
 
-        timeLapseCaptureRate = bundle.getFloat("timeLapseCaptureRate", -1);
+        recordingFrameRate = bundle.getFloat("recordingFrameRate", -1);
         return true;
     }
 
@@ -71,8 +71,8 @@ public class CameraSensorData extends AbstractSensorData {
 
         bundle.putString("videoName", videoFileName);
 
-        if (timeLapseCaptureRate > 0)
-            bundle.putFloat("timeLapseCaptureRate", timeLapseCaptureRate);
+        if (recordingFrameRate > 0)
+            bundle.putFloat("recordingFrameRate", recordingFrameRate);
 
         return bundle;
     }
@@ -117,15 +117,11 @@ public class CameraSensorData extends AbstractSensorData {
         return videoDuration;
     }
 
-    public void setRecordingFrameRate(float timeLapseCaptureRate) {
-        this.timeLapseCaptureRate = timeLapseCaptureRate;
+    public void setRecordingFrameRate(float recordingFrameRate) {
+        this.recordingFrameRate = recordingFrameRate;
     }
 
-    public boolean isTimeLapseData() {
-        return timeLapseCaptureRate > 0;
-    }
-
-    public float getTimeLapseCaptureRate() {
-        return timeLapseCaptureRate;
+    public float getRecordingFrameRate() {
+        return recordingFrameRate;
     }
 }

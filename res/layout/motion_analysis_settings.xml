@@ -113,6 +113,6 @@
 
     <view android:layout_width="match_parent"
         android:layout_height="match_parent"
-        class="nz.ac.auckland.lablet.camera.CameraRunSettingsHelpView" android:id="@+id/cameraSettingsHelp"
+        class="nz.ac.auckland.lablet.camera.MotionAnalysisSettingsHelpView" android:id="@+id/cameraSettingsHelp"
         android:visibility="invisible" />
 </RelativeLayout>

@@ -13,14 +13,14 @@ import nz.ac.auckland.lablet.R;
 
 
 /**
- * An overlay help view for the {@link nz.ac.auckland.lablet.camera.CameraRunSettingsHelpView}.
+ * An overlay help view for the {@link nz.ac.auckland.lablet.camera.MotionAnalysisSettingsHelpView}.
  */
-public class CameraRunSettingsHelpView extends FrameLayout {
+public class MotionAnalysisSettingsHelpView extends FrameLayout {
     private ImageView frameRateImageView;
     private ImageView rangeImageView;
     private TextView rangeTextView;
 
-    public CameraRunSettingsHelpView(Context context, AttributeSet attrs) {
+    public MotionAnalysisSettingsHelpView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         LayoutInflater inflater = (LayoutInflater)context.getSystemService
