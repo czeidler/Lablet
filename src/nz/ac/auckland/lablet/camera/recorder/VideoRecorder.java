@@ -529,7 +529,7 @@ public class VideoRecorder {
         }
     }
 
-    public void setOrientationHint(int orientationHintDegrees) {
+    public void setRotation(int orientationHintDegrees) {
         this.orientationHintDegrees = orientationHintDegrees;
     }
 }
