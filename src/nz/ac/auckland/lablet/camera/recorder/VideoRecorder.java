@@ -29,37 +29,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 
-class TextureCreator {
-    public static int create() {
-        int[] textures = new int[1];
-        GLES20.glGenTextures(1, textures, 0);
-        int textureID = textures[0];
-
-        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureID);
-        checkGlError("glBindTexture mTextureID");
-
-        GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER,
-                GLES20.GL_NEAREST);
-        GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER,
-                GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_S,
-                GLES20.GL_CLAMP_TO_EDGE);
-        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_T,
-                GLES20.GL_CLAMP_TO_EDGE);
-        checkGlError("glTexParameter");
-
-        return textureID;
-    }
-
-    public static void checkGlError(String op) {
-        int error;
-        while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
-            Log.e("Texture", op + ": glError " + error);
-            throw new RuntimeException(op + ": glError " + error);
-        }
-    }
-}
-
 /**
  * Holds state associated with a Surface used for MediaCodec encoder input.
  * <p>
