@@ -3,7 +3,7 @@
           package="nz.ac.auckland.lablet"
           android:versionCode="290"
           android:versionName="3.0Dev">
-    <uses-sdk android:minSdkVersion="17"/>
+    <uses-sdk android:minSdkVersion="18"/>
     <application android:label="@string/app_name" android:icon="@drawable/ic_tracker">
         <activity android:name="nz.ac.auckland.lablet.ExperimentHomeActivity"
                   android:icon="@drawable/ic_tracker"
