@@ -39,10 +39,10 @@ public class CameraGLTextureProducer implements IGLContextHost.IChild {
 
     @Override
     public void onContextReady() throws IOException {
-        this.textureId = TextureCreator.create();
-        this.surfaceTexture = new SurfaceTexture(textureId);
-        this.surfaceTexture.setOnFrameAvailableListener(cameraInputListener);
-        this.sharedContext = EGL14.eglGetCurrentContext();
+        textureId = TextureCreator.create();
+        surfaceTexture = new SurfaceTexture(textureId);
+        surfaceTexture.setOnFrameAvailableListener(cameraInputListener);
+        sharedContext = EGL14.eglGetCurrentContext();
 
         camera.stopPreview();
         camera.setPreviewTexture(surfaceTexture);
