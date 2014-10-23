@@ -197,7 +197,7 @@ public class VideoRecorder {
     private Looper looper = null;
     private Handler handler = null;
 
-    private Object lock = new Object();
+    final private Object lock = new Object();
 
     private boolean isRecording = false;
 
@@ -267,7 +267,21 @@ public class VideoRecorder {
             recordedFrames = 0;
 
             // start recording thread
-            new Thread(recordRunnable, "VideoRecorder").start();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (lock) {
+                        Looper.prepare();
+                        looper = Looper.myLooper();
+                        handler = new Handler(Looper.myLooper());
+                        lock.notify();
+                    }
+                    Looper.loop();
+
+                    cleanUpRecording();
+                }
+            }, "VideoRecorder").start();
+
             while (handler == null) {
                 try {
                     lock.wait();
@@ -316,21 +330,6 @@ public class VideoRecorder {
         encoderInputSurface = encoder.createInputSurface();
         encoder.start();
     }
-
-    private Runnable recordRunnable = new Runnable() {
-        @Override
-        public void run() {
-            synchronized (lock) {
-                Looper.prepare();
-                looper = Looper.myLooper();
-                handler = new Handler(Looper.myLooper());
-                lock.notify();
-            }
-            Looper.loop();
-
-            cleanUpRecording();
-        }
-    };
 
     private void cleanUpRecording() {
         // clean up
@@ -392,10 +391,10 @@ public class VideoRecorder {
 
         final Object stoppingSem = new Object();
         synchronized (stoppingSem) {
+            isRecording = false;
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    isRecording = false;
                     // send end-of-stream to encoder, and drain remaining output
                     drainEncoder(true);
                     // stop recording
@@ -408,7 +407,7 @@ public class VideoRecorder {
                 }
             });
 
-            while (isRecording) {
+            while (muxer != null) {
                 try {
                     stoppingSem.wait();
                 } catch (InterruptedException e) {
