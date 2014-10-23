@@ -117,7 +117,7 @@ public class CameraSensorData extends AbstractSensorData {
         return videoDuration;
     }
 
-    public void setTimeLapseCaptureRate(float timeLapseCaptureRate) {
+    public void setRecordingFrameRate(float timeLapseCaptureRate) {
         this.timeLapseCaptureRate = timeLapseCaptureRate;
     }
 

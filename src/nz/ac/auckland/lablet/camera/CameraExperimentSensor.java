@@ -30,6 +30,7 @@ import nz.ac.auckland.lablet.views.RatioGLSurfaceView;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -59,8 +60,6 @@ class CameraExperimentView extends AbstractExperimentSensorView {
         preview.setPreserveEGLContextOnPause(true);
 
         preview.setVisibility(INVISIBLE);
-
-        camera.startPreview();
 
         videoView = (VideoView)view.findViewById(R.id.videoView);
         MediaController mediaController = new MediaController(context);
@@ -166,26 +165,14 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
     final static public String SENSOR_NAME = "Camera";
 
-    private boolean timeLapseEnabled = false;
-    private float timeLapseCaptureRate = 1f;
+    private float recordingFrameRate = 30f;
 
-    public void setTimeLapse(boolean enabled, float captureRate) {
-        timeLapseEnabled = enabled;
-        timeLapseCaptureRate = captureRate;
-
-        onCamcorderProfileChanged(selectedVideoSettings);
+    public void setRecordingFrameRate(float recordingFrameRate) {
+        this.recordingFrameRate = recordingFrameRate;
     }
 
-    public float getTimeLapseCaptureRate() {
-        return timeLapseCaptureRate;
-    }
-
-    public boolean isTimeLapseEnabled() {
-        return timeLapseEnabled;
-    }
-
-    public VideoRecorder getVideoRecorder() {
-        return videoRecorder;
+    public float getRecordingFrameRate() {
+        return recordingFrameRate;
     }
 
     /**
@@ -339,8 +326,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             if (!moveTempFilesToExperimentDir(storageDir))
                 throw new IOException();
             experimentData.setVideoFileName(storageDir, getVideoFileName());
-            if (isTimeLapseEnabled())
-                experimentData.setTimeLapseCaptureRate(timeLapseCaptureRate);
+            experimentData.setRecordingFrameRate(recordingFrameRate);
             experimentData.saveExperimentDataToFile(storageDir);
         }
         videoFile = null;
@@ -375,11 +361,8 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         final int TIME_LAPSE_GROUP_ID = 2;
         final int TIME_LAPSE_ITEM_ID = RESOLUTION_ITEM_BASE + supportedVideoSettings.size();
         if (supportsTimeLapse()) {
-            String timeLapseLabel = "Time Lapse";
-            if (isTimeLapseEnabled())
-                timeLapseLabel += " (ON)";
-            else
-                timeLapseLabel += " (OFF)";
+            String timeLapseLabel = "Recording Frame Rate";
+            timeLapseLabel += " (" + new DecimalFormat("#.##").format(recordingFrameRate) + "fps)";
             popup.getMenu().add(TIME_LAPSE_GROUP_ID, TIME_LAPSE_ITEM_ID, Menu.NONE, timeLapseLabel);
             popup.getMenu().getItem(supportedVideoSettings.indexOf(selectedVideoSettings)).setChecked(true);
 
@@ -418,56 +401,18 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
     public void startPreview() {
         super.startPreview();
 
-        camera.startPreview();
         videoFile = null;
     }
 
     @Override
-    public void stopPreview() {
-
-    }
-
-    @Override
     public void startRecording() throws Exception {
-        camera.unlock();
-
-/*
-        recorder = new MediaRecorder();
-        recorder.setCamera(camera);
-        recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-
-        if (timeLapseEnabled)
-            recorder.setProfile(CamcorderProfile.get(cameraId, selectedVideoSettings.cameraTimeLapseProfile));
-        else {
-            recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            recorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-
-            CamcorderProfile profile = CamcorderProfile.get(cameraId, selectedVideoSettings.cameraProfile);
-            if (profile == null)
-                throw new Exception("no camcorder profile!");
-            recorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
-            recorder.setVideoFrameRate(profile.videoFrameRate);
-            recorder.setVideoEncodingBitRate(profile.videoBitRate);
-        }
-*/
         File outputDir = activity.getExternalCacheDir();
         videoFile = new File(outputDir, getVideoFileName());
 
-        videoRecorder.setOrientationHint(getHintRotation());
+        videoRecorder.setRotation(getHintRotation());
+        videoRecorder.setRecordingFrameRate(recordingFrameRate);
         videoRecorder.startRecording(CamcorderProfile.get(selectedVideoSettings.cameraProfile), videoFile.getPath());
 
-/*
-        recorder.setOutputFile(videoFile.getPath());
-
-        recorder.setOrientationHint(getHintRotation());
-
-        if (timeLapseEnabled)
-            recorder.setCaptureRate(timeLapseCaptureRate);
-
-        recorder.prepare();
-
-        recorder.start();
-*/
         super.startRecording();
     }
 
@@ -476,13 +421,6 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         boolean dataTaken = true;
 
         videoRecorder.stopRecording();
-
-        try {
-            camera.reconnect();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        camera.stopPreview();
 
         super.stopRecording();
 
@@ -514,9 +452,8 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         parameters.setRecordingHint(true);
         parameters.setPreviewSize(selectedVideoSettings.videoSize.width, selectedVideoSettings.videoSize.height);
 
-        camera.stopPreview();
         camera.setParameters(parameters);
-        camera.startPreview();
+
         notifySettingsChanged();
     }
 

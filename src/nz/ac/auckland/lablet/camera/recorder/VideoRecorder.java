@@ -18,7 +18,6 @@
  */
 package nz.ac.auckland.lablet.camera.recorder;
 
-import android.content.res.Configuration;
 import android.media.*;
 import android.opengl.*;
 import android.os.Handler;
@@ -230,10 +229,10 @@ public class VideoRecorder {
     private Handler handler = null;
 
     private Object lock = new Object();
-    private Object stoppingSem = new Object();
 
     private boolean isRecording = false;
 
+    private float recordingFrameRate = 30f;
     private int recordedFrames = 0;
 
     // allocate one of these up front so we don't need to do it every time
@@ -264,7 +263,8 @@ public class VideoRecorder {
             // Feed any pending encoder output into the muxer.
             drainEncoder(false);
 
-            if ((recordedFrames % 1) == 0)
+            int nthFrameToRecord = (int)(30f / recordingFrameRate);
+            if ((recordedFrames % nthFrameToRecord) == 0)
                 sendFrameToEncoder();
 
             recordedFrames++;
@@ -390,6 +390,7 @@ public class VideoRecorder {
     public void startRecording(CamcorderProfile camcorderProfile, String outputPath) {
         synchronized (lock) {
             try {
+                recordedFrames = 0;
                 prepareEncoder(camcorderProfile.videoFrameWidth, camcorderProfile.videoFrameHeight,
                         camcorderProfile.videoBitRate);
                 muxer = new MediaMuxer(outputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
@@ -420,6 +421,7 @@ public class VideoRecorder {
         if (!isRecording)
             return;
 
+        final Object stoppingSem = new Object();
         synchronized (stoppingSem) {
             handler.post(new Runnable() {
                 @Override
@@ -427,6 +429,7 @@ public class VideoRecorder {
                     isRecording = false;
                     // send end-of-stream to encoder, and drain remaining output
                     drainEncoder(true);
+                    // stop recording
                     cleanUpRecording();
                     reset();
 
@@ -436,10 +439,12 @@ public class VideoRecorder {
                 }
             });
 
-            try {
-                stoppingSem.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            while (isRecording) {
+                try {
+                    stoppingSem.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -531,5 +536,9 @@ public class VideoRecorder {
 
     public void setRotation(int orientationHintDegrees) {
         this.orientationHintDegrees = orientationHintDegrees;
+    }
+
+    public void setRecordingFrameRate(float recordingFrameRate) {
+        this.recordingFrameRate = recordingFrameRate;
     }
 }

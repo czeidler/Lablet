@@ -13,17 +13,12 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Time lapse"
+            android:text="Recording Frame Rate"
             android:id="@+id/textView" android:layout_gravity="center" android:gravity="center_vertical"/>
         <Space
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             />
-        <ToggleButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New ToggleButton"
-            android:id="@+id/toggleButton" android:layout_gravity="center_horizontal"/>
     </LinearLayout>
     <LinearLayout
         android:orientation="vertical"
@@ -34,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Take a video frame every:"
+            android:text="(This can be used to reduce the video size for very long recordings)"
             android:id="@+id/textView2"/>
         <LinearLayout
             android:orientation="horizontal"
