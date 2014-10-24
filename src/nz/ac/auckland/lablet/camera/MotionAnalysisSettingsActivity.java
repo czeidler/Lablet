@@ -23,8 +23,7 @@ import nz.ac.auckland.lablet.views.StartEndSeekBar;
 import nz.ac.auckland.lablet.views.VideoFrameView;
 
 import java.io.File;
-import java.util.ArrayList;
-
+import java.util.List;
 
 /**
  * Activity to configure the camera experiment analysis.
@@ -57,7 +56,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     private float initialVideoStartValue;
     private float initialVideoEndValue;
 
-    private ArrayList<Integer> frameRateList;
+    private List<Integer> frameRateList;
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -133,8 +132,6 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        frameRateList = new ArrayList<>();
 
         cameraSensorData = (CameraSensorData)experimentAnalysis.getCurrentSensorAnalysis().getData();
 
@@ -248,15 +245,16 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         if (runSettings != null) {
             calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
             calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
-            calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
+            if (!cameraSensorData.isRecordedAtReducedFrameRate())
+                calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
         }
         int analysisFrameRate = (int)calibrationVideoTimeData.getAnalysisFrameRate();
 
         // initial views with values
         View frameRateLayout = findViewById(R.id.frameRateLayout);
-        if ((int)cameraSensorData.getRecordingFrameRate() != 30)
+        if (cameraSensorData.isRecordedAtReducedFrameRate())
             frameRateLayout.setVisibility(View.INVISIBLE);
-        calculateFrameRateValues(videoFrameView.getVideoFrameRate());
+        frameRateList = FrameRateHelper.getPossibleAnalysisFrameRates(cameraSensorData.getVideoFrameRate());
         frameRatePicker.setMinValue(0);
         frameRatePicker.setMaxValue(frameRateList.size() - 1);
         frameRatePicker.setDisplayedValues(getFrameRateStringList());
@@ -314,7 +312,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     }
 
     private float getDurationAtFrameRate(int frameRate) {
-        int duration = cameraSensorData.getVideoDuration();
+        long duration = cameraSensorData.getVideoDuration();
         float stepSize = 1000.0f / frameRate;
         int numberOfSteps = (int)((float)(frameRate * duration) / 1000);
         return stepSize * numberOfSteps;
@@ -333,16 +331,6 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         String text = "";
         text += numberOfFrames;
         editFrames.setText(text);
-    }
-
-    private void calculateFrameRateValues(int maxFrameRate) {
-        frameRateList.clear();
-        frameRateList.add(1);
-        for (int i = 2; i < maxFrameRate; i++) {
-            if (maxFrameRate % i == 0)
-                frameRateList.add(i);
-        }
-        frameRateList.add(maxFrameRate);
     }
 
     private String[] getFrameRateStringList() {
@@ -409,7 +397,8 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         intent.putExtra("run_settings_changed", settingsChanged());
 
         Bundle runSettings = new Bundle();
-        runSettings.putInt("analysis_frame_rate", getFrameRateFromPicker());
+        if (!cameraSensorData.isRecordedAtReducedFrameRate())
+            runSettings.putInt("analysis_frame_rate", getFrameRateFromPicker());
         runSettings.putFloat("analysis_video_start", videoStartValue);
         runSettings.putFloat("analysis_video_end", videoEndValue);
         intent.putExtra("run_settings", runSettings);

@@ -59,8 +59,14 @@ public class MotionAnalysis implements ISensorAnalysis {
 
         calibrationXY = new CalibrationXY();
         calibrationVideoTimeData = new CalibrationVideoTimeData(sensorData.getVideoDuration());
-        if ((int)sensorData.getRecordingFrameRate() != 30)
+        // if recorded with reduced frame rate use the recording frame rate in this case, e.g., for recording frame
+        // rates < 1 the video frame rate is not valid
+        if (sensorData.isRecordedAtReducedFrameRate())
             calibrationVideoTimeData.setAnalysisFrameRate(sensorData.getRecordingFrameRate());
+        else {
+            calibrationVideoTimeData.setAnalysisFrameRate(FrameRateHelper.getBestPossibleAnalysisFrameRate(
+                    sensorData.getVideoFrameRate(), 10));
+        }
         timeData = calibrationVideoTimeData;
 
         frameDataModel = new FrameDataModel();
@@ -342,7 +348,8 @@ public class MotionAnalysis implements ISensorAnalysis {
 
         calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getFloat("analysis_video_start"));
         calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getFloat("analysis_video_end"));
-        calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
+        if (!sensorData.isRecordedAtReducedFrameRate())
+            calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
 
         int numberOfRuns = calibrationVideoTimeData.getNumberOfFrames();
         getFrameDataModel().setNumberOfFrames(numberOfRuns);

@@ -10,14 +10,14 @@ package nz.ac.auckland.lablet.camera;
 
 public class CalibrationVideoTimeData implements ITimeData {
     protected int numberOfFrames;
-    final protected int videoDuration;
+    final protected long videoDuration;
 
     protected float analysisFrameRate;
     // milli seconds
     protected float analysisVideoStart;
     protected float analysisVideoEnd;
 
-    public CalibrationVideoTimeData(int videoDuration) {
+    public CalibrationVideoTimeData(long videoDuration) {
         this.videoDuration = videoDuration;
 
         setAnalysisVideoStart(0);
