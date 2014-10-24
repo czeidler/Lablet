@@ -180,8 +180,7 @@ class CodecInputSurface {
 public class VideoRecorder {
     // parameters for the encoder
     private static final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
-    private static final int FRAME_RATE = 30;               // 30fps
-    private static final int IFRAME_INTERVAL = 5;           // 5 seconds between I-frames
+    private static final int IFRAME_INTERVAL = 5;
 
     private CameraGLTextureProducer cameraGLTextureProducer;
 
@@ -200,6 +199,7 @@ public class VideoRecorder {
     final private Object lock = new Object();
 
     private boolean isRecording = false;
+    private boolean stopRecording = false;
 
     private float recordingFrameRate = 30f;
     private int recordedFrames = 0;
@@ -229,6 +229,16 @@ public class VideoRecorder {
 
     private void handleNewFrame() {
         if (isRecording) {
+            if (stopRecording) {
+                // send end-of-stream to encoder, and drain remaining output
+                drainEncoder(true);
+                // stop recording
+                cleanUpRecording();
+
+                stopRecording = false;
+                isRecording = false;
+                return;
+            }
             // Feed any pending encoder output into the muxer.
             drainEncoder(false);
 
@@ -251,7 +261,6 @@ public class VideoRecorder {
         // Set the presentation time stamp from the SurfaceTexture's time stamp.  This
         // will be used by MediaMuxer to set the PTS in the video.
         codecInputSurface.setPresentationTime(cameraGLTextureProducer.getSurfaceTexture().getTimestamp());
-
         // Submit it to the encoder.  The eglSwapBuffers call will block if the input
         // is full, which would be bad if it stayed full until we dequeued an output
         // buffer (which we can't do, since we're stuck here).  So long as we fully drain
@@ -305,17 +314,18 @@ public class VideoRecorder {
         }
     }
 
-    private void prepareEncoder(int width, int height, int bitRate) {
+    private void prepareEncoder(CamcorderProfile profile) {
         bufferInfo = new MediaCodec.BufferInfo();
 
-        MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, width, height);
+        MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, profile.videoFrameWidth,
+                profile.videoFrameHeight);
 
         // Set some properties.  Failing to specify some of these can cause the MediaCodec
         // configure() call to throw an unhelpful exception.
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                 MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-        format.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
-        format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
+        format.setInteger(MediaFormat.KEY_BIT_RATE, profile.videoBitRate);
+        format.setInteger(MediaFormat.KEY_FRAME_RATE, profile.videoFrameRate);
         format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
 
         // Create a MediaCodec encoder, and configure it with our format.  Get a Surface
@@ -359,8 +369,7 @@ public class VideoRecorder {
         synchronized (lock) {
             try {
                 recordedFrames = 0;
-                prepareEncoder(camcorderProfile.videoFrameWidth, camcorderProfile.videoFrameHeight,
-                        camcorderProfile.videoBitRate);
+                prepareEncoder(camcorderProfile);
                 muxer = new MediaMuxer(outputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
                 muxer.setOrientationHint(orientationHintDegrees);
 
@@ -391,29 +400,29 @@ public class VideoRecorder {
 
         final Object stoppingSem = new Object();
         synchronized (stoppingSem) {
-            isRecording = false;
+            stopRecording = true;
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    // send end-of-stream to encoder, and drain remaining output
-                    drainEncoder(true);
-                    // stop recording
-                    cleanUpRecording();
-                    reset();
-
                     synchronized (stoppingSem) {
+                        // make sure that the stopRecording event is received (we are blocking the looper that receives
+                        // onNewFrameAvailable events)
+                        handleNewFrame();
+
                         stoppingSem.notifyAll();
                     }
                 }
             });
 
-            while (muxer != null) {
+            while (isRecording) {
                 try {
                     stoppingSem.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
+
+            reset();
         }
     }
 
