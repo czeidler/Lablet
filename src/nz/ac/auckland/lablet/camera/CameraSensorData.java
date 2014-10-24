@@ -8,6 +8,8 @@
 package nz.ac.auckland.lablet.camera;
 
 import android.content.Context;
+import android.media.MediaExtractor;
+import android.media.MediaFormat;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import nz.ac.auckland.lablet.experiment.AbstractSensorData;
 import nz.ac.auckland.lablet.experiment.IExperimentSensor;
 
 import java.io.File;
+import java.io.IOException;
 
 
 /**
@@ -24,9 +27,10 @@ public class CameraSensorData extends AbstractSensorData {
     private String videoFileName;
 
     // milli seconds
-    private int videoDuration;
+    private long videoDuration;
     private int videoWidth;
     private int videoHeight;
+    private int videoFrameRate;
 
     private float recordingFrameRate;
 
@@ -86,13 +90,31 @@ public class CameraSensorData extends AbstractSensorData {
     public void setVideoFileName(File storageDir, String fileName) {
         this.videoFileName = fileName;
 
-        MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.fromFile(new File(storageDir, fileName)));
+        String videoFilePath = new File(storageDir, fileName).getPath();
+        MediaExtractor extractor = new MediaExtractor();
+        try {
+            extractor.setDataSource(videoFilePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        videoDuration = mediaPlayer.getDuration();
-        videoWidth = mediaPlayer.getVideoWidth();
-        videoHeight = mediaPlayer.getVideoHeight();
+        for (int i = 0; i < extractor.getTrackCount(); i++) {
+            MediaFormat format = extractor.getTrackFormat(i);
+            String mime = format.getString(MediaFormat.KEY_MIME);
 
-        mediaPlayer.release();
+            if (mime.startsWith("video/")) {
+                extractor.selectTrack(i);
+
+                videoDuration = format.getLong(MediaFormat.KEY_DURATION) / 1000;
+                videoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
+                videoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
+                if (format.containsKey(MediaFormat.KEY_FRAME_RATE))
+                    videoFrameRate = format.getInteger(MediaFormat.KEY_FRAME_RATE);
+                if (videoFrameRate == 0)
+                    videoFrameRate = 30;
+                break;
+            }
+        }
     }
 
     public String getVideoFileName() {
@@ -113,8 +135,12 @@ public class CameraSensorData extends AbstractSensorData {
      *
      * @return the duration of the recorded video
      */
-    public int getVideoDuration() {
+    public long getVideoDuration() {
         return videoDuration;
+    }
+
+    public boolean isRecordedAtReducedFrameRate() {
+        return recordingFrameRate < 30;
     }
 
     public void setRecordingFrameRate(float recordingFrameRate) {
@@ -123,5 +149,17 @@ public class CameraSensorData extends AbstractSensorData {
 
     public float getRecordingFrameRate() {
         return recordingFrameRate;
+    }
+
+    public int getVideoWidth() {
+        return videoWidth;
+    }
+
+    public int getVideoHeight() {
+        return videoHeight;
+    }
+
+    public int getVideoFrameRate() {
+        return videoFrameRate;
     }
 }

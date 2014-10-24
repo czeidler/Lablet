@@ -32,10 +32,6 @@ public class VideoFrameView extends RatioSurfaceView {
 
     protected String videoFilePath = "";
 
-    private int videoWidth;
-    private int videoHeight;
-    private int videoFrameRate;
-
     private int queuedRequest = -1;
 
     public VideoFrameView(Context context, AttributeSet attrs) {
@@ -88,6 +84,9 @@ public class VideoFrameView extends RatioSurfaceView {
     public void setVideoFilePath(String path) {
         videoFilePath = path;
 
+        int videoWidth = 1;
+        int videoHeight = 1;
+
         MediaExtractor extractor = new MediaExtractor();
         try {
             extractor.setDataSource(videoFilePath);
@@ -104,15 +103,11 @@ public class VideoFrameView extends RatioSurfaceView {
 
                 videoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
                 videoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
-                if (format.containsKey(MediaFormat.KEY_FRAME_RATE))
-                    videoFrameRate = format.getInteger(MediaFormat.KEY_FRAME_RATE);
-                if (videoFrameRate == 0)
-                    videoFrameRate = 30;
                 break;
             }
         }
 
-        setRatio(((float)getVideoWidth()) / getVideoHeight());
+        setRatio(((float)(videoWidth) / videoHeight));
     }
 
     public void seekToFrame(int positionMicroSeconds) {
@@ -121,19 +116,6 @@ public class VideoFrameView extends RatioSurfaceView {
         else
             queuedRequest = positionMicroSeconds;
     }
-
-    public int getVideoWidth() {
-        return videoWidth;
-    }
-
-    public int getVideoHeight() {
-        return videoHeight;
-    }
-
-    public int getVideoFrameRate() {
-        return videoFrameRate;
-    }
-
 
     protected void toastMessage(String message) {
         Context context = getContext();
