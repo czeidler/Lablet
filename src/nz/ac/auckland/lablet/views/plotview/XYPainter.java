@@ -8,7 +8,6 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 import android.graphics.*;
-import android.view.MotionEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,61 +17,21 @@ interface IPointRenderer {
     public void drawPoint(Canvas canvas, PointF position, DrawConfig config);
 }
 
-class DrawConfig {
-    private Paint markerPaint = new Paint();
-    private Paint linePaint = new Paint();
-
-    public DrawConfig() {
-        markerPaint.setColor(Color.GREEN);
-        markerPaint.setStyle(Paint.Style.STROKE);
-
-        linePaint.setColor(Color.YELLOW);
-        linePaint.setStyle(Paint.Style.STROKE);
-        linePaint.setAntiAlias(true);
-    }
-
-    public Paint getMarkerPaint() {
-        return markerPaint;
-    }
-
-    public void setMarkerPaint(Paint markerPaint) {
-        this.markerPaint = markerPaint;
-    }
-
-    public Paint getLinePaint() {
-        return linePaint;
-    }
-
-    public void setLinePaint(Paint linePaint) {
-        this.linePaint = linePaint;
-    }
-}
-
-class CircleRenderer implements IPointRenderer {
-    private float circleWidth = 3.5f;
-
-    @Override
-    public void drawPoint(Canvas canvas, PointF position, DrawConfig config) {
-        canvas.drawCircle(position.x, position.y, circleWidth, config.getMarkerPaint());
-    }
-}
-
-class CrossRenderer implements IPointRenderer {
-    private final float size = 3f;
-
-    @Override
-    public void drawPoint(Canvas canvas, PointF position, DrawConfig config) {
-
-        canvas.drawLine(position.x - size, position.y - size, position.x + size, position.y + size,
-                config.getMarkerPaint());
-        canvas.drawLine(position.x - size, position.y + size, position.x + size, position.y - size,
-                config.getMarkerPaint());
-    }
-}
-
 public class XYPainter extends ArrayOffScreenPlotPainter {
     private DrawConfig drawConfig = new DrawConfig();
     private IPointRenderer pointRenderer = new CrossRenderer();
+
+    public DrawConfig getDrawConfig() {
+        return drawConfig;
+    }
+
+    public IPointRenderer getPointRenderer() {
+        return pointRenderer;
+    }
+
+    public void setPointRenderer(IPointRenderer pointRenderer) {
+        this.pointRenderer = pointRenderer;
+    }
 
     @Override
     protected RectF getRealDataRect(int startIndex, int lastIndex) {

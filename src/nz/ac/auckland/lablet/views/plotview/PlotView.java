@@ -501,6 +501,10 @@ public class PlotView extends ViewGroup {
             autoRange.removePainter(painter);
     }
 
+    public void addForegroundPainter(IPlotPainter painter) {
+        mainView.addForegroundPainter(painter);
+    }
+
     public RectF getRange() {
         return mainView.getRange();
     }
