@@ -30,6 +30,7 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     private XYDataAdapter xData = new XYDataAdapter();
     private XYDataAdapter yData = new XYDataAdapter();
     private XYDataAdapter zData = new XYDataAdapter();
+    private XYDataAdapter totalData = new XYDataAdapter();
 
     private SensorManager sensorManager;
 
@@ -59,6 +60,7 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
         yPainter.getDrawConfig().setMarkerPaint(yMarkerPaint);
         yPainter.setDataAdapter(yData);
         view.addPlotPainter(yPainter);
+
         XYPainter zPainter = new XYPainter();
         Paint zMarkerPaint = new Paint();
         zMarkerPaint.setColor(Color.RED);
@@ -67,10 +69,19 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
         zPainter.setDataAdapter(zData);
         view.addPlotPainter(zPainter);
 
+        XYPainter totalPainter = new XYPainter();
+        Paint totalMarkerPaint = new Paint();
+        totalMarkerPaint.setColor(Color.WHITE);
+        totalPainter.getDrawConfig().setMarkerPaint(totalMarkerPaint);
+        totalPainter.setPointRenderer(new CircleRenderer());
+        totalPainter.setDataAdapter(totalData);
+        view.addPlotPainter(totalPainter);
+
         LegendPainter legend = new LegendPainter();
         legend.addEntry(xPainter, "x-acceleration");
         legend.addEntry(yPainter, "y-acceleration");
         legend.addEntry(zPainter, "z-acceleration");
+        legend.addEntry(totalPainter, "total-acceleration");
         view.addForegroundPainter(legend);
 
         view.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_ZOOM_EXTENDING);
@@ -98,6 +109,8 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
                 xData.addData((float)time, x);
                 yData.addData((float)time, y);
                 zData.addData((float)time, z);
+
+                totalData.addData((float)time, (float)Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2)));
             }
         }
 
