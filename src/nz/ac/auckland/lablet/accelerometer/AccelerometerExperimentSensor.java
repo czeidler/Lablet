@@ -9,6 +9,8 @@ package nz.ac.auckland.lablet.accelerometer;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -18,9 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
 import nz.ac.auckland.lablet.experiment.ISensorData;
-import nz.ac.auckland.lablet.views.plotview.PlotView;
-import nz.ac.auckland.lablet.views.plotview.XYDataAdapter;
-import nz.ac.auckland.lablet.views.plotview.XYPainter;
+import nz.ac.auckland.lablet.views.plotview.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +28,8 @@ import java.io.IOException;
 
 public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     private XYDataAdapter xData = new XYDataAdapter();
+    private XYDataAdapter yData = new XYDataAdapter();
+    private XYDataAdapter zData = new XYDataAdapter();
 
     private SensorManager sensorManager;
 
@@ -46,9 +48,30 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
         view.getBackgroundPainter().setShowXGrid(true);
         view.getBackgroundPainter().setShowYGrid(true);
 
-        XYPainter painter = new XYPainter();
-        painter.setDataAdapter(xData);
-        view.addPlotPainter(painter);
+        XYPainter xPainter = new XYPainter();
+        xPainter.setDataAdapter(xData);
+        view.addPlotPainter(xPainter);
+
+        XYPainter yPainter = new XYPainter();
+        yPainter.setPointRenderer(new CircleRenderer());
+        Paint yMarkerPaint = new Paint();
+        yMarkerPaint.setColor(Color.BLUE);
+        yPainter.getDrawConfig().setMarkerPaint(yMarkerPaint);
+        yPainter.setDataAdapter(yData);
+        view.addPlotPainter(yPainter);
+        XYPainter zPainter = new XYPainter();
+        Paint zMarkerPaint = new Paint();
+        zMarkerPaint.setColor(Color.RED);
+        zPainter.getDrawConfig().setMarkerPaint(zMarkerPaint);
+        zPainter.setPointRenderer(new BottomTriangleRenderer());
+        zPainter.setDataAdapter(zData);
+        view.addPlotPainter(zPainter);
+
+        LegendPainter legend = new LegendPainter();
+        legend.addEntry(xPainter, "x-acceleration");
+        legend.addEntry(yPainter, "y-acceleration");
+        legend.addEntry(zPainter, "z-acceleration");
+        view.addForegroundPainter(legend);
 
         view.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_ZOOM_EXTENDING);
         //setListener(view);
@@ -73,6 +96,8 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
                 float z = values[2];
                 long time = System.currentTimeMillis() - startTime;
                 xData.addData((float)time, x);
+                yData.addData((float)time, y);
+                zData.addData((float)time, z);
             }
         }
 
