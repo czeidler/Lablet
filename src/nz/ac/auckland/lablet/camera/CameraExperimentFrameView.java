@@ -44,7 +44,7 @@ class CameraExperimentFrameView extends VideoFrameView implements IExperimentFra
     public void setCurrentFrame(int frame) {
         currentRun = frame;
         CalibrationVideoTimeData timeData = motionAnalysis.getCalibrationVideoTimeData();
-        int positionMicroSeconds = (int)timeData.getTimeAt(frame);
+        long positionMicroSeconds = (long)timeData.getTimeAt(frame);
         positionMicroSeconds *= 1000;
 
         seekToFrame(positionMicroSeconds);

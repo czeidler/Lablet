@@ -10,5 +10,12 @@ package nz.ac.auckland.lablet.camera;
 
 public interface ITimeData {
     public int getSize();
+
+    /**
+     * Get time value.
+     *
+     * @param index of the frame number
+     * @return time in milli seconds
+     */
     public float getTimeAt(float index);
 }

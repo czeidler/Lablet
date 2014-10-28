@@ -32,7 +32,7 @@ public class VideoFrameView extends RatioSurfaceView {
 
     protected String videoFilePath = "";
 
-    private int queuedRequest = -1;
+    private long queuedRequest = -1;
 
     public VideoFrameView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -110,7 +110,7 @@ public class VideoFrameView extends RatioSurfaceView {
         setRatio(((float)(videoWidth) / videoHeight));
     }
 
-    public void seekToFrame(int positionMicroSeconds) {
+    public void seekToFrame(long positionMicroSeconds) {
         if (seekToFrameExtractor != null)
             seekToFrameExtractor.seekToFrame(positionMicroSeconds);
         else

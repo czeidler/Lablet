@@ -44,7 +44,7 @@ class SeekToFrameExtractor {
         seekToThread.quit();
     }
 
-    public boolean seekToFrame(int positionMicroSeconds) {
+    public boolean seekToFrame(long positionMicroSeconds) {
         Handler seekHandler = seekToThread.getHandler();
         seekHandler.removeMessages(SeekToThread.SEEK_MESSAGE);
         Message message = new Message();
