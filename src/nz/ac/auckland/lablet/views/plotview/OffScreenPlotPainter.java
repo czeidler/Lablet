@@ -263,8 +263,13 @@ abstract public class OffScreenPlotPainter extends AbstractPlotDataPainter {
 
     protected void onSetupOffScreenBitmap() {
         if (offScreenBitmap.getBitmap() == null) {
-            Bitmap bitmap = Bitmap.createBitmap(containerView.getWidth(), containerView.getHeight(),
-                    Bitmap.Config.ARGB_8888);
+            int width = containerView.getWidth();
+            if (width <= 0)
+                width = 100;
+            int height = containerView.getHeight();
+            if (height <= 0)
+                height = 100;
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             bitmap.eraseColor(Color.TRANSPARENT);
             RectF bitmapRealRect = containerView.getRange();
             offScreenBitmap.setTo(bitmap, bitmapRealRect);
