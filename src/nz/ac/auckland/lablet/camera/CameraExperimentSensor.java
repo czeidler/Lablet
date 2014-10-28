@@ -14,6 +14,7 @@ import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.hardware.SensorManager;
 import android.media.CamcorderProfile;
+import android.media.MediaPlayer;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.*;
@@ -98,7 +99,7 @@ class CameraExperimentView extends AbstractExperimentSensorView {
 
     @Override
     public void onStartPlayback() {
-        File videoFile = cameraExperimentSensor.getVideoFile();
+        final File videoFile = cameraExperimentSensor.getVideoFile();
         if (videoFile == null)
             return;
 
@@ -107,6 +108,19 @@ class CameraExperimentView extends AbstractExperimentSensorView {
 
         videoView.setVideoPath(videoFile.getPath());
         videoView.requestFocus();
+        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                try {
+                    mediaPlayer.stop();
+                    mediaPlayer.reset();
+                    mediaPlayer.setDataSource(videoFile.getPath());
+                    mediaPlayer.prepare();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         videoView.start();
     }
 
