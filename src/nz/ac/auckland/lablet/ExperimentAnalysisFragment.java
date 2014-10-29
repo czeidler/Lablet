@@ -24,28 +24,15 @@ public class ExperimentAnalysisFragment extends android.support.v4.app.Fragment 
         super();
     }
 
-    public ExperimentAnalysisFragment(ExperimentAnalysis.AnalysisRef ref) {
-        super();
-
-        Bundle args = new Bundle();
-        args.putInt("sensorIndex", ref.sensor);
-        args.putString("analysisIndex", ref.analysisId);
-        setArguments(args);
-    }
-
     private ISensorAnalysis findExperimentFromArguments(Activity activity) {
         ExperimentAnalysisActivity experimentActivity = (ExperimentAnalysisActivity)activity;
         if (!experimentActivity.ensureExperimentDataLoaded())
             return null;
 
         final ExperimentAnalysis experimentAnalysis = experimentActivity.getExperimentAnalysis();
-        final int run = experimentAnalysis.getCurrentAnalysisRunIndex();
-        final int position = getArguments().getInt("sensorIndex", 0);
-        String analysis = getArguments().getString("analysisIndex", "");
-        analysisRef = new ExperimentAnalysis.AnalysisRef(run, position, analysis);
-
+        ExperimentAnalysis.AnalysisRef analysisRef = new ExperimentAnalysis.AnalysisRef(getArguments());
         ExperimentAnalysis.AnalysisRunEntry runEntry = experimentAnalysis.getCurrentAnalysisRun();
-        return runEntry.analysisDataList.get(position).getAnalysisEntry(analysis).analysis;
+        return runEntry.analysisDataList.get(analysisRef.sensor).getAnalysisEntry(analysisRef.analysisId).analysis;
     }
 
     @Override

@@ -7,6 +7,7 @@
  */
 package nz.ac.auckland.lablet;
 
+import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.File;
@@ -20,10 +21,24 @@ public class ExperimentAnalysis {
         final public int sensor;
         final public String analysisId;
 
+        public AnalysisRef(Bundle archive) {
+            run = archive.getInt("run");
+            sensor = archive.getInt("sensor");
+            analysisId = archive.getString("analysisId");
+        }
+
         public AnalysisRef(int run, int sensor, String analysisId) {
             this.run = run;
             this.sensor = sensor;
             this.analysisId = analysisId;
+        }
+
+        public Bundle toBundle() {
+            Bundle archive = new Bundle();
+            archive.putInt("run", run);
+            archive.putInt("sensor", sensor);
+            archive.putString("analysisId", analysisId);
+            return archive;
         }
     }
 

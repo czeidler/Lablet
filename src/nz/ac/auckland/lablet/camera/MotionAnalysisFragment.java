@@ -29,10 +29,6 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         super();
     }
 
-    public MotionAnalysisFragment(ExperimentAnalysis.AnalysisRef ref) {
-        super(ref);
-    }
-
     private MotionAnalysis getSensorAnalysis() {
         return (MotionAnalysis)sensorAnalysis;
     }

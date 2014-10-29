@@ -34,6 +34,8 @@ public class FrequencyAnalysisPlugin implements IAnalysisPlugin {
 
     @Override
     public Fragment createSensorAnalysisFragment(ExperimentAnalysis.AnalysisRef analysisRef) {
-        return new FrequencyAnalysisFragment(analysisRef);
+        Fragment fragment = new FrequencyAnalysisFragment();
+        fragment.setArguments(analysisRef.toBundle());
+        return fragment;
     }
 }

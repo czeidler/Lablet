@@ -20,10 +20,6 @@ public class FrequencyAnalysisFragment extends ExperimentAnalysisFragment {
         super();
     }
 
-    public FrequencyAnalysisFragment(ExperimentAnalysis.AnalysisRef ref) {
-        super(ref);
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return new FrequencyAnalysisView(getActivity(), (FrequencyAnalysis)sensorAnalysis);

@@ -31,6 +31,8 @@ public class MotionAnalysisPlugin implements IAnalysisPlugin {
 
     @Override
     public Fragment createSensorAnalysisFragment(ExperimentAnalysis.AnalysisRef analysisRef) {
-        return new MotionAnalysisFragment(analysisRef);
+        Fragment fragment = new MotionAnalysisFragment();
+        fragment.setArguments(analysisRef.toBundle());
+        return fragment;
     }
 }
