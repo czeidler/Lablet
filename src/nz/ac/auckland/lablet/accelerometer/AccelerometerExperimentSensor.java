@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
+import nz.ac.auckland.lablet.experiment.AbstractExperimentSensorView;
 import nz.ac.auckland.lablet.experiment.ISensorData;
 import nz.ac.auckland.lablet.views.plotview.*;
 import nz.ac.auckland.lablet.views.table.CSVWriter;
@@ -27,12 +28,108 @@ import nz.ac.auckland.lablet.views.table.DataTableColumn;
 
 import java.io.*;
 
+class AccelerometerExperimentView extends AbstractExperimentSensorView {
+    final private AccelerometerExperimentSensor sensor;
+
+    final private XYDataAdapter xData;
+    final private XYDataAdapter yData;
+    final private XYDataAdapter zData;
+    final private XYDataAdapter totalData = new XYDataAdapter();
+    final private AccelerometerSensorData.IListener dataListenerStrongRef;
+
+    final private PlotView plotView;
+
+    public AccelerometerExperimentView(Context context, AccelerometerExperimentSensor sensor) {
+        super(context);
+
+        this.sensor = sensor;
+
+        final AccelerometerSensorData data = (AccelerometerSensorData)sensor.getExperimentData();
+        dataListenerStrongRef = new AccelerometerSensorData.IListener() {
+            @Override
+            public void onDataAdded() {
+                int index = data.size() - 1;
+                final Number time = data.getTimeValues().get(index);
+                final Number x = data.getXValues().get(index);
+                final Number y = data.getYValues().get(index);
+                final Number z = data.getZValues().get(index);
+
+                totalData.addData(time.floatValue(), (float)Math.sqrt(Math.pow((float)x, 2) + Math.pow((float)y, 2)
+                        + Math.pow((float)z, 2)));
+
+                xData.notifyDataAdded(index, 1);
+                yData.notifyDataAdded(index, 1);
+                zData.notifyDataAdded(index, 1);
+            }
+
+            @Override
+            public void onDataCleared() {
+                // don't clear the x, y and z data because we don't own them
+                xData.notifyAllDataChanged();
+                yData.notifyAllDataChanged();
+                zData.notifyAllDataChanged();
+                totalData.clear();
+            }
+        };
+        data.addListener(dataListenerStrongRef);
+
+        plotView = new PlotView(context);
+        plotView.getTitleView().setTitle("Accelerometer");
+        plotView.setXRange(0, 20000);
+        plotView.setYRange(-0.5f, 0.5f);
+        plotView.getBackgroundPainter().setShowXGrid(true);
+        plotView.getBackgroundPainter().setShowYGrid(true);
+
+        XYPainter xPainter = new XYPainter();
+        xData = new XYDataAdapter(data.getTimeValues(), data.getXValues());
+        xPainter.setDataAdapter(xData);
+        plotView.addPlotPainter(xPainter);
+
+        XYPainter yPainter = new XYPainter();
+        yPainter.setPointRenderer(new CircleRenderer());
+        Paint yMarkerPaint = new Paint();
+        yMarkerPaint.setColor(Color.BLUE);
+        yPainter.getDrawConfig().setMarkerPaint(yMarkerPaint);
+        yData = new XYDataAdapter(data.getTimeValues(), data.getYValues());
+        yPainter.setDataAdapter(yData);
+        plotView.addPlotPainter(yPainter);
+
+        XYPainter zPainter = new XYPainter();
+        Paint zMarkerPaint = new Paint();
+        zMarkerPaint.setColor(Color.RED);
+        zPainter.getDrawConfig().setMarkerPaint(zMarkerPaint);
+        zPainter.setPointRenderer(new BottomTriangleRenderer());
+        zData = new XYDataAdapter(data.getTimeValues(), data.getZValues());
+        zPainter.setDataAdapter(zData);
+        plotView.addPlotPainter(zPainter);
+
+        XYPainter totalPainter = new XYPainter();
+        Paint totalMarkerPaint = new Paint();
+        totalMarkerPaint.setColor(Color.WHITE);
+        totalPainter.getDrawConfig().setMarkerPaint(totalMarkerPaint);
+        totalPainter.setPointRenderer(new CircleRenderer());
+        totalPainter.setDataAdapter(totalData);
+        plotView.addPlotPainter(totalPainter);
+
+        LegendPainter legend = new LegendPainter();
+        legend.addEntry(xPainter, "x-acceleration");
+        legend.addEntry(yPainter, "y-acceleration");
+        legend.addEntry(zPainter, "z-acceleration");
+        legend.addEntry(totalPainter, "total-acceleration");
+        plotView.addForegroundPainter(legend);
+
+        plotView.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_ZOOM_EXTENDING);
+        addView(plotView);
+    }
+
+    @Override
+    public void onSettingsChanged() {
+
+    }
+}
 
 public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
-    private XYDataAdapter xData = new XYDataAdapter();
-    private XYDataAdapter yData = new XYDataAdapter();
-    private XYDataAdapter zData = new XYDataAdapter();
-    private XYDataAdapter totalData = new XYDataAdapter();
+    private AccelerometerSensorData data;
 
     private SensorManager sensorManager;
     private long startTime = 0;
@@ -44,50 +141,8 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public View createExperimentView(Context context) {
-        PlotView view = new PlotView(context);
-        view.getTitleView().setTitle("Accelerometer");
-        view.setXRange(0, 20000);
-        view.setYRange(-0.5f, 0.5f);
-        view.getBackgroundPainter().setShowXGrid(true);
-        view.getBackgroundPainter().setShowYGrid(true);
-
-        XYPainter xPainter = new XYPainter();
-        xPainter.setDataAdapter(xData);
-        view.addPlotPainter(xPainter);
-
-        XYPainter yPainter = new XYPainter();
-        yPainter.setPointRenderer(new CircleRenderer());
-        Paint yMarkerPaint = new Paint();
-        yMarkerPaint.setColor(Color.BLUE);
-        yPainter.getDrawConfig().setMarkerPaint(yMarkerPaint);
-        yPainter.setDataAdapter(yData);
-        view.addPlotPainter(yPainter);
-
-        XYPainter zPainter = new XYPainter();
-        Paint zMarkerPaint = new Paint();
-        zMarkerPaint.setColor(Color.RED);
-        zPainter.getDrawConfig().setMarkerPaint(zMarkerPaint);
-        zPainter.setPointRenderer(new BottomTriangleRenderer());
-        zPainter.setDataAdapter(zData);
-        view.addPlotPainter(zPainter);
-
-        XYPainter totalPainter = new XYPainter();
-        Paint totalMarkerPaint = new Paint();
-        totalMarkerPaint.setColor(Color.WHITE);
-        totalPainter.getDrawConfig().setMarkerPaint(totalMarkerPaint);
-        totalPainter.setPointRenderer(new CircleRenderer());
-        totalPainter.setDataAdapter(totalData);
-        view.addPlotPainter(totalPainter);
-
-        LegendPainter legend = new LegendPainter();
-        legend.addEntry(xPainter, "x-acceleration");
-        legend.addEntry(yPainter, "y-acceleration");
-        legend.addEntry(zPainter, "z-acceleration");
-        legend.addEntry(totalPainter, "total-acceleration");
-        view.addForegroundPainter(legend);
-
-        view.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_ZOOM_EXTENDING);
-        //setListener(view);
+        AccelerometerExperimentView view = new AccelerometerExperimentView(context, this);
+        setListener(view);
         return view;
     }
 
@@ -101,17 +156,11 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
         public void onSensorChanged(SensorEvent sensorEvent) {
             if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 final float[] values = sensorEvent.values;
-                final float x = values[0];
-                final float y = values[1];
-                final float z = values[2];
                 if (startTime == 0)
                     startTime = sensorEvent.timestamp;
                 final long time = (sensorEvent.timestamp - startTime) / 1000000;
-                xData.addData((float)time, x);
-                yData.addData((float)time, y);
-                zData.addData((float)time, z);
 
-                totalData.addData((float)time, (float)Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2)));
+                data.addData(time, values);
             }
         }
 
@@ -123,6 +172,8 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public void init(Activity activity) {
+        data = new AccelerometerSensorData(activity, this);
+
         sensorManager = (SensorManager)activity.getSystemService(Context.SENSOR_SERVICE);
     }
 
@@ -141,48 +192,6 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
 
     }
 
-    abstract class DataColunm extends DataTableColumn {
-        final protected XYDataAdapter data;
-        final private String header;
-
-        public DataColunm(XYDataAdapter data, String header) {
-            this.data = data;
-            this.header = header;
-        }
-
-        @Override
-        public int size() {
-            return data.getSize();
-        }
-
-        @Override
-        public String getHeader() {
-            return header;
-        }
-    }
-
-    class XDataColumn extends DataColunm {
-        public XDataColumn(XYDataAdapter data, String header) {
-            super(data, header);
-        }
-
-        @Override
-        public Number getValue(int index) {
-            return data.getX(index);
-        }
-    }
-
-    class YDataColumn extends DataColunm {
-        public YDataColumn(XYDataAdapter data, String header) {
-            super(data, header);
-        }
-
-        @Override
-        public Number getValue(int index) {
-            return data.getY(index);
-        }
-    }
-
     @Override
     public void finishExperiment(boolean saveData, File storageDir) throws IOException {
         super.finishExperiment(saveData, storageDir);
@@ -192,14 +201,7 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
             return;
         }
 
-        ColumnDataTableAdapter dataTableAdapter = new ColumnDataTableAdapter();
-        dataTableAdapter.addColumn(new XDataColumn(xData, "time [ms]"));
-        dataTableAdapter.addColumn(new YDataColumn(xData, "x-acceleration [m/s^2]"));
-        dataTableAdapter.addColumn(new YDataColumn(yData, "y-acceleration [m/s^2]"));
-        dataTableAdapter.addColumn(new YDataColumn(zData, "z-acceleration [m/s^2]"));
-        Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                new File(storageDir, "data.csv"))));
-        CSVWriter.writeTable(dataTableAdapter, writer, ',');
+        data.saveExperimentDataToFile(storageDir);
     }
 
     @Override
@@ -223,10 +225,7 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     }
 
     private void resetData() {
-        xData.clear();
-        yData.clear();
-        zData.clear();
-        totalData.clear();
+        data.clear();
 
         startTime = 0;
     }
@@ -253,6 +252,6 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public ISensorData getExperimentData() {
-        return null;
+        return data;
     }
 }

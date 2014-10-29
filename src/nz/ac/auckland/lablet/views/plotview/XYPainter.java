@@ -39,8 +39,8 @@ public class XYPainter extends ArrayOffScreenPlotPainter {
             startIndex--;
         AbstractXYDataAdapter adapter = (AbstractXYDataAdapter)dataAdapter;
         RectF realDataRect = containerView.getRange();
-        realDataRect.left = adapter.getX(startIndex);
-        realDataRect.right = adapter.getX(lastIndex);
+        realDataRect.left = adapter.getX(startIndex).floatValue();
+        realDataRect.right = adapter.getX(lastIndex).floatValue();
         if (realDataRect.width() < 40) {
             realDataRect.left -= 20;
             realDataRect.right += 20;
@@ -60,8 +60,8 @@ public class XYPainter extends ArrayOffScreenPlotPainter {
         List<float[]> screenPoints = new ArrayList<>();
         for (int i = start; i < range.max + 1; i++) {
             float[] screenPoint = new float[2];
-            screenPoint[0] = adapter.getX(i);
-            screenPoint[1] = adapter.getY(i);
+            screenPoint[0] = adapter.getX(i).floatValue();
+            screenPoint[1] = adapter.getY(i).floatValue();
             payload.getRangeMatrix().mapPoints(screenPoint);
             screenPoints.add(screenPoint);
         }

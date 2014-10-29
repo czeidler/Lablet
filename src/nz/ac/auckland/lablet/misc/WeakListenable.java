@@ -61,7 +61,7 @@ public class WeakListenable<Listener> {
         return false;
     }
 
-    protected List<Listener> getListeners() {
+    public List<Listener> getListeners() {
         List<Listener> outList = new ArrayList<>();
 
         Iterator<WeakReference<Listener>> it = listeners.iterator();

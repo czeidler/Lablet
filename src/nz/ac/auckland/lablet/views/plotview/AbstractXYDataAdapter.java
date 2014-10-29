@@ -9,6 +9,6 @@ package nz.ac.auckland.lablet.views.plotview;
 
 
 public abstract class AbstractXYDataAdapter extends CloneablePlotDataAdapter {
-    abstract public float getX(int index);
-    abstract public float getY(int index);
+    abstract public Number getX(int index);
+    abstract public Number getY(int index);
 }

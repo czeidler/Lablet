@@ -22,22 +22,22 @@ public abstract class AbstractPlotDataAdapter extends WeakListenable<AbstractPlo
     abstract public int getSize();
 
 
-    protected void notifyDataAdded(int index, int number) {
+    public void notifyDataAdded(int index, int number) {
         for (IListener listener : getListeners())
             listener.onDataAdded(this, index, number);
     }
 
-    protected void notifyDataRemoved(int index, int number) {
+    public void notifyDataRemoved(int index, int number) {
         for (IListener listener : getListeners())
             listener.onDataRemoved(this, index, number);
     }
 
-    protected void notifyDataChanged(int index, int number) {
+    public void notifyDataChanged(int index, int number) {
         for (IListener listener : getListeners())
             listener.onDataChanged(this, index, number);
     }
 
-    protected void notifyAllDataChanged() {
+    public void notifyAllDataChanged() {
         for (IListener listener : getListeners())
             listener.onAllDataChanged(this);
     }

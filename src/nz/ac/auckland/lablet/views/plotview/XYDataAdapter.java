@@ -14,15 +14,25 @@ import java.util.List;
 public class XYDataAdapter extends AbstractXYDataAdapter {
     // for the clone
     final private int startIndex;
-    private List<Float> xValues = new ArrayList<>();
-    private List<Float> yValues = new ArrayList<>();
+    private List<Number> xValues;
+    private List<Number> yValues;
+
+    public XYDataAdapter(List<Number> xValues, List<Number> yValues) {
+        this.startIndex = 0;
+        this.xValues = xValues;
+        this.yValues = yValues;
+    }
 
     public XYDataAdapter() {
         this.startIndex = 0;
+        xValues = new ArrayList<>();
+        yValues = new ArrayList<>();
     }
 
     public XYDataAdapter(int startIndex) {
         this.startIndex = startIndex;
+        xValues = new ArrayList<>();
+        yValues = new ArrayList<>();
     }
 
     public void addData(Float xValue, Float yValue) {
@@ -41,12 +51,12 @@ public class XYDataAdapter extends AbstractXYDataAdapter {
     }
 
     @Override
-    public float getX(int index) {
+    public Number getX(int index) {
         return xValues.get(index - startIndex);
     }
 
     @Override
-    public float getY(int index) {
+    public Number getY(int index) {
         return yValues.get(index - startIndex);
     }
 

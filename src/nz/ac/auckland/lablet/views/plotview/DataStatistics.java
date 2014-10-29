@@ -112,8 +112,8 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
         dataLimits = null;
 
         for (int i = 0; i < adapter.getSize(); i++) {
-            float x = adapter.getX(i);
-            float y = adapter.getY(i);
+            float x = adapter.getX(i).floatValue();
+            float y = adapter.getY(i).floatValue();
             includePoint(x, y);
         }
     }
@@ -121,8 +121,8 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
     @Override
     public void onDataAdded(AbstractPlotDataAdapter plot, int index, int number) {
         for (int i = 0; i < number; i++) {
-            float x = adapter.getX(index + i);
-            float y = adapter.getY(index + i);
+            float x = adapter.getX(index + i).floatValue();
+            float y = adapter.getY(index + i).floatValue();
             includePoint(x, y);
         }
     }
@@ -135,8 +135,8 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
     @Override
     public void onDataChanged(AbstractPlotDataAdapter plot, int index, int number) {
         for (int i = 0; i < number; i++) {
-            float x = adapter.getX(index + i);
-            float y = adapter.getY(index + i);
+            float x = adapter.getX(index + i).floatValue();
+            float y = adapter.getY(index + i).floatValue();
             if (!isInLimit(x, y)) {
                 reset();
                 return;
