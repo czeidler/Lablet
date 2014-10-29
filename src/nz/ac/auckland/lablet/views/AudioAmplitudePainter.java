@@ -34,8 +34,8 @@ public class AudioAmplitudePainter extends ArrayOffScreenPlotPainter {
     protected RectF getRealDataRect(int startIndex, int lastIndex) {
         AudioAmplitudePlotDataAdapter audioAmplitudePlotDataAdapter = (AudioAmplitudePlotDataAdapter)dataAdapter;
         RectF realDataRect = containerView.getRange();
-        realDataRect.left = audioAmplitudePlotDataAdapter.getX(startIndex);
-        realDataRect.right = audioAmplitudePlotDataAdapter.getX(lastIndex);
+        realDataRect.left = audioAmplitudePlotDataAdapter.getX(startIndex).floatValue();
+        realDataRect.right = audioAmplitudePlotDataAdapter.getX(lastIndex).floatValue();
         return realDataRect;
     }
 
@@ -74,7 +74,7 @@ public class AudioAmplitudePainter extends ArrayOffScreenPlotPainter {
                 int index = i + a;
                 if (start + index >= dataSize)
                     break;
-                float value = adapter.getY(start + index);
+                float value = adapter.getY(start + index).floatValue();
                 ampSum += value;
                 ampSquareSum += Math.pow(value, 2);
                 if (value < min)
@@ -87,7 +87,7 @@ public class AudioAmplitudePainter extends ArrayOffScreenPlotPainter {
                     / (samplesPerPixel * (samplesPerPixel - 1)));
 
             // drawing
-            float x = adapter.getX(start + i);
+            float x = adapter.getX(start + i).floatValue();
             outerPath.moveTo(x, min);
             outerPath.lineTo(x, max);
 

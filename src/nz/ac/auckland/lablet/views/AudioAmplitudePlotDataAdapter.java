@@ -95,12 +95,12 @@ public class AudioAmplitudePlotDataAdapter extends AbstractXYDataAdapter {
     }
 
     @Override
-    public float getX(int index) {
+    public Number getX(int index) {
         return (float)index / sampleRate;
     }
 
     @Override
-    public float getY(int index) {
+    public Number getY(int index) {
         return data.get(index) / amplitudeMax;
     }
 

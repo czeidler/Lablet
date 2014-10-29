@@ -55,12 +55,12 @@ abstract class AbstractGraphAdapter extends AbstractXYDataAdapter {
     }
 
     @Override
-    public float getX(int i) {
+    public Number getX(int i) {
         return getXAxis().getValue(i).floatValue();
     }
 
     @Override
-    public float getY(int i) {
+    public Number getY(int i) {
         return getYAxis().getValue(i).floatValue();
     }
 

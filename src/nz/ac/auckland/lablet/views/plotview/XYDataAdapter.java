@@ -35,7 +35,7 @@ public class XYDataAdapter extends AbstractXYDataAdapter {
         yValues = new ArrayList<>();
     }
 
-    public void addData(Float xValue, Float yValue) {
+    public void addData(Number xValue, Number yValue) {
         int newIndex = getSize();
         xValues.add(xValue);
         yValues.add(yValue);
