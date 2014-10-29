@@ -21,9 +21,11 @@ import android.view.View;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
 import nz.ac.auckland.lablet.experiment.ISensorData;
 import nz.ac.auckland.lablet.views.plotview.*;
+import nz.ac.auckland.lablet.views.table.CSVWriter;
+import nz.ac.auckland.lablet.views.table.ColumnDataTableAdapter;
+import nz.ac.auckland.lablet.views.table.DataTableColumn;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 
 public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
@@ -33,7 +35,7 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     private XYDataAdapter totalData = new XYDataAdapter();
 
     private SensorManager sensorManager;
-
+    private long startTime = 0;
 
     @Override
     public String getSensorName() {
@@ -94,18 +96,17 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
         return false;
     }
 
-    final private long startTime = System.currentTimeMillis();
-
     private SensorEventListener sensorEventListener = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent sensorEvent) {
             if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                float[] values = sensorEvent.values;
-                // Movement
-                float x = values[0];
-                float y = values[1];
-                float z = values[2];
-                long time = System.currentTimeMillis() - startTime;
+                final float[] values = sensorEvent.values;
+                final float x = values[0];
+                final float y = values[1];
+                final float z = values[2];
+                if (startTime == 0)
+                    startTime = sensorEvent.timestamp;
+                final long time = (sensorEvent.timestamp - startTime) / 1000000;
                 xData.addData((float)time, x);
                 yData.addData((float)time, y);
                 zData.addData((float)time, z);
@@ -123,8 +124,6 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     @Override
     public void init(Activity activity) {
         sensorManager = (SensorManager)activity.getSystemService(Context.SENSOR_SERVICE);
-        sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -142,14 +141,72 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
 
     }
 
+    abstract class DataColunm extends DataTableColumn {
+        final protected XYDataAdapter data;
+        final private String header;
+
+        public DataColunm(XYDataAdapter data, String header) {
+            this.data = data;
+            this.header = header;
+        }
+
+        @Override
+        public int size() {
+            return data.getSize();
+        }
+
+        @Override
+        public String getHeader() {
+            return header;
+        }
+    }
+
+    class XDataColumn extends DataColunm {
+        public XDataColumn(XYDataAdapter data, String header) {
+            super(data, header);
+        }
+
+        @Override
+        public Number getValue(int index) {
+            return data.getX(index);
+        }
+    }
+
+    class YDataColumn extends DataColunm {
+        public YDataColumn(XYDataAdapter data, String header) {
+            super(data, header);
+        }
+
+        @Override
+        public Number getValue(int index) {
+            return data.getY(index);
+        }
+    }
+
     @Override
     public void finishExperiment(boolean saveData, File storageDir) throws IOException {
         super.finishExperiment(saveData, storageDir);
 
+        if (!saveData) {
+            resetData();
+            return;
+        }
+
+        ColumnDataTableAdapter dataTableAdapter = new ColumnDataTableAdapter();
+        dataTableAdapter.addColumn(new XDataColumn(xData, "time [ms]"));
+        dataTableAdapter.addColumn(new YDataColumn(xData, "x-acceleration [m/s^2]"));
+        dataTableAdapter.addColumn(new YDataColumn(yData, "y-acceleration [m/s^2]"));
+        dataTableAdapter.addColumn(new YDataColumn(zData, "z-acceleration [m/s^2]"));
+        Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+                new File(storageDir, "data.csv"))));
+        CSVWriter.writeTable(dataTableAdapter, writer, ',');
     }
 
     @Override
     public void startPreview() {
+        sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_NORMAL);
+
         super.startPreview();
     }
 
@@ -161,10 +218,23 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     @Override
     public void startRecording() throws Exception {
         super.startRecording();
+
+        resetData();
+    }
+
+    private void resetData() {
+        xData.clear();
+        yData.clear();
+        zData.clear();
+        totalData.clear();
+
+        startTime = 0;
     }
 
     @Override
     public boolean stopRecording() {
+        sensorManager.unregisterListener(sensorEventListener);
+
         super.stopRecording();
         return true;
     }
@@ -176,6 +246,8 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public void stopPlayback() {
+        resetData();
+
         super.stopPlayback();
     }
 
