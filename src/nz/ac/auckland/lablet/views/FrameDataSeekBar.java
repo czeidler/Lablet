@@ -8,6 +8,8 @@
 package nz.ac.auckland.lablet.views;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,12 +49,55 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.IFr
         init(context);
     }
 
+    class FastSeeker {
+        long longPressStart;
+        final ImageButton button;
+        final Handler handler = new Handler();
+        final int updateInterval = 600;
+        final int direction;
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!button.isPressed())
+                    return;
+
+                float updatesPerSecond = 1000f / updateInterval;
+                float progress = 5f / updatesPerSecond;
+                // acceleration
+                long time = System.currentTimeMillis();
+                if (time - longPressStart > 2000)
+                    progress *= 2;
+                if (time - longPressStart > 4000)
+                    progress *= 3;
+                if (time - longPressStart > 6000)
+                    progress *= 5;
+
+                if (progress < 1)
+                    progress = 1;
+
+                frameDataModel.setCurrentFrame(frameDataModel.getCurrentFrame() + direction * (int)progress);
+
+                handler.postDelayed(this, updateInterval);
+            }
+        };
+
+        public FastSeeker(ImageButton button, int direction) {
+            this.button = button;
+            this.direction = direction;
+        }
+
+        public void start() {
+            longPressStart = System.currentTimeMillis();
+            handler.post(runnable);
+        }
+    }
+
     private void init(Context context) {
         LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         layoutInflater.inflate(R.layout.experiment_run_view_control, this, true);
 
-        ImageButton prevButton = (ImageButton)findViewById(R.id.frameBackButton);
-        ImageButton nextButton = (ImageButton)findViewById(R.id.nextFrameButton);
+        final ImageButton prevButton = (ImageButton)findViewById(R.id.frameBackButton);
+        final ImageButton nextButton = (ImageButton)findViewById(R.id.nextFrameButton);
         progressLabel = (TextView)findViewById(R.id.progressLabel);
         seekBar = (SeekBar)findViewById(R.id.seekBar);
 
@@ -62,10 +107,26 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.IFr
                 frameDataModel.setCurrentFrame(frameDataModel.getCurrentFrame() - 1);
             }
         });
+        prevButton.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                FastSeeker seeker = new FastSeeker(prevButton, -1);
+                seeker.start();
+                return true;
+            }
+        });
         nextButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 frameDataModel.setCurrentFrame(frameDataModel.getCurrentFrame() + 1);
+            }
+        });
+        nextButton.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                FastSeeker seeker = new FastSeeker(nextButton, 1);
+                seeker.start();
+                return true;
             }
         });
 
