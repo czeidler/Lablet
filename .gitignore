@@ -13,6 +13,10 @@ profiles_settings.xml
 # other files
 ant.properties
 proguard-project.txt
+*.apk
+*.hprof
+*.jar
+*.bc
 
 # dolphin (KDE file manager)
 .directory
