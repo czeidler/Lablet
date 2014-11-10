@@ -4,13 +4,13 @@
           android:versionCode="290"
           android:versionName="3.0Dev">
     <uses-sdk android:minSdkVersion="18"/>
-    <application android:label="@string/app_name" android:icon="@drawable/ic_tracker">
+    <application android:label="@string/app_name" android:icon="@drawable/ic_lablet">
         <activity android:name="nz.ac.auckland.lablet.ExperimentHomeActivity"
-                  android:icon="@drawable/ic_tracker"
+                  android:icon="@drawable/ic_lablet"
                   android:label="@string/app_name">
         </activity>
         <activity android:name=".ExperimentAnalysisActivity"
-                  android:icon="@drawable/ic_tracker"/>
+                  android:icon="@drawable/ic_lablet"/>
 
         <activity android:name="nz.ac.auckland.lablet.ExperimentActivity"
                   android:icon="@drawable/ic_lab"/>
@@ -18,7 +18,7 @@
                   android:icon="@drawable/ic_cut" />
 
         <activity android:name="nz.ac.auckland.lablet.ScriptHomeActivity"
-                  android:icon="@drawable/ic_tracker"
+                  android:icon="@drawable/ic_lablet"
                   android:label="@string/script_activity_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
