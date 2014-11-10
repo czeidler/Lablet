@@ -43,6 +43,10 @@ public class LinearFitPainter extends AbstractPlotDataPainter {
         public double getM() {
             return m;
         }
+
+        public String getLabel() {
+            return "Linear Fit: b = " + String.format("%.2f", b) + ", m = " + String.format("%.2f", m);
+        }
     }
 
     private Fit fit = new Fit();
@@ -50,9 +54,14 @@ public class LinearFitPainter extends AbstractPlotDataPainter {
     private PointF lineStart = new PointF();
     private PointF lineEnd = new PointF();
     private PointF buffer = new PointF();
+    private Paint labelPaint = new Paint();
+    private Paint labelBackgroundPaint = new Paint();
 
     public LinearFitPainter() {
         fitPaint.setColor(Color.BLUE);
+        labelPaint.setColor(Color.BLUE);
+        labelBackgroundPaint.setColor(Color.argb(200, 200, 200, 200));
+        labelBackgroundPaint.setStyle(Paint.Style.FILL);
     }
 
     @Override
@@ -62,6 +71,13 @@ public class LinearFitPainter extends AbstractPlotDataPainter {
 
     @Override
     public void onDraw(Canvas canvas) {
+        float labelMargin = 5;
+        String label = fit.getLabel();
+        float labelHeight = labelPaint.descent() - labelPaint.ascent();
+        canvas.drawRect(labelMargin, labelMargin, labelMargin + labelPaint.measureText(label),
+                labelMargin + labelHeight, labelBackgroundPaint);
+        canvas.drawText(label, labelMargin, labelMargin - labelPaint.ascent(), labelPaint);
+
         RectF range = containerView.getRange();
 
         float yLeft = (float)(fit.getB() + fit.getM() * range.left);
