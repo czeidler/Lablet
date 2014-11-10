@@ -14,7 +14,7 @@ import java.util.List;
 
 
 public class FrameRateSettingsDialog extends AlertDialog {
-    private List<Float> intervalList = new ArrayList<>();
+    final private List<Float> frameRateList;
     final private CameraExperimentSensor cameraExperimentSensor;
     private NumberPicker numberPicker;
 
@@ -23,21 +23,7 @@ public class FrameRateSettingsDialog extends AlertDialog {
 
         this.cameraExperimentSensor = cameraExperimentSensor;
 
-        intervalList.add(0.1f);
-        intervalList.add(0.2f);
-        intervalList.add(0.3f);
-        intervalList.add(0.4f);
-        intervalList.add(0.5f);
-        intervalList.add(1f);
-        intervalList.add(1.5f);
-        intervalList.add(2f);
-        intervalList.add(2.5f);
-        intervalList.add(3f);
-        intervalList.add(5f);
-        intervalList.add(6f);
-        intervalList.add(10f);
-        intervalList.add(15f);
-        intervalList.add(30f);
+        frameRateList = cameraExperimentSensor.getListOfAllowedFrameRates();
     }
 
     @Override
@@ -51,7 +37,7 @@ public class FrameRateSettingsDialog extends AlertDialog {
 
         numberPicker = (NumberPicker)contentView.findViewById(R.id.numberPicker);
         numberPicker.setMinValue(0);
-        numberPicker.setMaxValue(intervalList.size() - 1);
+        numberPicker.setMaxValue(frameRateList.size() - 1);
         numberPicker.setDisplayedValues(getIntervalStringList());
         numberPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
         setCaptureRate(cameraExperimentSensor.getRecordingFrameRate());
@@ -78,22 +64,22 @@ public class FrameRateSettingsDialog extends AlertDialog {
     }
 
     private String[] getIntervalStringList() {
-        String[] list = new String[intervalList.size()];
-        for (int i = 0; i < intervalList.size(); i++)
-            list[i] = new DecimalFormat("#.##").format(intervalList.get(i));
+        String[] list = new String[frameRateList.size()];
+        for (int i = 0; i < frameRateList.size(); i++)
+            list[i] = new DecimalFormat("#.##").format(frameRateList.get(i));
         return list;
     }
 
     private float getCaptureRate() {
-        return intervalList.get(numberPicker.getValue());
+        return frameRateList.get(numberPicker.getValue());
     }
 
     private void setCaptureRate(float captureRate) {
         // find best matching interval
         float minDiff = Float.MAX_VALUE;
         int bestMatch = 0;
-        for (int i = 0; i < intervalList.size(); i++) {
-            final float inListInterval = intervalList.get(i);
+        for (int i = 0; i < frameRateList.size(); i++) {
+            final float inListInterval = frameRateList.get(i);
             final float diff = Math.abs(inListInterval - captureRate);
             if (diff < minDiff) {
                 minDiff = diff;

@@ -30,6 +30,7 @@ import java.io.File;
 public class CameraExperiment extends SingleExperimentBase {
     private int requestedVideoWidth = -1;
     private int requestedVideoHeight = -1;
+    private float recordingFrameRate = -1;
 
     public CameraExperiment() {
         setDescriptionText("Please take a video:");
@@ -50,6 +51,14 @@ public class CameraExperiment extends SingleExperimentBase {
     public void setRequestedResolution(int width, int height) {
         requestedVideoWidth = width;
         requestedVideoHeight = height;
+    }
+
+    public void setRecordingFrameRate(float frameRate) {
+        recordingFrameRate = frameRate;
+    }
+
+    public float getRecordingFrameRate() {
+        return recordingFrameRate;
     }
 }
 
@@ -118,6 +127,11 @@ class ScriptComponentCameraExperimentView extends ScriptComponentSingleExperimen
             options.putInt("requested_video_width", requestedWidth);
             options.putInt("requested_video_height", requestedHeight);
         }
+
+        float recordingFrameRate = cameraComponent.getRecordingFrameRate();
+        if (recordingFrameRate > 0)
+            options.putFloat("recording_frame_rate", recordingFrameRate);
+
         return options;
     }
 

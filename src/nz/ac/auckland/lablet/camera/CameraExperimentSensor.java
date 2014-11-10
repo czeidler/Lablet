@@ -189,6 +189,27 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         return recordingFrameRate;
     }
 
+    public List<Float> getListOfAllowedFrameRates() {
+        List<Float> frameRateList = new ArrayList<>();
+        frameRateList.add(0.1f);
+        frameRateList.add(0.2f);
+        frameRateList.add(0.3f);
+        frameRateList.add(0.4f);
+        frameRateList.add(0.5f);
+        frameRateList.add(1f);
+        frameRateList.add(1.5f);
+        frameRateList.add(2f);
+        frameRateList.add(2.5f);
+        frameRateList.add(3f);
+        frameRateList.add(5f);
+        frameRateList.add(6f);
+        frameRateList.add(10f);
+        frameRateList.add(15f);
+        frameRateList.add(30f);
+
+        return frameRateList;
+    }
+
     /**
      * Helper class to match a camera recording size with a camcorder profile matching for that size.
      */
@@ -230,6 +251,22 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         if (intent.hasExtra("requested_video_width") && intent.hasExtra("requested_video_height")) {
             requestedVideoWidth = intent.getIntExtra("requested_video_width", -1);
             requestedVideoHeight = intent.getIntExtra("requested_video_height", -1);
+        }
+        if (intent.hasExtra("recording_frame_rate")) {
+            float frameRate = intent.getFloatExtra("recording_frame_rate", -1);
+            // find best matching frame rate
+            float bestFrameRate = -1;
+            float bestDiff = Float.MAX_VALUE;
+            List<Float> allowedFrameRates = getListOfAllowedFrameRates();
+            for (int i = 0; i < allowedFrameRates.size(); i++) {
+                Float current = allowedFrameRates.get(i);
+                float diff = Math.abs(current - frameRate);
+                if (diff < bestDiff) {
+                    bestDiff = diff;
+                    bestFrameRate = current;
+                }
+            }
+            setRecordingFrameRate(bestFrameRate);
         }
 
         experimentData = new CameraSensorData(activity, this);
