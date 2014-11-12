@@ -30,6 +30,8 @@ import nz.ac.auckland.lablet.misc.AudioWavOutputStream;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.views.*;
 import nz.ac.auckland.lablet.views.plotview.PlotView;
+import nz.ac.auckland.lablet.views.plotview.StrategyPainter;
+import nz.ac.auckland.lablet.views.plotview.ThreadStrategyPainter;
 
 import java.io.*;
 import java.lang.ref.WeakReference;
@@ -86,17 +88,18 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
             };
 
             {
-                audioAmplitudePlotView = (PlotView)view.findViewById(R.id.audioSignalView);
-                AudioAmplitudePainter audioAmplitudePainter = new AudioAmplitudePainter();
+                StrategyPainter strategyPainter = new ThreadStrategyPainter();
                 audioAmplitudePlotAdapter = new AudioAmplitudePlotDataAdapter();
-                audioAmplitudePainter.setDataAdapter(audioAmplitudePlotAdapter);
-                audioAmplitudePlotView.addPlotPainter(audioAmplitudePainter);
+                audioAmplitudePlotView = (PlotView)view.findViewById(R.id.audioSignalView);
+                AudioAmplitudePainter audioAmplitudePainter = new AudioAmplitudePainter(audioAmplitudePlotAdapter);
+                strategyPainter.addChild(audioAmplitudePainter);
                 audioAmplitudePlotView.setXRange(0, amplitudeTimeSpan);
                 audioAmplitudePlotView.setYRange(-0.6f, 0.6f);
                 audioAmplitudePlotView.getTitleView().setTitle("Signal Strength Vs Time");
                 audioAmplitudePlotView.getXAxisView().setUnit("ms");
                 audioAmplitudePlotView.getXAxisView().setTitle("Time");
                 audioAmplitudePlotView.getBackgroundPainter().setShowYGrid(true);
+                audioAmplitudePlotView.addPlotPainter(strategyPainter);
 
                 audioFrequencyView = (AudioFrequencyView)view.findViewById(R.id.audioFrequencyView);
 
@@ -161,14 +164,16 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
             };
 
             {
+                StrategyPainter strategyPainter = new ThreadStrategyPainter();
                 startPauseButton = (ToggleButton)view.findViewById(R.id.startPauseButton);
                 seekBar = (SeekBar)view.findViewById(R.id.seekBar);
                 lengthTextView = (TextView)view.findViewById(R.id.lengthTextView);
                 playbackAmplitudeView = (PlotView)view.findViewById(R.id.playbackAmplitudeView);
-                AudioAmplitudePainter audioAmplitudePainter = new AudioAmplitudePainter();
                 audioAmplitudePlotAdapter = new AudioAmplitudePlotDataAdapter();
-                audioAmplitudePainter.setDataAdapter(audioAmplitudePlotAdapter);
-                playbackAmplitudeView.addPlotPainter(audioAmplitudePainter);
+                AudioAmplitudePainter audioAmplitudePainter = new AudioAmplitudePainter(audioAmplitudePlotAdapter);
+                strategyPainter.addChild(audioAmplitudePainter);
+
+                playbackAmplitudeView.addPlotPainter(strategyPainter);
                 playbackAmplitudeView.setYRange(-1, 1);
                 playbackAmplitudeView.getXAxisView().setUnit("ms");
                 playbackAmplitudeView.getXAxisView().setTitle("Time");

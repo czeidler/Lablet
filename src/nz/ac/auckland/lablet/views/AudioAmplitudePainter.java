@@ -8,15 +8,20 @@
 package nz.ac.auckland.lablet.views;
 
 import android.graphics.*;
-import nz.ac.auckland.lablet.views.plotview.ArrayOffScreenPlotPainter;
+import nz.ac.auckland.lablet.views.plotview.ArrayConcurrentPainter;
+import nz.ac.auckland.lablet.views.plotview.CloneablePlotDataAdapter;
 import nz.ac.auckland.lablet.views.plotview.Range;
+import nz.ac.auckland.lablet.views.plotview.StrategyPainter;
+
+import java.util.List;
 
 
-public class AudioAmplitudePainter extends ArrayOffScreenPlotPainter {
+public class AudioAmplitudePainter extends ArrayConcurrentPainter {
     final private Paint penMinMaxPaint = new Paint();
     final private Paint penStdPaint = new Paint();
 
-    public AudioAmplitudePainter() {
+    public AudioAmplitudePainter(CloneablePlotDataAdapter dataAdapter) {
+        super(dataAdapter);
         init();
     }
 
@@ -31,9 +36,15 @@ public class AudioAmplitudePainter extends ArrayOffScreenPlotPainter {
     }
 
     @Override
+    public List<StrategyPainter.RenderPayload> collectRenderPayloads(boolean geometryInfoNeeded, RectF requestedRealRect) {
+        // we need the geometry info to calculate getSamplesPerPixel
+        return super.collectRenderPayloads(true, requestedRealRect);
+    }
+
+    @Override
     protected RectF getRealDataRect(int startIndex, int lastIndex) {
         AudioAmplitudePlotDataAdapter audioAmplitudePlotDataAdapter = (AudioAmplitudePlotDataAdapter)dataAdapter;
-        RectF realDataRect = containerView.getRange();
+        RectF realDataRect = getContainerView().getRange();
         realDataRect.left = audioAmplitudePlotDataAdapter.getX(startIndex).floatValue();
         realDataRect.right = audioAmplitudePlotDataAdapter.getX(lastIndex).floatValue();
         return realDataRect;

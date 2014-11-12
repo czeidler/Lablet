@@ -80,36 +80,36 @@ class AccelerometerExperimentView extends AbstractExperimentSensorView {
         plotView.getBackgroundPainter().setShowXGrid(true);
         plotView.getBackgroundPainter().setShowYGrid(true);
 
-        XYPainter xPainter = new XYPainter();
-        xData = new XYDataAdapter(data.getTimeValues(), data.getXValues());
-        xPainter.setDataAdapter(xData);
-        plotView.addPlotPainter(xPainter);
+        StrategyPainter strategyPainter = new ThreadStrategyPainter();
 
-        XYPainter yPainter = new XYPainter();
+        xData = new XYDataAdapter(data.getTimeValues(), data.getXValues());
+        XYConcurrentPainter xPainter = new XYConcurrentPainter(xData);
+        strategyPainter.addChild(xPainter);
+
+        yData = new XYDataAdapter(data.getTimeValues(), data.getYValues());
+        XYConcurrentPainter yPainter = new XYConcurrentPainter(yData);
         yPainter.setPointRenderer(new CircleRenderer());
         Paint yMarkerPaint = new Paint();
         yMarkerPaint.setColor(Color.BLUE);
         yPainter.getDrawConfig().setMarkerPaint(yMarkerPaint);
-        yData = new XYDataAdapter(data.getTimeValues(), data.getYValues());
-        yPainter.setDataAdapter(yData);
-        plotView.addPlotPainter(yPainter);
+        strategyPainter.addChild(yPainter);
 
-        XYPainter zPainter = new XYPainter();
+        zData = new XYDataAdapter(data.getTimeValues(), data.getZValues());
+        XYConcurrentPainter zPainter = new XYConcurrentPainter(zData);
         Paint zMarkerPaint = new Paint();
         zMarkerPaint.setColor(Color.RED);
         zPainter.getDrawConfig().setMarkerPaint(zMarkerPaint);
         zPainter.setPointRenderer(new BottomTriangleRenderer());
-        zData = new XYDataAdapter(data.getTimeValues(), data.getZValues());
-        zPainter.setDataAdapter(zData);
-        plotView.addPlotPainter(zPainter);
+        strategyPainter.addChild(zPainter);
 
-        XYPainter totalPainter = new XYPainter();
+        XYConcurrentPainter totalPainter = new XYConcurrentPainter(totalData);
         Paint totalMarkerPaint = new Paint();
         totalMarkerPaint.setColor(Color.WHITE);
         totalPainter.getDrawConfig().setMarkerPaint(totalMarkerPaint);
         totalPainter.setPointRenderer(new CircleRenderer());
-        totalPainter.setDataAdapter(totalData);
-        plotView.addPlotPainter(totalPainter);
+        strategyPainter.addChild(totalPainter);
+
+        plotView.addPlotPainter(strategyPainter);
 
         LegendPainter legend = new LegendPainter();
         legend.addEntry(xPainter, "x-acceleration");
