@@ -188,7 +188,7 @@ public class ThreadStrategyPainter extends StrategyPainter {
             Canvas canvas = offScreenBitmap.getCanvas();
             canvas.drawBitmap(resultBitmap, null, targetRect, null);
         }
-        containerView.invalidate();
+
     }
 
     protected void onOffScreenRenderingFinished() {
@@ -199,6 +199,7 @@ public class ThreadStrategyPainter extends StrategyPainter {
         if (!hasFreeRenderingPipe())
             return;
 
+        containerView.invalidate();
         startRenderDirtyRegions();
     }
 
@@ -253,7 +254,7 @@ public class ThreadStrategyPainter extends StrategyPainter {
 
     @Override
     protected void startRenderDirtyRegions() {
-        triggerOffScreenRendering(null, false);
+        triggerOffScreenRendering(false);
     }
 
     @Override
@@ -270,9 +271,20 @@ public class ThreadStrategyPainter extends StrategyPainter {
         renderTask.start(payloadsToRender);
     }
 
-    private void triggerOffScreenRendering(RectF range, boolean completeRedraw) {
+    private boolean unprocessedCompleteRedraw = false;
+    private void triggerOffScreenRendering(boolean completeRedraw) {
         if (containerView == null)
             return;
+        if (isRendering()) {
+            unprocessedCompleteRedraw = completeRedraw;
+            return;
+        }
+        RectF range = null;
+        if (unprocessedCompleteRedraw || completeRedraw) {
+            completeRedraw = true;
+            range = getContainerView().getRange();
+            unprocessedCompleteRedraw = false;
+        }
 
         List<RenderPayload> dirt = new ArrayList<>();
         for (ConcurrentPainter painter : childPainters) {
@@ -290,13 +302,12 @@ public class ThreadStrategyPainter extends StrategyPainter {
                 payloadQueue.add(payload);
         }
 
-        if (!isRendering())
-            renderQueue();
+        renderQueue();
     }
 
     @Override
     public void invalidate() {
-        triggerOffScreenRendering(getContainerView().getRange(), true);
+        triggerOffScreenRendering(true);
     }
 
     @Override
