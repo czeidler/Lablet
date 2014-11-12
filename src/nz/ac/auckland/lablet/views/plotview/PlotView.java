@@ -225,26 +225,31 @@ public class PlotView extends ViewGroup {
         }
 
         public boolean removePainter(IPlotPainter painter) {
-            XYPainter xyPainter = (XYPainter)painter;
-            if (xyPainter == null)
-                return true;
-            AbstractXYDataAdapter xyDataAdapter = (AbstractXYDataAdapter)xyPainter.getDataAdapter();
-            if (xyDataAdapter == null)
-                return true;
+            boolean result = mainView.removePlotPainter(painter);
 
-            Iterator<DataStatistics> iterator = dataStatisticsList.iterator();
-            while (iterator.hasNext()) {
-                DataStatistics dataStatistics = iterator.next();
+            if (painter instanceof StrategyPainter) {
+                StrategyPainter strategyPainter = (StrategyPainter) painter;
+                for (ConcurrentPainter child : strategyPainter.getChildPainters()) {
+                    XYConcurrentPainter xyChild = (XYConcurrentPainter)child;
+                    AbstractXYDataAdapter xyDataAdapter = (AbstractXYDataAdapter)xyChild.getAdapter();
+                    if (xyDataAdapter == null)
+                        return true;
 
-                if (dataStatistics.getAdapter() != xyDataAdapter)
-                    continue;
+                    Iterator<DataStatistics> iterator = dataStatisticsList.iterator();
+                    while (iterator.hasNext()) {
+                        DataStatistics dataStatistics = iterator.next();
 
-                dataStatistics.release();
-                iterator.remove();
-                return true;
+                        if (dataStatistics.getAdapter() != xyDataAdapter)
+                            continue;
+
+                        dataStatistics.release();
+                        iterator.remove();
+                        return true;
+                    }
+                }
             }
 
-            return false;
+            return result;
         }
 
         public RectF getDataLimits() {

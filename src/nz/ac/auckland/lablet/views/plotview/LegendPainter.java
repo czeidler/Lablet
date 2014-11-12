@@ -26,15 +26,15 @@ public class LegendPainter implements IPlotPainter {
     private PlotPainterContainerView containerView;
 
     class Entry {
-        final private XYPainter painter;
+        final private XYConcurrentPainter painter;
         final private String label;
 
-        public Entry(XYPainter painter, String label) {
+        public Entry(XYConcurrentPainter painter, String label) {
             this.painter = painter;
             this.label = label;
         }
 
-        public XYPainter getPainter() {
+        public XYConcurrentPainter getPainter() {
             return painter;
         }
 
@@ -51,7 +51,7 @@ public class LegendPainter implements IPlotPainter {
         borderPaint.setStyle(Paint.Style.STROKE);
     }
 
-    public void addEntry(XYPainter painter, String label) {
+    public void addEntry(XYConcurrentPainter painter, String label) {
         entryList.add(new Entry(painter, label));
         layoutInfo = null;
     }

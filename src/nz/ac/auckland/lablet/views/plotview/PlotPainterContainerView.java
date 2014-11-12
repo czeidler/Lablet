@@ -45,9 +45,10 @@ public class PlotPainterContainerView extends RangeDrawingView {
             painter.onSizeChanged(getWidth(), getHeight(), 0, 0);
     }
 
-    public void removePlotPainter(IPlotPainter painter) {
-        plotPainters.remove(painter);
+    public boolean removePlotPainter(IPlotPainter painter) {
+        boolean result = plotPainters.remove(painter);
         invalidate();
+        return result;
     }
 
     public void addForegroundPainter(IPlotPainter painter) {

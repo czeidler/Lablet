@@ -16,6 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+interface IPointRenderer {
+    public void drawPoint(Canvas canvas, PointF position, DrawConfig config);
+}
+
 public class XYConcurrentPainter extends ArrayConcurrentPainter {
     private DrawConfig drawConfig = new DrawConfig();
     private IPointRenderer pointRenderer = new CrossRenderer();
