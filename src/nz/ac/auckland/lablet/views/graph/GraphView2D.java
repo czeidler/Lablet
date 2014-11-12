@@ -81,7 +81,7 @@ abstract class AbstractGraphAdapter extends AbstractXYDataAdapter {
 public class GraphView2D extends PlotView {
     private AbstractGraphAdapter adapter;
 
-    private XYPainter painter;
+    private StrategyPainter painter;
 
     // max layout sizes in dp
     private int maxWidth = -1;
@@ -191,8 +191,11 @@ public class GraphView2D extends PlotView {
         getBackgroundPainter().setShowXGrid(true);
         getBackgroundPainter().setShowYGrid(true);
 
-        painter = new XYPainter();
-        painter.setDataAdapter(adapter);
+
+        painter = new DirectStrategyPainter();
+        //painter = new ThreadStrategyPainter();
+        XYConcurrentPainter xyConcurrentPainter = new XYConcurrentPainter(adapter);
+        painter.addChild(xyConcurrentPainter);
         addPlotPainter(painter);
 
         setAutoRange(AUTO_RANGE_ZOOM, AUTO_RANGE_ZOOM);

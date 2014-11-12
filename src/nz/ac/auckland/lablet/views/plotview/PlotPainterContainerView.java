@@ -11,6 +11,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import org.luaj.vm2.ast.Str;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -110,5 +111,21 @@ public class PlotPainterContainerView extends RangeDrawingView {
             painter.onYRangeChanged(getRangeBottom(), getRangeTop(), oldBottom, oldTop);
 
         return true;
+    }
+
+    public List<AbstractXYDataAdapter> getXYDataAdapters() {
+        List<AbstractXYDataAdapter> list = new ArrayList<>();
+        for (IPlotPainter painter : allPainters) {
+            if (!(painter instanceof StrategyPainter))
+                continue;
+            List<ConcurrentPainter> childs = ((StrategyPainter)painter).getChildPainters();
+            for (ConcurrentPainter child : childs) {
+                if (!(child instanceof  XYConcurrentPainter))
+                    continue;
+                XYConcurrentPainter xyConcurrentPainter = (XYConcurrentPainter)child;
+                list.add((AbstractXYDataAdapter)xyConcurrentPainter.getAdapter());
+            }
+        }
+        return list;
     }
 }

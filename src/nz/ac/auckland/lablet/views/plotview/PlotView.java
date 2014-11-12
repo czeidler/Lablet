@@ -214,17 +214,10 @@ public class PlotView extends ViewGroup {
 
         private RectF previousLimits;
 
-        public AutoRange(List<IPlotPainter> painters, int behaviourX, int behaviourY) {
+        public AutoRange(List<AbstractXYDataAdapter> adapters, int behaviourX, int behaviourY) {
             setBehaviour(behaviourX, behaviourY);
 
-            for (IPlotPainter painter : painters) {
-                AbstractPlotDataPainter abstractPlotDataPainter = (AbstractPlotDataPainter)painter;
-                if (abstractPlotDataPainter == null)
-                    continue;
-                AbstractXYDataAdapter adapter = (AbstractXYDataAdapter) abstractPlotDataPainter.dataAdapter;
-                if (adapter == null)
-                    continue;
-
+            for (AbstractXYDataAdapter adapter : adapters) {
                 DataStatistics dataStatistics = new DataStatistics(adapter);
                 dataStatistics.addListener(this);
                 dataStatisticsList.add(dataStatistics);
@@ -494,7 +487,7 @@ public class PlotView extends ViewGroup {
         mainView.addPlotPainter(painter);
     }
 
-    public void removePlotPainter(XYPainter painter) {
+    protected void removePlotPainter(StrategyPainter painter) {
         mainView.removePlotPainter(painter);
 
         if (autoRange != null)
@@ -543,7 +536,7 @@ public class PlotView extends ViewGroup {
         if (behaviourX == AUTO_RANGE_DISABLED && behaviourY == AUTO_RANGE_DISABLED)
             return;
 
-        autoRange = new AutoRange(mainView.getPlotPainters(), behaviourX, behaviourY);
+        autoRange = new AutoRange(mainView.getXYDataAdapters(), behaviourX, behaviourY);
     }
 
     public void autoZoom() {
