@@ -35,6 +35,14 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
         this.yScale = yScale;
     }
 
+    public IScale getXScale() {
+        return xScale;
+    }
+
+    public IScale getYScale() {
+        return yScale;
+    }
+
     @Override
     public void onXRangeChanged(float left, float right, float oldLeft, float oldRight) {
 

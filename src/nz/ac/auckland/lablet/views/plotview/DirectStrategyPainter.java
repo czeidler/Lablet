@@ -13,6 +13,7 @@ import java.util.List;
 
 
 public class DirectStrategyPainter extends StrategyPainter {
+
     @Override
     public boolean hasThreads() {
         return false;
@@ -20,7 +21,7 @@ public class DirectStrategyPainter extends StrategyPainter {
 
     @Override
     public boolean hasFreeRenderingPipe() {
-        return false;
+        return true;
     }
 
     @Override
@@ -32,8 +33,14 @@ public class DirectStrategyPainter extends StrategyPainter {
     public void onDraw(Canvas canvas) {
         for (ConcurrentPainter painter : childPainters) {
             List<RenderPayload> payloadList = painter.collectRenderPayloads(false, getContainerView().getRange());
+
             for (RenderPayload renderPayload : payloadList)
                 painter.render(canvas, renderPayload);
         }
+    }
+
+    @Override
+    protected void startRenderDirtyRegions() {
+        containerView.invalidate();
     }
 }

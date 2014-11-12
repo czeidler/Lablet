@@ -79,6 +79,8 @@ abstract public class StrategyPainter extends AbstractPlotPainter {
 
     abstract public boolean hasFreeRenderingPipe();
 
+    abstract protected void startRenderDirtyRegions();
+
     public void addChild(ConcurrentPainter painter) {
         childPainters.add(painter);
         painter.setParent(this);

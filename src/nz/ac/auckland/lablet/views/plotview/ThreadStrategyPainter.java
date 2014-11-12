@@ -199,7 +199,7 @@ public class ThreadStrategyPainter extends StrategyPainter {
         if (!hasFreeRenderingPipe())
             return;
 
-        triggerOffScreenRendering(null, false);
+        startRenderDirtyRegions();
     }
 
     @Override
@@ -249,6 +249,11 @@ public class ThreadStrategyPainter extends StrategyPainter {
 
     private boolean isRendering() {
         return renderTask.isRendering();
+    }
+
+    @Override
+    protected void startRenderDirtyRegions() {
+        triggerOffScreenRendering(null, false);
     }
 
     @Override
