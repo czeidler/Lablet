@@ -35,12 +35,12 @@ public class Vector4DAnalysis implements ISensorAnalysis{
 
     @Override
     public boolean loadAnalysisData(Bundle bundle, File storageDir) {
-        return false;
+        return true;
     }
 
     @Override
     public Bundle exportAnalysisData(File additionalStorageDir) throws IOException {
-        return null;
+        return new Bundle();
     }
 
     @Override

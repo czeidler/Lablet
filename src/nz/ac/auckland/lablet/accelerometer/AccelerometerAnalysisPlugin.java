@@ -23,16 +23,19 @@ public class AccelerometerAnalysisPlugin implements IAnalysisPlugin {
 
     @Override
     public String supportedDataType() {
-        return "Vector3D/Accelerometer";
+        return AccelerometerSensorData.DATA_TYPE;
     }
 
     @Override
     public ISensorAnalysis createSensorAnalysis(ISensorData sensorData) {
-        return null;
+        assert sensorData instanceof AccelerometerSensorData;
+        return new Vector4DAnalysis((AccelerometerSensorData)sensorData);
     }
 
     @Override
     public Fragment createSensorAnalysisFragment(ExperimentAnalysis.AnalysisRef analysisRef) {
-        return null;
+        Fragment fragment = new Vector4DAnalysisFragment();
+        fragment.setArguments(analysisRef.toBundle());
+        return fragment;
     }
 }

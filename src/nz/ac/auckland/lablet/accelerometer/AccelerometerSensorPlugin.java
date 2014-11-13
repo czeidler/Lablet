@@ -12,13 +12,14 @@ import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.File;
+import java.io.IOException;
 
 
 public class AccelerometerSensorPlugin implements ISensorPlugin {
 
     @Override
     public String getSensorName() {
-        return AccelerometerExperimentSensor.class.getSimpleName();
+        return AccelerometerExperimentSensor.SENSOR_NAME;
     }
 
     @Override
@@ -28,7 +29,14 @@ public class AccelerometerSensorPlugin implements ISensorPlugin {
 
     @Override
     public ISensorData loadSensorData(Context context, Bundle data, File storageDir) {
-        return null;
+        ISensorData sensorData = new AccelerometerSensorData(context);
+        try {
+            sensorData.loadExperimentData(data, storageDir);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return sensorData;
     }
 }
 

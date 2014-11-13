@@ -9,6 +9,8 @@ package nz.ac.auckland.lablet.accelerometer;
 
 import android.content.Context;
 import android.os.Bundle;
+import au.com.bytecode.opencsv.CSV;
+import au.com.bytecode.opencsv.CSVReadProc;
 import nz.ac.auckland.lablet.experiment.AbstractSensorData;
 import nz.ac.auckland.lablet.experiment.IExperimentSensor;
 import nz.ac.auckland.lablet.misc.WeakListenable;
@@ -33,13 +35,15 @@ public class AccelerometerSensorData extends AbstractSensorData {
         void onDataCleared();
     }
 
+    static final public String DATA_TYPE = "Vector4D/Accelerometer";
+
     @Override
     public String getDataType() {
-        return "Vector4D/accelerometer";
+        return DATA_TYPE;
     }
 
-    public AccelerometerSensorData(Context experimentContext, Bundle bundle, File storageDir) {
-        super(experimentContext, bundle, storageDir);
+    public AccelerometerSensorData(Context experimentContext) {
+        super(experimentContext);
     }
 
     public AccelerometerSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
@@ -71,18 +75,63 @@ public class AccelerometerSensorData extends AbstractSensorData {
         }
     }
 
+    class LongDataColumn<T> extends DataColumn<T> {
+        public LongDataColumn(List<T> data, String header) {
+            super(data, header);
+        }
+
+        @Override
+        public String getStringValue(int index) {
+            return Long.toString(getValue(index).longValue());
+        }
+    }
+
     @Override
     public void saveExperimentDataToFile(File storageDir) throws IOException {
         super.saveExperimentDataToFile(storageDir);
 
         ColumnDataTableAdapter dataTableAdapter = new ColumnDataTableAdapter();
-        dataTableAdapter.addColumn(new DataColumn(timeValues, "time [ms]"));
+        dataTableAdapter.addColumn(new LongDataColumn(timeValues, "time [ms]"));
         dataTableAdapter.addColumn(new DataColumn(xValues, "x-acceleration [m/s^2]"));
         dataTableAdapter.addColumn(new DataColumn(yValues, "y-acceleration [m/s^2]"));
         dataTableAdapter.addColumn(new DataColumn(zValues, "z-acceleration [m/s^2]"));
         Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
                 new File(storageDir, "data.csv"))));
         CSVWriter.writeTable(dataTableAdapter, writer, ',');
+        writer.close();
+    }
+
+    @Override
+    public boolean loadExperimentData(Bundle bundle, File storageDir) {
+        clear();
+        final float[] dataBuffer = new float[3];
+        InputStream inputStream;
+        try {
+            inputStream = new BufferedInputStream(new FileInputStream(new File(storageDir, "data.csv")));
+            CSV csv = CSV.separator(',').quote('"').create();
+            csv.read(inputStream, new CSVReadProc() {
+                @Override
+                public void procRow(int rowIndex, String... strings) {
+                    // ignore header
+                    if (rowIndex ==  0)
+                        return;
+                    if (strings.length != 4)
+                        return;
+                    long time = Long.parseLong(strings[0]);
+                    dataBuffer[0] = Float.parseFloat(strings[1]);
+                    dataBuffer[1] = Float.parseFloat(strings[2]);
+                    dataBuffer[2] = Float.parseFloat(strings[3]);
+                    addData(time, dataBuffer);
+                }
+            });
+            inputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return super.loadExperimentData(bundle, storageDir);
     }
 
     public void addListener(IListener listener) {

@@ -22,11 +22,9 @@ import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensorView;
 import nz.ac.auckland.lablet.experiment.ISensorData;
 import nz.ac.auckland.lablet.views.plotview.*;
-import nz.ac.auckland.lablet.views.table.CSVWriter;
-import nz.ac.auckland.lablet.views.table.ColumnDataTableAdapter;
-import nz.ac.auckland.lablet.views.table.DataTableColumn;
 
 import java.io.*;
+
 
 class AccelerometerExperimentView extends AbstractExperimentSensorView {
     final private AccelerometerExperimentSensor sensor;
@@ -75,11 +73,9 @@ class AccelerometerExperimentView extends AbstractExperimentSensorView {
 
         plotView = new PlotView(context);
         plotView.getTitleView().setTitle("Accelerometer");
-        plotView.setXRange(0, 20000);
-        plotView.setYRange(-0.5f, 0.5f);
         plotView.getBackgroundPainter().setShowXGrid(true);
         plotView.getBackgroundPainter().setShowYGrid(true);
-
+        resetView();
         StrategyPainter strategyPainter = new ThreadStrategyPainter();
 
         xData = new XYDataAdapter(data.getTimeValues(), data.getXValues());
@@ -126,6 +122,18 @@ class AccelerometerExperimentView extends AbstractExperimentSensorView {
     public void onSettingsChanged() {
 
     }
+
+    @Override
+    public void onStartRecording() {
+        super.onStartRecording();
+
+        resetView();
+    }
+
+    private void resetView() {
+        plotView.setXRange(0, 20000);
+        plotView.setYRange(-0.5f, 0.5f);
+    }
 }
 
 public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
@@ -134,9 +142,11 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     private SensorManager sensorManager;
     private long startTime = 0;
 
+    final public static String SENSOR_NAME = "Accelerometer";
+
     @Override
     public String getSensorName() {
-        return getClass().getSimpleName();
+        return SENSOR_NAME;
     }
 
     @Override
