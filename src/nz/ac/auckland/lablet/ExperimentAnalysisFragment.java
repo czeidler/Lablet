@@ -24,22 +24,23 @@ public class ExperimentAnalysisFragment extends android.support.v4.app.Fragment 
         super();
     }
 
-    private ISensorAnalysis findExperimentFromArguments(Activity activity) {
+    private void findExperimentFromArguments(Activity activity) {
         ExperimentAnalysisActivity experimentActivity = (ExperimentAnalysisActivity)activity;
         if (!experimentActivity.ensureExperimentDataLoaded())
-            return null;
+            return;
 
         final ExperimentAnalysis experimentAnalysis = experimentActivity.getExperimentAnalysis();
-        ExperimentAnalysis.AnalysisRef analysisRef = new ExperimentAnalysis.AnalysisRef(getArguments());
+        analysisRef = new ExperimentAnalysis.AnalysisRef(getArguments());
         ExperimentAnalysis.AnalysisRunEntry runEntry = experimentAnalysis.getCurrentAnalysisRun();
-        return runEntry.analysisDataList.get(analysisRef.sensor).getAnalysisEntry(analysisRef.analysisId).analysis;
+        sensorAnalysis = runEntry.analysisDataList.get(analysisRef.sensor).getAnalysisEntry(
+                analysisRef.analysisId).analysis;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        sensorAnalysis = findExperimentFromArguments(activity);
+        findExperimentFromArguments(activity);
     }
 
     public ExperimentData getExperimentData() {
