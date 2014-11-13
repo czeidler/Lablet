@@ -8,13 +8,12 @@
 package nz.ac.auckland.lablet.camera;
 
 import android.content.Context;
+import android.support.v4.widget.DrawerLayout;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
-import android.widget.Spinner;
+import android.widget.*;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.experiment.Unit;
@@ -28,67 +27,7 @@ import java.util.List;
 
 
 class MotionAnalysisFragmentView extends FrameLayout {
-    class Layout extends ViewGroup {
-        private FrameDataSeekBar runViewControl = null;
-        private FrameContainerView sensorContainerView = null;
-        private ViewGroup experimentDataView = null;
-
-        /**
-         * After a long time of trying I was not able to create the desired layout using Androids layout classes. This
-         * layout class builds the layout manually.
-         *
-         * @param context the fragment context
-         */
-        public Layout(Context context) {
-            super(context);
-
-
-            runViewControl = new FrameDataSeekBar(context);
-            sensorContainerView = new FrameContainerView(context);
-
-            LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            experimentDataView = (ViewGroup)inflater.inflate(R.layout.motion_analysis_data_side_bar, null, false);
-
-            addView(runViewControl);
-            addView(sensorContainerView);
-            addView(experimentDataView);
-        }
-
-        public FrameDataSeekBar getRunViewControl() {
-            return runViewControl;
-        }
-
-        public FrameContainerView getSensorContainerView() {
-            return sensorContainerView;
-        }
-
-        @Override
-        protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-            int width = right -left;
-            int height = bottom - top;
-
-            runViewControl.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST),
-                    MeasureSpec.makeMeasureSpec(height, MeasureSpec.AT_MOST));
-            int controlHeight = runViewControl.getMeasuredHeight();
-
-            int containerHeight = height - controlHeight;
-            sensorContainerView.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(containerHeight, MeasureSpec.EXACTLY));
-            int containerWidth = sensorContainerView.getMeasuredWidth();
-
-            // the child's measure methods have to be called with the final sizes, Android ^^...
-            experimentDataView.measure(MeasureSpec.makeMeasureSpec(width - containerWidth, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
-            runViewControl.measure(MeasureSpec.makeMeasureSpec(containerWidth, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(height - containerHeight, MeasureSpec.EXACTLY));
-
-            sensorContainerView.layout(0, 0, containerWidth, containerHeight);
-            runViewControl.layout(0, containerHeight, containerWidth, height);
-            experimentDataView.layout(containerWidth, 0, width, height);
-        }
-    }
-
-    private FrameContainerView runContainerView = null;
+    private FrameContainerView runContainerView;
     private TableView tableView = null;
     private GraphView2D graphView = null;
     private Spinner graphSpinner = null;
@@ -116,11 +55,28 @@ class MotionAnalysisFragmentView extends FrameLayout {
     public MotionAnalysisFragmentView(Context context, MotionAnalysis sensorAnalysis) {
         super(context);
 
-        final Layout mainView = new Layout(getContext());
+        final LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View mainView = inflater.inflate(R.layout.motion_analysis, this, true);
         assert mainView != null;
-        addView(mainView);
 
-        runContainerView = mainView.getSensorContainerView();
+        final DrawerLayout drawerLayout = (DrawerLayout)mainView.findViewById(R.id.drawer_layout);
+
+        final Button drawerButton = (Button)mainView.findViewById(R.id.drawerButton);
+        drawerButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawerLayout.openDrawer(Gravity.RIGHT);
+            }
+        });
+
+        final FrameLayout leftDrawer = (FrameLayout)mainView.findViewById(R.id.left_drawer);
+
+        runContainerView = (FrameContainerView)mainView.findViewById(R.id.frameContainerView);
+        final FrameDataSeekBar runViewControl = (FrameDataSeekBar)mainView.findViewById(R.id.frameDataSeekBar);
+
+        final ViewGroup experimentDataView = (ViewGroup)inflater.inflate(R.layout.motion_analysis_data_side_bar, null, false);
+        leftDrawer.addView(experimentDataView);
+
         // marker graph view
         graphView = (GraphView2D)mainView.findViewById(R.id.tagMarkerGraphView);
         assert graphView != null;
@@ -131,7 +87,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
         if (sensorAnalysisView == null)
             return;
 
-        final FrameDataSeekBar runViewControl = mainView.getRunViewControl();
         runViewControl.setTo(sensorAnalysis.getFrameDataModel());
 
         runContainerView.setTo(sensorAnalysisView, sensorAnalysis);
@@ -165,6 +120,12 @@ class MotionAnalysisFragmentView extends FrameLayout {
         graphSpinnerEntryList.add(new GraphSpinnerEntry("y-Velocity", new MarkerTimeGraphAdapter(markerDataModel,
                 timeCalibration, "y-Velocity", new TimeMarkerGraphAxis(tUnit),
                 new YSpeedMarkerGraphAxis(yUnit, tUnit))));
+        graphSpinnerEntryList.add(new GraphSpinnerEntry("time vs x-Position", new MarkerTimeGraphAdapter(markerDataModel,
+                timeCalibration, "time vs x-Position", new TimeMarkerGraphAxis(tUnit),
+                new XPositionMarkerGraphAxis(xUnit, sensorAnalysis.getXMinRangeGetter()))));
+        graphSpinnerEntryList.add(new GraphSpinnerEntry("time vs y-Position", new MarkerTimeGraphAdapter(markerDataModel,
+                timeCalibration, "time vs y-Position", new TimeMarkerGraphAxis(tUnit),
+                new YPositionMarkerGraphAxis(yUnit, sensorAnalysis.getYMinRangeGetter()))));
 
         graphSpinner = (Spinner)mainView.findViewById(R.id.graphSpinner);
         graphSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
