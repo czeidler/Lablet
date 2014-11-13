@@ -180,7 +180,7 @@ class CodecInputSurface {
 public class VideoRecorder {
     // parameters for the encoder
     private static final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
-    private static final int IFRAME_INTERVAL = 5;
+    private static final int IFRAME_INTERVAL = 1;
 
     private CameraGLTextureProducer cameraGLTextureProducer;
 
