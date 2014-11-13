@@ -31,17 +31,15 @@ abstract public class AbstractSensorData implements ISensorData {
     static public String DATA_TYPE_KEY = "data_type";
 
     /**
-     * Constructor to load an existing experiment.
+     * Constructor to create an existing experiment that is loaded with loadExperimentData.
+     *
+     * loadExperimentData is not called directly here in the constructor because its not a good idea to call virtual
+     * methods, i.e., the derived is constructor is not finished before the derived method is called.
      *
      * @param experimentContext the context of the experiment
-     * @param bundle the experiment data that fits into a bundle
-     * @param storageDir the storage directory of the experiment
      */
-    public AbstractSensorData(Context experimentContext, Bundle bundle, File storageDir) {
+    public AbstractSensorData(Context experimentContext) {
         init(experimentContext);
-
-        this.storageDir = storageDir;
-        loadExperimentData(bundle, storageDir);
     }
 
     /**

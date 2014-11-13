@@ -18,13 +18,15 @@ import java.io.File;
 public class MicrophoneSensorData extends AbstractSensorData {
     private String audioFileName;
 
+    static final public String DATA_TYPE = "Audio";
+
     @Override
     public String getDataType() {
-        return "Audio";
+        return DATA_TYPE;
     }
 
-    public MicrophoneSensorData(Context experimentContext, Bundle bundle, File storageDir) {
-        super(experimentContext, bundle, storageDir);
+    public MicrophoneSensorData(Context experimentContext) {
+        super(experimentContext);
     }
 
     public MicrophoneSensorData(Context experimentContext, IExperimentSensor sourceSensor) {

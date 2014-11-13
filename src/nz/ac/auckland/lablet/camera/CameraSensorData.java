@@ -34,6 +34,8 @@ public class CameraSensorData extends AbstractSensorData {
 
     private float recordingFrameRate;
 
+    static final public String DATA_TYPE = "Video";
+
     public CameraSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
         super(experimentContext, sourceSensor);
     }
@@ -43,8 +45,8 @@ public class CameraSensorData extends AbstractSensorData {
         return "Video";
     }
 
-    public CameraSensorData(Context experimentContext, Bundle bundle, File storageDir) {
-        super(experimentContext, bundle, storageDir);
+    public CameraSensorData(Context experimentContext) {
+        super(experimentContext);
 
     }
 

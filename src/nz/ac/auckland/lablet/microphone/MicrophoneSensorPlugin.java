@@ -12,6 +12,7 @@ import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.File;
+import java.io.IOException;
 
 
 public class MicrophoneSensorPlugin implements ISensorPlugin {
@@ -28,7 +29,14 @@ public class MicrophoneSensorPlugin implements ISensorPlugin {
 
     @Override
     public ISensorData loadSensorData(Context context, Bundle data, File storageDir) {
-        return new MicrophoneSensorData(context, data, storageDir);
+        ISensorData sensorData = new MicrophoneSensorData(context);
+        try {
+            sensorData.loadExperimentData(data, storageDir);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return sensorData;
     }
 }
 

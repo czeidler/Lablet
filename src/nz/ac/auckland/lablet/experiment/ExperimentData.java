@@ -9,6 +9,7 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.content.Context;
 import android.os.Bundle;
+import nz.ac.auckland.lablet.accelerometer.AccelerometerSensorData;
 import nz.ac.auckland.lablet.camera.CameraSensorData;
 import nz.ac.auckland.lablet.microphone.MicrophoneSensorData;
 
@@ -89,13 +90,24 @@ public class ExperimentData {
     }
 
     private ISensorData getSensorDataForType(String dataType, Context context, Bundle data, File dir) {
+        ISensorData sensorData = null;
         switch (dataType) {
-            case "Audio":
-                return new MicrophoneSensorData(context, data, dir);
-            case "Video":
-                return new CameraSensorData(context, data, dir);
+            case MicrophoneSensorData.DATA_TYPE:
+                sensorData = new MicrophoneSensorData(context);
+            case CameraSensorData.DATA_TYPE:
+                sensorData = new CameraSensorData(context);
+            case AccelerometerSensorData.DATA_TYPE:
+                sensorData = new AccelerometerSensorData(context);
         }
-        return null;
+        if (sensorData != null) {
+            try {
+                sensorData.loadExperimentData(data, dir);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        return sensorData;
     }
 
     private ExperimentData.RunEntry loadRunData(Context context, File runDir) {

@@ -14,6 +14,7 @@ import nz.ac.auckland.lablet.experiment.ISensorData;
 import nz.ac.auckland.lablet.experiment.ISensorPlugin;
 
 import java.io.File;
+import java.io.IOException;
 
 
 public class CameraSensorPlugin implements ISensorPlugin {
@@ -29,6 +30,13 @@ public class CameraSensorPlugin implements ISensorPlugin {
 
     @Override
     public ISensorData loadSensorData(Context context, Bundle data, File storageDir) {
-        return new CameraSensorData(context, data, storageDir);
+        ISensorData sensorData = new CameraSensorData(context);
+        try {
+            sensorData.loadExperimentData(data, storageDir);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return sensorData;
     }
 }
