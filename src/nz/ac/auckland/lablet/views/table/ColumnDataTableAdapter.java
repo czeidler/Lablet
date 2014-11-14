@@ -41,6 +41,7 @@ public class ColumnDataTableAdapter extends WeakListenable<ITableAdapter.IListen
 
         }
 
+        // add one for the header row
         return rowCount + 1;
     }
 
@@ -58,16 +59,17 @@ public class ColumnDataTableAdapter extends WeakListenable<ITableAdapter.IListen
         return columns.get(i);
     }
 
-    protected void populateTextView(TextView textView, int index, int columnNumber) {
+    private void populateTextView(TextView textView, int index, int columnNumber) {
         DataTableColumn column = columns.get(columnNumber);
         if (column == null)
             throw new IndexOutOfBoundsException();
 
-        String text = column.getStringValue(index);
+        // getStringValue does not include the header so -1
+        String text = column.getStringValue(index - 1);
         textView.setText(text);
     }
 
-    protected void populateHeaderView(TextView textView, int columnNumber) {
+    private void populateHeaderView(TextView textView, int columnNumber) {
         DataTableColumn column = columns.get(columnNumber);
         if (column == null)
             throw new IndexOutOfBoundsException();
@@ -81,7 +83,7 @@ public class ColumnDataTableAdapter extends WeakListenable<ITableAdapter.IListen
             populateHeaderView((TextView)view, column);
             return;
         }
-        populateTextView((TextView)view, row - 1, column);
+        populateTextView((TextView)view, row, column);
     }
 
     @Override
@@ -112,7 +114,7 @@ public class ColumnDataTableAdapter extends WeakListenable<ITableAdapter.IListen
         textView.setTextColor(Color.BLACK);
         textView.setBackgroundColor(Color.WHITE);
 
-        populateTextView(textView, row - 1, column);
+        populateTextView(textView, row, column);
 
         return textView;
     }

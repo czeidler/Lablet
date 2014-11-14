@@ -13,13 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MarkerDataTableAdapter extends ColumnDataTableAdapter implements MarkerDataModel.IListener,
-        Unit.IListener {
+public class MarkerDataTableAdapter extends ColumnDataTableAdapter {
     protected MarkerDataModel model;
 
     public MarkerDataTableAdapter(MarkerDataModel model) {
         this.model = model;
-        model.addListener(this);
+        model.addListener(markerListener);
     }
 
     @Override
@@ -30,7 +29,7 @@ public class MarkerDataTableAdapter extends ColumnDataTableAdapter implements Ma
 
     @Override
     protected void finalize() {
-        model.removeListener(this);
+        model.removeListener(markerListener);
     }
 
     @Override
@@ -48,36 +47,32 @@ public class MarkerDataTableAdapter extends ColumnDataTableAdapter implements Ma
         return model.getSelectedMarkerData();
     }
 
-    @Override
-    public void onDataAdded(MarkerDataModel model, int index) {
-        notifyRowAdded(index);
-    }
+    private MarkerDataModel.IListener markerListener = new MarkerDataModel.IListener() {
+        @Override
+        public void onDataAdded (MarkerDataModel model,int index){
+            notifyRowAdded(index + 1);
+        }
 
-    @Override
-    public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
-        notifyRowRemoved(index);
-    }
+        @Override
+        public void onDataRemoved (MarkerDataModel model,int index, MarkerData data){
+            notifyRowRemoved(index + 1);
+        }
 
-    @Override
-    public void onDataChanged(MarkerDataModel model, int index, int number) {
-        notifyRowChanged(index, number);
-    }
+        @Override
+        public void onDataChanged (MarkerDataModel model,int index, int number){
+            notifyRowChanged(index + 1, number);
+        }
 
-    @Override
-    public void onAllDataChanged(MarkerDataModel model) {
-        notifyAllRowsChanged();
-    }
+        @Override
+        public void onAllDataChanged (MarkerDataModel model){
+            notifyAllRowsChanged();
+        }
 
-    @Override
-    public void onDataSelected(MarkerDataModel model, int index) {
-        notifyRowSelected(index);
-    }
-
-    @Override
-    public void onPrefixChanged() {
-        for (IListener listener : getListeners())
-            listener.onRowUpdated(this, 0, 1);
-    }
+        @Override
+        public void onDataSelected (MarkerDataModel model,int index){
+            notifyRowSelected(index + 1);
+        }
+    };
 
     private void notifyRowAdded(int row) {
         for (IListener listener : getListeners())
@@ -91,7 +86,7 @@ public class MarkerDataTableAdapter extends ColumnDataTableAdapter implements Ma
 
     private void notifyRowChanged(int row, int number) {
         for (IListener listener : getListeners())
-            listener.onRowUpdated(this, row + 1, number);
+            listener.onRowUpdated(this, row, number);
     }
 
     private void notifyAllRowsChanged() {
