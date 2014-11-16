@@ -8,7 +8,7 @@
 package nz.ac.auckland.lablet.views.table;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.graphics.*;
 import android.view.View;
 import android.widget.TextView;
 import nz.ac.auckland.lablet.misc.WeakListenable;

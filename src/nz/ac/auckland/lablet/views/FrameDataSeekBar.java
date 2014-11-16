@@ -8,7 +8,6 @@
 package nz.ac.auckland.lablet.views;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
