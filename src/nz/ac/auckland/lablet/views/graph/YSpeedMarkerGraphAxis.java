@@ -28,11 +28,11 @@ public class YSpeedMarkerGraphAxis extends MarkerTimeGraphAxis {
 
     @Override
     public Number getValue(int index) {
-        float deltaX = getData().getRealMarkerPositionAt(index + 1).y - getData().getRealMarkerPositionAt(index).y;
+        float deltaY = getData().getRealMarkerPositionAt(index + 1).y - getData().getRealMarkerPositionAt(index).y;
         float deltaT = getTimeData().getTimeAt(index + 1) - getTimeData().getTimeAt(index);
-        if (yUnit.getPrefix().equals("m"))
+        if (tUnit.getPrefix().equals("m"))
             deltaT /= 1000;
-        return deltaX / deltaT;
+        return deltaY / deltaT;
     }
 
     @Override
