@@ -8,11 +8,9 @@
 package nz.ac.auckland.lablet.camera;
 
 import android.content.Context;
+import android.graphics.PixelFormat;
 import android.support.v4.widget.DrawerLayout;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.*;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
@@ -20,6 +18,8 @@ import nz.ac.auckland.lablet.experiment.Unit;
 import nz.ac.auckland.lablet.views.FrameContainerView;
 import nz.ac.auckland.lablet.views.FrameDataSeekBar;
 import nz.ac.auckland.lablet.views.graph.*;
+import nz.ac.auckland.lablet.views.plotview.IPlotPainter;
+import nz.ac.auckland.lablet.views.plotview.LinearFitPainter;
 import nz.ac.auckland.lablet.views.table.*;
 
 import java.util.ArrayList;
@@ -36,10 +36,17 @@ class MotionAnalysisFragmentView extends FrameLayout {
     private class GraphSpinnerEntry {
         private String name;
         private MarkerTimeGraphAdapter markerGraphAdapter;
+        private boolean fit = false;
 
         public GraphSpinnerEntry(String name, MarkerTimeGraphAdapter adapter) {
             this.name = name;
             this.markerGraphAdapter = adapter;
+        }
+
+        public GraphSpinnerEntry(String name, MarkerTimeGraphAdapter adapter, boolean fit) {
+            this.name = name;
+            this.markerGraphAdapter = adapter;
+            this.fit = fit;
         }
 
         public String toString() {
@@ -49,8 +56,11 @@ class MotionAnalysisFragmentView extends FrameLayout {
         public MarkerTimeGraphAdapter getMarkerGraphAdapter() {
             return markerGraphAdapter;
         }
-    }
 
+        public boolean getFit() {
+            return fit;
+        }
+    }
 
     public MotionAnalysisFragmentView(Context context, MotionAnalysis sensorAnalysis) {
         super(context);
@@ -116,10 +126,10 @@ class MotionAnalysisFragmentView extends FrameLayout {
                 new YPositionMarkerGraphAxis(yUnit, sensorAnalysis.getYMinRangeGetter()))));
         graphSpinnerEntryList.add(new GraphSpinnerEntry("x-Velocity", new MarkerTimeGraphAdapter(markerDataModel,
                 timeCalibration, "x-Velocity", new TimeMarkerGraphAxis(tUnit),
-                new XSpeedMarkerGraphAxis(xUnit, tUnit))));
+                new XSpeedMarkerGraphAxis(xUnit, tUnit)), true));
         graphSpinnerEntryList.add(new GraphSpinnerEntry("y-Velocity", new MarkerTimeGraphAdapter(markerDataModel,
                 timeCalibration, "y-Velocity", new TimeMarkerGraphAxis(tUnit),
-                new YSpeedMarkerGraphAxis(yUnit, tUnit))));
+                new YSpeedMarkerGraphAxis(yUnit, tUnit)), true));
         graphSpinnerEntryList.add(new GraphSpinnerEntry("time vs x-Position", new MarkerTimeGraphAdapter(markerDataModel,
                 timeCalibration, "time vs x-Position", new TimeMarkerGraphAxis(tUnit),
                 new XPositionMarkerGraphAxis(xUnit, sensorAnalysis.getXMinRangeGetter()))));
@@ -135,7 +145,13 @@ class MotionAnalysisFragmentView extends FrameLayout {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 GraphSpinnerEntry entry = graphSpinnerEntryList.get(i);
                 MarkerGraphAdapter adapter = entry.getMarkerGraphAdapter();
+                LinearFitPainter fitPainter = null;
+                if (entry.getFit()) {
+                    fitPainter = new LinearFitPainter();
+                    fitPainter.setDataAdapter(adapter);
+                }
                 graphView.setAdapter(adapter);
+                graphView.setFitPainter(fitPainter);
             }
 
             @Override

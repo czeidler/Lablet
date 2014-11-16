@@ -99,7 +99,8 @@ public class LinearFitPainter extends AbstractPlotDataPainter {
     @Override
     public void setDataAdapter(AbstractPlotDataAdapter adapter) {
         super.setDataAdapter(adapter);
-        fit();
+        if (adapter != null)
+            fit();
     }
 
     @Override

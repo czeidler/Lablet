@@ -19,8 +19,11 @@ abstract public class AbstractPlotDataPainter extends AbstractPlotPainter {
             this.dataAdapter.removeListener(listener);
 
         this.dataAdapter = adapter;
-        listener = createListener();
-        this.dataAdapter.addListener(listener);
+
+        if (this.dataAdapter != null) {
+            listener = createListener();
+            this.dataAdapter.addListener(listener);
+        }
 
         invalidate();
     }

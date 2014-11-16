@@ -56,12 +56,12 @@ abstract class AbstractGraphAdapter extends AbstractXYDataAdapter {
 
     @Override
     public Number getX(int i) {
-        return getXAxis().getValue(i).floatValue();
+        return getXAxis().getValue(i);
     }
 
     @Override
     public Number getY(int i) {
-        return getYAxis().getValue(i).floatValue();
+        return getYAxis().getValue(i);
     }
 
     @Override
@@ -82,6 +82,7 @@ public class GraphView2D extends PlotView {
     private AbstractGraphAdapter adapter;
 
     private StrategyPainter painter;
+    private LinearFitPainter fitPainter;
 
     // max layout sizes in dp
     private int maxWidth = -1;
@@ -171,6 +172,18 @@ public class GraphView2D extends PlotView {
     private int toPixel(float densityIndependentPixel) {
         final float scale = getResources().getDisplayMetrics().density;
         return Math.round(densityIndependentPixel * scale);
+    }
+
+    public void setFitPainter(LinearFitPainter fitPainter) {
+        if (this.fitPainter != null) {
+            this.fitPainter.setDataAdapter(null);
+            removePlotPainter(this.fitPainter);
+        }
+
+        this.fitPainter = fitPainter;
+
+        if (this.fitPainter != null)
+            addPlotPainter(this.fitPainter);
     }
 
     public void setAdapter(AbstractGraphAdapter adapter) {
