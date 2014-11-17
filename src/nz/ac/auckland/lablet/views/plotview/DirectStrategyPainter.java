@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 import android.graphics.Canvas;
+import android.graphics.RectF;
 
 import java.util.List;
 
@@ -43,4 +44,10 @@ public class DirectStrategyPainter extends StrategyPainter {
     protected void onNewDirtyRegions() {
         containerView.invalidate();
     }
+
+    @Override
+    public void onRangeChanged(RectF range, RectF oldRange, boolean keepDistance) {
+        invalidate();
+    }
+
 }

@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 
+import android.graphics.RectF;
 import android.view.MotionEvent;
 
 abstract public class AbstractPlotPainter implements IPlotPainter {
@@ -44,12 +45,7 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
     }
 
     @Override
-    public void onXRangeChanged(float left, float right, float oldLeft, float oldRight) {
-
-    }
-
-    @Override
-    public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop) {
+    public void onRangeChanged(RectF range, RectF oldRange, boolean keepDistance) {
 
     }
 

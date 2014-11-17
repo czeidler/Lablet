@@ -9,6 +9,7 @@ package nz.ac.auckland.lablet.views.plotview;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import org.luaj.vm2.ast.Str;
@@ -88,28 +89,30 @@ public class PlotPainterContainerView extends RangeDrawingView {
 
     @Override
     public boolean setXRange(float left, float right, boolean keepDistance) {
-        float oldLeft = getRangeLeft();
-        float oldRight = getRangeRight();
+        RectF oldRange = getRange();
 
         if (!super.setXRange(left, right, keepDistance))
             return false;
 
+        RectF newRange = getRange();
+
         for (IPlotPainter painter : allPainters)
-            painter.onXRangeChanged(getRangeLeft(), getRangeRight(), oldLeft, oldRight);
+            painter.onRangeChanged(newRange, oldRange, keepDistance);
 
         return true;
     }
 
     @Override
     public boolean setYRange(float bottom, float top, boolean keepDistance) {
-        float oldBottom = getRangeBottom();
-        float oldTop = getRangeTop();
+        RectF oldRange = getRange();
 
         if (!super.setYRange(bottom, top, keepDistance))
             return false;
 
+        RectF newRange = getRange();
+
         for (IPlotPainter painter : allPainters)
-            painter.onYRangeChanged(getRangeBottom(), getRangeTop(), oldBottom, oldTop);
+            painter.onRangeChanged(newRange, oldRange, keepDistance);
 
         return true;
     }

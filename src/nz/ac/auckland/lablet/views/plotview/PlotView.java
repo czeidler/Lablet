@@ -696,7 +696,6 @@ public class PlotView extends ViewGroup {
         if (hasXAxis())
             xAxisView.setDataRange(mainView.getRangeLeft(), mainView.getRangeRight());
 
-        invalidate();
         return true;
     }
 
@@ -708,7 +707,6 @@ public class PlotView extends ViewGroup {
         if (hasYAxis())
             yAxisView.setDataRange(mainView.getRangeBottom(), mainView.getRangeTop());
 
-        invalidate();
         return true;
     }
 

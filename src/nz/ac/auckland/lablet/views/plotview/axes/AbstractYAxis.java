@@ -52,6 +52,8 @@ abstract public class AbstractYAxis extends AbstractAxis {
         realBottom = bottom;
 
         calculateLabels();
+
+        invalidate();
     }
 
     abstract public float optimalWidthForHeight(float height);

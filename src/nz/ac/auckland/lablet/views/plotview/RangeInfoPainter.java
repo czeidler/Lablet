@@ -67,12 +67,7 @@ public class RangeInfoPainter extends AbstractPlotPainter {
     }
 
     @Override
-    public void onXRangeChanged(float left, float right, float oldLeft, float oldRight) {
-        recalculateRangeValue();
-    }
-
-    @Override
-    public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop) {
+    public void onRangeChanged(RectF range, RectF oldRange, boolean keepDistance) {
         recalculateRangeValue();
     }
 

@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 import android.graphics.Canvas;
+import android.graphics.RectF;
 import android.view.MotionEvent;
 
 
@@ -27,6 +28,5 @@ public interface IPlotPainter {
     public void setXScale(IScale xScale);
     public void setYScale(IScale yScale);
 
-    public void onXRangeChanged(float left, float right, float oldLeft, float oldRight);
-    public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop);
+    public void onRangeChanged(RectF range, RectF oldRange, boolean keepDistance);
 }

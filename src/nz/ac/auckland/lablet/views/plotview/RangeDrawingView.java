@@ -215,11 +215,11 @@ public class RangeDrawingView extends ViewGroup {
     }
 
     final public void setRange(RectF range) {
-        setXRange(range.left, range.right);
-        setYRange(range.bottom, range.top);
+        if (setXRange(range.left, range.right) || setYRange(range.bottom, range.top))
+            notifyRangeChanged();
     }
 
-    public boolean setXRange(float left, float right, boolean keepDistance) {
+    private boolean setXRangeNoNotification(float left, float right, boolean keepDistance) {
         float oldLeft = getRangeLeft();
         float oldRight = getRangeRight();
 
@@ -238,11 +238,17 @@ public class RangeDrawingView extends ViewGroup {
 
         rangeRect.left = left;
         rangeRect.right = right;
-        notifyRangeChanged();
         return true;
     }
 
-    public boolean setYRange(float bottom, float top, boolean keepDistance) {
+    public boolean setXRange(float left, float right, boolean keepDistance) {
+        boolean result = setXRangeNoNotification(left, right, keepDistance);
+        if (result)
+            notifyRangeChanged();
+        return result;
+    }
+
+    private boolean setYRangeNoNotification(float bottom, float top, boolean keepDistance) {
         float oldBottom = getRangeBottom();
         float oldTop = getRangeTop();
 
@@ -261,7 +267,13 @@ public class RangeDrawingView extends ViewGroup {
 
         rangeRect.bottom = bottom;
         rangeRect.top = top;
-        notifyRangeChanged();
+        return true;
+    }
+
+    public boolean setYRange(float bottom, float top, boolean keepDistance) {
+        boolean result = setYRangeNoNotification(bottom, top, keepDistance);
+        if (result)
+            notifyRangeChanged();
         return true;
     }
 

@@ -31,6 +31,8 @@ abstract public class AbstractXAxis extends AbstractAxis {
         realRight = right;
 
         calculateLabels();
+
+        invalidate();
     }
 
     abstract public float optimalHeight();

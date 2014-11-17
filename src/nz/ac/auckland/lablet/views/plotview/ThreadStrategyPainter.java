@@ -311,15 +311,8 @@ public class ThreadStrategyPainter extends StrategyPainter {
     }
 
     @Override
-    public void onXRangeChanged(float left, float right, float oldLeft, float oldRight) {
-        super.onXRangeChanged(left, right, oldLeft, oldRight);
-
-        invalidate();
-    }
-
-    @Override
-    public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop) {
-        super.onYRangeChanged(bottom, top, oldBottom, oldTop);
+    public void onRangeChanged(RectF range, RectF oldRange, boolean keepDistance) {
+        super.onRangeChanged(range, oldRange, keepDistance);
 
         invalidate();
     }

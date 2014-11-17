@@ -558,12 +558,9 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
     }
 
     @Override
-    public void onXRangeChanged(float left, float right, float oldLeft, float oldRight) {
-        invalidateMarker();
-    }
+    public void onRangeChanged(RectF range, RectF oldRange, boolean keepDistance) {
+        super.onRangeChanged(range, oldRange, keepDistance);
 
-    @Override
-    public void onYRangeChanged(float bottom, float top, float oldBottom, float oldTop) {
         invalidateMarker();
     }
 
