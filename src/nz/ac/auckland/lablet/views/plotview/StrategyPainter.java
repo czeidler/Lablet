@@ -79,7 +79,7 @@ abstract public class StrategyPainter extends AbstractPlotPainter {
 
     abstract public boolean hasFreeRenderingPipe();
 
-    abstract protected void startRenderDirtyRegions();
+    abstract protected void onNewDirtyRegions();
 
     public void addChild(ConcurrentPainter painter) {
         childPainters.add(painter);

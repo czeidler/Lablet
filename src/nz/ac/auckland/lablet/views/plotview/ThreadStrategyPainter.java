@@ -200,7 +200,7 @@ public class ThreadStrategyPainter extends StrategyPainter {
             return;
 
         containerView.invalidate();
-        startRenderDirtyRegions();
+        onNewDirtyRegions();
     }
 
     @Override
@@ -253,7 +253,7 @@ public class ThreadStrategyPainter extends StrategyPainter {
     }
 
     @Override
-    protected void startRenderDirtyRegions() {
+    protected void onNewDirtyRegions() {
         triggerOffScreenRendering(false);
     }
 

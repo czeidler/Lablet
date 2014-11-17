@@ -40,7 +40,7 @@ public class DirectStrategyPainter extends StrategyPainter {
     }
 
     @Override
-    protected void startRenderDirtyRegions() {
+    protected void onNewDirtyRegions() {
         containerView.invalidate();
     }
 }

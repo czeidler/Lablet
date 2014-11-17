@@ -156,7 +156,7 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
                 start -= 1;
             dirtyRegion.addRange(start, index + number - 1);
             if ((maxDirtyRanges > 0 && maxDirtyRanges <= dirtyRegion.getSize()) || parent.hasFreeRenderingPipe())
-                parent.startRenderDirtyRegions();
+                parent.onNewDirtyRegions();
         }
 
         @Override
