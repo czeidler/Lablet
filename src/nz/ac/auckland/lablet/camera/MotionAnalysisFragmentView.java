@@ -8,7 +8,6 @@
 package nz.ac.auckland.lablet.camera;
 
 import android.content.Context;
-import android.graphics.PixelFormat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.*;
 import android.widget.*;
@@ -18,7 +17,6 @@ import nz.ac.auckland.lablet.experiment.Unit;
 import nz.ac.auckland.lablet.views.FrameContainerView;
 import nz.ac.auckland.lablet.views.FrameDataSeekBar;
 import nz.ac.auckland.lablet.views.graph.*;
-import nz.ac.auckland.lablet.views.plotview.IPlotPainter;
 import nz.ac.auckland.lablet.views.plotview.LinearFitPainter;
 import nz.ac.auckland.lablet.views.table.*;
 

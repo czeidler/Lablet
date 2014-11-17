@@ -159,6 +159,9 @@ public class GraphView2D extends PlotView {
                     ViewGroup parent = ((ViewGroup)getRootView());
                     parent.getDrawingRect(finalBounds);
 
+                    if (fitPainter != null)
+                        zoomGraphView.addPlotPainter(fitPainter);
+
                     ZoomDialog dialog = new ZoomDialog(getContext(), zoomGraphView, startBounds, finalBounds);
                     dialog.show();
                 }
