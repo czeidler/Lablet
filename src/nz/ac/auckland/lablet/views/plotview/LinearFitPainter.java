@@ -45,7 +45,7 @@ public class LinearFitPainter extends AbstractPlotDataPainter {
         }
 
         public String getLabel() {
-            return "Linear Fit: b = " + String.format("%.2f", b) + ", m = " + String.format("%.2f", m);
+            return "Linear Fit: b = " + String.format("%.4f", b) + ", m = " + String.format("%.4f", m);
         }
     }
 
