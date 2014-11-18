@@ -13,6 +13,10 @@ import java.util.List;
 
 class FrameRateHelper {
     static public List<Integer> getPossibleAnalysisFrameRates(int maxFrameRate) {
+        // sanitize the frame rate a bit
+        if (maxFrameRate >= 28)
+            maxFrameRate = 30;
+
         List<Integer> frameRateList = new ArrayList<>();
         frameRateList.add(1);
         for (int i = 2; i < maxFrameRate; i++) {
