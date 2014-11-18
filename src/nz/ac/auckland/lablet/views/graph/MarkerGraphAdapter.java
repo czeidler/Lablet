@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.graph;
 
 import nz.ac.auckland.lablet.experiment.*;
+import nz.ac.auckland.lablet.views.plotview.Range;
 
 
 public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDataModel.IListener {
@@ -89,5 +90,10 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
     @Override
     public void onDataSelected(MarkerDataModel model, int index) {
 
+    }
+
+    @Override
+    public Range getRange(Number leftReal, Number rightReal) {
+        return new Range(0, data.getMarkerCount() - 1);
     }
 }

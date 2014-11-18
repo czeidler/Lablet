@@ -56,6 +56,12 @@ public class XYConcurrentPainter extends ArrayConcurrentPainter {
     }
 
     @Override
+    protected Range getDataRangeFor(float left, float right) {
+        AbstractXYDataAdapter xyDataAdapter = (AbstractXYDataAdapter)dataAdapter;
+        return xyDataAdapter.getRange(left, right);
+    }
+
+    @Override
     protected void drawRange(Canvas bitmapCanvas, ArrayRenderPayload payload, Range range) {
         AbstractXYDataAdapter adapter = (AbstractXYDataAdapter)payload.getAdapter();
 

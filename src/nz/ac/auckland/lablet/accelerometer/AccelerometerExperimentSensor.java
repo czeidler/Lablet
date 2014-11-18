@@ -76,8 +76,9 @@ class AccelerometerExperimentView extends AbstractExperimentSensorView {
         plotView.getBackgroundPainter().setShowXGrid(true);
         plotView.getBackgroundPainter().setShowYGrid(true);
         resetView();
-        StrategyPainter strategyPainter = new ThreadStrategyPainter();
 
+        StrategyPainter strategyPainter = new BufferedStrategyPainter();
+        
         xData = new XYDataAdapter(data.getTimeValues(), data.getXValues());
         XYConcurrentPainter xPainter = new XYConcurrentPainter(xData);
         strategyPainter.addChild(xPainter);

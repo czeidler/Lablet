@@ -11,4 +11,6 @@ package nz.ac.auckland.lablet.views.plotview;
 public abstract class AbstractXYDataAdapter extends CloneablePlotDataAdapter {
     abstract public Number getX(int index);
     abstract public Number getY(int index);
+
+    abstract public Range getRange(Number leftReal, Number rightReal);
 }

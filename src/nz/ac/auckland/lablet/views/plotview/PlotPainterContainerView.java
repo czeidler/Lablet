@@ -96,6 +96,9 @@ public class PlotPainterContainerView extends RangeDrawingView {
 
         RectF newRange = getRange();
 
+        if (newRange.left == oldRange.left || newRange.right == oldRange.right)
+            return true;
+
         for (IPlotPainter painter : allPainters)
             painter.onRangeChanged(newRange, oldRange, keepDistance);
 
@@ -110,6 +113,9 @@ public class PlotPainterContainerView extends RangeDrawingView {
             return false;
 
         RectF newRange = getRange();
+
+        if (newRange.top == oldRange.top || newRange.bottom == oldRange.bottom)
+            return true;
 
         for (IPlotPainter painter : allPainters)
             painter.onRangeChanged(newRange, oldRange, keepDistance);

@@ -8,6 +8,8 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -58,6 +60,29 @@ public class XYDataAdapter extends AbstractXYDataAdapter {
     @Override
     public Number getY(int index) {
         return yValues.get(index - startIndex);
+    }
+
+    @Override
+    public Range getRange(Number leftReal, Number rightReal) {
+        Comparator<Number> numberComparator =  new Comparator<Number>() {
+            @Override
+            public int compare(Number number, Number t1) {
+                return Float.compare(number.floatValue(), t1.floatValue());
+            }
+        };
+
+        int leftIndex = Math.abs(Collections.binarySearch(xValues, leftReal, numberComparator));
+        int rightIndex = Math.abs(Collections.binarySearch(xValues, rightReal, numberComparator));
+
+        leftIndex -= 3;
+        rightIndex ++;
+        if (leftIndex < 0)
+            leftIndex = 0;
+        int size = xValues.size();
+        if (rightIndex >= size)
+            rightIndex = size - 1;
+
+        return new Range(leftIndex, rightIndex);
     }
 
     @Override

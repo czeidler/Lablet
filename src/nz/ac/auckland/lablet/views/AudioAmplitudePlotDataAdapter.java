@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views;
 
 import nz.ac.auckland.lablet.views.plotview.AbstractXYDataAdapter;
+import nz.ac.auckland.lablet.views.plotview.Range;
 import nz.ac.auckland.lablet.views.plotview.Region1D;
 
 import java.util.ArrayList;
@@ -102,6 +103,11 @@ public class AudioAmplitudePlotDataAdapter extends AbstractXYDataAdapter {
     @Override
     public Number getY(int index) {
         return data.get(index) / amplitudeMax;
+    }
+
+    @Override
+    public Range getRange(Number leftReal, Number rightReal) {
+        return new Range(0, data.getSize() - 1);
     }
 
     @Override
