@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.graph;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.View;
@@ -149,7 +150,7 @@ public class GraphView2D extends PlotView {
                 public void onClick(View view) {
                     //zoom();
 
-                    GraphView2D zoomGraphView = new GraphView2D(getContext(), adapter.getTitle(), false);
+                    final GraphView2D zoomGraphView = new GraphView2D(getContext(), adapter.getTitle(), false);
                     zoomGraphView.setAdapter(adapter);
 
                     Rect startBounds = new Rect();
@@ -163,6 +164,12 @@ public class GraphView2D extends PlotView {
                         zoomGraphView.addPlotPainter(fitPainter);
 
                     ZoomDialog dialog = new ZoomDialog(getContext(), zoomGraphView, startBounds, finalBounds);
+                    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialogInterface) {
+                            zoomGraphView.release();
+                        }
+                    });
                     dialog.show();
                 }
             });
@@ -175,6 +182,11 @@ public class GraphView2D extends PlotView {
     private int toPixel(float densityIndependentPixel) {
         final float scale = getResources().getDisplayMetrics().density;
         return Math.round(densityIndependentPixel * scale);
+    }
+
+    public void release() {
+        setFitPainter(null);
+        setAdapter(null);
     }
 
     public void setFitPainter(LinearFitPainter fitPainter) {
@@ -207,9 +219,12 @@ public class GraphView2D extends PlotView {
         getBackgroundPainter().setShowXGrid(true);
         getBackgroundPainter().setShowYGrid(true);
 
+        /*if (adapter.getSize() < 100)
+            painter = new BufferedStrategyPainter();
+        else
+            painter = new ThreadStrategyPainter();*/
+        painter = new BufferedStrategyPainter();
 
-        painter = new DirectStrategyPainter();
-        //painter = new ThreadStrategyPainter();
         XYConcurrentPainter xyConcurrentPainter = new XYConcurrentPainter(adapter);
         painter.addChild(xyConcurrentPainter);
         addPlotPainter(painter);
