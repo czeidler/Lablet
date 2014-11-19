@@ -94,6 +94,6 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
 
     @Override
     public Range getRange(Number leftReal, Number rightReal) {
-        return new Range(0, data.getMarkerCount() - 1);
+        return new Range(0, getSize() - 1);
     }
 }
