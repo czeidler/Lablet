@@ -45,7 +45,7 @@ public class MotionAnalysis implements ISensorAnalysis {
     private OriginCalibrationSetter originCalibrationSetter;
     private boolean showCoordinateSystem = true;
 
-    private Bundle experimentSpecificData = null;
+    private Bundle videoAnalysisSettings = null;
 
     private List<IListener> listenerList = new ArrayList<>();
 
@@ -138,7 +138,7 @@ public class MotionAnalysis implements ISensorAnalysis {
     public MarkerDataModel getOriginMarkers(){
         return originMarkers;
     }
-    public Bundle getExperimentSpecificData() { return experimentSpecificData; }
+    public Bundle getVideoAnalysisSettings() { return videoAnalysisSettings; }
     public void setShowCoordinateSystem(boolean show) {
         showCoordinateSystem = show;
         notifyShowCoordinateSystem(show);
@@ -146,9 +146,9 @@ public class MotionAnalysis implements ISensorAnalysis {
     public boolean getShowCoordinateSystem() {
         return showCoordinateSystem;
     }
-    public void setExperimentSpecificData(Bundle data) {
-        experimentSpecificData = data;
-        onRunSpecificDataChanged();
+    public void setVideoAnalysisSettings(Bundle data) {
+        videoAnalysisSettings = data;
+        onVideoAnalysisSettingsChanged();
     }
 
     public Unit getXUnit() {
@@ -205,7 +205,7 @@ public class MotionAnalysis implements ISensorAnalysis {
     public boolean loadAnalysisData(Bundle bundle, File storageDir) {
         tagMarkers.clear();
 
-        setExperimentSpecificData(bundle.getBundle("experiment_specific_data"));
+        setVideoAnalysisSettings(bundle.getBundle("video_analysis_settings"));
         frameDataModel.setCurrentFrame(bundle.getInt("currentRun"));
 
         Bundle tagMarkerBundle = bundle.getBundle("tagMarkers");
@@ -280,8 +280,8 @@ public class MotionAnalysis implements ISensorAnalysis {
         analysisDataBundle.putString("xUnitPrefix", getXUnit().getPrefix());
         analysisDataBundle.putString("yUnitPrefix", getYUnit().getPrefix());
 
-        if (experimentSpecificData != null)
-            analysisDataBundle.putBundle("experiment_specific_data", experimentSpecificData);
+        if (videoAnalysisSettings != null)
+            analysisDataBundle.putBundle("video_analysis_settings", videoAnalysisSettings);
         return analysisDataBundle;
     }
 
@@ -338,18 +338,14 @@ public class MotionAnalysis implements ISensorAnalysis {
         setOrigin(origin, axis1);
     }
 
-    protected void onRunSpecificDataChanged() {
-        Bundle experimentSpecificData = getExperimentSpecificData();
-        if (experimentSpecificData == null)
-            return;
-        Bundle runSettings = experimentSpecificData.getBundle("run_settings");
+    protected void onVideoAnalysisSettingsChanged() {
+        Bundle runSettings = getVideoAnalysisSettings();
         if (runSettings == null)
             return;
 
         calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getFloat("analysis_video_start"));
         calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getFloat("analysis_video_end"));
-        if (!sensorData.isRecordedAtReducedFrameRate())
-            calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
+        calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getFloat("analysis_frame_rate"));
 
         int numberOfRuns = calibrationVideoTimeData.getNumberOfFrames();
         getFrameDataModel().setNumberOfFrames(numberOfRuns);

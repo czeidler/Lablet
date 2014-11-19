@@ -23,6 +23,7 @@ import nz.ac.auckland.lablet.views.StartEndSeekBar;
 import nz.ac.auckland.lablet.views.VideoFrameView;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -52,11 +53,11 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     private float videoEndValue;
 
     // cache initial values to check if values have been changed
-    private int initialFrameRate;
+    private float initialFrameRate;
     private float initialVideoStartValue;
     private float initialVideoEndValue;
 
-    private List<Integer> frameRateList;
+    private List<Float> frameRateList;
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -150,7 +151,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (!fromUser)
                     return;
-                int frameRate = getFrameRateFromPicker();
+                float frameRate = getFrameRateFromPicker();
                 float frameSize = 1000.f / frameRate;
                 seekTo((int) (frameSize * progress));
             }
@@ -184,7 +185,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
 
             @Override
             public void onDataChanged(MarkerDataModel model, int index, int number) {
-                int frameRate = getFrameRateFromPicker();
+                float frameRate = getFrameRateFromPicker();
                 float duration = getDurationAtFrameRate(frameRate);
 
                 float progress = 0;
@@ -221,7 +222,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         frameRatePicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker numberPicker, int old, int newValue) {
-                int frameRate = frameRateList.get(newValue);
+                float frameRate = frameRateList.get(newValue);
                 setFrameRate(frameRate);
             }
         });
@@ -245,16 +246,15 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         if (runSettings != null) {
             calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
             calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
-            if (!cameraSensorData.isRecordedAtReducedFrameRate())
-                calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getInt("analysis_frame_rate"));
+            calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getFloat("analysis_frame_rate"));
         }
-        int analysisFrameRate = (int)calibrationVideoTimeData.getAnalysisFrameRate();
+        float analysisFrameRate = calibrationVideoTimeData.getAnalysisFrameRate();
 
         // initial views with values
-        View frameRateLayout = findViewById(R.id.frameRateLayout);
         if (cameraSensorData.isRecordedAtReducedFrameRate())
-            frameRateLayout.setVisibility(View.INVISIBLE);
-        frameRateList = FrameRateHelper.getPossibleAnalysisFrameRates(cameraSensorData.getVideoFrameRate());
+            frameRateList = FrameRateHelper.getPossibleLowAnalysisFrameRates(cameraSensorData.getRecordingFrameRate());
+        else
+            frameRateList = FrameRateHelper.getPossibleAnalysisFrameRates(cameraSensorData.getVideoFrameRate());
         frameRatePicker.setMinValue(0);
         frameRatePicker.setMaxValue(frameRateList.size() - 1);
         frameRatePicker.setDisplayedValues(getFrameRateStringList());
@@ -283,7 +283,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         if (options != null && options.getBoolean("start_with_help", false))
             helpView.setVisibility(View.VISIBLE);
 
-        int frameRate = getFrameRateFromPicker();
+        float frameRate = getFrameRateFromPicker();
         initialFrameRate = frameRate;
         initialVideoStartValue = videoStartValue;
         initialVideoEndValue = videoEndValue;
@@ -307,19 +307,19 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     }
 
     private int findFrame(float milliSeconds) {
-        int frameRate = getFrameRateFromPicker();
+        float frameRate = getFrameRateFromPicker();
         return Math.round(frameRate * milliSeconds / 1000);
     }
 
-    private float getDurationAtFrameRate(int frameRate) {
+    private float getDurationAtFrameRate(float frameRate) {
         long duration = cameraSensorData.getVideoDuration();
         float stepSize = 1000.0f / frameRate;
-        int numberOfSteps = (int)((float)(frameRate * duration) / 1000);
+        int numberOfSteps = (int)((frameRate * duration) / 1000);
         return stepSize * numberOfSteps;
     }
 
     private void updateEditFrames() {
-        int frameRate = getFrameRateFromPicker();
+        float frameRate = getFrameRateFromPicker();
         float duration = getDurationAtFrameRate(frameRate);
 
         float start = startEndSeekBar.getMarkerDataModel().getMarkerDataAt(0).getPosition().x;
@@ -335,15 +335,12 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
 
     private String[] getFrameRateStringList() {
         String[] list = new String[frameRateList.size()];
-        for (int i = 0; i < frameRateList.size(); i++) {
-            String stringValue = "";
-            stringValue += frameRateList.get(i);
-            list[i] = stringValue;
-        }
+        for (int i = 0; i < frameRateList.size(); i++)
+            list[i] = new DecimalFormat("#.###").format(frameRateList.get(i));
         return list;
     }
 
-    private void setFrameRate(int frameRate) {
+    private void setFrameRate(float frameRate) {
         setFrameRateLengthEdit(frameRate);
         float duration = getDurationAtFrameRate(frameRate);
         int numberOfSteps = Math.round((duration * frameRate) / 1000);
@@ -360,7 +357,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         updateEditFrames();
     }
 
-    private int getNumberPickerIndexForFrameRate(int frameRate) {
+    private int getNumberPickerIndexForFrameRate(float frameRate) {
         for (int i = 0; i < frameRateList.size(); i++) {
             if (frameRateList.get(i) == frameRate)
                 return i;
@@ -368,7 +365,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         return frameRateList.size() - 1;
     }
 
-    private void setFrameRateLengthEdit(int frameRate) {
+    private void setFrameRateLengthEdit(float frameRate) {
         float length = 1.0f / frameRate * 1000;
         editFrameLength.setText(String.format("%.1f", length));
     }
@@ -397,8 +394,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         intent.putExtra("run_settings_changed", settingsChanged());
 
         Bundle runSettings = new Bundle();
-        if (!cameraSensorData.isRecordedAtReducedFrameRate())
-            runSettings.putInt("analysis_frame_rate", getFrameRateFromPicker());
+        runSettings.putFloat("analysis_frame_rate", getFrameRateFromPicker());
         runSettings.putFloat("analysis_video_start", videoStartValue);
         runSettings.putFloat("analysis_video_end", videoEndValue);
         intent.putExtra("run_settings", runSettings);
@@ -418,7 +414,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         return false;
     }
 
-    private int getFrameRateFromPicker() {
+    private float getFrameRateFromPicker() {
         return frameRateList.get(frameRatePicker.getValue());
     }
 
