@@ -47,7 +47,7 @@ class FrameRateHelper {
         frameRateList.add(0.1f); // every 10 second
         frameRateList.add(0.06666666f); // every 15 seconds
         frameRateList.add(0.05f); // every 20 seconds
-        frameRateList.add(0.16666666f); // every minute
+        frameRateList.add(0.016666666f); // every minute
         frameRateList.add(0.00333333f); // every 5 minutes
 
         while (true) {

@@ -87,7 +87,7 @@
                 android:text="Analysis Frame Rate [Hz]:"
                 android:id="@+id/textView" android:layout_gravity="left"/>
         <NumberPicker
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/frameRatePicker" android:layout_gravity="center_horizontal"
                 android:gravity="center_horizontal"/>
