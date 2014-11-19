@@ -35,9 +35,19 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
 
     @Override
     public void onDraw(Canvas canvas) {
+        int MAX_DISPLAYED_MARKERS = 100;
+
         int currentMarkerRow = markerData.getSelectedMarkerData();
         IMarker topMarker = getMarkerForRow(currentMarkerRow);
-        for (int i = 0; i < markerList.size(); i++) {
+
+        int start = currentMarkerRow - MAX_DISPLAYED_MARKERS / 2 + 1;
+        if (start < 0)
+            start = 0;
+        int end = currentMarkerRow + MAX_DISPLAYED_MARKERS / 2 + 1;
+        if (end > markerList.size())
+            end = markerList.size();
+
+        for (int i = start; i < end; i++) {
             IMarker marker = markerList.get(i);
             if (marker == topMarker)
                 continue;
