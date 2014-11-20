@@ -25,11 +25,14 @@ import java.util.List;
 
 
 class MotionAnalysisFragmentView extends FrameLayout {
-    private FrameContainerView runContainerView;
-    private TableView tableView = null;
-    private GraphView2D graphView = null;
-    private Spinner graphSpinner = null;
+    final private FrameContainerView runContainerView;
+    final private TableView tableView;
+    final private GraphView2D graphView;
+    final private Spinner graphSpinner;
+    final private DrawerLayout drawerLayout;
+    final private FrameLayout drawer;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
+    private boolean releaseAdaptersWhenDrawerClosed = false;
 
     private class GraphSpinnerEntry {
         private String name;
@@ -67,7 +70,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
         final View mainView = inflater.inflate(R.layout.motion_analysis, this, true);
         assert mainView != null;
 
-        final DrawerLayout drawerLayout = (DrawerLayout)mainView.findViewById(R.id.drawer_layout);
+        drawerLayout = (DrawerLayout)mainView.findViewById(R.id.drawer_layout);
 
         final Button drawerButton = (Button)mainView.findViewById(R.id.drawerButton);
         drawerButton.setOnClickListener(new OnClickListener() {
@@ -77,13 +80,15 @@ class MotionAnalysisFragmentView extends FrameLayout {
             }
         });
 
-        final FrameLayout leftDrawer = (FrameLayout)mainView.findViewById(R.id.left_drawer);
+        drawer = (FrameLayout)mainView.findViewById(R.id.left_drawer);
 
         runContainerView = (FrameContainerView)mainView.findViewById(R.id.frameContainerView);
         final FrameDataSeekBar runViewControl = (FrameDataSeekBar)mainView.findViewById(R.id.frameDataSeekBar);
 
         final ViewGroup experimentDataView = (ViewGroup)inflater.inflate(R.layout.motion_analysis_data_side_bar, null, false);
-        leftDrawer.addView(experimentDataView);
+        drawer.addView(experimentDataView);
+
+        graphSpinner = (Spinner)mainView.findViewById(R.id.graphSpinner);
 
         // marker graph view
         graphView = (GraphView2D)mainView.findViewById(R.id.tagMarkerGraphView);
@@ -113,10 +118,12 @@ class MotionAnalysisFragmentView extends FrameLayout {
         adapter.addColumn(new TimeDataTableColumn(tUnit, timeData));
         adapter.addColumn(new XPositionDataTableColumn(xUnit));
         adapter.addColumn(new YPositionDataTableColumn(yUnit));
-        tableView.setAdapter(adapter);
 
         MarkerDataModel markerDataModel = sensorAnalysis.getTagMarkers();
         ITimeData timeCalibration = sensorAnalysis.getTimeData();
+        if (timeCalibration.getSize() > 400)
+            releaseAdaptersWhenDrawerClosed = true;
+
         // graph spinner
         graphSpinnerEntryList.add(new GraphSpinnerEntry("Position Data", new MarkerTimeGraphAdapter(markerDataModel,
                 timeCalibration, "Position Data",
@@ -135,21 +142,13 @@ class MotionAnalysisFragmentView extends FrameLayout {
                 timeCalibration, "time vs y-Position", new TimeMarkerGraphAxis(tUnit),
                 new YPositionMarkerGraphAxis(yUnit, sensorAnalysis.getYMinRangeGetter()))));
 
-        graphSpinner = (Spinner)mainView.findViewById(R.id.graphSpinner);
         graphSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
                 graphSpinnerEntryList));
+        graphSpinner.setSelection(0);
         graphSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                GraphSpinnerEntry entry = graphSpinnerEntryList.get(i);
-                MarkerGraphAdapter adapter = entry.getMarkerGraphAdapter();
-                LinearFitPainter fitPainter = null;
-                if (entry.getFit()) {
-                    fitPainter = new LinearFitPainter();
-                    fitPainter.setDataAdapter(adapter);
-                }
-                graphView.setAdapter(adapter);
-                graphView.setFitPainter(fitPainter);
+                selectGraphAdapter(i);
             }
 
             @Override
@@ -157,7 +156,59 @@ class MotionAnalysisFragmentView extends FrameLayout {
                 graphView.setAdapter(null);
             }
         });
-        graphSpinner.setSelection(0);
+
+        // setup the load/ unloading of the view data adapters
+        drawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                if (releaseAdaptersWhenDrawerClosed) {
+                    tableView.setAdapter(adapter);
+                    selectGraphAdapter(graphSpinner.getSelectedItemPosition());
+                }
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                if (releaseAdaptersWhenDrawerClosed) {
+                    tableView.setAdapter(null);
+                    selectGraphAdapter(-1);
+                }
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
+
+        if (!releaseAdaptersWhenDrawerClosed) {
+            tableView.setAdapter(adapter);
+            selectGraphAdapter(graphSpinner.getSelectedItemPosition());
+        }
+    }
+
+    private void selectGraphAdapter(int i) {
+        if (i < 0) {
+            graphView.setFitPainter(null);
+            graphView.setAdapter(null);
+            return;
+        }
+        if (releaseAdaptersWhenDrawerClosed && !drawerLayout.isDrawerVisible(drawer))
+            return;
+        GraphSpinnerEntry entry = graphSpinnerEntryList.get(i);
+        MarkerGraphAdapter adapter = entry.getMarkerGraphAdapter();
+        LinearFitPainter fitPainter = null;
+        if (entry.getFit()) {
+            fitPainter = new LinearFitPainter();
+            fitPainter.setDataAdapter(adapter);
+        }
+        graphView.setAdapter(adapter);
+        graphView.setFitPainter(fitPainter);
     }
 
     @Override
