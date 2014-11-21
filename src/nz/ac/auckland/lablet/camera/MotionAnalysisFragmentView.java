@@ -100,7 +100,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
         if (sensorAnalysisView == null)
             return;
 
-        runViewControl.setTo(sensorAnalysis.getFrameDataModel());
+        runViewControl.setTo(sensorAnalysis.getFrameDataModel(), sensorAnalysis.getTimeData());
 
         runContainerView.setTo(sensorAnalysisView, sensorAnalysis);
         runContainerView.addTagMarkerData(sensorAnalysis.getTagMarkers());
