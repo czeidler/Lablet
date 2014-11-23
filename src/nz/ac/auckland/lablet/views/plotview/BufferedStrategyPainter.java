@@ -15,11 +15,12 @@ import java.util.List;
 
 public class BufferedStrategyPainter extends StrategyPainter {
     private Bitmap offScreenBitmap;
+    final private RectF offScreenRealRect = new RectF();
     private Canvas offScreenCanvas;
 
     private RectF dirtyRect = null;
     private boolean invalidated = false;
-    private Point moveBitmap = new Point();
+    private PointF moveBitmap = new PointF();
 
     @Override
     public boolean hasThreads() {
@@ -31,10 +32,27 @@ public class BufferedStrategyPainter extends StrategyPainter {
         return true;
     }
 
+    private RectF containerViewRangeToOffScreen(RectF range) {
+        return range;
+    }
+
     @Override
     public void onSizeChanged(int width, int height, int oldw, int oldh) {
         offScreenBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         offScreenCanvas = new Canvas(offScreenBitmap);
+        offScreenRealRect.set(containerViewRangeToOffScreen(containerView.getRange()));
+    }
+
+    @Override
+    public Matrix getRangeMatrixCopy() {
+        float xScale = (float)offScreenBitmap.getWidth() / (offScreenRealRect.right - offScreenRealRect.left);
+        float yScale = (float)offScreenBitmap.getHeight() / (offScreenRealRect.bottom - offScreenRealRect.top);
+
+
+        Matrix matrix = new Matrix();
+        matrix.setScale(xScale, yScale);
+        matrix.preTranslate(-offScreenRealRect.left, -offScreenRealRect.top);
+        return matrix;
     }
 
     private List<RenderPayload> collectAllRenderPayloads(boolean geometryInfoNeeded, RectF requestedRealRect) {
@@ -53,11 +71,7 @@ public class BufferedStrategyPainter extends StrategyPainter {
         return false;
     }
 
-    @Override
-    public void onDraw(Canvas canvas) {
-        if (offScreenBitmap == null)
-            return;
-
+    protected void onDirectDraw(Canvas canvas) {
         RectF range = null;
         if (dirtyRect != null)
             range = dirtyRect;
@@ -68,6 +82,17 @@ public class BufferedStrategyPainter extends StrategyPainter {
             offScreenBitmap.eraseColor(Color.TRANSPARENT);
             invalidated = false;
         }
+
+        for (RenderPayload payload : payloadList) {
+            ConcurrentPainter painter = payload.getPainter();
+            painter.render(offScreenCanvas, payload);
+        }
+    }
+
+    @Override
+    public void onDraw(Canvas canvas) {
+        if (offScreenBitmap == null)
+            return;
 
         if ((moveBitmap.x != 0 && Math.abs(moveBitmap.x) < containerView.getWidth()
                 || (moveBitmap.y != 0 && Math.abs(moveBitmap.y) < containerView.getHeight()))) {
@@ -80,10 +105,7 @@ public class BufferedStrategyPainter extends StrategyPainter {
             moveBitmap.set(0, 0);
         }
 
-        for (RenderPayload payload : payloadList) {
-            ConcurrentPainter painter = payload.getPainter();
-            painter.render(offScreenCanvas, payload);
-        }
+        onDirectDraw(canvas);
 
         canvas.drawBitmap(offScreenBitmap, 0, 0, null);
     }
@@ -97,7 +119,7 @@ public class BufferedStrategyPainter extends StrategyPainter {
     public void invalidate() {
         super.invalidate();
 
-        dirtyRect = new RectF(containerView.getRange());
+        dirtyRect = new RectF(offScreenRealRect);
         invalidated = true;
     }
 
@@ -127,6 +149,8 @@ public class BufferedStrategyPainter extends StrategyPainter {
 
     @Override
     public void onRangeChanged(RectF range, RectF oldRange, boolean keepDistance) {
+        offScreenRealRect.set(containerViewRangeToOffScreen(range));
+
         if (keepDistance) {
             dirtyRect = getDirtyRect(range, oldRange, keepDistance);
 

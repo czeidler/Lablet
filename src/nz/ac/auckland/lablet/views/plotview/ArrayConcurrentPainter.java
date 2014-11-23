@@ -128,7 +128,7 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
             adapter = dataAdapter.clone(regionToRender);
 
         ArrayRenderPayload renderPayload = new ArrayRenderPayload(this, realDataRect, screenRect,
-                getContainerView().getRangeMatrixCopy(),
+                parent.getRangeMatrixCopy(),
                 adapter,
                 regionToRender);
         renderPayload.setCompleteRedraw(clearParentBitmap);

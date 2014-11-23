@@ -96,7 +96,7 @@ public class PlotPainterContainerView extends RangeDrawingView {
 
         RectF newRange = getRange();
 
-        if (newRange.left == oldRange.left || newRange.right == oldRange.right)
+        if (newRange.left == oldRange.left && newRange.right == oldRange.right)
             return true;
 
         for (IPlotPainter painter : allPainters)
@@ -114,7 +114,7 @@ public class PlotPainterContainerView extends RangeDrawingView {
 
         RectF newRange = getRange();
 
-        if (newRange.top == oldRange.top || newRange.bottom == oldRange.bottom)
+        if (newRange.top == oldRange.top && newRange.bottom == oldRange.bottom)
             return true;
 
         for (IPlotPainter painter : allPainters)
@@ -128,8 +128,8 @@ public class PlotPainterContainerView extends RangeDrawingView {
         for (IPlotPainter painter : allPainters) {
             if (!(painter instanceof StrategyPainter))
                 continue;
-            List<ConcurrentPainter> childs = ((StrategyPainter)painter).getChildPainters();
-            for (ConcurrentPainter child : childs) {
+            List<ConcurrentPainter> childPainters = ((StrategyPainter)painter).getChildPainters();
+            for (ConcurrentPainter child : childPainters) {
                 if (!(child instanceof  XYConcurrentPainter))
                     continue;
                 XYConcurrentPainter xyConcurrentPainter = (XYConcurrentPainter)child;

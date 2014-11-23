@@ -9,6 +9,7 @@ package nz.ac.auckland.lablet.views.plotview;
 
 
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -93,5 +94,9 @@ abstract public class StrategyPainter extends AbstractPlotPainter {
 
     public List<ConcurrentPainter> getChildPainters() {
         return childPainters;
+    }
+
+    public Matrix getRangeMatrixCopy() {
+        return containerView.getRangeMatrixCopy();
     }
 }
