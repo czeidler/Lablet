@@ -708,6 +708,8 @@ public class PlotView extends ViewGroup {
         if (hasXAxis())
             xAxisView.setDataRange(mainView.getRangeLeft(), mainView.getRangeRight());
 
+        // request layout in case the axis changed its size
+        requestLayout();
         return true;
     }
 
@@ -719,6 +721,8 @@ public class PlotView extends ViewGroup {
         if (hasYAxis())
             yAxisView.setDataRange(mainView.getRangeBottom(), mainView.getRangeTop());
 
+        // request layout in case the axis changed its size
+        requestLayout();
         return true;
     }
 
