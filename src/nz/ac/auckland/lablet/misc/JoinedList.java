@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views.plotview;
+package nz.ac.auckland.lablet.misc;
 
 import java.util.ArrayList;
 import java.util.Iterator;
