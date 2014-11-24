@@ -19,7 +19,7 @@ class LabelMetric {
 
 class LabelPartitionerHelper {
     static public String createDummyLabel(LabelMetric metric) {
-        float dummyValue = 1.f / 3 * 10 * metric.digits;
+        float dummyValue = 1.f / 3 * (float)Math.pow(10, metric.digits);
         return createLabel(dummyValue, metric);
     }
 
