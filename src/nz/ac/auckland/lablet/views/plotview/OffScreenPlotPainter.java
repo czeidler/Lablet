@@ -44,11 +44,13 @@ class RenderTask {
             for (int index = 0; payloadList != null && index < payloadList.size(); index++) {
                 OffScreenPlotPainter.RenderPayload payload = payloadList.get(index);
 
-                Rect screenRect = payload.getScreenRect();
+                RectF screenRect = payload.getScreenRect();
                 Bitmap bitmap;
                 if (screenRect.width() > 0 && screenRect.height() > 0) {
                     // create bitmap for drawing
-                    bitmap = Bitmap.createBitmap(screenRect.width(), screenRect.height(), Bitmap.Config.ARGB_8888);
+                    final int screenRectWidth = (int)Math.ceil(screenRect.width());
+                    final int screenRectHeight = (int)Math.ceil(screenRect.height());
+                    bitmap = Bitmap.createBitmap(screenRectWidth, screenRectHeight, Bitmap.Config.ARGB_8888);
                     bitmap.eraseColor(Color.TRANSPARENT);
                     payload.setResultBitmap(bitmap);
 
@@ -153,11 +155,11 @@ abstract public class OffScreenPlotPainter extends AbstractPlotDataPainter {
 
     public class RenderPayload {
         private RectF realDataRect;
-        private Rect screenRect;
+        private RectF screenRect;
         private Bitmap resultBitmap;
         private boolean clearParentBitmap = false;
 
-        public RenderPayload(RectF realDataRect, Rect screenRect) {
+        public RenderPayload(RectF realDataRect, RectF screenRect) {
             this.realDataRect = realDataRect;
             this.screenRect = screenRect;
         }
@@ -170,11 +172,11 @@ abstract public class OffScreenPlotPainter extends AbstractPlotDataPainter {
             this.realDataRect = realDataRect;
         }
 
-        public Rect getScreenRect() {
+        public RectF getScreenRect() {
             return screenRect;
         }
 
-        public void setScreenRect(Rect screenRect) {
+        public void setScreenRect(RectF screenRect) {
             this.screenRect = screenRect;
         }
 
@@ -234,8 +236,8 @@ abstract public class OffScreenPlotPainter extends AbstractPlotDataPainter {
 
         Bitmap resultBitmap = payload.resultBitmap;
         if (resultBitmap != null) {
-            Rect targetRect = containerView.toScreen(payload.realDataRect);
-            Rect offScreenRect = containerView.toScreen(offScreenBitmap.getRealRect());
+            RectF targetRect = containerView.toScreen(payload.realDataRect);
+            RectF offScreenRect = containerView.toScreen(offScreenBitmap.getRealRect());
             targetRect.offset(-offScreenRect.left, -offScreenRect.top);
             Canvas canvas = offScreenBitmap.getCanvas();
             canvas.drawBitmap(resultBitmap, null, targetRect, null);
@@ -287,7 +289,7 @@ abstract public class OffScreenPlotPainter extends AbstractPlotDataPainter {
     public void onDraw(Canvas canvas) {
         Bitmap bitmap = offScreenBitmap.getBitmap();
         if (bitmap != null) {
-            Rect bitmapScreenRect = containerView.toScreen(offScreenBitmap.getRealRect());
+            RectF bitmapScreenRect = containerView.toScreen(offScreenBitmap.getRealRect());
             canvas.drawBitmap(bitmap, null, bitmapScreenRect, offScreenPaint);
         }
 

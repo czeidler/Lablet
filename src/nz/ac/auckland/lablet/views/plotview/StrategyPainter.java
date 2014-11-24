@@ -44,10 +44,10 @@ abstract public class StrategyPainter extends AbstractPlotPainter {
     public static class RenderPayload {
         final private ConcurrentPainter painter;
         final private RectF realDataRect;
-        final private Rect screenRect;
+        final private RectF screenRect;
         private boolean completeRedraw = false;
 
-        public RenderPayload(ConcurrentPainter painter, RectF realDataRect, Rect screenRect) {
+        public RenderPayload(ConcurrentPainter painter, RectF realDataRect, RectF screenRect) {
             this.painter = painter;
             this.realDataRect = realDataRect;
             this.screenRect = screenRect;
@@ -57,7 +57,7 @@ abstract public class StrategyPainter extends AbstractPlotPainter {
             return realDataRect;
         }
 
-        public Rect getScreenRect() {
+        public RectF getScreenRect() {
             return screenRect;
         }
 

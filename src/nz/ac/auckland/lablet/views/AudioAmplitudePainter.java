@@ -51,7 +51,7 @@ public class AudioAmplitudePainter extends ArrayConcurrentPainter {
     }
 
     private int getSamplesPerPixel(ArrayRenderPayload payload) {
-        Rect screenRect = payload.getScreenRect();
+        RectF screenRect = payload.getScreenRect();
 
         int dataRange = payload.getRegion().getMax() - payload.getRegion().getMin();
 

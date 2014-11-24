@@ -115,9 +115,11 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
         float[] startLeftTop = mapPoint(rangeMatrix, adapter.getX(start), payload.getRealDataRect().top);
         int xStartPixel = (int)startLeftTop[0];
 
-        final Rect screenRect = payload.getScreenRect();
-        final int[] colors = new int[screenRect.height()];
-        final int[] bitmapData = new int[screenRect.width() * screenRect.height()];
+        final RectF screenRect = payload.getScreenRect();
+        final int screenRectWidth = (int)Math.ceil(screenRect.width());
+        final int screenRectHeight = (int)Math.ceil(screenRect.height());
+        final int[] colors = new int[screenRectHeight];
+        final int[] bitmapData = new int[screenRectWidth * screenRectHeight];
         // the default int value of 0 is transparent
         //Arrays.fill(bitmapData, Color.TRANSPARENT);
 
@@ -149,11 +151,11 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
                 if (column >= screenRect.width())
                     break;
                 for (int row = 0; row < colors.length; row++)
-                    bitmapData[column + row * screenRect.width()] = colors[row];
+                    bitmapData[column + row * screenRectWidth] = colors[row];
             }
         }
-        canvas.drawBitmap(bitmapData, 0, screenRect.width(), startLeftTop[0], startLeftTop[1],
-                screenRect.width(), screenRect.height(), true, null);
+        canvas.drawBitmap(bitmapData, 0, screenRectWidth, startLeftTop[0], startLeftTop[1],
+                screenRectWidth, screenRectHeight, true, null);
     }
 
     private int toPixel(float scaledValue, float scaledBottom, float scaledTop, int screenRectHeight) {
@@ -176,7 +178,7 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
     private int[] getColors(int[] colors, final float[] frequencies, final ArrayRenderPayload payload) {
         final float scaledBottom = yScale.scale(payload.getRealDataRect().bottom);
         final float scaledTop = yScale.scale(payload.getRealDataRect().top);
-        final int screenRectHeight = payload.getScreenRect().height();
+        final int screenRectHeight = (int)Math.ceil(payload.getScreenRect().height());
 
         float maxFreqAmplitude = 32768 * frequencies.length * 2;
 
@@ -265,7 +267,7 @@ public class AudioFrequencyMapPainter extends ArrayOffScreenPlotPainter {
         realDataRect.bottom -= heightHalf;
         containerView.ensureRectInMaxRange(realDataRect);
 
-        Rect screenRect = containerView.toScreen(realDataRect);
+        RectF screenRect = containerView.toScreen(realDataRect);
 
         Range dirty = getDataRangeFor(realDataRect.left, realDataRect.right);
         Region1D regionToRender = new Region1D(dirty);

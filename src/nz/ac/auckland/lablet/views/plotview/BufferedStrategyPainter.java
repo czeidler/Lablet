@@ -154,8 +154,8 @@ public class BufferedStrategyPainter extends StrategyPainter {
         if (keepDistance) {
             dirtyRect = getDirtyRect(range, oldRange, keepDistance);
 
-            Rect oldScreen = containerView.toScreen(oldRange);
-            Rect screen = containerView.toScreen(range);
+            RectF oldScreen = containerView.toScreen(oldRange);
+            RectF screen = containerView.toScreen(range);
             moveBitmap.offset(oldScreen.left - screen.left, oldScreen.top - screen.top);
             containerView.invalidate();
         } else

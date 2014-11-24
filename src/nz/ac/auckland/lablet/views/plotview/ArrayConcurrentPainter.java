@@ -22,7 +22,7 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
         private CloneablePlotDataAdapter adapter;
         private Region1D region;
 
-        public ArrayRenderPayload(ConcurrentPainter painter, RectF realDataRect, Rect screenRect,
+        public ArrayRenderPayload(ConcurrentPainter painter, RectF realDataRect, RectF screenRect,
                                   Matrix rangeMatrix, CloneablePlotDataAdapter adapter, Region1D region) {
             super(painter, realDataRect, screenRect);
             this.rangeMatrix = rangeMatrix;
@@ -72,7 +72,7 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
 
         Region1D regionToRender;
         RectF realDataRect = null;
-        Rect screenRect = null;
+        RectF screenRect = null;
         boolean clearParentBitmap = false;
         PlotPainterContainerView containerView = getContainerView();
         if (requestedRealRect != null) {
@@ -120,7 +120,7 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
     }
     abstract protected void drawRange(Canvas bitmapCanvas, ArrayRenderPayload payload, Range range);
 
-    protected ArrayRenderPayload makeRenderPayload(RectF realDataRect, Rect screenRect, Region1D regionToRender,
+    protected ArrayRenderPayload makeRenderPayload(RectF realDataRect, RectF screenRect, Region1D regionToRender,
                                                    boolean clearParentBitmap) {
         // optimization: just use the normal adapter if we don't use threads
         CloneablePlotDataAdapter adapter = dataAdapter;

@@ -47,11 +47,13 @@ class ThreadRenderTask {
             for (int index = 0; payloadList != null && index < payloadList.size(); index++) {
                 StrategyPainter.RenderPayload payload = payloadList.get(index);
 
-                Rect screenRect = payload.getScreenRect();
+                RectF screenRect = payload.getScreenRect();
                 Bitmap bitmap = null;
                 if (screenRect.width() > 0 && screenRect.height() > 0) {
+                    final int screenRectWidth = (int)Math.ceil(screenRect.width());
+                    final int screenRectHeight = (int)Math.ceil(screenRect.height());
                     // create bitmap for drawing
-                    bitmap = Bitmap.createBitmap(screenRect.width(), screenRect.height(), Bitmap.Config.ARGB_8888);
+                    bitmap = Bitmap.createBitmap(screenRectWidth, screenRectHeight, Bitmap.Config.ARGB_8888);
                     bitmap.eraseColor(Color.TRANSPARENT);
 
                     Canvas bitmapCanvas = new Canvas(bitmap);
@@ -182,8 +184,8 @@ public class ThreadStrategyPainter extends StrategyPainter {
         }
 
         if (resultBitmap != null) {
-            Rect targetRect = containerView.toScreen(payload.getRealDataRect());
-            Rect offScreenRect = containerView.toScreen(offScreenBitmap.getRealRect());
+            RectF targetRect = containerView.toScreen(payload.getRealDataRect());
+            RectF offScreenRect = containerView.toScreen(offScreenBitmap.getRealRect());
             targetRect.offset(-offScreenRect.left, -offScreenRect.top);
             Canvas canvas = offScreenBitmap.getCanvas();
             canvas.drawBitmap(resultBitmap, null, targetRect, null);
@@ -236,7 +238,7 @@ public class ThreadStrategyPainter extends StrategyPainter {
 
             Bitmap bitmap = offScreenBitmap.getBitmap();
             if (bitmap != null) {
-                Rect bitmapScreenRect = containerView.toScreen(offScreenBitmap.getRealRect());
+                RectF bitmapScreenRect = containerView.toScreen(offScreenBitmap.getRealRect());
                 canvas.drawBitmap(bitmap, null, bitmapScreenRect, offScreenPaint);
             }
 

@@ -21,7 +21,7 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
         private CloneablePlotDataAdapter adapter;
         private Region1D region;
 
-        public ArrayRenderPayload(RectF realDataRect, Rect screenRect,
+        public ArrayRenderPayload(RectF realDataRect, RectF screenRect,
                                   Matrix rangeMatrix, CloneablePlotDataAdapter adapter, Region1D region) {
             super(realDataRect, screenRect);
             this.rangeMatrix = rangeMatrix;
@@ -84,7 +84,7 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
             return;
 
         RectF realDataRect = getRealDataRect(dirtyRegion.getMin(), dirtyRegion.getMax());
-        Rect screenRect = containerView.toScreen(realDataRect);
+        RectF screenRect = containerView.toScreen(realDataRect);
 
         triggerJob(realDataRect, screenRect, new Region1D(dirtyRegion), false);
 
@@ -101,14 +101,15 @@ abstract public class ArrayOffScreenPlotPainter extends OffScreenPlotPainter {
         Range dirty = getDataRangeFor(containerView.getRangeLeft(), containerView.getRangeRight());
         Region1D regionToRender = new Region1D(dirty);
         RectF realDataRect = containerView.getRange();
-        Rect screenRect = containerView.toScreen(realDataRect);
+        RectF screenRect = containerView.toScreen(realDataRect);
 
         triggerJob(realDataRect, screenRect, regionToRender, true);
 
         dirtyRegion.clear();
     }
 
-    protected void triggerJob(RectF realDataRect, Rect screenRect, Region1D regionToRender, boolean clearParentBitmap) {
+    protected void triggerJob(RectF realDataRect, RectF screenRect, Region1D regionToRender,
+                              boolean clearParentBitmap) {
         ArrayRenderPayload renderPayload = new ArrayRenderPayload(realDataRect, screenRect,
                 containerView.getRangeMatrixCopy(),
                 ((CloneablePlotDataAdapter)dataAdapter).clone(regionToRender),

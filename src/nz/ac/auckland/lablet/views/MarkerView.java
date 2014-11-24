@@ -405,7 +405,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
         return screenPosition;
     }
 
-    public Rect getScreenRect() {
+    public RectF getScreenRect() {
         return containerView.getScreenRect();
     }
 

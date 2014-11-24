@@ -51,8 +51,8 @@ abstract class CursorMarker extends DraggableMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
-        Point start = getStartPoint();
-        Point end = getEndPoint();
+        PointF start = getStartPoint();
+        PointF end = getEndPoint();
         cursorPaint.setStyle(Paint.Style.STROKE);
         cursorPaint.setStrokeWidth(1);
         if (isSelectedForDrag())
@@ -71,12 +71,12 @@ abstract class CursorMarker extends DraggableMarker {
         textBackgroundPaint.setStyle(Paint.Style.FILL);
         final PointF realPosition = new PointF();
         parent.getContainerView().fromScreen(getCachedScreenPosition(), realPosition);
-        Point textPosition = new Point(start);
+        PointF textPosition = new PointF(start.x, start.y);
         textPosition.offset(2, -2);
         final String positionString = String.format("Position: %d", (int)getDirection(realPosition));
         final Rect textBounds = new Rect();
         textPaint.getTextBounds(positionString, 0, positionString.length(), textBounds);
-        textBounds.offset(textPosition.x, textPosition.y);
+        textBounds.offset((int)textPosition.x, (int)textPosition.y);
         canvas.drawRect(textBounds, textBackgroundPaint);
         canvas.drawText(positionString, textPosition.x, textPosition.y,
                 textPaint);
@@ -84,8 +84,8 @@ abstract class CursorMarker extends DraggableMarker {
 
     abstract protected float getDirection(PointF point);
     abstract protected void offsetPoint(Point point, float offset);
-    abstract protected Point getStartPoint();
-    abstract protected Point getEndPoint();
+    abstract protected PointF getStartPoint();
+    abstract protected PointF getEndPoint();
 }
 
 class HCursorMarker extends CursorMarker {
@@ -100,13 +100,13 @@ class HCursorMarker extends CursorMarker {
     }
 
     @Override
-    protected Point getStartPoint() {
-        return new Point(0, (int)getCachedScreenPosition().y);
+    protected PointF getStartPoint() {
+        return new PointF(0, getCachedScreenPosition().y);
     }
 
     @Override
-    protected Point getEndPoint() {
-        return new Point(parent.getScreenRect().width(), (int)getCachedScreenPosition().y);
+    protected PointF getEndPoint() {
+        return new PointF(parent.getScreenRect().width(), getCachedScreenPosition().y);
     }
 }
 
@@ -123,13 +123,13 @@ class VCursorMarker extends CursorMarker {
     }
 
     @Override
-    protected Point getStartPoint() {
-        return new Point((int)getCachedScreenPosition().x, parent.getScreenRect().height());
+    protected PointF getStartPoint() {
+        return new PointF((int)getCachedScreenPosition().x, parent.getScreenRect().height());
     }
 
     @Override
-    protected Point getEndPoint() {
-        return new Point((int)getCachedScreenPosition().x, 0);
+    protected PointF getEndPoint() {
+        return new PointF(getCachedScreenPosition().x, 0);
     }
 }
 
