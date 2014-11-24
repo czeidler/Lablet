@@ -212,8 +212,6 @@ public class PlotView extends ViewGroup {
         private ResizePolicy xPolicy = null;
         private ResizePolicy yPolicy = null;
 
-        private RectF previousLimits;
-
         public AutoRange(List<AbstractXYDataAdapter> adapters, int behaviourX, int behaviourY) {
             setBehaviour(behaviourX, behaviourY);
 
@@ -256,20 +254,34 @@ public class PlotView extends ViewGroup {
             RectF limits = null;
             for (DataStatistics statistics : dataStatisticsList) {
                 RectF currentLimits = statistics.getDataLimits();
-                if (currentLimits == null)
-                    continue;
-                if (limits == null)
-                    limits = currentLimits;
-                else {
-                    if (limits.left > currentLimits.left)
-                        limits.left = currentLimits.left;
-                    if (limits.top > currentLimits.top)
-                        limits.top = currentLimits.top;
-                    if (limits.right < currentLimits.right)
-                        limits.right = currentLimits.right;
-                    if (limits.bottom < currentLimits.bottom)
-                        limits.bottom = currentLimits.bottom;
-                }
+                limits = includeLimit(limits, currentLimits);
+            }
+            return limits;
+        }
+
+        public RectF getPreviousDataLimits() {
+            RectF limits = null;
+            for (DataStatistics statistics : dataStatisticsList) {
+                RectF currentLimits = statistics.getPreviousDataLimits();
+                limits = includeLimit(limits, currentLimits);
+            }
+            return limits;
+        }
+
+        private RectF includeLimit(RectF limits, RectF limitsToAdd) {
+            if (limitsToAdd == null)
+                return limits;
+            if (limits == null)
+                limits = limitsToAdd;
+            else {
+                if (limits.left > limitsToAdd.left)
+                    limits.left = limitsToAdd.left;
+                if (limits.top > limitsToAdd.top)
+                    limits.top = limitsToAdd.top;
+                if (limits.right < limitsToAdd.right)
+                    limits.right = limitsToAdd.right;
+                if (limits.bottom < limitsToAdd.bottom)
+                    limits.bottom = limitsToAdd.bottom;
             }
             return limits;
         }
@@ -355,6 +367,7 @@ public class PlotView extends ViewGroup {
         class ScrollPolicyH extends ResizePolicy {
             @Override
             void onLimitsChanged(RectF limits, RectF oldRange, boolean flippedAxis) {
+                RectF previousLimits = getPreviousDataLimits();
                 if (previousLimits == null)
                     return;
 
@@ -375,6 +388,7 @@ public class PlotView extends ViewGroup {
         class ScrollPolicyV extends ResizePolicy {
             @Override
             void onLimitsChanged(RectF limits, RectF oldRange, boolean flippedAxis) {
+                RectF previousLimits = getPreviousDataLimits();
                 if (previousLimits == null)
                     return;
 
@@ -413,8 +427,6 @@ public class PlotView extends ViewGroup {
                 xPolicy.onLimitsChanged(limits, oldRange, xFlipped);
             if (yPolicy != null)
                 yPolicy.onLimitsChanged(limits, oldRange, yFlipped);
-
-            previousLimits = new RectF(limits);
         }
 
         public void setBehaviour(int behaviourX, int behaviourY) {

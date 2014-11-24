@@ -20,6 +20,7 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
 
     final private AbstractXYDataAdapter adapter;
     private RectF dataLimits = null;
+    private RectF previousLimits = null;
     private float sumX = 0;
     private float sumY = 0;
 
@@ -62,6 +63,10 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
         return new RectF(dataLimits);
     }
 
+    public RectF getPreviousDataLimits() {
+        return previousLimits;
+    }
+
     public float getAverageX() {
         return sumX / adapter.getSize();
     }
@@ -78,6 +83,8 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
             notifyLimitsChanged();
             return;
         }
+
+        RectF oldLimits = new RectF(dataLimits);
 
         boolean limitsChanged = false;
         if (dataLimits.left > x) {
@@ -97,8 +104,10 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
             limitsChanged = true;
         }
 
-        if (limitsChanged)
+        if (limitsChanged) {
+            previousLimits = oldLimits;
             notifyLimitsChanged();
+        }
 
         sumX += x;
         sumY += y;
@@ -109,6 +118,7 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
     }
 
     private void reset() {
+        previousLimits = null;
         dataLimits = null;
 
         for (int i = 0; i < adapter.getSize(); i++) {

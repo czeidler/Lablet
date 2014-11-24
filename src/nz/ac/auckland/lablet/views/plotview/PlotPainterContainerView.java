@@ -12,10 +12,9 @@ import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import org.luaj.vm2.ast.Str;
+import nz.ac.auckland.lablet.misc.JoinedList;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
