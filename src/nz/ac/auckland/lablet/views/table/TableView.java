@@ -23,11 +23,11 @@ import java.util.List;
  */
 public class TableView extends TableLayout {
     protected ITableAdapter adapter = null;
-    TableRow selectedRow = null;
-    final int rowBackgroundColor = Color.WHITE;
-    final int headerRowBackgroundColor = Color.rgb(100, 100, 100);
-    final int selectedRowColor = Color.rgb(200, 200, 200);
-    final List<TableRow> tableRowOrder = new ArrayList<>();
+    private TableRow selectedRow = null;
+    final private int rowBackgroundColor = Color.WHITE;
+    final private int headerRowBackgroundColor = Color.rgb(100, 100, 100);
+    final private int selectedRowColor = Color.rgb(200, 200, 200);
+    final private List<TableRow> tableRowOrder = new ArrayList<>();
 
     public TableView(Context context) {
         super(context);
