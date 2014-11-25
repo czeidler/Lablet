@@ -30,7 +30,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
     final private Spinner graphSpinner;
     final private DrawerLayout drawerLayout;
     final private FrameLayout drawer;
-    final private ListView tableListView;
+    final private TableView tableView;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
     private boolean releaseAdaptersWhenDrawerClosed = false;
 
@@ -94,8 +94,8 @@ class MotionAnalysisFragmentView extends FrameLayout {
         graphView = (GraphView2D)mainView.findViewById(R.id.tagMarkerGraphView);
         assert graphView != null;
 
-        tableListView = (ListView)mainView.findViewById(R.id.tableListView);
-        assert tableListView != null;
+        tableView = (TableView)mainView.findViewById(R.id.tableView);
+        assert tableView != null;
 
         final View sensorAnalysisView = new CameraExperimentFrameView(context, sensorAnalysis);
         if (sensorAnalysisView == null)
@@ -169,14 +169,14 @@ class MotionAnalysisFragmentView extends FrameLayout {
             public void onDrawerOpened(View drawerView) {
                 if (releaseAdaptersWhenDrawerClosed) {
                     selectGraphAdapter(graphSpinner.getSelectedItemPosition());
-                    tableListView.setAdapter(new TableListAdapter(adapter));
+                    tableView.setAdapter(adapter);
                 }
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
                 if (releaseAdaptersWhenDrawerClosed) {
-                    tableListView.setAdapter(null);
+                    tableView.setAdapter((ITableAdapter)null);
                     selectGraphAdapter(-1);
                 }
             }
@@ -188,7 +188,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
         });
 
         if (!releaseAdaptersWhenDrawerClosed) {
-            tableListView.setAdapter(new TableListAdapter(adapter));
+            tableView.setAdapter(adapter);
             selectGraphAdapter(graphSpinner.getSelectedItemPosition());
         }
     }
@@ -215,7 +215,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
     @Override
     public void finalize() {
         runContainerView.release();
-        tableListView.setAdapter(null);
+        tableView.setAdapter((ITableAdapter)null);
         graphView.setAdapter(null);
     }
 }

@@ -99,6 +99,10 @@ public class TableListAdapter extends BaseAdapter {
         selectRow(adapter.getSelectedRow());
     }
 
+    public void release() {
+        adapter.removeListener(tableAdapterListener);
+    }
+
     @Override
     public int getCount() {
         return adapter.getRowCount();
