@@ -96,6 +96,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
         tableView = (TableView)mainView.findViewById(R.id.tableView);
         assert tableView != null;
+        tableView.setColumnWeights(1f, 1.8f, 1.4f, 1.4f);
 
         final View sensorAnalysisView = new CameraExperimentFrameView(context, sensorAnalysis);
         if (sensorAnalysisView == null)
