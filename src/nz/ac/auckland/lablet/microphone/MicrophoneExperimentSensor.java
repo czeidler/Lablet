@@ -57,8 +57,6 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
         playbackView.setVisibility(View.INVISIBLE);
 
         previewState = new AbstractExperimentSensor.State() {
-            private AudioFrequencyView audioFrequencyView;
-
             private PlotView audioAmplitudePlotView;
             private AudioAmplitudePlotDataAdapter audioAmplitudePlotAdapter;
 
@@ -78,8 +76,6 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
 
                 @Override
                 public void onNewFrequencyData(float[] frequencies) {
-                    audioFrequencyView.addData(frequencies);
-
                     int size = audioFrequencyMapAdapter.getSize();
                     if (size > 0 && audioFrequencyMapAdapter.getX(size - 1) >= frequencyMapTimeSpan)
                         audioFrequencyMapAdapter.clear();
@@ -100,8 +96,6 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 audioAmplitudePlotView.getXAxisView().setTitle("Time");
                 audioAmplitudePlotView.getBackgroundPainter().setShowYGrid(true);
                 audioAmplitudePlotView.addPlotPainter(strategyPainter);
-
-                audioFrequencyView = (AudioFrequencyView)view.findViewById(R.id.audioFrequencyView);
 
                 frequencyMapPlotView = (PlotView)view.findViewById(R.id.audioFrequencyMapPlot);
                 audioFrequencyMapAdapter = new AudioFrequencyMapAdapter(0.5f);
