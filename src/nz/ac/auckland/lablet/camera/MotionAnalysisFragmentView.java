@@ -26,11 +26,11 @@ import java.util.List;
 
 class MotionAnalysisFragmentView extends FrameLayout {
     final private FrameContainerView runContainerView;
-    final private TableView tableView;
     final private GraphView2D graphView;
     final private Spinner graphSpinner;
     final private DrawerLayout drawerLayout;
     final private FrameLayout drawer;
+    final private ListView tableListView;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
     private boolean releaseAdaptersWhenDrawerClosed = false;
 
@@ -93,8 +93,9 @@ class MotionAnalysisFragmentView extends FrameLayout {
         // marker graph view
         graphView = (GraphView2D)mainView.findViewById(R.id.tagMarkerGraphView);
         assert graphView != null;
-        tableView = (TableView)mainView.findViewById(R.id.tagMarkerTableView);
-        assert tableView != null;
+
+        tableListView = (ListView)mainView.findViewById(R.id.tableListView);
+        assert tableListView != null;
 
         final View sensorAnalysisView = new CameraExperimentFrameView(context, sensorAnalysis);
         if (sensorAnalysisView == null)
@@ -135,11 +136,11 @@ class MotionAnalysisFragmentView extends FrameLayout {
         graphSpinnerEntryList.add(new GraphSpinnerEntry("y-Velocity", new MarkerTimeGraphAdapter(markerDataModel,
                 timeCalibration, "y-Velocity", new TimeMarkerGraphAxis(tUnit),
                 new YSpeedMarkerGraphAxis(yUnit, tUnit)), true));
-        graphSpinnerEntryList.add(new GraphSpinnerEntry("time vs x-Position", new MarkerTimeGraphAdapter(markerDataModel,
-                timeCalibration, "time vs x-Position", new TimeMarkerGraphAxis(tUnit),
+        graphSpinnerEntryList.add(new GraphSpinnerEntry("Time vs x-Position", new MarkerTimeGraphAdapter(markerDataModel,
+                timeCalibration, "Time vs x-Position", new TimeMarkerGraphAxis(tUnit),
                 new XPositionMarkerGraphAxis(xUnit, sensorAnalysis.getXMinRangeGetter()))));
-        graphSpinnerEntryList.add(new GraphSpinnerEntry("time vs y-Position", new MarkerTimeGraphAdapter(markerDataModel,
-                timeCalibration, "time vs y-Position", new TimeMarkerGraphAxis(tUnit),
+        graphSpinnerEntryList.add(new GraphSpinnerEntry("Time vs y-Position", new MarkerTimeGraphAdapter(markerDataModel,
+                timeCalibration, "Time vs y-Position", new TimeMarkerGraphAxis(tUnit),
                 new YPositionMarkerGraphAxis(yUnit, sensorAnalysis.getYMinRangeGetter()))));
 
         graphSpinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
@@ -167,15 +168,15 @@ class MotionAnalysisFragmentView extends FrameLayout {
             @Override
             public void onDrawerOpened(View drawerView) {
                 if (releaseAdaptersWhenDrawerClosed) {
-                    tableView.setAdapter(adapter);
                     selectGraphAdapter(graphSpinner.getSelectedItemPosition());
+                    tableListView.setAdapter(new TableListAdapter(adapter));
                 }
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
                 if (releaseAdaptersWhenDrawerClosed) {
-                    tableView.setAdapter(null);
+                    tableListView.setAdapter(null);
                     selectGraphAdapter(-1);
                 }
             }
@@ -187,7 +188,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
         });
 
         if (!releaseAdaptersWhenDrawerClosed) {
-            tableView.setAdapter(adapter);
+            tableListView.setAdapter(new TableListAdapter(adapter));
             selectGraphAdapter(graphSpinner.getSelectedItemPosition());
         }
     }
@@ -214,7 +215,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
     @Override
     public void finalize() {
         runContainerView.release();
-        tableView.setAdapter(null);
+        tableListView.setAdapter(null);
         graphView.setAdapter(null);
     }
 }
