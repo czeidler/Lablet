@@ -36,6 +36,10 @@ abstract class ConcurrentPainter {
     abstract public List<StrategyPainter.RenderPayload> collectRenderPayloads(boolean geometryInfoNeeded,
                                                                               RectF requestedRealRect);
 
+    protected boolean geometryInfoNeededForRendering() {
+        return false;
+    }
+
     abstract protected void render(Canvas bitmapCanvas, StrategyPainter.RenderPayload payload);
 }
 

@@ -70,6 +70,10 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
         if (dataAdapter == null)
             return payloads;
 
+        // do we need the geometry for ourselves?
+        if (geometryInfoNeededForRendering())
+            geometryInfoNeeded = true;
+
         Region1D regionToRender;
         RectF realDataRect = null;
         RectF screenRect = null;
