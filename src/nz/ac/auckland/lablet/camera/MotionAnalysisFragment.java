@@ -192,9 +192,19 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         }
     }
 
+    private MotionAnalysisFragmentView view;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return new MotionAnalysisFragmentView(getActivity(), getSensorAnalysis());
+        view = new MotionAnalysisFragmentView(getActivity(), getSensorAnalysis());
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        view.release();
+        view = null;
+        super.onDestroyView();
     }
 
     @Override

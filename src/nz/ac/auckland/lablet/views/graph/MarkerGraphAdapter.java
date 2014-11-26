@@ -26,9 +26,16 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
         setYAxis(yAxis);
     }
 
+    public void release() {
+        if (data != null) {
+            data.removeListener(this);
+            data = null;
+        }
+    }
+
     @Override
     protected void finalize() {
-        data.removeListener(this);
+        release();
     }
 
     public void setTo(MarkerDataModel data) {
@@ -37,7 +44,7 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
 
         this.data = data;
 
-        data.addListener(this);
+        this.data.addListener(this);
     }
 
     @Override

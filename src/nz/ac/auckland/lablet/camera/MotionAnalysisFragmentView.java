@@ -25,6 +25,7 @@ import java.util.List;
 
 
 class MotionAnalysisFragmentView extends FrameLayout {
+    private MarkerDataTableAdapter markerDataTableAdapter;
     final private FrameContainerView runContainerView;
     final private GraphView2D graphView;
     final private Spinner graphSpinner;
@@ -48,6 +49,10 @@ class MotionAnalysisFragmentView extends FrameLayout {
             this.name = name;
             this.markerGraphAdapter = adapter;
             this.fit = fit;
+        }
+
+        public void release() {
+            markerGraphAdapter.release();
         }
 
         public String toString() {
@@ -115,11 +120,11 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
         // marker table view
         final ITimeData timeData = sensorAnalysis.getTimeData();
-        final MarkerDataTableAdapter adapter = new MarkerDataTableAdapter(sensorAnalysis.getTagMarkers());
-        adapter.addColumn(new RunIdDataTableColumn());
-        adapter.addColumn(new TimeDataTableColumn(tUnit, timeData));
-        adapter.addColumn(new XPositionDataTableColumn(xUnit));
-        adapter.addColumn(new YPositionDataTableColumn(yUnit));
+        markerDataTableAdapter = new MarkerDataTableAdapter(sensorAnalysis.getTagMarkers());
+        markerDataTableAdapter.addColumn(new RunIdDataTableColumn());
+        markerDataTableAdapter.addColumn(new TimeDataTableColumn(tUnit, timeData));
+        markerDataTableAdapter.addColumn(new XPositionDataTableColumn(xUnit));
+        markerDataTableAdapter.addColumn(new YPositionDataTableColumn(yUnit));
 
         MarkerDataModel markerDataModel = sensorAnalysis.getTagMarkers();
         ITimeData timeCalibration = sensorAnalysis.getTimeData();
@@ -170,7 +175,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
             public void onDrawerOpened(View drawerView) {
                 if (releaseAdaptersWhenDrawerClosed) {
                     selectGraphAdapter(graphSpinner.getSelectedItemPosition());
-                    tableView.setAdapter(adapter);
+                    tableView.setAdapter(markerDataTableAdapter);
                 }
             }
 
@@ -189,7 +194,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
         });
 
         if (!releaseAdaptersWhenDrawerClosed) {
-            tableView.setAdapter(adapter);
+            tableView.setAdapter(markerDataTableAdapter);
             selectGraphAdapter(graphSpinner.getSelectedItemPosition());
         }
     }
@@ -214,9 +219,19 @@ class MotionAnalysisFragmentView extends FrameLayout {
     }
 
     @Override
-    public void finalize() {
+    protected void finalize() throws Throwable {
+        release();
+        super.finalize();
+    }
+
+    public void release() {
+        markerDataTableAdapter.release();
         runContainerView.release();
         tableView.setAdapter((ITableAdapter)null);
         graphView.setAdapter(null);
+        graphSpinner.setAdapter(null);
+        for (GraphSpinnerEntry entry : graphSpinnerEntryList)
+            entry.release();
+        graphSpinnerEntryList.clear();
     }
 }

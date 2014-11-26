@@ -77,5 +77,4 @@ public class WeakListenable<Listener> {
 
         return outList;
     }
-
 }

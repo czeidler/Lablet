@@ -297,7 +297,7 @@ class SimpleMarker extends DraggableMarker {
  * Abstract base class to draw a {@link nz.ac.auckland.lablet.experiment.MarkerDataModel} in a
  * {@link nz.ac.auckland.lablet.views.MarkerView}.
  */
-abstract class AbstractMarkerPainter extends AbstractPlotPainter implements MarkerDataModel.IListener {
+abstract class AbstractMarkerPainter extends AbstractPlotPainter {
 
     public class MarkerPainterGroup {
         private AbstractMarkerPainter selectedForDragPainter = null;
@@ -365,6 +365,40 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
         }
     }
 
+    private MarkerDataModel.IListener dataListener = new MarkerDataModel.IListener() {
+
+        @Override
+        public void onDataAdded(MarkerDataModel model, int index) {
+            addMarker(index);
+            containerView.invalidate();
+        }
+
+        @Override
+        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
+            removeMarker(index);
+            containerView.invalidate();
+        }
+
+        @Override
+        public void onDataChanged(MarkerDataModel model, int index, int number) {
+            containerView.invalidate();
+        }
+
+        @Override
+        public void onAllDataChanged(MarkerDataModel model) {
+            rebuildMarkerList();
+            containerView.invalidate();
+        }
+
+        @Override
+        public void onDataSelected(MarkerDataModel model, int index) {
+            if (getMarkerPainterGroup().selectOnSelectOnDrag && index >= 0)
+                markerList.get(index).setSelectedForDrag(true);
+
+            containerView.invalidate();
+        }
+    };
+
     private MarkerPainterGroup markerPainterGroup = new MarkerPainterGroup();
 
     protected MarkerDataModel markerData = null;
@@ -373,7 +407,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
 
     public AbstractMarkerPainter(MarkerDataModel model) {
         markerData = model;
-        markerData.addListener(this);
+        markerData.addListener(dataListener);
     }
 
 
@@ -390,7 +424,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
     }
 
     public void release() {
-        markerData.removeListener(this);
+        markerData.removeListener(dataListener);
         markerData = null;
     }
 
@@ -524,37 +558,6 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter implements Mark
         markerList.remove(row);
         if (row == markerData.getSelectedMarkerData())
             markerData.selectMarkerData(-1);
-    }
-
-    @Override
-    public void onDataAdded(MarkerDataModel model, int index) {
-        addMarker(index);
-        containerView.invalidate();
-    }
-
-    @Override
-    public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
-        removeMarker(index);
-        containerView.invalidate();
-    }
-
-    @Override
-    public void onDataChanged(MarkerDataModel model, int index, int number) {
-        containerView.invalidate();
-    }
-
-    @Override
-    public void onAllDataChanged(MarkerDataModel model) {
-        rebuildMarkerList();
-        containerView.invalidate();
-    }
-
-    @Override
-    public void onDataSelected(MarkerDataModel model, int index) {
-        if (getMarkerPainterGroup().selectOnSelectOnDrag && index >= 0)
-            markerList.get(index).setSelectedForDrag(true);
-
-        containerView.invalidate();
     }
 
     @Override

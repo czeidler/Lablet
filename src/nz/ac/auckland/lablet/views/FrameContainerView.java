@@ -25,13 +25,36 @@ import nz.ac.auckland.lablet.experiment.MarkerDataModel;
  * the screen coordinates of the run view and the marker view are the same.
  * </p>
  */
-public class FrameContainerView extends RelativeLayout implements FrameDataModel.IFrameDataModelListener,
-        MotionAnalysis.IListener {
+public class FrameContainerView extends RelativeLayout {
     private View sensorAnalysisView = null;
     private MarkerView markerView = null;
     private FrameDataModel frameDataModel = null;
     private MotionAnalysis sensorAnalysis = null;
     private OriginMarkerPainter originMarkerPainter = null;
+
+    private FrameDataModel.IFrameDataModelListener frameDataModelListener = new FrameDataModel.IFrameDataModelListener() {
+        @Override
+        public void onFrameChanged(int newFrame) {
+            ((IExperimentFrameView) sensorAnalysisView).setCurrentFrame(newFrame);
+            markerView.setCurrentRun(newFrame);
+            markerView.invalidate();
+        }
+
+        @Override
+        public void onNumberOfFramesChanged() {
+
+        }
+    };
+
+    private MotionAnalysis.IListener motionAnalysisListener = new MotionAnalysis.IListener() {
+        @Override
+        public void onShowCoordinateSystem(boolean show) {
+            if (show)
+                markerView.addPlotPainter(originMarkerPainter);
+            else
+                markerView.removePlotPainter(originMarkerPainter);
+        }
+    };
 
     public FrameContainerView(Context context) {
         super(context);
@@ -41,11 +64,9 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
         super(context, attrs);
     }
 
+    @Override
     protected void finalize() {
-        if (sensorAnalysis != null)
-            sensorAnalysis.removeListener(this);
-        if (frameDataModel != null)
-            frameDataModel.removeListener(this);
+        release();
 
         try {
             super.finalize();
@@ -56,14 +77,14 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
 
     public void setTo(View runView, MotionAnalysis analysis) {
         if (sensorAnalysis != null)
-            sensorAnalysis.removeListener(this);
+            sensorAnalysis.removeListener(motionAnalysisListener);
         sensorAnalysis = analysis;
-        sensorAnalysis.addListener(this);
+        sensorAnalysis.addListener(motionAnalysisListener);
 
         if (frameDataModel != null)
-            frameDataModel.removeListener(this);
+            frameDataModel.removeListener(frameDataModelListener);
         frameDataModel = sensorAnalysis.getFrameDataModel();
-        frameDataModel.addListener(this);
+        frameDataModel.addListener(frameDataModelListener);
 
         sensorAnalysisView = runView;
 
@@ -101,7 +122,7 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
         TagMarkerDataModelPainter painter = new TagMarkerDataModelPainter(data);
         markerView.addPlotPainter(painter);
 
-        onFrameChanged(frameDataModel.getCurrentFrame());
+        frameDataModelListener.onFrameChanged(frameDataModel.getCurrentFrame());
     }
 
     public void addXYCalibrationData(MarkerDataModel data) {
@@ -122,26 +143,10 @@ public class FrameContainerView extends RelativeLayout implements FrameDataModel
     public void release() {
         if (markerView != null)
             markerView.release();
-    }
-
-    @Override
-    public void onFrameChanged(int newFrame) {
-        ((IExperimentFrameView) sensorAnalysisView).setCurrentFrame(newFrame);
-        markerView.setCurrentRun(newFrame);
-        markerView.invalidate();
-    }
-
-    @Override
-    public void onNumberOfFramesChanged() {
-
-    }
-
-    @Override
-    public void onShowCoordinateSystem(boolean show) {
-        if (show)
-            markerView.addPlotPainter(originMarkerPainter);
-        else
-            markerView.removePlotPainter(originMarkerPainter);
+        if (sensorAnalysis != null)
+            sensorAnalysis.removeListener(motionAnalysisListener);
+        if (frameDataModel != null)
+            frameDataModel.removeListener(frameDataModelListener);
     }
 
     /**

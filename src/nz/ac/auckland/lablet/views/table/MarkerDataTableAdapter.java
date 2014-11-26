@@ -21,6 +21,10 @@ public class MarkerDataTableAdapter extends ColumnDataTableAdapter {
         model.addListener(markerListener);
     }
 
+    public void release() {
+        model.removeListener(markerListener);
+    }
+
     @Override
     public void addColumn(DataTableColumn column) {
         column.setDataModel(model);
