@@ -9,121 +9,116 @@ package nz.ac.auckland.lablet.views.plotview;
 
 import android.graphics.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.ref.SoftReference;
 
 
-public class BufferedStrategyPainter extends StrategyPainter {
-    private Bitmap offScreenBitmap;
-    final private RectF offScreenRealRect = new RectF();
-    private Canvas offScreenCanvas;
+class BitmapBuffer {
+    private SoftReference<Bitmap> bitmapSoftReference;
 
-    private RectF dirtyRect = null;
-    private boolean invalidated = false;
-    private PointF moveBitmap = new PointF();
+    public Bitmap getBuffer(Bitmap reference) {
+        Bitmap bitmap = null;
+        if (bitmapSoftReference != null)
+            bitmap = bitmapSoftReference.get();
 
-    @Override
-    public boolean hasThreads() {
-        return false;
+        if (bitmap == null || bitmap.getWidth() != reference.getWidth()
+                || bitmap.getHeight() != reference.getHeight()) {
+            bitmap = Bitmap.createBitmap(reference.getWidth(), reference.getHeight(),  reference.getConfig());
+            setBuffer(bitmap);
+        } else
+            bitmap.eraseColor(Color.TRANSPARENT);
+
+        return bitmap;
     }
 
-    @Override
-    public boolean hasFreeRenderingPipe() {
-        return true;
+    public Bitmap swap(Bitmap bitmap) {
+        Bitmap buffer = getBuffer(bitmap);
+        setBuffer(bitmap);
+        return buffer;
     }
 
-    private RectF containerViewRangeToOffScreen(RectF range) {
+    private void setBuffer(Bitmap bitmap) {
+        bitmapSoftReference = new SoftReference<>(bitmap);
+    }
+}
+
+abstract public class BufferedStrategyPainter extends StrategyPainter {
+    private Bitmap bufferBitmap;
+    final private RectF bufferRealRect = new RectF();
+    private RectF bufferScreenRect;
+    private Canvas bufferCanvas;
+    private BitmapBuffer bufferCache = new BitmapBuffer();
+
+    private boolean bufferMoved = false;
+
+    private Paint offScreenPaint;
+
+    private RectF containerViewRangeToBufferRange(RectF range) {
         return range;
+    }
+
+    public void setOffScreenPaint(Paint paint) {
+        this.offScreenPaint = paint;
     }
 
     @Override
     public void onSizeChanged(int width, int height, int oldw, int oldh) {
-        offScreenBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        offScreenCanvas = new Canvas(offScreenBitmap);
-        offScreenRealRect.set(containerViewRangeToOffScreen(containerView.getRange()));
+        bufferBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bufferCanvas = new Canvas(bufferBitmap);
+        setBufferRealRect(containerViewRangeToBufferRange(containerView.getRange()));
     }
 
     @Override
     public Matrix getRangeMatrixCopy() {
-        float xScale = (float)offScreenBitmap.getWidth() / (offScreenRealRect.right - offScreenRealRect.left);
-        float yScale = (float)offScreenBitmap.getHeight() / (offScreenRealRect.bottom - offScreenRealRect.top);
-
+        float xScale = (float) bufferBitmap.getWidth() / (bufferRealRect.right - bufferRealRect.left);
+        float yScale = (float) bufferBitmap.getHeight() / (bufferRealRect.bottom - bufferRealRect.top);
 
         Matrix matrix = new Matrix();
         matrix.setScale(xScale, yScale);
-        matrix.preTranslate(-offScreenRealRect.left, -offScreenRealRect.top);
+        matrix.preTranslate(-bufferRealRect.left, -bufferRealRect.top);
         return matrix;
     }
 
-    private List<RenderPayload> collectAllRenderPayloads(boolean geometryInfoNeeded, RectF requestedRealRect) {
-        List<RenderPayload> payloadList = new ArrayList<>();
-        for (ConcurrentPainter painter : childPainters)
-            payloadList.addAll(painter.collectRenderPayloads(geometryInfoNeeded, requestedRealRect));
+    abstract protected void onDirectDraw();
 
-        return payloadList;
+    protected Bitmap getBufferBitmap() {
+        return bufferBitmap;
     }
 
-    private boolean isCompleteRedraw(List<RenderPayload> payloadList) {
-        for (RenderPayload payload : payloadList) {
-            if (payload.isCompleteRedraw())
-                return true;
+    protected Canvas startEditingBufferBitmap(boolean clean) {
+        if (bufferBitmap == null)
+            return null;
+        if (!bufferMoved) {
+            if (clean)
+                bufferBitmap.eraseColor(Color.TRANSPARENT);
+            return bufferCanvas;
         }
-        return false;
+
+        Bitmap oldBitmap = bufferBitmap;
+        bufferBitmap = bufferCache.swap(bufferBitmap);
+        bufferCanvas = new Canvas(bufferBitmap);
+        bufferCanvas.drawBitmap(oldBitmap, null, bufferScreenRect, null);
+        setBufferRealRect(containerViewRangeToBufferRange(containerView.getRange()));
+
+        bufferMoved = false;
+
+        return bufferCanvas;
     }
 
-    protected void onDirectDraw(Canvas canvas) {
-        RectF range = null;
-        if (dirtyRect != null)
-            range = dirtyRect;
-        dirtyRect = null;
-
-        List<RenderPayload> payloadList = collectAllRenderPayloads(false, range);
-        if (isCompleteRedraw(payloadList) || invalidated) {
-            offScreenBitmap.eraseColor(Color.TRANSPARENT);
-            invalidated = false;
-        }
-
-        for (RenderPayload payload : payloadList) {
-            ConcurrentPainter painter = payload.getPainter();
-            painter.render(offScreenCanvas, payload);
-        }
+    protected RectF getBufferRealRect() {
+        return bufferRealRect;
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (offScreenBitmap == null)
+        if (bufferBitmap == null)
             return;
 
-        if ((moveBitmap.x != 0 && Math.abs(moveBitmap.x) < containerView.getWidth()
-                || (moveBitmap.y != 0 && Math.abs(moveBitmap.y) < containerView.getHeight()))) {
-            Bitmap newBitmap = Bitmap.createBitmap(offScreenBitmap.getWidth(), offScreenBitmap.getHeight(),
-                    offScreenBitmap.getConfig());
-            Canvas newCanvas = new Canvas(newBitmap);
-            newCanvas.drawBitmap(offScreenBitmap, moveBitmap.x, moveBitmap.y, null);
-            offScreenBitmap = newBitmap;
-            offScreenCanvas = newCanvas;
-            moveBitmap.set(0, 0);
-        }
+        onDirectDraw();
 
-        onDirectDraw(canvas);
-
-        canvas.drawBitmap(offScreenBitmap, 0, 0, null);
+        canvas.drawBitmap(bufferBitmap, null, bufferScreenRect, offScreenPaint);
     }
 
-    @Override
-    protected void onNewDirtyRegions() {
-        containerView.invalidate();
-    }
-
-    @Override
-    public void invalidate() {
-        super.invalidate();
-
-        dirtyRect = new RectF(offScreenRealRect);
-        invalidated = true;
-    }
-
-    private RectF getDirtyRect(RectF rangeOrg, RectF oldRangeOrg, boolean keepDistance) {
+    protected RectF getDirtyRect(RectF rangeOrg, RectF oldRangeOrg, boolean keepDistance) {
         NormRectF dirt = new NormRectF(new RectF(rangeOrg));
         if (!keepDistance)
             return dirt.get();
@@ -149,16 +144,19 @@ public class BufferedStrategyPainter extends StrategyPainter {
 
     @Override
     public void onRangeChanged(RectF range, RectF oldRange, boolean keepDistance) {
-        offScreenRealRect.set(containerViewRangeToOffScreen(range));
+        updateBufferScreenRect();
 
-        if (keepDistance) {
-            dirtyRect = getDirtyRect(range, oldRange, keepDistance);
+        bufferMoved = true;
 
-            RectF oldScreen = containerView.toScreen(oldRange);
-            RectF screen = containerView.toScreen(range);
-            moveBitmap.offset(oldScreen.left - screen.left, oldScreen.top - screen.top);
-            containerView.invalidate();
-        } else
-            invalidate();
+        containerView.invalidate();
+    }
+
+    private void setBufferRealRect(RectF rect) {
+        bufferRealRect.set(rect);
+        updateBufferScreenRect();
+    }
+
+    private void updateBufferScreenRect() {
+        bufferScreenRect = containerView.toScreen(bufferRealRect);
     }
 }

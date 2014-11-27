@@ -22,9 +22,7 @@ import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.AnimatedTabHostListener;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.views.*;
-import nz.ac.auckland.lablet.views.plotview.Log10Scale;
-import nz.ac.auckland.lablet.views.plotview.PlotView;
-import nz.ac.auckland.lablet.views.plotview.RangeDrawingView;
+import nz.ac.auckland.lablet.views.plotview.*;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -45,7 +43,8 @@ public class FrequencyAnalysisView extends FrameLayout {
     private Spinner windowOverlapSpinner;
     final private List<OverlapSpinnerEntry> overlapSpinnerEntryList = new ArrayList<>();
 
-    private AudioFrequencyMapPainter audioFrequencyMapPainter;
+    private AudioFrequencyMapConcurrentPainter audioFrequencyMapPainter;
+    private ThreadStrategyPainter2 threadStrategyPainter;
 
     private PlotView frequencyView;
     private ViewGroup loadingView;
@@ -290,7 +289,7 @@ public class FrequencyAnalysisView extends FrameLayout {
         colorMatrix.postConcat(contrastScaleMatrix);
         Paint paint = new Paint();
         paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
-        audioFrequencyMapPainter.setOffScreenPaint(paint);
+        threadStrategyPainter.setOffScreenPaint(paint);
         frequencyView.invalidate();
     }
 
@@ -302,9 +301,11 @@ public class FrequencyAnalysisView extends FrameLayout {
 
     private void setupFrequencyView(PlotView frequencyMapPlotView, AudioWavInputStream audioWavInputStream) {
         audioFrequencyMapAdapter = new AudioFrequencyMapAdapter(freqMapDisplaySettings.getStepFactor());
-        audioFrequencyMapPainter = new AudioFrequencyMapPainter();
-        audioFrequencyMapPainter.setDataAdapter(audioFrequencyMapAdapter);
-        frequencyMapPlotView.addPlotPainter(audioFrequencyMapPainter);
+        audioFrequencyMapPainter = new AudioFrequencyMapConcurrentPainter(audioFrequencyMapAdapter);
+        threadStrategyPainter = new ThreadStrategyPainter2();
+        threadStrategyPainter.addChild(audioFrequencyMapPainter);
+        frequencyMapPlotView.addPlotPainter(threadStrategyPainter);
+
         RectF range = frequencyAnalysis.getFreqMapDisplaySettings().getRange();
         if (Math.abs(range.width()) > 0 && Math.abs(range.height()) > 0)
             frequencyMapPlotView.setRange(range);

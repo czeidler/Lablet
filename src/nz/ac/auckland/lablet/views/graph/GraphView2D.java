@@ -223,7 +223,7 @@ public class GraphView2D extends PlotView {
             painter = new BufferedStrategyPainter();
         else
             painter = new ThreadStrategyPainter();*/
-        painter = new BufferedStrategyPainter();
+        painter = new BufferedDirectStrategyPainter();
 
         XYConcurrentPainter xyConcurrentPainter = new XYConcurrentPainter(adapter);
         painter.addChild(xyConcurrentPainter);
