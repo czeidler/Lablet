@@ -214,9 +214,18 @@ public class RangeDrawingView extends ViewGroup {
         return setYRange(bottom, top, false);
     }
 
-    final public void setRange(RectF range) {
-        if (setXRange(range.left, range.right) || setYRange(range.bottom, range.top))
+    final public boolean setRange(RectF range) {
+        return setRange(range, false);
+    }
+
+    public boolean setRange(RectF range, boolean keepDistance) {
+        boolean xChanged = setXRangeNoNotification(range.left, range.right, keepDistance);
+        boolean yChanged = setYRangeNoNotification(range.bottom, range.top, keepDistance);
+        if (xChanged || yChanged) {
             notifyRangeChanged();
+            return true;
+        }
+        return false;
     }
 
     private boolean setXRangeNoNotification(float left, float right, boolean keepDistance) {

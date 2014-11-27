@@ -87,6 +87,24 @@ public class PlotPainterContainerView extends RangeDrawingView {
     }
 
     @Override
+    public boolean setRange(RectF range, boolean keepDistance) {
+        RectF oldRange = getRange();
+
+        if (!super.setRange(range, keepDistance))
+            return false;
+
+        RectF newRange = getRange();
+
+        if (newRange.left == oldRange.left && newRange.right == oldRange.right)
+            return true;
+
+        for (IPlotPainter painter : allPainters)
+            painter.onRangeChanged(newRange, oldRange, keepDistance);
+
+        return true;
+    }
+
+    @Override
     public boolean setXRange(float left, float right, boolean keepDistance) {
         RectF oldRange = getRange();
 

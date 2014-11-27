@@ -65,22 +65,23 @@ class PlotGestureDetector {
         }
 
         private boolean onDragged(float x, float y) {
-            boolean handled = false;
-            if (plotView.isYDraggable()) {
-                float realDelta = rangeView.fromScreenY(y) - rangeView.fromScreenY(0);
-                if (rangeView.getRangeBottom() < rangeView.getRangeTop())
-                    realDelta *= -1;
-
-                handled = plotView.offsetYRange(realDelta);
-            }
+            float xRealDelta = 0;
             if (plotView.isXDraggable()) {
-                float realDelta = rangeView.fromScreenX(x) - rangeView.fromScreenX(0);
+                xRealDelta = rangeView.fromScreenX(x) - rangeView.fromScreenX(0);
                 if (rangeView.getRangeLeft() < rangeView.getRangeRight())
-                    realDelta *= -1;
+                    xRealDelta *= -1;
 
-                handled = plotView.offsetXRange(realDelta);
             }
-            return handled;
+            float yRealDelta = 0;
+            if (plotView.isYDraggable()) {
+                yRealDelta = rangeView.fromScreenY(y) - rangeView.fromScreenY(0);
+                if (rangeView.getRangeBottom() < rangeView.getRangeTop())
+                    yRealDelta *= -1;
+            }
+
+            if (xRealDelta != 0 || yRealDelta != 0)
+                return plotView.offsetRange(xRealDelta, yRealDelta);
+            return false;
         }
     }
 
@@ -629,6 +630,13 @@ public class PlotView extends ViewGroup {
         return setYRange(bottom, top, false);
     }
 
+
+    public boolean offsetRange(float xRealDelta, float yRealDelta) {
+        RectF range = mainView.getRange();
+        range.offset(xRealDelta, yRealDelta);
+        return setRange(range, true);
+    }
+
     public boolean offsetXRange(float offset) {
         return setXRange(mainView.getRangeLeft() + offset, mainView.getRangeRight() + offset, true);
     }
@@ -698,6 +706,21 @@ public class PlotView extends ViewGroup {
             set.start();
             animator = set;
         }
+    }
+
+    private boolean setRange(RectF range, boolean keepDistance) {
+        if (!mainView.setRange(range, keepDistance))
+            return false;
+
+        // always use the validated range values from the mainView!
+        if (hasXAxis())
+            xAxisView.setDataRange(mainView.getRangeLeft(), mainView.getRangeRight());
+        if (hasYAxis())
+            yAxisView.setDataRange(mainView.getRangeBottom(), mainView.getRangeTop());
+
+        // request layout in case the axis changed its size
+        requestLayout();
+        return true;
     }
 
     private boolean setXRange(float left, float right, boolean keepDistance) {
