@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.views.plotview;
 
-
 import android.graphics.*;
 import android.os.Handler;
 import android.support.v4.util.ArrayMap;
@@ -241,9 +240,8 @@ public class ThreadStrategyPainter extends StrategyPainter {
                 RectF bitmapScreenRect = containerView.toScreen(offScreenBitmap.getRealRect());
                 canvas.drawBitmap(bitmap, null, bitmapScreenRect, offScreenPaint);
             }
-
-            isRenderingDrawer.onDraw(canvas);
         }
+        isRenderingDrawer.onDraw(canvas);
     }
 
     public void setOffScreenPaint(Paint paint) {
