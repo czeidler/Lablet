@@ -69,39 +69,31 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
 
         if (dataAdapter == null)
             return payloads;
+        if (dirtyRegion.getSize() == 0 && requestedRealRect == null)
+            return payloads;
 
         // do we need the geometry for ourselves?
         if (geometryInfoNeededForRendering())
             geometryInfoNeeded = true;
 
-        Region1D regionToRender;
         RectF realDataRect = null;
         RectF screenRect = null;
-        boolean clearParentBitmap = false;
         PlotPainterContainerView containerView = getContainerView();
         if (requestedRealRect != null) {
             Range dirty = getDataRangeFor(requestedRealRect.left, requestedRealRect.right);
-            regionToRender = new Region1D(dirty);
-            if (geometryInfoNeeded) {
-                realDataRect = requestedRealRect;
-                screenRect = containerView.toScreen(realDataRect);
-            }
-        } else {
-            if (dirtyRegion.getSize() == 0)
-                return payloads;
-
-            regionToRender = new Region1D(dirtyRegion);
-            if (geometryInfoNeeded) {
-                realDataRect = getRealDataRect(dirtyRegion.getMin(), dirtyRegion.getMax());
-                screenRect = containerView.toScreen(realDataRect);
-            }
+            dirtyRegion.addRange(dirty);
         }
 
-        StrategyPainter.RenderPayload payload = makeRenderPayload(realDataRect, screenRect, regionToRender,
-                clearParentBitmap);
+        if (geometryInfoNeeded) {
+            realDataRect = getRealDataRect(dirtyRegion.getMin(), dirtyRegion.getMax());
+            screenRect = containerView.toScreen(realDataRect);
+        }
+
+        StrategyPainter.RenderPayload payload = makeRenderPayload(realDataRect, screenRect, dirtyRegion);
         payloads.add(payload);
 
-        dirtyRegion.clear();
+        // clear
+        dirtyRegion = new Region1D();
 
         return payloads;
     }
@@ -124,8 +116,7 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
     }
     abstract protected void drawRange(Canvas bitmapCanvas, ArrayRenderPayload payload, Range range);
 
-    protected ArrayRenderPayload makeRenderPayload(RectF realDataRect, RectF screenRect, Region1D regionToRender,
-                                                   boolean clearParentBitmap) {
+    protected ArrayRenderPayload makeRenderPayload(RectF realDataRect, RectF screenRect, Region1D regionToRender) {
         // optimization: just use the normal adapter if we don't use threads
         CloneablePlotDataAdapter adapter = dataAdapter;
         if (parent.hasThreads())
@@ -135,7 +126,6 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
                 parent.getRangeMatrixCopy(),
                 adapter,
                 regionToRender);
-        renderPayload.setCompleteRedraw(clearParentBitmap);
 
         return renderPayload;
     }
@@ -160,7 +150,7 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
                 start -= 1;
             dirtyRegion.addRange(start, index + number - 1);
             if ((maxDirtyRanges > 0 && maxDirtyRanges <= dirtyRegion.getSize()) || parent.hasFreeRenderingPipe())
-                parent.onNewDirtyRegions();
+                parent.onNewDirtyRegions(null);
         }
 
         @Override

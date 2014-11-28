@@ -9,15 +9,11 @@ package nz.ac.auckland.lablet.views.plotview;
 
 import android.graphics.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
 public class BufferedDirectStrategyPainter extends BufferedStrategyPainter {
-
-    private RectF dirtyRect = null;
     private boolean invalidated = false;
-    private PointF moveBitmap = new PointF();
 
     @Override
     public boolean hasThreads() {
@@ -30,59 +26,33 @@ public class BufferedDirectStrategyPainter extends BufferedStrategyPainter {
     }
 
     @Override
-    protected void onNewDirtyRegions() {
+    protected void onNewDirtyRegions(RectF newDirt) {
+        super.onNewDirtyRegions(newDirt);
+
         containerView.invalidate();
     }
 
     @Override
     protected void onDirectDraw() {
-        RectF range = null;
-        if (dirtyRect != null)
-            range = dirtyRect;
-        dirtyRect = null;
+        Canvas canvas = startEditingBufferBitmap(invalidated);
+
+        RectF range = getDirtyRect();
+        if (invalidated)
+            range = new RectF(getBufferRealRect());
+        clearDirtyRect();
 
         List<RenderPayload> payloadList = collectAllRenderPayloads(false, range);
-        Canvas canvas = startEditingBufferBitmap(isCompleteRedraw(payloadList) || invalidated);
         for (RenderPayload payload : payloadList) {
             ConcurrentPainter painter = payload.getPainter();
             painter.render(canvas, payload);
         }
+        invalidated = false;
     }
 
     @Override
     public void invalidate() {
         super.invalidate();
 
-        dirtyRect = new RectF(getBufferRealRect());
         invalidated = true;
-    }
-
-    @Override
-    public void onRangeChanged(RectF range, RectF oldRange, boolean keepDistance) {
-        if (keepDistance || false) {
-            dirtyRect = getDirtyRect(range, oldRange, keepDistance);
-
-            RectF oldScreen = containerView.toScreen(oldRange);
-            RectF screen = containerView.toScreen(range);
-            moveBitmap.offset(oldScreen.left - screen.left, oldScreen.top - screen.top);
-            containerView.invalidate();
-        } else
-            invalidate();
-    }
-
-    private List<RenderPayload> collectAllRenderPayloads(boolean geometryInfoNeeded, RectF requestedRealRect) {
-        List<RenderPayload> payloadList = new ArrayList<>();
-        for (ConcurrentPainter painter : childPainters)
-            payloadList.addAll(painter.collectRenderPayloads(geometryInfoNeeded, requestedRealRect));
-
-        return payloadList;
-    }
-
-    private boolean isCompleteRedraw(List<RenderPayload> payloadList) {
-        for (RenderPayload payload : payloadList) {
-            if (payload.isCompleteRedraw())
-                return true;
-        }
-        return false;
     }
 }

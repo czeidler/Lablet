@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 import android.graphics.*;
+import android.support.annotation.Nullable;
 
 import java.lang.ref.SoftReference;
 
@@ -48,16 +49,36 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
     private Canvas bufferCanvas;
     private BitmapBuffer bufferCache = new BitmapBuffer();
 
+    private RectF dirtyRect = null;
+
     private boolean bufferMoved = false;
 
     private Paint offScreenPaint;
 
-    private RectF containerViewRangeToBufferRange(RectF range) {
+    protected RectF containerViewRangeToBufferRange(RectF range) {
         return range;
     }
 
     public void setOffScreenPaint(Paint paint) {
         this.offScreenPaint = paint;
+    }
+
+    protected RectF getDirtyRect() {
+        return dirtyRect;
+    }
+
+    protected void clearDirtyRect() {
+        dirtyRect = null;
+    }
+
+    @Override
+    protected void onNewDirtyRegions(@Nullable RectF newDirt) {
+        if (newDirt != null) {
+            if (dirtyRect == null)
+                dirtyRect = newDirt;
+            else
+                addRect(dirtyRect, newDirt);
+        }
     }
 
     @Override
@@ -118,7 +139,7 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
         canvas.drawBitmap(bufferBitmap, null, bufferScreenRect, offScreenPaint);
     }
 
-    protected RectF getDirtyRect(RectF rangeOrg, RectF oldRangeOrg, boolean keepDistance) {
+    private RectF getDirtyRect(RectF rangeOrg, RectF oldRangeOrg, boolean keepDistance) {
         NormRectF dirt = new NormRectF(new RectF(rangeOrg));
         if (!keepDistance)
             return dirt.get();
@@ -142,11 +163,36 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
         return dirt.get();
     }
 
+    protected RectF addRect(RectF source, RectF toAdd) {
+        NormRectF sourceN = new NormRectF(source);
+        NormRectF toAddN = new NormRectF(toAdd);
+
+        if (sourceN.getLeft() > toAddN.getLeft())
+            sourceN.setLeft(toAddN.getLeft());
+        if (sourceN.getTop() > toAddN.getTop())
+            sourceN.setTop(toAddN.getTop());
+        if (sourceN.getRight() < toAddN.getRight())
+            sourceN.setRight(toAddN.getRight());
+        if (sourceN.getBottom() < toAddN.getBottom())
+            sourceN.setBottom(toAddN.getBottom());
+
+        return sourceN.get();
+    }
+
     @Override
     public void onRangeChanged(RectF range, RectF oldRange, boolean keepDistance) {
         updateBufferScreenRect();
 
         bufferMoved = true;
+
+        // if keepDistance is true there was no zoom and we may reuse some parts
+        if (keepDistance) {
+            RectF bufferRange = containerViewRangeToBufferRange(range);
+            RectF bufferOldRange = containerViewRangeToBufferRange(oldRange);
+            RectF newDirt = getDirtyRect(bufferRange, bufferOldRange, keepDistance);
+            onNewDirtyRegions(newDirt);
+        } else
+            invalidate();
 
         containerView.invalidate();
     }

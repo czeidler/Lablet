@@ -88,14 +88,14 @@ public class AudioFrequencyMapConcurrentPainter extends ArrayConcurrentPainter {
         if (start < 0)
             start = 0;
 
-        int dataSize = adapter.getSize();
+        final int dataSize = adapter.getSize();
         if (dataSize == 0)
             return;
         if (start + count > dataSize)
             count = dataSize - start;
 
-        float[] startLeftTop = mapPoint(rangeMatrix, payload.getRealDataRect().left, payload.getRealDataRect().top);
-        int xStartPixel = (int)startLeftTop[0];
+        final float[] startLeftTop = mapPoint(rangeMatrix, payload.getRealDataRect().left, payload.getRealDataRect().top);
+        final int xStartPixel = (int)startLeftTop[0];
 
         final RectF screenRect = payload.getScreenRect();
         final int screenRectWidth = (int)Math.ceil(screenRect.width());

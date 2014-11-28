@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,6 @@ abstract public class StrategyPainter extends AbstractPlotPainter {
         final private ConcurrentPainter painter;
         final private RectF realDataRect;
         final private RectF screenRect;
-        private boolean completeRedraw = false;
 
         public RenderPayload(ConcurrentPainter painter, RectF realDataRect, RectF screenRect) {
             this.painter = painter;
@@ -65,14 +65,6 @@ abstract public class StrategyPainter extends AbstractPlotPainter {
             return screenRect;
         }
 
-        public boolean isCompleteRedraw() {
-            return completeRedraw;
-        }
-
-        public void setCompleteRedraw(boolean completeRedraw) {
-            this.completeRedraw = completeRedraw;
-        }
-
         public ConcurrentPainter getPainter() {
             return painter;
         }
@@ -84,7 +76,12 @@ abstract public class StrategyPainter extends AbstractPlotPainter {
 
     abstract public boolean hasFreeRenderingPipe();
 
-    abstract protected void onNewDirtyRegions();
+    /**
+     * Is called if either the data has changed or a real rect on the screen has to be redrawn.
+     *
+     * @param newDirt if null only some data has changed
+     */
+    abstract protected void onNewDirtyRegions(@Nullable RectF newDirt);
 
     public void addChild(ConcurrentPainter painter) {
         childPainters.add(painter);
@@ -102,5 +99,13 @@ abstract public class StrategyPainter extends AbstractPlotPainter {
 
     public Matrix getRangeMatrixCopy() {
         return containerView.getRangeMatrixCopy();
+    }
+
+    protected List<RenderPayload> collectAllRenderPayloads(boolean geometryInfoNeeded, RectF requestedRealRect) {
+        List<RenderPayload> payloadList = new ArrayList<>();
+        for (ConcurrentPainter painter : childPainters)
+            payloadList.addAll(painter.collectRenderPayloads(geometryInfoNeeded, requestedRealRect));
+
+        return payloadList;
     }
 }

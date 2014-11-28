@@ -58,6 +58,10 @@ public class Region1D {
         return ranges.size();
     }
 
+    public void addRange(Range range) {
+        addRange(range.min, range.max);
+    }
+
     public void addRange(int min, int max) {
         if (ranges.size() == 0) {
             ranges.add(new Range(min, max));
