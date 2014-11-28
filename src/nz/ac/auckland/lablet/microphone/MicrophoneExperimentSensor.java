@@ -99,9 +99,11 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
 
                 frequencyMapPlotView = (PlotView)view.findViewById(R.id.audioFrequencyMapPlot);
                 audioFrequencyMapAdapter = new AudioFrequencyMapAdapter(0.5f);
-                AudioFrequencyMapPainter audioFrequencyMapPainter = new AudioFrequencyMapPainter();
-                audioFrequencyMapPainter.setDataAdapter(audioFrequencyMapAdapter);
-                frequencyMapPlotView.addPlotPainter(audioFrequencyMapPainter);
+                strategyPainter = new ThreadStrategyPainter();
+                AudioFrequencyMapConcurrentPainter audioFrequencyMapPainter
+                        = new AudioFrequencyMapConcurrentPainter(audioFrequencyMapAdapter);
+                strategyPainter.addChild(audioFrequencyMapPainter);
+                frequencyMapPlotView.addPlotPainter(strategyPainter);
                 frequencyMapPlotView.setXRange(0, frequencyMapTimeSpan);
                 frequencyMapPlotView.setYRange(1, experimentSensor.SAMPLE_RATE / 2);
                 frequencyMapPlotView.setMaxXRange(0, frequencyMapTimeSpan);
