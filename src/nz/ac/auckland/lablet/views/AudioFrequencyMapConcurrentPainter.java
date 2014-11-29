@@ -74,6 +74,12 @@ public class AudioFrequencyMapConcurrentPainter extends ArrayConcurrentPainter {
     }
 
     @Override
+    protected Range getDataRangeFor(float left, float right) {
+        AudioFrequencyMapAdapter adapter = (AudioFrequencyMapAdapter)dataAdapter;
+        return adapter.getRange(left, right);
+    }
+
+    @Override
     protected boolean geometryInfoNeededForRendering() {
         return true;
     }
@@ -102,44 +108,49 @@ public class AudioFrequencyMapConcurrentPainter extends ArrayConcurrentPainter {
         final int screenRectHeight = (int)Math.ceil(screenRect.height());
         final int[] colors = new int[screenRectHeight];
         final int[] bitmapData = new int[screenRectWidth * screenRectHeight];
-        // the default int value of 0 is transparent
-        //Arrays.fill(bitmapData, Color.TRANSPARENT);
 
-        for (int index = start; index < start + count; index++) {
-
-            final float[] screenLeftTop = mapPoint(rangeMatrix, adapter.getX(index), payload.getRealDataRect().top);
-            int timePixel = (int)screenLeftTop[0] - xStartPixel;
-
-            if (timePixel < 0)
-                continue;
-
-            final int lastTimePixel = timePixel;
-
-            final float[] frequencies = adapter.getY(index);
-            getColors(colors, frequencies, payload);
-
+        int index = start;
+        int startXPixel = -1;
+        int startIndex = 0;
+        while (index < start + count) {
             // advance till the next pixel
+            int endXPixel = -1;
             for (; index < start + count; index++) {
-                final float[] temp = mapPoint(rangeMatrix, adapter.getX(index), payload.getRealDataRect().top);
-                timePixel = (int)temp[0] - xStartPixel;
-                if (lastTimePixel != timePixel) {
-                    // go back again
-                    timePixel --;
-                    index --;
-                    break;
+                final float[] screenLeftTop = mapPoint(rangeMatrix, adapter.getX(index), payload.getRealDataRect().top);
+                endXPixel = (int)screenLeftTop[0] - xStartPixel;
+                if (endXPixel < 0)
+                    continue;
+                if (startXPixel < 0) {
+                    startXPixel = endXPixel;
+                    startIndex = index;
+                    continue;
                 }
+                if (startXPixel != endXPixel)
+                    break;
             }
 
-            for (int column = lastTimePixel; column <= timePixel; column++) {
-                if (column >= screenRect.width())
+            if (startXPixel < 0)
+                break;
+            if (index + 1 == start + count)
+                endXPixel = screenRectWidth;
+
+            // do the drawing
+            final float[] frequencies = adapter.getY(startIndex);
+            getColors(colors, frequencies, payload);
+            for (int column = startXPixel; column <= endXPixel; column++) {
+                if (column >= screenRectWidth)
                     break;
                 for (int row = 0; row < colors.length; row++)
                     bitmapData[column + row * screenRectWidth] = colors[row];
             }
 
-            if (timePixel >= screenRect.width())
+            if (endXPixel >= screenRectWidth)
                 break;
+
+            startXPixel = endXPixel;
+            startIndex = index;
         }
+
         bitmapCanvas.drawBitmap(bitmapData, 0, screenRectWidth, startLeftTop[0], startLeftTop[1],
                 screenRectWidth, screenRectHeight, true, null);
     }
@@ -166,7 +177,7 @@ public class AudioFrequencyMapConcurrentPainter extends ArrayConcurrentPainter {
     }
 
 
-    private int toPixel(float scaledValue, float scaledBottom, float scaledTop, int screenRectHeight) {
+    private int toYPixel(float scaledValue, float scaledBottom, float scaledTop, int screenRectHeight) {
         return (int)((scaledValue - scaledBottom) / (scaledTop - scaledBottom) * screenRectHeight);
     }
 
@@ -188,7 +199,7 @@ public class AudioFrequencyMapConcurrentPainter extends ArrayConcurrentPainter {
             float frequencyAmp = frequencies[i];
 
             float frequency = getRealValue(i, frequencies.length);
-            int pixel = toPixel(yScale.scale(frequency), scaledBottom, scaledTop, screenRectHeight);
+            int pixel = toYPixel(yScale.scale(frequency), scaledBottom, scaledTop, screenRectHeight);
             if (pixel < 0)
                 continue;
             if (pixel >= colors.length)
