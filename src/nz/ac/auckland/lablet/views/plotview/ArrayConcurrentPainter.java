@@ -9,7 +9,6 @@ package nz.ac.auckland.lablet.views.plotview;
 
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Rect;
 import android.graphics.RectF;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
 
     @Override
     public List<StrategyPainter.RenderPayload> collectRenderPayloads(boolean geometryInfoNeeded,
-                                                                     RectF requestedRealRect) {
+                                                                     RectF requestedRealRect, RectF maxRealRect) {
         List<StrategyPainter.RenderPayload> payloads = new ArrayList<>();
 
         if (dataAdapter == null)
@@ -82,6 +81,14 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
         if (requestedRealRect != null) {
             Range dirty = getDataRangeFor(requestedRealRect.left, requestedRealRect.right);
             dirtyRegion.addRange(dirty);
+        } else {
+            Range maxDirt = getDataRangeFor(maxRealRect.left, maxRealRect.right);
+            if (dirtyRegion.getMin() < maxDirt.min || dirtyRegion.getMax() > maxDirt.max) {
+                maxDirt.min = Math.max(dirtyRegion.getMin(), maxDirt.min);
+                maxDirt.max = Math.min(dirtyRegion.getMax(), maxDirt.max);
+                dirtyRegion.clear();
+                dirtyRegion.addRange(maxDirt);
+            }
         }
 
         if (geometryInfoNeeded) {
@@ -111,9 +118,8 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
     protected int maxDirtyRanges = -1;
 
     abstract protected RectF getRealDataRect(int startIndex, int lastIndex);
-    protected Range getDataRangeFor(float left, float right) {
-        return new Range(0, dataAdapter.getSize() - 1);
-    }
+    abstract protected Range getDataRangeFor(float left, float right);
+
     abstract protected void drawRange(Canvas bitmapCanvas, ArrayRenderPayload payload, Range range);
 
     protected ArrayRenderPayload makeRenderPayload(RectF realDataRect, RectF screenRect, Region1D regionToRender) {

@@ -8,7 +8,13 @@
 package nz.ac.auckland.lablet.views;
 
 import nz.ac.auckland.lablet.views.plotview.CloneablePlotDataAdapter;
+import nz.ac.auckland.lablet.views.plotview.Range;
 import nz.ac.auckland.lablet.views.plotview.Region1D;
+
+import java.util.AbstractList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 
 public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
@@ -47,6 +53,43 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
             data = null;
         }
         notifyAllDataChanged();
+    }
+
+    public Range getRange(float leftReal, float rightReal) {
+        if (data == null)
+            return new Range(0, -1);
+
+        Comparator<Float> numberComparator =  new Comparator<Float>() {
+            @Override
+            public int compare(Float number1, Float number2) {
+                return Float.compare(number1, number2);
+            }
+        };
+
+        List<Float> timeListHelper = new AbstractList<Float>() {
+            @Override
+            public Float get(int i) {
+                return getX(i);
+            }
+
+            @Override
+            public int size() {
+                return getSize();
+            }
+        };
+
+        int leftIndex = Math.abs(Collections.binarySearch(timeListHelper, leftReal, numberComparator));
+        int rightIndex = Math.abs(Collections.binarySearch(timeListHelper, rightReal, numberComparator));
+
+        leftIndex -= 2;
+        rightIndex ++;
+        if (leftIndex < 0)
+            leftIndex = 0;
+        int size = getSize();
+        if (rightIndex >= size)
+            rightIndex = size - 1;
+
+        return new Range(leftIndex, rightIndex);
     }
 
     public void addData(float frequencies[]) {

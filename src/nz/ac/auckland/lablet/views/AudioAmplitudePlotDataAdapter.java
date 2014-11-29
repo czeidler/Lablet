@@ -11,11 +11,10 @@ import nz.ac.auckland.lablet.views.plotview.AbstractXYDataAdapter;
 import nz.ac.auckland.lablet.views.plotview.Range;
 import nz.ac.auckland.lablet.views.plotview.Region1D;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
-class FixSizedBunchArray {
+class FixSizedBunchArray extends AbstractList<Float> {
     final public List<float[]> list;
     final public int bunchSize;
     public int size = 0;
@@ -42,12 +41,37 @@ class FixSizedBunchArray {
         size = 0;
     }
 
-    public float get(int index) {
+    @Override
+    public Iterator<Float> iterator() {
+        return new Iterator<Float>() {
+            int position = 0;
+            @Override
+            public boolean hasNext() {
+                return position < size();
+            }
+
+            @Override
+            public Float next() {
+                float value = get(position);
+                position++;
+                return value;
+            }
+
+            @Override
+            public void remove() {
+                throw new RuntimeException("not allowed");
+            }
+        };
+    }
+
+    @Override
+    public Float get(int index) {
         float[] data = list.get(index / bunchSize);
         return data[index % bunchSize];
     }
 
-    public int getSize() {
+    @Override
+    public int size() {
         return size;
     }
 
@@ -74,7 +98,7 @@ public class AudioAmplitudePlotDataAdapter extends AbstractXYDataAdapter {
         if (data == null)
             data = new FixSizedBunchArray(amplitudes.length);
 
-        int oldSize = data.getSize();
+        int oldSize = data.size();
 
         data.add(amplitudes);
 
@@ -107,13 +131,13 @@ public class AudioAmplitudePlotDataAdapter extends AbstractXYDataAdapter {
 
     @Override
     public Range getRange(Number leftReal, Number rightReal) {
-        return new Range(0, data.getSize() - 1);
+        return new Range(0, data.size() - 1);
     }
 
     @Override
     public int getSize() {
         if (data == null)
             return 0;
-        return data.getSize();
+        return data.size();
     }
 }

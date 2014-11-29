@@ -35,19 +35,10 @@ class ThreadRenderTask {
     Runnable renderRunnable = new Runnable() {
         @Override
         public void run() {
-            List<StrategyPainter.RenderPayload> payloadList = cookie.payloads;
-            int size = payloadList.size();
-            if (size == 0) {
-                running.set(false);
-                return;
-            }
-
             Bitmap bitmap = cookie.bitmap;
             Canvas bitmapCanvas = new Canvas(bitmap);
-            for (int index = 0; payloadList != null && index < payloadList.size(); index++) {
-                StrategyPainter.RenderPayload payload = payloadList.get(index);
+            for (StrategyPainter.RenderPayload payload : cookie.payloads)
                 payload.getPainter().render(bitmapCanvas, payload);
-            }
 
             publishBitmap(cookie);
         }
@@ -156,12 +147,14 @@ public class ThreadStrategyPainter extends BufferedStrategyPainter {
             return;
 
         try {
+            RectF viewRange = getContainerView().getRange();
             RectF range = newDirt;
             if (invalidated)
-                range = containerViewRangeToBufferRange(getContainerView().getRange());
+                range = containerViewRangeToBufferRange(viewRange);
 
-            List<RenderPayload> dirt = collectAllRenderPayloads(true, range);
-
+            List<RenderPayload> dirt = collectAllRenderPayloads(true, range, viewRange);
+            if (dirt.size() == 0)
+                return;
             Bitmap renderBitmap = threadBitmap.getBuffer(getBufferBitmap());
             renderTask.start(new ThreadCookie(dirt, renderBitmap, new RectF(getBufferRealRect()), invalidated));
 

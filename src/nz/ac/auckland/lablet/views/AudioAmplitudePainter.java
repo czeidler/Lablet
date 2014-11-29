@@ -36,9 +36,10 @@ public class AudioAmplitudePainter extends ArrayConcurrentPainter {
     }
 
     @Override
-    public List<StrategyPainter.RenderPayload> collectRenderPayloads(boolean geometryInfoNeeded, RectF requestedRealRect) {
+    public List<StrategyPainter.RenderPayload> collectRenderPayloads(boolean geometryInfoNeeded,
+                                                                     RectF requestedRealRect, RectF maxRealRect) {
         // we need the geometry info to calculate getSamplesPerPixel
-        return super.collectRenderPayloads(true, requestedRealRect);
+        return super.collectRenderPayloads(true, requestedRealRect, maxRealRect);
     }
 
     @Override
@@ -48,6 +49,10 @@ public class AudioAmplitudePainter extends ArrayConcurrentPainter {
         realDataRect.left = audioAmplitudePlotDataAdapter.getX(startIndex).floatValue();
         realDataRect.right = audioAmplitudePlotDataAdapter.getX(lastIndex).floatValue();
         return realDataRect;
+    }
+
+    protected Range getDataRangeFor(float left, float right) {
+        return new Range(0, dataAdapter.getSize() - 1);
     }
 
     private int getSamplesPerPixel(ArrayRenderPayload payload) {

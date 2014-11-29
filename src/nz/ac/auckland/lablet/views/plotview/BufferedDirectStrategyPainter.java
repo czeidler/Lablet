@@ -37,11 +37,12 @@ public class BufferedDirectStrategyPainter extends BufferedStrategyPainter {
         Canvas canvas = startEditingBufferBitmap(invalidated);
 
         RectF range = getDirtyRect();
+        RectF bufferRealRect = getBufferRealRect();
         if (invalidated)
-            range = new RectF(getBufferRealRect());
+            range = new RectF(bufferRealRect);
         clearDirtyRect();
 
-        List<RenderPayload> payloadList = collectAllRenderPayloads(false, range);
+        List<RenderPayload> payloadList = collectAllRenderPayloads(false, range, bufferRealRect);
         for (RenderPayload payload : payloadList) {
             ConcurrentPainter painter = payload.getPainter();
             painter.render(canvas, payload);

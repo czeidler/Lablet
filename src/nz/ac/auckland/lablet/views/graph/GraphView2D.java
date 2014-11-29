@@ -219,7 +219,7 @@ public class GraphView2D extends PlotView {
         getBackgroundPainter().setShowXGrid(true);
         getBackgroundPainter().setShowYGrid(true);
 
-        /*if (adapter.getSize() < 100)
+        /*if (adapter.size() < 100)
             painter = new BufferedStrategyPainter();
         else
             painter = new ThreadStrategyPainter();*/

@@ -35,7 +35,8 @@ abstract class ConcurrentPainter {
      * @return
      */
     abstract public List<StrategyPainter.RenderPayload> collectRenderPayloads(boolean geometryInfoNeeded,
-                                                                              RectF requestedRealRect);
+                                                                              RectF requestedRealRect,
+                                                                              RectF maxRealRect);
 
     protected boolean geometryInfoNeededForRendering() {
         return false;
@@ -101,10 +102,11 @@ abstract public class StrategyPainter extends AbstractPlotPainter {
         return containerView.getRangeMatrixCopy();
     }
 
-    protected List<RenderPayload> collectAllRenderPayloads(boolean geometryInfoNeeded, RectF requestedRealRect) {
+    protected List<RenderPayload> collectAllRenderPayloads(boolean geometryInfoNeeded, RectF requestedRealRect,
+                                                           RectF maxRealRect) {
         List<RenderPayload> payloadList = new ArrayList<>();
         for (ConcurrentPainter painter : childPainters)
-            payloadList.addAll(painter.collectRenderPayloads(geometryInfoNeeded, requestedRealRect));
+            payloadList.addAll(painter.collectRenderPayloads(geometryInfoNeeded, requestedRealRect, maxRealRect));
 
         return payloadList;
     }

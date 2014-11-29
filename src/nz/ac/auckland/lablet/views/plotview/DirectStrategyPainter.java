@@ -32,8 +32,9 @@ public class DirectStrategyPainter extends StrategyPainter {
 
     @Override
     public void onDraw(Canvas canvas) {
+        RectF viewRange = getContainerView().getRange();
         for (ConcurrentPainter painter : childPainters) {
-            List<RenderPayload> payloadList = painter.collectRenderPayloads(false, getContainerView().getRange());
+            List<RenderPayload> payloadList = painter.collectRenderPayloads(false, viewRange, viewRange);
 
             for (RenderPayload renderPayload : payloadList)
                 painter.render(canvas, renderPayload);
