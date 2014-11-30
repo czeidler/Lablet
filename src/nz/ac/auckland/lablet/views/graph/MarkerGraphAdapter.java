@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.graph;
 
 import nz.ac.auckland.lablet.experiment.*;
+import nz.ac.auckland.lablet.views.plotview.DataStatistics;
 import nz.ac.auckland.lablet.views.plotview.Range;
 
 
@@ -102,5 +103,10 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
     @Override
     public Range getRange(Number leftReal, Number rightReal) {
         return new Range(0, getSize() - 1);
+    }
+
+    @Override
+    public DataStatistics createDataStatistics() {
+        return null;
     }
 }

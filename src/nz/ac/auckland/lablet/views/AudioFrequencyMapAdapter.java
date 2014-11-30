@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views;
 
 import nz.ac.auckland.lablet.views.plotview.CloneablePlotDataAdapter;
+import nz.ac.auckland.lablet.views.plotview.DataStatistics;
 import nz.ac.auckland.lablet.views.plotview.Range;
 import nz.ac.auckland.lablet.views.plotview.Region1D;
 
@@ -125,5 +126,10 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
         if (data == null)
             return 0;
         return data.getBunchCount();
+    }
+
+    @Override
+    public DataStatistics createDataStatistics() {
+        return null;
     }
 }

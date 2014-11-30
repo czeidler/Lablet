@@ -141,17 +141,17 @@ public class PlotPainterContainerView extends RangeDrawingView {
         return true;
     }
 
-    public List<AbstractXYDataAdapter> getXYDataAdapters() {
-        List<AbstractXYDataAdapter> list = new ArrayList<>();
+    public List<AbstractPlotDataAdapter> getPlotDataAdapters() {
+        List<AbstractPlotDataAdapter> list = new ArrayList<>();
         for (IPlotPainter painter : allPainters) {
             if (!(painter instanceof StrategyPainter))
                 continue;
             List<ConcurrentPainter> childPainters = ((StrategyPainter)painter).getChildPainters();
             for (ConcurrentPainter child : childPainters) {
-                if (!(child instanceof  XYConcurrentPainter))
+                if (!(child instanceof  ArrayConcurrentPainter))
                     continue;
-                XYConcurrentPainter xyConcurrentPainter = (XYConcurrentPainter)child;
-                list.add((AbstractXYDataAdapter)xyConcurrentPainter.getAdapter());
+                ArrayConcurrentPainter arrayConcurrentPainter = (ArrayConcurrentPainter)child;
+                list.add(arrayConcurrentPainter.getAdapter());
             }
         }
         return list;

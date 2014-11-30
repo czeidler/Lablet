@@ -21,6 +21,7 @@ public abstract class AbstractPlotDataAdapter extends WeakListenable<AbstractPlo
 
     abstract public int getSize();
 
+    abstract public DataStatistics createDataStatistics();
 
     public void notifyDataAdded(int index, int number) {
         for (IListener listener : getListeners())

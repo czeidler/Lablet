@@ -206,21 +206,20 @@ public class PlotView extends ViewGroup {
     private PlotGestureDetector plotGestureDetector;
 
     class AutoRange implements DataStatistics.IListener {
-        final private List<DataStatistics> dataStatisticsList = new ArrayList<>();
+        final private List<DataStatistics> dataStatisticsList;
 
         private float offsetRatio = 0.4f;
 
         private ResizePolicy xPolicy = null;
         private ResizePolicy yPolicy = null;
 
-        public AutoRange(List<AbstractXYDataAdapter> adapters, int behaviourX, int behaviourY) {
+        public AutoRange(List<DataStatistics> dataStatisticsList, int behaviourX, int behaviourY) {
             setBehaviour(behaviourX, behaviourY);
 
-            for (AbstractXYDataAdapter adapter : adapters) {
-                DataStatistics dataStatistics = new DataStatistics(adapter);
+            this.dataStatisticsList = dataStatisticsList;
+            for (DataStatistics dataStatistics : dataStatisticsList)
                 dataStatistics.addListener(this);
-                dataStatisticsList.add(dataStatistics);
-            }
+
         }
 
         public boolean removePainter(IPlotPainter painter) {
@@ -229,16 +228,18 @@ public class PlotView extends ViewGroup {
             if (painter instanceof StrategyPainter) {
                 StrategyPainter strategyPainter = (StrategyPainter) painter;
                 for (ConcurrentPainter child : strategyPainter.getChildPainters()) {
-                    XYConcurrentPainter xyChild = (XYConcurrentPainter)child;
-                    AbstractXYDataAdapter xyDataAdapter = (AbstractXYDataAdapter)xyChild.getAdapter();
-                    if (xyDataAdapter == null)
-                        return true;
+                    if (!(child instanceof ArrayConcurrentPainter))
+                        continue;
+                    ArrayConcurrentPainter arrayConcurrentPainter = (ArrayConcurrentPainter)child;
+                    CloneablePlotDataAdapter dataAdapter = arrayConcurrentPainter.getAdapter();
+                    if (dataAdapter == null)
+                        continue;
 
                     Iterator<DataStatistics> iterator = dataStatisticsList.iterator();
                     while (iterator.hasNext()) {
                         DataStatistics dataStatistics = iterator.next();
 
-                        if (dataStatistics.getAdapter() != xyDataAdapter)
+                        if (dataStatistics.getAdapter() != dataAdapter)
                             continue;
 
                         dataStatistics.release();
@@ -554,7 +555,18 @@ public class PlotView extends ViewGroup {
         if (behaviourX == AUTO_RANGE_DISABLED && behaviourY == AUTO_RANGE_DISABLED)
             return;
 
-        autoRange = new AutoRange(mainView.getXYDataAdapters(), behaviourX, behaviourY);
+        List<DataStatistics> dataStatisticsList = new ArrayList<>();
+        List<AbstractPlotDataAdapter> adapters = mainView.getPlotDataAdapters();
+        for (AbstractPlotDataAdapter adapter : adapters) {
+            DataStatistics dataStatistics = adapter.createDataStatistics();
+            if (dataStatistics == null)
+                continue;
+            dataStatisticsList.add(dataStatistics);
+        }
+        if (dataStatisticsList.size() == 0)
+            return;
+
+        autoRange = new AutoRange(dataStatisticsList, behaviourX, behaviourY);
     }
 
     public void autoZoom() {

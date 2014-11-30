@@ -13,4 +13,9 @@ public abstract class AbstractXYDataAdapter extends CloneablePlotDataAdapter {
     abstract public Number getY(int index);
 
     abstract public Range getRange(Number leftReal, Number rightReal);
+
+    @Override
+    public DataStatistics createDataStatistics() {
+        return new XYDataStatistics(this);
+    }
 }

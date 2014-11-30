@@ -11,12 +11,7 @@ import android.graphics.RectF;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 
 
-public class DataStatistics extends WeakListenable<DataStatistics.IListener>
-        implements AbstractPlotDataAdapter.IListener {
-
-    public interface IListener {
-        public void onLimitsChanged(DataStatistics dataStatistics);
-    }
+public class XYDataStatistics extends DataStatistics implements AbstractPlotDataAdapter.IListener {
 
     final private AbstractXYDataAdapter adapter;
     private RectF dataLimits = null;
@@ -24,12 +19,7 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
     private float sumX = 0;
     private float sumY = 0;
 
-    private void notifyLimitsChanged() {
-        for (IListener listener : getListeners())
-            listener.onLimitsChanged(this);
-    }
-
-    public DataStatistics(AbstractXYDataAdapter adapter) {
+    public XYDataStatistics(AbstractXYDataAdapter adapter) {
         this.adapter = adapter;
         this.adapter.addListener(this);
 
@@ -37,15 +27,21 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
     }
 
     @Override
-    public void addListener(DataStatistics.IListener listener) {
+    public void addListener(XYDataStatistics.IListener listener) {
         super.addListener(listener);
 
         if (dataLimits != null)
             listener.onLimitsChanged(this);
     }
 
+    @Override
     public void release() {
         adapter.removeListener(this);
+    }
+
+    @Override
+    public AbstractPlotDataAdapter getAdapter() {
+        return adapter;
     }
 
     @Override
@@ -53,16 +49,14 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
         release();
     }
 
-    public AbstractXYDataAdapter getAdapter() {
-        return adapter;
-    }
-
+    @Override
     public RectF getDataLimits() {
         if (dataLimits == null)
             return null;
         return new RectF(dataLimits);
     }
 
+    @Override
     public RectF getPreviousDataLimits() {
         return previousLimits;
     }
@@ -75,13 +69,13 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
         return sumY / adapter.getSize();
     }
 
-    private void includePoint(float x, float y) {
+    private boolean includePoint(float x, float y) {
         if (dataLimits == null) {
             dataLimits = new RectF(x, y, x, y);
             sumX = x;
             sumY = y;
             notifyLimitsChanged();
-            return;
+            return true;
         }
 
         RectF oldLimits = new RectF(dataLimits);
@@ -111,6 +105,8 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
 
         sumX += x;
         sumY += y;
+
+        return limitsChanged;
     }
 
     private boolean isInLimit(float x, float y) {
@@ -121,20 +117,20 @@ public class DataStatistics extends WeakListenable<DataStatistics.IListener>
         previousLimits = null;
         dataLimits = null;
 
-        for (int i = 0; i < adapter.getSize(); i++) {
-            float x = adapter.getX(i).floatValue();
-            float y = adapter.getY(i).floatValue();
-            includePoint(x, y);
-        }
+        onDataAdded(adapter, 0, adapter.getSize());
     }
 
     @Override
     public void onDataAdded(AbstractPlotDataAdapter plot, int index, int number) {
+        boolean changed = false;
         for (int i = 0; i < number; i++) {
             float x = adapter.getX(index + i).floatValue();
             float y = adapter.getY(index + i).floatValue();
-            includePoint(x, y);
+            if (includePoint(x, y))
+                changed = true;
         }
+        if (changed)
+            notifyLimitsChanged();
     }
 
     @Override
