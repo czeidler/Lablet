@@ -44,7 +44,7 @@ public class Fourier {
 
     static public float[] transform(float[] data, int windowSize, float stepFactor) {
         final int stepWidth =  (int)(stepFactor * windowSize);
-        final int nSteps = (data.length - windowSize) / stepWidth + 1;
+        final int nSteps = data.length / stepWidth;
         final int outputSize = nSteps * windowSize / 2;
         final float[] out = new float[outputSize];
 
@@ -87,9 +87,8 @@ public class Fourier {
         dct.forward(trafo, false);
 
         float[] out = new float[trafo.length / 2];
-        for (int i = 1; i < trafo.length; i += 2) {
+        for (int i = 1; i < trafo.length; i += 2)
             out[(i - 1) / 2] = (float) Math.sqrt(Math.pow(trafo[i], 2) + Math.pow(trafo[i - 1], 2));
-        }
 
         return out;
     }
@@ -109,7 +108,7 @@ class FourierRenderScript {
 
     public float[] renderScriptFFT(float[] data, int windowSize, float stepFactor) {
         final int stepWidth =  (int)(stepFactor * windowSize);
-        final int nSteps = (data.length - windowSize) / stepWidth + 1;
+        final int nSteps = data.length / stepWidth;
         final int outputSize = nSteps * windowSize / 2;
 
         Allocation dataAllocation = Allocation.createSized(renderScript, Element.F32(renderScript), data.length);
