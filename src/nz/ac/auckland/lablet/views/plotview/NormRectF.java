@@ -15,7 +15,7 @@ import android.graphics.RectF;
  *
  * For example, a rect with left > right can be accessed and modified like a "normed" rect.
  */
-class NormRectF {
+public class NormRectF {
     final private RectF rect;
     private boolean isXInverted = false;
     private boolean isYInverted = false;

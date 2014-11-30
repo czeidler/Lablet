@@ -77,7 +77,6 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
 
         RectF realDataRect = null;
         RectF screenRect = null;
-        PlotPainterContainerView containerView = getContainerView();
         if (requestedRealRect != null) {
             Range dirty = getDataRangeFor(requestedRealRect.left, requestedRealRect.right);
             dirtyRegion.addRange(dirty);
@@ -93,7 +92,7 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
 
         if (geometryInfoNeeded) {
             realDataRect = getRealDataRect(dirtyRegion.getMin(), dirtyRegion.getMax());
-            screenRect = containerView.toScreen(realDataRect);
+            screenRect = getContainerView().toScreen(realDataRect);
         }
 
         StrategyPainter.RenderPayload payload = makeRenderPayload(realDataRect, screenRect, dirtyRegion);

@@ -110,4 +110,8 @@ abstract public class StrategyPainter extends AbstractPlotPainter {
 
         return payloadList;
     }
+
+    public RectF getDrawingRange() {
+        return containerView.getRange();
+    }
 }

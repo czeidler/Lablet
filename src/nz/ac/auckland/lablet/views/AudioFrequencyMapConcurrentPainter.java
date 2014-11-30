@@ -65,10 +65,11 @@ public class AudioFrequencyMapConcurrentPainter extends ArrayConcurrentPainter {
     @Override
     protected RectF getRealDataRect(int startIndex, int lastIndex) {
         AudioFrequencyMapAdapter audioAmplitudePlotDataAdapter = (AudioFrequencyMapAdapter)dataAdapter;
-        RectF realDataRect = parent.getContainerView().getRange();
+        RectF realDataRect = parent.getDrawingRange();
         if (audioAmplitudePlotDataAdapter.getSize() > 0) {
-            realDataRect.left = audioAmplitudePlotDataAdapter.getX(startIndex);
-            realDataRect.right = audioAmplitudePlotDataAdapter.getX(lastIndex);
+            NormRectF normRectF = new NormRectF(realDataRect);
+            normRectF.setLeft(audioAmplitudePlotDataAdapter.getX(startIndex));
+            normRectF.setRight(audioAmplitudePlotDataAdapter.getX(lastIndex));
         }
         return realDataRect;
     }

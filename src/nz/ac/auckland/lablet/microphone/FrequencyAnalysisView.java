@@ -44,7 +44,7 @@ public class FrequencyAnalysisView extends FrameLayout {
     final private List<OverlapSpinnerEntry> overlapSpinnerEntryList = new ArrayList<>();
 
     private AudioFrequencyMapConcurrentPainter audioFrequencyMapPainter;
-    private ThreadStrategyPainter2 threadStrategyPainter;
+    private ThreadStrategyPainter threadStrategyPainter;
 
     private PlotView frequencyView;
     private ViewGroup loadingView;
@@ -302,7 +302,7 @@ public class FrequencyAnalysisView extends FrameLayout {
     private void setupFrequencyView(PlotView frequencyMapPlotView, AudioWavInputStream audioWavInputStream) {
         audioFrequencyMapAdapter = new AudioFrequencyMapAdapter(freqMapDisplaySettings.getStepFactor());
         audioFrequencyMapPainter = new AudioFrequencyMapConcurrentPainter(audioFrequencyMapAdapter);
-        threadStrategyPainter = new ThreadStrategyPainter2();
+        threadStrategyPainter = new ThreadStrategyPainter();
         threadStrategyPainter.addChild(audioFrequencyMapPainter);
         frequencyMapPlotView.addPlotPainter(threadStrategyPainter);
 
