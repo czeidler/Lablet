@@ -218,7 +218,7 @@ public class PlotView extends ViewGroup {
 
             this.dataStatisticsList = dataStatisticsList;
             for (DataStatistics dataStatistics : dataStatisticsList)
-                dataStatistics.addListener(this);
+                dataStatistics.setListener(this);
 
         }
 
@@ -690,7 +690,7 @@ public class PlotView extends ViewGroup {
             valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 public void onAnimationUpdate(ValueAnimator animation) {
                     Float value = (Float) animation.getAnimatedValue();
-                    setXRange(value, value + mainView.getRangeTop() - mainView.getRangeBottom(), true);
+                    setYRange(value, value + mainView.getRangeTop() - mainView.getRangeBottom(), true);
                 }
             });
             animate(valueAnimator);
