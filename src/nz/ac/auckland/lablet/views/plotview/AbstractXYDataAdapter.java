@@ -16,6 +16,6 @@ public abstract class AbstractXYDataAdapter extends CloneablePlotDataAdapter {
 
     @Override
     public DataStatistics createDataStatistics() {
-        return new XYDataStatistics(this);
+        return new XYDataStatistics(this, false);
     }
 }

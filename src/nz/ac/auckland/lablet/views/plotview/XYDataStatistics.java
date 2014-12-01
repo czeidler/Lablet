@@ -12,25 +12,24 @@ import nz.ac.auckland.lablet.misc.WeakListenable;
 
 
 public class XYDataStatistics extends DataStatistics implements AbstractPlotDataAdapter.IListener {
-
     final private AbstractXYDataAdapter adapter;
-    private RectF dataLimits = null;
-    private RectF previousLimits = null;
     private float sumX = 0;
     private float sumY = 0;
+    final private boolean dataIsContinuously;
 
-    public XYDataStatistics(AbstractXYDataAdapter adapter) {
+    public XYDataStatistics(AbstractXYDataAdapter adapter, boolean dataIsContinuously) {
         this.adapter = adapter;
         this.adapter.addListener(this);
+        this.dataIsContinuously = dataIsContinuously;
 
         reset();
     }
 
     @Override
-    public void addListener(XYDataStatistics.IListener listener) {
-        super.addListener(listener);
+    public void setListener(DataStatistics.IListener listener) {
+        super.setListener(listener);
 
-        if (dataLimits != null)
+        if (listener != null && dataLimits != null)
             listener.onLimitsChanged(this);
     }
 
@@ -49,18 +48,6 @@ public class XYDataStatistics extends DataStatistics implements AbstractPlotData
         release();
     }
 
-    @Override
-    public RectF getDataLimits() {
-        if (dataLimits == null)
-            return null;
-        return new RectF(dataLimits);
-    }
-
-    @Override
-    public RectF getPreviousDataLimits() {
-        return previousLimits;
-    }
-
     public float getAverageX() {
         return sumX / adapter.getSize();
     }
@@ -74,7 +61,6 @@ public class XYDataStatistics extends DataStatistics implements AbstractPlotData
             dataLimits = new RectF(x, y, x, y);
             sumX = x;
             sumY = y;
-            notifyLimitsChanged();
             return true;
         }
 
@@ -98,10 +84,8 @@ public class XYDataStatistics extends DataStatistics implements AbstractPlotData
             limitsChanged = true;
         }
 
-        if (limitsChanged) {
+        if (limitsChanged)
             previousLimits = oldLimits;
-            notifyLimitsChanged();
-        }
 
         sumX += x;
         sumY += y;
@@ -117,17 +101,29 @@ public class XYDataStatistics extends DataStatistics implements AbstractPlotData
         previousLimits = null;
         dataLimits = null;
 
-        onDataAdded(adapter, 0, adapter.getSize());
+        if (adapter.getSize() > 0)
+            onDataAdded(adapter, 0, adapter.getSize());
     }
 
     @Override
     public void onDataAdded(AbstractPlotDataAdapter plot, int index, int number) {
         boolean changed = false;
-        for (int i = 0; i < number; i++) {
-            float x = adapter.getX(index + i).floatValue();
-            float y = adapter.getY(index + i).floatValue();
+        if (dataIsContinuously) {
+            float x = adapter.getX(index).floatValue();
+            float y = adapter.getY(index).floatValue();
             if (includePoint(x, y))
                 changed = true;
+            x = adapter.getX(index + number - 1).floatValue();
+            y = adapter.getY(index + number - 1).floatValue();
+            if (includePoint(x, y))
+                changed = true;
+        } else {
+            for (int i = 0; i < number; i++) {
+                float x = adapter.getX(index + i).floatValue();
+                float y = adapter.getY(index + i).floatValue();
+                if (includePoint(x, y))
+                    changed = true;
+            }
         }
         if (changed)
             notifyLimitsChanged();
