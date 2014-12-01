@@ -51,8 +51,9 @@ public class AudioAmplitudePainter extends ArrayConcurrentPainter {
         return realDataRect;
     }
 
+    @Override
     protected Range getDataRangeFor(float left, float right) {
-        return new Range(0, dataAdapter.getSize() - 1);
+        return ((AudioAmplitudePlotDataAdapter)dataAdapter).getRange(left, right);
     }
 
     private int getSamplesPerPixel(ArrayRenderPayload payload) {

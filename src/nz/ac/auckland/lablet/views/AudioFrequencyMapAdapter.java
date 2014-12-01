@@ -7,10 +7,8 @@
  */
 package nz.ac.auckland.lablet.views;
 
-import nz.ac.auckland.lablet.views.plotview.CloneablePlotDataAdapter;
-import nz.ac.auckland.lablet.views.plotview.DataStatistics;
-import nz.ac.auckland.lablet.views.plotview.Range;
-import nz.ac.auckland.lablet.views.plotview.Region1D;
+import android.graphics.RectF;
+import nz.ac.auckland.lablet.views.plotview.*;
 
 import java.util.AbstractList;
 import java.util.Collections;
@@ -56,37 +54,17 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
         notifyAllDataChanged();
     }
 
-    public Range getRange(float leftReal, float rightReal) {
+    protected Range getRange(Number leftReal, Number rightReal) {
         if (data == null)
             return new Range(0, -1);
 
-        Comparator<Float> numberComparator =  new Comparator<Float>() {
-            @Override
-            public int compare(Float number1, Float number2) {
-                return Float.compare(number1, number2);
-            }
-        };
-
-        List<Float> timeListHelper = new AbstractList<Float>() {
-            @Override
-            public Float get(int i) {
-                return getX(i);
-            }
-
-            @Override
-            public int size() {
-                return getSize();
-            }
-        };
-
-        int leftIndex = Math.abs(Collections.binarySearch(timeListHelper, leftReal, numberComparator));
-        int rightIndex = Math.abs(Collections.binarySearch(timeListHelper, rightReal, numberComparator));
-
+        int leftIndex = Math.round(leftReal.floatValue() / stepFactor * sampleRate / (2 * data.getBunchSize()) / 1000);
+        int rightIndex = Math.round(rightReal.floatValue() / stepFactor * sampleRate / (2 * data.getBunchSize()) / 1000);
         leftIndex -= 2;
         rightIndex ++;
         if (leftIndex < 0)
             leftIndex = 0;
-        int size = getSize();
+        int size = data.size();
         if (rightIndex >= size)
             rightIndex = size - 1;
 
@@ -128,8 +106,80 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
         return data.getBunchCount();
     }
 
+    class FrequencyMapDataStatistics extends DataStatistics {
+        final private AudioFrequencyMapAdapter adapter;
+
+        private AbstractPlotDataAdapter.IListener listener = new AbstractPlotDataAdapter.IListener() {
+            @Override
+            public void onDataAdded(AbstractPlotDataAdapter plot, int index, int number) {
+                float first = getX(index);
+                float last = getX(index + number - 1);
+                if (dataLimits == null) {
+                    dataLimits = new RectF(first, sampleRate / 2, last, 0);
+                    notifyLimitsChanged();
+                    return;
+                }
+                boolean changed = includePoint(first);
+                if (includePoint(last))
+                    changed = true;
+                if (changed)
+                    notifyLimitsChanged();
+            }
+
+            private boolean includePoint(float x) {
+                RectF oldLimits = new RectF(dataLimits);
+
+                boolean limitsChanged = false;
+                if (dataLimits.left > x) {
+                    dataLimits.left = x;
+                    limitsChanged = true;
+                }
+                if (dataLimits.right < x) {
+                    dataLimits.right = x;
+                    limitsChanged = true;
+                }
+
+                if (limitsChanged)
+                    previousLimits = oldLimits;
+
+                return limitsChanged;
+            }
+
+            @Override
+            public void onDataRemoved(AbstractPlotDataAdapter plot, int index, int number) {
+                onAllDataChanged(plot);
+            }
+
+            @Override
+            public void onDataChanged(AbstractPlotDataAdapter plot, int index, int number) {
+                onAllDataChanged(plot);
+            }
+
+            @Override
+            public void onAllDataChanged(AbstractPlotDataAdapter plot) {
+                if (getSize() > 0)
+                    onDataAdded(plot, 0, getSize());
+            }
+        };
+
+        public FrequencyMapDataStatistics(AudioFrequencyMapAdapter adapter) {
+            this.adapter = adapter;
+            adapter.addListener(listener);
+        }
+
+        @Override
+        public void release() {
+
+        }
+
+        @Override
+        public AbstractPlotDataAdapter getAdapter() {
+            return adapter;
+        }
+    }
+
     @Override
     public DataStatistics createDataStatistics() {
-        return null;
+        return new FrequencyMapDataStatistics(this);
     }
 }

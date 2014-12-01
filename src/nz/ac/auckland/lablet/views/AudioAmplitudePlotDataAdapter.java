@@ -7,9 +7,7 @@
  */
 package nz.ac.auckland.lablet.views;
 
-import nz.ac.auckland.lablet.views.plotview.AbstractXYDataAdapter;
-import nz.ac.auckland.lablet.views.plotview.Range;
-import nz.ac.auckland.lablet.views.plotview.Region1D;
+import nz.ac.auckland.lablet.views.plotview.*;
 
 import java.util.*;
 
@@ -121,7 +119,7 @@ public class AudioAmplitudePlotDataAdapter extends AbstractXYDataAdapter {
 
     @Override
     public Number getX(int index) {
-        return (float)index / sampleRate;
+        return (float)index / sampleRate * 1000;
     }
 
     @Override
@@ -131,7 +129,20 @@ public class AudioAmplitudePlotDataAdapter extends AbstractXYDataAdapter {
 
     @Override
     public Range getRange(Number leftReal, Number rightReal) {
-        return new Range(0, data.size() - 1);
+        if (data == null)
+            return new Range(0, -1);
+
+        int leftIndex = Math.round(sampleRate * leftReal.floatValue() / 1000);
+        int rightIndex = Math.round(sampleRate * rightReal.floatValue() / 1000);
+        leftIndex -= 2;
+        rightIndex ++;
+        if (leftIndex < 0)
+            leftIndex = 0;
+        int size = data.size();
+        if (rightIndex >= size)
+            rightIndex = size - 1;
+
+        return new Range(leftIndex, rightIndex);
     }
 
     @Override
@@ -139,5 +150,14 @@ public class AudioAmplitudePlotDataAdapter extends AbstractXYDataAdapter {
         if (data == null)
             return 0;
         return data.size();
+    }
+
+    public int getTotalTime() {
+        return getSize() / sampleRate * 1000;
+    }
+
+    @Override
+    public DataStatistics createDataStatistics() {
+        return new XYDataStatistics(this, true);
     }
 }

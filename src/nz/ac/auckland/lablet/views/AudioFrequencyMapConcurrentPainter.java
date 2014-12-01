@@ -132,8 +132,8 @@ public class AudioFrequencyMapConcurrentPainter extends ArrayConcurrentPainter {
 
             if (startXPixel < 0)
                 break;
-            if (index + 1 == start + count)
-                endXPixel = screenRectWidth;
+            //if (index + 1 == start + count)
+              //  endXPixel = screenRectWidth;
 
             // do the drawing
             final float[] frequencies = adapter.getY(startIndex);
