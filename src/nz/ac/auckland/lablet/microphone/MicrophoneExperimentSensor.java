@@ -63,39 +63,42 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
             private PlotView frequencyMapPlotView;
             private AudioFrequencyMapAdapter audioFrequencyMapAdapter;
 
-            private int frequencyMapTimeSpan = 30 * 1000;
-            private int amplitudeTimeSpan = 3;
+            final int timeSpan = 15 * 1000;
+            final private int frequencyMapTimeSpan = timeSpan;
+            final private int amplitudeTimeSpan = timeSpan;
 
             private MicrophoneExperimentSensor.ISensorDataListener listener = new MicrophoneExperimentSensor.ISensorDataListener() {
                 @Override
                 public void onNewAmplitudeData(float[] amplitudes) {
-                    if (audioAmplitudePlotAdapter.getSize() / experimentSensor.SAMPLE_RATE >= amplitudeTimeSpan)
-                        audioAmplitudePlotAdapter.clear();
+                    /*if (audioAmplitudePlotAdapter.getTotalTime() >= amplitudeTimeSpan)
+                        audioAmplitudePlotAdapter.clear();*/
                     audioAmplitudePlotAdapter.addData(amplitudes);
                 }
 
                 @Override
                 public void onNewFrequencyData(float[] frequencies) {
-                    int size = audioFrequencyMapAdapter.getSize();
+                    /*int size = audioFrequencyMapAdapter.getSize();
                     if (size > 0 && audioFrequencyMapAdapter.getX(size - 1) >= frequencyMapTimeSpan)
-                        audioFrequencyMapAdapter.clear();
+                        audioFrequencyMapAdapter.clear();*/
                     audioFrequencyMapAdapter.addData(frequencies);
                 }
             };
 
             {
                 StrategyPainter strategyPainter = new ThreadStrategyPainter();
+                //StrategyPainter strategyPainter = new BufferedDirectStrategyPainter();
                 audioAmplitudePlotAdapter = new AudioAmplitudePlotDataAdapter();
                 audioAmplitudePlotView = (PlotView)view.findViewById(R.id.audioSignalView);
                 AudioAmplitudePainter audioAmplitudePainter = new AudioAmplitudePainter(audioAmplitudePlotAdapter);
                 strategyPainter.addChild(audioAmplitudePainter);
+                audioAmplitudePlotView.addPlotPainter(strategyPainter);
                 audioAmplitudePlotView.setXRange(0, amplitudeTimeSpan);
                 audioAmplitudePlotView.setYRange(-0.6f, 0.6f);
                 audioAmplitudePlotView.getTitleView().setTitle("Signal Strength Vs Time");
                 audioAmplitudePlotView.getXAxisView().setUnit("ms");
                 audioAmplitudePlotView.getXAxisView().setTitle("Time");
                 audioAmplitudePlotView.getBackgroundPainter().setShowYGrid(true);
-                audioAmplitudePlotView.addPlotPainter(strategyPainter);
+                audioAmplitudePlotView.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_DISABLED);
 
                 frequencyMapPlotView = (PlotView)view.findViewById(R.id.audioFrequencyMapPlot);
                 audioFrequencyMapAdapter = new AudioFrequencyMapAdapter(0.5f);
@@ -106,14 +109,15 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
                 frequencyMapPlotView.addPlotPainter(strategyPainter);
                 frequencyMapPlotView.setXRange(0, frequencyMapTimeSpan);
                 frequencyMapPlotView.setYRange(1, experimentSensor.SAMPLE_RATE / 2);
-                frequencyMapPlotView.setMaxXRange(0, frequencyMapTimeSpan);
-                frequencyMapPlotView.setMaxYRange(1, experimentSensor.SAMPLE_RATE / 2);
+                //frequencyMapPlotView.setMaxXRange(0, frequencyMapTimeSpan);
+                //frequencyMapPlotView.setMaxYRange(1, experimentSensor.SAMPLE_RATE / 2);
                 //frequencyMapPlotView.getBackgroundPainter().setShowGrid(true);
                 //frequencyMapPlotView.setYScale(PlotView.log10Scale());
-                frequencyMapPlotView.setXDraggable(true);
+                /*frequencyMapPlotView.setXDraggable(true);
                 frequencyMapPlotView.setYDraggable(true);
                 frequencyMapPlotView.setXZoomable(true);
-                frequencyMapPlotView.setYZoomable(true);
+                frequencyMapPlotView.setYZoomable(true);*/
+                frequencyMapPlotView.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_DISABLED);
                 frequencyMapPlotView.getYAxisView().setUnit("Hz");
                 frequencyMapPlotView.getYAxisView().setTitle("Frequency");
                 frequencyMapPlotView.getXAxisView().setUnit("ms");
