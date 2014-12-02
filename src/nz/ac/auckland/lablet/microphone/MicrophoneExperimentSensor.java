@@ -10,286 +10,22 @@ package nz.ac.auckland.lablet.microphone;
 import android.app.Activity;
 import android.content.Context;
 import android.media.*;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CompoundButton;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.ToggleButton;
-import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensorView;
 import nz.ac.auckland.lablet.experiment.ISensorData;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.misc.AudioWavOutputStream;
 import nz.ac.auckland.lablet.misc.StorageLib;
-import nz.ac.auckland.lablet.views.*;
-import nz.ac.auckland.lablet.views.plotview.PlotView;
-import nz.ac.auckland.lablet.views.plotview.StrategyPainter;
-import nz.ac.auckland.lablet.views.plotview.ThreadStrategyPainter;
 
 import java.io.*;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
-
-    private ViewGroup previewView;
-    private ViewGroup playbackView;
-
-    public MicrophoneExperimentSensorView(final Context context, final MicrophoneExperimentSensor experimentSensor) {
-        super(context);
-
-        final LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final ViewGroup view = (ViewGroup)inflater.inflate(R.layout.microphone_run_view, null, false);
-        assert view != null;
-        addView(view);
-
-        previewView = (ViewGroup)view.findViewById(R.id.previewView);
-        playbackView = (ViewGroup)view.findViewById(R.id.playbackView);
-
-        playbackView.setVisibility(View.INVISIBLE);
-
-        previewState = new AbstractExperimentSensor.State() {
-            private PlotView audioAmplitudePlotView;
-            private AudioAmplitudePlotDataAdapter audioAmplitudePlotAdapter;
-
-            private PlotView frequencyMapPlotView;
-            private AudioFrequencyMapAdapter audioFrequencyMapAdapter;
-
-            final int timeSpan = 15 * 1000;
-            final private int frequencyMapTimeSpan = timeSpan;
-            final private int amplitudeTimeSpan = timeSpan;
-
-            private MicrophoneExperimentSensor.ISensorDataListener listener = new MicrophoneExperimentSensor.ISensorDataListener() {
-                @Override
-                public void onNewAmplitudeData(float[] amplitudes) {
-                    /*if (audioAmplitudePlotAdapter.getTotalTime() >= amplitudeTimeSpan)
-                        audioAmplitudePlotAdapter.clear();*/
-                    audioAmplitudePlotAdapter.addData(amplitudes);
-                }
-
-                @Override
-                public void onNewFrequencyData(float[] frequencies) {
-                    /*int size = audioFrequencyMapAdapter.getSize();
-                    if (size > 0 && audioFrequencyMapAdapter.getX(size - 1) >= frequencyMapTimeSpan)
-                        audioFrequencyMapAdapter.clear();*/
-                    audioFrequencyMapAdapter.addData(frequencies);
-                }
-            };
-
-            {
-                StrategyPainter strategyPainter = new ThreadStrategyPainter();
-                //StrategyPainter strategyPainter = new BufferedDirectStrategyPainter();
-                audioAmplitudePlotAdapter = new AudioAmplitudePlotDataAdapter();
-                audioAmplitudePlotView = (PlotView)view.findViewById(R.id.audioSignalView);
-                AudioAmplitudePainter audioAmplitudePainter = new AudioAmplitudePainter(audioAmplitudePlotAdapter);
-                strategyPainter.addChild(audioAmplitudePainter);
-                audioAmplitudePlotView.addPlotPainter(strategyPainter);
-                audioAmplitudePlotView.setXRange(0, amplitudeTimeSpan);
-                audioAmplitudePlotView.setYRange(-0.6f, 0.6f);
-                audioAmplitudePlotView.getTitleView().setTitle("Signal Strength Vs Time");
-                audioAmplitudePlotView.getXAxisView().setUnit("ms");
-                audioAmplitudePlotView.getXAxisView().setTitle("Time");
-                audioAmplitudePlotView.getBackgroundPainter().setShowYGrid(true);
-                audioAmplitudePlotView.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_DISABLED);
-
-                frequencyMapPlotView = (PlotView)view.findViewById(R.id.audioFrequencyMapPlot);
-                audioFrequencyMapAdapter = new AudioFrequencyMapAdapter(0.5f);
-                strategyPainter = new ThreadStrategyPainter();
-                AudioFrequencyMapConcurrentPainter audioFrequencyMapPainter
-                        = new AudioFrequencyMapConcurrentPainter(audioFrequencyMapAdapter);
-                strategyPainter.addChild(audioFrequencyMapPainter);
-                frequencyMapPlotView.addPlotPainter(strategyPainter);
-                frequencyMapPlotView.setXRange(0, frequencyMapTimeSpan);
-                frequencyMapPlotView.setYRange(1, experimentSensor.SAMPLE_RATE / 2);
-                //frequencyMapPlotView.setMaxXRange(0, frequencyMapTimeSpan);
-                //frequencyMapPlotView.setMaxYRange(1, experimentSensor.SAMPLE_RATE / 2);
-                //frequencyMapPlotView.getBackgroundPainter().setShowGrid(true);
-                //frequencyMapPlotView.setYScale(PlotView.log10Scale());
-                /*frequencyMapPlotView.setXDraggable(true);
-                frequencyMapPlotView.setYDraggable(true);
-                frequencyMapPlotView.setXZoomable(true);
-                frequencyMapPlotView.setYZoomable(true);*/
-                frequencyMapPlotView.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_DISABLED);
-                frequencyMapPlotView.getYAxisView().setUnit("Hz");
-                frequencyMapPlotView.getYAxisView().setTitle("Frequency");
-                frequencyMapPlotView.getXAxisView().setUnit("ms");
-                frequencyMapPlotView.getXAxisView().setTitle("Time");
-
-                experimentSensor.setSensorDataListener(listener);
-            }
-
-            @Override
-            public void start() {
-                previewView.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public boolean stop() {
-                previewView.setVisibility(View.INVISIBLE);
-                return true;
-            }
-        };
-
-        recordingState = previewState;
-
-        playbackState = new AbstractExperimentSensor.State() {
-            final private ToggleButton startPauseButton;
-            final private SeekBar seekBar;
-            final private TextView lengthTextView;
-            final private PlotView playbackAmplitudeView;
-            private AudioAmplitudePlotDataAdapter audioAmplitudePlotAdapter;
-
-            private MediaPlayer mediaPlayer;
-
-            final private Runnable seekBarUpdater = new Runnable() {
-                private Handler handler = new Handler();
-
-                @Override
-                public void run() {
-                    if (mediaPlayer == null)
-                        return;
-                    seekBar.setProgress(mediaPlayer.getCurrentPosition());
-                    if (!mediaPlayer.isPlaying())
-                        return;
-                    handler.postDelayed(seekBarUpdater, 100);
-                }
-            };
-
-            {
-                StrategyPainter strategyPainter = new ThreadStrategyPainter();
-                startPauseButton = (ToggleButton)view.findViewById(R.id.startPauseButton);
-                seekBar = (SeekBar)view.findViewById(R.id.seekBar);
-                lengthTextView = (TextView)view.findViewById(R.id.lengthTextView);
-                playbackAmplitudeView = (PlotView)view.findViewById(R.id.playbackAmplitudeView);
-                audioAmplitudePlotAdapter = new AudioAmplitudePlotDataAdapter();
-                AudioAmplitudePainter audioAmplitudePainter = new AudioAmplitudePainter(audioAmplitudePlotAdapter);
-                strategyPainter.addChild(audioAmplitudePainter);
-
-                playbackAmplitudeView.addPlotPainter(strategyPainter);
-                playbackAmplitudeView.setYRange(-1, 1);
-                playbackAmplitudeView.getXAxisView().setUnit("ms");
-                playbackAmplitudeView.getXAxisView().setTitle("Time");
-
-                startPauseButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
-                        if (mediaPlayer == null)
-                            return;
-                        if (checked) {
-                            mediaPlayer.start();
-                            seekBarUpdater.run();
-                        } else
-                            mediaPlayer.pause();
-                    }
-                });
-
-                seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        if (fromUser)
-                            mediaPlayer.seekTo(progress);
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-
-                    }
-                });
-            }
-
-            private void loadWavFileAsync() {
-                audioAmplitudePlotAdapter.clear();
-
-                AsyncTask<File, Integer, Void> asyncTask = new AsyncTask<File, Integer, Void>() {
-                    private byte[] data;
-
-                    @Override
-                    protected Void doInBackground(File... files) {
-                        try {
-                            AudioWavInputStream audioWavInputStream = new AudioWavInputStream(files[0]);
-                            int size = audioWavInputStream.getSize();
-                            BufferedInputStream bufferedInputStream = new BufferedInputStream(audioWavInputStream);
-                            data = new byte[size];
-                            for (int i = 0; i < size; i++)
-                                data[i] = (byte)bufferedInputStream.read();
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                        return null;
-                    }
-
-                    protected void onPostExecute(Void result) {
-                        audioAmplitudePlotAdapter.addData(AudioWavInputStream.toAmplitudeData(data, data.length));
-                    }
-                };
-                asyncTask.execute(experimentSensor.getAudioFile());
-            }
-
-            @Override
-            public void start() {
-                playbackView.setVisibility(View.VISIBLE);
-
-                loadWavFileAsync();
-
-                try {
-                    mediaPlayer = new MediaPlayer();
-                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mediaPlayer) {
-                            startPauseButton.setChecked(false);
-                            mediaPlayer.seekTo(0);
-                        }
-                    });
-
-                    mediaPlayer.setDataSource(experimentSensor.getAudioFile().getPath());
-                    mediaPlayer.prepare();
-
-                } catch (IOException e) {
-                    mediaPlayer = null;
-                    e.printStackTrace();
-                    return;
-                }
-
-                int duration = mediaPlayer.getDuration();
-                seekBar.setMax(duration);
-                lengthTextView.setText("" + (duration / 1000) + "s");
-                playbackAmplitudeView.setXRange(0, (float) duration / 1000);
-            }
-
-            @Override
-            public boolean stop() {
-                playbackView.setVisibility(View.INVISIBLE);
-
-                if (mediaPlayer != null) {
-                    mediaPlayer.stop();
-                    mediaPlayer.release();
-                    mediaPlayer = null;
-                }
-                return false;
-            }
-        };
-    }
-
-    @Override
-    public void onSettingsChanged() {
-
-    }
-}
 
 public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     private WeakReference<ISensorDataListener> softListener = null;
@@ -311,7 +47,10 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     }
 
     public void setSensorDataListener(ISensorDataListener listener) {
-        softListener = new WeakReference<>(listener);
+        if (listener == null)
+            softListener = null;
+        else
+            softListener = new WeakReference<>(listener);
     }
 
     private void notifyNewAudioData(float[] amplitudes) {

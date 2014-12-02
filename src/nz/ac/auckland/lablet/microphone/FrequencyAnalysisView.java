@@ -448,7 +448,7 @@ public class FrequencyAnalysisView extends FrameLayout {
                     }
 
                     /*
-                    final int step = (int)(newSampleSize * audioFrequencyMapAdapter.getStepFactor());
+                    final int step = (int)(newSampleSize * frequencyMapAdapter.getStepFactor());
                     for (int i = 0; i < amplitudes.length; i += step) {
                         float frequencies[] = Fourier.transform(amplitudes, i, newSampleSize);
                         if (isCancelled())
