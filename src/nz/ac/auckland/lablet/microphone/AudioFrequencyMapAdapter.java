@@ -5,9 +5,10 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views;
+package nz.ac.auckland.lablet.microphone;
 
 import android.graphics.RectF;
+import nz.ac.auckland.lablet.microphone.FixSizedBunchArray;
 import nz.ac.auckland.lablet.views.plotview.*;
 
 

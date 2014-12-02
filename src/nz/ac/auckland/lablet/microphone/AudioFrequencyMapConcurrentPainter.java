@@ -5,12 +5,13 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views;
+package nz.ac.auckland.lablet.microphone;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
+import nz.ac.auckland.lablet.microphone.AudioFrequencyMapAdapter;
 import nz.ac.auckland.lablet.views.plotview.*;
 
 import java.util.Arrays;
