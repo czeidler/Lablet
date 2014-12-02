@@ -14,6 +14,7 @@ import nz.ac.auckland.lablet.camera.CameraSensorPlugin;
 import nz.ac.auckland.lablet.camera.VideoImportPlugin;
 import nz.ac.auckland.lablet.microphone.FrequencyAnalysisPlugin;
 import nz.ac.auckland.lablet.microphone.MicrophoneSensorPlugin;
+import nz.ac.auckland.lablet.microphone.WavImportPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class ExperimentPluginFactory {
         sensorPlugins.add(new AccelerometerSensorPlugin());
 
         importPlugins.add(new VideoImportPlugin());
+        importPlugins.add(new WavImportPlugin());
     }
 
     /**

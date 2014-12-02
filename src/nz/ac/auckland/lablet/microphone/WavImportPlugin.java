@@ -5,13 +5,10 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.camera;
+package nz.ac.auckland.lablet.microphone;
 
 import android.app.Activity;
 import nz.ac.auckland.lablet.experiment.AbstractFileImportPlugin;
-import nz.ac.auckland.lablet.experiment.Experiment;
-import nz.ac.auckland.lablet.experiment.IImportPlugin;
-import nz.ac.auckland.lablet.experiment.ImportExperimentRun;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.misc.StreamHelper;
 
@@ -19,22 +16,22 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class VideoImportPlugin extends AbstractFileImportPlugin {
+public class WavImportPlugin extends AbstractFileImportPlugin {
     @Override
     public String getName() {
-        return "Video";
+        return "Audio";
     }
 
     @Override
     public String getFileFilter() {
-        return ".*mp4|.*MP4";
+        return ".*wav|.*WAV";
     }
 
     @Override
     protected String createUid(String importFileName) {
         CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", new java.util.Date());
 
-        return dateString + "_Imported_Video_" + importFileName;
+        return dateString + "_Imported_Audio_" + importFileName;
     }
 
     @Override
@@ -52,12 +49,12 @@ public class VideoImportPlugin extends AbstractFileImportPlugin {
             return false;
         }
 
-        final CameraSensorData cameraSensorData = new CameraSensorData(activity);
-        cameraSensorData.setUid(importUid);
+        final MicrophoneSensorData sensorData = new MicrophoneSensorData(activity);
+        sensorData.setUid(importUid);
 
-        cameraSensorData.setVideoFileName(dataStorageDir, fileName);
+        sensorData.setAudioFileName(fileName);
         try {
-            cameraSensorData.saveExperimentDataToFile(dataStorageDir);
+            sensorData.saveExperimentDataToFile(dataStorageDir);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
