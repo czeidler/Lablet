@@ -55,6 +55,9 @@ class ExperimentRunViewManager {
     public ExperimentRunViewManager(final Activity activity, final int maxNumberOfRuns, final Experiment experiment) {
         this.experiment = experiment;
 
+        // disable the selection layout for now
+        View runSelectionLayout = activity.findViewById(R.id.runSelectionLayout);
+        runSelectionLayout.setVisibility(View.INVISIBLE);
         addRunButton = (ImageButton)activity.findViewById(R.id.addRunButton);
         nextRunButton = (Button)activity.findViewById(R.id.nextButton);
         prevRunButton = (Button)activity.findViewById(R.id.prevButton);
