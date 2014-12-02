@@ -79,7 +79,7 @@ public class Experiment {
             if (runState == null)
                 continue;
             ExperimentRun run = new ExperimentRun();
-            addExperimentRunGroup(run);
+            addExperimentRun(run);
             run.onRestoreInstanceState(runState);
         }
 
@@ -92,26 +92,26 @@ public class Experiment {
         return experimentRuns;
     }
 
-    public boolean addExperimentRunGroup(ExperimentRun runGroup) {
-        if (runGroup.getExperiment() != null)
+    public boolean addExperimentRun(ExperimentRun experimentRun) {
+        if (experimentRun.getExperiment() != null)
             return false;
         if (currentExperimentRun == null)
-            currentExperimentRun = runGroup;
-        runGroup.setExperiment(this, "run" + Integer.toString(createRunGroupId()));
-        experimentRuns.add(runGroup);
+            currentExperimentRun = experimentRun;
+        experimentRun.setExperiment(this, "run" + Integer.toString(createExperimentRunId()));
+        experimentRuns.add(experimentRun);
 
-        notifyExperimentRunAdded(runGroup);
+        notifyExperimentRunAdded(experimentRun);
         return true;
     }
 
-    public void removeExperimentRunGroup(ExperimentRun runGroup) {
-        final int removedGroupIndex = experimentRuns.indexOf(runGroup);
+    public void removeExperimentRun(ExperimentRun experimentRun) {
+        final int removedGroupIndex = experimentRuns.indexOf(experimentRun);
 
-        runGroup.setExperiment(null, "");
-        experimentRuns.remove(runGroup);
+        experimentRun.setExperiment(null, "");
+        experimentRuns.remove(experimentRun);
 
         // find new current group if runGroup was the current group
-        if (runGroup == currentExperimentRun) {
+        if (experimentRun == currentExperimentRun) {
             if (removedGroupIndex > 0)
                 setCurrentExperimentRun(experimentRuns.get(removedGroupIndex - 1));
             else if (experimentRuns.size() > removedGroupIndex)
@@ -120,7 +120,7 @@ public class Experiment {
                 setCurrentExperimentRun(null);
         }
 
-        notifyExperimentRunRemoved(runGroup);
+        notifyExperimentRunRemoved(experimentRun);
     }
 
     public void setCurrentExperimentRun(ExperimentRun experimentRun) {
@@ -134,7 +134,7 @@ public class Experiment {
         return currentExperimentRun;
     }
 
-    public int createRunGroupId() {
+    public int createExperimentRunId() {
         runGroupId++;
         return runGroupId;
     }
