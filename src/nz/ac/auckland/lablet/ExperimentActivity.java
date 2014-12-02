@@ -827,28 +827,30 @@ public class ExperimentActivity extends FragmentActivity {
 }
 
 class ExperimentRunFragmentPagerAdapter extends FragmentStatePagerAdapter {
-    private ExperimentRun experimentRun;
+    private int sensorCount;
 
     public ExperimentRunFragmentPagerAdapter(android.support.v4.app.FragmentManager fragmentManager) {
         super(fragmentManager);
     }
 
     public void setExperimentRun(ExperimentRun experimentRun) {
-        this.experimentRun = experimentRun;
+        this.sensorCount = experimentRun.getSensorCount();
 
         notifyDataSetChanged();
     }
 
     @Override
     public android.support.v4.app.Fragment getItem(int position) {
-        List<IExperimentSensor> list = experimentRun.getExperimentSensors();
-        return new ExperimentRunFragment(list.get(position));
+        ExperimentRunFragment experimentRunFragment = new ExperimentRunFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("sensor", position);
+        experimentRunFragment.setArguments(bundle);
+        return experimentRunFragment;
     }
 
     @Override
     public int getCount() {
-        List<IExperimentSensor> list = experimentRun.getExperimentSensors();
-        return list.size();
+        return sensorCount;
     }
 
     public int getItemPosition(Object object) {

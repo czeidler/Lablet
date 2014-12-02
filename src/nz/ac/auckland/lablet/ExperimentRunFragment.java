@@ -20,33 +20,21 @@ import java.util.List;
 public class ExperimentRunFragment extends android.support.v4.app.Fragment {
     private IExperimentSensor sensor;
 
-    public ExperimentRunFragment(IExperimentSensor sensor) {
-        super();
-
-        this.sensor = sensor;
-    }
-
     public ExperimentRunFragment() {
         super();
     }
 
     private IExperimentSensor findExperimentFromArguments(Activity activity) {
-        String name = getArguments().getString("experiment_name", "");
+        int sensorId = getArguments().getInt("sensor", 0);
         List<IExperimentSensor> activeSensors = ((ExperimentActivity)activity).getActiveSensors();
-        IExperimentSensor foundSensor = null;
-        for (IExperimentSensor sensor : activeSensors) {
-            String sensorName = sensor.getClass().getSimpleName();
-            if (sensorName.equals(name)) {
-                foundSensor = sensor;
-                break;
-            }
-        }
-        return foundSensor;
+        return activeSensors.get(sensorId);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        this.sensor = findExperimentFromArguments(getActivity());
+
         if (savedInstanceState != null) {
             ExperimentActivity activity = (ExperimentActivity)getActivity();
             int index = savedInstanceState.getInt("component", -1);
