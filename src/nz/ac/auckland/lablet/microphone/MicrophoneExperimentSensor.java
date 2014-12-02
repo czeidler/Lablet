@@ -172,7 +172,12 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
             if (!storageDir.mkdirs())
                 return false;
         File target = new File(storageDir, audioFileName);
-        return StorageLib.moveFile(audioFile, target);
+        try {
+            return StorageLib.moveFile(audioFile, target);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private class AudioRecordingTask {

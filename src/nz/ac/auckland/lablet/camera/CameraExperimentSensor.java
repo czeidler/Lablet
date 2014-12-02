@@ -494,7 +494,12 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             if (!storageDir.mkdirs())
                 return false;
         File target = new File(storageDir, getVideoFileName());
-        return StorageLib.moveFile(videoFile, target);
+        try {
+            return StorageLib.moveFile(videoFile, target);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private void onCamcorderProfileChanged(VideoSettings videoSettings) {

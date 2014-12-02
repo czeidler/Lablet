@@ -77,7 +77,7 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
     public void onPause() {
         super.onPause();
 
-        if (experimentAnalysis.getNumberOfRuns() == 0)
+        if (experimentAnalysis == null || experimentAnalysis.getNumberOfRuns() == 0)
             return;
 
         final ExperimentData experimentData = experimentAnalysis.getExperimentData();

@@ -98,11 +98,6 @@ public class ExportDirDialog extends AlertDialog {
                             int totalProgress = 0;
 
                             @Override
-                            public int getReportingStep() {
-                                return 10 * 1024;
-                            }
-
-                            @Override
                             public void onNewProgress(int progress) {
                                 totalProgress += progress;
                                 String status = "Zipping: " + dir.getName() + " " + totalProgress / 1000 + "/"

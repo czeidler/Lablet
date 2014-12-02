@@ -8,10 +8,7 @@
 package nz.ac.auckland.lablet.misc;
 
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.channels.FileChannel;
 
 /**
@@ -24,7 +21,6 @@ import java.nio.channels.FileChannel;
  * TODO: add listener interfaces to monitor copy, move, delete... progress
  */
 public class StorageLib {
-
     /**
      * I file is a directory it deletes it recursively. If it is just a file it just deletes this file.
      * @param file
@@ -47,15 +43,14 @@ public class StorageLib {
      * @param destination
      * @return false on failure
      */
-    static public boolean moveFile(File source, File destination) {
+    static public boolean moveFile(File source, File destination) throws IOException {
         if (source.isDirectory())
             return false;
         // first try to just rename the file
         if (source.renameTo(destination))
             return true;
         // this could have failed because the file is on different storage cards so to a hard copy and then delete it
-        if (!copyFile(source, destination))
-            return false;
+        copyFile(source, destination);
 
         return source.delete();
     }
@@ -66,18 +61,19 @@ public class StorageLib {
      * @param destination
      * @return false on failure
      */
-    static public boolean copyFile(File source, File destination) {
-        try {
-            FileInputStream inStream = new FileInputStream(source);
-            FileOutputStream outStream = new FileOutputStream(destination);
-            FileChannel inChannel = inStream.getChannel();
-            inChannel.transferTo(0, inChannel.size(), outStream.getChannel());
-            inStream.close();
-            outStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
+    static public void copyFile(File source, File destination) throws IOException {
+        FileInputStream inStream = new FileInputStream(source);
+        FileOutputStream outStream = new FileOutputStream(destination);
+        FileChannel inChannel = inStream.getChannel();
+        inChannel.transferTo(0, inChannel.size(), outStream.getChannel());
+        inStream.close();
+        outStream.close();
+    }
+
+    static public void copyFile(File source, File destination, StreamHelper.IProgressListener listener, int reportingStep)
+            throws IOException {
+        FileInputStream inStream = new FileInputStream(source);
+        FileOutputStream outStream = new FileOutputStream(destination);
+        StreamHelper.copy(inStream, outStream, listener, reportingStep);
     }
 }

@@ -52,17 +52,13 @@ public class ExperimentData {
             return null;
         }
 
-        String experimentIdentifier = bundle.getString("sensor_name");
-        if (experimentIdentifier == null) {
-            loadError = "invalid experiment data";
-            return null;
-        }
-
         Bundle experimentData = bundle.getBundle("data");
         if (experimentData == null) {
             loadError = "failed to load experiment data";
             return null;
         }
+
+        String experimentIdentifier = bundle.getString("sensor_name", "");
 
         ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
         ISensorPlugin plugin = factory.findSensorPlugin(experimentIdentifier);
@@ -94,10 +90,13 @@ public class ExperimentData {
         switch (dataType) {
             case MicrophoneSensorData.DATA_TYPE:
                 sensorData = new MicrophoneSensorData(context);
+                break;
             case CameraSensorData.DATA_TYPE:
                 sensorData = new CameraSensorData(context);
+                break;
             case AccelerometerSensorData.DATA_TYPE:
                 sensorData = new AccelerometerSensorData(context);
+                break;
         }
         if (sensorData != null) {
             try {

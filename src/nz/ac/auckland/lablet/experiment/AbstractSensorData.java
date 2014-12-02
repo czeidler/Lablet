@@ -20,7 +20,7 @@ import java.io.IOException;
  * Abstract base class for experiments.
  */
 abstract public class AbstractSensorData implements ISensorData {
-    private String uid;
+    private String uid = "";
     protected Context context;
 
     private File storageDir;
@@ -59,6 +59,10 @@ abstract public class AbstractSensorData implements ISensorData {
         return uid;
     }
 
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
     @Override
     public File getStorageDir() {
         return storageDir;
@@ -76,7 +80,8 @@ abstract public class AbstractSensorData implements ISensorData {
         this.storageDir = storageDir;
 
         Bundle bundle = new Bundle();
-        bundle.putString("sensor_name", sourceSensor.getSensorName());
+        if (sourceSensor != null)
+            bundle.putString("sensor_name", sourceSensor.getSensorName());
         Bundle experimentData = experimentDataToBundle();
         bundle.putBundle("data", experimentData);
 
@@ -89,6 +94,7 @@ abstract public class AbstractSensorData implements ISensorData {
         FileWriter fileWriter = new FileWriter(projectFile);
         PersistentBundle persistentBundle = new PersistentBundle();
         persistentBundle.flattenBundle(bundle, fileWriter);
+        fileWriter.close();
     }
 
     /**
