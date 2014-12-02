@@ -107,6 +107,8 @@ class FourierRenderScript {
     }
 
     public float[] renderScriptFFT(float[] data, int windowSize, float stepFactor) {
+        if (data.length == 0)
+            return new float[0];
         final int stepWidth =  (int)(stepFactor * windowSize);
         final int nSteps = data.length / stepWidth;
         final int outputSize = nSteps * windowSize / 2;

@@ -10,11 +10,6 @@ package nz.ac.auckland.lablet.views;
 import android.graphics.RectF;
 import nz.ac.auckland.lablet.views.plotview.*;
 
-import java.util.AbstractList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 
 public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
     private FixSizedBunchArray data = null;

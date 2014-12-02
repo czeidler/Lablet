@@ -86,13 +86,14 @@ class FixSizedBunchArray extends AbstractList<Float> {
     }
 }
 
-
 public class AudioAmplitudePlotDataAdapter extends AbstractXYDataAdapter {
     private FixSizedBunchArray data = null;
     private float amplitudeMax = 65535;
     private int sampleRate = 44100;
 
     public void addData(float amplitudes[]) {
+        if (amplitudes.length == 0)
+            return;
         if (data == null)
             data = new FixSizedBunchArray(amplitudes.length);
 
@@ -153,7 +154,7 @@ public class AudioAmplitudePlotDataAdapter extends AbstractXYDataAdapter {
     }
 
     public int getTotalTime() {
-        return getSize() / sampleRate * 1000;
+        return getSize() * 1000 / sampleRate;
     }
 
     @Override
