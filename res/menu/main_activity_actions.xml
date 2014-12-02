@@ -10,6 +10,10 @@
           android:icon="@drawable/ic_action_delete"
           android:title="@string/action_delete"
           yourapp:showAsAction="ifRoom|withText"/>
+    <item android:id="@+id/action_import"
+          android:icon="@drawable/ic_action_import"
+          android:title="@string/action_import"
+          yourapp:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/action_scripts"
           android:icon="@drawable/ic_console"
           android:title="@string/action_scripts"

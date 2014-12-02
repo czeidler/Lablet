@@ -9,6 +9,8 @@ package nz.ac.auckland.lablet;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,9 +21,11 @@ import android.view.*;
 import android.widget.*;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
 import nz.ac.auckland.lablet.experiment.ExperimentPluginFactory;
+import nz.ac.auckland.lablet.experiment.IImportPlugin;
 import nz.ac.auckland.lablet.experiment.ISensorPlugin;
 import nz.ac.auckland.lablet.misc.NaturalOrderComparator;
 import nz.ac.auckland.lablet.misc.StorageLib;
+import nz.ac.auckland.lablet.misc.aFileDialog.FileChooserDialog;
 import nz.ac.auckland.lablet.views.*;
 
 import java.io.File;
@@ -140,6 +144,17 @@ public class ExperimentHomeActivity extends Activity {
             }
         });
 
+        // import item
+        MenuItem importItem = menu.findItem(R.id.action_import);
+        assert(importItem != null);
+        importItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                showImportMenu();
+                return true;
+            }
+        });
+
         // delete item
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -187,6 +202,26 @@ public class ExperimentHomeActivity extends Activity {
         return true;
     }
 
+    private void showImportMenu() {
+        final View menuView = findViewById(R.id.action_import);
+        final List<IImportPlugin> importPlugins = ExperimentPluginFactory.getFactory().getImportPlugins();
+        PopupMenu popup = new PopupMenu(this, menuView);
+        for (int i = 0; i < importPlugins.size(); i++) {
+            IImportPlugin plugin = importPlugins.get(i);
+            popup.getMenu().add(0, i, Menu.NONE, plugin.getName());
+        }
+
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                int item = menuItem.getItemId();
+                importData(importPlugins.get(item));
+                return false;
+            }
+        });
+        popup.show();
+    }
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         boolean atLeastOneExperimentSelected = isAtLeastOneExperimentSelected();
@@ -194,6 +229,32 @@ public class ExperimentHomeActivity extends Activity {
         exportItem.setVisible(atLeastOneExperimentSelected);
 
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void importData(final IImportPlugin plugin) {
+        FileChooserDialog dialog = new FileChooserDialog(this);
+        dialog.setFilter(plugin.getFileFilter());
+        final Activity activity = this;
+        dialog.addListener(new FileChooserDialog.OnFileSelectedListener() {
+            @Override
+            public void onFileSelected(final Dialog source, File file) {
+                Context context = source.getContext();
+                plugin.importData(activity, file, ExperimentAnalysisBaseActivity.getDefaultExperimentBaseDir(context),
+                        new IImportPlugin.IListener() {
+                    @Override
+                    public void onImportFinished(boolean successful) {
+                        source.dismiss();
+                        updateExperimentList();
+                    }
+                });
+            }
+
+            @Override
+            public void onFileSelected(Dialog source, File folder, String name) {
+
+            }
+        });
+        dialog.show();
     }
 
     private void exportSelection() {

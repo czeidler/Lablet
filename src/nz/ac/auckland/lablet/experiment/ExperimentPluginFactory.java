@@ -11,6 +11,7 @@ import nz.ac.auckland.lablet.accelerometer.AccelerometerAnalysisPlugin;
 import nz.ac.auckland.lablet.accelerometer.AccelerometerSensorPlugin;
 import nz.ac.auckland.lablet.camera.MotionAnalysisPlugin;
 import nz.ac.auckland.lablet.camera.CameraSensorPlugin;
+import nz.ac.auckland.lablet.camera.VideoImportPlugin;
 import nz.ac.auckland.lablet.microphone.FrequencyAnalysisPlugin;
 import nz.ac.auckland.lablet.microphone.MicrophoneSensorPlugin;
 
@@ -26,6 +27,7 @@ public class ExperimentPluginFactory {
 
     private List<ISensorPlugin> sensorPlugins = new ArrayList<>();
     private List<IAnalysisPlugin> analysisPlugins = new ArrayList<>();
+    private List<IImportPlugin> importPlugins = new ArrayList<>();
 
     private ExperimentPluginFactory() {
         analysisPlugins.add(new MotionAnalysisPlugin());
@@ -35,6 +37,8 @@ public class ExperimentPluginFactory {
         sensorPlugins.add(new CameraSensorPlugin());
         sensorPlugins.add(new MicrophoneSensorPlugin());
         sensorPlugins.add(new AccelerometerSensorPlugin());
+
+        importPlugins.add(new VideoImportPlugin());
     }
 
     /**
@@ -48,6 +52,10 @@ public class ExperimentPluginFactory {
 
     public List<IAnalysisPlugin> getAnalysisPlugins() {
         return analysisPlugins;
+    }
+
+    public List<IImportPlugin> getImportPlugins() {
+        return importPlugins;
     }
 
     /**
