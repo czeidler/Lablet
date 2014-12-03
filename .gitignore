@@ -1,5 +1,6 @@
 # build files
 out/*
+build/*
 gen/*
 LabletTests/gen/*
 
@@ -9,6 +10,10 @@ build.xml
 local.properties
 Project_Default.xml
 profiles_settings.xml
+.idea/libraries/*
+
+.gradle/*
+
 
 # other files
 ant.properties
