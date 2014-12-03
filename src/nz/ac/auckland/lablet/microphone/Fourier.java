@@ -137,4 +137,8 @@ class FourierRenderScript {
 
         return out;
     }
+
+    public void release() {
+        renderScript.destroy();
+    }
 }
