@@ -432,7 +432,7 @@ public class FrequencyAnalysisView extends FrameLayout {
                 @Override
                 protected Void doInBackground(Void... params) {
                     float[] frequencies;
-                    if (useRenderScript && false) {
+                    if (useRenderScript) {
                         final FourierRenderScript fourierRenderScript = new FourierRenderScript(getContext());
                         frequencies = fourierRenderScript.renderScriptFFT(amplitudes, newWindowSize, newStepFactor);
                         fourierRenderScript.release();
