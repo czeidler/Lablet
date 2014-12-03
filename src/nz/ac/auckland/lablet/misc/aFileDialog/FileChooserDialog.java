@@ -74,8 +74,8 @@ public class FileChooserDialog extends Dialog implements FileChooser {
 		// Maximize the dialog.
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(this.getWindow().getAttributes());
-        lp.width = WindowManager.LayoutParams.FILL_PARENT;
-        lp.height = WindowManager.LayoutParams.FILL_PARENT;
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
         this.getWindow().setAttributes(lp);
         
         // By default, load the SD card files.

@@ -9,17 +9,12 @@ package nz.ac.auckland.lablet.script.components;
 
 import android.content.Context;
 import nz.ac.auckland.lablet.ExperimentAnalysis;
-import nz.ac.auckland.lablet.ExperimentAnalysisBaseActivity;
-import nz.ac.auckland.lablet.camera.CameraSensorData;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
 import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
-import nz.ac.auckland.lablet.experiment.ISensorData;
 import nz.ac.auckland.lablet.microphone.FrequencyAnalysis;
 import nz.ac.auckland.lablet.misc.WeakListenable;
-
-import java.io.File;
 
 
 /**

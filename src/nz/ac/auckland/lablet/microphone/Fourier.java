@@ -12,7 +12,6 @@ import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import edu.emory.mathcs.jtransforms.dct.FloatDCT_1D;
-import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
 import nz.ac.auckland.lablet.R;
 
 import java.util.Arrays;
