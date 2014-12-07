@@ -41,9 +41,13 @@ public class Fourier {
         return transformInternal(trafo);
     }
 
+    static int getNSteps(int dataLength, int windowSize, int stepWidth) {
+        return (dataLength - windowSize) / stepWidth + 1;
+    }
+
     static public float[] transform(float[] data, int windowSize, float stepFactor) {
         final int stepWidth =  (int)(stepFactor * windowSize);
-        final int nSteps = data.length / stepWidth;
+        final int nSteps = getNSteps(data.length, windowSize, stepWidth);
         final int outputSize = nSteps * windowSize / 2;
         final float[] out = new float[outputSize];
 
@@ -109,16 +113,20 @@ class FourierRenderScript {
         if (data.length == 0)
             return new float[0];
         final int stepWidth =  (int)(stepFactor * windowSize);
-        final int nSteps = data.length / stepWidth;
+        final int nSteps = Fourier.getNSteps(data.length, windowSize, stepWidth);
         final int outputSize = nSteps * windowSize / 2;
 
-        Allocation dataAllocation = Allocation.createSized(renderScript, Element.F32(renderScript), data.length);
+        Allocation dataAllocation = Allocation.createSized(renderScript, Element.F32(renderScript), data.length,
+                Allocation.USAGE_SHARED);
         dataAllocation.copyFrom(data);
-        Allocation outAllocation = Allocation.createSized(renderScript, Element.F32(renderScript), outputSize);
+        final float[] out = new float[outputSize];
+        Allocation outAllocation = Allocation.createSized(renderScript, Element.F32(renderScript), outputSize,
+                Allocation.USAGE_SHARED);
+        outAllocation.copyFrom(out);
 
         final int[] inStartValues = new int[nSteps];
         for (int i = 0; i < nSteps; i++)
-            inStartValues[i] = i * stepWidth;
+            inStartValues[i] = i;
 
         Allocation inAllocation = Allocation.createSized(renderScript, Element.I32(renderScript), nSteps);
         inAllocation.copyFrom(inStartValues);
@@ -127,9 +135,8 @@ class FourierRenderScript {
         script.set_gStepWidth(stepWidth);
         script.bind_gData(dataAllocation);
         script.bind_gOutput(outAllocation);
-        script.forEach_root(inAllocation, inAllocation);
 
-        final float[] out = new float[outputSize];
+        script.forEach_root(inAllocation, inAllocation);
         outAllocation.copyTo(out);
 
         renderScript.finish();

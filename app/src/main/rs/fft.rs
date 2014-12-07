@@ -72,7 +72,8 @@ static void four1(float* data, int nn)
 
 
 void root(const int *in, int *out, const void *usrData, uint32_t x, uint32_t y) {
-    const int start = in[0];
+    const int index = *in;
+    const int start = index * gStepWidth;
 
     const int trafoLength = 2 * gWindowSize;
     // The size of trafo is actually trafoLength. But this value is not know by the compiler. However, this is still
@@ -87,7 +88,6 @@ void root(const int *in, int *out, const void *usrData, uint32_t x, uint32_t y) 
 
     four1(trafo, gWindowSize);
 
-    const int index = start / gStepWidth;
     const int outPosition = gWindowSize / 2 * index;
     for (int i = 1; i < gWindowSize; i += 2)
         gOutput[outPosition + (i - 1) / 2] = sqrt(pow(trafo[i], 2) + pow(trafo[i - 1], 2));
