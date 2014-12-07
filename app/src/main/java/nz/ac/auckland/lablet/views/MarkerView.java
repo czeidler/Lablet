@@ -424,8 +424,10 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
     }
 
     public void release() {
-        markerData.removeListener(dataListener);
-        markerData = null;
+        if (markerData != null) {
+            markerData.removeListener(dataListener);
+            markerData = null;
+        }
     }
 
     public List<IMarker> getSelectableMarkerList() {
