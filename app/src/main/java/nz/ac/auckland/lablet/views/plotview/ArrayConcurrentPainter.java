@@ -66,7 +66,7 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
                                                                      RectF requestedRealRect, RectF maxRealRect) {
         List<StrategyPainter.RenderPayload> payloads = new ArrayList<>();
 
-        if (dataAdapter == null)
+        if (dataAdapter == null || dataAdapter.getSize() == 0)
             return payloads;
         if (dirtyRegion.getSize() == 0 && requestedRealRect == null)
             return payloads;
@@ -83,8 +83,8 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
         } else {
             Range maxDirt = getDataRangeFor(maxRealRect.left, maxRealRect.right);
             if (dirtyRegion.getMin() < maxDirt.min || dirtyRegion.getMax() > maxDirt.max) {
-                maxDirt.min = Math.max(dirtyRegion.getMin(), maxDirt.min);
-                maxDirt.max = Math.min(dirtyRegion.getMax(), maxDirt.max);
+                maxDirt.min = Math.min(dirtyRegion.getMin(), maxDirt.min);
+                maxDirt.max = Math.max(dirtyRegion.getMax(), maxDirt.max);
                 dirtyRegion.clear();
                 dirtyRegion.addRange(maxDirt);
             }
