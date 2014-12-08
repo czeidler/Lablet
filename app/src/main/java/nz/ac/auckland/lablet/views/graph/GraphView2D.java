@@ -13,6 +13,7 @@ import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
 import nz.ac.auckland.lablet.views.ZoomDialog;
 import nz.ac.auckland.lablet.views.plotview.*;
 
@@ -180,8 +181,7 @@ public class GraphView2D extends PlotView {
     }
 
     private int toPixel(float densityIndependentPixel) {
-        final float scale = getResources().getDisplayMetrics().density;
-        return Math.round(densityIndependentPixel * scale);
+        return DeviceIndependentPixel.toPixel(densityIndependentPixel, this);
     }
 
     public void release() {

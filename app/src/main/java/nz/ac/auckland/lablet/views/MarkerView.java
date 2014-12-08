@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.ViewParent;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
 import nz.ac.auckland.lablet.views.plotview.*;
 
 import java.util.ArrayList;
@@ -533,8 +534,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
     }
 
     public int toPixel(float densityIndependentPixel) {
-        final float scale = containerView.getResources().getDisplayMetrics().density;
-        return Math.round(densityIndependentPixel * scale);
+        return DeviceIndependentPixel.toPixel(densityIndependentPixel, containerView);
     }
 
     protected void sanitizeScreenPoint(PointF point) {
