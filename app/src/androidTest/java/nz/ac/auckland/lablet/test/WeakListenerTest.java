@@ -5,8 +5,9 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet;
+package nz.ac.auckland.lablet.test;
 
+import android.test.suitebuilder.annotation.SmallTest;
 import junit.framework.TestCase;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 
@@ -35,6 +36,7 @@ public class WeakListenerTest extends TestCase {
         }
     }
 
+    @SmallTest
     public void test() {
         DataClass data = new DataClass();
 

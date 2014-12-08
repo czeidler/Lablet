@@ -5,15 +5,17 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet;
+package nz.ac.auckland.lablet.test;
 
 import android.os.Bundle;
+import android.test.suitebuilder.annotation.SmallTest;
 import junit.framework.TestCase;
 import nz.ac.auckland.lablet.misc.PersistentBundle;
 
 import java.io.*;
 import java.util.Arrays;
 import java.util.Set;
+
 
 public class PersistentBundleTest extends TestCase {
 
@@ -76,22 +78,27 @@ public class PersistentBundleTest extends TestCase {
         bundleBundle.putBundle("bundle", subBundle2);
     }
 
+    @SmallTest
     public void testPrimitiveBundle() throws Exception {
         assertTrue(testBundle(primitiveBundle));
     }
 
+    @SmallTest
     public void testArrayBundle() throws Exception {
         assertTrue(testBundle(arrayBundle));
     }
 
+    @SmallTest
     public void testBundleBundle() throws Exception {
         assertTrue(testBundle(bundleBundle));
     }
 
+    @SmallTest
     public void testMixedBundle() throws Exception {
         assertTrue(testBundle(mixedBundle));
     }
 
+    @SmallTest
     private boolean testBundle(Bundle bundle) throws Exception {
         // pack
         StringWriter writer = new StringWriter();

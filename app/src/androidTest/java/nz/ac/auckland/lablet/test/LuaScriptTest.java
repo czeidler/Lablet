@@ -5,13 +5,15 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet;
+package nz.ac.auckland.lablet.test;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.suitebuilder.annotation.SmallTest;
+import nz.ac.auckland.lablet.ScriptHomeActivity;
 import nz.ac.auckland.lablet.script.LuaScriptLoader;
 import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.components.ScriptComponentFragmentFactory;
@@ -40,6 +42,7 @@ public class LuaScriptTest extends ActivityInstrumentationTestCase2<ScriptHomeAc
     /**
      * Load a script and check its initial state.
      */
+    @SmallTest
     public void testScriptLoading() {
         File dir = ScriptHomeActivity.getScriptDirectory(activity);
         assertNotNull(dir);

@@ -5,8 +5,9 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet;
+package nz.ac.auckland.lablet.test;
 
+import android.test.suitebuilder.annotation.SmallTest;
 import junit.framework.TestCase;
 import nz.ac.auckland.lablet.views.plotview.Range;
 import nz.ac.auckland.lablet.views.plotview.Region1D;
@@ -16,6 +17,7 @@ import java.util.List;
 
 
 public class Region1DTest extends TestCase {
+    @SmallTest
     public void testRanges() {
         Region1D region1D = new Region1D();
 
