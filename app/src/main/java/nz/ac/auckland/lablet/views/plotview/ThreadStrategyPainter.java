@@ -35,12 +35,17 @@ class ThreadRenderTask {
     Runnable renderRunnable = new Runnable() {
         @Override
         public void run() {
-            Bitmap bitmap = cookie.bitmap;
-            Canvas bitmapCanvas = new Canvas(bitmap);
-            for (StrategyPainter.RenderPayload payload : cookie.payloads)
-                payload.getPainter().render(bitmapCanvas, payload);
+            try {
+                Bitmap bitmap = cookie.bitmap;
+                Canvas bitmapCanvas = new Canvas(bitmap);
+                for (StrategyPainter.RenderPayload payload : cookie.payloads)
+                    payload.getPainter().render(bitmapCanvas, payload);
 
-            publishBitmap(cookie);
+                publishBitmap(cookie);
+            } catch (Exception e) {
+                e.printStackTrace();
+                running.set(false);
+            }
         }
     };
 
