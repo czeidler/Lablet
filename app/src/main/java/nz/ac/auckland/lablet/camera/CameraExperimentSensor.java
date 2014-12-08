@@ -215,7 +215,6 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
      */
     class VideoSettings {
         public Integer cameraProfile;
-        public Integer cameraTimeLapseProfile = -1;
         public Camera.Size videoSize;
     }
 
@@ -409,41 +408,33 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         }
         popup.getMenu().setGroupCheckable(RESOLUTION_GROUP_ID, true, true);
 
-        final int TIME_LAPSE_GROUP_ID = 2;
-        final int TIME_LAPSE_ITEM_ID = RESOLUTION_ITEM_BASE + supportedVideoSettings.size();
-        if (supportsTimeLapse()) {
-            String timeLapseLabel = "Recording Frame Rate";
-            timeLapseLabel += " (" + new DecimalFormat("#.##").format(recordingFrameRate) + "fps)";
-            popup.getMenu().add(TIME_LAPSE_GROUP_ID, TIME_LAPSE_ITEM_ID, Menu.NONE, timeLapseLabel);
-            popup.getMenu().getItem(supportedVideoSettings.indexOf(selectedVideoSettings)).setChecked(true);
+        final int FRAME_RATE_GROUP_ID = 2;
+        final int FRAME_RATE_ITEM_ID = RESOLUTION_ITEM_BASE + supportedVideoSettings.size();
 
-            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
-                    int itemId = menuItem.getItemId();
-                    if (itemId == TIME_LAPSE_ITEM_ID) {
-                        showTimeLapseSettingsDialog();
-                        return true;
-                    }
-                    VideoSettings videoSettings = supportedVideoSettings.get(itemId);
-                    onCamcorderProfileChanged(videoSettings);
+        // frame rate
+        String recordingFrameRateLabel = "Recording Frame Rate";
+        recordingFrameRateLabel += " (" + new DecimalFormat("#.##").format(recordingFrameRate) + "fps)";
+        popup.getMenu().add(FRAME_RATE_GROUP_ID, FRAME_RATE_ITEM_ID, Menu.NONE, recordingFrameRateLabel);
+        popup.getMenu().getItem(supportedVideoSettings.indexOf(selectedVideoSettings)).setChecked(true);
+
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                int itemId = menuItem.getItemId();
+                if (itemId == FRAME_RATE_ITEM_ID) {
+                    showFrameRateSettingsDialog();
                     return true;
                 }
-            });
-        }
+                VideoSettings videoSettings = supportedVideoSettings.get(itemId);
+                onCamcorderProfileChanged(videoSettings);
+                return true;
+            }
+        });
 
         popup.show();
     }
 
-    private boolean supportsTimeLapse() {
-        for (VideoSettings settings : supportedVideoSettings) {
-            if (settings.cameraTimeLapseProfile >= 0)
-                return true;
-        }
-        return false;
-    }
-
-    private void showTimeLapseSettingsDialog() {
+    private void showFrameRateSettingsDialog() {
         FrameRateSettingsDialog dialog = new FrameRateSettingsDialog(getActivity(), this);
         dialog.show();
     }
@@ -508,7 +499,9 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         parameters.setRecordingHint(true);
         parameters.setPreviewSize(selectedVideoSettings.videoSize.width, selectedVideoSettings.videoSize.height);
 
+        camera.stopPreview();
         camera.setParameters(parameters);
+        camera.startPreview();
 
         notifySettingsChanged();
     }
@@ -518,8 +511,6 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         if (CamcorderProfile.hasProfile(cameraId, profile)) {
             VideoSettings videoSettings = new VideoSettings();
             videoSettings.cameraProfile = profile;
-            if (CamcorderProfile.hasProfile(cameraId, timeLapseProfile))
-                videoSettings.cameraTimeLapseProfile = timeLapseProfile;
             list.add(videoSettings);
         }
     }
