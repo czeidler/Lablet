@@ -25,7 +25,7 @@ function onBuildExperimentScript(scriptBuilder)
 	-- some standard graphs:
 	graphSheet:addMotionAnalysisGraph(cameraExperiment):showXVsYPosition()
 	graphSheet:addMotionAnalysisGraph(cameraExperiment):showTimeVsXSpeed()
-	graphSheet:addMotionAnalysisGraph(cameraExperiment):showTimeVsYSpeed(cameraExperiment)
+	graphSheet:addMotionAnalysisGraph(cameraExperiment):showTimeVsYSpeed()
 	--[[ build a custom graph, possible axis are:
 	time, x-position, y-position, x-speed, y-speed
 	--]]

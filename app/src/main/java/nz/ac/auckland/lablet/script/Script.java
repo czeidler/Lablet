@@ -50,6 +50,8 @@ public class Script {
      * @return true if script is ok
      */
     public boolean initCheck() {
+        if (root == null)
+            return false;
         java.util.Iterator<ScriptTreeNode> iterator = root.iterator();
         while (true) {
             if (!iterator.hasNext())

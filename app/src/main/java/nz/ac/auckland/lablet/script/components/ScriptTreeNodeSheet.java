@@ -305,7 +305,7 @@ class MotionAnalysisGraphView extends ScriptComponentViewHolder {
         return true;
     }
 
-    public void showXVsYPosition(ScriptExperimentRef experiment, SheetGroupLayout parent) {
+    public void showXVsYPosition() {
         setTitle("Position Data");
         setXAxisContent("x-position");
         setYAxisContent("y-position");
@@ -317,7 +317,7 @@ class MotionAnalysisGraphView extends ScriptComponentViewHolder {
         setYAxisContent("x-velocity");
     }
 
-    public void showTimeVsYSpeed(ScriptExperimentRef experiment, SheetGroupLayout parent) {
+    public void showTimeVsYSpeed() {
         setTitle("Y-Velocity vs. Time");
         setXAxisContent("time_v");
         setYAxisContent("y-velocity");
