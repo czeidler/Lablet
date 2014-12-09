@@ -339,6 +339,15 @@ public class RangeDrawingView extends ViewGroup {
         return screen;
     }
 
+    public RectF fromScreen(RectF screen) {
+        RectF real = new RectF();
+        real.left = fromScreenX(screen.left);
+        real.top = fromScreenY(screen.top);
+        real.right = fromScreenX(screen.right);
+        real.bottom = fromScreenY(screen.bottom);
+        return real;
+    }
+
     public void applyRangeMatrix(Canvas canvas) {
         canvas.scale(getXScale(), getYScale());
         canvas.translate(-rangeRect.left, -rangeRect.top);
