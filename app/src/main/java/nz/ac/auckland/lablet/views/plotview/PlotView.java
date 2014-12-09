@@ -276,14 +276,16 @@ public class PlotView extends ViewGroup {
             if (limits == null)
                 limits = limitsToAdd;
             else {
-                if (limits.left > limitsToAdd.left)
-                    limits.left = limitsToAdd.left;
-                if (limits.top > limitsToAdd.top)
-                    limits.top = limitsToAdd.top;
-                if (limits.right < limitsToAdd.right)
-                    limits.right = limitsToAdd.right;
-                if (limits.bottom < limitsToAdd.bottom)
-                    limits.bottom = limitsToAdd.bottom;
+                NormRectF normLimits = new NormRectF(limits);
+                NormRectF normLimitsToAdd = new NormRectF(limitsToAdd);
+                if (normLimits.getLeft() > normLimitsToAdd.getLeft())
+                    normLimits.setLeft(normLimitsToAdd.getLeft());
+                if (normLimits.getTop() > normLimitsToAdd.getTop())
+                    normLimits.setTop(normLimitsToAdd.getTop());
+                if (normLimits.getRight() < normLimitsToAdd.getRight())
+                    normLimits.setRight(normLimitsToAdd.getRight());
+                if (normLimits.getBottom() < normLimitsToAdd.getBottom())
+                    normLimits.setBottom(normLimitsToAdd.getBottom());
             }
             return limits;
         }
@@ -504,6 +506,7 @@ public class PlotView extends ViewGroup {
 
     public void addPlotPainter(IPlotPainter painter) {
         mainView.addPlotPainter(painter);
+        painter.invalidate();
     }
 
     protected void removePlotPainter(IPlotPainter painter) {
@@ -570,9 +573,19 @@ public class PlotView extends ViewGroup {
     }
 
     public void autoZoom() {
+        boolean autoRangeWasNull = false;
+        if (autoRange == null) {
+            setAutoRange(AUTO_RANGE_ZOOM_EXTENDING, AUTO_RANGE_ZOOM_EXTENDING);
+            autoRangeWasNull = true;
+        }
+
         RectF limits = autoRange.getDataLimits();
         if (limits == null)
             return;
+
+        if (autoRangeWasNull)
+            setAutoRange(AUTO_RANGE_DISABLED, AUTO_RANGE_DISABLED);
+
         setXRange(limits.left, limits.right);
         setYRange(limits.bottom, limits.top);
     }
@@ -604,6 +617,10 @@ public class PlotView extends ViewGroup {
 
     public void setMaxYRange(float bottom, float top) {
         mainView.setMaxYRange(bottom, top);
+    }
+
+    public void setMaxRange(RectF range) {
+        mainView.setMaxRange(range);
     }
 
     public void setMinXRange(float range) {

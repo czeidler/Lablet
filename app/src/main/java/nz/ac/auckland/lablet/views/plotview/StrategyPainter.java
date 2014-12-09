@@ -87,6 +87,7 @@ abstract public class StrategyPainter extends AbstractPlotPainter {
     public void addChild(ConcurrentPainter painter) {
         childPainters.add(painter);
         painter.setParent(this);
+        invalidate();
     }
 
     public void removedChild(ConcurrentPainter painter) {

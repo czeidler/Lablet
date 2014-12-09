@@ -10,6 +10,7 @@ package nz.ac.auckland.lablet.accelerometer;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -63,6 +64,10 @@ public class Vector4DFragmentView extends FrameLayout {
         legend.addEntry(zPainter, "z-acceleration");
         plotView.addForegroundPainter(legend);
 
-        plotView.setAutoRange(PlotView.AUTO_RANGE_ZOOM_EXTENDING, PlotView.AUTO_RANGE_ZOOM_EXTENDING);
+        plotView.autoZoom();
+        RectF range = plotView.getRange();
+        plotView.setMaxRange(range);
+        plotView.setDraggable(true);
+        plotView.setZoomable(true);
     }
 }

@@ -86,6 +86,7 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
         bufferBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         bufferCanvas = new Canvas(bufferBitmap);
         setBufferRealRect(containerViewRangeToBufferRange(containerView.getRange()));
+        invalidate();
     }
 
     @Override

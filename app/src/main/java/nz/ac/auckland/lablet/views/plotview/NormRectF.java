@@ -56,25 +56,29 @@ public class NormRectF {
     public void setLeft(float value) {
         if (isXInverted)
             rect.right = value;
-        rect.left = value;
+        else
+            rect.left = value;
     }
 
     public void setRight(float value) {
         if (isXInverted)
             rect.left = value;
-        rect.right = value;
+        else
+            rect.right = value;
     }
 
     public void setTop(float value) {
         if (isYInverted)
             rect.bottom = value;
-        rect.top = value;
+        else
+            rect.top = value;
     }
 
     public void setBottom(float value) {
         if (isYInverted)
             rect.top = value;
-        rect.bottom = value;
+        else
+            rect.bottom = value;
     }
 
     public RectF get() {
