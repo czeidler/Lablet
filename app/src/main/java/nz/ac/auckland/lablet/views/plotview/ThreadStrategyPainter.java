@@ -155,7 +155,7 @@ public class ThreadStrategyPainter extends BufferedStrategyPainter {
             RectF viewRange = getContainerView().getRange();
             RectF range = newDirt;
             if (invalidated)
-                range = containerViewRangeToBufferRange(viewRange);
+                range = enlargeViewRangeToBufferRange(viewRange);
 
             List<RenderPayload> dirt = collectAllRenderPayloads(true, range, viewRange);
             if (dirt.size() == 0)
