@@ -9,10 +9,7 @@ package nz.ac.auckland.lablet.views.plotview.axes;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
-import nz.ac.auckland.lablet.views.plotview.PlotView;
 
 
 public class XAxisView extends AbstractXAxis {
@@ -53,12 +50,12 @@ public class XAxisView extends AbstractXAxis {
     public float optimalHeight() {
         final float titleHeight = titlePaint.descent() - titlePaint.ascent();
         // axis
-        float optimalWidth = settings.getFullTickSize() + titleHeight;
+        float optimalHeight = settings.getFullTickSize() + titleHeight;
         // title and uni
         if (!title.equals("") || !unit.equals(""))
-            optimalWidth += titleHeight;
+            optimalHeight += titleHeight;
 
-        return optimalWidth;
+        return optimalHeight;
     }
 
     private void calculateAxisOffsets() {
@@ -90,9 +87,8 @@ public class XAxisView extends AbstractXAxis {
 
         if (labels == null)
             return;
-        for (int i = 0; i < labels.size(); i++) {
-            LabelPartitioner.LabelEntry entry = labels.get(i);
-            float position = 0;
+        for (LabelPartitioner.LabelEntry entry : labels) {
+            float position;
             if (realRight < realLeft)
                 position = getAxisRightOffset() - entry.relativePosition * getAxisLength();
             else

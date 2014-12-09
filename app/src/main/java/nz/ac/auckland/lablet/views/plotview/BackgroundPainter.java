@@ -43,6 +43,7 @@ public class BackgroundPainter extends AbstractPlotPainter {
         backgroundPaint.setStyle(Paint.Style.FILL);
 
         mainGridPaint.setColor(DEFAULT_MAIN_GRID_COLOR);
+        mainGridPaint.setStrokeWidth(1f);
     }
 
     public Paint getBackgroundPaint() {

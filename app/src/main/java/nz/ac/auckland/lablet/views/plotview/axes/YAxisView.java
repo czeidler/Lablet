@@ -9,10 +9,7 @@ package nz.ac.auckland.lablet.views.plotview.axes;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
-import nz.ac.auckland.lablet.views.plotview.PlotView;
 
 import java.util.List;
 
@@ -60,8 +57,8 @@ public class YAxisView extends AbstractYAxis {
         }
 
         float maxLabelWidth = 0;
-        for (int i = 0; i < labelEntries.size(); i++) {
-            float width = titlePaint.measureText(labelEntries.get(i).label);
+        for (LabelPartitioner.LabelEntry labelEntry : labelEntries) {
+            float width = titlePaint.measureText(labelEntry.label);
             if (width > maxLabelWidth)
                 maxLabelWidth = width;
         }
@@ -102,7 +99,7 @@ public class YAxisView extends AbstractYAxis {
             if (hasUnit)
                 completeLabel += "[" + unit + "]";
             canvas.save();
-            canvas.translate(titleHeight, ((float)(getHeight() + titlePaint.measureText(completeLabel))) / 2);
+            canvas.translate(titleHeight, (getHeight() + titlePaint.measureText(completeLabel)) / 2);
             canvas.rotate(-90);
             canvas.drawText(completeLabel, 0, 0, titlePaint);
             canvas.restore();
@@ -112,9 +109,8 @@ public class YAxisView extends AbstractYAxis {
 
         if (labels == null)
             return;
-        for (int i = 0; i < labels.size(); i++) {
-            LabelPartitioner.LabelEntry entry = labels.get(i);
-            float position = 0;
+        for (LabelPartitioner.LabelEntry entry : labels) {
+            float position;
             if (realTop < realBottom)
                 position = getAxisTopOffset() + entry.relativePosition * getAxisLength();
             else
