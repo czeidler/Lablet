@@ -51,7 +51,7 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
 
     private RectF dirtyRect = null;
 
-    private boolean bufferMoved = false;
+    private boolean bufferRangeChanged = false;
 
     private Paint offScreenPaint;
 
@@ -109,7 +109,7 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
     protected Canvas startEditingBufferBitmap(boolean clean) {
         if (bufferBitmap == null)
             return null;
-        if (!bufferMoved) {
+        if (!bufferRangeChanged) {
             if (clean)
                 bufferBitmap.eraseColor(Color.TRANSPARENT);
             return bufferCanvas;
@@ -118,10 +118,11 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
         Bitmap oldBitmap = bufferBitmap;
         bufferBitmap = bufferCache.swap(bufferBitmap);
         bufferCanvas = new Canvas(bufferBitmap);
-        bufferCanvas.drawBitmap(oldBitmap, null, bufferScreenRect, null);
+        if (!clean)
+            bufferCanvas.drawBitmap(oldBitmap, null, bufferScreenRect, null);
         setBufferRealRect(containerViewRangeToBufferRange(containerView.getRange()));
 
-        bufferMoved = false;
+        bufferRangeChanged = false;
 
         return bufferCanvas;
     }
@@ -184,13 +185,13 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
     public void onRangeChanged(RectF range, RectF oldRange, boolean keepDistance) {
         updateBufferScreenRect();
 
-        bufferMoved = true;
+        bufferRangeChanged = true;
 
         // if keepDistance is true there was no zoom and we may reuse some parts
         if (keepDistance) {
             RectF bufferRange = containerViewRangeToBufferRange(range);
             RectF bufferOldRange = containerViewRangeToBufferRange(oldRange);
-            RectF newDirt = getDirtyRect(bufferRange, bufferOldRange, keepDistance);
+            RectF newDirt = getDirtyRect(bufferRange, bufferOldRange, true);
             onNewDirtyRegions(newDirt);
         } else
             invalidate();
