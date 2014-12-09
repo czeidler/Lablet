@@ -74,7 +74,7 @@ public class XYDataAdapter extends AbstractXYDataAdapter {
         int leftIndex = Math.abs(Collections.binarySearch(xValues, leftReal, numberComparator));
         int rightIndex = Math.abs(Collections.binarySearch(xValues, rightReal, numberComparator));
 
-        leftIndex -= 2;
+        leftIndex -= 1;
         rightIndex ++;
         if (leftIndex < 0)
             leftIndex = 0;

@@ -56,7 +56,7 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
 
         int leftIndex = Math.round(leftReal.floatValue() / stepFactor * sampleRate / (2 * data.getBunchSize()) / 1000);
         int rightIndex = Math.round(rightReal.floatValue() / stepFactor * sampleRate / (2 * data.getBunchSize()) / 1000);
-        leftIndex -= 2;
+        leftIndex -= 1;
         rightIndex ++;
         if (leftIndex < 0)
             leftIndex = 0;
