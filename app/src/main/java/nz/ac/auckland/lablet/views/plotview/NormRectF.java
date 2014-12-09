@@ -84,4 +84,12 @@ public class NormRectF {
     public RectF get() {
         return rect;
     }
+
+    public float getWidth() {
+        return getRight() - getLeft();
+    }
+
+    public float getHeight() {
+        return getBottom() - getTop();
+    }
 }
