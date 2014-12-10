@@ -31,7 +31,7 @@ public class FrequencyAnalysis implements ISensorAnalysis {
         private float stepFactor = 0.5f;
         private int contrast = 127;
         private int brightness = 127;
-        private RectF range = new RectF();
+        final private RectF range = new RectF();
 
         public int getWindowSize() {
             return windowSize;

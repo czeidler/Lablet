@@ -23,17 +23,27 @@ public class Vector4DFragmentView extends FrameLayout {
         super(context);
     }
 
-    public Vector4DFragmentView(final Context context, Vector4DAnalysis analysis) {
+    public Vector4DFragmentView(final Context context, final Vector4DAnalysis analysis) {
         super(context);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         ViewGroup view = (ViewGroup) inflater.inflate(R.layout.vector4d_analysis, this, true);
+
+        RectF savedRange = new RectF(analysis.getDisplaySettings().getRange());
 
         PlotView plotView = (PlotView)view.findViewById(R.id.plotView);
         plotView.getTitleView().setTitle("Accelerometer");
         plotView.getBackgroundPainter().setShowXGrid(true);
         plotView.getBackgroundPainter().setShowYGrid(true);
         StrategyPainter strategyPainter = new ThreadStrategyPainter();
+        //StrategyPainter strategyPainter = new BufferedDirectStrategyPainter();
+
+        plotView.setRangeListener(new RangeDrawingView.IRangeListener() {
+            @Override
+            public void onRangeChanged(RectF range) {
+                analysis.getDisplaySettings().setRange(range);
+            }
+        });
 
         AccelerometerSensorData data = (AccelerometerSensorData)analysis.getData();
         XYDataAdapter xData = new XYDataAdapter(data.getTimeValues(), data.getXValues());
@@ -69,5 +79,8 @@ public class Vector4DFragmentView extends FrameLayout {
         plotView.setMaxRange(range);
         plotView.setDraggable(true);
         plotView.setZoomable(true);
+
+        if (Math.abs(savedRange.width()) > 0 && Math.abs(savedRange.height()) > 0)
+            plotView.setRange(savedRange);
     }
 }
