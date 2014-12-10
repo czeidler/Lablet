@@ -68,6 +68,10 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
         dirtyRect = null;
     }
 
+    public void setEnlargementFactor(float enlargementFactor) {
+        this.enlargementFactor = enlargementFactor;
+    }
+
     @Override
     protected void onNewDirtyRegions(@Nullable RectF newDirt) {
         if (newDirt != null) {
@@ -78,40 +82,39 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
         }
     }
 
-    protected RectF enlargeViewRangeToBufferRange(RectF range) {
-        RectF screenRange = containerView.toScreen(range);
+    protected RectF enlargeViewRangeToBufferScreenRange(RectF range) {
+        int bufferScreenWidth = (int)(containerView.getWidth() * enlargementFactor) + 2;
+        int bufferScreenHeight = (int)(containerView.getHeight() * enlargementFactor) + 2;
 
-        // enlarge for testing:
+        RectF screenRange = containerView.toScreen(range);
         float xEnlargement = screenRange.width() * (enlargementFactor - 1f) / 2;
         float yEnlargement = screenRange.height() * (enlargementFactor - 1f) / 2;
 
         screenRange.left = (float) Math.floor(screenRange.left - xEnlargement);
         screenRange.top = (float) Math.floor(screenRange.top - yEnlargement);
-        screenRange.right = (float) Math.ceil(screenRange.right + xEnlargement);
-        screenRange.bottom = (float) Math.ceil(screenRange.bottom + yEnlargement);
+        screenRange.right = screenRange.left + bufferScreenWidth;
+        screenRange.bottom = screenRange.top + bufferScreenHeight;
+
+        return screenRange;
+    }
+
+    protected RectF enlargeViewRangeToBufferRange(RectF range) {
+        RectF screenRange = enlargeViewRangeToBufferScreenRange(range);
 
         return containerView.fromScreen(screenRange);
     }
 
+    private void updateBufferRect() {
+        bufferScreenRect = enlargeViewRangeToBufferScreenRange(containerView.getRange());
+        bufferRealRect.set(containerView.fromScreen(bufferScreenRect));
+    }
+
     @Override
     public void onSizeChanged(int width, int height, int oldw, int oldh) {
-        //int bufferScreenWidth = (int)(width * enlargementFactor) + 1;
-        //int bufferScreenHeight = (int)(height * enlargementFactor) + 1;
-        int bufferScreenWidth = (int)(width * enlargementFactor);
-        int bufferScreenHeight = (int)(height * enlargementFactor);
-        bufferBitmap = Bitmap.createBitmap(bufferScreenWidth, bufferScreenHeight, Bitmap.Config.ARGB_8888);
+        updateBufferRect();
 
-        RectF enlargedRealRect = enlargeViewRangeToBufferRange(containerView.getRange());
-        // adjust the real rect to fit the pixel grid
-        /*RectF screenRect = containerView.toScreen(enlargedRealRect);
-        screenRect.left = (float) Math.floor(screenRect.left);
-        screenRect.top = (float) Math.floor(screenRect.top);
-        screenRect.right = screenRect.left + bufferScreenWidth;
-        screenRect.bottom = screenRect.top + bufferScreenHeight;
-        RectF finalRealRect = containerView.fromScreen(screenRect);
-
-        setBufferRealRect(finalRealRect);*/
-        setBufferRealRect(enlargedRealRect);
+        bufferBitmap = Bitmap.createBitmap((int)bufferScreenRect.width(), (int)bufferScreenRect.height(),
+                Bitmap.Config.ARGB_8888);
 
         bufferCanvas = new Canvas(bufferBitmap);
         bufferCanvas.translate(-bufferScreenRect.left, -bufferScreenRect.top);
@@ -121,8 +124,8 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
 
     @Override
     public Matrix getRangeMatrixCopy() {
-        float xScale = (float) bufferBitmap.getWidth() / (bufferRealRect.right - bufferRealRect.left);
-        float yScale = (float) bufferBitmap.getHeight() / (bufferRealRect.bottom - bufferRealRect.top);
+        float xScale = bufferScreenRect.width() / (bufferRealRect.right - bufferRealRect.left);
+        float yScale = bufferScreenRect.height() / (bufferRealRect.bottom - bufferRealRect.top);
 
         Matrix matrix = new Matrix();
         matrix.setScale(xScale, yScale);
@@ -150,11 +153,11 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
         bufferCanvas = new Canvas(bufferBitmap);
 
         RectF oldBufferScreenRect = bufferScreenRect;
-        setBufferRealRect(enlargeViewRangeToBufferRange(containerView.getRange()));
+        updateBufferRect();
+
         bufferCanvas.translate(-bufferScreenRect.left, -bufferScreenRect.top);
         if (!clean)
             bufferCanvas.drawBitmap(oldBitmap, null, oldBufferScreenRect, null);
-
 
         bufferRangeChanged = false;
 
@@ -215,14 +218,21 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
         return sourceN.get();
     }
 
+    // Its very difficult to stitch the old bitmap together with the new drawing (the drawing is a bit off at times).
+    private boolean forceInvalidateOnRangeChanged = true;
+
+    public void setForceInvalidateOnRangeChanged(boolean forceInvalidateOnRangeChanged) {
+        this.forceInvalidateOnRangeChanged = forceInvalidateOnRangeChanged;
+    }
+
     @Override
     public void onRangeChanged(RectF range, RectF oldRange, boolean keepDistance) {
-        updateBufferScreenRect();
+        bufferScreenRect = containerView.toScreen(bufferRealRect);
 
         bufferRangeChanged = true;
 
         // if keepDistance is true there was no zoom and we may reuse some parts
-        if (keepDistance) {
+        if (keepDistance && !forceInvalidateOnRangeChanged) {
             RectF bufferRange = enlargeViewRangeToBufferRange(range);
             RectF bufferOldRange = enlargeViewRangeToBufferRange(oldRange);
             if (!bufferRange.equals(bufferOldRange)) {
@@ -233,14 +243,5 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
             invalidate();
 
         containerView.invalidate();
-    }
-
-    private void setBufferRealRect(RectF rect) {
-        bufferRealRect.set(rect);
-        updateBufferScreenRect();
-    }
-
-    private void updateBufferScreenRect() {
-        bufferScreenRect = containerView.toScreen(bufferRealRect);
     }
 }
