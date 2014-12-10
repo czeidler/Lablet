@@ -113,8 +113,13 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
     public void onSizeChanged(int width, int height, int oldw, int oldh) {
         updateBufferRect();
 
-        bufferBitmap = Bitmap.createBitmap((int)bufferScreenRect.width(), (int)bufferScreenRect.height(),
-                Bitmap.Config.ARGB_8888);
+        int bitmapWidth = (int)bufferScreenRect.width();
+        int bitmapHeight = (int)bufferScreenRect.height();
+        if (bitmapWidth <= 0)
+            bitmapWidth = width;
+        if (bitmapHeight <= 0)
+            bitmapHeight = height;
+        bufferBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
 
         bufferCanvas = new Canvas(bufferBitmap);
         bufferCanvas.translate(-bufferScreenRect.left, -bufferScreenRect.top);
