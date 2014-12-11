@@ -93,16 +93,16 @@ public class BackgroundPainter extends AbstractPlotPainter {
         if (showXGrid) {
             List<LabelPartitioner.LabelEntry> labels = xAxisView.getLabels();
             for (LabelPartitioner.LabelEntry label : labels) {
-                int position = (int)(label.relativePosition * bounds.width());
-                canvas.drawLine(position, 0, position, bounds.height(), mainGridPaint);
+                float position = label.relativePosition * bounds.width();
+                canvas.drawLine(position, 0f, position, bounds.height(), mainGridPaint);
             }
         }
 
         if (showYGrid) {
             List<LabelPartitioner.LabelEntry> labels = yAxisView.getLabels();
             for (LabelPartitioner.LabelEntry label : labels) {
-                int position = (int)((1.f - label.relativePosition) * bounds.height());
-                canvas.drawLine(0, position, bounds.width(), position, mainGridPaint);
+                float position =(1.f - label.relativePosition) * bounds.height();
+                canvas.drawLine(0f, position, bounds.width(), position, mainGridPaint);
             }
         }
 

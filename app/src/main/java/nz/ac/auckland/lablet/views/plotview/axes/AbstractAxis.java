@@ -69,7 +69,7 @@ abstract public class AbstractAxis extends ViewGroup {
         titlePaint.setStyle(Paint.Style.STROKE);
 
         axisPaint.setColor(Color.WHITE);
-        axisPaint.setStrokeWidth(3f);
+        axisPaint.setStrokeWidth(1f);
         axisPaint.setStyle(Paint.Style.STROKE);
     }
 

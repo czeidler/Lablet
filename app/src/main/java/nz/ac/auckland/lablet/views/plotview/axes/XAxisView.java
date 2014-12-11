@@ -118,7 +118,7 @@ public class XAxisView extends AbstractXAxis {
         float tickLength = settings.getFullTickSize();
         if (!labelEntry.isFullTick)
             tickLength = settings.getShortTickSize();
-        canvas.drawLine(xPosition, 0, xPosition, tickLength, axisPaint);
+        canvas.drawLine(xPosition, 0f, xPosition, tickLength, axisPaint);
     }
 
     private float getAxisLength() {

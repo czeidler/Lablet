@@ -818,59 +818,60 @@ public class PlotView extends ViewGroup {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         final int width = right - left;
         final int height = bottom - top;
-        int titleBottom = 0;
+        float titleBottom = 0;
         if (hasTitle())
-            titleBottom = (int)titleView.getPreferredHeight();
-        final int titleHeight = titleBottom;
+            titleBottom = titleView.getPreferredHeight();
+        final float titleHeight = titleBottom;
 
-        int xAxisTop = height;
-        int xAxisLeftOffset = 0;
-        int xAxisRightOffset = 0;
+        float xAxisTop = height;
+        float xAxisLeftOffset = 0;
+        float xAxisRightOffset = 0;
         if (hasXAxis()) {
-            xAxisTop -= (int)xAxisView.optimalHeight();
-            xAxisRightOffset = (int)xAxisView.getAxisRightOffset();
-            xAxisLeftOffset = (int)xAxisView.getAxisLeftOffset();
+            xAxisTop -= xAxisView.optimalHeight();
+            xAxisRightOffset = xAxisView.getAxisRightOffset();
+            xAxisLeftOffset = xAxisView.getAxisLeftOffset();
         }
 
-        int yAxisRight = 0;
-        int yAxisTopOffset = 0;
-        int yAxisBottomOffset = 0;
+        float yAxisRight = 0;
+        float yAxisTopOffset = 0;
+        float yAxisBottomOffset = 0;
         if (hasYAxis()) {
-            final int mainAreaHeight = xAxisTop - (int)Math.max(yAxisView.getAxisTopOffset(), titleHeight);
-            yAxisRight = (int) yAxisView.optimalWidthForHeight(mainAreaHeight);
-            yAxisTopOffset = (int) yAxisView.getAxisTopOffset();
-            yAxisBottomOffset = (int)yAxisView.getAxisBottomOffset();
+            final float mainAreaHeight = xAxisTop - Math.max(yAxisView.getAxisTopOffset(), titleHeight);
+            yAxisRight = yAxisView.optimalWidthForHeight(mainAreaHeight);
+            yAxisTopOffset = yAxisView.getAxisTopOffset();
+            yAxisBottomOffset = yAxisView.getAxisBottomOffset();
         }
 
-        final Rect titleRect = new Rect(yAxisRight, 0, width, titleBottom);
-        final Rect xAxisRect = new Rect(yAxisRight - xAxisLeftOffset, xAxisTop, width, height);
-        final Rect yAxisRect = new Rect(0, Math.max(0, titleBottom - yAxisTopOffset), yAxisRight,
+        final RectF titleRect = new RectF(yAxisRight, 0, width, titleBottom);
+        final RectF xAxisRect = new RectF(yAxisRight - xAxisLeftOffset, xAxisTop, width, height);
+        final RectF yAxisRect = new RectF(0, Math.max(0, titleBottom - yAxisTopOffset), yAxisRight,
                 xAxisTop + yAxisBottomOffset);
-        final Rect mainViewRect = new Rect(yAxisRight, Math.max(titleBottom, yAxisTopOffset), width - xAxisRightOffset,
+        final RectF mainViewRect = new RectF(yAxisRight, Math.max(titleBottom, yAxisTopOffset), width - xAxisRightOffset,
                 xAxisTop);
 
         if (hasTitle()) {
-            titleView.measure(MeasureSpec.makeMeasureSpec(titleRect.width(), MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(titleRect.height(), MeasureSpec.EXACTLY));
-            titleView.layout(titleRect.left, titleRect.top, titleRect.right, titleRect.bottom);
+            titleView.measure(MeasureSpec.makeMeasureSpec((int)titleRect.width(), MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec((int)titleRect.height(), MeasureSpec.EXACTLY));
+            titleView.layout((int)titleRect.left, (int)titleRect.top, (int)titleRect.right, (int)titleRect.bottom);
         }
 
         if (hasXAxis()) {
-            xAxisView.measure(MeasureSpec.makeMeasureSpec(xAxisRect.width(), MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(xAxisRect.height(), MeasureSpec.EXACTLY));
-            xAxisView.layout(xAxisRect.left, xAxisRect.top, xAxisRect.right, xAxisRect.bottom);
+            xAxisView.measure(MeasureSpec.makeMeasureSpec((int)xAxisRect.width(), MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec((int)xAxisRect.height(), MeasureSpec.EXACTLY));
+            xAxisView.layout((int)xAxisRect.left, (int)xAxisRect.top, (int)xAxisRect.right, (int)xAxisRect.bottom);
         }
 
         if (hasYAxis()) {
-            yAxisView.measure(MeasureSpec.makeMeasureSpec(yAxisRect.width(), MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(yAxisRect.height(), MeasureSpec.EXACTLY));
-            yAxisView.layout(yAxisRect.left, yAxisRect.top, yAxisRect.right, yAxisRect.bottom);
+            yAxisView.measure(MeasureSpec.makeMeasureSpec((int)yAxisRect.width(), MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec((int)yAxisRect.height(), MeasureSpec.EXACTLY));
+            yAxisView.layout((int)yAxisRect.left, (int)yAxisRect.top, (int)yAxisRect.right, (int)yAxisRect.bottom);
         }
 
         if (mainView != null) {
-            mainView.measure(MeasureSpec.makeMeasureSpec(mainViewRect.width(), MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(mainViewRect.height(), MeasureSpec.EXACTLY));
-            mainView.layout(mainViewRect.left, mainViewRect.top, mainViewRect.right, mainViewRect.bottom);
+            mainView.measure(MeasureSpec.makeMeasureSpec((int)mainViewRect.width(), MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec((int)mainViewRect.height(), MeasureSpec.EXACTLY));
+            mainView.layout((int)mainViewRect.left, (int)mainViewRect.top, (int)mainViewRect.right,
+                    (int)mainViewRect.bottom);
         }
     }
 

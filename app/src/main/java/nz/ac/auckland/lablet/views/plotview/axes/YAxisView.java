@@ -104,8 +104,7 @@ public class YAxisView extends AbstractYAxis {
             canvas.drawText(completeLabel, 0, 0, titlePaint);
             canvas.restore();
         }
-        canvas.drawLine(getWidth() - 1, getAxisTopOffset(), getWidth() - 1, getHeight() - getAxisBottomOffset(),
-                axisPaint);
+        canvas.drawLine(getWidth(), getAxisTopOffset(), getWidth(), getHeight() - getAxisBottomOffset(), axisPaint);
 
         if (labels == null)
             return;
