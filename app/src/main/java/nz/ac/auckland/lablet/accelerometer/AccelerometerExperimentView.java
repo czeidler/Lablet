@@ -15,6 +15,9 @@ import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensorView;
 import nz.ac.auckland.lablet.views.plotview.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 class AccelerometerExperimentView extends AbstractExperimentSensorView {
     final private AccelerometerExperimentSensor sensor;
@@ -53,9 +56,19 @@ class AccelerometerExperimentView extends AbstractExperimentSensorView {
         @Override
         public void start() {
             AccelerometerSensorData data = (AccelerometerSensorData)sensor.getExperimentData();
-            xData.setTo(data.getTimeValues(), data.getXValues());
-            yData.setTo(data.getTimeValues(), data.getYValues());
-            zData.setTo(data.getTimeValues(), data.getZValues());
+
+            List<Number> timeCopy = new ArrayList<>(data.getTimeValues().size());
+            timeCopy.addAll(data.getTimeValues());
+            List<Number> xCopy = new ArrayList<>(data.getXValues().size());
+            xCopy.addAll(data.getXValues());
+            List<Number> yCopy = new ArrayList<>(data.getYValues().size());
+            yCopy.addAll(data.getYValues());
+            List<Number> zCopy = new ArrayList<>(data.getZValues().size());
+            zCopy.addAll(data.getZValues());
+
+            xData.setTo(timeCopy, xCopy);
+            yData.setTo(timeCopy, yCopy);
+            zData.setTo(timeCopy, zCopy);
 
             plotView.setAutoRange(PlotView.AUTO_RANGE_DISABLED, PlotView.AUTO_RANGE_DISABLED);
 
