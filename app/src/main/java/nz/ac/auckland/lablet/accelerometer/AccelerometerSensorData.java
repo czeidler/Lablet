@@ -31,7 +31,7 @@ public class AccelerometerSensorData extends AbstractSensorData {
     private WeakListenable<IListener> weakListenable = new WeakListenable<>();
 
     public interface IListener {
-        void onDataAdded();
+        void onDataAdded(long time, float[] data);
         void onDataCleared();
     }
 
@@ -142,9 +142,9 @@ public class AccelerometerSensorData extends AbstractSensorData {
         weakListenable.removeListener(listener);
     }
 
-    private void notifyDataAdded() {
+    private void notifyDataAdded(long time, float[] data) {
         for (IListener listener : weakListenable.getListeners())
-            listener.onDataAdded();
+            listener.onDataAdded(time, data);
     }
 
     private void notifyDataCleared() {
@@ -164,7 +164,7 @@ public class AccelerometerSensorData extends AbstractSensorData {
         xValues.add(data[0]);
         yValues.add(data[1]);
         zValues.add(data[2]);
-        notifyDataAdded();
+        notifyDataAdded(time, data);
     }
 
     public void clear() {

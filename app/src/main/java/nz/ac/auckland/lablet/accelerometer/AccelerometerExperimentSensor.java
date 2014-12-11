@@ -9,8 +9,6 @@ package nz.ac.auckland.lablet.accelerometer;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -19,123 +17,10 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
-import nz.ac.auckland.lablet.experiment.AbstractExperimentSensorView;
 import nz.ac.auckland.lablet.experiment.ISensorData;
-import nz.ac.auckland.lablet.views.plotview.*;
 
 import java.io.*;
 
-
-class AccelerometerExperimentView extends AbstractExperimentSensorView {
-    final private AccelerometerExperimentSensor sensor;
-
-    final private XYDataAdapter xData;
-    final private XYDataAdapter yData;
-    final private XYDataAdapter zData;
-    final private XYDataAdapter totalData = new XYDataAdapter();
-    final private AccelerometerSensorData.IListener dataListenerStrongRef;
-
-    final private PlotView plotView;
-
-    public AccelerometerExperimentView(Context context, AccelerometerExperimentSensor sensor) {
-        super(context);
-
-        this.sensor = sensor;
-
-        final AccelerometerSensorData data = (AccelerometerSensorData)sensor.getExperimentData();
-        dataListenerStrongRef = new AccelerometerSensorData.IListener() {
-            @Override
-            public void onDataAdded() {
-                int index = data.size() - 1;
-                final Number time = data.getTimeValues().get(index);
-                final Number x = data.getXValues().get(index);
-                final Number y = data.getYValues().get(index);
-                final Number z = data.getZValues().get(index);
-
-                totalData.addData(time.floatValue(), (float)Math.sqrt(Math.pow((float)x, 2) + Math.pow((float)y, 2)
-                        + Math.pow((float)z, 2)));
-
-                xData.notifyDataAdded(index, 1);
-                yData.notifyDataAdded(index, 1);
-                zData.notifyDataAdded(index, 1);
-            }
-
-            @Override
-            public void onDataCleared() {
-                // don't clear the x, y and z data because we don't own them
-                xData.notifyAllDataChanged();
-                yData.notifyAllDataChanged();
-                zData.notifyAllDataChanged();
-                totalData.clear();
-            }
-        };
-        data.addListener(dataListenerStrongRef);
-
-        plotView = new PlotView(context);
-        plotView.getTitleView().setTitle("Accelerometer");
-        plotView.getBackgroundPainter().setShowXGrid(true);
-        plotView.getBackgroundPainter().setShowYGrid(true);
-        resetView();
-
-        StrategyPainter strategyPainter = new BufferedDirectStrategyPainter();
-        
-        xData = new XYDataAdapter(data.getTimeValues(), data.getXValues());
-        XYConcurrentPainter xPainter = new XYConcurrentPainter(xData);
-        strategyPainter.addChild(xPainter);
-
-        yData = new XYDataAdapter(data.getTimeValues(), data.getYValues());
-        XYConcurrentPainter yPainter = new XYConcurrentPainter(yData);
-        yPainter.setPointRenderer(new CircleRenderer());
-        Paint yMarkerPaint = new Paint();
-        yMarkerPaint.setColor(Color.BLUE);
-        yPainter.getDrawConfig().setMarkerPaint(yMarkerPaint);
-        strategyPainter.addChild(yPainter);
-
-        zData = new XYDataAdapter(data.getTimeValues(), data.getZValues());
-        XYConcurrentPainter zPainter = new XYConcurrentPainter(zData);
-        Paint zMarkerPaint = new Paint();
-        zMarkerPaint.setColor(Color.RED);
-        zPainter.getDrawConfig().setMarkerPaint(zMarkerPaint);
-        zPainter.setPointRenderer(new BottomTriangleRenderer());
-        strategyPainter.addChild(zPainter);
-
-        XYConcurrentPainter totalPainter = new XYConcurrentPainter(totalData);
-        Paint totalMarkerPaint = new Paint();
-        totalMarkerPaint.setColor(Color.WHITE);
-        totalPainter.getDrawConfig().setMarkerPaint(totalMarkerPaint);
-        totalPainter.setPointRenderer(new CircleRenderer());
-        strategyPainter.addChild(totalPainter);
-
-        plotView.addPlotPainter(strategyPainter);
-
-        LegendPainter legend = new LegendPainter();
-        legend.addEntry(xPainter, "x-acceleration");
-        legend.addEntry(yPainter, "y-acceleration");
-        legend.addEntry(zPainter, "z-acceleration");
-        legend.addEntry(totalPainter, "total-acceleration");
-        plotView.addForegroundPainter(legend);
-
-        plotView.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_ZOOM_EXTENDING);
-        addView(plotView);
-    }
-
-    @Override
-    public void onSettingsChanged() {
-
-    }
-
-    @Override
-    public void onStartRecording() {
-        super.onStartRecording();
-
-        resetView();
-    }
-
-    private void resetView() {
-        plotView.setXRange(0, 20000);
-        plotView.setYRange(-0.5f, 0.5f);
-    }
-}
 
 public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     private AccelerometerSensorData data;

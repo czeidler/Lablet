@@ -7,6 +7,8 @@
  */
 package nz.ac.auckland.lablet.views.plotview;
 
+import android.support.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,6 +37,19 @@ public class XYDataAdapter extends AbstractXYDataAdapter {
         this.startIndex = startIndex;
         xValues = new ArrayList<>();
         yValues = new ArrayList<>();
+    }
+
+    public void setTo(@Nullable List<Number> xValues, @Nullable List<Number> yValues) {
+        if (xValues != null)
+            this.xValues = xValues;
+        else
+            this.xValues = new ArrayList<>();
+        if (yValues != null)
+            this.yValues = yValues;
+        else
+            this.yValues = new ArrayList<>();
+
+        notifyAllDataChanged();
     }
 
     public void addData(Number xValue, Number yValue) {
