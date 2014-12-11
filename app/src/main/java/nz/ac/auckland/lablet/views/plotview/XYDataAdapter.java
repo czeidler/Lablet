@@ -21,12 +21,6 @@ public class XYDataAdapter extends AbstractXYDataAdapter {
     private List<Number> xValues;
     private List<Number> yValues;
 
-    public XYDataAdapter(List<Number> xValues, List<Number> yValues) {
-        this.startIndex = 0;
-        this.xValues = xValues;
-        this.yValues = yValues;
-    }
-
     public XYDataAdapter() {
         this.startIndex = 0;
         xValues = new ArrayList<>();
