@@ -53,9 +53,7 @@ public class ScaleSettingsDialog extends AlertDialog {
 
         // scale length
         lengthEditText = (EditText)contentView.findViewById(R.id.lengthEditText);
-        String text = "";
-        text += calibrationSetter.getCalibrationValue();
-        lengthEditText.setText(text);
+        lengthEditText.setText(Float.toString(calibrationSetter.getCalibrationValue()));
 
         // unit spinner
         spinnerUnit = (Spinner)contentView.findViewById(R.id.spinnerUnit);

@@ -15,6 +15,7 @@ import android.widget.PopupMenu;
 import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
+import nz.ac.auckland.lablet.experiment.LengthCalibrationSetter;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 
 
@@ -50,22 +51,12 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             }
         });
 
-        final MenuItem calibrationMenu = menu.findItem(R.id.action_calibration_settings);
+        final MenuItem calibrationMenu = menu.findItem(R.id.length_scale);
         assert calibrationMenu != null;
         calibrationMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                showCalibrationMenu();
-                return true;
-            }
-        });
-
-        final MenuItem originMenu = menu.findItem(R.id.action_origin_settings);
-        assert originMenu != null;
-        originMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                showOriginPopup();
+                showCalibrationPopup();
                 return true;
             }
         });
@@ -73,22 +64,24 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         setupStandardMenu(menu, inflater);
     }
 
-    private void showCalibrationMenu() {
+    private void showLengthScaleDialog() {
         MotionAnalysis analysis = getSensorAnalysis();
         ScaleSettingsDialog scaleSettingsDialog = new ScaleSettingsDialog(getActivity(),
                 analysis.getLengthCalibrationSetter(), analysis.getXUnit(), analysis.getYUnit());
         scaleSettingsDialog.show();
     }
 
-    private void showOriginPopup() {
-        final View menuView = getActivity().findViewById(R.id.action_origin_settings);
+    private void showCalibrationPopup() {
+        final View menuView = getActivity().findViewById(R.id.length_scale);
         final PopupMenu popup = new PopupMenu(getActivity(), menuView);
-        popup.inflate(R.menu.origin_popup);
+        popup.inflate(R.menu.calibration_popup);
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 int item = menuItem.getItemId();
-                if (item == R.id.showCoordinateSystem) {
+                if (item == R.id.length_scale) {
+                    showLengthScaleDialog();
+                } else if (item == R.id.showCoordinateSystem) {
                     getSensorAnalysis().setShowCoordinateSystem(!menuItem.isChecked());
                 } else if (item == R.id.swapAxis) {
                     getSensorAnalysis().getCalibrationXY().setSwapAxis(!menuItem.isChecked());
@@ -96,8 +89,13 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                 return false;
             }
         });
-        popup.getMenu().getItem(0).setChecked(getSensorAnalysis().getShowCoordinateSystem());
-        popup.getMenu().getItem(1).setChecked(getSensorAnalysis().getCalibrationXY().getSwapAxis());
+        LengthCalibrationSetter lengthCalibrationSetter = getSensorAnalysis().getLengthCalibrationSetter();
+        MenuItem lengthItem = popup.getMenu().findItem(R.id.length_scale);
+        String lengthTitle = lengthItem.getTitle() + " (" + lengthCalibrationSetter.getCalibrationValue() + " "
+                + getSensorAnalysis().getXUnit().getUnit() + ")";
+        popup.getMenu().findItem(R.id.length_scale).setTitle(lengthTitle);
+        popup.getMenu().findItem(R.id.showCoordinateSystem).setChecked(getSensorAnalysis().getShowCoordinateSystem());
+        popup.getMenu().findItem(R.id.swapAxis).setChecked(getSensorAnalysis().getCalibrationXY().getSwapAxis());
         popup.show();
     }
 
