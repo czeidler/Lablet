@@ -15,7 +15,7 @@ import java.util.List;
 public class JoinedList<T> implements Iterable<T> {
     private List<List<? extends T>> allLists = new ArrayList<>();
 
-    public void addList(List list) {
+    public void addList(List<? extends T> list) {
         allLists.add(list);
     }
 
@@ -44,9 +44,7 @@ public class JoinedList<T> implements Iterable<T> {
 
             @Override
             public boolean hasNext() {
-                if (currentListIterator == null)
-                    return false;
-                return currentListIterator.hasNext();
+                return currentListIterator != null && currentListIterator.hasNext();
             }
 
             @Override

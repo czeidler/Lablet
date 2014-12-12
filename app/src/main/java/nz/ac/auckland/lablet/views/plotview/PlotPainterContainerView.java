@@ -10,6 +10,7 @@ package nz.ac.auckland.lablet.views.plotview;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.RectF;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import nz.ac.auckland.lablet.misc.JoinedList;
@@ -19,10 +20,10 @@ import java.util.List;
 
 
 public class PlotPainterContainerView extends RangeDrawingView {
-    final private List<IPlotPainter> backgroundPainters = new ArrayList();
-    final private List<IPlotPainter> plotPainters = new ArrayList();
-    final private List<IPlotPainter> foregroundPainters = new ArrayList();
-    final protected JoinedList<IPlotPainter> allPainters = new JoinedList(backgroundPainters, plotPainters,
+    final private List<IPlotPainter> backgroundPainters = new ArrayList<>();
+    final private List<IPlotPainter> plotPainters = new ArrayList<>();
+    final private List<IPlotPainter> foregroundPainters = new ArrayList<>();
+    final protected JoinedList<IPlotPainter> allPainters = new JoinedList<>(backgroundPainters, plotPainters,
             foregroundPainters);
 
     public PlotPainterContainerView(Context context, AttributeSet attrs) {
@@ -47,8 +48,11 @@ public class PlotPainterContainerView extends RangeDrawingView {
 
     public boolean removePlotPainter(IPlotPainter painter) {
         boolean result = plotPainters.remove(painter);
+        if (!result)
+            return false;
+        painter.setContainer(null);
         invalidate();
-        return result;
+        return true;
     }
 
     public void addForegroundPainter(IPlotPainter painter) {
@@ -66,7 +70,7 @@ public class PlotPainterContainerView extends RangeDrawingView {
     }
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
+    public boolean dispatchTouchEvent(@NonNull MotionEvent event) {
         for (IPlotPainter painter : allPainters) {
             if (painter.onTouchEvent(event))
                 return true;

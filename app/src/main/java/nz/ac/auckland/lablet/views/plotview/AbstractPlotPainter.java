@@ -19,6 +19,8 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
 
     public void setContainer(PlotPainterContainerView view) {
         this.containerView = view;
+        if (view == null)
+            return;
         containerView.invalidate();
     }
 
