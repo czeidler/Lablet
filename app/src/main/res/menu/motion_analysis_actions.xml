@@ -4,7 +4,7 @@
       xmlns:yourapp="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/action_run_settings"
           android:icon="@drawable/ic_action_settings"
-          android:title="@string/action_settings"
+          android:title="@string/action_video"
           yourapp:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/action_calibration_settings"
           android:icon="@drawable/ic_ruler"
@@ -13,9 +13,5 @@
     <item android:id="@+id/action_origin_settings"
           android:icon="@drawable/ic_chart_line"
           android:title="@string/action_origin"
-          yourapp:showAsAction="ifRoom|withText"/>
-    <item android:id="@+id/action_back"
-          android:icon="@drawable/ic_action_accept"
-          android:title="@string/action_done"
           yourapp:showAsAction="ifRoom|withText"/>
 </menu>

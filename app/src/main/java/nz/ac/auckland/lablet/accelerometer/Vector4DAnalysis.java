@@ -9,17 +9,16 @@ package nz.ac.auckland.lablet.accelerometer;
 
 import android.graphics.RectF;
 import android.os.Bundle;
-import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
-import nz.ac.auckland.lablet.experiment.ISensorData;
-import nz.ac.auckland.lablet.views.plotview.PlotView;
+import nz.ac.auckland.lablet.experiment.IDataAnalysis;
+import nz.ac.auckland.lablet.experiment.IExperimentData;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 
 
-public class Vector4DAnalysis implements ISensorAnalysis{
-    final private AccelerometerSensorData sensorData;
+public class Vector4DAnalysis implements IDataAnalysis {
+    final private AccelerometerExperimentData sensorData;
     final private DisplaySettings displaySettings = new DisplaySettings();
 
     public class DisplaySettings {
@@ -50,8 +49,13 @@ public class Vector4DAnalysis implements ISensorAnalysis{
         }
     }
 
-    public Vector4DAnalysis(AccelerometerSensorData sensorData) {
+    public Vector4DAnalysis(AccelerometerExperimentData sensorData) {
         this.sensorData = sensorData;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return "Accelerometer Analysis";
     }
 
     @Override
@@ -60,7 +64,7 @@ public class Vector4DAnalysis implements ISensorAnalysis{
     }
 
     @Override
-    public ISensorData getData() {
+    public IExperimentData getData() {
         return sensorData;
     }
 

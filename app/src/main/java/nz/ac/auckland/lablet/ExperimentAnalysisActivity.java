@@ -13,8 +13,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
-import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
-import nz.ac.auckland.lablet.experiment.ISensorData;
+import nz.ac.auckland.lablet.experiment.IDataAnalysis;
+import nz.ac.auckland.lablet.experiment.IExperimentData;
 
 import java.io.*;
 import java.util.List;
@@ -31,6 +31,12 @@ import java.util.List;
  * </p>
  */
 public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
+    private ViewPager pager;
+
+    public ViewPager getViewPager() {
+        return pager;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +45,7 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
 
         setContentView(R.layout.experiment_analyser);
         // Instantiate a ViewPager and a PagerAdapter.
-        final ViewPager pager = (ViewPager)findViewById(R.id.pager);
+        pager = (ViewPager)findViewById(R.id.pager);
         final ScreenSlidePagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
         pager.setCurrentItem(0);
@@ -86,7 +92,7 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
             for (ExperimentAnalysis.AnalysisDataEntry sensorEntry : analysisRun.analysisDataList) {
                 for (ExperimentAnalysis.AnalysisEntry analysisEntry : sensorEntry.analysisList) {
                     try {
-                        ISensorAnalysis analysis = analysisEntry.analysis;
+                        IDataAnalysis analysis = analysisEntry.analysis;
                         File storageDir = ExperimentAnalysis.getAnalysisStorageFor(experimentData,
                                 analysisRuns.indexOf(analysisRun), analysis);
                         storageDir.mkdirs();
@@ -100,12 +106,12 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
         }
     }
 
-    private File getTagMarkerCSVFile(ISensorAnalysis analysis, File storageDir) {
-        ISensorData sensorData = analysis.getData();
+    private File getTagMarkerCSVFile(IDataAnalysis analysis, File storageDir) {
+        IExperimentData sensorData = analysis.getData();
         return new File(storageDir, sensorData.getUid() + "_tag_markers.csv");
     }
 
-    private void exportTagMarkerCSVData(ISensorAnalysis sensorAnalysis, File storageDir) throws IOException {
+    private void exportTagMarkerCSVData(IDataAnalysis sensorAnalysis, File storageDir) throws IOException {
         File csvFile = getTagMarkerCSVFile(sensorAnalysis, storageDir);
         if (!csvFile.exists()) {
             try {

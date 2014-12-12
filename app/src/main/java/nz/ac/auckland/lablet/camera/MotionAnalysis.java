@@ -21,12 +21,12 @@ import java.util.List;
 /**
  * Base class for everything that is related to analysing an experiment.
  */
-public class MotionAnalysis implements ISensorAnalysis {
+public class MotionAnalysis implements IDataAnalysis {
     public interface IListener {
         void onShowCoordinateSystem(boolean show);
     }
 
-    private CameraSensorData sensorData;
+    private CameraExperimentData sensorData;
 
     private FrameDataModel frameDataModel;
     private CalibrationXY calibrationXY;
@@ -49,7 +49,7 @@ public class MotionAnalysis implements ISensorAnalysis {
 
     private List<IListener> listenerList = new ArrayList<>();
 
-    public MotionAnalysis(CameraSensorData sensorData) {
+    public MotionAnalysis(CameraExperimentData sensorData) {
         this.sensorData = sensorData;
 
         xUnit.setName("x");
@@ -111,11 +111,16 @@ public class MotionAnalysis implements ISensorAnalysis {
     }
 
     @Override
+    public String getDisplayName() {
+        return "Motion Analysis";
+    }
+
+    @Override
     public String getIdentifier() {
         return "MotionAnalysis";
     }
 
-    public ISensorData getData() { return sensorData; }
+    public IExperimentData getData() { return sensorData; }
     public FrameDataModel getFrameDataModel() {
         return frameDataModel;
     }
@@ -301,7 +306,7 @@ public class MotionAnalysis implements ISensorAnalysis {
     }
 
     private void updateOriginFromVideoRotation() {
-        CameraSensorData cameraExperiment = (CameraSensorData)getData();
+        CameraExperimentData cameraExperiment = (CameraExperimentData)getData();
 
         // read rotation from video
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();

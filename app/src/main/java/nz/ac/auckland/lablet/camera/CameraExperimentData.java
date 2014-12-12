@@ -10,10 +10,8 @@ package nz.ac.auckland.lablet.camera;
 import android.content.Context;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
-import nz.ac.auckland.lablet.experiment.AbstractSensorData;
+import nz.ac.auckland.lablet.experiment.AbstractExperimentData;
 import nz.ac.auckland.lablet.experiment.IExperimentSensor;
 
 import java.io.File;
@@ -23,7 +21,7 @@ import java.io.IOException;
 /**
  * Holds all important data for the camera experiment.
  */
-public class CameraSensorData extends AbstractSensorData {
+public class CameraExperimentData extends AbstractExperimentData {
     private String videoFileName;
 
     // milli seconds
@@ -36,7 +34,7 @@ public class CameraSensorData extends AbstractSensorData {
 
     static final public String DATA_TYPE = "Video";
 
-    public CameraSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
+    public CameraExperimentData(Context experimentContext, IExperimentSensor sourceSensor) {
         super(experimentContext, sourceSensor);
     }
 
@@ -45,7 +43,7 @@ public class CameraSensorData extends AbstractSensorData {
         return "Video";
     }
 
-    public CameraSensorData(Context experimentContext) {
+    public CameraExperimentData(Context experimentContext) {
         super(experimentContext);
 
     }

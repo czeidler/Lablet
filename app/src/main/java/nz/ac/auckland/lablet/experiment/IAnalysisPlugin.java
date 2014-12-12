@@ -22,13 +22,13 @@ public interface IAnalysisPlugin {
     public String supportedDataType();
 
     /**
-     * Creates an {@link nz.ac.auckland.lablet.experiment.ISensorAnalysis} object for the given
-     * {@link nz.ac.auckland.lablet.experiment.ISensorData}.
+     * Creates an {@link IDataAnalysis} object for the given
+     * {@link IExperimentData}.
      *
      * @param sensorData usually loaded with the loadSensorData method
      * @return pointer to the created experiment analysis
      */
-    public ISensorAnalysis createSensorAnalysis(ISensorData sensorData);
+    public IDataAnalysis createDataAnalysis(IExperimentData sensorData);
 
     /**
      * Creates the view that displays the results in the

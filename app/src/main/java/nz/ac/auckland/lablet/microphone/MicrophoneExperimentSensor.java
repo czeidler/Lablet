@@ -16,7 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensorView;
-import nz.ac.auckland.lablet.experiment.ISensorData;
+import nz.ac.auckland.lablet.experiment.IExperimentData;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.misc.AudioWavOutputStream;
 import nz.ac.auckland.lablet.misc.StorageLib;
@@ -39,7 +39,7 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     final String audioFileName = "audio.wav";
     private File audioFile = null;
 
-    private MicrophoneSensorData experimentData;
+    private MicrophoneExperimentData experimentData;
 
     public interface ISensorDataListener {
         public void onNewAmplitudeData(float[] amplitudes);
@@ -102,7 +102,7 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public void init(final Activity activity) {
-        experimentData = new MicrophoneSensorData(activity, this);
+        experimentData = new MicrophoneExperimentData(activity, this);
 
         previewState = new State() {
             private AudioRecordingTask audioRecordingTask = null;
@@ -300,7 +300,7 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     }
 
     @Override
-    public ISensorData getExperimentData() {
+    public IExperimentData getExperimentData() {
         return experimentData;
     }
 }

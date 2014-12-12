@@ -45,7 +45,7 @@ public class Vector4DFragmentView extends FrameLayout {
             }
         });
 
-        AccelerometerSensorData data = (AccelerometerSensorData)analysis.getData();
+        AccelerometerExperimentData data = (AccelerometerExperimentData)analysis.getData();
 
         XYDataAdapter xData = new XYDataAdapter(data.getTimeValues(), data.getXValues());
         XYConcurrentPainter xPainter = new XYConcurrentPainter(xData);

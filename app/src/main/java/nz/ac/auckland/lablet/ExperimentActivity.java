@@ -226,7 +226,7 @@ public class ExperimentActivity extends FragmentActivity {
         getMenuInflater().inflate(R.menu.perform_experiment_activity_actions, menu);
 
         // back item
-        MenuItem backItem = menu.findItem(R.id.action_back);
+        MenuItem backItem = menu.findItem(R.id.action_done);
         assert backItem != null;
         backItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override

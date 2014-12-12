@@ -19,7 +19,7 @@ import java.io.IOException;
 /**
  * Abstract base class for experiments.
  */
-abstract public class AbstractSensorData implements ISensorData {
+abstract public class AbstractExperimentData implements IExperimentData {
     private String uid = "";
     protected Context context;
 
@@ -38,7 +38,7 @@ abstract public class AbstractSensorData implements ISensorData {
      *
      * @param experimentContext the context of the experiment
      */
-    public AbstractSensorData(Context experimentContext) {
+    public AbstractExperimentData(Context experimentContext) {
         init(experimentContext);
     }
 
@@ -47,7 +47,7 @@ abstract public class AbstractSensorData implements ISensorData {
      *
      * @param experimentContext the experiment context
      */
-    public AbstractSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
+    public AbstractExperimentData(Context experimentContext, IExperimentSensor sourceSensor) {
         init(experimentContext);
 
         uid = generateNewUid();

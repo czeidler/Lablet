@@ -12,7 +12,7 @@ import nz.ac.auckland.lablet.ExperimentAnalysis;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
-import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
+import nz.ac.auckland.lablet.experiment.IDataAnalysis;
 import nz.ac.auckland.lablet.microphone.FrequencyAnalysis;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 
@@ -44,7 +44,7 @@ public class ScriptExperimentRef extends WeakListenable<ScriptExperimentRef.ILis
         return getAnalysis(context, run, "FrequencyAnalysis");
     }
 
-    protected <T extends ISensorAnalysis> T getAnalysis(Context context, int run, String analysisIdentifier) {
+    protected <T extends IDataAnalysis> T getAnalysis(Context context, int run, String analysisIdentifier) {
         if (experimentAnalysis == null)
             experimentAnalysis = loadExperimentAnalysis(context);
         if (experimentAnalysis == null || experimentAnalysis.getNumberOfRuns() <= run)

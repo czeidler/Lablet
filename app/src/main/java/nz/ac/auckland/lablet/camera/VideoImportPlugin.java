@@ -9,9 +9,6 @@ package nz.ac.auckland.lablet.camera;
 
 import android.app.Activity;
 import nz.ac.auckland.lablet.experiment.AbstractFileImportPlugin;
-import nz.ac.auckland.lablet.experiment.Experiment;
-import nz.ac.auckland.lablet.experiment.IImportPlugin;
-import nz.ac.auckland.lablet.experiment.ImportExperimentRun;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.misc.StreamHelper;
 
@@ -52,7 +49,7 @@ public class VideoImportPlugin extends AbstractFileImportPlugin {
             return false;
         }
 
-        final CameraSensorData cameraSensorData = new CameraSensorData(activity);
+        final CameraExperimentData cameraSensorData = new CameraExperimentData(activity);
         cameraSensorData.setUid(importUid);
 
         cameraSensorData.setVideoFileName(dataStorageDir, fileName);

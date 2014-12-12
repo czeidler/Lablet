@@ -38,19 +38,8 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             return;
 
         menu.clear();
-        inflater.inflate(R.menu.experiment_analyser_activity_actions, menu);
+        inflater.inflate(R.menu.motion_analysis_actions, menu);
 
-        final MenuItem backItem = menu.findItem(R.id.action_back);
-        assert backItem != null;
-        backItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                Activity activity = getActivity();
-                activity.setResult(Activity.RESULT_OK);
-                activity.finish();
-                return true;
-            }
-        });
         final MenuItem settingsItem = menu.findItem(R.id.action_run_settings);
         assert settingsItem != null;
         settingsItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -80,6 +69,8 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                 return true;
             }
         });
+
+        setupStandardMenu(menu, inflater);
     }
 
     private void showCalibrationMenu() {
@@ -173,8 +164,6 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setHasOptionsMenu(true);
 
         final Intent intent = getActivity().getIntent();
         if (intent != null) {

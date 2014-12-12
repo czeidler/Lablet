@@ -55,9 +55,9 @@ public class ExperimentHelper {
     }
 
     // Creates a new ExperimentAnalysis and tries to load an existing analysis.
-    static public boolean loadSensorAnalysis(ISensorAnalysis sensorAnalysis, File storageDir) {
+    static public boolean loadSensorAnalysis(IDataAnalysis sensorAnalysis, File storageDir) {
         // try to load old analysis
-        File projectFile = new File(storageDir, ISensorAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
+        File projectFile = new File(storageDir, IDataAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
         Bundle bundle = loadBundleFromFile(projectFile);
         if (bundle == null)
             return false;
@@ -69,13 +69,13 @@ public class ExperimentHelper {
         return sensorAnalysis.loadAnalysisData(analysisDataBundle, storageDir);
     }
 
-    static public void saveAnalysisData(ISensorAnalysis sensorAnalysis, File storageDir) throws IOException {
+    static public void saveAnalysisData(IDataAnalysis sensorAnalysis, File storageDir) throws IOException {
         Bundle experimentData = sensorAnalysis.exportAnalysisData(storageDir);
         Bundle bundle = new Bundle();
         bundle.putBundle("analysis_data", experimentData);
 
         // save the bundle
-        File projectFile = new File(storageDir, ISensorAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
+        File projectFile = new File(storageDir, IDataAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
         FileWriter fileWriter = new FileWriter(projectFile);
         PersistentBundle persistentBundle = new PersistentBundle();
         persistentBundle.flattenBundle(bundle, fileWriter);

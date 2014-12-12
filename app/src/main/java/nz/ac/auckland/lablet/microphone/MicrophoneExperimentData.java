@@ -9,13 +9,13 @@ package nz.ac.auckland.lablet.microphone;
 
 import android.content.Context;
 import android.os.Bundle;
-import nz.ac.auckland.lablet.experiment.AbstractSensorData;
+import nz.ac.auckland.lablet.experiment.AbstractExperimentData;
 import nz.ac.auckland.lablet.experiment.IExperimentSensor;
 
 import java.io.File;
 
 
-public class MicrophoneSensorData extends AbstractSensorData {
+public class MicrophoneExperimentData extends AbstractExperimentData {
     private String audioFileName;
 
     static final public String DATA_TYPE = "Audio";
@@ -25,11 +25,11 @@ public class MicrophoneSensorData extends AbstractSensorData {
         return DATA_TYPE;
     }
 
-    public MicrophoneSensorData(Context experimentContext) {
+    public MicrophoneExperimentData(Context experimentContext) {
         super(experimentContext);
     }
 
-    public MicrophoneSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
+    public MicrophoneExperimentData(Context experimentContext, IExperimentSensor sourceSensor) {
         super(experimentContext, sourceSensor);
     }
 

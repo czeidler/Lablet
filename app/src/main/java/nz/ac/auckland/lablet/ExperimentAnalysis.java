@@ -43,10 +43,10 @@ public class ExperimentAnalysis {
     }
 
     public static class AnalysisEntry {
-        final public ISensorAnalysis analysis;
+        final public IDataAnalysis analysis;
         final public IAnalysisPlugin plugin;
 
-        public AnalysisEntry(ISensorAnalysis analysis, IAnalysisPlugin plugin) {
+        public AnalysisEntry(IDataAnalysis analysis, IAnalysisPlugin plugin) {
             this.analysis = analysis;
             this.plugin = plugin;
         }
@@ -76,23 +76,23 @@ public class ExperimentAnalysis {
 
     protected List<AnalysisRunEntry> analysisRuns = new ArrayList<>();
     protected AnalysisRunEntry currentAnalysisRun;
-    protected ISensorAnalysis currentSensorAnalysis;
+    protected IDataAnalysis currentSensorAnalysis;
 
     public int getNumberOfRuns() {
         return analysisRuns.size();
     }
 
-    static public File getAnalysisStorageFor(ExperimentData experimentData, int run, ISensorAnalysis analysis) {
+    static public File getAnalysisStorageFor(ExperimentData experimentData, int run, IDataAnalysis analysis) {
         File dir = experimentData.getStorageDir().getParentFile();
         dir = new File(dir, "analysis");
         dir = new File(dir, "run" + Integer.toString(run));
-        ISensorData sensorData = analysis.getData();
+        IExperimentData sensorData = analysis.getData();
         dir = new File(dir, sensorData.getDataType());
         dir = new File(dir, analysis.getIdentifier());
         return dir;
     }
 
-    public ISensorAnalysis getCurrentSensorAnalysis() {
+    public IDataAnalysis getCurrentSensorAnalysis() {
         return currentSensorAnalysis;
     }
 
@@ -109,7 +109,7 @@ public class ExperimentAnalysis {
         List<ExperimentData.RunEntry> runs = experimentData.getRuns();
         for (ExperimentData.RunEntry runEntry : runs) {
             AnalysisRunEntry analysisRunEntry = new AnalysisRunEntry();
-            for (ISensorData sensorData : runEntry.sensorDataList) {
+            for (IExperimentData sensorData : runEntry.sensorDataList) {
                 AnalysisDataEntry analysisDataEntry = new AnalysisDataEntry();
                 ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
                 List<IAnalysisPlugin> pluginList = factory.analysisPluginsFor(sensorData);
@@ -117,7 +117,7 @@ public class ExperimentAnalysis {
                     continue;
                 IAnalysisPlugin plugin = pluginList.get(0);
 
-                ISensorAnalysis sensorAnalysis = plugin.createSensorAnalysis(sensorData);
+                IDataAnalysis sensorAnalysis = plugin.createDataAnalysis(sensorData);
                 File storage = getAnalysisStorageFor(experimentData, runs.indexOf(runEntry), sensorAnalysis);
                 // if loading fails we add the entry anyway and start a new analysis
                 ExperimentHelper.loadSensorAnalysis(sensorAnalysis, storage);

@@ -33,7 +33,7 @@ import java.util.List;
  * </p>
  */
 public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivity {
-    private CameraSensorData cameraSensorData;
+    private CameraExperimentData cameraSensorData;
     private VideoFrameView videoFrameView;
 
     private SeekBar seekBar = null;
@@ -134,7 +134,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        cameraSensorData = (CameraSensorData)experimentAnalysis.getCurrentSensorAnalysis().getData();
+        cameraSensorData = (CameraExperimentData)experimentAnalysis.getCurrentSensorAnalysis().getData();
 
         setContentView(R.layout.motion_analysis_settings);
 

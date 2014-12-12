@@ -10,8 +10,8 @@ package nz.ac.auckland.lablet.accelerometer;
 import android.support.v4.app.Fragment;
 import nz.ac.auckland.lablet.ExperimentAnalysis;
 import nz.ac.auckland.lablet.experiment.IAnalysisPlugin;
-import nz.ac.auckland.lablet.experiment.ISensorAnalysis;
-import nz.ac.auckland.lablet.experiment.ISensorData;
+import nz.ac.auckland.lablet.experiment.IDataAnalysis;
+import nz.ac.auckland.lablet.experiment.IExperimentData;
 
 
 public class AccelerometerAnalysisPlugin implements IAnalysisPlugin {
@@ -23,13 +23,13 @@ public class AccelerometerAnalysisPlugin implements IAnalysisPlugin {
 
     @Override
     public String supportedDataType() {
-        return AccelerometerSensorData.DATA_TYPE;
+        return AccelerometerExperimentData.DATA_TYPE;
     }
 
     @Override
-    public ISensorAnalysis createSensorAnalysis(ISensorData sensorData) {
-        assert sensorData instanceof AccelerometerSensorData;
-        return new Vector4DAnalysis((AccelerometerSensorData)sensorData);
+    public IDataAnalysis createDataAnalysis(IExperimentData sensorData) {
+        assert sensorData instanceof AccelerometerExperimentData;
+        return new Vector4DAnalysis((AccelerometerExperimentData)sensorData);
     }
 
     @Override

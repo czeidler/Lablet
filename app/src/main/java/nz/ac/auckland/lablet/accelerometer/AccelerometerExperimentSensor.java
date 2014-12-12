@@ -17,13 +17,13 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
-import nz.ac.auckland.lablet.experiment.ISensorData;
+import nz.ac.auckland.lablet.experiment.IExperimentData;
 
 import java.io.*;
 
 
 public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
-    private AccelerometerSensorData data;
+    private AccelerometerExperimentData data;
 
     private SensorManager sensorManager;
     private long startTime = 0;
@@ -68,7 +68,7 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public void init(Activity activity) {
-        data = new AccelerometerSensorData(activity, this);
+        data = new AccelerometerExperimentData(activity, this);
 
         sensorManager = (SensorManager)activity.getSystemService(Context.SENSOR_SERVICE);
     }
@@ -147,7 +147,7 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     }
 
     @Override
-    public ISensorData getExperimentData() {
+    public IExperimentData getExperimentData() {
         return data;
     }
 }

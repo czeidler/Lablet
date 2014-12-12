@@ -11,14 +11,13 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.views.table.CSVWriter;
-import nz.ac.auckland.lablet.views.table.ColumnDataTableAdapter;
 import nz.ac.auckland.lablet.views.table.MarkerDataTableAdapter;
 
 import java.io.*;
 
 
-public class FrequencyAnalysis implements ISensorAnalysis {
-    final private MicrophoneSensorData sensorData;
+public class FrequencyAnalysis implements IDataAnalysis {
+    final private MicrophoneExperimentData sensorData;
 
     final private MarkerDataModel hCursorMarkerModel;
     final private MarkerDataModel vCursorMarkerModel;
@@ -98,7 +97,7 @@ public class FrequencyAnalysis implements ISensorAnalysis {
         }
     }
 
-    public FrequencyAnalysis(MicrophoneSensorData sensorData) {
+    public FrequencyAnalysis(MicrophoneExperimentData sensorData) {
         this.sensorData = sensorData;
 
         xUnit.setName("time");
@@ -120,12 +119,17 @@ public class FrequencyAnalysis implements ISensorAnalysis {
     }
 
     @Override
+    public String getDisplayName() {
+        return "Frequency Analysis";
+    }
+
+    @Override
     public String getIdentifier() {
         return getClass().getSimpleName();
     }
 
     @Override
-    public ISensorData getData() {
+    public IExperimentData getData() {
         return sensorData;
     }
 

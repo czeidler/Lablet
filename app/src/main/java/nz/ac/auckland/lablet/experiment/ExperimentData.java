@@ -9,9 +9,9 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.content.Context;
 import android.os.Bundle;
-import nz.ac.auckland.lablet.accelerometer.AccelerometerSensorData;
-import nz.ac.auckland.lablet.camera.CameraSensorData;
-import nz.ac.auckland.lablet.microphone.MicrophoneSensorData;
+import nz.ac.auckland.lablet.accelerometer.AccelerometerExperimentData;
+import nz.ac.auckland.lablet.camera.CameraExperimentData;
+import nz.ac.auckland.lablet.microphone.MicrophoneExperimentData;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import java.util.List;
 public class ExperimentData {
     public static class RunEntry {
         public ExperimentRunData runData;
-        public List<ISensorData> sensorDataList = new ArrayList<>();
+        public List<IExperimentData> sensorDataList = new ArrayList<>();
     }
 
     private File storageDir;
@@ -41,10 +41,10 @@ public class ExperimentData {
         return loadError;
     }
 
-    private ISensorData loadSensorData(Context context, File sensorDirectory) {
+    private IExperimentData loadSensorData(Context context, File sensorDirectory) {
         Bundle bundle;
 
-        File file = new File(sensorDirectory, ISensorData.EXPERIMENT_DATA_FILE_NAME);
+        File file = new File(sensorDirectory, IExperimentData.EXPERIMENT_DATA_FILE_NAME);
         bundle = ExperimentHelper.loadBundleFromFile(file);
 
         if (bundle == null) {
@@ -64,19 +64,19 @@ public class ExperimentData {
         ISensorPlugin plugin = factory.findSensorPlugin(experimentIdentifier);
         if (plugin == null) {
             // fallback: try to find analysis for the data type
-            if (!experimentData.containsKey(AbstractSensorData.DATA_TYPE_KEY)) {
+            if (!experimentData.containsKey(AbstractExperimentData.DATA_TYPE_KEY)) {
                 loadError = "experiment data type information is missing";
                 return null;
             }
-            String dataType = experimentData.getString(AbstractSensorData.DATA_TYPE_KEY);
-            ISensorData sensorData = getSensorDataForType(dataType, context, experimentData, sensorDirectory);
+            String dataType = experimentData.getString(AbstractExperimentData.DATA_TYPE_KEY);
+            IExperimentData sensorData = getSensorDataForType(dataType, context, experimentData, sensorDirectory);
             if (sensorData == null)
                 loadError = "unknown experiment type";
             return sensorData;
         }
 
 
-        ISensorData sensorData = plugin.loadSensorData(context, experimentData, sensorDirectory);
+        IExperimentData sensorData = plugin.loadSensorData(context, experimentData, sensorDirectory);
         if (sensorData == null) {
             loadError = "can't load experiment";
             return null;
@@ -85,17 +85,17 @@ public class ExperimentData {
         return sensorData;
     }
 
-    private ISensorData getSensorDataForType(String dataType, Context context, Bundle data, File dir) {
-        ISensorData sensorData = null;
+    private IExperimentData getSensorDataForType(String dataType, Context context, Bundle data, File dir) {
+        IExperimentData sensorData = null;
         switch (dataType) {
-            case MicrophoneSensorData.DATA_TYPE:
-                sensorData = new MicrophoneSensorData(context);
+            case MicrophoneExperimentData.DATA_TYPE:
+                sensorData = new MicrophoneExperimentData(context);
                 break;
-            case CameraSensorData.DATA_TYPE:
-                sensorData = new CameraSensorData(context);
+            case CameraExperimentData.DATA_TYPE:
+                sensorData = new CameraExperimentData(context);
                 break;
-            case AccelerometerSensorData.DATA_TYPE:
-                sensorData = new AccelerometerSensorData(context);
+            case AccelerometerExperimentData.DATA_TYPE:
+                sensorData = new AccelerometerExperimentData(context);
                 break;
         }
         if (sensorData != null) {
@@ -125,7 +125,7 @@ public class ExperimentData {
         for (File runDirectory : runDir.listFiles()) {
             if (!runDirectory.isDirectory())
                 continue;
-            ISensorData sensorData = loadSensorData(context, runDirectory);
+            IExperimentData sensorData = loadSensorData(context, runDirectory);
             if (sensorData == null)
                 return null;
             runEntry.sensorDataList.add(sensorData);
