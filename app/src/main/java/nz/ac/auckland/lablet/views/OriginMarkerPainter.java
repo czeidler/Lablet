@@ -83,6 +83,11 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
     public void setContainer(PlotPainterContainerView view) {
         super.setContainer(view);
 
+        if (view == null) {
+            firstDraw = true;
+            return;
+        }
+
         FONT_SIZE = toPixel(FONT_SIZE_DP);
         LINE_WIDTH = toPixel(LINE_WIDTH_DP);
         ARROW_WIDTH = toPixel(ARROW_WIDTH_DP);
