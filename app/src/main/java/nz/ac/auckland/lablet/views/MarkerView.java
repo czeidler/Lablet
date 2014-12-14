@@ -25,7 +25,7 @@ import java.util.List;
  * Interface for a drawable, selectable marker that can handle motion events.
  */
 interface IMarker {
-    public void setTo(AbstractMarkerPainter painter, int markerIndex);
+    public void setTo(AbstractMarkerPainter painter, MarkerData markerData);
 
     public void onDraw(Canvas canvas, float priority);
 
@@ -49,16 +49,16 @@ interface IMarker {
  */
 abstract class DraggableMarker implements IMarker {
     protected AbstractMarkerPainter parent = null;
-    protected int index;
+    protected MarkerData markerData;
     protected PointF currentPosition;
     protected PointF dragOffset = new PointF(0, 0);
     protected boolean isSelectedForDragging = false;
     protected boolean isDragging = false;
 
     @Override
-    public void setTo(AbstractMarkerPainter painter, int markerIndex) {
-        parent = painter;
-        index = markerIndex;
+    public void setTo(AbstractMarkerPainter painter, MarkerData markerData) {
+        this.parent = painter;
+        this.markerData = markerData;
     }
 
     /**
@@ -145,7 +145,7 @@ abstract class DraggableMarker implements IMarker {
 
     public PointF getCachedScreenPosition() {
         if (currentPosition == null)
-            currentPosition = parent.getMarkerScreenPosition(index);
+            currentPosition = parent.getMarkerScreenPosition(markerData);
 
         return currentPosition;
     }
@@ -221,8 +221,8 @@ class SimpleMarker extends DraggableMarker {
     }
 
     @Override
-    public void setTo(AbstractMarkerPainter painter, int markerIndex) {
-        super.setTo(painter, markerIndex);
+    public void setTo(AbstractMarkerPainter painter, MarkerData markerData) {
+        super.setTo(painter, markerData);
 
         INNER_RING_RADIUS = parent.toPixel(Const.INNER_RING_RADIUS_DP);
         INNER_RING_WIDTH = parent.toPixel(Const.INNER_RING_WIDTH_DP);
@@ -435,8 +435,8 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
         return markerList;
     }
 
-    public PointF getMarkerScreenPosition(int index) {
-        PointF realPosition = markerData.getMarkerDataAt(index).getPosition();
+    public PointF getMarkerScreenPosition(MarkerData markerData) {
+        PointF realPosition = markerData.getPosition();
         PointF screenPosition = new PointF();
         containerView.toScreen(realPosition, screenPosition);
         return screenPosition;
@@ -552,7 +552,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
 
     public void addMarker(int row) {
         IMarker marker = createMarkerForRow(row);
-        marker.setTo(this, row);
+        marker.setTo(this, markerData.getMarkerDataAt(row));
         markerList.add(row, marker);
     }
 
