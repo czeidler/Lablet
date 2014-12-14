@@ -105,8 +105,4 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
         return new Range(0, getSize() - 1);
     }
 
-    @Override
-    public DataStatistics createDataStatistics() {
-        return null;
-    }
 }
