@@ -170,6 +170,9 @@ public class ThreadStrategyPainter extends BufferedStrategyPainter {
     }
 
     protected void onMergeOffScreenRendering(ThreadCookie cookie) {
+        if (containerView == null)
+            return;
+
         Canvas canvas = startEditingBufferBitmap(cookie.isCompleteRedraw);
 
         RectF targetRect = containerView.toScreen(cookie.bitmapRealRange);
@@ -177,6 +180,9 @@ public class ThreadStrategyPainter extends BufferedStrategyPainter {
     }
 
     protected void onRenderingFinished() {
+        if (containerView == null)
+            return;
+
         containerView.invalidate();
 
         onNewDirtyRegions(getDirtyRect());
