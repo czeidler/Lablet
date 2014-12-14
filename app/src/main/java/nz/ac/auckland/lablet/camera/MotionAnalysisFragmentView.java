@@ -7,13 +7,18 @@
  */
 package nz.ac.auckland.lablet.camera;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.support.v4.widget.DrawerLayout;
 import android.view.*;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.experiment.Unit;
+import nz.ac.auckland.lablet.misc.WeakListenable;
 import nz.ac.auckland.lablet.views.FrameContainerView;
 import nz.ac.auckland.lablet.views.FrameDataSeekBar;
 import nz.ac.auckland.lablet.views.graph.*;
@@ -24,14 +29,105 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+class MotionAnalysisSideBar extends WeakListenable<MotionAnalysisSideBar.IListener> {
+    public interface IListener {
+        void onOpened();
+        void onClosed();
+    }
+
+    final private FrameLayout sideBar;
+    private boolean open = false;
+    private AnimatorSet animator;
+    final private View parent;
+    final int animationDuration = 300;
+
+    public MotionAnalysisSideBar(View parent, View content) {
+        this.parent = parent;
+        sideBar = (FrameLayout)parent.findViewById(R.id.sideBarFrame);
+
+        sideBar.addView(content);
+    }
+
+    public float getWidth() {
+        return sideBar.getWidth();
+    }
+
+    public boolean isOpen() {
+        return open;
+    }
+
+    public void open() {
+        if (animator != null)
+            animator.cancel();
+
+        sideBar.setVisibility(View.VISIBLE);
+
+        animator = new AnimatorSet();
+        int width = parent.getWidth();
+        animator.play(ObjectAnimator.ofFloat(sideBar, View.X, width, width - sideBar.getWidth()));
+        animator.setDuration(animationDuration);
+        animator.setInterpolator(new DecelerateInterpolator());
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                animator = null;
+                open = true;
+                notifyOnOpened();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                sideBar.setVisibility(View.INVISIBLE);
+            }
+        });
+        animator.start();
+    }
+
+    public void close() {
+        if (animator != null)
+            animator.cancel();
+
+        animator = new AnimatorSet();
+        int width = parent.getWidth();
+        animator.play(ObjectAnimator.ofFloat(sideBar, View.X, width - sideBar.getWidth(), width));
+        animator.setDuration(animationDuration);
+        animator.setInterpolator(new DecelerateInterpolator());
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                animator = null;
+                open = false;
+                notifyOnClosed();
+
+                sideBar.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                sideBar.setVisibility(View.INVISIBLE);
+            }
+        });
+        animator.start();
+    }
+
+    private void notifyOnOpened() {
+        for (IListener listener : getListeners())
+            listener.onOpened();
+    }
+
+    private void notifyOnClosed() {
+        for (IListener listener : getListeners())
+            listener.onClosed();
+    }
+}
+
 class MotionAnalysisFragmentView extends FrameLayout {
     private MarkerDataTableAdapter markerDataTableAdapter;
     final private FrameContainerView runContainerView;
     final private GraphView2D graphView;
     final private Spinner graphSpinner;
-    final private DrawerLayout drawerLayout;
-    final private FrameLayout drawer;
     final private TableView tableView;
+    final private MotionAnalysisSideBar sideBar;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
     private boolean releaseAdaptersWhenDrawerClosed = false;
 
@@ -75,23 +171,24 @@ class MotionAnalysisFragmentView extends FrameLayout {
         final View mainView = inflater.inflate(R.layout.motion_analysis, this, true);
         assert mainView != null;
 
-        drawerLayout = (DrawerLayout)mainView.findViewById(R.id.drawer_layout);
+        ViewGroup sideBarView = (ViewGroup)inflater.inflate(R.layout.motion_analysis_data_side_bar, null, false);
+        sideBarView.setAlpha(0.75f);
+
+        sideBar = new MotionAnalysisSideBar(mainView, sideBarView);
+
+        runContainerView = (FrameContainerView)mainView.findViewById(R.id.frameContainerView);
+        final FrameDataSeekBar runViewControl = (FrameDataSeekBar)mainView.findViewById(R.id.frameDataSeekBar);
 
         final Button drawerButton = (Button)mainView.findViewById(R.id.drawerButton);
         drawerButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                drawerLayout.openDrawer(Gravity.RIGHT);
+                if (!sideBar.isOpen())
+                    sideBar.open();
+                else
+                    sideBar.close();
             }
         });
-
-        drawer = (FrameLayout)mainView.findViewById(R.id.left_drawer);
-
-        runContainerView = (FrameContainerView)mainView.findViewById(R.id.frameContainerView);
-        final FrameDataSeekBar runViewControl = (FrameDataSeekBar)mainView.findViewById(R.id.frameDataSeekBar);
-
-        final ViewGroup experimentDataView = (ViewGroup)inflater.inflate(R.layout.motion_analysis_data_side_bar, null, false);
-        drawer.addView(experimentDataView);
 
         graphSpinner = (Spinner)mainView.findViewById(R.id.graphSpinner);
 
@@ -165,14 +262,9 @@ class MotionAnalysisFragmentView extends FrameLayout {
         });
 
         // setup the load/ unloading of the view data adapters
-        drawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
+        sideBar.addListener(new MotionAnalysisSideBar.IListener() {
             @Override
-            public void onDrawerSlide(View drawerView, float slideOffset) {
-
-            }
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
+            public void onOpened() {
                 if (releaseAdaptersWhenDrawerClosed) {
                     selectGraphAdapter(graphSpinner.getSelectedItemPosition());
                     tableView.setAdapter(markerDataTableAdapter);
@@ -180,16 +272,11 @@ class MotionAnalysisFragmentView extends FrameLayout {
             }
 
             @Override
-            public void onDrawerClosed(View drawerView) {
+            public void onClosed() {
                 if (releaseAdaptersWhenDrawerClosed) {
-                    tableView.setAdapter((ITableAdapter)null);
+                    tableView.setAdapter((ITableAdapter) null);
                     selectGraphAdapter(-1);
                 }
-            }
-
-            @Override
-            public void onDrawerStateChanged(int newState) {
-
             }
         });
 
@@ -197,6 +284,17 @@ class MotionAnalysisFragmentView extends FrameLayout {
             tableView.setAdapter(markerDataTableAdapter);
             selectGraphAdapter(graphSpinner.getSelectedItemPosition());
         }
+
+        OnTouchListener onTouchListener = new OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return false;
+            }
+        };
+        findViewById(R.id.scrollView).setOnTouchListener(onTouchListener);
+        findViewById(R.id.sideBarFrame).setOnTouchListener(onTouchListener);
+        sideBarView.setOnTouchListener(onTouchListener);
+        tableView.setOnTouchListener(onTouchListener);
     }
 
     private void selectGraphAdapter(int i) {
@@ -205,7 +303,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
             graphView.setAdapter(null);
             return;
         }
-        if (releaseAdaptersWhenDrawerClosed && !drawerLayout.isDrawerVisible(drawer))
+        if (releaseAdaptersWhenDrawerClosed && !sideBar.isOpen())
             return;
         GraphSpinnerEntry entry = graphSpinnerEntryList.get(i);
         MarkerGraphAdapter adapter = entry.getMarkerGraphAdapter();
