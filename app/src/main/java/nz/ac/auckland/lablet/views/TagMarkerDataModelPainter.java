@@ -19,6 +19,8 @@ import java.util.List;
  * Painter for tagged data. For example, the tagged data from a camera experiment.
  */
 public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
+    private int MAX_DISPLAYED_MARKERS = 100;
+
     private LastInsertMarkerManager lastInsertMarkerManager = new LastInsertMarkerManager();
 
     public TagMarkerDataModelPainter(MarkerDataModel data) {
@@ -32,11 +34,29 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
         selectableMarkers.add(selectedMarker);
         return selectableMarkers;
     }
+    
+    public IMarker getMarkerAtScreenPosition(PointF screenPosition) {
+        int currentMarkerRow = markerData.getSelectedMarkerData();
+
+        int start = currentMarkerRow - MAX_DISPLAYED_MARKERS / 2 + 1;
+        if (start < 0)
+            start = 0;
+        int end = currentMarkerRow + MAX_DISPLAYED_MARKERS / 2 + 1;
+        if (end > markerList.size())
+            end = markerList.size();
+
+        for (int i = start; i < end; i++) {
+        IMarker marker = markerList.get(i);
+            if (!(marker instanceof DraggableMarker))
+                continue;
+            if (((DraggableMarker)marker).isPointOnSelectArea(screenPosition))
+                return marker;
+        }
+        return null;
+    }
 
     @Override
     public void onDraw(Canvas canvas) {
-        int MAX_DISPLAYED_MARKERS = 100;
-
         int currentMarkerRow = markerData.getSelectedMarkerData();
         IMarker topMarker = getMarkerForRow(currentMarkerRow);
 

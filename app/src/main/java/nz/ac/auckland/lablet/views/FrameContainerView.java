@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views;
 
 import android.content.Context;
+import android.graphics.PointF;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -17,6 +18,7 @@ import android.widget.RelativeLayout;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
+import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 
@@ -30,6 +32,7 @@ import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 public class FrameContainerView extends RelativeLayout {
     private View sensorAnalysisView = null;
     private MarkerView markerView = null;
+    private TagMarkerDataModelPainter painter = null;
     private FrameDataModel frameDataModel = null;
     private MotionAnalysis sensorAnalysis = null;
     private OriginMarkerPainter originMarkerPainter = null;
@@ -51,6 +54,25 @@ public class FrameContainerView extends RelativeLayout {
     };
 
     class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            if (painter == null)
+                return super.onSingleTapUp(e);
+
+            IMarker currentMarker = painter.getMarkerForRow(painter.getMarkerModel().getSelectedMarkerData());
+            if (currentMarker != null && currentMarker.isSelectedForDrag())
+                return super.onSingleTapUp(e);
+
+            IMarker tappedMarker = painter.getMarkerAtScreenPosition(new PointF(e.getX(), e.getY()));
+            if (tappedMarker == null)
+                return super.onSingleTapUp(e);
+            int tappedMarkerIndex = painter.markerIndexOf(tappedMarker);
+
+            MarkerDataModel markerDataModel = painter.getMarkerModel();
+            frameDataModel.setCurrentFrame(markerDataModel.getMarkerDataAt(tappedMarkerIndex).getRunId());
+            return true;
+        }
+
         @Override
         public boolean onDoubleTap(MotionEvent e) {
             int currentFrame = frameDataModel.getCurrentFrame();
@@ -146,7 +168,7 @@ public class FrameContainerView extends RelativeLayout {
     }
 
     public void addTagMarkerData(MarkerDataModel data) {
-        TagMarkerDataModelPainter painter = new TagMarkerDataModelPainter(data);
+        painter = new TagMarkerDataModelPainter(data);
         markerView.addPlotPainter(painter);
 
         frameDataModelListener.onFrameChanged(frameDataModel.getCurrentFrame());
