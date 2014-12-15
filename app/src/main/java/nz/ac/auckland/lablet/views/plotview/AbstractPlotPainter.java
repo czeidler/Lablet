@@ -22,6 +22,11 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
         if (view == null)
             return;
         containerView.invalidate();
+        onAttachedToView();
+    }
+
+    protected void onAttachedToView() {
+
     }
 
     public PlotPainterContainerView getContainerView() {

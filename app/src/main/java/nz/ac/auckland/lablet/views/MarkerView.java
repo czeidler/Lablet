@@ -411,6 +411,12 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
         markerData.addListener(dataListener);
     }
 
+    @Override
+    protected void onAttachedToView() {
+        super.onAttachedToView();
+
+        rebuildMarkerList();
+    }
 
     public MarkerDataModel getMarkerModel() {
         return markerData;

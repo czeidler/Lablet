@@ -16,6 +16,8 @@ import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
 import nz.ac.auckland.lablet.experiment.LengthCalibrationSetter;
+import nz.ac.auckland.lablet.experiment.MarkerData;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 
 
@@ -40,6 +42,37 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 
         menu.clear();
         inflater.inflate(R.menu.motion_analysis_actions, menu);
+
+        final MenuItem deleteItem = menu.findItem(R.id.action_delete);
+        assert deleteItem != null;
+        final MarkerDataModel markerDataModel = getSensorAnalysis().getTagMarkers();
+        if (markerDataModel.getMarkerCount() <= 1)
+            deleteItem.setVisible(false);
+        else
+            deleteItem.setVisible(true);
+        deleteItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                int selectedIndex = markerDataModel.getSelectedMarkerData();
+                if (selectedIndex < 0 || markerDataModel.getMarkerCount() == 1) {
+                    getActivity().invalidateOptionsMenu();
+                    return true;
+                }
+
+                markerDataModel.removeMarkerData(selectedIndex);
+
+                int newSelectedIndex;
+                if (selectedIndex < markerDataModel.getMarkerCount())
+                    newSelectedIndex = selectedIndex;
+                else
+                    newSelectedIndex = selectedIndex - 1;
+                markerDataModel.selectMarkerData(newSelectedIndex);
+
+                if (markerDataModel.getMarkerCount() <= 1)
+                    getActivity().invalidateOptionsMenu();
+                return true;
+            }
+        });
 
         final MenuItem settingsItem = menu.findItem(R.id.action_run_settings);
         assert settingsItem != null;
@@ -159,6 +192,34 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         }
     }
 
+    private MarkerDataModel.IListener menuDataListener = new MarkerDataModel.IListener() {
+        @Override
+        public void onDataAdded(MarkerDataModel model, int index) {
+            if (model.getMarkerCount() > 1)
+                getActivity().invalidateOptionsMenu();
+        }
+
+        @Override
+        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
+
+        }
+
+        @Override
+        public void onDataChanged(MarkerDataModel model, int index, int number) {
+
+        }
+
+        @Override
+        public void onAllDataChanged(MarkerDataModel model) {
+
+        }
+
+        @Override
+        public void onDataSelected(MarkerDataModel model, int index) {
+
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,6 +238,8 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                 }
             }
         }
+
+        getSensorAnalysis().getTagMarkers().addListener(menuDataListener);
     }
 
     private MotionAnalysisFragmentView view;

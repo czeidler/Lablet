@@ -34,7 +34,7 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
         selectableMarkers.add(selectedMarker);
         return selectableMarkers;
     }
-    
+
     public IMarker getMarkerAtScreenPosition(PointF screenPosition) {
         int currentMarkerRow = markerData.getSelectedMarkerData();
 
@@ -136,7 +136,7 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
 
         if (data == null) {
             data = new MarkerData(frame);
-            if (markerData.getMarkerCount() > 0) {
+            if (markerData.getMarkerCount() > 0 && markerData.getSelectedMarkerData() > 0) {
                 int selectedIndex = markerData.getSelectedMarkerData();
                 MarkerData prevData = markerData.getMarkerDataAt(selectedIndex);
                 data.setPosition(prevData.getPosition());
