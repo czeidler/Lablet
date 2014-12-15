@@ -10,6 +10,8 @@ package nz.ac.auckland.lablet.views;
 import android.content.Context;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
@@ -32,6 +34,8 @@ public class FrameContainerView extends RelativeLayout {
     private MotionAnalysis sensorAnalysis = null;
     private OriginMarkerPainter originMarkerPainter = null;
 
+    private GestureDetector gestureDetector;
+
     private FrameDataModel.IFrameDataModelListener frameDataModelListener = new FrameDataModel.IFrameDataModelListener() {
         @Override
         public void onFrameChanged(int newFrame) {
@@ -45,6 +49,21 @@ public class FrameContainerView extends RelativeLayout {
 
         }
     };
+
+    class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            int currentFrame = frameDataModel.getCurrentFrame();
+            if (frameDataModel.getCurrentFrame() < frameDataModel.getNumberOfFrames() - 1)
+                frameDataModel.setCurrentFrame(currentFrame + 1);
+            return true;
+        }
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return true;
+        }
+    }
 
     private MotionAnalysis.IListener motionAnalysisListener = new MotionAnalysis.IListener() {
         @Override
@@ -116,6 +135,14 @@ public class FrameContainerView extends RelativeLayout {
         RectF range = ((IExperimentFrameView) sensorAnalysisView).getDataRange();
         markerView.setRange(range);
         markerView.setMaxRange(range);
+
+        gestureDetector = new GestureDetector(getContext(), new GestureListener());
+        markerView.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return gestureDetector.onTouchEvent(motionEvent);
+            }
+        });
     }
 
     public void addTagMarkerData(MarkerDataModel data) {
