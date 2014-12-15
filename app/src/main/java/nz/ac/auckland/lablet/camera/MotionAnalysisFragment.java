@@ -14,10 +14,7 @@ import android.view.*;
 import android.widget.PopupMenu;
 import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.ExperimentHelper;
-import nz.ac.auckland.lablet.experiment.LengthCalibrationSetter;
-import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 
 
@@ -46,6 +43,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         final MenuItem deleteItem = menu.findItem(R.id.action_delete);
         assert deleteItem != null;
         final MarkerDataModel markerDataModel = getSensorAnalysis().getTagMarkers();
+        final FrameDataModel frameDataModel = getSensorAnalysis().getFrameDataModel();
         if (markerDataModel.getMarkerCount() <= 1)
             deleteItem.setVisible(false);
         else
@@ -66,7 +64,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                     newSelectedIndex = selectedIndex;
                 else
                     newSelectedIndex = selectedIndex - 1;
-                markerDataModel.selectMarkerData(newSelectedIndex);
+                frameDataModel.setCurrentFrame(markerDataModel.getMarkerDataAt(newSelectedIndex).getFrameId());
 
                 if (markerDataModel.getMarkerCount() <= 1)
                     getActivity().invalidateOptionsMenu();
