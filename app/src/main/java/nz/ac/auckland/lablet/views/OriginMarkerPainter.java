@@ -115,6 +115,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         if (firstDraw) {
             firstDraw = false;
             updateMarkerScreenPositions(getMarkerScreenPosition(markerData.getMarkerDataAt(0)));
+            updateTagMarkerPositions();
         }
 
         for (IMarker marker : markerList)
