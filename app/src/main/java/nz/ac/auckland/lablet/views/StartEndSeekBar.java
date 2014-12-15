@@ -55,7 +55,7 @@ abstract class StartEndMarker extends DraggableMarker {
     }
 
     @Override
-    protected boolean isPointOnSelectArea(PointF point) {
+    public boolean isPointOnSelectArea(PointF screenPoint) {
         PointF position = parent.getMarkerScreenPosition(markerData);
         // build a marker rect with increased width
         final float touchWidth = (float)parent.toPixel(60);
@@ -65,7 +65,7 @@ abstract class StartEndMarker extends DraggableMarker {
         rect.right = position.x + touchWidth / 2;
         rect.bottom = HEIGHT + 1;
 
-        return rect.contains(point.x, point.y);
+        return rect.contains(screenPoint.x, screenPoint.y);
     }
 
     protected void drawGlow(Canvas canvas, float position) {

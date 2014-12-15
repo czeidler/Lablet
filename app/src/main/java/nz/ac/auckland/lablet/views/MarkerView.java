@@ -174,19 +174,19 @@ abstract class DraggableMarker implements IMarker {
     /**
      * Check if a point is in the selectable are.
      *
-     * @param point to be checked
+     * @param screenPoint to be checked
      * @return true if the point is in the selectable area
      */
-    abstract protected boolean isPointOnSelectArea(PointF point);
+    abstract public boolean isPointOnSelectArea(PointF screenPoint);
 
     /**
      * Check if a point is in the draggable area of the marker.
      *
-     * @param point to be checked
+     * @param screenPoint to be checked
      * @return true if the point is in the drag area
      */
-    protected boolean isPointOnDragArea(PointF point) {
-        return isPointOnSelectArea(point);
+    protected boolean isPointOnDragArea(PointF screenPoint) {
+        return isPointOnSelectArea(screenPoint);
     }
 
 }
@@ -262,19 +262,19 @@ class SimpleMarker extends DraggableMarker {
     }
 
     @Override
-    protected boolean isPointOnSelectArea(PointF point) {
+    public boolean isPointOnSelectArea(PointF screenPoint) {
         PointF position = getCachedScreenPosition();
-        float distance = (float)Math.sqrt(Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2));
+        float distance = (float)Math.sqrt(Math.pow(screenPoint.x - position.x, 2) + Math.pow(screenPoint.y - position.y, 2));
         return distance <= INNER_RING_RADIUS;
     }
 
     @Override
-    protected boolean isPointOnDragArea(PointF point) {
+    protected boolean isPointOnDragArea(PointF screenPoint) {
         PointF position = getCachedScreenPosition();
-        float distance = (float)Math.sqrt(Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2));
+        float distance = (float)Math.sqrt(Math.pow(screenPoint.x - position.x, 2) + Math.pow(screenPoint.y - position.y, 2));
         if (distance < RING_RADIUS + RING_WIDTH / 2)
             return true;
-        return isPointOnSelectArea(point);
+        return isPointOnSelectArea(screenPoint);
     }
 
     protected int makeColor(int alpha, int red, int green, int blue) {
@@ -527,7 +527,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
         markerData.setMarkerPosition(newReal, row);
     }
 
-    protected IMarker getMarkerForRow(int row) {
+    public IMarker getMarkerForRow(int row) {
         if (row < 0 || row >= markerList.size())
             return null;
         return markerList.get(row);
@@ -554,6 +554,10 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
         IMarker marker = createMarkerForRow(row);
         marker.setTo(this, markerData.getMarkerDataAt(row));
         markerList.add(row, marker);
+    }
+
+    public int markerIndexOf(IMarker marker) {
+        return markerList.indexOf(marker);
     }
 
     public void removeMarker(int row) {

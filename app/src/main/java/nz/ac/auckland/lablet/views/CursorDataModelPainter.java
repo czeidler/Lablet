@@ -34,16 +34,16 @@ abstract class CursorMarker extends DraggableMarker {
     }
 
     @Override
-    protected boolean isPointOnSelectArea(PointF point) {
+    public boolean isPointOnSelectArea(PointF screenPoint) {
         PointF position = getCachedScreenPosition();
-        float distance = Math.abs(getDirection(point) - getDirection(position));
+        float distance = Math.abs(getDirection(screenPoint) - getDirection(position));
         return distance <= SELECT_RADIUS;
     }
 
     @Override
-    protected boolean isPointOnDragArea(PointF point) {
+    protected boolean isPointOnDragArea(PointF screenPoint) {
         PointF position = getCachedScreenPosition();
-        float distance = Math.abs(getDirection(point)- getDirection(position));
+        float distance = Math.abs(getDirection(screenPoint)- getDirection(position));
         if (distance < SELECT_RADIUS)
             return true;
         return false;
