@@ -29,7 +29,7 @@ public class TimeMarkerGraphAxis extends MarkerTimeGraphAxis {
     @Override
     public Number getValue(int index) {
         MarkerDataModel markerData = getData();
-        int runId = markerData.getMarkerDataAt(index).getRunId();
+        int runId = markerData.getMarkerDataAt(index).getFrameId();
         return getTimeData().getTimeAt(runId);
     }
 

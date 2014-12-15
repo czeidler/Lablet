@@ -60,9 +60,9 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
         if (sort) {
             for (; i < markerDataList.size(); i++) {
                 MarkerData current = markerDataList.get(i);
-                if (current.getRunId() == data.getRunId())
+                if (current.getFrameId() == data.getFrameId())
                     return -1;
-                if (current.getRunId() > data.getRunId())
+                if (current.getFrameId() > data.getFrameId())
                     break;
             }
         } else
@@ -76,8 +76,8 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
     public int getLargestRunId() {
         int runId = -1;
         for (MarkerData markerData : markerDataList) {
-            if (markerData.getRunId() > runId)
-                runId = markerData.getRunId();
+            if (markerData.getFrameId() > runId)
+                runId = markerData.getFrameId();
         }
         return runId;
     }
@@ -97,7 +97,7 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
         float[] yPositions = new float[getMarkerCount()];
         for (int i = 0; i < getMarkerCount(); i++) {
             MarkerData data = getMarkerDataAt(i);
-            runIds[i] = data.getRunId();
+            runIds[i] = data.getFrameId();
             xPositions[i] = data.getPosition().x;
             yPositions[i] = data.getPosition().y;
         }
@@ -126,7 +126,7 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
     public int findMarkerDataByRun(int run) {
         for (int i = 0; i < getMarkerCount(); i++) {
             MarkerData data = getMarkerDataAt(i);
-            if (data.getRunId() == run)
+            if (data.getFrameId() == run)
                 return i;
         }
         return -1;

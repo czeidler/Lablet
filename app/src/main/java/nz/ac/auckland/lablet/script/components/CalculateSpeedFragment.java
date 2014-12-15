@@ -391,13 +391,13 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
             return;
 
         String text = "";
-        text += timeData.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex()).getRunId());
+        text += timeData.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex()).getFrameId());
         time1EditText.setText(text);
         text = "";
-        text += timeData.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 1).getRunId());
+        text += timeData.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 1).getFrameId());
         time2EditText.setText(text);
         text = "";
-        text += timeData.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 2).getRunId());
+        text += timeData.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 2).getFrameId());
         time3EditText.setText(text);
 
         text = "";

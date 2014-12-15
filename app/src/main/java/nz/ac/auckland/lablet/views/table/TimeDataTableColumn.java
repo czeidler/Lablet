@@ -33,7 +33,7 @@ public class TimeDataTableColumn extends UnitDataTableColumn {
 
     @Override
     public Number getValue(int index) {
-        int runId = dataModel.getMarkerDataAt(index).getRunId();
+        int runId = dataModel.getMarkerDataAt(index).getFrameId();
         return timeData.getTimeAt(runId);
     }
 
