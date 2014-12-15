@@ -26,28 +26,28 @@ public class MotionAnalysis implements IDataAnalysis {
         void onShowCoordinateSystem(boolean show);
     }
 
-    private CameraExperimentData sensorData;
+    final private CameraExperimentData sensorData;
 
-    private FrameDataModel frameDataModel;
-    private CalibrationXY calibrationXY;
-    private CalibrationVideoTimeData calibrationVideoTimeData;
-    private ITimeData timeData;
+    final private FrameDataModel frameDataModel;
+    final private CalibrationXY calibrationXY;
+    final private CalibrationVideoTimeData calibrationVideoTimeData;
+    final private ITimeData timeData;
 
-    private Unit xUnit = new Unit("m");
-    private Unit yUnit = new Unit("m");
-    private Unit tUnit = new Unit("s");
+    final private Unit xUnit = new Unit("m");
+    final private Unit yUnit = new Unit("m");
+    final private Unit tUnit = new Unit("s");
 
-    private CalibratedMarkerDataModel tagMarkers;
-    private MarkerDataModel lengthCalibrationMarkers;
-    private MarkerDataModel originMarkers;
+    final private CalibratedMarkerDataModel tagMarkers;
+    final private MarkerDataModel lengthCalibrationMarkers;
+    final private MarkerDataModel originMarkers;
 
-    private LengthCalibrationSetter lengthCalibrationSetter;
-    private OriginCalibrationSetter originCalibrationSetter;
+    final private LengthCalibrationSetter lengthCalibrationSetter;
+    final private OriginCalibrationSetter originCalibrationSetter;
     private boolean showCoordinateSystem = true;
 
     private Bundle videoAnalysisSettings = null;
 
-    private List<IListener> listenerList = new ArrayList<>();
+    final private List<IListener> listenerList = new ArrayList<>();
 
     public MotionAnalysis(CameraExperimentData sensorData) {
         this.sensorData = sensorData;
