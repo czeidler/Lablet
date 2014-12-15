@@ -9,6 +9,7 @@ package nz.ac.auckland.lablet.views;
 
 import android.content.Context;
 import android.graphics.*;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewParent;
@@ -632,12 +633,12 @@ public class MarkerView extends PlotPainterContainerView {
         }
     }
 
-    public void setCurrentFrame(int frame) {
+    public void setCurrentFrame(int frame, @Nullable PointF insertHint) {
         for (IPlotPainter painter : allPainters) {
             if (!(painter instanceof TagMarkerDataModelPainter))
                 continue;
             TagMarkerDataModelPainter tagMarkerDataModelPainter = (TagMarkerDataModelPainter)painter;
-            tagMarkerDataModelPainter.setCurrentFrame(frame);
+            tagMarkerDataModelPainter.setCurrentFrame(frame, insertHint);
             // deselect any marker
             tagMarkerDataModelPainter.getMarkerPainterGroup().deselect();
         }

@@ -18,7 +18,6 @@ import android.widget.RelativeLayout;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
-import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 
@@ -43,7 +42,7 @@ public class FrameContainerView extends RelativeLayout {
         @Override
         public void onFrameChanged(int newFrame) {
             ((IExperimentFrameView) sensorAnalysisView).setCurrentFrame(newFrame);
-            markerView.setCurrentFrame(newFrame);
+            markerView.setCurrentFrame(newFrame, null);
             markerView.invalidate();
         }
 
@@ -69,15 +68,19 @@ public class FrameContainerView extends RelativeLayout {
             int tappedMarkerIndex = painter.markerIndexOf(tappedMarker);
 
             MarkerDataModel markerDataModel = painter.getMarkerModel();
-            frameDataModel.setCurrentFrame(markerDataModel.getMarkerDataAt(tappedMarkerIndex).getRunId());
+            int frameId = markerDataModel.getMarkerDataAt(tappedMarkerIndex).getFrameId();
+            frameDataModel.setCurrentFrame(frameId);
             return true;
         }
 
         @Override
         public boolean onDoubleTap(MotionEvent e) {
             int currentFrame = frameDataModel.getCurrentFrame();
-            if (frameDataModel.getCurrentFrame() < frameDataModel.getNumberOfFrames() - 1)
-                frameDataModel.setCurrentFrame(currentFrame + 1);
+            int newFrame = currentFrame + 1;
+            if (newFrame < frameDataModel.getNumberOfFrames()) {
+                frameDataModel.setCurrentFrame(newFrame);
+                markerView.setCurrentFrame(newFrame, new PointF(e.getX(), e.getY()));
+            }
             return true;
         }
 

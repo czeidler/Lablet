@@ -9,6 +9,7 @@ package nz.ac.auckland.lablet.views;
 
 import android.graphics.Canvas;
 import android.graphics.PointF;
+import android.support.annotation.Nullable;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
@@ -97,7 +98,7 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
         private int markerInsertedInLastRun = -1;
         private PointF lastMarkerPosition = new PointF();
 
-        void onCurrentRunChanging(MarkerDataModel markersDataModel) {
+        void onCurrentFrameChanging(MarkerDataModel markersDataModel) {
             // Index could be out of bounds, e.g., when the marker data has been cleared.
             if (markerInsertedInLastRun >= markerData.getMarkerCount()) {
                 markerInsertedInLastRun =-1;
@@ -123,8 +124,8 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
         }
     }
 
-    public void setCurrentFrame(int frame) {
-        lastInsertMarkerManager.onCurrentRunChanging(markerData);
+    public void setCurrentFrame(int frame, @Nullable PointF insertHint) {
+        lastInsertMarkerManager.onCurrentFrameChanging(markerData);
 
         // check if we have the run in the data list
         MarkerData data = null;
@@ -136,23 +137,30 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
 
         if (data == null) {
             data = new MarkerData(frame);
-            if (markerData.getMarkerCount() > 0 && markerData.getSelectedMarkerData() > 0) {
-                int selectedIndex = markerData.getSelectedMarkerData();
-                MarkerData prevData = markerData.getMarkerDataAt(selectedIndex);
-                data.setPosition(prevData.getPosition());
-                data.getPosition().x += 5;
-
-                // sanitize the new marker position
-                PointF screenPos = new PointF();
-                containerView.toScreen(data.getPosition(), screenPos);
-                sanitizeScreenPoint(screenPos);
-                containerView.fromScreen(screenPos, data.getPosition());
+            if (insertHint != null) {
+                sanitizeScreenPoint(insertHint);
+                PointF insertHintReal = new PointF();
+                containerView.fromScreen(insertHint, insertHintReal);
+                data.setPosition(insertHintReal);
             } else {
-                // center the first marker
-                PointF initPosition = new PointF();
-                initPosition.x = (containerView.getRangeRight() - containerView.getRangeLeft()) * 0.5f;
-                initPosition.y = (containerView.getRangeTop() - containerView.getRangeBottom()) * 0.5f;
-                data.setPosition(initPosition);
+                if (markerData.getMarkerCount() > 0 && markerData.getSelectedMarkerData() > 0) {
+                    int selectedIndex = markerData.getSelectedMarkerData();
+                    MarkerData prevData = markerData.getMarkerDataAt(selectedIndex);
+                    data.setPosition(prevData.getPosition());
+                    data.getPosition().x += 5;
+
+                    // sanitize the new marker position
+                    PointF screenPos = new PointF();
+                    containerView.toScreen(data.getPosition(), screenPos);
+                    sanitizeScreenPoint(screenPos);
+                    containerView.fromScreen(screenPos, data.getPosition());
+                } else {
+                    // center the first marker
+                    PointF initPosition = new PointF();
+                    initPosition.x = (containerView.getRangeRight() - containerView.getRangeLeft()) * 0.5f;
+                    initPosition.y = (containerView.getRangeTop() - containerView.getRangeBottom()) * 0.5f;
+                    data.setPosition(initPosition);
+                }
             }
 
             int newIndex = markerData.addMarkerData(data);
