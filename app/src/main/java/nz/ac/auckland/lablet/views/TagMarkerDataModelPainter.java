@@ -103,19 +103,19 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
         }
     }
 
-    public void setCurrentRun(int run) {
+    public void setCurrentFrame(int frame) {
         lastInsertMarkerManager.onCurrentRunChanging(markerData);
 
         // check if we have the run in the data list
         MarkerData data = null;
-        int index = markerData.findMarkerDataByRun(run);
+        int index = markerData.findMarkerDataByRun(frame);
         if (index >= 0) {
             data = markerData.getMarkerDataAt(index);
             markerData.selectMarkerData(index);
         }
 
         if (data == null) {
-            data = new MarkerData(run);
+            data = new MarkerData(frame);
             if (markerData.getMarkerCount() > 0) {
                 int selectedIndex = markerData.getSelectedMarkerData();
                 MarkerData prevData = markerData.getMarkerDataAt(selectedIndex);

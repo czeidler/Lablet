@@ -139,7 +139,7 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
     public CursorDataModelPainter(MarkerDataModel data) {
         super(data);
 
-        getMarkerPainterGroup().setSelectOnSelectOnDrag(true);
+        getMarkerPainterGroup().setSelectOnDrag(true);
     }
 
     @Override

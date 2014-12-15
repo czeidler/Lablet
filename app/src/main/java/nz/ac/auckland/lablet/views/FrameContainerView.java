@@ -36,7 +36,7 @@ public class FrameContainerView extends RelativeLayout {
         @Override
         public void onFrameChanged(int newFrame) {
             ((IExperimentFrameView) sensorAnalysisView).setCurrentFrame(newFrame);
-            markerView.setCurrentRun(newFrame);
+            markerView.setCurrentFrame(newFrame);
             markerView.invalidate();
         }
 

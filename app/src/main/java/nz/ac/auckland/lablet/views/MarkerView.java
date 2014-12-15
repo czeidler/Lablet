@@ -304,13 +304,13 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
         private AbstractMarkerPainter selectedForDragPainter = null;
         private IMarker selectedForDragMarker = null;
         private boolean inSelectForDragMethod = false;
-        private boolean selectOnSelectOnDrag = false;
+        private boolean selectOnDrag = false;
 
         public void deselect() {
             if (selectedForDragMarker == null || selectedForDragPainter == null)
                 return;
             selectedForDragPainter.containerView.invalidate();
-            if (selectOnSelectOnDrag)
+            if (selectOnDrag)
                 selectedForDragPainter.markerData.selectMarkerData(-1);
 
             selectedForDragMarker.setSelectedForDrag(false);
@@ -321,10 +321,10 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
         /**
          * Set if the MarkerData should be marked as selected if the IMarker is selected for drag.
          *
-         * @param selectOnSelectOnDrag
+         * @param selectOnDrag
          */
-        public void setSelectOnSelectOnDrag(boolean selectOnSelectOnDrag) {
-            this.selectOnSelectOnDrag = selectOnSelectOnDrag;
+        public void setSelectOnDrag(boolean selectOnDrag) {
+            this.selectOnDrag = selectOnDrag;
         }
 
         public void selectForDrag(IMarker marker, AbstractMarkerPainter painter) {
@@ -339,7 +339,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
 
                     if (selectedForDragPainter == painter && selectedForDragMarker == marker) {
                         selectedForDragPainter.containerView.invalidate();
-                        if (selectOnSelectOnDrag)
+                        if (selectOnDrag)
                             selectedForDragPainter.markerData.selectMarkerData(-1);
                         selectedForDragPainter = null;
                         selectedForDragMarker = null;
@@ -349,14 +349,14 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
                 // marker has been selected; deselect old marker
                 if (selectedForDragMarker != null && selectedForDragMarker != marker) {
                     selectedForDragMarker.setSelectedForDrag(false);
-                    if (selectOnSelectOnDrag)
+                    if (selectOnDrag)
                         selectedForDragPainter.markerData.selectMarkerData(-1);
                     selectedForDragPainter.containerView.invalidate();
                 }
 
                 selectedForDragPainter = painter;
                 selectedForDragMarker = marker;
-                if (selectOnSelectOnDrag) {
+                if (selectOnDrag) {
                     int selectedIndex = selectedForDragPainter.getSelectableMarkerList().indexOf(selectedForDragMarker);
                     selectedForDragPainter.markerData.selectMarkerData(selectedIndex);
                 }
@@ -393,7 +393,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
 
         @Override
         public void onDataSelected(MarkerDataModel model, int index) {
-            if (getMarkerPainterGroup().selectOnSelectOnDrag && index >= 0)
+            if (getMarkerPainterGroup().selectOnDrag && index >= 0)
                 markerList.get(index).setSelectedForDrag(true);
 
             containerView.invalidate();
@@ -622,12 +622,12 @@ public class MarkerView extends PlotPainterContainerView {
         }
     }
 
-    public void setCurrentRun(int run) {
+    public void setCurrentFrame(int frame) {
         for (IPlotPainter painter : allPainters) {
             if (!(painter instanceof TagMarkerDataModelPainter))
                 continue;
             TagMarkerDataModelPainter tagMarkerDataModelPainter = (TagMarkerDataModelPainter)painter;
-            tagMarkerDataModelPainter.setCurrentRun(run);
+            tagMarkerDataModelPainter.setCurrentFrame(frame);
             // deselect any marker
             tagMarkerDataModelPainter.getMarkerPainterGroup().deselect();
         }
