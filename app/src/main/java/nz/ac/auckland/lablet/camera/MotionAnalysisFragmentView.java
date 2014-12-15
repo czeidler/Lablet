@@ -126,6 +126,8 @@ class MotionAnalysisFragmentView extends FrameLayout {
     final private FrameContainerView runContainerView;
     final private GraphView2D graphView;
     final private Spinner graphSpinner;
+    final private ViewGroup sideBarView;
+    final private ScrollView scrollView;
     final private TableView tableView;
     final private MotionAnalysisSideBar sideBar;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
@@ -164,6 +166,66 @@ class MotionAnalysisFragmentView extends FrameLayout {
         }
     }
 
+    private SideBarState sideBarState = new ClosedSideBarState();
+
+    private void setSideBarState(SideBarState state) {
+        if (sideBarState != null)
+            sideBarState.leaveState();
+        sideBarState = state;
+        if (sideBarState != null)
+            sideBarState.enterState();
+    }
+
+    abstract class SideBarState {
+        abstract void nextState();
+        void enterState() {}
+        void leaveState() {}
+    }
+
+    class ClosedSideBarState extends SideBarState {
+        @Override
+        void nextState() {
+            setSideBarState(new HalfOpenedSideBarState());
+        }
+    }
+
+    class HalfOpenedSideBarState extends SideBarState {
+        @Override
+        void nextState() {
+            setSideBarState(new OpenedSideBarState());
+        }
+
+        @Override
+        void enterState() {
+            scrollView.setVisibility(GONE);
+            ViewGroup.LayoutParams params = sideBarView.getLayoutParams();
+            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            sideBarView.setLayoutParams(params);
+
+            sideBar.open();
+        }
+
+        @Override
+        void leaveState() {
+            ViewGroup.LayoutParams params = sideBarView.getLayoutParams();
+            params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            sideBarView.setLayoutParams(params);
+            scrollView.setVisibility(VISIBLE);
+        }
+    }
+
+    class OpenedSideBarState extends SideBarState {
+        @Override
+        void nextState() {
+            setSideBarState(new ClosedSideBarState());
+        }
+
+        @Override
+        void leaveState() {
+            sideBar.close();
+        }
+    }
+
     public MotionAnalysisFragmentView(Context context, MotionAnalysis sensorAnalysis) {
         super(context);
 
@@ -171,7 +233,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
         final View mainView = inflater.inflate(R.layout.motion_analysis, this, true);
         assert mainView != null;
 
-        ViewGroup sideBarView = (ViewGroup)inflater.inflate(R.layout.motion_analysis_data_side_bar, null, false);
+        sideBarView = (ViewGroup)inflater.inflate(R.layout.motion_analysis_data_side_bar, null, false);
         sideBarView.setAlpha(0.75f);
 
         sideBar = new MotionAnalysisSideBar(mainView, sideBarView);
@@ -183,22 +245,22 @@ class MotionAnalysisFragmentView extends FrameLayout {
         drawerButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!sideBar.isOpen())
-                    sideBar.open();
-                else
-                    sideBar.close();
+                sideBarState.nextState();
             }
         });
 
-        graphSpinner = (Spinner)mainView.findViewById(R.id.graphSpinner);
+        graphSpinner = (Spinner)sideBarView.findViewById(R.id.graphSpinner);
 
         // marker graph view
-        graphView = (GraphView2D)mainView.findViewById(R.id.tagMarkerGraphView);
+        graphView = (GraphView2D)sideBarView.findViewById(R.id.tagMarkerGraphView);
         assert graphView != null;
 
-        tableView = (TableView)mainView.findViewById(R.id.tableView);
+        tableView = (TableView)sideBarView.findViewById(R.id.tableView);
         assert tableView != null;
         tableView.setColumnWeights(1f, 1.8f, 1.4f, 1.4f);
+
+        scrollView = (ScrollView)sideBarView.findViewById(R.id.scrollView);
+        assert tableView != null;
 
         final View sensorAnalysisView = new CameraExperimentFrameView(context, sensorAnalysis);
         if (sensorAnalysisView == null)
@@ -291,8 +353,8 @@ class MotionAnalysisFragmentView extends FrameLayout {
                 return false;
             }
         };
-        findViewById(R.id.scrollView).setOnTouchListener(onTouchListener);
         findViewById(R.id.sideBarFrame).setOnTouchListener(onTouchListener);
+        sideBarView.findViewById(R.id.scrollView).setOnTouchListener(onTouchListener);
         sideBarView.setOnTouchListener(onTouchListener);
         tableView.setOnTouchListener(onTouchListener);
     }
