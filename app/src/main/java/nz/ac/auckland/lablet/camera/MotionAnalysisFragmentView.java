@@ -197,16 +197,21 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
         @Override
         void enterState() {
+            sideBarView.setAlpha(0.4f);
+            graphView.setClickable(false);
+
             scrollView.setVisibility(GONE);
             ViewGroup.LayoutParams params = sideBarView.getLayoutParams();
             params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
             sideBarView.setLayoutParams(params);
-
             sideBar.open();
         }
 
         @Override
         void leaveState() {
+            graphView.setClickable(true);
+            sideBarView.setAlpha(0.8f);
+
             ViewGroup.LayoutParams params = sideBarView.getLayoutParams();
             params.height = ViewGroup.LayoutParams.MATCH_PARENT;
             sideBarView.setLayoutParams(params);
@@ -234,7 +239,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
         assert mainView != null;
 
         sideBarView = (ViewGroup)inflater.inflate(R.layout.motion_analysis_data_side_bar, null, false);
-        sideBarView.setAlpha(0.75f);
 
         sideBar = new MotionAnalysisSideBar(mainView, sideBarView);
 
@@ -346,17 +350,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
             tableView.setAdapter(markerDataTableAdapter);
             selectGraphAdapter(graphSpinner.getSelectedItemPosition());
         }
-
-        OnTouchListener onTouchListener = new OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                return false;
-            }
-        };
-        findViewById(R.id.sideBarFrame).setOnTouchListener(onTouchListener);
-        sideBarView.findViewById(R.id.scrollView).setOnTouchListener(onTouchListener);
-        sideBarView.setOnTouchListener(onTouchListener);
-        tableView.setOnTouchListener(onTouchListener);
     }
 
     private void selectGraphAdapter(int i) {
