@@ -74,7 +74,7 @@ public class MarkerDataTableAdapter extends ColumnDataTableAdapter {
 
         @Override
         public void onDataSelected (MarkerDataModel model,int index){
-            notifyRowSelected(index + 1);
+            notifyRowSelected(index);
         }
     };
 
