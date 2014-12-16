@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views;
+package nz.ac.auckland.lablet.camera;
 
 import android.content.Context;
 import android.graphics.PointF;
@@ -19,17 +19,19 @@ import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.*;
 
 
 /**
- * Container for the {@link IExperimentFrameView} and a marker view overlay.
+ * Container for the {@link nz.ac.auckland.lablet.views.IExperimentFrameView} and a marker view overlay.
  * <p>
  * The resize behaviour of the run view is copied and the marker view is put exactly on top of the run view. In this way
  * the screen coordinates of the run view and the marker view are the same.
  * </p>
  */
-public class FrameContainerView extends RelativeLayout {
-    private View sensorAnalysisView = null;
+class FrameContainerView extends RelativeLayout {
+    private View videoAnalysisView = null;
+    private View seekBar;
     private MarkerView markerView = null;
     private TagMarkerDataModelPainter painter = null;
     private FrameDataModel frameDataModel = null;
@@ -41,7 +43,7 @@ public class FrameContainerView extends RelativeLayout {
     private FrameDataModel.IFrameDataModelListener frameDataModelListener = new FrameDataModel.IFrameDataModelListener() {
         @Override
         public void onFrameChanged(int newFrame) {
-            ((IExperimentFrameView) sensorAnalysisView).setCurrentFrame(newFrame);
+            ((IExperimentFrameView) videoAnalysisView).setCurrentFrame(newFrame);
             markerView.setCurrentFrame(newFrame, null);
             markerView.invalidate();
         }
@@ -52,14 +54,32 @@ public class FrameContainerView extends RelativeLayout {
         }
     };
 
+    class SeekBarManager {
+        boolean open = false;
+
+        public boolean isOpen() {
+            return open;
+        }
+
+        public void open() {
+            open = true;
+            seekBar.setVisibility(VISIBLE);
+        }
+
+        public void close() {
+            open = false;
+            seekBar.setVisibility(INVISIBLE);
+        }
+    }
+    private SeekBarManager seekBarManager = new SeekBarManager();
+
     class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
             if (painter == null)
                 return super.onSingleTapUp(e);
 
-            IMarker currentMarker = painter.getMarkerForRow(painter.getMarkerModel().getSelectedMarkerData());
-            if (currentMarker != null && currentMarker.isSelectedForDrag())
+            if (markerView.isAnyMarkerSelectedForDrag())
                 return super.onSingleTapUp(e);
 
             IMarker tappedMarker = painter.getMarkerAtScreenPosition(new PointF(e.getX(), e.getY()));
@@ -86,6 +106,13 @@ public class FrameContainerView extends RelativeLayout {
 
         @Override
         public boolean onDown(MotionEvent e) {
+            if (markerView.isAnyMarkerSelectedForDrag())
+                return false;
+
+            if (seekBarManager.isOpen())
+                seekBarManager.close();
+            else
+                seekBarManager.open();
             return true;
         }
     }
@@ -119,7 +146,9 @@ public class FrameContainerView extends RelativeLayout {
         }
     }
 
-    public void setTo(View runView, MotionAnalysis analysis) {
+    public void setTo(View runView, View seekBar, MotionAnalysis analysis) {
+        this.seekBar = seekBar;
+
         if (sensorAnalysis != null)
             sensorAnalysis.removeListener(motionAnalysisListener);
         sensorAnalysis = analysis;
@@ -130,13 +159,13 @@ public class FrameContainerView extends RelativeLayout {
         frameDataModel = sensorAnalysis.getFrameDataModel();
         frameDataModel.addListener(frameDataModelListener);
 
-        sensorAnalysisView = runView;
+        videoAnalysisView = runView;
 
-        sensorAnalysisView.addOnLayoutChangeListener(new OnLayoutChangeListener() {
+        videoAnalysisView.addOnLayoutChangeListener(new OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View view, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
-                int parentWidth = sensorAnalysisView.getMeasuredWidth();
-                int parentHeight = sensorAnalysisView.getMeasuredHeight();
+                int parentWidth = videoAnalysisView.getMeasuredWidth();
+                int parentHeight = videoAnalysisView.getMeasuredHeight();
                 markerView.setSize(parentWidth, parentHeight);
             }
         });
@@ -144,20 +173,20 @@ public class FrameContainerView extends RelativeLayout {
         // run view
         RelativeLayout.LayoutParams runViewParams = new RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        addView(sensorAnalysisView, runViewParams);
+        addView(videoAnalysisView, runViewParams);
 
         // marker view
         RelativeLayout.LayoutParams makerViewParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        makerViewParams.addRule(RelativeLayout.ALIGN_LEFT, sensorAnalysisView.getId());
-        makerViewParams.addRule(RelativeLayout.ALIGN_TOP, sensorAnalysisView.getId());
-        makerViewParams.addRule(RelativeLayout.ALIGN_RIGHT, sensorAnalysisView.getId());
-        makerViewParams.addRule(RelativeLayout.ALIGN_BOTTOM, sensorAnalysisView.getId());
+        makerViewParams.addRule(RelativeLayout.ALIGN_LEFT, videoAnalysisView.getId());
+        makerViewParams.addRule(RelativeLayout.ALIGN_TOP, videoAnalysisView.getId());
+        makerViewParams.addRule(RelativeLayout.ALIGN_RIGHT, videoAnalysisView.getId());
+        makerViewParams.addRule(RelativeLayout.ALIGN_BOTTOM, videoAnalysisView.getId());
 
         markerView = new MarkerView(getContext());
         addView(markerView, makerViewParams);
 
-        RectF range = ((IExperimentFrameView) sensorAnalysisView).getDataRange();
+        RectF range = ((IExperimentFrameView) videoAnalysisView).getDataRange();
         markerView.setRange(range);
         markerView.setMaxRange(range);
 
@@ -202,7 +231,7 @@ public class FrameContainerView extends RelativeLayout {
     }
 
     /**
-     * Copy resize behaviour of the sensorAnalysisView.
+     * Copy resize behaviour of the videoAnalysisView.
      */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -214,10 +243,10 @@ public class FrameContainerView extends RelativeLayout {
         int specWidthMode = MeasureSpec.getMode(widthMeasureSpec);
         int specHeightMode = MeasureSpec.getMode(heightMeasureSpec);
 
-        sensorAnalysisView.measure(widthMeasureSpec, heightMeasureSpec);
+        videoAnalysisView.measure(widthMeasureSpec, heightMeasureSpec);
 
-        int width = sensorAnalysisView.getMeasuredWidth();
-        int height = sensorAnalysisView.getMeasuredHeight();
+        int width = videoAnalysisView.getMeasuredWidth();
+        int height = videoAnalysisView.getMeasuredHeight();
 
         super.onMeasure(MeasureSpec.makeMeasureSpec(width, specWidthMode),
                 MeasureSpec.makeMeasureSpec(height, specHeightMode));

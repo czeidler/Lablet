@@ -23,24 +23,6 @@ import java.util.List;
 
 
 /**
- * Interface for a drawable, selectable marker that can handle motion events.
- */
-interface IMarker {
-    public void setTo(AbstractMarkerPainter painter, MarkerData markerData);
-
-    public void onDraw(Canvas canvas, float priority);
-
-    public boolean handleActionDown(MotionEvent ev);
-    public boolean handleActionUp(MotionEvent ev);
-    public boolean handleActionMove(MotionEvent ev);
-
-    public void setSelectedForDrag(boolean selectedForDrag);
-    public boolean isSelectedForDrag();
-
-    public void invalidate();
-}
-
-/**
  * A selectable and draggable marker.
  * <p>
  * Once the marker is selected it can be dragged around. The marker has an area where it can be selected and an area
@@ -306,6 +288,10 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
         private IMarker selectedForDragMarker = null;
         private boolean inSelectForDragMethod = false;
         private boolean selectOnDrag = false;
+
+        public IMarker getSelectedForDragMarker() {
+            return selectedForDragMarker;
+        }
 
         public void deselect() {
             if (selectedForDragMarker == null || selectedForDragPainter == null)
@@ -618,6 +604,12 @@ public class MarkerView extends PlotPainterContainerView {
         setWillNotDraw(false);
 
         getDrawingRect(viewFrame);
+    }
+
+    public boolean isAnyMarkerSelectedForDrag() {
+        if (markerPainterGroup == null)
+            return false;
+        return markerPainterGroup.getSelectedForDragMarker() != null;
     }
 
     @Override
