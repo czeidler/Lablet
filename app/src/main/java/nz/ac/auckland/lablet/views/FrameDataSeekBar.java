@@ -11,6 +11,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.R;
@@ -28,6 +29,8 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.IFr
     private TextView progressLabel = null;
     private TextView timeLabel = null;
     private SeekBar seekBar = null;
+
+    private long lastTouchEvent = 0;
 
     @Override
     public void onFrameChanged(int newFrame) {
@@ -96,7 +99,7 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.IFr
 
     private void init(Context context) {
         LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        layoutInflater.inflate(R.layout.experiment_run_view_control, this, true);
+        layoutInflater.inflate(R.layout.frame_data_seek_bar, this, true);
 
         final ImageButton prevButton = (ImageButton)findViewById(R.id.frameBackButton);
         final ImageButton nextButton = (ImageButton)findViewById(R.id.nextFrameButton);
@@ -182,5 +185,15 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.IFr
 
         seekBar.setMax(frameDataModel.getNumberOfFrames() - 1);
         seekBar.setProgress(run);
+    }
+
+    public long getLastTouchEvent() {
+        return lastTouchEvent;
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        lastTouchEvent = ev.getEventTime();
+        return super.dispatchTouchEvent(ev);
     }
 }

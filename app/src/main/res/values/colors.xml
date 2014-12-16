@@ -2,4 +2,5 @@
 <resources>
     <color name="sc_question_background_color">#464646</color>
     <color name="dark_grey">#444444</color>
+    <color name="dark_grey_transparent">#AA444444</color>
 </resources>

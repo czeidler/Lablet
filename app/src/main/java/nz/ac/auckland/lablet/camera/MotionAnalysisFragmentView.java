@@ -19,7 +19,6 @@ import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.experiment.Unit;
 import nz.ac.auckland.lablet.misc.WeakListenable;
-import nz.ac.auckland.lablet.views.FrameContainerView;
 import nz.ac.auckland.lablet.views.FrameDataSeekBar;
 import nz.ac.auckland.lablet.views.graph.*;
 import nz.ac.auckland.lablet.views.plotview.LinearFitPainter;
@@ -130,6 +129,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
     final private ScrollView scrollView;
     final private TableView tableView;
     final private MotionAnalysisSideBar sideBar;
+    final private FrameDataSeekBar frameDataSeekBar;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
     private boolean releaseAdaptersWhenDrawerClosed = false;
 
@@ -238,12 +238,12 @@ class MotionAnalysisFragmentView extends FrameLayout {
         final View mainView = inflater.inflate(R.layout.motion_analysis, this, true);
         assert mainView != null;
 
-        sideBarView = (ViewGroup)inflater.inflate(R.layout.motion_analysis_data_side_bar, null, false);
+        frameDataSeekBar = (FrameDataSeekBar)mainView.findViewById(R.id.frameDataSeekBar);
 
+        sideBarView = (ViewGroup)inflater.inflate(R.layout.motion_analysis_data_side_bar, null, false);
         sideBar = new MotionAnalysisSideBar(mainView, sideBarView);
 
         runContainerView = (FrameContainerView)mainView.findViewById(R.id.frameContainerView);
-        final FrameDataSeekBar runViewControl = (FrameDataSeekBar)mainView.findViewById(R.id.frameDataSeekBar);
 
         final Button drawerButton = (Button)mainView.findViewById(R.id.drawerButton);
         drawerButton.setOnClickListener(new OnClickListener() {
@@ -270,9 +270,9 @@ class MotionAnalysisFragmentView extends FrameLayout {
         if (sensorAnalysisView == null)
             return;
 
-        runViewControl.setTo(sensorAnalysis.getFrameDataModel(), sensorAnalysis.getTimeData());
+        frameDataSeekBar.setTo(sensorAnalysis.getFrameDataModel(), sensorAnalysis.getTimeData());
 
-        runContainerView.setTo(sensorAnalysisView, sensorAnalysis);
+        runContainerView.setTo(sensorAnalysisView, frameDataSeekBar, sensorAnalysis);
         runContainerView.addTagMarkerData(sensorAnalysis.getTagMarkers());
         runContainerView.addXYCalibrationData(sensorAnalysis.getXYCalibrationMarkers());
         runContainerView.addOriginData(sensorAnalysis.getOriginMarkers(), sensorAnalysis.getCalibrationXY());

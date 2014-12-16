@@ -71,11 +71,13 @@ public class PlotPainterContainerView extends RangeDrawingView {
 
     @Override
     public boolean dispatchTouchEvent(@NonNull MotionEvent event) {
+        boolean handled = super.dispatchTouchEvent(event);
+
         for (IPlotPainter painter : allPainters) {
             if (painter.onTouchEvent(event))
                 return true;
         }
-        return super.dispatchTouchEvent(event);
+        return handled;
     }
 
     @Override

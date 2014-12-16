@@ -7,15 +7,21 @@
  */
 package nz.ac.auckland.lablet.camera;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
-import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
@@ -29,9 +35,9 @@ import nz.ac.auckland.lablet.views.*;
  * the screen coordinates of the run view and the marker view are the same.
  * </p>
  */
-class FrameContainerView extends RelativeLayout {
+public class FrameContainerView extends RelativeLayout {
     private View videoAnalysisView = null;
-    private View seekBar;
+    private FrameDataSeekBar seekBar;
     private MarkerView markerView = null;
     private TagMarkerDataModelPainter painter = null;
     private FrameDataModel frameDataModel = null;
@@ -39,6 +45,7 @@ class FrameContainerView extends RelativeLayout {
     private OriginMarkerPainter originMarkerPainter = null;
 
     private GestureDetector gestureDetector;
+    final Handler handler = new Handler();
 
     private FrameDataModel.IFrameDataModelListener frameDataModelListener = new FrameDataModel.IFrameDataModelListener() {
         @Override
@@ -46,6 +53,7 @@ class FrameContainerView extends RelativeLayout {
             ((IExperimentFrameView) videoAnalysisView).setCurrentFrame(newFrame);
             markerView.setCurrentFrame(newFrame, null);
             markerView.invalidate();
+            seekBarManager.open();
         }
 
         @Override
@@ -56,22 +64,104 @@ class FrameContainerView extends RelativeLayout {
 
     class SeekBarManager {
         boolean open = false;
+        long lastOpenRequest = 0;
+        final int openTime = 3000;
+
+        final int animationDuration = 300;
+        AnimatorSet animator = null;
+
+        public SeekBarManager() {
+            seekBar.setVisibility(View.INVISIBLE);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    open();
+                }
+            });
+        }
 
         public boolean isOpen() {
             return open;
         }
 
         public void open() {
+            // seek bar getLastTouchEvent is SystemClock.uptimeMillis();
+            lastOpenRequest = SystemClock.uptimeMillis();
+            if (open)
+                return;
             open = true;
-            seekBar.setVisibility(VISIBLE);
+
+            seekBar.setVisibility(View.VISIBLE);
+
+            animate(FrameContainerView.this.getHeight(), FrameContainerView.this.getHeight() - seekBar.getHeight(),
+                    new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    animator = null;
+                    scheduleClose(openTime);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                    animator = null;
+                }
+            });
         }
 
-        public void close() {
-            open = false;
-            seekBar.setVisibility(INVISIBLE);
+        private void close() {
+            animate(FrameContainerView.this.getHeight() - seekBar.getHeight(), FrameContainerView.this.getHeight(),
+                    new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    animator = null;
+                    open = false;
+                    seekBar.setVisibility(INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                    animator = null;
+                }
+            });
+        }
+
+        private void animate(int startY, int endY, AnimatorListenerAdapter listener) {
+            // startY == endY == 0 can happen during init, wait for the real open event
+            if (startY == endY) {
+                open = false;
+                return;
+            }
+            if (animator != null)
+                animator.cancel();
+
+            animator = new AnimatorSet();
+            animator.play(ObjectAnimator.ofFloat(seekBar, View.Y, startY, endY));
+            animator.setDuration(animationDuration);
+            animator.setInterpolator(new DecelerateInterpolator());
+            animator.addListener(listener);
+            animator.start();
+        }
+
+        private void scheduleClose(long delay) {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    long currentTime = SystemClock.uptimeMillis();
+                    if (seekBar.getLastTouchEvent() > lastOpenRequest)
+                        lastOpenRequest = seekBar.getLastTouchEvent();
+                    long timePast = currentTime - lastOpenRequest;
+                    if (timePast >= openTime) {
+                        close();
+                        return;
+                    }
+
+                    // not done yet, wait the remaining time
+                    scheduleClose(timePast - openTime);
+                }
+            }, delay);
         }
     }
-    private SeekBarManager seekBarManager = new SeekBarManager();
+    private SeekBarManager seekBarManager;
 
     class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
@@ -109,10 +199,15 @@ class FrameContainerView extends RelativeLayout {
             if (markerView.isAnyMarkerSelectedForDrag())
                 return false;
 
-            if (seekBarManager.isOpen())
-                seekBarManager.close();
-            else
-                seekBarManager.open();
+            // give the marker view the change to select a marker
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (!markerView.isAnyMarkerSelectedForDrag())
+                        seekBarManager.open();
+                }
+            });
+
             return true;
         }
     }
@@ -146,8 +241,9 @@ class FrameContainerView extends RelativeLayout {
         }
     }
 
-    public void setTo(View runView, View seekBar, MotionAnalysis analysis) {
+    public void setTo(View runView, FrameDataSeekBar seekBar, MotionAnalysis analysis) {
         this.seekBar = seekBar;
+        seekBarManager = new SeekBarManager();
 
         if (sensorAnalysis != null)
             sensorAnalysis.removeListener(motionAnalysisListener);

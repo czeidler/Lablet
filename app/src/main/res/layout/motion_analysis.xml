@@ -5,29 +5,31 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <view android:layout_width="wrap_content"
+    <view class="nz.ac.auckland.lablet.camera.FrameContainerView" android:id="@+id/frameContainerView"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          class="nz.ac.auckland.lablet.views.FrameDataSeekBar" android:id="@+id/frameDataSeekBar"
-          android:layout_alignParentBottom="true"
-          android:layout_alignParentLeft="true" android:layout_toStartOf="@+id/drawerButton"/>
-    <view android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          class="nz.ac.auckland.lablet.views.FrameContainerView" android:id="@+id/frameContainerView"
           android:layout_alignParentTop="true"
-          android:layout_alignParentLeft="true"
-          android:layout_above="@+id/frameDataSeekBar"/>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="+"
-        android:id="@+id/drawerButton" android:layout_alignParentBottom="true" android:layout_alignParentEnd="true"
-        android:layout_alignTop="@+id/frameDataSeekBar"/>
+          android:layout_alignParentStart="true"
+          android:layout_alignParentBottom="true"/>
 
     <FrameLayout android:id="@+id/sideBarFrame"
                  android:layout_width="320dp"
                  android:layout_height="match_parent"
-                 android:layout_gravity="right" android:visibility="invisible"
-                 android:layout_above="@+id/frameDataSeekBar">
-    </FrameLayout>
+                 android:visibility="invisible"/>
+
+    <view class="nz.ac.auckland.lablet.views.FrameDataSeekBar" android:id="@+id/frameDataSeekBar"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:layout_alignParentBottom="true"
+          android:layout_alignParentStart="true"
+          android:layout_alignParentEnd="true"/>
+
+    <Button android:id="@+id/drawerButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"/>
+
 </RelativeLayout>
 
