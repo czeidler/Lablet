@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   inkscape:export-filename="/home/lec/IdeaProjects/Lablet/app/src/main/res/drawable-mdpi/ic_chart_line_plus.png"
+   inkscape:export-xdpi="47.939999"
+   inkscape:export-ydpi="47.939999"
+   sodipodi:docname="New document 1">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="5.6"
+     inkscape:cx="421.30093"
+     inkscape:cy="305.45866"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1879"
+     inkscape:window-height="1057"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <image
+       y="725.50507"
+       x="481.71429"
+       id="image2993"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABHNCSVQICAgIfAhkiAAAAp5JREFU
+aIHtms+R2jAUxn9muLMdLB2EDkwuXJMOoINw54C3AtgK4u1gtwNcQaCCeDswFZDDs7BxkCVbcgxM
+vhnGSJaf3j99kh8Ep9OJe8YQYLVaARCGobIm6EuhJpjNZgz6VsIV/w3oG49jQBiGferRGkO4YJ+7
+w8OkUMDtcv8GOJU+m/LNW4/ABlhW+pbAWjVu3YCq8n/1DwCSJPE14Rr4jYT6F/DNl+AKnpTOAziz
+kCsTrYEIGOftCfBON0Zk6ovPFNKFO3KQGZtkDvOrYiCXKDxp+icOMseVdgZsgVfVMaR7pC2fmwNT
+YAd81Q3ymUJbTX/aQtaoJE+XmoBfA/aVdoZ4bwr8bChri6TkFjjUDVQp5OMstMivE0T5T8STu/ze
+nlLu1iDMx2dYEICvCIQU+XpAlAc45v17xJtzC1nl1DmaBvs6Cy0qk5dxpPBoDHypkfMDieAOeLOZ
+2EcEnhEFU+BDM+aAREKti2tGjChSpnbhluHDADVZVDcIMWKJLM53ROEy1MKNMCzcMlz3gRFFetiE
+XI2JkXUxztsZonyKno6vQkWg7VloQUF3tnjjUnkodvEYi4ULxSuwawqp9GnkNfTHi2lTBdRxOkiS
+pCkLzREvxlh6zQLjpg+4RMB28V5Dpumv7uZGtDUgpODrz/qhV6FLuaipoLZ1IRfvA7wA3xEHpAit
+TmlAnwpt6kLP+eR7wOVd9AP9xmeNNikU5demzNMJziyE3VlohHg/xfKs0jVMERhxWVhSO2bcrVr2
+MBkQcf1gpaPBfw6TAcbCUt9oW50e+1elHUwR8LZjdgXTG5m3HbMrmCLwguR7mrf3CI06b0C+YPNC
+84pdNaEX3Hp53QhdXehefjMLHiYC1ep0lZFurf+Mu49AcO9/t/kDY3GXpud7MwoAAAAASUVORK5C
+YII=
+"
+       height="48"
+       width="48"
+       inkscape:export-filename="/home/lec/IdeaProjects/Lablet/app/src/main/res/drawable-mdpi/ic_chart_line_plus.png"
+       inkscape:export-xdpi="89.260002"
+       inkscape:export-ydpi="89.260002" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#585858;fill-opacity:0.48587569;stroke:#ffffff;stroke-width:2.30545211;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="path2996"
+       sodipodi:cx="516.81927"
+       sodipodi:cy="759.22852"
+       sodipodi:rx="12.184965"
+       sodipodi:ry="13.195118"
+       d="m 529.00424,759.22852 a 12.184965,13.195118 0 1 1 -24.36993,0 12.184965,13.195118 0 1 1 24.36993,0 z"
+       transform="matrix(1.2036691,0,0,1.1115222,-108.22225,-88.162167)"
+       inkscape:export-filename="/home/lec/IdeaProjects/Lablet/app/src/main/res/drawable-mdpi/ic_chart_line_plus.png"
+       inkscape:export-xdpi="89.260002"
+       inkscape:export-ydpi="89.260002" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:2.94020033;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none"
+       d="m 499.45948,756.11218 28.08237,0"
+       id="path3768"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/lec/IdeaProjects/Lablet/app/src/main/res/drawable-mdpi/ic_chart_line_plus.png"
+       inkscape:export-xdpi="89.260002"
+       inkscape:export-ydpi="89.260002" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:2.99318051;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none"
+       d="m 514.00552,741.78734 0,28.00682"
+       id="path3768-8"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/lec/IdeaProjects/Lablet/app/src/main/res/drawable-mdpi/ic_chart_line_plus.png"
+       inkscape:export-xdpi="89.260002"
+       inkscape:export-ydpi="89.260002" />
+    <image
+       y="723.8913"
+       x="386.51584"
+       id="image2993-1"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABHNCSVQICAgIfAhkiAAAAp5JREFU aIHtms+R2jAUxn9muLMdLB2EDkwuXJMOoINw54C3AtgK4u1gtwNcQaCCeDswFZDDs7BxkCVbcgxM vhnGSJaf3j99kh8Ep9OJe8YQYLVaARCGobIm6EuhJpjNZgz6VsIV/w3oG49jQBiGferRGkO4YJ+7 w8OkUMDtcv8GOJU+m/LNW4/ABlhW+pbAWjVu3YCq8n/1DwCSJPE14Rr4jYT6F/DNl+AKnpTOAziz kCsTrYEIGOftCfBON0Zk6ovPFNKFO3KQGZtkDvOrYiCXKDxp+icOMseVdgZsgVfVMaR7pC2fmwNT YAd81Q3ymUJbTX/aQtaoJE+XmoBfA/aVdoZ4bwr8bChri6TkFjjUDVQp5OMstMivE0T5T8STu/ze nlLu1iDMx2dYEICvCIQU+XpAlAc45v17xJtzC1nl1DmaBvs6Cy0qk5dxpPBoDHypkfMDieAOeLOZ 2EcEnhEFU+BDM+aAREKti2tGjChSpnbhluHDADVZVDcIMWKJLM53ROEy1MKNMCzcMlz3gRFFetiE XI2JkXUxztsZonyKno6vQkWg7VloQUF3tnjjUnkodvEYi4ULxSuwawqp9GnkNfTHi2lTBdRxOkiS pCkLzREvxlh6zQLjpg+4RMB28V5Dpumv7uZGtDUgpODrz/qhV6FLuaipoLZ1IRfvA7wA3xEHpAit TmlAnwpt6kLP+eR7wOVd9AP9xmeNNikU5demzNMJziyE3VlohHg/xfKs0jVMERhxWVhSO2bcrVr2 MBkQcf1gpaPBfw6TAcbCUt9oW50e+1elHUwR8LZjdgXTG5m3HbMrmCLwguR7mrf3CI06b0C+YPNC 84pdNaEX3Hp53QhdXehefjMLHiYC1ep0lZFurf+Mu49AcO9/t/kDY3GXpud7MwoAAAAASUVORK5C YII= "
+       height="48"
+       width="48"
+       inkscape:export-filename="/home/lec/IdeaProjects/Lablet/app/src/main/res/drawable-mdpi/ic_chart_line_less.png"
+       inkscape:export-xdpi="89.260002"
+       inkscape:export-ydpi="89.260002" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#585858;fill-opacity:0.48587569;stroke:#ffffff;stroke-width:2.30545211;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="path2996-5"
+       sodipodi:cx="516.81927"
+       sodipodi:cy="759.22852"
+       sodipodi:rx="12.184965"
+       sodipodi:ry="13.195118"
+       d="m 529.00424,759.22852 a 12.184965,13.195118 0 1 1 -24.36993,0 12.184965,13.195118 0 1 1 24.36993,0 z"
+       transform="matrix(0.85112258,-0.85112258,0.78596489,0.78596489,-617.67493,596.85107)"
+       inkscape:export-filename="/home/lec/IdeaProjects/Lablet/app/src/main/res/drawable-mdpi/ic_chart_line_less.png"
+       inkscape:export-xdpi="89.260002"
+       inkscape:export-ydpi="89.260002" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:2.94020033;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none"
+       d="m 409.37019,764.50446 19.85724,-19.85724"
+       id="path3768-5"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/lec/IdeaProjects/Lablet/app/src/main/res/drawable-mdpi/ic_chart_line_less.png"
+       inkscape:export-xdpi="89.260002"
+       inkscape:export-ydpi="89.260002" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:2.99318051;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none"
+       d="m 409.16946,743.73252 19.80382,19.80382"
+       id="path3768-8-1"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/lec/IdeaProjects/Lablet/app/src/main/res/drawable-mdpi/ic_chart_line_less.png"
+       inkscape:export-xdpi="89.260002"
+       inkscape:export-ydpi="89.260002" />
+  </g>
+</svg>
