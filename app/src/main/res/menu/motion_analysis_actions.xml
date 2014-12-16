@@ -6,12 +6,16 @@
           android:icon="@drawable/ic_action_delete"
           android:title="@string/action_delete"
           yourapp:showAsAction="ifRoom|withText"/>
-    <item android:id="@+id/action_run_settings"
+    <item android:id="@+id/action_video_settings"
           android:icon="@drawable/ic_action_settings"
           android:title="@string/action_video"
           yourapp:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/length_scale"
           android:icon="@drawable/ic_ruler"
           android:title="@string/action_calibration"
+          yourapp:showAsAction="ifRoom|withText"/>
+    <item android:id="@+id/action_view"
+          android:icon="@drawable/ic_chart_line"
+          android:title="@string/action_view"
           yourapp:showAsAction="ifRoom|withText"/>
 </menu>

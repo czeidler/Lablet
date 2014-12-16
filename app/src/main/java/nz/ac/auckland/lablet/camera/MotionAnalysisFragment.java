@@ -72,7 +72,19 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             }
         });
 
-        final MenuItem settingsItem = menu.findItem(R.id.action_run_settings);
+        final MenuItem viewItem = menu.findItem(R.id.action_view);
+        assert viewItem != null;
+        viewItem.setIcon(view.getSideBarStatusIcon());
+        viewItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                view.onToggleSidebar();
+                viewItem.setIcon(view.getSideBarStatusIcon());
+                return true;
+            }
+        });
+
+        final MenuItem settingsItem = menu.findItem(R.id.action_video_settings);
         assert settingsItem != null;
         settingsItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override

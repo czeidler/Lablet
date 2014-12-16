@@ -180,12 +180,18 @@ class MotionAnalysisFragmentView extends FrameLayout {
         abstract void nextState();
         void enterState() {}
         void leaveState() {}
+        abstract int getIcon();
     }
 
     class ClosedSideBarState extends SideBarState {
         @Override
         void nextState() {
             setSideBarState(new HalfOpenedSideBarState());
+        }
+
+        @Override
+        int getIcon() {
+            return R.drawable.ic_chart_line;
         }
     }
 
@@ -217,6 +223,11 @@ class MotionAnalysisFragmentView extends FrameLayout {
             sideBarView.setLayoutParams(params);
             scrollView.setVisibility(VISIBLE);
         }
+
+        @Override
+        int getIcon() {
+            return R.drawable.ic_chart_line_plus;
+        }
     }
 
     class OpenedSideBarState extends SideBarState {
@@ -228,6 +239,11 @@ class MotionAnalysisFragmentView extends FrameLayout {
         @Override
         void leaveState() {
             sideBar.close();
+        }
+
+        @Override
+        int getIcon() {
+            return R.drawable.ic_chart_line_less;
         }
     }
 
@@ -244,14 +260,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
         sideBar = new MotionAnalysisSideBar(mainView, sideBarView);
 
         runContainerView = (FrameContainerView)mainView.findViewById(R.id.frameContainerView);
-
-        final Button drawerButton = (Button)mainView.findViewById(R.id.drawerButton);
-        drawerButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sideBarState.nextState();
-            }
-        });
 
         graphSpinner = (Spinner)sideBarView.findViewById(R.id.graphSpinner);
 
@@ -350,6 +358,18 @@ class MotionAnalysisFragmentView extends FrameLayout {
             tableView.setAdapter(markerDataTableAdapter);
             selectGraphAdapter(graphSpinner.getSelectedItemPosition());
         }
+    }
+
+    /**
+     *
+     * @return an icon id for the new state
+     */
+    public void onToggleSidebar() {
+        sideBarState.nextState();
+    }
+
+    public int getSideBarStatusIcon() {
+        return sideBarState.getIcon();
     }
 
     private void selectGraphAdapter(int i) {
