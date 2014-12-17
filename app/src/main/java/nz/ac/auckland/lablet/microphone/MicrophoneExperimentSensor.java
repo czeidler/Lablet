@@ -41,6 +41,9 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
 
     private MicrophoneExperimentData experimentData;
 
+    // currently only works with 0.5f
+    final private float liveStepFactor = 0.5f;
+
     public interface ISensorDataListener {
         public void onNewAmplitudeData(float[] amplitudes);
         public void onNewFrequencyData(float[] frequencies);
@@ -53,6 +56,10 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
             softListener = new WeakReference<>(listener);
     }
 
+    public float getLiveStepFactor() {
+        return liveStepFactor;
+    }
+
     private void notifyNewAudioData(float[] amplitudes) {
         if (softListener == null)
             return;
@@ -63,11 +70,11 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
 
         listener.onNewAmplitudeData(amplitudes);
 
+        // currently only works with stepFactor 0.5f
         if (prevAmplitudes != null) {
-            float[] frequencies = Fourier.transform(prevAmplitudes, amplitudes);
+            float[] frequencies = Fourier.transformOverlap(prevAmplitudes, amplitudes, liveStepFactor);
             listener.onNewFrequencyData(frequencies);
         }
-
         float[] frequencies = Fourier.transform(amplitudes);
         listener.onNewFrequencyData(frequencies);
         prevAmplitudes = amplitudes;

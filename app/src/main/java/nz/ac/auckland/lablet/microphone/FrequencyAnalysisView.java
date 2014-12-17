@@ -450,7 +450,7 @@ public class FrequencyAnalysisView extends FrameLayout {
                     /*
                     final int step = (int)(newSampleSize * frequencyMapAdapter.getStepFactor());
                     for (int i = 0; i < amplitudes.length; i += step) {
-                        float frequencies[] = Fourier.transform(amplitudes, i, newSampleSize);
+                        float frequencies[] = Fourier.transformOverlap(amplitudes, i, newSampleSize);
                         if (isCancelled())
                             return null;
                         publishProgress(new DataContainer(frequencies));
