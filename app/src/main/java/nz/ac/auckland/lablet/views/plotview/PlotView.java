@@ -16,6 +16,7 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
+import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
 import nz.ac.auckland.lablet.views.plotview.axes.*;
 
 import java.util.ArrayList;
@@ -164,12 +165,18 @@ class PlotGestureDetector {
 }
 
 public class PlotView extends ViewGroup {
-    final static public int DEFAULT_PEN_COLOR = Color.WHITE;
+    static public class Defaults {
+        final static public int PEN_COLOR = Color.WHITE;
+        // device independent size
+        final static public float TITLE_TEXT_SIZE_DP = 12;
+        final static public float LABEL_TEXT_SIZE_DP = 10;
+    }
 
     public static class PlotScale {
         public IScale scale;
         public LabelPartitioner labelPartitioner;
     }
+
     static public PlotScale log10Scale() {
         PlotScale plotScale = new PlotScale();
         plotScale.scale = new Log10Scale();
@@ -191,12 +198,14 @@ public class PlotView extends ViewGroup {
     private BackgroundPainter backgroundPainter;
     private RangeInfoPainter rangeInfoPainter;
 
+    private float TITLE_TEXT_SIZE;
+    private float LABEL_TEXT_SIZE;
+
     final static public int AUTO_RANGE_DISABLED = 0;
     final static public int AUTO_RANGE_SCROLL = 10;
     final static public int AUTO_RANGE_ZOOM = 20;
     // only extend the range when the data can't be displayed
     final static public int AUTO_RANGE_ZOOM_EXTENDING = 21;
-
 
     private boolean xDraggable = false;
     private boolean yDraggable = false;
@@ -498,6 +507,19 @@ public class PlotView extends ViewGroup {
         mainView.addForegroundPainter(rangeInfoPainter);
 
         plotGestureDetector = new PlotGestureDetector(context, this, mainView);
+
+        TITLE_TEXT_SIZE = toPixel(Defaults.TITLE_TEXT_SIZE_DP);
+        LABEL_TEXT_SIZE = toPixel(Defaults.LABEL_TEXT_SIZE_DP);
+
+        getTitleView().getLabelPaint().setTextSize(TITLE_TEXT_SIZE);
+        getXAxisView().getAxisPaint().setTextSize(LABEL_TEXT_SIZE);
+        getXAxisView().getTitlePaint().setTextSize(LABEL_TEXT_SIZE);
+        getYAxisView().getAxisPaint().setTextSize(LABEL_TEXT_SIZE);
+        getYAxisView().getTitlePaint().setTextSize(LABEL_TEXT_SIZE);
+    }
+
+    private int toPixel(float densityIndependentPixel) {
+        return DeviceIndependentPixel.toPixel(densityIndependentPixel, this);
     }
 
     public void setRangeListener(RangeDrawingView.IRangeListener listener) {

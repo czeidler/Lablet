@@ -25,7 +25,7 @@ public class TitleView extends ViewGroup {
 
         setWillNotDraw(false);
 
-        labelPaint.setColor(PlotView.DEFAULT_PEN_COLOR);
+        labelPaint.setColor(PlotView.Defaults.PEN_COLOR);
         labelPaint.setTypeface(Typeface.DEFAULT_BOLD);
     }
 

@@ -65,7 +65,7 @@ abstract public class AbstractAxis extends ViewGroup {
     private void init() {
         setWillNotDraw(false);
 
-        titlePaint.setColor(PlotView.DEFAULT_PEN_COLOR);
+        titlePaint.setColor(PlotView.Defaults.PEN_COLOR);
         titlePaint.setStyle(Paint.Style.STROKE);
 
         axisPaint.setColor(Color.WHITE);

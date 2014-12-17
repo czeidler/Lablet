@@ -90,13 +90,6 @@ public class GraphView2D extends PlotView {
     private int maxWidth = -1;
     private int maxHeight = -1;
 
-    // device independent size
-    private float TITLE_TEXT_SIZE_DP = 12;
-    private float LABEL_TEXT_SIZE_DP = 10;
-
-    private float TITLE_TEXT_SIZE;
-    private float LABEL_TEXT_SIZE;
-
     // in dp
     public int getMaxWidth() {
         return maxWidth;
@@ -118,8 +111,6 @@ public class GraphView2D extends PlotView {
 
         getTitleView().setTitle(title);
 
-        init();
-
         if (zoomOnClick)
             setZoomOnClick(true);
     }
@@ -127,20 +118,7 @@ public class GraphView2D extends PlotView {
     public GraphView2D(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        init();
-
         setZoomOnClick(true);
-    }
-
-    private void init() {
-        TITLE_TEXT_SIZE = toPixel(TITLE_TEXT_SIZE_DP);
-        LABEL_TEXT_SIZE = toPixel(LABEL_TEXT_SIZE_DP);
-
-        getTitleView().getLabelPaint().setTextSize(TITLE_TEXT_SIZE);
-        getXAxisView().getAxisPaint().setTextSize(LABEL_TEXT_SIZE);
-        getXAxisView().getTitlePaint().setTextSize(LABEL_TEXT_SIZE);
-        getYAxisView().getAxisPaint().setTextSize(LABEL_TEXT_SIZE);
-        getYAxisView().getTitlePaint().setTextSize(LABEL_TEXT_SIZE);
     }
 
     public void setZoomOnClick(boolean zoomable) {
@@ -178,10 +156,6 @@ public class GraphView2D extends PlotView {
         } else {
             setOnClickListener(null);
         }
-    }
-
-    private int toPixel(float densityIndependentPixel) {
-        return DeviceIndependentPixel.toPixel(densityIndependentPixel, this);
     }
 
     public void release() {
@@ -225,7 +199,7 @@ public class GraphView2D extends PlotView {
             painter = new ThreadStrategyPainter();*/
         painter = new BufferedDirectStrategyPainter();
 
-        XYConcurrentPainter xyConcurrentPainter = new XYConcurrentPainter(adapter);
+        XYConcurrentPainter xyConcurrentPainter = new XYConcurrentPainter(adapter, getContext());
         painter.addChild(xyConcurrentPainter);
         addPlotPainter(painter);
 
