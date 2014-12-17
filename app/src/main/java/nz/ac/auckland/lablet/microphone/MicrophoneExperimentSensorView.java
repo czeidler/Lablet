@@ -42,12 +42,10 @@ class PreviewViewState implements AbstractExperimentSensor.State {
     protected PlotView frequencyMapPlotView;
     protected AudioFrequencyMapAdapter frequencyMapAdapter;
 
-    final protected int timeSpan = 8 * 1000;
-
     private MicrophoneExperimentSensor.ISensorDataListener listener = new MicrophoneExperimentSensor.ISensorDataListener() {
         @Override
         public void onNewAmplitudeData(float[] amplitudes) {
-            if (amplitudePlotAdapter.getTotalTime() >= timeSpan)
+            if (amplitudePlotAdapter.getTotalTime() >= MicrophoneExperimentSensorView.Settings.timeSpan)
                 amplitudePlotAdapter.clear();
             amplitudePlotAdapter.addData(amplitudes);
         }
@@ -55,7 +53,7 @@ class PreviewViewState implements AbstractExperimentSensor.State {
         @Override
         public void onNewFrequencyData(float[] frequencies) {
             int size = frequencyMapAdapter.getSize();
-            if (size > 0 && frequencyMapAdapter.getX(size - 1) >= timeSpan)
+            if (size > 0 && frequencyMapAdapter.getX(size - 1) >= MicrophoneExperimentSensorView.Settings.timeSpan)
                 frequencyMapAdapter.clear();
             frequencyMapAdapter.addData(frequencies);
         }
@@ -74,7 +72,7 @@ class PreviewViewState implements AbstractExperimentSensor.State {
         amplitudePlotView.addPlotPainter(strategyPainter);
 
         frequencyMapPlotView = (PlotView)mainView.findViewById(R.id.audioFrequencyMapPlot);
-        frequencyMapAdapter = new AudioFrequencyMapAdapter(0.5f);
+        frequencyMapAdapter = new AudioFrequencyMapAdapter(experimentSensor.getLiveStepFactor());
         strategyPainter = new ThreadStrategyPainter();
         AudioFrequencyMapConcurrentPainter audioFrequencyMapPainter
                 = new AudioFrequencyMapConcurrentPainter(frequencyMapAdapter);
@@ -88,16 +86,17 @@ class PreviewViewState implements AbstractExperimentSensor.State {
         amplitudePlotAdapter.clear();
         frequencyMapAdapter.clear();
 
-        amplitudePlotView.setXRange(0, timeSpan);
-        amplitudePlotView.setYRange(-0.6f, 0.6f);
+        amplitudePlotView.setXRange(0, MicrophoneExperimentSensorView.Settings.timeSpan);
+        amplitudePlotView.setYRange(MicrophoneExperimentSensorView.Settings.amplitudeMin,
+                MicrophoneExperimentSensorView.Settings.amplitudeMax);
         amplitudePlotView.getTitleView().setTitle("Signal Strength Vs Time");
         amplitudePlotView.getXAxisView().setUnit("ms");
         amplitudePlotView.getXAxisView().setTitle("Time");
         //amplitudePlotView.getBackgroundPainter().setShowYGrid(true);
 
-        frequencyMapPlotView.setXRange(0, timeSpan);
+        frequencyMapPlotView.setXRange(0, MicrophoneExperimentSensorView.Settings.timeSpan);
         frequencyMapPlotView.setYRange(1, experimentSensor.SAMPLE_RATE / 2);
-        frequencyMapPlotView.setMaxXRange(0, timeSpan);
+        frequencyMapPlotView.setMaxXRange(0, MicrophoneExperimentSensorView.Settings.timeSpan);
         frequencyMapPlotView.setMaxYRange(1, experimentSensor.SAMPLE_RATE / 2);
         //frequencyMapPlotView.setYScale(PlotView.log10Scale());
         frequencyMapPlotView.setAutoRange(PlotView.AUTO_RANGE_DISABLED, PlotView.AUTO_RANGE_DISABLED);
@@ -136,8 +135,6 @@ class RecordingViewState implements AbstractExperimentSensor.State {
     final protected PlotView frequencyMapPlotView;
     final protected AudioFrequencyMapAdapter frequencyMapAdapter;
 
-    final protected int timeSpan;
-
     public RecordingViewState(PreviewViewState previewViewState) {
         mainView = previewViewState.mainView;
         experimentSensor = previewViewState.experimentSensor;
@@ -147,8 +144,6 @@ class RecordingViewState implements AbstractExperimentSensor.State {
 
         frequencyMapPlotView = previewViewState.frequencyMapPlotView;
         frequencyMapAdapter = previewViewState.frequencyMapAdapter;
-
-        timeSpan = previewViewState.timeSpan;
     }
 
     private MicrophoneExperimentSensor.ISensorDataListener listener = new MicrophoneExperimentSensor.ISensorDataListener() {
@@ -168,15 +163,16 @@ class RecordingViewState implements AbstractExperimentSensor.State {
         amplitudePlotAdapter.clear();
         frequencyMapAdapter.clear();
 
-        amplitudePlotView.setXRange(0, timeSpan);
-        amplitudePlotView.setYRange(-0.6f, 0.6f);
+        amplitudePlotView.setXRange(0, MicrophoneExperimentSensorView.Settings.timeSpan);
+        amplitudePlotView.setYRange(MicrophoneExperimentSensorView.Settings.amplitudeMin,
+                MicrophoneExperimentSensorView.Settings.amplitudeMax);
         amplitudePlotView.getTitleView().setTitle("Signal Strength Vs Time");
         amplitudePlotView.getXAxisView().setUnit("ms");
         amplitudePlotView.getXAxisView().setTitle("Time");
         //amplitudePlotView.getBackgroundPainter().setShowYGrid(true);
         amplitudePlotView.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_DISABLED);
 
-        frequencyMapPlotView.setXRange(0, timeSpan);
+        frequencyMapPlotView.setXRange(0, MicrophoneExperimentSensorView.Settings.timeSpan);
         frequencyMapPlotView.setYRange(1, experimentSensor.SAMPLE_RATE / 2);
         frequencyMapPlotView.setMaxXRange(Float.MAX_VALUE, Float.MAX_VALUE);
         frequencyMapPlotView.setMaxYRange(Float.MAX_VALUE, Float.MAX_VALUE);
@@ -254,7 +250,8 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
         audioAmplitudePlotAdapter = new AudioAmplitudePlotDataAdapter();
         strategyPainter.addChild(new AudioAmplitudePainter(audioAmplitudePlotAdapter));
         amplitudeView.addPlotPainter(strategyPainter);
-        amplitudeView.setYRange(-0.6f, 0.6f);
+        amplitudeView.setYRange(MicrophoneExperimentSensorView.Settings.amplitudeMin,
+                MicrophoneExperimentSensorView.Settings.amplitudeMax);
         amplitudeView.getTitleView().setTitle("Signal Strength Vs Time");
         amplitudeView.getXAxisView().setUnit("ms");
         amplitudeView.getXAxisView().setTitle("Time");
@@ -321,7 +318,7 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
                     amplitudes = AudioWavInputStream.toAmplitudeData(data, data.length);
                     frequencies = fourierRenderScript.renderScriptFFT(amplitudes, DEFAULT_SAMPLE_SIZE,
                             frequencyMapAdapter.getStepFactor());
-                    //frequencies = Fourier.transform(amplitudes, DEFAULT_SAMPLE_SIZE,
+                    //frequencies = Fourier.transformOverlap(amplitudes, DEFAULT_SAMPLE_SIZE,
                       //      frequencyMapAdapter.getStepFactor());
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -401,6 +398,12 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
 }
 
 class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
+    static public class Settings {
+        public static int timeSpan = 8 * 1000;
+        public static float amplitudeMax = 0.52f;
+        public static float amplitudeMin = -0.52f;
+    }
+
     public MicrophoneExperimentSensorView(final Context context, final MicrophoneExperimentSensor experimentSensor) {
         super(context);
 
