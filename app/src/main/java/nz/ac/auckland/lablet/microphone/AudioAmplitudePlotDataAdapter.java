@@ -107,7 +107,7 @@ public class AudioAmplitudePlotDataAdapter extends AbstractXYDataAdapter {
     public void clear() {
         if (data == null)
             return;
-        data = null;
+        data.clear();
         notifyAllDataChanged();
     }
 
