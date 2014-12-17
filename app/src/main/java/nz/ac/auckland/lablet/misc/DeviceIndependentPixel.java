@@ -7,22 +7,27 @@
  */
 package nz.ac.auckland.lablet.misc;
 
+import android.content.Context;
 import android.view.View;
 
 
 public class DeviceIndependentPixel {
-    final private View view;
+    final private Context context;
 
-    public DeviceIndependentPixel(View view) {
-        this.view = view;
+    public DeviceIndependentPixel(Context context) {
+        this.context = context;
     }
 
     static public int toPixel(float densityIndependentPixel, View view) {
-        final float scale = view.getResources().getDisplayMetrics().density;
+        return toPixel(densityIndependentPixel, view.getContext());
+    }
+
+    static public int toPixel(float densityIndependentPixel, Context context) {
+        final float scale = context.getResources().getDisplayMetrics().density;
         return Math.round(densityIndependentPixel * scale);
     }
 
     public int toPixel(float densityIndependentPixel) {
-        return toPixel(densityIndependentPixel, view);
+        return toPixel(densityIndependentPixel, context);
     }
 }

@@ -125,11 +125,11 @@ class AccelerometerExperimentView extends AbstractExperimentSensorView {
         StrategyPainter strategyPainter = new BufferedDirectStrategyPainter();
 
         xData = new XYDataAdapter();
-        XYConcurrentPainter xPainter = new XYConcurrentPainter(xData);
+        XYConcurrentPainter xPainter = new XYConcurrentPainter(xData, getContext());
         strategyPainter.addChild(xPainter);
 
         yData = new XYDataAdapter();
-        XYConcurrentPainter yPainter = new XYConcurrentPainter(yData);
+        XYConcurrentPainter yPainter = new XYConcurrentPainter(yData, getContext());
         yPainter.setPointRenderer(new CircleRenderer());
         Paint yMarkerPaint = new Paint();
         yMarkerPaint.setColor(Color.BLUE);
@@ -137,14 +137,14 @@ class AccelerometerExperimentView extends AbstractExperimentSensorView {
         strategyPainter.addChild(yPainter);
 
         zData = new XYDataAdapter();
-        XYConcurrentPainter zPainter = new XYConcurrentPainter(zData);
+        XYConcurrentPainter zPainter = new XYConcurrentPainter(zData, getContext());
         Paint zMarkerPaint = new Paint();
         zMarkerPaint.setColor(Color.RED);
         zPainter.getDrawConfig().setMarkerPaint(zMarkerPaint);
         zPainter.setPointRenderer(new BottomTriangleRenderer());
         strategyPainter.addChild(zPainter);
 
-        XYConcurrentPainter totalPainter = new XYConcurrentPainter(totalData);
+        XYConcurrentPainter totalPainter = new XYConcurrentPainter(totalData, getContext());
         Paint totalMarkerPaint = new Paint();
         totalMarkerPaint.setColor(Color.WHITE);
         totalPainter.getDrawConfig().setMarkerPaint(totalMarkerPaint);

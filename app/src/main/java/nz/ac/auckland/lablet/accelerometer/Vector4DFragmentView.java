@@ -48,11 +48,11 @@ public class Vector4DFragmentView extends FrameLayout {
         AccelerometerExperimentData data = (AccelerometerExperimentData)analysis.getData();
 
         XYDataAdapter xData = new XYDataAdapter(data.getTimeValues(), data.getXValues());
-        XYConcurrentPainter xPainter = new XYConcurrentPainter(xData);
+        XYConcurrentPainter xPainter = new XYConcurrentPainter(xData, getContext());
         strategyPainter.addChild(xPainter);
 
         XYDataAdapter yData = new XYDataAdapter(data.getTimeValues(), data.getYValues());
-        XYConcurrentPainter yPainter = new XYConcurrentPainter(yData);
+        XYConcurrentPainter yPainter = new XYConcurrentPainter(yData, getContext());
         yPainter.setPointRenderer(new CircleRenderer());
         Paint yMarkerPaint = new Paint();
         yMarkerPaint.setColor(Color.BLUE);
@@ -60,7 +60,7 @@ public class Vector4DFragmentView extends FrameLayout {
         strategyPainter.addChild(yPainter);
 
         XYDataAdapter zData = new XYDataAdapter(data.getTimeValues(), data.getZValues());
-        XYConcurrentPainter zPainter = new XYConcurrentPainter(zData);
+        XYConcurrentPainter zPainter = new XYConcurrentPainter(zData, getContext());
         Paint zMarkerPaint = new Paint();
         zMarkerPaint.setColor(Color.RED);
         zPainter.getDrawConfig().setMarkerPaint(zMarkerPaint);

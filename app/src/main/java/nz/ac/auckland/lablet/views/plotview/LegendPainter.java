@@ -9,6 +9,7 @@ package nz.ac.auckland.lablet.views.plotview;
 
 import android.graphics.*;
 import android.view.MotionEvent;
+import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,8 @@ public class LegendPainter implements IPlotPainter {
     @Override
     public void setContainer(PlotPainterContainerView view) {
         containerView = view;
+
+        labelPaint.setTextSize(DeviceIndependentPixel.toPixel(PlotView.Defaults.LABEL_TEXT_SIZE_DP, view));
     }
 
     @Override

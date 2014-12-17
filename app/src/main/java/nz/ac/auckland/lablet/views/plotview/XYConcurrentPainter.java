@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.plotview;
 
-
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -21,11 +21,13 @@ interface IPointRenderer {
 }
 
 public class XYConcurrentPainter extends ArrayConcurrentPainter {
-    private DrawConfig drawConfig = new DrawConfig();
+    private DrawConfig drawConfig;
     private IPointRenderer pointRenderer = new CrossRenderer();
 
-    public XYConcurrentPainter(CloneablePlotDataAdapter dataAdapter) {
+    public XYConcurrentPainter(CloneablePlotDataAdapter dataAdapter, Context context) {
         super(dataAdapter);
+
+        this.drawConfig = new DrawConfig(context);
     }
 
     public DrawConfig getDrawConfig() {

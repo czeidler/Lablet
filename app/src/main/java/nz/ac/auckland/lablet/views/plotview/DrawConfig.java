@@ -7,22 +7,29 @@
  */
 package nz.ac.auckland.lablet.views.plotview;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
+import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
 
 
 public class DrawConfig {
+    private Context context;
     private Paint markerPaint = new Paint();
-    private float markerSize = 6f;
+    private float markerSize;
     private Paint linePaint = new Paint();
 
-    public DrawConfig() {
+    public DrawConfig(Context context) {
+        this.context = context;
+
         markerPaint.setColor(Color.GREEN);
         markerPaint.setStyle(Paint.Style.STROKE);
 
         linePaint.setColor(Color.YELLOW);
         linePaint.setStyle(Paint.Style.STROKE);
         linePaint.setAntiAlias(true);
+
+        setMarkerSizeDP(6f);
     }
 
     public Paint getMarkerPaint() {
@@ -45,7 +52,7 @@ public class DrawConfig {
         return markerSize;
     }
 
-    public void setMarkerSize(float markerSize) {
-        this.markerSize = markerSize;
+    public void setMarkerSizeDP(float markerSizeDP) {
+        this.markerSize = DeviceIndependentPixel.toPixel(markerSizeDP, context);
     }
 }
