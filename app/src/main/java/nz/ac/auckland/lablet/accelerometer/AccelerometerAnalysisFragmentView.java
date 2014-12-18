@@ -15,6 +15,9 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import nz.ac.auckland.lablet.R;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.HCursorDataModelPainter;
+import nz.ac.auckland.lablet.views.VCursorDataModelPainter;
 import nz.ac.auckland.lablet.views.plotview.*;
 
 
@@ -83,5 +86,15 @@ public class AccelerometerAnalysisFragmentView extends FrameLayout {
 
         if (Math.abs(savedRange.width()) > 0 && Math.abs(savedRange.height()) > 0)
             plotView.setRange(savedRange);
+
+        // marker
+        MarkerDataModel baseLineMarker = analysis.getBaseLineMarker();
+        HCursorDataModelPainter hCursorDataModelPainter = new HCursorDataModelPainter(baseLineMarker);
+        plotView.addPlotPainter(hCursorDataModelPainter);
+
+        MarkerDataModel rangeMarkers = analysis.getRangeMarkers();
+        VCursorDataModelPainter vCursorDataModelPainter = new VCursorDataModelPainter(rangeMarkers);
+        vCursorDataModelPainter.setMarkerPainterGroup(hCursorDataModelPainter.getMarkerPainterGroup());
+        plotView.addPlotPainter(vCursorDataModelPainter);
     }
 }
