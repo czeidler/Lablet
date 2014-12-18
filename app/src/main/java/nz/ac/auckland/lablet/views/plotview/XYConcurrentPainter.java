@@ -65,26 +65,27 @@ public class XYConcurrentPainter extends ArrayConcurrentPainter {
 
     @Override
     protected void drawRange(Canvas bitmapCanvas, ArrayRenderPayload payload, Range range) {
+        // prepare points
         AbstractXYDataAdapter adapter = (AbstractXYDataAdapter)payload.getAdapter();
-
-        List<float[]> screenPoints = new ArrayList<>();
+        List<PointF> screenPoints = new ArrayList<>();
         for (int i = range.min; i < range.max + 1; i++) {
             float[] screenPoint = new float[2];
             screenPoint[0] = adapter.getX(i).floatValue();
             screenPoint[1] = adapter.getY(i).floatValue();
             payload.getRangeMatrix().mapPoints(screenPoint);
-            screenPoints.add(screenPoint);
+            screenPoints.add(new PointF(screenPoint[0], screenPoint[1]));
         }
 
+        // draw the lines
         for (int i = 0; i < screenPoints.size() - 1; i++) {
-            float[] point1 = screenPoints.get(i);
-            float[] point2 = screenPoints.get(i + 1);
-            bitmapCanvas.drawLine(point1[0], point1[1], point2[0], point2[1], drawConfig.getLinePaint());
+            PointF point1 = screenPoints.get(i);
+            PointF point2 = screenPoints.get(i + 1);
+            bitmapCanvas.drawLine(point1.x, point1.y, point2.x, point2.y, drawConfig.getLinePaint());
         }
-
+        // draw points
         for (int i = 0; i < screenPoints.size(); i++) {
-            float[] point = screenPoints.get(i);
-            pointRenderer.drawPoint(bitmapCanvas, new PointF(point[0], point[1]), drawConfig);
+            PointF point = screenPoints.get(i);
+            pointRenderer.drawPoint(bitmapCanvas, point, drawConfig);
         }
     }
 }
