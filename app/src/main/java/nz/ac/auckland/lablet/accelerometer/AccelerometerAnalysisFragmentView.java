@@ -18,12 +18,12 @@ import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.views.plotview.*;
 
 
-public class Vector4DFragmentView extends FrameLayout {
-    public Vector4DFragmentView(Context context) {
+public class AccelerometerAnalysisFragmentView extends FrameLayout {
+    public AccelerometerAnalysisFragmentView(Context context) {
         super(context);
     }
 
-    public Vector4DFragmentView(final Context context, final Vector4DAnalysis analysis) {
+    public AccelerometerAnalysisFragmentView(final Context context, final AccelerometerAnalysis analysis) {
         super(context);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

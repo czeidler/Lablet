@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 
 
-public class Vector4DAnalysisFragment extends ExperimentAnalysisFragment {
+public class AccelerometerAnalysisFragment extends ExperimentAnalysisFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,10 +23,10 @@ public class Vector4DAnalysisFragment extends ExperimentAnalysisFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return new Vector4DFragmentView(getActivity(), getSensorAnalysis());
+        return new AccelerometerAnalysisFragmentView(getActivity(), getSensorAnalysis());
     }
 
-    private Vector4DAnalysis getSensorAnalysis() {
-        return (Vector4DAnalysis)sensorAnalysis;
+    private AccelerometerAnalysis getSensorAnalysis() {
+        return (AccelerometerAnalysis)sensorAnalysis;
     }
 }

@@ -29,12 +29,12 @@ public class AccelerometerAnalysisPlugin implements IAnalysisPlugin {
     @Override
     public IDataAnalysis createDataAnalysis(IExperimentData sensorData) {
         assert sensorData instanceof AccelerometerExperimentData;
-        return new Vector4DAnalysis((AccelerometerExperimentData)sensorData);
+        return new AccelerometerAnalysis((AccelerometerExperimentData)sensorData);
     }
 
     @Override
     public Fragment createSensorAnalysisFragment(ExperimentAnalysis.AnalysisRef analysisRef) {
-        Fragment fragment = new Vector4DAnalysisFragment();
+        Fragment fragment = new AccelerometerAnalysisFragment();
         fragment.setArguments(analysisRef.toBundle());
         return fragment;
     }

@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 
-public class Vector4DAnalysis implements IDataAnalysis {
+public class AccelerometerAnalysis implements IDataAnalysis {
     final private AccelerometerExperimentData sensorData;
     final private DisplaySettings displaySettings = new DisplaySettings();
 
@@ -49,7 +49,7 @@ public class Vector4DAnalysis implements IDataAnalysis {
         }
     }
 
-    public Vector4DAnalysis(AccelerometerExperimentData sensorData) {
+    public AccelerometerAnalysis(AccelerometerExperimentData sensorData) {
         this.sensorData = sensorData;
     }
 
