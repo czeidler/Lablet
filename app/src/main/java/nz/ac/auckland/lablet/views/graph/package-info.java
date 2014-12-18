@@ -1,5 +1,5 @@
 /**
- * Wrapper class for a graph view (currently using androidplot).
+ * Wrapper class for a simple graph view.
  * <p>
  * Includes a set of physics related axises.
  */
