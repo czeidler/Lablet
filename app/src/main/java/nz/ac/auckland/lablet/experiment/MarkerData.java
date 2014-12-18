@@ -17,16 +17,16 @@ import android.graphics.PointF;
  * </p>
  */
 public class MarkerData {
-    final private int frameId;
+    final private int id;
     private PointF positionReal;
 
-    public MarkerData(int frame) {
-        frameId = frame;
+    public MarkerData(int id) {
+        this.id = id;
         positionReal = new PointF();
     }
 
-    public int getFrameId() {
-        return frameId;
+    public int getId() {
+        return id;
     }
 
     public PointF getPosition() {

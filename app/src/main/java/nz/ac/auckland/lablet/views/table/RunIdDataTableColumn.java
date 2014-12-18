@@ -17,7 +17,7 @@ public class RunIdDataTableColumn extends DataTableColumn {
     }
 
     public Number getValue(int index) {
-        return dataModel.getMarkerDataAt(index).getFrameId();
+        return dataModel.getMarkerDataAt(index).getId();
     }
 
     public String getStringValue(int index) {

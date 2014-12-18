@@ -64,7 +64,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                     newSelectedIndex = selectedIndex;
                 else
                     newSelectedIndex = selectedIndex - 1;
-                frameDataModel.setCurrentFrame(markerDataModel.getMarkerDataAt(newSelectedIndex).getFrameId());
+                frameDataModel.setCurrentFrame(markerDataModel.getMarkerDataAt(newSelectedIndex).getId());
 
                 if (markerDataModel.getMarkerCount() <= 1)
                     getActivity().invalidateOptionsMenu();

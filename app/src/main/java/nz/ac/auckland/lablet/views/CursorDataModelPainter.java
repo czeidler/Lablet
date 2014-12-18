@@ -161,7 +161,7 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
 
         int selectedMarkerId = -1;
         if (marker.isSelectedForDrag())
-            selectedMarkerId = markerData.getMarkerDataAt(markerList.indexOf(marker)).getFrameId();
+            selectedMarkerId = markerData.getMarkerDataAt(markerList.indexOf(marker)).getId();
 
         if (!isDragging)
             sort();
@@ -169,7 +169,7 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
         if (selectedMarkerId >= 0) {
             for (int i = 0; i < markerData.getMarkerCount(); i++) {
                 MarkerData data = markerData.getMarkerDataAt(i);
-                if (data.getFrameId() == selectedMarkerId) {
+                if (data.getId() == selectedMarkerId) {
                     markerList.get(i).setSelectedForDrag(true);
                     break;
                 }
