@@ -30,7 +30,7 @@ public class AccelerometerAnalysisView extends FrameLayout {
         super(context);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        ViewGroup view = (ViewGroup) inflater.inflate(R.layout.vector4d_analysis, this, true);
+        ViewGroup view = (ViewGroup) inflater.inflate(R.layout.accelerometer_analysis, this, true);
 
         RectF savedRange = new RectF(analysis.getDisplaySettings().getRange());
 

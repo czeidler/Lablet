@@ -85,7 +85,7 @@ public class AccelerometerAnalysis implements IDataAnalysis {
 
     @Override
     public String getIdentifier() {
-        return "Vector4DAnalysis";
+        return "AccelerometerAnalysis";
     }
 
     @Override
