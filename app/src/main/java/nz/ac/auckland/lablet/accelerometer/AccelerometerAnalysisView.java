@@ -21,12 +21,12 @@ import nz.ac.auckland.lablet.views.VCursorDataModelPainter;
 import nz.ac.auckland.lablet.views.plotview.*;
 
 
-public class AccelerometerAnalysisFragmentView extends FrameLayout {
-    public AccelerometerAnalysisFragmentView(Context context) {
+public class AccelerometerAnalysisView extends FrameLayout {
+    public AccelerometerAnalysisView(Context context) {
         super(context);
     }
 
-    public AccelerometerAnalysisFragmentView(final Context context, final AccelerometerAnalysis analysis) {
+    public AccelerometerAnalysisView(final Context context, final AccelerometerAnalysis analysis) {
         super(context);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

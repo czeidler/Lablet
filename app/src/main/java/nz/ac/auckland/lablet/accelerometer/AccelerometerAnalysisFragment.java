@@ -23,7 +23,7 @@ public class AccelerometerAnalysisFragment extends ExperimentAnalysisFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return new AccelerometerAnalysisFragmentView(getActivity(), getSensorAnalysis());
+        return new AccelerometerAnalysisView(getActivity(), getSensorAnalysis());
     }
 
     private AccelerometerAnalysis getSensorAnalysis() {
