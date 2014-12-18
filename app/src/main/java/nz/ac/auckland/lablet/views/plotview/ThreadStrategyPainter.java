@@ -152,14 +152,17 @@ public class ThreadStrategyPainter extends BufferedStrategyPainter {
             return;
 
         try {
-            RectF viewRange = getContainerView().getRange();
+            RectF viewRange = enlargeViewRangeToBufferRange(getContainerView().getRange());
             RectF range = newDirt;
             if (invalidated)
-                range = enlargeViewRangeToBufferRange(viewRange);
-
+                range = viewRange;
             List<RenderPayload> dirt = collectAllRenderPayloads(true, range, viewRange);
-            if (dirt.size() == 0)
+            if (dirt.size() == 0) {
+                if (invalidated)
+                    // clear the buffer, this can happen if the data has just been cleared
+                    startEditingBufferBitmap(true);
                 return;
+            }
             Bitmap renderBitmap = threadBitmap.getBuffer(getBufferBitmap());
             renderTask.start(new ThreadCookie(dirt, renderBitmap, new RectF(getBufferRealRect()), invalidated));
 

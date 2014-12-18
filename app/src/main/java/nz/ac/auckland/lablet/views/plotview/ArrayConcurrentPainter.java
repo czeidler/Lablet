@@ -81,10 +81,11 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
             Range dirty = getDataRangeFor(requestedRealRect.left, requestedRealRect.right);
             dirtyRegion.addRange(dirty);
         } else {
+            // ensure to be within the max dirt
             Range maxDirt = getDataRangeFor(maxRealRect.left, maxRealRect.right);
             if (dirtyRegion.getMin() < maxDirt.min || dirtyRegion.getMax() > maxDirt.max) {
-                maxDirt.min = Math.min(dirtyRegion.getMin(), maxDirt.min);
-                maxDirt.max = Math.max(dirtyRegion.getMax(), maxDirt.max);
+                maxDirt.min = Math.max(dirtyRegion.getMin(), maxDirt.min);
+                maxDirt.max = Math.min(dirtyRegion.getMax(), maxDirt.max);
                 dirtyRegion.clear();
                 dirtyRegion.addRange(maxDirt);
             }
@@ -98,7 +99,7 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
         StrategyPainter.RenderPayload payload = makeRenderPayload(realDataRect, screenRect, dirtyRegion);
         payloads.add(payload);
 
-        // clear
+        // clear (copy is send to the painter so don't call clear() )
         dirtyRegion = new Region1D();
 
         return payloads;
@@ -113,8 +114,8 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
             drawRange(bitmapCanvas, renderPayload, range);
     }
 
-    protected Region1D dirtyRegion = new Region1D();
-    protected int maxDirtyRanges = -1;
+    private Region1D dirtyRegion = new Region1D();
+    private int maxDirtyRanges = -1;
 
     abstract protected RectF getRealDataRect(int startIndex, int lastIndex);
     abstract protected Range getDataRangeFor(float left, float right);
@@ -149,7 +150,6 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
     private AbstractPlotDataAdapter.IListener dataListener = new AbstractPlotDataAdapter.IListener() {
         @Override
         public void onDataAdded(AbstractPlotDataAdapter plot, int index, int number) {
-            //TODO find out what that was good for: onSetupOffScreenBitmap();
             int start = index;
             if (index > 0)
                 start -= 1;
