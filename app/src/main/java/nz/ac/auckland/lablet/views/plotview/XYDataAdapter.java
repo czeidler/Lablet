@@ -93,7 +93,7 @@ public class XYDataAdapter extends AbstractXYDataAdapter {
         rightIndex ++;
         if (leftIndex < 0)
             leftIndex = 0;
-        int size = xValues.size();
+        int size = getSize();
         if (rightIndex >= size)
             rightIndex = size - 1;
 
@@ -102,7 +102,7 @@ public class XYDataAdapter extends AbstractXYDataAdapter {
 
     @Override
     public int getSize() {
-        return startIndex + xValues.size();
+        return startIndex + Math.min(xValues.size(), yValues.size());
     }
 
     @Override
