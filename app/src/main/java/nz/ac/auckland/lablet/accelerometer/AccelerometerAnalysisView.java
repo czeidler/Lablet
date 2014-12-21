@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import nz.ac.auckland.lablet.R;
@@ -96,5 +97,18 @@ public class AccelerometerAnalysisView extends FrameLayout {
         VCursorDataModelPainter vCursorDataModelPainter = new VCursorDataModelPainter(rangeMarkers);
         vCursorDataModelPainter.setMarkerPainterGroup(hCursorDataModelPainter.getMarkerPainterGroup());
         plotView.addPlotPainter(vCursorDataModelPainter);
+    }
+
+    private View integralView = null;
+
+    public void toggleIntegralView() {
+        if (integralView != null) {
+            removeView(integralView);
+            integralView = null;
+            return;
+        }
+
+        integralView = new IntegralView(getContext());
+        addView(integralView);
     }
 }

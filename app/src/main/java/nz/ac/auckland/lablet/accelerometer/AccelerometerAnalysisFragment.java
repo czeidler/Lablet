@@ -8,13 +8,14 @@
 package nz.ac.auckland.lablet.accelerometer;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
+import nz.ac.auckland.lablet.R;
 
 
 public class AccelerometerAnalysisFragment extends ExperimentAnalysisFragment {
+    private AccelerometerAnalysisView analysisView = null;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,8 +23,36 @@ public class AccelerometerAnalysisFragment extends ExperimentAnalysisFragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (sensorAnalysis == null)
+            return;
+
+        menu.clear();
+        inflater.inflate(R.menu.accelerometer_analysis_actions, menu);
+
+        final MenuItem viewItem = menu.findItem(R.id.action_view);
+        assert viewItem != null;
+        viewItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                analysisView.toggleIntegralView();
+                return true;
+            }
+        });
+
+        setupStandardMenu(menu, inflater);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return new AccelerometerAnalysisView(getActivity(), getSensorAnalysis());
+        analysisView = new AccelerometerAnalysisView(getActivity(), getSensorAnalysis());
+        return analysisView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        analysisView = null;
     }
 
     private AccelerometerAnalysis getSensorAnalysis() {
