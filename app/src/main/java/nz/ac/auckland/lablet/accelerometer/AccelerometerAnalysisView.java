@@ -23,12 +23,12 @@ import nz.ac.auckland.lablet.views.plotview.*;
 
 
 public class AccelerometerAnalysisView extends FrameLayout {
-    public AccelerometerAnalysisView(Context context) {
-        super(context);
-    }
+    final private AccelerometerAnalysis analysis;
 
-    public AccelerometerAnalysisView(final Context context, final AccelerometerAnalysis analysis) {
+    public AccelerometerAnalysisView(final Context context, AccelerometerAnalysis analysis) {
         super(context);
+
+        this.analysis = analysis;
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         ViewGroup view = (ViewGroup) inflater.inflate(R.layout.accelerometer_analysis, this, true);
@@ -45,7 +45,7 @@ public class AccelerometerAnalysisView extends FrameLayout {
         plotView.setRangeListener(new RangeDrawingView.IRangeListener() {
             @Override
             public void onRangeChanged(RectF range) {
-                analysis.getDisplaySettings().setRange(range);
+                AccelerometerAnalysisView.this.analysis.getDisplaySettings().setRange(range);
             }
         });
 
@@ -108,7 +108,7 @@ public class AccelerometerAnalysisView extends FrameLayout {
             return;
         }
 
-        integralView = new IntegralView(getContext());
+        integralView = new IntegralView(getContext(), analysis);
         addView(integralView);
     }
 }
