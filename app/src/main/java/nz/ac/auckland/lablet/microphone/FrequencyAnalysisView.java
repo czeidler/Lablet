@@ -207,7 +207,10 @@ public class FrequencyAnalysisView extends FrameLayout {
         }
         windowOverlapSpinner.setSelection(stepFactorIndex);
 
+        // render script check box
         renderScriptCheckBox = (CheckBox)view.findViewById(R.id.renderScriptCheckBox);
+        // disable it
+        renderScriptCheckBox.setVisibility(INVISIBLE);
         renderScriptCheckBox.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -251,7 +254,9 @@ public class FrequencyAnalysisView extends FrameLayout {
 
         updateContrastBrightness();
 
+        // y scale check box
         CheckBox yScaleCheckBox = (CheckBox)view.findViewById(R.id.yLogScaleCheckBox);
+        // disable it
         yScaleCheckBox.setVisibility(INVISIBLE);
         yScaleCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
