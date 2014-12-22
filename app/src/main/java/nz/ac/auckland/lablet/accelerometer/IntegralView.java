@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.accelerometer;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,13 +42,17 @@ public class IntegralView extends FrameLayout {
         final public AccelerometerAnalysis.Calibration calibration;
         final public List<Number> data;
         final public String labelPrefix;
+        final public int markerColor;
+        final public IPointRenderer markerRenderer;
 
         public SpinnerEntry(String name, AccelerometerAnalysis.Calibration calibration, List<Number> data,
-                            String labelPrefix) {
+                            String labelPrefix, int markerColor, IPointRenderer markerRenderer) {
             this.name = name;
             this.calibration = calibration;
             this.data = data;
             this.labelPrefix = labelPrefix;
+            this.markerColor = markerColor;
+            this.markerRenderer = markerRenderer;
         }
         @Override
         public String toString() {
@@ -66,11 +71,14 @@ public class IntegralView extends FrameLayout {
         AccelerometerExperimentData data = (AccelerometerExperimentData)analysis.getData();
 
         Spinner spinner = (Spinner)view.findViewById(R.id.spinner);
-        spinnerEntryList.add(new SpinnerEntry("x-Acceleration", analysis.getXCalibration(), data.getXValues(), "x"));
-        spinnerEntryList.add(new SpinnerEntry("y-Acceleration", analysis.getYCalibration(), data.getYValues(), "y"));
-        spinnerEntryList.add(new SpinnerEntry("z-Acceleration", analysis.getZCalibration(), data.getZValues(), "z"));
+        spinnerEntryList.add(new SpinnerEntry("x-Acceleration", analysis.getXCalibration(), data.getXValues(), "x",
+                AccelerometerAnalysisView.X_MARKER_COLOR, AccelerometerAnalysisView.X_POINT_RENDERER));
+        spinnerEntryList.add(new SpinnerEntry("y-Acceleration", analysis.getYCalibration(), data.getYValues(), "y",
+                AccelerometerAnalysisView.Y_MARKER_COLOR, AccelerometerAnalysisView.Y_POINT_RENDERER));
+        spinnerEntryList.add(new SpinnerEntry("z-Acceleration", analysis.getZCalibration(), data.getZValues(), "z",
+                AccelerometerAnalysisView.Z_MARKER_COLOR, AccelerometerAnalysisView.Z_POINT_RENDERER));
         spinnerEntryList.add(new SpinnerEntry("total-Acceleration", analysis.getTotalCalibration(), totalData,
-                "total"));
+                "total", AccelerometerAnalysisView.TOTAL_MARKER_COLOR, AccelerometerAnalysisView.TOTAL_POINT_RENDERER));
         spinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
                 spinnerEntryList));
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -133,7 +141,8 @@ public class IntegralView extends FrameLayout {
         start = 0;
         end = data.getTimeValues().size() - 1;
         timeValues = data.getTimeValues().subList(start, end);
-        setupPlot(accelerometerPlotView, timeValues, currentEntry.data, prefix + "-Acceleration", "acceleration [m/s^2]");
+        setupPlot(accelerometerPlotView, timeValues, currentEntry.data, prefix + "-Acceleration",
+                "acceleration [m/s^2]");
 
         float baseLine = calibration.getBaseLine();
         NormRectF normRectF = new NormRectF(accelerometerPlotView.getRange());
@@ -176,14 +185,22 @@ public class IntegralView extends FrameLayout {
 
         XYDataAdapter zData = new XYDataAdapter(x, y);
         XYConcurrentPainter painter = new XYConcurrentPainter(zData, getContext());
+        Paint paint = new Paint();
+        paint.setColor(currentEntry.markerColor);
+        painter.getDrawConfig().setMarkerPaint(paint);
+        painter.setPointRenderer(currentEntry.markerRenderer);
         strategyPainter.addChild(painter);
 
         plotView.addPlotPainter(strategyPainter);
 
+        // reset max values before auto zoom
+        plotView.setMaxXRange(Float.MAX_VALUE, Float.MAX_VALUE);
+        plotView.setMaxYRange(Float.MAX_VALUE, Float.MAX_VALUE);
         plotView.autoZoom();
-
+        // set max values calculated in auto zoom
         RectF range = plotView.getRange();
         plotView.setMaxRange(range);
+
         plotView.setZoomable(true);
         plotView.setDraggable(true);
 
