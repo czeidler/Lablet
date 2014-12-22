@@ -11,9 +11,9 @@
         android:text="Cursors:"
         android:id="@+id/titleTextView"/>
     <view android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
+          android:layout_height="fill_parent"
           class="nz.ac.auckland.lablet.views.table.TableView"
-          android:id="@+id/tableView"/>
+          android:id="@+id/tableView" android:layout_weight="1"/>
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"

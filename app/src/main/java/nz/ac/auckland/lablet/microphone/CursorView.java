@@ -97,7 +97,7 @@ class VCursorDiffToPrevColumn extends DataTableColumn {
 }
 
 
-public class CursorView extends ScrollView {
+public class CursorView extends LinearLayout {
     final private PlotView frequencyView;
     final private MarkerDataModel hDataModel;
     final private MarkerDataModel vDataModel;
@@ -113,18 +113,15 @@ public class CursorView extends ScrollView {
     }
 
     private void init(Context context) {
-        LinearLayout layout = new LinearLayout(context);
-        layout.setOrientation(LinearLayout.VERTICAL);
+        setOrientation(LinearLayout.VERTICAL);
 
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        layout.addView(setupHCursorView(inflater));
-        Space space = new Space(context);
-        space.setLayoutParams(new LayoutParams(0, 20));
-        layout.addView(space);
-        layout.addView(setupVCursorView(inflater));
-
-        addView(layout);
+        LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
+                1);
+        addView(setupHCursorView(inflater), params);
+        addView(new Space(context), new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 20));
+        addView(setupVCursorView(inflater), params);
     }
 
     private View setupHCursorView(LayoutInflater inflater) {
