@@ -16,15 +16,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
-import nz.ac.auckland.lablet.views.HCursorDataModelPainter;
-import nz.ac.auckland.lablet.views.VCursorDataModelPainter;
 import nz.ac.auckland.lablet.views.plotview.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class AccelerometerAnalysisView extends FrameLayout {
     final private AccelerometerAnalysis analysis;
     final private ViewGroup mainView;
+    final private List<Number> totalData = new ArrayList<>();
 
     public AccelerometerAnalysisView(final Context context, AccelerometerAnalysis analysis) {
         super(context);
@@ -32,7 +33,10 @@ public class AccelerometerAnalysisView extends FrameLayout {
         this.analysis = analysis;
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mainView = (ViewGroup) inflater.inflate(R.layout.accelerometer_analysis, this, true);
+        // Don't attach the view to the root view to make it switchable with the integral view.
+        // (Android seems to reuse the root view otherwise)
+        mainView = (ViewGroup)inflater.inflate(R.layout.accelerometer_analysis, this, false);
+        addView(mainView);
 
         RectF savedRange = new RectF(analysis.getDisplaySettings().getRange());
 
@@ -51,6 +55,14 @@ public class AccelerometerAnalysisView extends FrameLayout {
         });
 
         AccelerometerExperimentData data = (AccelerometerExperimentData)analysis.getData();
+
+        // total data
+        for (int i = 0 ; i < data.getTimeValues().size(); i++) {
+            float total = (float) Math.sqrt(Math.pow(data.getXValues().get(i).floatValue(), 2)
+                    + Math.pow(data.getYValues().get(i).floatValue(), 2)
+                    + Math.pow(data.getZValues().get(i).floatValue(), 2));
+            totalData.add(total);
+        }
 
         XYDataAdapter xData = new XYDataAdapter(data.getTimeValues(), data.getXValues());
         XYConcurrentPainter xPainter = new XYConcurrentPainter(xData, getContext());
@@ -71,6 +83,14 @@ public class AccelerometerAnalysisView extends FrameLayout {
         zPainter.getDrawConfig().setMarkerPaint(zMarkerPaint);
         zPainter.setPointRenderer(new BottomTriangleRenderer());
         strategyPainter.addChild(zPainter);
+
+        XYDataAdapter totalDataAdapter = new XYDataAdapter(data.getTimeValues(), totalData);
+        XYConcurrentPainter totalPainter = new XYConcurrentPainter(totalDataAdapter, getContext());
+        Paint totalMarkerPaint = new Paint();
+        totalMarkerPaint.setColor(Color.WHITE);
+        totalPainter.getDrawConfig().setMarkerPaint(totalMarkerPaint);
+        totalPainter.setPointRenderer(new CircleRenderer());
+        strategyPainter.addChild(totalPainter);
 
         plotView.addPlotPainter(strategyPainter);
 
@@ -96,10 +116,12 @@ public class AccelerometerAnalysisView extends FrameLayout {
         if (integralView != null) {
             removeView(integralView);
             integralView = null;
+            mainView.setVisibility(VISIBLE);
             return;
         }
 
-        integralView = new IntegralView(getContext(), analysis);
+        mainView.setVisibility(INVISIBLE);
+        integralView = new IntegralView(getContext(), analysis, totalData);
         addView(integralView);
     }
 }

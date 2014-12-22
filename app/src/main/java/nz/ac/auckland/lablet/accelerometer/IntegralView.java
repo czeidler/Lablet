@@ -7,11 +7,7 @@
  */
 package nz.ac.auckland.lablet.accelerometer;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.graphics.RectF;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -22,7 +18,6 @@ import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.HCursorDataModelPainter;
-import nz.ac.auckland.lablet.views.VCursorDataModelPainter;
 import nz.ac.auckland.lablet.views.plotview.*;
 
 import java.util.ArrayList;
@@ -59,18 +54,13 @@ public class IntegralView extends FrameLayout {
         }
     }
 
-    public IntegralView(Context context, AccelerometerAnalysis analysis) {
+    public IntegralView(Context context, AccelerometerAnalysis analysis, List<Number> totalData) {
         super(context);
         this.analysis = analysis;
 
         LayoutInflater inflater = (LayoutInflater)context.getSystemService
                 (Context.LAYOUT_INFLATER_SERVICE);
-
-        View view = inflater.inflate(R.layout.accelerometer_integral, null, false);
-        addView(view);
-        TypedArray array = context.getTheme().obtainStyledAttributes(new int[]{android.R.attr.colorBackground,});
-        int backGroundColor = array.getColor(0, 0xFF00FF);
-        view.setBackgroundColor(backGroundColor);
+        View view = inflater.inflate(R.layout.accelerometer_integral, this, true);
 
         AccelerometerExperimentData data = (AccelerometerExperimentData)analysis.getData();
 
@@ -78,6 +68,8 @@ public class IntegralView extends FrameLayout {
         spinnerEntryList.add(new SpinnerEntry("x-Acceleration", analysis.getXCalibration(), data.getXValues(), "x"));
         spinnerEntryList.add(new SpinnerEntry("y-Acceleration", analysis.getYCalibration(), data.getYValues(), "y"));
         spinnerEntryList.add(new SpinnerEntry("z-Acceleration", analysis.getZCalibration(), data.getZValues(), "z"));
+        spinnerEntryList.add(new SpinnerEntry("total-Acceleration", analysis.getTotalCalibration(), totalData,
+                "total"));
         spinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
                 spinnerEntryList));
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
