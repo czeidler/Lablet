@@ -19,9 +19,11 @@ import android.widget.Spinner;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.CursorDataModelPainter;
 import nz.ac.auckland.lablet.views.HCursorDataModelPainter;
 import nz.ac.auckland.lablet.views.plotview.*;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -154,6 +156,7 @@ public class IntegralView extends FrameLayout {
         // marker
         MarkerDataModel baseLineMarker = calibration.getBaseLineMarker();
         HCursorDataModelPainter hCursorDataModelPainter = new HCursorDataModelPainter(baseLineMarker);
+        hCursorDataModelPainter.setPositionDecimalFormat("#.###");
         accelerometerPlotView.addPlotPainter(hCursorDataModelPainter);
 
         baseLineMarker.addListener(dataListener);

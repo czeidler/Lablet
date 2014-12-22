@@ -11,6 +11,7 @@ import android.graphics.*;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 
@@ -73,7 +74,10 @@ abstract class CursorMarker extends DraggableMarker {
         parent.getContainerView().fromScreen(getCachedScreenPosition(), realPosition);
         PointF textPosition = new PointF(start.x, start.y);
         textPosition.offset(2, -2);
-        final String positionString = String.format("Position: %d", (int)getDirection(realPosition));
+
+        CursorDataModelPainter cursorDataModelPainter = (CursorDataModelPainter)parent;
+        final String positionString = "Position: " + new DecimalFormat(
+                cursorDataModelPainter.getPositionDecimalFormat()).format(getDirection(realPosition));
         final Rect textBounds = new Rect();
         textPaint.getTextBounds(positionString, 0, positionString.length(), textBounds);
         textBounds.offset((int)textPosition.x, (int)textPosition.y);
@@ -135,6 +139,15 @@ class VCursorMarker extends CursorMarker {
 
 
 abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
+    private String positionDecimalFormat = "#";
+
+    public void setPositionDecimalFormat(String positionDecimalFormat) {
+        this.positionDecimalFormat = positionDecimalFormat;
+    }
+
+    public String getPositionDecimalFormat() {
+        return positionDecimalFormat;
+    }
 
     public CursorDataModelPainter(MarkerDataModel data) {
         super(data);
