@@ -594,6 +594,10 @@ public class PlotView extends ViewGroup {
         autoRange = new AutoRange(dataStatisticsList, behaviourX, behaviourY);
     }
 
+    public void clear() {
+        mainView.removeAllPlotPainters();
+    }
+
     public void autoZoom() {
         boolean autoRangeWasNull = false;
         if (autoRange == null) {
