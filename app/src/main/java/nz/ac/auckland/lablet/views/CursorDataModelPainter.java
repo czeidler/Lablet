@@ -162,10 +162,19 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
 
     @Override
     public void onDraw(Canvas canvas) {
+        IMarker selectedMarker = null;
         for (int i = 0; i < markerList.size(); i++) {
             IMarker marker = markerList.get(i);
+            if (marker.isSelectedForDrag()) {
+                selectedMarker = marker;
+                continue;
+            }
             marker.onDraw(canvas, 1);
         }
+
+        // draw selected marker on the top
+        if (selectedMarker != null)
+            selectedMarker.onDraw(canvas, 1);
     }
 
     @Override
@@ -183,7 +192,8 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
             for (int i = 0; i < markerData.getMarkerCount(); i++) {
                 MarkerData data = markerData.getMarkerDataAt(i);
                 if (data.getId() == selectedMarkerId) {
-                    markerList.get(i).setSelectedForDrag(true);
+                    if (!markerList.get(i).isSelectedForDrag())
+                        markerList.get(i).setSelectedForDrag(true);
                     break;
                 }
             }
