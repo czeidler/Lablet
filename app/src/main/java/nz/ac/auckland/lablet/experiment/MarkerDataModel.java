@@ -30,6 +30,8 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
     private int selectedDataIndex = -1;
 
     public void selectMarkerData(int index) {
+        if (selectedDataIndex == index)
+            return;
         selectedDataIndex = index;
         notifyDataSelected(index);
     }
