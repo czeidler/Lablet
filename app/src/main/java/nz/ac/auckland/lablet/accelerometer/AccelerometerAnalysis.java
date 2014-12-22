@@ -24,8 +24,45 @@ public class AccelerometerAnalysis implements IDataAnalysis {
     final private AccelerometerExperimentData sensorData;
     final private DisplaySettings displaySettings = new DisplaySettings();
 
-    final private MarkerDataModel baseLineMarker = new MarkerDataModel();
-    final private MarkerDataModel rangeMarkers = new MarkerDataModel();
+    final private Calibration xCalibration = new Calibration();
+    final private Calibration yCalibration = new Calibration();
+    final private Calibration zCalibration = new Calibration();
+    final private Calibration totalCalibration = new Calibration();
+
+    class Calibration {
+        final private MarkerDataModel baseLineMarker = new MarkerDataModel();
+
+        public Calibration() {
+            MarkerData markerData = new MarkerData(0);
+            markerData.setPosition(new PointF(0f, 9.81f));
+            baseLineMarker.addMarkerData(markerData);
+        }
+
+        public Bundle toBundle() {
+            Bundle bundle = new Bundle();
+            bundle.putBundle("baseLineMarker", baseLineMarker.toBundle());
+
+            return bundle;
+        }
+
+        public void fromBundle(Bundle bundle) {
+            Bundle baseLineMarkerBundle = bundle.getBundle("baseLineMarker");
+            if (baseLineMarkerBundle != null)
+                baseLineMarker.fromBundle(baseLineMarkerBundle);
+        }
+
+        public MarkerDataModel getBaseLineMarker() {
+            return baseLineMarker;
+        }
+
+        public float getBaseLine() {
+            return baseLineMarker.getRealMarkerPositionAt(0).y;
+        }
+
+        public void setBaseLine(float baseLine) {
+            baseLineMarker.setMarkerPosition(new PointF(0, baseLine), 0);
+        }
+    }
 
     public class DisplaySettings {
         final RectF range = new RectF();
@@ -57,25 +94,22 @@ public class AccelerometerAnalysis implements IDataAnalysis {
 
     public AccelerometerAnalysis(AccelerometerExperimentData sensorData) {
         this.sensorData = sensorData;
-
-        MarkerData markerData = new MarkerData(0);
-        markerData.setPosition(new PointF(0f, 9.81f));
-        baseLineMarker.addMarkerData(markerData);
-
-        markerData = new MarkerData(0);
-        markerData.setPosition(new PointF(0f, 0f));
-        rangeMarkers.addMarkerData(markerData);
-        markerData = new MarkerData(1);
-        markerData.setPosition(new PointF(0f, 0f));
-        rangeMarkers.addMarkerData(markerData);
     }
 
-    public MarkerDataModel getBaseLineMarker() {
-        return baseLineMarker;
+    public Calibration getXCalibration() {
+        return xCalibration;
     }
 
-    public MarkerDataModel getRangeMarkers() {
-        return rangeMarkers;
+    public Calibration getYCalibration() {
+        return yCalibration;
+    }
+
+    public Calibration getZCalibration() {
+        return zCalibration;
+    }
+
+    public Calibration getTotalCalibration() {
+        return totalCalibration;
     }
 
     @Override
@@ -95,16 +129,22 @@ public class AccelerometerAnalysis implements IDataAnalysis {
 
     @Override
     public boolean loadAnalysisData(Bundle bundle, File storageDir) {
-        Bundle displaySettingsBundle = bundle.getBundle("displaySettingsBundle");
+        Bundle displaySettingsBundle = bundle.getBundle("displaySettings");
         if (displaySettingsBundle != null)
             displaySettings.fromBundle(displaySettingsBundle);
 
-        Bundle baseLineMarkerBundle = bundle.getBundle("baseLineMarker");
-        if (baseLineMarkerBundle != null)
-            baseLineMarker.fromBundle(baseLineMarkerBundle);
-        Bundle rangeMarkersBundle = bundle.getBundle("rangeMarkers");
-        if (rangeMarkersBundle != null)
-            rangeMarkers.fromBundle(rangeMarkersBundle);
+        Bundle xCalibrationBundle = bundle.getBundle("xCalibration");
+        if (xCalibrationBundle != null)
+            xCalibration.fromBundle(xCalibrationBundle);
+        Bundle yCalibrationBundle = bundle.getBundle("yCalibration");
+        if (yCalibrationBundle != null)
+            yCalibration.fromBundle(yCalibrationBundle);
+        Bundle zCalibrationBundle = bundle.getBundle("zCalibration");
+        if (zCalibrationBundle != null)
+            zCalibration.fromBundle(zCalibrationBundle);
+        Bundle totalCalibrationBundle = bundle.getBundle("totalCalibration");
+        if (totalCalibrationBundle != null)
+            totalCalibration.fromBundle(totalCalibrationBundle);
 
         return true;
     }
@@ -112,10 +152,12 @@ public class AccelerometerAnalysis implements IDataAnalysis {
     @Override
     public Bundle exportAnalysisData(File additionalStorageDir) throws IOException {
         Bundle bundle = new Bundle();
-        bundle.putBundle("displaySettingsBundle", getDisplaySettings().toBundle());
+        bundle.putBundle("displaySettings", getDisplaySettings().toBundle());
 
-        bundle.putBundle("baseLineMarker", baseLineMarker.toBundle());
-        bundle.putBundle("rangeMarkers", rangeMarkers.toBundle());
+        bundle.putBundle("xCalibration", xCalibration.toBundle());
+        bundle.putBundle("yCalibration", yCalibration.toBundle());
+        bundle.putBundle("zCalibration", zCalibration.toBundle());
+        bundle.putBundle("totalCalibration", totalCalibration.toBundle());
 
         return bundle;
     }
