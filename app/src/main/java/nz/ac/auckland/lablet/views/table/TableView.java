@@ -115,7 +115,8 @@ public class TableView extends ListView {
             if (getChildCount() == 0)
                 return 0;
             View view = getChildAt(0);
-            view.measure(MeasureSpec.makeMeasureSpec(50, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(500, MeasureSpec.AT_MOST));
+            view.measure(MeasureSpec.makeMeasureSpec(ViewGroup.LayoutParams.WRAP_CONTENT, MeasureSpec.AT_MOST),
+                    MeasureSpec.makeMeasureSpec(ViewGroup.LayoutParams.WRAP_CONTENT, MeasureSpec.AT_MOST));
             return view.getMeasuredHeight();
         }
 
