@@ -98,6 +98,7 @@ public class AccelerometerAnalysisView extends FrameLayout {
         legend.addEntry(xPainter, "x-acceleration");
         legend.addEntry(yPainter, "y-acceleration");
         legend.addEntry(zPainter, "z-acceleration");
+        legend.addEntry(totalPainter, "total-acceleration");
         plotView.addForegroundPainter(legend);
 
         plotView.autoZoom();
