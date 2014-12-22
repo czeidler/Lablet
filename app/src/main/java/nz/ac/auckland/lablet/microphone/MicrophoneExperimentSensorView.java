@@ -408,7 +408,7 @@ class MicrophoneExperimentSensorView extends AbstractExperimentSensorView {
         super(context);
 
         final LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final ViewGroup view = (ViewGroup)inflater.inflate(R.layout.microphone_run_view, null, false);
+        final ViewGroup view = (ViewGroup)inflater.inflate(R.layout.microphone_experiment_view, null, false);
         assert view != null;
         addView(view);
 
