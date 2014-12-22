@@ -1,60 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <LinearLayout android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1">
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner" android:layout_weight="1" android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true" />
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="fill_parent" android:orientation="vertical"
+                  android:layout_below="@+id/spinner">
         <view android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_weight="1"
-              class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/xAccelerometerPlotView"
-              android:layout_gravity="center_horizontal"/>
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_weight="1"
-              class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/xVelocityPlotView"
-              android:layout_gravity="center_horizontal"/>
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_weight="1"
-              class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/xDistancePlotView"
-              android:layout_gravity="center_horizontal"/>
+              class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/accelerometerPlotView"
+              android:layout_gravity="center_horizontal" />
+        <LinearLayout android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1">
+            <view android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/velocityPlotView"
+                  android:layout_gravity="center_horizontal"/>
+            <view android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/distancePlotView"
+                  android:layout_gravity="center_horizontal"/>
+        </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1">
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_weight="1"
-              class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/yAccelerometerPlotView"
-              android:layout_gravity="center_horizontal"/>
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_weight="1"
-              class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/yVelocityPlotView"
-              android:layout_gravity="center_horizontal"/>
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_weight="1"
-              class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/yDistancePlotView"
-              android:layout_gravity="center_horizontal"/>
-    </LinearLayout>
 
-    <LinearLayout android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1">
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_weight="1"
-              class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/zAccelerometerPlotView"
-              android:layout_gravity="center_horizontal"/>
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_weight="1"
-              class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/zVelocityPlotView"
-              android:layout_gravity="center_horizontal"/>
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_weight="1"
-              class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/zDistancePlotView"
-              android:layout_gravity="center_horizontal"/>
-    </LinearLayout>
-</LinearLayout>
+
+</RelativeLayout>

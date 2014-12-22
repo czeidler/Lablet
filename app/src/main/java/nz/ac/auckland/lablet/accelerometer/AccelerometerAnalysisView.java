@@ -24,6 +24,7 @@ import nz.ac.auckland.lablet.views.plotview.*;
 
 public class AccelerometerAnalysisView extends FrameLayout {
     final private AccelerometerAnalysis analysis;
+    final private ViewGroup mainView;
 
     public AccelerometerAnalysisView(final Context context, AccelerometerAnalysis analysis) {
         super(context);
@@ -31,11 +32,11 @@ public class AccelerometerAnalysisView extends FrameLayout {
         this.analysis = analysis;
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        ViewGroup view = (ViewGroup) inflater.inflate(R.layout.accelerometer_analysis, this, true);
+        mainView = (ViewGroup) inflater.inflate(R.layout.accelerometer_analysis, this, true);
 
         RectF savedRange = new RectF(analysis.getDisplaySettings().getRange());
 
-        PlotView plotView = (PlotView)view.findViewById(R.id.plotView);
+        PlotView plotView = (PlotView)mainView.findViewById(R.id.plotView);
         plotView.getTitleView().setTitle("Accelerometer");
         plotView.getBackgroundPainter().setShowXGrid(true);
         plotView.getBackgroundPainter().setShowYGrid(true);
@@ -87,16 +88,6 @@ public class AccelerometerAnalysisView extends FrameLayout {
 
         if (Math.abs(savedRange.width()) > 0 && Math.abs(savedRange.height()) > 0)
             plotView.setRange(savedRange);
-
-        // marker
-        MarkerDataModel baseLineMarker = analysis.getBaseLineMarker();
-        HCursorDataModelPainter hCursorDataModelPainter = new HCursorDataModelPainter(baseLineMarker);
-        plotView.addPlotPainter(hCursorDataModelPainter);
-
-        MarkerDataModel rangeMarkers = analysis.getRangeMarkers();
-        VCursorDataModelPainter vCursorDataModelPainter = new VCursorDataModelPainter(rangeMarkers);
-        vCursorDataModelPainter.setMarkerPainterGroup(hCursorDataModelPainter.getMarkerPainterGroup());
-        plotView.addPlotPainter(vCursorDataModelPainter);
     }
 
     private View integralView = null;
