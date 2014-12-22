@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.accelerometer;
 
 import android.content.Context;
+import android.graphics.RectF;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -83,7 +84,7 @@ public class IntegralView extends FrameLayout {
 
             }
         });
-        spinner.setSelection(2);
+        spinner.setSelection(3);
 
         accelerometerPlotView = (PlotView)view.findViewById(R.id.accelerometerPlotView);
         velocityPlotView = (PlotView)view.findViewById(R.id.velocityPlotView);
@@ -132,7 +133,7 @@ public class IntegralView extends FrameLayout {
         start = 0;
         end = data.getTimeValues().size() - 1;
         timeValues = data.getTimeValues().subList(start, end);
-        setupPlot(accelerometerPlotView, timeValues, currentEntry.data, prefix + "-Acceleration", "a [m/s^2]");
+        setupPlot(accelerometerPlotView, timeValues, currentEntry.data, prefix + "-Acceleration", "acceleration [m/s^2]");
 
         float baseLine = calibration.getBaseLine();
         NormRectF normRectF = new NormRectF(accelerometerPlotView.getRange());
@@ -162,14 +163,13 @@ public class IntegralView extends FrameLayout {
         List<Number> integral = integral(timeValues, currentEntry.data, start, end, calibration.getBaseLine());
         List<Number> integral2 = integral(timeValues, integral, start, end - 1, 0);
 
-        setupPlot(velocityPlotView, timeValues, integral, prefix + "-Velocity", "v [m/s]");
-        setupPlot(distancePlotView, timeValues, integral2, prefix + "-Distance", "s [m]");
-
-
+        setupPlot(velocityPlotView, timeValues, integral, prefix + "-Velocity", "velocity [m/s]");
+        setupPlot(distancePlotView, timeValues, integral2, prefix + "-Distance", "distance [m]");
     }
 
     private void setupPlot(PlotView plotView, List<Number> x, List<Number> y, String title, String yAxisTitle) {
         plotView.getTitleView().setTitle(title);
+        plotView.getXAxisView().setTitle("time [ms]");
         plotView.getYAxisView().setTitle(yAxisTitle);
 
         StrategyPainter strategyPainter = new BufferedDirectStrategyPainter();
@@ -181,6 +181,11 @@ public class IntegralView extends FrameLayout {
         plotView.addPlotPainter(strategyPainter);
 
         plotView.autoZoom();
+
+        RectF range = plotView.getRange();
+        plotView.setMaxRange(range);
+        plotView.setZoomable(true);
+        plotView.setDraggable(true);
 
         plotView.invalidate();
     }
