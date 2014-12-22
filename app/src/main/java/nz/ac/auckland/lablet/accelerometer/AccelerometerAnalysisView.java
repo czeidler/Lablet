@@ -27,6 +27,16 @@ public class AccelerometerAnalysisView extends FrameLayout {
     final private ViewGroup mainView;
     final private List<Number> totalData = new ArrayList<>();
 
+    final public static int X_MARKER_COLOR = Color.GREEN;
+    final public static int Y_MARKER_COLOR = Color.BLUE;
+    final public static int Z_MARKER_COLOR = Color.RED;
+    final public static int TOTAL_MARKER_COLOR = Color.WHITE;
+
+    final public static IPointRenderer X_POINT_RENDERER = new CrossRenderer();
+    final public static IPointRenderer Y_POINT_RENDERER = new CircleRenderer();
+    final public static IPointRenderer Z_POINT_RENDERER = new BottomTriangleRenderer();
+    final public static IPointRenderer TOTAL_POINT_RENDERER = new TopTriangleRenderer();
+
     public AccelerometerAnalysisView(final Context context, AccelerometerAnalysis analysis) {
         super(context);
 
@@ -66,30 +76,34 @@ public class AccelerometerAnalysisView extends FrameLayout {
 
         XYDataAdapter xData = new XYDataAdapter(data.getTimeValues(), data.getXValues());
         XYConcurrentPainter xPainter = new XYConcurrentPainter(xData, getContext());
+        xPainter.setPointRenderer(X_POINT_RENDERER);
+        Paint xMarkerPaint = new Paint();
+        xMarkerPaint.setColor(X_MARKER_COLOR);
+        xPainter.getDrawConfig().setMarkerPaint(xMarkerPaint);
         strategyPainter.addChild(xPainter);
 
         XYDataAdapter yData = new XYDataAdapter(data.getTimeValues(), data.getYValues());
         XYConcurrentPainter yPainter = new XYConcurrentPainter(yData, getContext());
-        yPainter.setPointRenderer(new CircleRenderer());
+        yPainter.setPointRenderer(Y_POINT_RENDERER);
         Paint yMarkerPaint = new Paint();
-        yMarkerPaint.setColor(Color.BLUE);
+        yMarkerPaint.setColor(Y_MARKER_COLOR);
         yPainter.getDrawConfig().setMarkerPaint(yMarkerPaint);
         strategyPainter.addChild(yPainter);
 
         XYDataAdapter zData = new XYDataAdapter(data.getTimeValues(), data.getZValues());
         XYConcurrentPainter zPainter = new XYConcurrentPainter(zData, getContext());
         Paint zMarkerPaint = new Paint();
-        zMarkerPaint.setColor(Color.RED);
+        zMarkerPaint.setColor(Z_MARKER_COLOR);
         zPainter.getDrawConfig().setMarkerPaint(zMarkerPaint);
-        zPainter.setPointRenderer(new BottomTriangleRenderer());
+        zPainter.setPointRenderer(Z_POINT_RENDERER);
         strategyPainter.addChild(zPainter);
 
         XYDataAdapter totalDataAdapter = new XYDataAdapter(data.getTimeValues(), totalData);
         XYConcurrentPainter totalPainter = new XYConcurrentPainter(totalDataAdapter, getContext());
         Paint totalMarkerPaint = new Paint();
-        totalMarkerPaint.setColor(Color.WHITE);
+        totalMarkerPaint.setColor(TOTAL_MARKER_COLOR);
         totalPainter.getDrawConfig().setMarkerPaint(totalMarkerPaint);
-        totalPainter.setPointRenderer(new CircleRenderer());
+        totalPainter.setPointRenderer(TOTAL_POINT_RENDERER);
         strategyPainter.addChild(totalPainter);
 
         plotView.addPlotPainter(strategyPainter);
