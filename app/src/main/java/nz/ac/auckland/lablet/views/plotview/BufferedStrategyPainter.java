@@ -12,6 +12,8 @@ import android.support.annotation.Nullable;
 
 
 class BitmapBuffer {
+    // It can happen that there is not enough contiguous memory if we allocate the buffer all the
+    // time. For that reason use a hard reference.
     /*private SoftReference<Bitmap> bitmapReference;
 
     private void setBuffer(Bitmap bitmap) {
