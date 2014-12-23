@@ -10,16 +10,32 @@ package nz.ac.auckland.lablet.views.plotview;
 import android.graphics.*;
 import android.support.annotation.Nullable;
 
-import java.lang.ref.SoftReference;
-
 
 class BitmapBuffer {
-    private SoftReference<Bitmap> bitmapSoftReference;
+    /*private SoftReference<Bitmap> bitmapReference;
+
+    private void setBuffer(Bitmap bitmap) {
+        bitmapReference = new SoftReference<>(bitmap);
+    }
+
+    private Bitmap getBuffer() {
+        if (bitmapReference != null)
+            return bitmapReference.get();
+        return null;
+    }
+    */
+    private Bitmap bitmapReference;
+
+    private void setBuffer(Bitmap bitmap) {
+        bitmapReference = bitmap;
+    }
+
+    private Bitmap getBuffer() {
+        return bitmapReference;
+    }
 
     public Bitmap getBuffer(Bitmap reference) {
-        Bitmap bitmap = null;
-        if (bitmapSoftReference != null)
-            bitmap = bitmapSoftReference.get();
+        Bitmap bitmap = getBuffer();
 
         if (bitmap == null || bitmap.getWidth() != reference.getWidth()
                 || bitmap.getHeight() != reference.getHeight()) {
@@ -35,10 +51,6 @@ class BitmapBuffer {
         Bitmap buffer = getBuffer(bitmap);
         setBuffer(bitmap);
         return buffer;
-    }
-
-    private void setBuffer(Bitmap bitmap) {
-        bitmapSoftReference = new SoftReference<>(bitmap);
     }
 }
 
@@ -165,7 +177,6 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
             bufferCanvas.drawBitmap(oldBitmap, null, oldBufferScreenRect, null);
 
         bufferRangeChanged = false;
-
         return bufferCanvas;
     }
 
