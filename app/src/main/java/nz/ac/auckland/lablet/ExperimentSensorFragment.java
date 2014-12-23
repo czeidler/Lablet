@@ -17,10 +17,10 @@ import nz.ac.auckland.lablet.experiment.IExperimentSensor;
 import java.util.List;
 
 
-public class ExperimentRunFragment extends android.support.v4.app.Fragment {
+public class ExperimentSensorFragment extends android.support.v4.app.Fragment {
     private IExperimentSensor sensor;
 
-    public ExperimentRunFragment() {
+    public ExperimentSensorFragment() {
         super();
     }
 

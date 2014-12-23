@@ -844,11 +844,11 @@ class ExperimentRunFragmentPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public android.support.v4.app.Fragment getItem(int position) {
-        ExperimentRunFragment experimentRunFragment = new ExperimentRunFragment();
+        ExperimentSensorFragment experimentSensorFragment = new ExperimentSensorFragment();
         Bundle bundle = new Bundle();
         bundle.putInt("sensor", position);
-        experimentRunFragment.setArguments(bundle);
-        return experimentRunFragment;
+        experimentSensorFragment.setArguments(bundle);
+        return experimentSensorFragment;
     }
 
     @Override
