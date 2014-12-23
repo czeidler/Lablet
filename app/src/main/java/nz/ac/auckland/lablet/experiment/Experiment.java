@@ -29,6 +29,9 @@ public class Experiment extends WeakListenable<Experiment.IListener> {
     final private Activity activity;
     private int runGroupId = -1;
 
+    final static private String NUMBER_OF_RUNS_KEY = "number_of_runs";
+    final static private String CURRENT_RUN_KEY = "current_run";
+
     public Experiment(Activity activity) {
         this.activity = activity;
     }
@@ -50,9 +53,9 @@ public class Experiment extends WeakListenable<Experiment.IListener> {
     }
 
     public void onSaveInstanceState(Bundle outState) {
-        outState.putInt("number_of_runs", experimentRuns.size());
+        outState.putInt(NUMBER_OF_RUNS_KEY, experimentRuns.size());
         if (currentExperimentRun != null)
-            outState.putInt("current_run", experimentRuns.indexOf(currentExperimentRun));
+            outState.putInt(CURRENT_RUN_KEY, experimentRuns.indexOf(currentExperimentRun));
         int i = 0;
         for (ExperimentRun run : experimentRuns) {
             Bundle runBundle = new Bundle();
@@ -65,7 +68,7 @@ public class Experiment extends WeakListenable<Experiment.IListener> {
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         assert(experimentRuns.size() == 0);
 
-        int numberOfRuns = savedInstanceState.getInt("number_of_runs", 0);
+        int numberOfRuns = savedInstanceState.getInt(NUMBER_OF_RUNS_KEY, 0);
         for (int i = 0; i < numberOfRuns; i++) {
             String runNumberString = Integer.toString(i);
             Bundle runState = savedInstanceState.getBundle(runNumberString);
@@ -76,7 +79,7 @@ public class Experiment extends WeakListenable<Experiment.IListener> {
             run.onRestoreInstanceState(runState);
         }
 
-        int currentRunIndex = savedInstanceState.getInt("current_run", -1);
+        int currentRunIndex = savedInstanceState.getInt(CURRENT_RUN_KEY, -1);
         if (currentRunIndex >= 0)
             setCurrentExperimentRun(experimentRuns.get(currentRunIndex));
     }

@@ -52,16 +52,16 @@ public class ExperimentData {
             return null;
         }
 
-        Bundle dataBundle = bundle.getBundle("data");
+        Bundle dataBundle = bundle.getBundle(AbstractSensorData.DATA_KEY);
         if (dataBundle == null) {
             loadError = "failed to load sensor data";
             return null;
         }
 
-        String experimentIdentifier = bundle.getString("sensor_name", "");
+        String sensorName = bundle.getString(AbstractSensorData.SENSOR_NAME_KEY, "");
 
         ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
-        ISensorPlugin plugin = factory.findSensorPlugin(experimentIdentifier);
+        ISensorPlugin plugin = factory.findSensorPlugin(sensorName);
         if (plugin == null) {
             // fallback: try to find analysis for the data type
             if (!dataBundle.containsKey(AbstractSensorData.DATA_TYPE_KEY)) {

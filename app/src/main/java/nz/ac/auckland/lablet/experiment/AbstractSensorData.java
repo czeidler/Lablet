@@ -28,7 +28,9 @@ abstract public class AbstractSensorData implements ISensorData {
     private IExperimentSensor sourceSensor;
 
     static public String UID_KEY = "uid";
+    static public String DATA_KEY = "data";
     static public String DATA_TYPE_KEY = "data_type";
+    static public String SENSOR_NAME_KEY = "sensor_name";
 
     /**
      * Constructor to create an existing experiment that is loaded with loadExperimentData.
@@ -71,7 +73,7 @@ abstract public class AbstractSensorData implements ISensorData {
     @Override
     public boolean loadExperimentData(Bundle bundle, File storageDir) {
         this.storageDir = storageDir;
-        uid = bundle.getString("uid");
+        uid = bundle.getString(UID_KEY);
         return true;
     }
 
@@ -81,9 +83,9 @@ abstract public class AbstractSensorData implements ISensorData {
 
         Bundle bundle = new Bundle();
         if (sourceSensor != null)
-            bundle.putString("sensor_name", sourceSensor.getSensorName());
+            bundle.putString(SENSOR_NAME_KEY, sourceSensor.getSensorName());
         Bundle experimentData = experimentDataToBundle();
-        bundle.putBundle("data", experimentData);
+        bundle.putBundle(DATA_KEY, experimentData);
 
         if (!storageDir.exists())
             storageDir.mkdir();

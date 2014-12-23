@@ -20,6 +20,9 @@ class ExperimentRunInfo {
     private String description = "";
     private Bundle runInformation = new Bundle();
 
+    final static private String DESCRIPTION_KEY = "description";
+    final static private String RUN_INFO_KEY = "run_info";
+
     public String getDescription() {
         return description;
     }
@@ -33,13 +36,13 @@ class ExperimentRunInfo {
     }
 
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString("description", getDescription());
-        outState.putBundle("runInformation", getRunInformation());
+        outState.putString(DESCRIPTION_KEY, getDescription());
+        outState.putBundle(RUN_INFO_KEY, getRunInformation());
     }
 
     public void onRestoreInstanceState(Bundle savedInstanceState) {
-        description = savedInstanceState.getString("description", "");
-        Bundle bundle = savedInstanceState.getBundle("runInformation");
+        description = savedInstanceState.getString(DESCRIPTION_KEY, "");
+        Bundle bundle = savedInstanceState.getBundle(RUN_INFO_KEY);
         if (bundle != null)
             runInformation = bundle;
     }
@@ -82,6 +85,10 @@ public class ExperimentRun {
     private Activity experimentActivity;
 
     final static public String EXPERIMENT_RUN_FILE_NAME = "experiment_run.xml";
+
+    final static private String SENSOR_KEY = "sensor";
+    final static private String SENSOR_COUNT_KEY = "sensor_count";
+    final static private String CURRENT_SENSOR_KEY = "current_sensor";
 
     static public ExperimentRun createExperimentRunGroup(List<String> experimentRuns) {
         String[] experimentRunsArray = new String[experimentRuns.size()];
@@ -195,7 +202,7 @@ public class ExperimentRun {
 
         if (currentSensor != null) {
             int index = getExperimentSensors().indexOf(currentSensor);
-            outState.putInt("current_sensor", index);
+            outState.putInt(CURRENT_SENSOR_KEY, index);
         }
 
         // store plugin information
@@ -205,15 +212,15 @@ public class ExperimentRun {
             experimentSensorClasses.putString(Integer.toString(i), experimentSensor.getSensorName());
             i++;
         }
-        outState.putBundle("sensors", experimentSensorClasses);
-        outState.putInt("sensor_count", experimentSensors.size());
+        outState.putBundle(SENSOR_KEY, experimentSensorClasses);
+        outState.putInt(SENSOR_COUNT_KEY, experimentSensors.size());
     }
 
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         data.onRestoreInstanceState(savedInstanceState);
 
-        int sensorClassesCount = savedInstanceState.getInt("sensor_count");
-        Bundle sensorsBundle = savedInstanceState.getBundle("sensors");
+        int sensorClassesCount = savedInstanceState.getInt(SENSOR_COUNT_KEY);
+        Bundle sensorsBundle = savedInstanceState.getBundle(SENSOR_KEY);
         ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
         for (int i = 0; i < sensorClassesCount; i++) {
             String pluginName = sensorsBundle.getString(Integer.toString(i));
@@ -224,7 +231,7 @@ public class ExperimentRun {
             addExperimentSensor(experimentSensor);
         }
 
-        int index = savedInstanceState.getInt("current_sensor", -1);
+        int index = savedInstanceState.getInt(CURRENT_SENSOR_KEY, -1);
         if (index >= 0)
             setCurrentSensor(index);
     }
