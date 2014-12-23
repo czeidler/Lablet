@@ -247,7 +247,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
         }
     }
 
-    public MotionAnalysisFragmentView(Context context, MotionAnalysis sensorAnalysis) {
+    public MotionAnalysisFragmentView(Context context, final MotionAnalysis sensorAnalysis) {
         super(context);
 
         final LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -270,6 +270,14 @@ class MotionAnalysisFragmentView extends FrameLayout {
         tableView = (TableView)sideBarView.findViewById(R.id.tableView);
         assert tableView != null;
         tableView.setColumnWeights(1f, 1.8f, 1.4f, 1.4f);
+        tableView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (i == 0)
+                    return;
+                sensorAnalysis.getFrameDataModel().setCurrentFrame(i - 1);
+            }
+        });
 
         scrollView = (ScrollView)sideBarView.findViewById(R.id.scrollView);
         assert tableView != null;
