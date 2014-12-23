@@ -537,8 +537,8 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
             point.x = frame.right - containerView.getPaddingRight();
         if (frame.top + containerView.getPaddingTop() > point.y)
             point.y = frame.top + containerView.getPaddingTop();
-        if (frame.bottom - containerView.getRangeBottom() < point.y)
-            point.y = frame.bottom - containerView.getRangeBottom();
+        if (frame.bottom - containerView.getPaddingBottom() < point.y)
+            point.y = frame.bottom - containerView.getPaddingBottom();
     }
 
     abstract protected DraggableMarker createMarkerForRow(int row);
