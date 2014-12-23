@@ -135,6 +135,15 @@ public class CursorView extends LinearLayout {
         tableAdapter.addColumn(new HCursorColumn());
         tableAdapter.addColumn(new HCursorDiffToPrevColumn());
         tableView.setAdapter(tableAdapter);
+        tableView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (i == 0)
+                    return;
+                hDataModel.selectMarkerData(i - 1);
+            }
+        });
+
         final Button removeButton = (Button)hCursorView.findViewById(R.id.removeButton);
         removeButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -165,6 +174,15 @@ public class CursorView extends LinearLayout {
         tableAdapter.addColumn(new VCursorColumn());
         tableAdapter.addColumn(new VCursorDiffToPrevColumn());
         tableView.setAdapter(tableAdapter);
+        tableView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (i == 0)
+                    return;
+                vDataModel.selectMarkerData(i - 1);
+            }
+        });
+
         final Button removeButton = (Button)vCursorView.findViewById(R.id.removeButton);
         removeButton.setOnClickListener(new OnClickListener() {
             @Override
