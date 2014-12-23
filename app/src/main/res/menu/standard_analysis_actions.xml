@@ -5,8 +5,4 @@
           android:icon="@drawable/ic_lab"
           android:title="@string/action_experiments"
           yourapp:showAsAction="always|withText"/>
-    <item android:id="@+id/action_done"
-          android:icon="@drawable/ic_action_accept"
-          android:title="@string/action_done"
-          yourapp:showAsAction="always|withText"/>
 </menu>

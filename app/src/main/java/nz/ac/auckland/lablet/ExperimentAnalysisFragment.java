@@ -68,19 +68,6 @@ public class ExperimentAnalysisFragment extends android.support.v4.app.Fragment 
     protected void setupStandardMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.standard_analysis_actions, menu);
 
-        // done menu item
-        final MenuItem doneItem = menu.findItem(R.id.action_done);
-        assert doneItem != null;
-        doneItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                Activity activity = getActivity();
-                activity.setResult(Activity.RESULT_OK);
-                activity.finish();
-                return true;
-            }
-        });
-
         // data menu item
         ExperimentAnalysisActivity experimentActivity = (ExperimentAnalysisActivity)getActivity();
         final ExperimentAnalysis experimentAnalysis = experimentActivity.getExperimentAnalysis();
