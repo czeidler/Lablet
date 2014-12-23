@@ -107,7 +107,7 @@ public class ExperimentAnalysisFragment extends android.support.v4.app.Fragment 
         int i = 0;
         for (ExperimentAnalysis.AnalysisDataEntry entry : dataList) {
             for (ExperimentAnalysis.AnalysisEntry analysisEntry : entry.analysisList) {
-                MenuItem item = popup.getMenu().add(0, i, Menu.NONE, analysisEntry.analysis.getDisplayName());
+                MenuItem item = popup.getMenu().add(1, i, Menu.NONE, analysisEntry.analysis.getDisplayName());
                 item.setCheckable(true);
 
                 if (pager.getCurrentItem() == i)
@@ -115,7 +115,7 @@ public class ExperimentAnalysisFragment extends android.support.v4.app.Fragment 
                 i++;
             }
         }
-
+        popup.getMenu().setGroupCheckable(1, true, true);
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
