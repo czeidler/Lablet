@@ -8,8 +8,6 @@
 package nz.ac.auckland.lablet.microphone;
 
 import android.content.Context;
-import android.graphics.PointF;
-import android.graphics.RectF;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +15,6 @@ import android.widget.*;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
-import nz.ac.auckland.lablet.views.CursorDataModelPainter;
 import nz.ac.auckland.lablet.views.plotview.PlotView;
 import nz.ac.auckland.lablet.views.table.DataTableColumn;
 import nz.ac.auckland.lablet.views.table.MarkerDataTableAdapter;
@@ -124,6 +121,46 @@ public class CursorView extends LinearLayout {
         addView(setupVCursorView(inflater), params);
     }
 
+    class EnableButtonOnMarkerSelectedListener implements MarkerDataModel.IListener {
+        final Button button;
+
+        public EnableButtonOnMarkerSelectedListener(Button button) {
+            this.button = button;
+        }
+
+        @Override
+        public void onDataAdded(MarkerDataModel model, int index) {
+
+        }
+
+        @Override
+        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
+
+        }
+
+        @Override
+        public void onDataChanged(MarkerDataModel model, int index, int number) {
+
+        }
+
+        @Override
+        public void onAllDataChanged(MarkerDataModel model) {
+
+        }
+
+        @Override
+        public void onDataSelected(MarkerDataModel model, int index) {
+            if (index < 0)
+                button.setEnabled(false);
+            else
+                button.setEnabled(true);
+        }
+    }
+
+    // keep hard references!
+    private EnableButtonOnMarkerSelectedListener hMarkerListener;
+    private EnableButtonOnMarkerSelectedListener vMarkerListener;
+
     private View setupHCursorView(LayoutInflater inflater) {
         ViewGroup hCursorView = (ViewGroup)inflater.inflate(R.layout.frequency_cursor, this, false);
         TextView titleTextView = (TextView)hCursorView.findViewById(R.id.titleTextView);
@@ -151,8 +188,10 @@ public class CursorView extends LinearLayout {
                 removeSelectedCursor(hDataModel, removeButton, tableView);
             }
         });
+        hMarkerListener = new EnableButtonOnMarkerSelectedListener(removeButton);
+        hDataModel.addListener(hMarkerListener);
         Button addButton = (Button)hCursorView.findViewById(R.id.addButton);
-        if (hDataModel.getMarkerCount() == 0)
+        if (hDataModel.getSelectedMarkerData() < 0)
             removeButton.setEnabled(false);
         addButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -190,7 +229,9 @@ public class CursorView extends LinearLayout {
                 removeSelectedCursor(vDataModel, removeButton, tableView);
             }
         });
-        if (vDataModel.getMarkerCount() == 0)
+        vMarkerListener = new EnableButtonOnMarkerSelectedListener(removeButton);
+        vDataModel.addListener(vMarkerListener);
+        if (vDataModel.getSelectedMarkerData() < 0)
             removeButton.setEnabled(false);
         Button addButton = (Button)vCursorView.findViewById(R.id.addButton);
         addButton.setOnClickListener(new OnClickListener() {
@@ -208,10 +249,8 @@ public class CursorView extends LinearLayout {
         markerDataModel.addMarkerData(markerData);
         markerDataModel.selectMarkerData(markerData);
 
-        if (markerDataModel.getMarkerCount() > 0) {
-            removeButton.setEnabled(true);
+        if (markerDataModel.getMarkerCount() > 0)
             tableView.setVisibility(VISIBLE);
-        }
     }
 
     private void removeSelectedCursor(MarkerDataModel markerDataModel, Button removeButton, TableView tableView) {
@@ -221,9 +260,7 @@ public class CursorView extends LinearLayout {
 
         markerDataModel.removeMarkerData(selected);
 
-        if (markerDataModel.getMarkerCount() == 0) {
-            removeButton.setEnabled(false);
+        if (markerDataModel.getMarkerCount() == 0)
             tableView.setVisibility(INVISIBLE);
-        }
     }
 }
