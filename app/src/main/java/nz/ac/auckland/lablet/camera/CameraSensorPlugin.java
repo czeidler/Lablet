@@ -10,7 +10,7 @@ package nz.ac.auckland.lablet.camera;
 import android.content.Context;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.IExperimentSensor;
-import nz.ac.auckland.lablet.experiment.IExperimentData;
+import nz.ac.auckland.lablet.experiment.ISensorData;
 import nz.ac.auckland.lablet.experiment.ISensorPlugin;
 
 import java.io.File;
@@ -29,8 +29,8 @@ public class CameraSensorPlugin implements ISensorPlugin {
     }
 
     @Override
-    public IExperimentData loadSensorData(Context context, Bundle data, File storageDir) {
-        IExperimentData sensorData = new CameraExperimentData(context);
+    public ISensorData loadSensorData(Context context, Bundle data, File storageDir) {
+        ISensorData sensorData = new CameraSensorData(context);
         try {
             sensorData.loadExperimentData(data, storageDir);
         } catch (IOException e) {

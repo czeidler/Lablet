@@ -23,12 +23,12 @@ public interface IAnalysisPlugin {
 
     /**
      * Creates an {@link IDataAnalysis} object for the given
-     * {@link IExperimentData}.
+     * {@link ISensorData}.
      *
      * @param sensorData usually loaded with the loadSensorData method
      * @return pointer to the created experiment analysis
      */
-    public IDataAnalysis createDataAnalysis(IExperimentData sensorData);
+    public IDataAnalysis createDataAnalysis(ISensorData sensorData);
 
     /**
      * Creates the view that displays the results in the

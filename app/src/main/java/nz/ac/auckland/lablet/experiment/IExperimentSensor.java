@@ -64,5 +64,5 @@ public interface IExperimentSensor {
     public void startPlayback();
     public void stopPlayback();
 
-    public IExperimentData getExperimentData();
+    public ISensorData getExperimentData();
 }

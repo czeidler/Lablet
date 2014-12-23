@@ -19,7 +19,7 @@ public interface IDataAnalysis {
 
     public String getDisplayName();
     public String getIdentifier();
-    public IExperimentData getData();
+    public ISensorData getData();
     public boolean loadAnalysisData(Bundle bundle, File storageDir);
 
     public Bundle exportAnalysisData(File additionalStorageDir) throws IOException;

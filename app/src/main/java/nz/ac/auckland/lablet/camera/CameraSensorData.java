@@ -11,7 +11,7 @@ import android.content.Context;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.os.Bundle;
-import nz.ac.auckland.lablet.experiment.AbstractExperimentData;
+import nz.ac.auckland.lablet.experiment.AbstractSensorData;
 import nz.ac.auckland.lablet.experiment.IExperimentSensor;
 
 import java.io.File;
@@ -21,7 +21,7 @@ import java.io.IOException;
 /**
  * Holds all important data for the camera experiment.
  */
-public class CameraExperimentData extends AbstractExperimentData {
+public class CameraSensorData extends AbstractSensorData {
     private String videoFileName;
 
     // milli seconds
@@ -34,7 +34,7 @@ public class CameraExperimentData extends AbstractExperimentData {
 
     static final public String DATA_TYPE = "Video";
 
-    public CameraExperimentData(Context experimentContext, IExperimentSensor sourceSensor) {
+    public CameraSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
         super(experimentContext, sourceSensor);
     }
 
@@ -43,7 +43,7 @@ public class CameraExperimentData extends AbstractExperimentData {
         return "Video";
     }
 
-    public CameraExperimentData(Context experimentContext) {
+    public CameraSensorData(Context experimentContext) {
         super(experimentContext);
 
     }

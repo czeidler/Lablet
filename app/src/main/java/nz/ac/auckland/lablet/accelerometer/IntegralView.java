@@ -19,11 +19,9 @@ import android.widget.Spinner;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
-import nz.ac.auckland.lablet.views.CursorDataModelPainter;
 import nz.ac.auckland.lablet.views.HCursorDataModelPainter;
 import nz.ac.auckland.lablet.views.plotview.*;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +68,7 @@ public class IntegralView extends FrameLayout {
                 (Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.accelerometer_integral, this, true);
 
-        AccelerometerExperimentData data = (AccelerometerExperimentData)analysis.getData();
+        AccelerometerSensorData data = (AccelerometerSensorData)analysis.getData();
 
         Spinner spinner = (Spinner)view.findViewById(R.id.spinner);
         spinnerEntryList.add(new SpinnerEntry("x-Acceleration", analysis.getXCalibration(), data.getXValues(), "x",
@@ -134,7 +132,7 @@ public class IntegralView extends FrameLayout {
         if (currentEntry != null)
             currentEntry.calibration.getBaseLineMarker().removeListener(dataListener);
 
-        AccelerometerExperimentData data = (AccelerometerExperimentData)analysis.getData();
+        AccelerometerSensorData data = (AccelerometerSensorData)analysis.getData();
         currentEntry = spinnerEntryList.get(index);
 
         final AccelerometerAnalysis.Calibration calibration = currentEntry.calibration;

@@ -24,7 +24,7 @@ import java.io.File;
  */
 class CameraExperimentFrameView extends VideoFrameView implements IExperimentFrameView {
     final private MotionAnalysis motionAnalysis;
-    final private CameraExperimentData sensorData;
+    final private CameraSensorData sensorData;
     private int currentRun = -1;
 
     public CameraExperimentFrameView(Context context, MotionAnalysis motionAnalysis) {
@@ -33,7 +33,7 @@ class CameraExperimentFrameView extends VideoFrameView implements IExperimentFra
         setWillNotDraw(false);
 
         this.motionAnalysis = motionAnalysis;
-        this.sensorData = (CameraExperimentData)motionAnalysis.getData();
+        this.sensorData = (CameraSensorData)motionAnalysis.getData();
 
         File storageDir = motionAnalysis.getData().getStorageDir();
         File videoFile = new File(storageDir, sensorData.getVideoFileName());

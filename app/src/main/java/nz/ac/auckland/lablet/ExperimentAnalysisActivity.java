@@ -14,7 +14,7 @@ import android.support.v4.view.ViewPager;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
 import nz.ac.auckland.lablet.experiment.IDataAnalysis;
-import nz.ac.auckland.lablet.experiment.IExperimentData;
+import nz.ac.auckland.lablet.experiment.ISensorData;
 
 import java.io.*;
 import java.util.List;
@@ -107,7 +107,7 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
     }
 
     private File getTagMarkerCSVFile(IDataAnalysis analysis, File storageDir) {
-        IExperimentData sensorData = analysis.getData();
+        ISensorData sensorData = analysis.getData();
         return new File(storageDir, sensorData.getUid() + "_tag_markers.csv");
     }
 

@@ -11,7 +11,7 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.IDataAnalysis;
-import nz.ac.auckland.lablet.experiment.IExperimentData;
+import nz.ac.auckland.lablet.experiment.ISensorData;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
@@ -21,7 +21,7 @@ import java.io.Writer;
 
 
 public class AccelerometerAnalysis implements IDataAnalysis {
-    final private AccelerometerExperimentData sensorData;
+    final private AccelerometerSensorData sensorData;
     final private DisplaySettings displaySettings = new DisplaySettings();
 
     final private Calibration xCalibration = new Calibration();
@@ -92,7 +92,7 @@ public class AccelerometerAnalysis implements IDataAnalysis {
         }
     }
 
-    public AccelerometerAnalysis(AccelerometerExperimentData sensorData) {
+    public AccelerometerAnalysis(AccelerometerSensorData sensorData) {
         this.sensorData = sensorData;
     }
 
@@ -123,7 +123,7 @@ public class AccelerometerAnalysis implements IDataAnalysis {
     }
 
     @Override
-    public IExperimentData getData() {
+    public ISensorData getData() {
         return sensorData;
     }
 

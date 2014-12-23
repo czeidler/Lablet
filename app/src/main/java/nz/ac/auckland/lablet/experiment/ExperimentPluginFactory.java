@@ -107,7 +107,7 @@ public class ExperimentPluginFactory {
         return null;
     }
 
-    public List<IAnalysisPlugin> analysisPluginsFor(IExperimentData sensorData) {
+    public List<IAnalysisPlugin> analysisPluginsFor(ISensorData sensorData) {
         List<IAnalysisPlugin> foundPlugins = new ArrayList<>();
         String dataType = sensorData.getDataType();
 

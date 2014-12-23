@@ -35,7 +35,7 @@ class ExperimentRunViewManager {
     private TextView runView = null;
 
     // keep reference to listener
-    private Experiment.IExperimentListener experimentListener = new Experiment.IExperimentListener() {
+    private Experiment.IListener experimentListener = new Experiment.IListener() {
         @Override
         public void onExperimentRunAdded(ExperimentRun run) {
             updateViews();
@@ -202,7 +202,7 @@ public class ExperimentActivity extends FragmentActivity {
     private ExperimentRunViewManager experimentRunViewManager;
     private ExperimentRun activeExperimentRun = null;
 
-    private Experiment.IExperimentListener experimentListener = new Experiment.IExperimentListener() {
+    private Experiment.IListener experimentListener = new Experiment.IListener() {
         @Override
         public void onExperimentRunAdded(ExperimentRun runGroup) {
         }

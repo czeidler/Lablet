@@ -6,7 +6,7 @@ import android.os.Bundle;
 import java.io.File;
 import java.io.IOException;
 
-public interface IExperimentData {
+public interface ISensorData {
     /**
      * The default file name where the experiment data is stored.
      * <p>

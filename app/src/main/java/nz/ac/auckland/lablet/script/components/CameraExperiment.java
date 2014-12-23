@@ -15,11 +15,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.*;
-import nz.ac.auckland.lablet.camera.CameraExperimentData;
+import nz.ac.auckland.lablet.camera.CameraSensorData;
 import nz.ac.auckland.lablet.camera.CameraSensorPlugin;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
-import nz.ac.auckland.lablet.experiment.IExperimentData;
+import nz.ac.auckland.lablet.experiment.ISensorData;
 
 import java.io.File;
 
@@ -148,8 +148,8 @@ class ScriptComponentCameraExperimentView extends ScriptComponentSingleExperimen
                     return null;
 
                 // TODO fix if there are more than one runs or sensors
-                IExperimentData sensorData = experimentData.getRuns().get(0).sensorDataList.get(0);
-                CameraExperimentData cameraSensorData = (CameraExperimentData)sensorData;
+                ISensorData sensorData = experimentData.getRuns().get(0).sensorDataList.get(0);
+                CameraSensorData cameraSensorData = (CameraSensorData)sensorData;
                 return new File(cameraSensorData.getStorageDir(), cameraSensorData.getVideoFileName());
             }
 

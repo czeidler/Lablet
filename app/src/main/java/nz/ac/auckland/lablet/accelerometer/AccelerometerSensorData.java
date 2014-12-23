@@ -11,7 +11,7 @@ import android.content.Context;
 import android.os.Bundle;
 import au.com.bytecode.opencsv.CSV;
 import au.com.bytecode.opencsv.CSVReadProc;
-import nz.ac.auckland.lablet.experiment.AbstractExperimentData;
+import nz.ac.auckland.lablet.experiment.AbstractSensorData;
 import nz.ac.auckland.lablet.experiment.IExperimentSensor;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 import nz.ac.auckland.lablet.views.table.CSVWriter;
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AccelerometerExperimentData extends AbstractExperimentData {
+public class AccelerometerSensorData extends AbstractSensorData {
     private List<Number> timeValues = new ArrayList<>();
     private List<Number> xValues = new ArrayList<>();
     private List<Number> yValues = new ArrayList<>();
@@ -42,11 +42,11 @@ public class AccelerometerExperimentData extends AbstractExperimentData {
         return DATA_TYPE;
     }
 
-    public AccelerometerExperimentData(Context experimentContext) {
+    public AccelerometerSensorData(Context experimentContext) {
         super(experimentContext);
     }
 
-    public AccelerometerExperimentData(Context experimentContext, IExperimentSensor sourceSensor) {
+    public AccelerometerSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
         super(experimentContext, sourceSensor);
     }
 

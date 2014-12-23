@@ -9,9 +9,9 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.content.Context;
 import android.os.Bundle;
-import nz.ac.auckland.lablet.accelerometer.AccelerometerExperimentData;
-import nz.ac.auckland.lablet.camera.CameraExperimentData;
-import nz.ac.auckland.lablet.microphone.MicrophoneExperimentData;
+import nz.ac.auckland.lablet.accelerometer.AccelerometerSensorData;
+import nz.ac.auckland.lablet.camera.CameraSensorData;
+import nz.ac.auckland.lablet.microphone.MicrophoneSensorData;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,20 +20,20 @@ import java.util.List;
 
 
 public class ExperimentData {
-    public static class RunEntry {
-        public ExperimentRunData runData;
-        public List<IExperimentData> sensorDataList = new ArrayList<>();
+    public static class Run {
+        public ExperimentRunInfo runData;
+        public List<ISensorData> sensorDataList = new ArrayList<>();
     }
 
     private File storageDir;
     private String loadError = "";
-    private List<RunEntry> runs = new ArrayList<>();
+    private List<Run> runs = new ArrayList<>();
 
     public File getStorageDir() {
         return storageDir;
     }
 
-    public List<RunEntry> getRuns() {
+    public List<Run> getRuns() {
         return runs;
     }
 
@@ -41,10 +41,10 @@ public class ExperimentData {
         return loadError;
     }
 
-    private IExperimentData loadSensorData(Context context, File sensorDirectory) {
+    private ISensorData loadExperimentData(Context context, File sensorDirectory) {
         Bundle bundle;
 
-        File file = new File(sensorDirectory, IExperimentData.EXPERIMENT_DATA_FILE_NAME);
+        File file = new File(sensorDirectory, ISensorData.EXPERIMENT_DATA_FILE_NAME);
         bundle = ExperimentHelper.loadBundleFromFile(file);
 
         if (bundle == null) {
@@ -52,9 +52,9 @@ public class ExperimentData {
             return null;
         }
 
-        Bundle experimentData = bundle.getBundle("data");
-        if (experimentData == null) {
-            loadError = "failed to load experiment data";
+        Bundle dataBundle = bundle.getBundle("data");
+        if (dataBundle == null) {
+            loadError = "failed to load sensor data";
             return null;
         }
 
@@ -64,38 +64,38 @@ public class ExperimentData {
         ISensorPlugin plugin = factory.findSensorPlugin(experimentIdentifier);
         if (plugin == null) {
             // fallback: try to find analysis for the data type
-            if (!experimentData.containsKey(AbstractExperimentData.DATA_TYPE_KEY)) {
-                loadError = "experiment data type information is missing";
+            if (!dataBundle.containsKey(AbstractSensorData.DATA_TYPE_KEY)) {
+                loadError = "data type information is missing";
                 return null;
             }
-            String dataType = experimentData.getString(AbstractExperimentData.DATA_TYPE_KEY);
-            IExperimentData sensorData = getSensorDataForType(dataType, context, experimentData, sensorDirectory);
+            String dataType = dataBundle.getString(AbstractSensorData.DATA_TYPE_KEY);
+            ISensorData sensorData = getSensorDataForType(dataType, context, dataBundle, sensorDirectory);
             if (sensorData == null)
-                loadError = "unknown experiment type";
+                loadError = "unknown data type";
             return sensorData;
         }
 
 
-        IExperimentData sensorData = plugin.loadSensorData(context, experimentData, sensorDirectory);
+        ISensorData sensorData = plugin.loadSensorData(context, dataBundle, sensorDirectory);
         if (sensorData == null) {
-            loadError = "can't load experiment";
+            loadError = "can't load sensor data";
             return null;
         }
 
         return sensorData;
     }
 
-    private IExperimentData getSensorDataForType(String dataType, Context context, Bundle data, File dir) {
-        IExperimentData sensorData = null;
+    private ISensorData getSensorDataForType(String dataType, Context context, Bundle data, File dir) {
+        ISensorData sensorData = null;
         switch (dataType) {
-            case MicrophoneExperimentData.DATA_TYPE:
-                sensorData = new MicrophoneExperimentData(context);
+            case MicrophoneSensorData.DATA_TYPE:
+                sensorData = new MicrophoneSensorData(context);
                 break;
-            case CameraExperimentData.DATA_TYPE:
-                sensorData = new CameraExperimentData(context);
+            case CameraSensorData.DATA_TYPE:
+                sensorData = new CameraSensorData(context);
                 break;
-            case AccelerometerExperimentData.DATA_TYPE:
-                sensorData = new AccelerometerExperimentData(context);
+            case AccelerometerSensorData.DATA_TYPE:
+                sensorData = new AccelerometerSensorData(context);
                 break;
         }
         if (sensorData != null) {
@@ -109,28 +109,28 @@ public class ExperimentData {
         return sensorData;
     }
 
-    private ExperimentData.RunEntry loadRunData(Context context, File runDir) {
-        ExperimentRunData runData = new ExperimentRunData();
+    private Run loadRun(Context context, File runDir) {
+        ExperimentRunInfo runInfo = new ExperimentRunInfo();
         File runDataFile = new File(runDir, ExperimentRun.EXPERIMENT_RUN_FILE_NAME);
         try {
-            runData.loadFromFile(runDataFile);
+            runInfo.loadFromFile(runDataFile);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
 
-        ExperimentData.RunEntry runEntry = new ExperimentData.RunEntry();
-        runEntry.runData = runData;
+        Run run = new Run();
+        run.runData = runInfo;
 
         for (File runDirectory : runDir.listFiles()) {
             if (!runDirectory.isDirectory())
                 continue;
-            IExperimentData sensorData = loadSensorData(context, runDirectory);
+            ISensorData sensorData = loadExperimentData(context, runDirectory);
             if (sensorData == null)
                 return null;
-            runEntry.sensorDataList.add(sensorData);
+            run.sensorDataList.add(sensorData);
         }
-        return runEntry;
+        return run;
     }
 
     public boolean load(Context context, File storageDir) {
@@ -143,10 +143,10 @@ public class ExperimentData {
             if (!groupDir.isDirectory())
                 continue;
 
-            ExperimentData.RunEntry runEntry = loadRunData(context, groupDir);
-            if (runEntry == null)
+            Run run = loadRun(context, groupDir);
+            if (run == null)
                 return false;
-            runs.add(runEntry);
+            runs.add(run);
         }
 
         return true;

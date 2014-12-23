@@ -64,7 +64,7 @@ public class AccelerometerAnalysisView extends FrameLayout {
             }
         });
 
-        AccelerometerExperimentData data = (AccelerometerExperimentData)analysis.getData();
+        AccelerometerSensorData data = (AccelerometerSensorData)analysis.getData();
 
         // total data
         for (int i = 0 ; i < data.getTimeValues().size(); i++) {

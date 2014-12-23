@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-class ExperimentRunData {
+class ExperimentRunInfo {
     private String description = "";
     private Bundle runInformation = new Bundle();
 
@@ -73,7 +73,7 @@ class ExperimentRunData {
 }
 
 public class ExperimentRun {
-    private ExperimentRunData data = new ExperimentRunData();
+    private ExperimentRunInfo data = new ExperimentRunInfo();
 
     final private List<IExperimentSensor> experimentSensors = new ArrayList<>();
     private IExperimentSensor currentSensor = null;

@@ -21,7 +21,7 @@ import java.util.List;
 
 class AccelerometerExperimentView extends AbstractExperimentSensorView {
     final private AccelerometerExperimentSensor sensor;
-    final private AccelerometerExperimentData.IListener dataListenerStrongRef;
+    final private AccelerometerSensorData.IListener dataListenerStrongRef;
 
     final private PlotView plotView;
     final private XYDataAdapter xData;
@@ -55,7 +55,7 @@ class AccelerometerExperimentView extends AbstractExperimentSensorView {
     class PlaybackViewState implements AbstractExperimentSensor.State {
         @Override
         public void start() {
-            AccelerometerExperimentData data = (AccelerometerExperimentData)sensor.getExperimentData();
+            AccelerometerSensorData data = (AccelerometerSensorData)sensor.getExperimentData();
 
             List<Number> timeCopy = new ArrayList<>(data.getTimeValues().size());
             timeCopy.addAll(data.getTimeValues());
@@ -100,8 +100,8 @@ class AccelerometerExperimentView extends AbstractExperimentSensorView {
         plotView.getBackgroundPainter().setShowYGrid(true);
         addView(plotView);
 
-        final AccelerometerExperimentData data = (AccelerometerExperimentData)sensor.getExperimentData();
-        dataListenerStrongRef = new AccelerometerExperimentData.IListener() {
+        final AccelerometerSensorData data = (AccelerometerSensorData)sensor.getExperimentData();
+        dataListenerStrongRef = new AccelerometerSensorData.IListener() {
             @Override
             public void onDataAdded(long time, float[] data) {
                 final float x = data[0];
