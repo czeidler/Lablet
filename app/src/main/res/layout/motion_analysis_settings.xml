@@ -28,51 +28,47 @@
           android:layout_height="wrap_content"
           class="nz.ac.auckland.lablet.views.StartEndSeekBar" android:id="@+id/startEndSeekBar"
           android:layout_alignParentLeft="true"
-          android:layout_above="@+id/editStart" android:layout_alignRight="@+id/seekBar"/>
-    <TextView
+          android:layout_above="@+id/statusBar" android:layout_alignRight="@+id/seekBar"/>
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                  android:id="@+id/statusBar"
+                  android:layout_alignParentBottom="true"
+                  android:layout_alignParentStart="true" android:layout_alignEnd="@+id/frameRateLayout">
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Analysis Start [ms]:"
-            android:id="@+id/textView2"
-            android:layout_alignParentBottom="true" android:layout_alignParentLeft="true"/>
-    <EditText
+            android:id="@+id/textView2"/>
+        <EditText
             android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:ems="10"
             android:id="@+id/editStart"
-            android:editable="false" android:enabled="true"
-            android:layout_alignParentBottom="true" android:layout_toRightOf="@+id/textView2" android:focusable="false"/>
-    <TextView
+            android:editable="false" android:enabled="true" android:focusable="false"/>
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Analysis End [ms]:"
-            android:id="@+id/textView3"
-            android:layout_alignParentBottom="true" android:layout_toRightOf="@+id/editStart"/>
-    <EditText
+            android:id="@+id/textView3"/>
+        <EditText
             android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:ems="10"
             android:id="@+id/editEnd"
-            android:editable="false" android:enabled="true"
-            android:layout_alignParentBottom="true" android:layout_toRightOf="@+id/textView3" android:focusable="false"/>
-    <TextView
+            android:editable="false" android:enabled="true" android:focusable="false"/>
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Frames:"
-            android:layout_toRightOf="@+id/editEnd"
-            android:layout_alignParentBottom="true" android:layout_alignTop="@+id/textView3"
             android:id="@+id/textView5"/>
-    <EditText
+        <EditText
             android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:ems="10"
             android:id="@+id/editFrames"
-            android:editable="false" android:enabled="true" android:focusable="false"
-            android:layout_alignTop="@+id/editEnd" android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@+id/textView5"/>
+            android:editable="false" android:enabled="true" android:focusable="false"/>
+        <Space android:layout_width="wrap_content" android:layout_height="fill_parent"
+               android:layout_weight="1"/>
+    </LinearLayout>
 
     <LinearLayout
             android:id="@+id/frameRateLayout"
@@ -83,7 +79,7 @@
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Analysis Frame Rate [Hz]:"
                 android:id="@+id/textView" android:layout_gravity="left"/>
         <NumberPicker
@@ -98,7 +94,7 @@
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Frame Length [ms]:"
                     android:id="@+id/textView4"/>
             <EditText
