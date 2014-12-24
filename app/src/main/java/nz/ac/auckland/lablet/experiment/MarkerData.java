@@ -10,10 +10,11 @@ package nz.ac.auckland.lablet.experiment;
 import android.graphics.PointF;
 
 /**
- * Two dimensional data that is associated with an integer run id.
+ * Two dimensional data that is associated with an integer id.
  * <p>
- * The run id is associated with a run of an experiment. The run id is needed because not every run may have a marker.
- * For example, if only every second run is tagged the marker run id is used to map the marker data to the sensors.
+ * The id can be used to identify the data in an experiment. For example, in case of the motion analysis, the id is
+ * needed because not every frame may have a marker, e.g., when only every second frame is tagged. In this case the id
+ * would be the frame id.
  * </p>
  */
 public class MarkerData {
