@@ -81,7 +81,6 @@ public class ExperimentRun {
     final private List<IExperimentSensor> experimentSensors = new ArrayList<>();
     private IExperimentSensor currentSensor = null;
     private Experiment experiment;
-    private String subStorageDirectory;
     private Activity experimentActivity;
 
     final static public String EXPERIMENT_RUN_FILE_NAME = "experiment_run.xml";
@@ -113,9 +112,8 @@ public class ExperimentRun {
         return experimentRunGroup;
     }
 
-    public void setExperiment(Experiment experiment, String subStorageDirectory) {
+    public void setExperiment(Experiment experiment) {
         this.experiment = experiment;
-        this.subStorageDirectory = subStorageDirectory;
     }
 
     public void activateSensors(Activity activity) {
@@ -249,6 +247,9 @@ public class ExperimentRun {
     }
 
     public void finishExperiment(boolean saveData, File storageDir) throws IOException {
+        if (!dataTaken())
+            return;
+
         if (saveData) {
             storageDir.mkdirs();
             data.saveToFile(new File(storageDir, EXPERIMENT_RUN_FILE_NAME));
