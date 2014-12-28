@@ -12,7 +12,7 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 
-abstract public class AbstractExperimentSensorView extends FrameLayout implements IExperimentSensor.IExperimentSensorListener {
+abstract public class AbstractExperimentSensorView extends FrameLayout implements IExperimentSensor.IListener {
     protected AbstractExperimentSensor.State previewState = null;
     protected AbstractExperimentSensor.State recordingState = null;
     protected AbstractExperimentSensor.State playbackState = null;

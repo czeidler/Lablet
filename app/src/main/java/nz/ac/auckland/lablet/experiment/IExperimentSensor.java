@@ -18,7 +18,7 @@ import java.io.IOException;
 
 
 public interface IExperimentSensor {
-    public interface IExperimentSensorListener {
+    public interface IListener {
         public void onStartPreview();
         public void onStopPreview();
         public void onStartRecording();

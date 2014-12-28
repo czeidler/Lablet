@@ -22,7 +22,7 @@ import nz.ac.auckland.lablet.experiment.FrameDataModel;
 /**
  * Seek bar to work with the {@link nz.ac.auckland.lablet.experiment.FrameDataModel}.
  */
-public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.IFrameDataModelListener {
+public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.IListener {
     private FrameDataModel frameDataModel = null;
     private ITimeData timeData = null;
 

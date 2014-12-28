@@ -47,7 +47,7 @@ public class FrameContainerView extends RelativeLayout {
     private GestureDetector gestureDetector;
     final Handler handler = new Handler();
 
-    private FrameDataModel.IFrameDataModelListener frameDataModelListener = new FrameDataModel.IFrameDataModelListener() {
+    private FrameDataModel.IListener frameDataModelListener = new FrameDataModel.IListener() {
         @Override
         public void onFrameChanged(int newFrame) {
             ((IExperimentFrameView) videoAnalysisView).setCurrentFrame(newFrame);
