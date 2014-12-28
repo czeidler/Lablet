@@ -9,71 +9,11 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.app.Activity;
 import android.os.Bundle;
-import nz.ac.auckland.lablet.misc.PersistentBundle;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
-class ExperimentRunInfo {
-    private String description = "";
-    private Bundle runInformation = new Bundle();
-
-    final static private String DESCRIPTION_KEY = "description";
-    final static private String RUN_INFO_KEY = "run_info";
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Bundle getRunInformation() {
-        return runInformation;
-    }
-
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putString(DESCRIPTION_KEY, getDescription());
-        outState.putBundle(RUN_INFO_KEY, getRunInformation());
-    }
-
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        description = savedInstanceState.getString(DESCRIPTION_KEY, "");
-        Bundle bundle = savedInstanceState.getBundle(RUN_INFO_KEY);
-        if (bundle != null)
-            runInformation = bundle;
-    }
-
-    public void saveToFile(File file) throws IOException {
-        Bundle bundle = new Bundle();
-        onSaveInstanceState(bundle);
-
-        FileWriter fileWriter = new FileWriter(file);
-        PersistentBundle persistentBundle = new PersistentBundle();
-        persistentBundle.flattenBundle(bundle, fileWriter);
-        fileWriter.close();
-    }
-
-    public void loadFromFile(File file) throws IOException {
-        Bundle bundle = null;
-        PersistentBundle persistentBundle = new PersistentBundle();
-        InputStream inStream = null;
-        try {
-            inStream = new FileInputStream(file);
-            bundle = persistentBundle.unflattenBundle(inStream);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        } finally {
-            if (inStream!= null)
-                inStream.close();
-        }
-        onRestoreInstanceState(bundle);
-    }
-}
 
 public class ExperimentRun {
     private ExperimentRunInfo data = new ExperimentRunInfo();

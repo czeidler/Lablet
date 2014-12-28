@@ -148,7 +148,7 @@ class ScriptComponentCameraExperimentView extends ScriptComponentSingleExperimen
                     return null;
 
                 // TODO fix if there are more than one runs or sensors
-                ISensorData sensorData = experimentData.getRuns().get(0).sensorDataList.get(0);
+                ISensorData sensorData = experimentData.getRunDataList().get(0).sensorDataList.get(0);
                 CameraSensorData cameraSensorData = (CameraSensorData)sensorData;
                 return new File(cameraSensorData.getStorageDir(), cameraSensorData.getVideoFileName());
             }

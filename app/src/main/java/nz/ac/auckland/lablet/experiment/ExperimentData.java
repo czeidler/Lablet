@@ -19,26 +19,70 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Main class for experiment data.
+ *
+ * Holds the run data.
+ */
 public class ExperimentData {
-    public static class Run {
-        public ExperimentRunInfo runData;
+    /**
+     * Contains the run information and the run sensor data.
+     */
+    public static class RunData {
+        public ExperimentRunInfo experimentRunInfo;
         public List<ISensorData> sensorDataList = new ArrayList<>();
     }
 
     private File storageDir;
     private String loadError = "";
-    private List<Run> runs = new ArrayList<>();
+    private List<RunData> runDataList = new ArrayList<>();
 
+    /**
+     * Get the data storage directory.
+     *
+     * @return null if no load hasn't be called or loading the data failed
+     */
     public File getStorageDir() {
         return storageDir;
     }
 
-    public List<Run> getRuns() {
-        return runs;
+    /**
+     * @return the list of run data
+     */
+    public List<RunData> getRunDataList() {
+        return runDataList;
     }
 
+    /**
+     * @return the last load error
+     */
     public String getLoadError() {
         return loadError;
+    }
+
+    /**
+     * Load the experiment data from a storage directory.
+     *
+     * @param context
+     * @param storageDir
+     * @return false if there was an error (see {@link #getLoadError})
+     */
+    public boolean load(Context context, File storageDir) {
+        if (storageDir == null || !storageDir.exists())
+            return false;
+
+        for (File groupDir : storageDir.listFiles()) {
+            if (!groupDir.isDirectory())
+                continue;
+
+            RunData runData = loadRunData(context, groupDir);
+            if (runData == null)
+                return false;
+            runDataList.add(runData);
+        }
+
+        this.storageDir = storageDir;
+        return true;
     }
 
     private ISensorData loadExperimentData(Context context, File sensorDirectory) {
@@ -109,9 +153,9 @@ public class ExperimentData {
         return sensorData;
     }
 
-    private Run loadRun(Context context, File runDir) {
+    private RunData loadRunData(Context context, File runDataDir) {
         ExperimentRunInfo runInfo = new ExperimentRunInfo();
-        File runDataFile = new File(runDir, ExperimentRun.EXPERIMENT_RUN_FILE_NAME);
+        File runDataFile = new File(runDataDir, ExperimentRun.EXPERIMENT_RUN_FILE_NAME);
         try {
             runInfo.loadFromFile(runDataFile);
         } catch (IOException e) {
@@ -119,36 +163,17 @@ public class ExperimentData {
             return null;
         }
 
-        Run run = new Run();
-        run.runData = runInfo;
+        RunData runData = new RunData();
+        runData.experimentRunInfo = runInfo;
 
-        for (File runDirectory : runDir.listFiles()) {
+        for (File runDirectory : runDataDir.listFiles()) {
             if (!runDirectory.isDirectory())
                 continue;
             ISensorData sensorData = loadExperimentData(context, runDirectory);
             if (sensorData == null)
                 return null;
-            run.sensorDataList.add(sensorData);
+            runData.sensorDataList.add(sensorData);
         }
-        return run;
-    }
-
-    public boolean load(Context context, File storageDir) {
-        if (storageDir == null || !storageDir.exists())
-            return false;
-
-        this.storageDir = storageDir;
-
-        for (File groupDir : storageDir.listFiles()) {
-            if (!groupDir.isDirectory())
-                continue;
-
-            Run run = loadRun(context, groupDir);
-            if (run == null)
-                return false;
-            runs.add(run);
-        }
-
-        return true;
+        return runData;
     }
 }
