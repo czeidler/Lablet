@@ -8,10 +8,13 @@
 package nz.ac.auckland.lablet.experiment;
 
 import nz.ac.auckland.lablet.accelerometer.AccelerometerAnalysisPlugin;
+import nz.ac.auckland.lablet.accelerometer.AccelerometerDataTypePlugin;
 import nz.ac.auckland.lablet.accelerometer.AccelerometerSensorPlugin;
 import nz.ac.auckland.lablet.camera.MotionAnalysisPlugin;
 import nz.ac.auckland.lablet.camera.CameraSensorPlugin;
+import nz.ac.auckland.lablet.camera.VideoDataTypePlugin;
 import nz.ac.auckland.lablet.camera.VideoImportPlugin;
+import nz.ac.auckland.lablet.microphone.AudioDataTypePlugin;
 import nz.ac.auckland.lablet.microphone.FrequencyAnalysisPlugin;
 import nz.ac.auckland.lablet.microphone.MicrophoneSensorPlugin;
 import nz.ac.auckland.lablet.microphone.WavImportPlugin;
@@ -26,18 +29,23 @@ import java.util.List;
 public class ExperimentPluginFactory {
     static ExperimentPluginFactory factory = null;
 
+    private List<IDataTypePlugin> dataTypePlugins = new ArrayList<>();
     private List<ISensorPlugin> sensorPlugins = new ArrayList<>();
     private List<IAnalysisPlugin> analysisPlugins = new ArrayList<>();
     private List<IImportPlugin> importPlugins = new ArrayList<>();
 
     private ExperimentPluginFactory() {
-        analysisPlugins.add(new MotionAnalysisPlugin());
-        analysisPlugins.add(new FrequencyAnalysisPlugin());
-        analysisPlugins.add(new AccelerometerAnalysisPlugin());
+        dataTypePlugins.add(new VideoDataTypePlugin());
+        dataTypePlugins.add(new AudioDataTypePlugin());
+        dataTypePlugins.add(new AccelerometerDataTypePlugin());
 
         sensorPlugins.add(new CameraSensorPlugin());
         sensorPlugins.add(new MicrophoneSensorPlugin());
         sensorPlugins.add(new AccelerometerSensorPlugin());
+
+        analysisPlugins.add(new MotionAnalysisPlugin());
+        analysisPlugins.add(new FrequencyAnalysisPlugin());
+        analysisPlugins.add(new AccelerometerAnalysisPlugin());
 
         importPlugins.add(new VideoImportPlugin());
         importPlugins.add(new WavImportPlugin());
@@ -84,6 +92,15 @@ public class ExperimentPluginFactory {
         for (ISensorPlugin plugin : sensorPlugins) {
             if (plugin.getSensorName().equals(pluginName))
                 return plugin;
+        }
+        return null;
+    }
+
+    public ISensorData instantiateSensorData(String dataType) {
+        for (IDataTypePlugin plugin : dataTypePlugins) {
+            if (!plugin.getDataType().equals(dataType))
+                continue;
+            return plugin.instantiateData();
         }
         return null;
     }

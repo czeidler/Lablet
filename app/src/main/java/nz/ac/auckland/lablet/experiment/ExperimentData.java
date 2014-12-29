@@ -113,7 +113,7 @@ public class ExperimentData {
                 return null;
             }
             String dataType = dataBundle.getString(AbstractSensorData.DATA_TYPE_KEY);
-            ISensorData sensorData = getSensorDataForType(dataType, context, dataBundle, sensorDirectory);
+            ISensorData sensorData = getSensorDataForType(dataType, dataBundle, sensorDirectory);
             if (sensorData == null)
                 loadError = "unknown data type";
             return sensorData;
@@ -129,26 +129,17 @@ public class ExperimentData {
         return sensorData;
     }
 
-    private ISensorData getSensorDataForType(String dataType, Context context, Bundle data, File dir) {
-        ISensorData sensorData = null;
-        switch (dataType) {
-            case MicrophoneSensorData.DATA_TYPE:
-                sensorData = new MicrophoneSensorData();
-                break;
-            case CameraSensorData.DATA_TYPE:
-                sensorData = new CameraSensorData();
-                break;
-            case AccelerometerSensorData.DATA_TYPE:
-                sensorData = new AccelerometerSensorData();
-                break;
-        }
-        if (sensorData != null) {
-            try {
-                sensorData.loadExperimentData(data, dir);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
+    private ISensorData getSensorDataForType(String dataType, Bundle data, File dir) {
+        ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
+        ISensorData sensorData = factory.instantiateSensorData(dataType);
+        if (sensorData == null)
+            return null;
+
+        try {
+            sensorData.loadExperimentData(data, dir);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
         return sensorData;
     }
