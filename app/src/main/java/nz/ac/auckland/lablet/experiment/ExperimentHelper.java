@@ -9,7 +9,6 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import nz.ac.auckland.lablet.ExperimentAnalysis;
 import nz.ac.auckland.lablet.misc.PersistentBundle;
 import org.xmlpull.v1.XmlPullParserException;
 

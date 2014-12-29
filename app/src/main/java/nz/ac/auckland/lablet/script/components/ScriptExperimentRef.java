@@ -7,8 +7,7 @@
  */
 package nz.ac.auckland.lablet.script.components;
 
-import android.content.Context;
-import nz.ac.auckland.lablet.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;

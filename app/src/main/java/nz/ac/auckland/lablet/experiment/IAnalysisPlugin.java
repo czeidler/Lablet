@@ -8,7 +8,6 @@
 package nz.ac.auckland.lablet.experiment;
 
 import android.support.v4.app.Fragment;
-import nz.ac.auckland.lablet.ExperimentAnalysis;
 
 
 public interface IAnalysisPlugin {

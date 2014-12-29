@@ -5,10 +5,9 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet;
+package nz.ac.auckland.lablet.experiment;
 
 import android.os.Bundle;
-import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -163,7 +162,7 @@ public class ExperimentAnalysis {
         return analysisRuns.indexOf(currentAnalysisRun);
     }
 
-    protected boolean setCurrentAnalysisRun(int index) {
+    public boolean setCurrentAnalysisRun(int index) {
         if (index >= analysisRuns.size())
             return false;
         currentAnalysisRun = analysisRuns.get(index);
@@ -171,7 +170,7 @@ public class ExperimentAnalysis {
         return true;
     }
 
-    protected void setCurrentSensorAnalysis(int sensor, int analysis) {
+    public void setCurrentSensorAnalysis(int sensor, int analysis) {
         currentSensorAnalysis = currentAnalysisRun.analysisDataList.get(sensor).analysisList.get(analysis).analysis;
     }
 }

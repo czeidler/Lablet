@@ -8,7 +8,7 @@
 package nz.ac.auckland.lablet.camera;
 
 import android.support.v4.app.Fragment;
-import nz.ac.auckland.lablet.ExperimentAnalysis;
+import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
 import nz.ac.auckland.lablet.experiment.*;
 
 

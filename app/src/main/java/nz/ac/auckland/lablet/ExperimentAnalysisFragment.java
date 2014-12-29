@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
+import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.IDataAnalysis;
 

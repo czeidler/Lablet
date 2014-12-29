@@ -11,10 +11,7 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import nz.ac.auckland.lablet.experiment.ExperimentData;
-import nz.ac.auckland.lablet.experiment.ExperimentHelper;
-import nz.ac.auckland.lablet.experiment.IDataAnalysis;
-import nz.ac.auckland.lablet.experiment.ISensorData;
+import nz.ac.auckland.lablet.experiment.*;
 
 import java.io.*;
 import java.util.List;
