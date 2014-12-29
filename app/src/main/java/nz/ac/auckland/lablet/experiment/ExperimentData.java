@@ -9,9 +9,6 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.content.Context;
 import android.os.Bundle;
-import nz.ac.auckland.lablet.accelerometer.AccelerometerSensorData;
-import nz.ac.auckland.lablet.camera.CameraSensorData;
-import nz.ac.auckland.lablet.microphone.MicrophoneSensorData;
 
 import java.io.File;
 import java.io.IOException;

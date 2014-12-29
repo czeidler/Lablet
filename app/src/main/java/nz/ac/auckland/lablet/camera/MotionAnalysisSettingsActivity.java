@@ -33,7 +33,7 @@ import java.util.List;
  * </p>
  */
 public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivity {
-    private CameraSensorData cameraSensorData;
+    private VideoData videoData;
     private VideoFrameView videoFrameView;
 
     private SeekBar seekBar = null;
@@ -134,14 +134,14 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        cameraSensorData = (CameraSensorData)experimentAnalysis.getCurrentSensorAnalysis().getData();
+        videoData = (VideoData)experimentAnalysis.getCurrentSensorAnalysis().getData();
 
         setContentView(R.layout.motion_analysis_settings);
 
         videoFrameView = (VideoFrameView)findViewById(R.id.videoFrameView);
         assert videoFrameView != null;
-        File storageDir = cameraSensorData.getStorageDir();
-        File videoFile = new File(storageDir, cameraSensorData.getVideoFileName());
+        File storageDir = videoData.getStorageDir();
+        File videoFile = new File(storageDir, videoData.getVideoFileName());
         videoFrameView.setVideoFilePath(videoFile.getPath());
 
         seekBar = (SeekBar)findViewById(R.id.seekBar);
@@ -251,10 +251,10 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         float analysisFrameRate = calibrationVideoTimeData.getAnalysisFrameRate();
 
         // initial views with values
-        if (cameraSensorData.isRecordedAtReducedFrameRate())
-            frameRateList = FrameRateHelper.getPossibleLowAnalysisFrameRates(cameraSensorData.getRecordingFrameRate());
+        if (videoData.isRecordedAtReducedFrameRate())
+            frameRateList = FrameRateHelper.getPossibleLowAnalysisFrameRates(videoData.getRecordingFrameRate());
         else
-            frameRateList = FrameRateHelper.getPossibleAnalysisFrameRates(cameraSensorData.getVideoFrameRate());
+            frameRateList = FrameRateHelper.getPossibleAnalysisFrameRates(videoData.getVideoFrameRate());
         frameRatePicker.setMinValue(0);
         frameRatePicker.setMaxValue(frameRateList.size() - 1);
         frameRatePicker.setDisplayedValues(getFrameRateStringList());
@@ -312,7 +312,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     }
 
     private float getDurationAtFrameRate(float frameRate) {
-        long duration = cameraSensorData.getVideoDuration();
+        long duration = videoData.getVideoDuration();
         float stepSize = 1000.0f / frameRate;
         int numberOfSteps = (int)((frameRate * duration) / 1000);
         return stepSize * numberOfSteps;

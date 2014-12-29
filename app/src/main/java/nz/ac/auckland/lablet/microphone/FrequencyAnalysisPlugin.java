@@ -28,8 +28,8 @@ public class FrequencyAnalysisPlugin implements IAnalysisPlugin {
 
     @Override
     public IDataAnalysis createDataAnalysis(ISensorData sensorData) {
-        assert sensorData instanceof MicrophoneSensorData;
-        return new FrequencyAnalysis((MicrophoneSensorData)sensorData);
+        assert sensorData instanceof AudioData;
+        return new FrequencyAnalysis((AudioData)sensorData);
     }
 
     @Override

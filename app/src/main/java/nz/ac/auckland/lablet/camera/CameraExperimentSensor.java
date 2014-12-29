@@ -143,7 +143,7 @@ class CameraExperimentView extends AbstractExperimentSensorView {
 public class CameraExperimentSensor extends AbstractExperimentSensor {
     private Activity activity;
 
-    private CameraSensorData experimentData;
+    private VideoData experimentData;
 
     private Camera camera = null;
     private CameraGLTextureProducer producer = null;
@@ -268,7 +268,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             setRecordingFrameRate(bestFrameRate);
         }
 
-        experimentData = new CameraSensorData(this);
+        experimentData = new VideoData(this);
 
         if (camera == null) {
             Camera.CameraInfo info = new Camera.CameraInfo();

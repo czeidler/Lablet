@@ -17,7 +17,7 @@ import java.io.*;
 
 
 public class FrequencyAnalysis implements IDataAnalysis {
-    final private MicrophoneSensorData sensorData;
+    final private AudioData sensorData;
 
     final private MarkerDataModel hCursorMarkerModel;
     final private MarkerDataModel vCursorMarkerModel;
@@ -97,7 +97,7 @@ public class FrequencyAnalysis implements IDataAnalysis {
         }
     }
 
-    public FrequencyAnalysis(MicrophoneSensorData sensorData) {
+    public FrequencyAnalysis(AudioData sensorData) {
         this.sensorData = sensorData;
 
         xUnit.setName("time");

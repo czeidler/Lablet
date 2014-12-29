@@ -14,7 +14,7 @@ import nz.ac.auckland.lablet.experiment.IExperimentSensor;
 import java.io.File;
 
 
-public class MicrophoneSensorData extends AbstractSensorData {
+public class AudioData extends AbstractSensorData {
     private String audioFileName;
 
     static final public String DATA_TYPE = "Audio";
@@ -24,11 +24,11 @@ public class MicrophoneSensorData extends AbstractSensorData {
         return DATA_TYPE;
     }
 
-    public MicrophoneSensorData() {
+    public AudioData() {
         super();
     }
 
-    public MicrophoneSensorData(IExperimentSensor sourceSensor) {
+    public AudioData(IExperimentSensor sourceSensor) {
         super(sourceSensor);
     }
 

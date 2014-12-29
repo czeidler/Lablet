@@ -14,11 +14,11 @@ import nz.ac.auckland.lablet.experiment.ISensorData;
 public class AudioDataTypePlugin implements IDataTypePlugin {
     @Override
     public String getDataType() {
-        return MicrophoneSensorData.DATA_TYPE;
+        return AudioData.DATA_TYPE;
     }
 
     @Override
     public ISensorData instantiateData() {
-        return new MicrophoneSensorData();
+        return new AudioData();
     }
 }

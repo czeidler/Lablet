@@ -49,12 +49,12 @@ public class VideoImportPlugin extends AbstractFileImportPlugin {
             return false;
         }
 
-        final CameraSensorData cameraSensorData = new CameraSensorData();
-        cameraSensorData.setUid(importUid);
+        final VideoData videoData = new VideoData();
+        videoData.setUid(importUid);
 
-        cameraSensorData.setVideoFileName(dataStorageDir, fileName);
+        videoData.setVideoFileName(dataStorageDir, fileName);
         try {
-            cameraSensorData.saveExperimentDataToFile(dataStorageDir);
+            videoData.saveExperimentDataToFile(dataStorageDir);
         } catch (IOException e) {
             e.printStackTrace();
             return false;

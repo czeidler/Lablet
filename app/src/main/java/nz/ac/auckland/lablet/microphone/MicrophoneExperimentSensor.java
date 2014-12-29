@@ -39,7 +39,7 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     final String audioFileName = "audio.wav";
     private File audioFile = null;
 
-    private MicrophoneSensorData experimentData;
+    private AudioData experimentData;
 
     // currently only works with 0.5f
     final private float liveStepFactor = 0.5f;
@@ -109,7 +109,7 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public void init(final Activity activity) {
-        experimentData = new MicrophoneSensorData(this);
+        experimentData = new AudioData(this);
 
         previewState = new State() {
             private AudioRecordingTask audioRecordingTask = null;

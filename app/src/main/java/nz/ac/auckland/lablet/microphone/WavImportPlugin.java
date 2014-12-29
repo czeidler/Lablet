@@ -49,7 +49,7 @@ public class WavImportPlugin extends AbstractFileImportPlugin {
             return false;
         }
 
-        final MicrophoneSensorData sensorData = new MicrophoneSensorData();
+        final AudioData sensorData = new AudioData();
         sensorData.setUid(importUid);
 
         sensorData.setAudioFileName(fileName);

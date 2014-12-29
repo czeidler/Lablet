@@ -15,7 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.*;
-import nz.ac.auckland.lablet.camera.CameraSensorData;
+import nz.ac.auckland.lablet.camera.VideoData;
 import nz.ac.auckland.lablet.camera.CameraSensorPlugin;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
@@ -149,8 +149,8 @@ class ScriptComponentCameraExperimentView extends ScriptComponentSingleExperimen
 
                 // TODO fix if there are more than one runs or sensors
                 ISensorData sensorData = experimentData.getRunDataList().get(0).sensorDataList.get(0);
-                CameraSensorData cameraSensorData = (CameraSensorData)sensorData;
-                return new File(cameraSensorData.getStorageDir(), cameraSensorData.getVideoFileName());
+                VideoData videoData = (VideoData)sensorData;
+                return new File(videoData.getStorageDir(), videoData.getVideoFileName());
             }
 
             @Override

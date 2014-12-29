@@ -14,11 +14,11 @@ import nz.ac.auckland.lablet.experiment.ISensorData;
 public class VideoDataTypePlugin implements IDataTypePlugin {
     @Override
     public String getDataType() {
-        return CameraSensorData.DATA_TYPE;
+        return VideoData.DATA_TYPE;
     }
 
     @Override
     public ISensorData instantiateData() {
-        return new CameraSensorData();
+        return new VideoData();
     }
 }

@@ -20,7 +20,7 @@ import java.io.IOException;
 /**
  * Holds all important data for the camera experiment.
  */
-public class CameraSensorData extends AbstractSensorData {
+public class VideoData extends AbstractSensorData {
     private String videoFileName;
 
     // milli seconds
@@ -33,7 +33,7 @@ public class CameraSensorData extends AbstractSensorData {
 
     static final public String DATA_TYPE = "Video";
 
-    public CameraSensorData(IExperimentSensor sourceSensor) {
+    public VideoData(IExperimentSensor sourceSensor) {
         super(sourceSensor);
     }
 
@@ -42,7 +42,7 @@ public class CameraSensorData extends AbstractSensorData {
         return "Video";
     }
 
-    public CameraSensorData() {
+    public VideoData() {
         super();
     }
 

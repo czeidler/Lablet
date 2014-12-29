@@ -26,7 +26,7 @@ public class MotionAnalysis implements IDataAnalysis {
         void onShowCoordinateSystem(boolean show);
     }
 
-    final private CameraSensorData sensorData;
+    final private VideoData sensorData;
 
     final private FrameDataModel frameDataModel;
     final private CalibrationXY calibrationXY;
@@ -49,7 +49,7 @@ public class MotionAnalysis implements IDataAnalysis {
 
     final private List<IListener> listenerList = new ArrayList<>();
 
-    public MotionAnalysis(CameraSensorData sensorData) {
+    public MotionAnalysis(VideoData sensorData) {
         this.sensorData = sensorData;
 
         xUnit.setName("x");
@@ -306,7 +306,7 @@ public class MotionAnalysis implements IDataAnalysis {
     }
 
     private void updateOriginFromVideoRotation() {
-        CameraSensorData cameraExperiment = (CameraSensorData)getData();
+        VideoData cameraExperiment = (VideoData)getData();
 
         // read rotation from video
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
