@@ -36,17 +36,17 @@ public class ScriptExperimentRef extends WeakListenable<ScriptExperimentRef.ILis
         experimentPath = path;
     }
 
-    public MotionAnalysis getMotionAnalysis(Context context, int run) {
-        return getAnalysis(context, run, "MotionAnalysis");
+    public MotionAnalysis getMotionAnalysis(int run) {
+        return getAnalysis(run, "MotionAnalysis");
     }
 
-    public FrequencyAnalysis getFrequencyAnalysis(Context context, int run) {
-        return getAnalysis(context, run, "FrequencyAnalysis");
+    public FrequencyAnalysis getFrequencyAnalysis(int run) {
+        return getAnalysis(run, "FrequencyAnalysis");
     }
 
-    protected <T extends IDataAnalysis> T getAnalysis(Context context, int run, String analysisIdentifier) {
+    protected <T extends IDataAnalysis> T getAnalysis(int run, String analysisIdentifier) {
         if (experimentAnalysis == null)
-            experimentAnalysis = loadExperimentAnalysis(context);
+            experimentAnalysis = loadExperimentAnalysis();
         if (experimentAnalysis == null || experimentAnalysis.getNumberOfRuns() <= run)
             return null;
 
@@ -60,15 +60,15 @@ public class ScriptExperimentRef extends WeakListenable<ScriptExperimentRef.ILis
         return null;
     }
 
-    public void reloadExperimentAnalysis(Context context) {
-        experimentAnalysis = loadExperimentAnalysis(context);
+    public void reloadExperimentAnalysis() {
+        experimentAnalysis = loadExperimentAnalysis();
 
         for (IListener listener : getListeners())
             listener.onExperimentAnalysisUpdated();
     }
 
-    private ExperimentAnalysis loadExperimentAnalysis(Context context) {
-        ExperimentData experimentData = ExperimentHelper.loadExperimentData(context, getExperimentPath());
+    private ExperimentAnalysis loadExperimentAnalysis() {
+        ExperimentData experimentData = ExperimentHelper.loadExperimentData(getExperimentPath());
         if (experimentData == null)
             return null;
 

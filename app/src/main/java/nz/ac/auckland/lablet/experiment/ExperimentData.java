@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.experiment;
 
-import android.content.Context;
 import android.os.Bundle;
 
 import java.io.File;
@@ -60,11 +59,10 @@ public class ExperimentData {
     /**
      * Load the experiment data from a storage directory.
      *
-     * @param context
      * @param storageDir
      * @return false if there was an error (see {@link #getLoadError})
      */
-    public boolean load(Context context, File storageDir) {
+    public boolean load(File storageDir) {
         if (storageDir == null || !storageDir.exists())
             return false;
 
@@ -72,7 +70,7 @@ public class ExperimentData {
             if (!groupDir.isDirectory())
                 continue;
 
-            RunData runData = loadRunData(context, groupDir);
+            RunData runData = loadRunData(groupDir);
             if (runData == null)
                 return false;
             runDataList.add(runData);
@@ -82,7 +80,7 @@ public class ExperimentData {
         return true;
     }
 
-    private ISensorData loadExperimentData(Context context, File sensorDirectory) {
+    private ISensorData loadExperimentData(File sensorDirectory) {
         Bundle bundle;
 
         File file = new File(sensorDirectory, ISensorData.EXPERIMENT_DATA_FILE_NAME);
@@ -125,7 +123,7 @@ public class ExperimentData {
         return sensorData;
     }
 
-    private RunData loadRunData(Context context, File runDataDir) {
+    private RunData loadRunData(File runDataDir) {
         ExperimentRunInfo runInfo = new ExperimentRunInfo();
         File runDataFile = new File(runDataDir, ExperimentRun.EXPERIMENT_RUN_FILE_NAME);
         try {
@@ -141,7 +139,7 @@ public class ExperimentData {
         for (File runDirectory : runDataDir.listFiles()) {
             if (!runDirectory.isDirectory())
                 continue;
-            ISensorData sensorData = loadExperimentData(context, runDirectory);
+            ISensorData sensorData = loadExperimentData(runDirectory);
             if (sensorData == null)
                 return null;
             runData.sensorDataList.add(sensorData);

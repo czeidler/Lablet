@@ -7,8 +7,6 @@
  */
 package nz.ac.auckland.lablet.experiment;
 
-
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.ExperimentAnalysis;
@@ -23,9 +21,9 @@ import java.util.List;
  * Abstract base class for experiment plugins.
  */
 public class ExperimentHelper {
-    static public ExperimentData loadExperimentData(Context context, String experimentMainDir) {
+    static public ExperimentData loadExperimentData(String experimentMainDir) {
         ExperimentData experimentData = new ExperimentData();
-        if (!experimentData.load(context, new File(experimentMainDir, "data")))
+        if (!experimentData.load(new File(experimentMainDir, "data")))
             return experimentData;
         return experimentData;
     }

@@ -258,12 +258,12 @@ class MotionAnalysisGraphView extends ScriptComponentViewHolder {
 
         graphView2D.setMaxWidth(500);
 
-        MotionAnalysis sensorAnalysis = experiment.getMotionAnalysis(context, 0);
+        MotionAnalysis sensorAnalysis = experiment.getMotionAnalysis(0);
         if (sensorAnalysis != null) {
-            MarkerGraphAxis xAxis = createAxis(xAxisContentId, context);
+            MarkerGraphAxis xAxis = createAxis(xAxisContentId);
             if (xAxis == null)
                 xAxis = new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getXMinRangeGetter());
-            MarkerGraphAxis yAxis = createAxis(yAxisContentId, context);
+            MarkerGraphAxis yAxis = createAxis(yAxisContentId);
             if (yAxis == null)
                 yAxis = new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getYMinRangeGetter());
 
@@ -273,11 +273,10 @@ class MotionAnalysisGraphView extends ScriptComponentViewHolder {
         }
 
         // install listener
-        final Context contextFinal = context;
         experimentListener = new ScriptExperimentRef.IListener() {
             @Override
             public void onExperimentAnalysisUpdated() {
-                MotionAnalysis motionAnalysis = experiment.getMotionAnalysis(contextFinal, 0);
+                MotionAnalysis motionAnalysis = experiment.getMotionAnalysis(0);
                 adapter.setTo(motionAnalysis.getTagMarkers(), motionAnalysis.getTimeData());
             }
         };
@@ -327,8 +326,8 @@ class MotionAnalysisGraphView extends ScriptComponentViewHolder {
         this.title = title;
     }
 
-    private MarkerGraphAxis createAxis(String id, Context context) {
-        MotionAnalysis sensorAnalysis = experiment.getMotionAnalysis(context, 0);
+    private MarkerGraphAxis createAxis(String id) {
+        MotionAnalysis sensorAnalysis = experiment.getMotionAnalysis(0);
 
         if (id.equalsIgnoreCase("x-position"))
             return new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getXMinRangeGetter());

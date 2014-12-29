@@ -78,7 +78,7 @@ class ScriptComponentMicExperimentView extends ScriptComponentSingleExperimentBa
         takenExperimentInfo.setVisibility(View.INVISIBLE);
 
         final String experimentPath = micComponent.getExperiment().getExperimentPath();
-        ExperimentData experimentData = ExperimentHelper.loadExperimentData(getContext(), experimentPath);
+        ExperimentData experimentData = ExperimentHelper.loadExperimentData(experimentPath);
         if (experimentData == null)
             return;
 

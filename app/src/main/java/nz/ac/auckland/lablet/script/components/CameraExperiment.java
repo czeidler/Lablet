@@ -143,7 +143,7 @@ class ScriptComponentCameraExperimentView extends ScriptComponentSingleExperimen
         AsyncTask task = new AsyncTask() {
             @Override
             protected Object doInBackground(Object... objects) {
-                ExperimentData experimentData = ExperimentHelper.loadExperimentData(getContext(), experimentPath);
+                ExperimentData experimentData = ExperimentHelper.loadExperimentData(experimentPath);
                 if (experimentData == null)
                     return null;
 
