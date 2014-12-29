@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.microphone;
 
-import android.content.Context;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.AbstractSensorData;
 import nz.ac.auckland.lablet.experiment.IExperimentSensor;
@@ -25,12 +24,12 @@ public class MicrophoneSensorData extends AbstractSensorData {
         return DATA_TYPE;
     }
 
-    public MicrophoneSensorData(Context experimentContext) {
-        super(experimentContext);
+    public MicrophoneSensorData() {
+        super();
     }
 
-    public MicrophoneSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
-        super(experimentContext, sourceSensor);
+    public MicrophoneSensorData(IExperimentSensor sourceSensor) {
+        super(sourceSensor);
     }
 
     @Override

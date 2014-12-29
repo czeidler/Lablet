@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.camera;
 
-import android.content.Context;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.os.Bundle;
@@ -34,8 +33,8 @@ public class CameraSensorData extends AbstractSensorData {
 
     static final public String DATA_TYPE = "Video";
 
-    public CameraSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
-        super(experimentContext, sourceSensor);
+    public CameraSensorData(IExperimentSensor sourceSensor) {
+        super(sourceSensor);
     }
 
     @Override
@@ -43,9 +42,8 @@ public class CameraSensorData extends AbstractSensorData {
         return "Video";
     }
 
-    public CameraSensorData(Context experimentContext) {
-        super(experimentContext);
-
+    public CameraSensorData() {
+        super();
     }
 
     public float getMaxRawX() {

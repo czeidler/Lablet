@@ -30,7 +30,7 @@ public class CameraSensorPlugin implements ISensorPlugin {
 
     @Override
     public ISensorData loadSensorData(Context context, Bundle data, File storageDir) {
-        ISensorData sensorData = new CameraSensorData(context);
+        ISensorData sensorData = new CameraSensorData();
         try {
             sensorData.loadExperimentData(data, storageDir);
         } catch (IOException e) {

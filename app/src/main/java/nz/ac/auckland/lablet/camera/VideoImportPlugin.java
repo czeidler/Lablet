@@ -49,7 +49,7 @@ public class VideoImportPlugin extends AbstractFileImportPlugin {
             return false;
         }
 
-        final CameraSensorData cameraSensorData = new CameraSensorData(activity);
+        final CameraSensorData cameraSensorData = new CameraSensorData();
         cameraSensorData.setUid(importUid);
 
         cameraSensorData.setVideoFileName(dataStorageDir, fileName);

@@ -68,7 +68,7 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public void init(Activity activity) {
-        data = new AccelerometerSensorData(activity, this);
+        data = new AccelerometerSensorData(this);
 
         sensorManager = (SensorManager)activity.getSystemService(Context.SENSOR_SERVICE);
     }

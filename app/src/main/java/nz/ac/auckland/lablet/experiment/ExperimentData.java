@@ -133,13 +133,13 @@ public class ExperimentData {
         ISensorData sensorData = null;
         switch (dataType) {
             case MicrophoneSensorData.DATA_TYPE:
-                sensorData = new MicrophoneSensorData(context);
+                sensorData = new MicrophoneSensorData();
                 break;
             case CameraSensorData.DATA_TYPE:
-                sensorData = new CameraSensorData(context);
+                sensorData = new CameraSensorData();
                 break;
             case AccelerometerSensorData.DATA_TYPE:
-                sensorData = new AccelerometerSensorData(context);
+                sensorData = new AccelerometerSensorData();
                 break;
         }
         if (sensorData != null) {

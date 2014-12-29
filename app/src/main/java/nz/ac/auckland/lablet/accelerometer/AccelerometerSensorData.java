@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.accelerometer;
 
-import android.content.Context;
 import android.os.Bundle;
 import au.com.bytecode.opencsv.CSV;
 import au.com.bytecode.opencsv.CSVReadProc;
@@ -42,12 +41,12 @@ public class AccelerometerSensorData extends AbstractSensorData {
         return DATA_TYPE;
     }
 
-    public AccelerometerSensorData(Context experimentContext) {
-        super(experimentContext);
+    public AccelerometerSensorData() {
+        super();
     }
 
-    public AccelerometerSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
-        super(experimentContext, sourceSensor);
+    public AccelerometerSensorData(IExperimentSensor sourceSensor) {
+        super(sourceSensor);
     }
 
     class DataColumn<T> extends DataTableColumn {

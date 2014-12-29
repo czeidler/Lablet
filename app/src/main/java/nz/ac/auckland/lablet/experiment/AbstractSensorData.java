@@ -21,7 +21,6 @@ import java.io.IOException;
  */
 abstract public class AbstractSensorData implements ISensorData {
     private String uid = "";
-    protected Context context;
 
     private File storageDir;
 
@@ -37,21 +36,14 @@ abstract public class AbstractSensorData implements ISensorData {
      *
      * loadExperimentData is not called directly here in the constructor because its not a good idea to call virtual
      * methods, i.e., the derived is constructor is not finished before the derived method is called.
-     *
-     * @param experimentContext the context of the experiment
      */
-    public AbstractSensorData(Context experimentContext) {
-        init(experimentContext);
+    public AbstractSensorData() {
     }
 
     /**
-     * Create a new experiment.
-     *
-     * @param experimentContext the experiment context
+     * Create data to be filled by an experiment sensor.
      */
-    public AbstractSensorData(Context experimentContext, IExperimentSensor sourceSensor) {
-        init(experimentContext);
-
+    public AbstractSensorData(IExperimentSensor sourceSensor) {
         uid = generateNewUid();
         this.sourceSensor = sourceSensor;
     }
@@ -138,9 +130,5 @@ abstract public class AbstractSensorData implements ISensorData {
         }
         newUid += dateString;
         return newUid;
-    }
-
-    private void init(Context experimentContext) {
-        context = experimentContext;
     }
 }

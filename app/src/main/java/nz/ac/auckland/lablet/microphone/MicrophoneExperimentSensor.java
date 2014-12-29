@@ -109,7 +109,7 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public void init(final Activity activity) {
-        experimentData = new MicrophoneSensorData(activity, this);
+        experimentData = new MicrophoneSensorData(this);
 
         previewState = new State() {
             private AudioRecordingTask audioRecordingTask = null;

@@ -268,7 +268,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             setRecordingFrameRate(bestFrameRate);
         }
 
-        experimentData = new CameraSensorData(activity, this);
+        experimentData = new CameraSensorData(this);
 
         if (camera == null) {
             Camera.CameraInfo info = new Camera.CameraInfo();
