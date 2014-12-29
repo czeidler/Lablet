@@ -54,7 +54,7 @@ public class VideoImportPlugin extends AbstractFileImportPlugin {
 
         videoData.setVideoFileName(dataStorageDir, fileName);
         try {
-            videoData.saveExperimentDataToFile(dataStorageDir);
+            videoData.saveExperimentData(dataStorageDir);
         } catch (IOException e) {
             e.printStackTrace();
             return false;

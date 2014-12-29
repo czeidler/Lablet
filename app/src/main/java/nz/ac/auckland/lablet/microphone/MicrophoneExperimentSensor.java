@@ -159,7 +159,7 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
             if (!moveTempFilesToExperimentDir(storageDir))
                 throw new IOException();
             experimentData.setAudioFileName(audioFileName);
-            experimentData.saveExperimentDataToFile(storageDir);
+            experimentData.saveExperimentData(storageDir);
         }
         audioFile = null;
     }

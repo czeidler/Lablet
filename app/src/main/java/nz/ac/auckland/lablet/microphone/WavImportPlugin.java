@@ -54,7 +54,7 @@ public class WavImportPlugin extends AbstractFileImportPlugin {
 
         sensorData.setAudioFileName(fileName);
         try {
-            sensorData.saveExperimentDataToFile(dataStorageDir);
+            sensorData.saveExperimentData(dataStorageDir);
         } catch (IOException e) {
             e.printStackTrace();
             return false;

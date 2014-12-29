@@ -86,8 +86,8 @@ public class AccelerometerSensorData extends AbstractSensorData {
     }
 
     @Override
-    public void saveExperimentDataToFile(File storageDir) throws IOException {
-        super.saveExperimentDataToFile(storageDir);
+    public void saveExperimentData(File storageDir) throws IOException {
+        super.saveExperimentData(storageDir);
 
         ColumnDataTableAdapter dataTableAdapter = new ColumnDataTableAdapter();
         dataTableAdapter.addColumn(new LongDataColumn(timeValues, "time [ms]"));

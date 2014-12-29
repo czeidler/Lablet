@@ -97,7 +97,7 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
             return;
         }
 
-        data.saveExperimentDataToFile(storageDir);
+        data.saveExperimentData(storageDir);
     }
 
     @Override

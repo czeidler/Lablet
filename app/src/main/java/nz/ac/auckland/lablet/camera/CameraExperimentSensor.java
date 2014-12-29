@@ -377,7 +377,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
                 throw new IOException();
             experimentData.setVideoFileName(storageDir, getVideoFileName());
             experimentData.setRecordingFrameRate(recordingFrameRate);
-            experimentData.saveExperimentDataToFile(storageDir);
+            experimentData.saveExperimentData(storageDir);
         }
         videoFile = null;
     }

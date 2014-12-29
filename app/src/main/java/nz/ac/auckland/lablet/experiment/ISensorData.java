@@ -7,12 +7,15 @@
  */
 package nz.ac.auckland.lablet.experiment;
 
-
 import android.os.Bundle;
 
 import java.io.File;
 import java.io.IOException;
 
+
+/**
+ * The ISensorData interface allows to save and load experiment data.
+ */
 public interface ISensorData {
     /**
      * The default file name where the experiment data is stored.
@@ -21,11 +24,28 @@ public interface ISensorData {
      * {@link nz.ac.auckland.lablet.misc.PersistentBundle}.
      * </p>
      */
-    final static public String EXPERIMENT_DATA_FILE_NAME = "experiment_data.xml";
+    final static String EXPERIMENT_DATA_FILE_NAME = "experiment_data.xml";
 
-    public String getUid();
-    public File getStorageDir();
-    public String getDataType();
+    /**
+     * A uid for a sensor data is for example the sensor name in combination with the recording date.
+     *
+     * @return the uid of the sensor data
+     */
+    String getUid();
+
+    /**
+     * Only returns a valid file if {load, save}ExperimentData has been called.
+     *
+     * @return the storage directory of the sensor data.
+     */
+    File getStorageDir();
+
+    /**
+     * The data type is a unique string describing the data.
+     *
+     * @return the data type string.
+     */
+    String getDataType();
 
     /**
      * Load a previously conducted experiment from a Bundle and sets the storage directory.
@@ -36,14 +56,13 @@ public interface ISensorData {
      * @param storageDir the storage directory of the experiment
      * @return
      */
-    public boolean loadExperimentData(Bundle bundle, File storageDir) throws IOException;
+    boolean loadExperimentData(Bundle bundle, File storageDir) throws IOException;
 
     /**
-     * /**
-     * Saves the experiment to the path specified in {@see setStorageDir}.
+     * Saves the experiment to the path specified. The default file name is EXPERIMENT_DATA_FILE_NAME.
      *
      * @param storageDir
      * @throws IOException
      */
-    public void saveExperimentDataToFile(File storageDir) throws IOException;
+    void saveExperimentData(File storageDir) throws IOException;
 }

@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.experiment;
 
-import android.content.Context;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.misc.PersistentBundle;
 
@@ -70,7 +69,7 @@ abstract public class AbstractSensorData implements ISensorData {
     }
 
     @Override
-    public void saveExperimentDataToFile(File storageDir) throws IOException {
+    public void saveExperimentData(File storageDir) throws IOException {
         this.storageDir = storageDir;
 
         Bundle bundle = new Bundle();
@@ -94,7 +93,7 @@ abstract public class AbstractSensorData implements ISensorData {
     /**
      * Sub classes can override this method to store data that does not fit into a Bundle.
      *
-     * This method is called from {@see saveExperimentDataToFile}.
+     * This method is called from {@see saveExperimentData}.
      *
      * * @param dir directory where data can be stored
      */
