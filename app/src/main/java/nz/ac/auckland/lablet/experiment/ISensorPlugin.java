@@ -7,11 +7,6 @@
  */
 package nz.ac.auckland.lablet.experiment;
 
-import android.content.Context;
-import android.os.Bundle;
-
-import java.io.File;
-
 
 /**
  * Plugin interface for a sensor.
@@ -36,15 +31,5 @@ public interface ISensorPlugin {
      * @return the experiment run
      */
     public IExperimentSensor createExperimentSensor();
-
-    /**
-     * Load an old experiment from a data bundle.
-     *
-     * @param context of the parent
-     * @param data saved state of the experiment
-     * @param storageDir directory where additional data may have been stored
-     * @return the loaded experiment or null on failure
-     */
-    public ISensorData loadSensorData(Context context, Bundle data, File storageDir);
 }
 

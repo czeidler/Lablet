@@ -98,31 +98,15 @@ public class ExperimentData {
             loadError = "failed to load sensor data";
             return null;
         }
-
-        String sensorName = bundle.getString(AbstractSensorData.SENSOR_NAME_KEY, "");
-
-        ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
-        ISensorPlugin plugin = factory.findSensorPlugin(sensorName);
-        if (plugin == null) {
-            // fallback: try to find analysis for the data type
-            if (!dataBundle.containsKey(AbstractSensorData.DATA_TYPE_KEY)) {
-                loadError = "data type information is missing";
-                return null;
-            }
-            String dataType = dataBundle.getString(AbstractSensorData.DATA_TYPE_KEY);
-            ISensorData sensorData = getSensorDataForType(dataType, dataBundle, sensorDirectory);
-            if (sensorData == null)
-                loadError = "unknown data type";
-            return sensorData;
-        }
-
-
-        ISensorData sensorData = plugin.loadSensorData(context, dataBundle, sensorDirectory);
-        if (sensorData == null) {
-            loadError = "can't load sensor data";
+        if (!dataBundle.containsKey(AbstractSensorData.DATA_TYPE_KEY)) {
+            loadError = "data type information is missing";
             return null;
         }
 
+        String dataType = dataBundle.getString(AbstractSensorData.DATA_TYPE_KEY);
+        ISensorData sensorData = getSensorDataForType(dataType, dataBundle, sensorDirectory);
+        if (sensorData == null)
+            loadError = "unknown data type";
         return sensorData;
     }
 
