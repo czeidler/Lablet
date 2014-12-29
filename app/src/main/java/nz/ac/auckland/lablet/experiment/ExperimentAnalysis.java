@@ -16,27 +16,31 @@ import java.util.List;
 
 public class ExperimentAnalysis {
     public static class AnalysisRef {
-        final public int run;
-        final public int sensor;
+        final static private String KEY_RUN_ID = "runID";
+        final static private String KEY_DATA_ID = "dataID";
+        final static private String KEY_ANALYSIS_ID = "analysisID";
+
+        final public int runId;
+        final public int dataId;
         final public String analysisId;
 
         public AnalysisRef(Bundle archive) {
-            run = archive.getInt("run");
-            sensor = archive.getInt("sensor");
-            analysisId = archive.getString("analysisId");
+            runId = archive.getInt(KEY_RUN_ID);
+            dataId = archive.getInt(KEY_DATA_ID);
+            analysisId = archive.getString(KEY_ANALYSIS_ID);
         }
 
-        public AnalysisRef(int run, int sensor, String analysisId) {
-            this.run = run;
-            this.sensor = sensor;
+        public AnalysisRef(int runId, int dataId, String analysisId) {
+            this.runId = runId;
+            this.dataId = dataId;
             this.analysisId = analysisId;
         }
 
         public Bundle toBundle() {
             Bundle archive = new Bundle();
-            archive.putInt("run", run);
-            archive.putInt("sensor", sensor);
-            archive.putString("analysisId", analysisId);
+            archive.putInt(KEY_RUN_ID, runId);
+            archive.putInt(KEY_DATA_ID, dataId);
+            archive.putString(KEY_ANALYSIS_ID, analysisId);
             return archive;
         }
     }
@@ -84,7 +88,7 @@ public class ExperimentAnalysis {
     static public File getAnalysisStorageFor(ExperimentData experimentData, int run, IDataAnalysis analysis) {
         File dir = experimentData.getStorageDir().getParentFile();
         dir = new File(dir, "analysis");
-        dir = new File(dir, "run" + Integer.toString(run));
+        dir = new File(dir, "runId" + Integer.toString(run));
         ISensorData sensorData = analysis.getData();
         dir = new File(dir, sensorData.getDataType());
         dir = new File(dir, analysis.getIdentifier());
@@ -96,17 +100,17 @@ public class ExperimentAnalysis {
     }
 
     /**
-     * Set the experiment data and load a sensor analysis for each sensor.
+     * Set the experiment data and load a sensor analysis for all data.
      *
-     * For now it is assumed that each sensor only has one analysis.
+     * For now it is assumed that each data entry only has one analysis.
      *
      * @param experimentData the experiment data
      */
     public void setExperimentData(ExperimentData experimentData) {
         this.experimentData = experimentData;
 
-        List<ExperimentData.RunData> runDatas = experimentData.getRunDataList();
-        for (ExperimentData.RunData runData : runDatas) {
+        List<ExperimentData.RunData> runDataList = experimentData.getRunDataList();
+        for (ExperimentData.RunData runData : runDataList) {
             AnalysisRunEntry analysisRunEntry = new AnalysisRunEntry();
             for (ISensorData sensorData : runData.sensorDataList) {
                 AnalysisDataEntry analysisDataEntry = new AnalysisDataEntry();
@@ -117,7 +121,7 @@ public class ExperimentAnalysis {
                 IAnalysisPlugin plugin = pluginList.get(0);
 
                 IDataAnalysis sensorAnalysis = plugin.createDataAnalysis(sensorData);
-                File storage = getAnalysisStorageFor(experimentData, runDatas.indexOf(runData), sensorAnalysis);
+                File storage = getAnalysisStorageFor(experimentData, runDataList.indexOf(runData), sensorAnalysis);
                 // if loading fails we add the entry anyway and start a new analysis
                 ExperimentHelper.loadSensorAnalysis(sensorAnalysis, storage);
                 analysisDataEntry.analysisList.add(new AnalysisEntry(sensorAnalysis, plugin));
@@ -151,7 +155,7 @@ public class ExperimentAnalysis {
     }
 
     public AnalysisEntry getAnalysisEntry(AnalysisRef ref) {
-        return analysisRuns.get(ref.run).getSensorEntry(ref.sensor).getAnalysisEntry(ref.analysisId);
+        return analysisRuns.get(ref.runId).getSensorEntry(ref.dataId).getAnalysisEntry(ref.analysisId);
     }
 
     public IAnalysisPlugin getAnalysisPlugin(AnalysisRef analysisRef) {

@@ -86,8 +86,8 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
         final ExperimentData experimentData = experimentAnalysis.getExperimentData();
         List<ExperimentAnalysis.AnalysisRunEntry> analysisRuns = experimentAnalysis.getAnalysisRuns();
         for (ExperimentAnalysis.AnalysisRunEntry analysisRun : analysisRuns) {
-            for (ExperimentAnalysis.AnalysisDataEntry sensorEntry : analysisRun.analysisDataList) {
-                for (ExperimentAnalysis.AnalysisEntry analysisEntry : sensorEntry.analysisList) {
+            for (ExperimentAnalysis.AnalysisDataEntry dataEntry : analysisRun.analysisDataList) {
+                for (ExperimentAnalysis.AnalysisEntry analysisEntry : dataEntry.analysisList) {
                     try {
                         IDataAnalysis analysis = analysisEntry.analysis;
                         File storageDir = ExperimentAnalysis.getAnalysisStorageFor(experimentData,

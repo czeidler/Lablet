@@ -129,8 +129,8 @@ public class ExperimentHelper {
     static public void packStartAnalysisSettingsIntent(Intent intent, ExperimentAnalysis.AnalysisRef analysisRef,
                                                        String experimentPath, Bundle options) {
 
-        intent.putExtra("run_id", analysisRef.run);
-        intent.putExtra("sensor_id", analysisRef.sensor);
+        intent.putExtra("run_id", analysisRef.runId);
+        intent.putExtra("sensor_id", analysisRef.dataId);
         intent.putExtra("analysis_id", analysisRef.analysisId);
 
         intent.putExtra("experiment_path", experimentPath);
