@@ -39,10 +39,6 @@ public interface ISensorPlugin {
 
     /**
      * Load an old experiment from a data bundle.
-     * <p>
-     * Note that there is no method to create a new experiment from the plugin. When creating a new experiment you
-     * usually know what you are doing so just call the normal constructor, e.g. new CameraExperiment(...).
-     * </p>
      *
      * @param context of the parent
      * @param data saved state of the experiment
