@@ -53,7 +53,7 @@ public class MusicPainter extends AbstractPlotPainter {
         }
     }
 
-    class Tone {
+    static class Tone {
         final public float frequency;
         final public String name;
         final public int octave;
@@ -65,7 +65,21 @@ public class MusicPainter extends AbstractPlotPainter {
         }
     }
 
-    OctaveList octaveList = new OctaveList();
+
+    static public List<Tone> getGuitarStrings() {
+        List<Tone> guitarStrings = new ArrayList<>();
+        guitarStrings.add(new Tone(82.41f, "E", 2));
+        guitarStrings.add(new Tone(110.00f, "A", 2));
+        guitarStrings.add(new Tone(146.83f, "D", 3));
+        guitarStrings.add(new Tone(196.00f, "G", 3));
+        guitarStrings.add(new Tone(246.94f, "B", 3));
+        guitarStrings.add(new Tone(329.63f, "E", 4));
+        return guitarStrings;
+    }
+
+    //List<Tone> octaveList = new OctaveList();
+    List<Tone> octaveList = getGuitarStrings();
+
     Paint paint = new Paint();
 
     @Override
