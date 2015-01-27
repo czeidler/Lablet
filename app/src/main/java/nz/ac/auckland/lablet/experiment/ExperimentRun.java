@@ -195,9 +195,7 @@ public class ExperimentRun {
             data.saveToFile(new File(storageDir, EXPERIMENT_RUN_FILE_NAME));
         }
 
-        for (IExperimentSensor experimentSensor : experimentSensors) {
-            experimentSensor.finishExperiment(saveData,
-                    new File(storageDir, experimentSensor.getClass().getSimpleName()));
-        }
+        for (IExperimentSensor experimentSensor : experimentSensors)
+            experimentSensor.finishExperiment(saveData, storageDir);
     }
 }

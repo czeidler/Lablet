@@ -150,12 +150,13 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     }
 
     @Override
-    public void finishExperiment(boolean saveData, File storageDir) throws IOException {
-        super.finishExperiment(saveData, storageDir);
+    public void finishExperiment(boolean saveData, File storageBaseDir) throws IOException {
+        super.finishExperiment(saveData, storageBaseDir);
 
         if (!saveData)
             deleteTempFiles();
         else {
+            File storageDir = getSensorDataStorage(storageBaseDir, this.getClass().getSimpleName());
             if (!moveTempFilesToExperimentDir(storageDir))
                 throw new IOException();
             experimentData.setAudioFileName(audioFileName);

@@ -89,14 +89,15 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     }
 
     @Override
-    public void finishExperiment(boolean saveData, File storageDir) throws IOException {
-        super.finishExperiment(saveData, storageDir);
+    public void finishExperiment(boolean saveData, File storageBaseDir) throws IOException {
+        super.finishExperiment(saveData, storageBaseDir);
 
         if (!saveData) {
             resetData();
             return;
         }
 
+        File storageDir = getSensorDataStorage(storageBaseDir, this.getClass().getSimpleName());
         data.saveExperimentData(storageDir);
     }
 

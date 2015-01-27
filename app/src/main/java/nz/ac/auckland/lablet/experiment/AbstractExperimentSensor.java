@@ -137,12 +137,24 @@ abstract public class AbstractExperimentSensor implements IExperimentSensor {
     }
 
     @Override
-    public void finishExperiment(boolean saveData, File storageDir) throws IOException {
+    public void finishExperiment(boolean saveData, File storageBaseDir) throws IOException {
         if (saveData)
-            storageDir.mkdirs();
+            storageBaseDir.mkdirs();
         unsavedExperimentData = false;
     }
 
+    protected File getSensorDataStorage(File storageBaseDir, String name) {
+        for (int i = 0; true; i++) {
+            String fileName = name;
+            if (i != 0)
+                fileName += i;
+            File file = new File(storageBaseDir, fileName);
+            if (file.exists())
+                continue;
+            return file;
+        }
+    }
+    
     @Override
     public boolean dataTaken() {
         return unsavedExperimentData;

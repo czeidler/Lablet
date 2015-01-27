@@ -49,7 +49,18 @@ public interface IExperimentSensor {
     public void init(Activity activity);
     public void destroy();
 
-    public void finishExperiment(boolean saveData, File storageDir) throws IOException;
+    /**
+     * Finishes the experiment by either saving or discarding the data.
+     *
+     * We allow a sensor to produce more than one type of data. For example, an external sensor could act as a
+     * thermometer and a barometer at the same time. For that reason the sensor is responsible to create one or more
+     * directories in the storageBaseDir to store its data.
+     *
+     * @param saveData flag that indicates if data should be saved
+     * @param storageBaseDir the data should be saved into a sub directory of storageBaseDir
+     * @throws IOException
+     */
+    public void finishExperiment(boolean saveData, File storageBaseDir) throws IOException;
     public boolean dataTaken();
 
     public void startPreview();
