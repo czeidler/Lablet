@@ -14,6 +14,8 @@ import nz.ac.auckland.lablet.views.table.CSVWriter;
 import nz.ac.auckland.lablet.views.table.MarkerDataTableAdapter;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class FrequencyAnalysis implements IDataAnalysis {
@@ -128,9 +130,13 @@ public class FrequencyAnalysis implements IDataAnalysis {
         return getClass().getSimpleName();
     }
 
-    @Override
-    public ISensorData getData() {
+    public AudioData getAudioData() {
         return sensorData;
+    }
+
+    @Override
+    public ISensorData[] getData() {
+        return new ISensorData[]{sensorData};
     }
 
     @Override

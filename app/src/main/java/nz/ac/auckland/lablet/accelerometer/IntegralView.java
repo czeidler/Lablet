@@ -68,7 +68,7 @@ public class IntegralView extends FrameLayout {
                 (Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.accelerometer_integral, this, true);
 
-        AccelerometerSensorData data = (AccelerometerSensorData)analysis.getData();
+        AccelerometerSensorData data = (AccelerometerSensorData)analysis.getAccelerometerData();
 
         Spinner spinner = (Spinner)view.findViewById(R.id.spinner);
         spinnerEntryList.add(new SpinnerEntry("x-Acceleration", analysis.getXCalibration(), data.getXValues(), "x",
@@ -132,7 +132,7 @@ public class IntegralView extends FrameLayout {
         if (currentEntry != null)
             currentEntry.calibration.getBaseLineMarker().removeListener(dataListener);
 
-        AccelerometerSensorData data = (AccelerometerSensorData)analysis.getData();
+        AccelerometerSensorData data = (AccelerometerSensorData)analysis.getAccelerometerData();
         currentEntry = spinnerEntryList.get(index);
 
         final AccelerometerAnalysis.Calibration calibration = currentEntry.calibration;

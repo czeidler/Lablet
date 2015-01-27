@@ -120,7 +120,7 @@ public class MotionAnalysis implements IDataAnalysis {
         return "MotionAnalysis";
     }
 
-    public ISensorData getData() { return sensorData; }
+    public VideoData getVideoData() { return sensorData; }
     public FrameDataModel getFrameDataModel() {
         return frameDataModel;
     }
@@ -154,6 +154,11 @@ public class MotionAnalysis implements IDataAnalysis {
     public void setVideoAnalysisSettings(Bundle data) {
         videoAnalysisSettings = data;
         onVideoAnalysisSettingsChanged();
+    }
+
+    @Override
+    public ISensorData[] getData() {
+        return new ISensorData[]{sensorData};
     }
 
     public Unit getXUnit() {
@@ -306,7 +311,7 @@ public class MotionAnalysis implements IDataAnalysis {
     }
 
     private void updateOriginFromVideoRotation() {
-        VideoData cameraExperiment = (VideoData)getData();
+        VideoData cameraExperiment = (VideoData) getVideoData();
 
         // read rotation from video
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();

@@ -90,10 +90,11 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
                 for (ExperimentAnalysis.AnalysisEntry analysisEntry : dataEntry.analysisList) {
                     try {
                         IDataAnalysis analysis = analysisEntry.analysis;
-                        File storageDir = ExperimentAnalysis.getAnalysisStorageFor(experimentData,
-                                analysisRuns.indexOf(analysisRun), analysis);
+                        File storageDir = analysisEntry.storageDir;
                         storageDir.mkdirs();
-                        ExperimentHelper.saveAnalysisData(analysis, storageDir);
+
+                        ExperimentHelper.saveAnalysisData(analysisEntry.plugin, analysis, storageDir,
+                                experimentData.getRunDataList().get(analysisRuns.indexOf(analysisRun)).sensorDataList);
                         exportTagMarkerCSVData(analysis, storageDir);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -103,9 +104,8 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
         }
     }
 
-    private File getTagMarkerCSVFile(IDataAnalysis analysis, File storageDir) {
-        ISensorData sensorData = analysis.getData();
-        return new File(storageDir, sensorData.getUid() + "_tag_markers.csv");
+    private File getTagMarkerCSVFile(IDataAnalysis sensorAnalysis, File storageDir) {
+        return new File(storageDir, sensorAnalysis.getIdentifier() + "_tag_markers.csv");
     }
 
     private void exportTagMarkerCSVData(IDataAnalysis sensorAnalysis, File storageDir) throws IOException {

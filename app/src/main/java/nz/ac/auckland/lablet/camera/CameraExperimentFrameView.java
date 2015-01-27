@@ -33,9 +33,9 @@ class CameraExperimentFrameView extends VideoFrameView implements IExperimentFra
         setWillNotDraw(false);
 
         this.motionAnalysis = motionAnalysis;
-        this.sensorData = (VideoData)motionAnalysis.getData();
+        this.sensorData = (VideoData)motionAnalysis.getVideoData();
 
-        File storageDir = motionAnalysis.getData().getStorageDir();
+        File storageDir = motionAnalysis.getVideoData().getStorageDir();
         File videoFile = new File(storageDir, sensorData.getVideoFileName());
         setVideoFilePath(videoFile.getPath());
     }

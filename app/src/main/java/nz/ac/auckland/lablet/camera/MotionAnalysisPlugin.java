@@ -19,14 +19,15 @@ public class MotionAnalysisPlugin implements IAnalysisPlugin {
     }
 
     @Override
-    public String supportedDataType() {
-        return "Video";
+    public String[] requiredDataTypes() {
+        return new String[]{VideoData.DATA_TYPE};
     }
 
     @Override
-    public IDataAnalysis createDataAnalysis(ISensorData sensorData) {
-        assert sensorData instanceof VideoData;
-        return new MotionAnalysis((VideoData)sensorData);
+    public IDataAnalysis createDataAnalysis(ISensorData... sensorData) {
+        assert sensorData.length == 1;
+        assert sensorData[0] instanceof VideoData;
+        return new MotionAnalysis((VideoData)sensorData[0]);
     }
 
     @Override

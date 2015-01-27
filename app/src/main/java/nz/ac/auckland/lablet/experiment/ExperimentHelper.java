@@ -51,25 +51,54 @@ public class ExperimentHelper {
         return bundle;
     }
 
-    // Creates a new ExperimentAnalysis and tries to load an existing analysis.
-    static public boolean loadSensorAnalysis(IDataAnalysis sensorAnalysis, File storageDir) {
+    final static private String PLUGIN_ID_KEY = "plugin_id";
+    final static private String USED_DATA_KEY = "used_data";
+    final static private String SENSOR_DATA_LIST_KEY = "sensor_data_list";
+
+    // Tries to load an existing analysis.
+    static public ExperimentAnalysis.AnalysisEntry loadSensorAnalysis(File storageDir, List<ISensorData> allSensorData) {
         // try to load old analysis
         File projectFile = new File(storageDir, IDataAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);
         Bundle bundle = loadBundleFromFile(projectFile);
         if (bundle == null)
-            return false;
+            return null;
 
-        Bundle analysisDataBundle = bundle.getBundle("analysis_data");
+        Bundle analysisDataBundle = bundle.getBundle(USED_DATA_KEY);
         if (analysisDataBundle == null)
-            return false;
+            return null;
 
-        return sensorAnalysis.loadAnalysisData(analysisDataBundle, storageDir);
+        int[] integerList = bundle.getIntArray(SENSOR_DATA_LIST_KEY);
+        ISensorData[] dataList = new ISensorData[integerList.length];
+        for (int i = 0; i < dataList.length; i++)
+            dataList[i] = allSensorData.get(integerList[i]);
+
+        String analysisPluginId= bundle.getString(PLUGIN_ID_KEY);
+        ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
+        IAnalysisPlugin plugin = factory.findAnalysisPlugin(analysisPluginId);
+        IDataAnalysis dataAnalysis = plugin.createDataAnalysis(dataList);
+
+        if (!dataAnalysis.loadAnalysisData(analysisDataBundle, storageDir))
+            return null;
+
+        return new ExperimentAnalysis.AnalysisEntry(dataAnalysis, plugin, storageDir);
     }
 
-    static public void saveAnalysisData(IDataAnalysis sensorAnalysis, File storageDir) throws IOException {
-        Bundle experimentData = sensorAnalysis.exportAnalysisData(storageDir);
+    static public void saveAnalysisData(IAnalysisPlugin plugin, IDataAnalysis sensorAnalysis, File storageDir,
+                                        List<ISensorData> allSensorData) throws IOException {
         Bundle bundle = new Bundle();
-        bundle.putBundle("analysis_data", experimentData);
+        // save plugin
+        bundle.putString(PLUGIN_ID_KEY, plugin.getIdentifier());
+
+        // save used data
+        ISensorData[] dataList = sensorAnalysis.getData();
+        int integerList[] = new int[dataList.length];
+        for (int i = 0; i < integerList.length; i++)
+            integerList[i] = allSensorData.indexOf(dataList[i]);
+        bundle.putIntArray(SENSOR_DATA_LIST_KEY, integerList);
+
+        // save experiment data
+        Bundle experimentData = sensorAnalysis.exportAnalysisData(storageDir);
+        bundle.putBundle(USED_DATA_KEY, experimentData);
 
         // save the bundle
         File projectFile = new File(storageDir, IDataAnalysis.EXPERIMENT_ANALYSIS_FILE_NAME);

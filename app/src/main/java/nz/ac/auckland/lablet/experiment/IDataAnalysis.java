@@ -19,8 +19,8 @@ public interface IDataAnalysis {
 
     public String getDisplayName();
     public String getIdentifier();
-    public ISensorData getData();
     public boolean loadAnalysisData(Bundle bundle, File storageDir);
+    public ISensorData[] getData();
 
     public Bundle exportAnalysisData(File additionalStorageDir) throws IOException;
     public void exportTagMarkerCSVData(Writer writer) throws IOException;

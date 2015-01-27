@@ -18,7 +18,7 @@ public interface IAnalysisPlugin {
      */
     public String getIdentifier();
 
-    public String supportedDataType();
+    public String[] requiredDataTypes();
 
     /**
      * Creates an {@link IDataAnalysis} object for the given
@@ -27,7 +27,7 @@ public interface IAnalysisPlugin {
      * @param sensorData usually loaded with the loadSensorData method
      * @return pointer to the created experiment analysis
      */
-    public IDataAnalysis createDataAnalysis(ISensorData sensorData);
+    public IDataAnalysis createDataAnalysis(ISensorData... sensorData);
 
     /**
      * Creates the view that displays the results in the

@@ -22,14 +22,15 @@ public class FrequencyAnalysisPlugin implements IAnalysisPlugin {
     }
 
     @Override
-    public String supportedDataType() {
-        return "Audio";
+    public String[] requiredDataTypes() {
+        return new String[]{AudioData.DATA_TYPE};
     }
 
     @Override
-    public IDataAnalysis createDataAnalysis(ISensorData sensorData) {
-        assert sensorData instanceof AudioData;
-        return new FrequencyAnalysis((AudioData)sensorData);
+    public IDataAnalysis createDataAnalysis(ISensorData... sensorData) {
+        assert sensorData.length == 1;
+        assert sensorData[0] instanceof AudioData;
+        return new FrequencyAnalysis((AudioData)sensorData[0]);
     }
 
     @Override

@@ -134,7 +134,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        videoData = (VideoData)experimentAnalysis.getCurrentSensorAnalysis().getData();
+        videoData = ((MotionAnalysis)experimentAnalysis.getCurrentSensorAnalysis()).getVideoData();
 
         setContentView(R.layout.motion_analysis_settings);
 

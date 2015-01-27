@@ -22,14 +22,15 @@ public class AccelerometerAnalysisPlugin implements IAnalysisPlugin {
     }
 
     @Override
-    public String supportedDataType() {
-        return AccelerometerSensorData.DATA_TYPE;
+    public String[] requiredDataTypes() {
+        return new String[]{AccelerometerSensorData.DATA_TYPE};
     }
 
     @Override
-    public IDataAnalysis createDataAnalysis(ISensorData sensorData) {
-        assert sensorData instanceof AccelerometerSensorData;
-        return new AccelerometerAnalysis((AccelerometerSensorData)sensorData);
+    public IDataAnalysis createDataAnalysis(ISensorData... sensorData) {
+        assert sensorData.length == 1;
+        assert sensorData[0] instanceof AccelerometerSensorData;
+        return new AccelerometerAnalysis((AccelerometerSensorData)sensorData[0]);
     }
 
     @Override

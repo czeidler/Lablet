@@ -80,7 +80,7 @@ public class FrequencyAnalysisView extends FrameLayout {
 
         this.frequencyAnalysis = analysis;
         this.freqMapDisplaySettings = analysis.getFreqMapDisplaySettings();
-        AudioData micSensorData = (AudioData) analysis.getData();
+        AudioData micSensorData = (AudioData) analysis.getAudioData();
 
         File audioFile = micSensorData.getAudioFile();
         AudioWavInputStream audioWavInputStream;

@@ -18,6 +18,8 @@ import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class AccelerometerAnalysis implements IDataAnalysis {
@@ -122,9 +124,13 @@ public class AccelerometerAnalysis implements IDataAnalysis {
         return "AccelerometerAnalysis";
     }
 
-    @Override
-    public ISensorData getData() {
+    public AccelerometerSensorData getAccelerometerData() {
         return sensorData;
+    }
+
+    @Override
+    public ISensorData[] getData() {
+        return new ISensorData[]{sensorData};
     }
 
     @Override
