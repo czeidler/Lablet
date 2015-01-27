@@ -88,9 +88,7 @@ public class ExperimentAnalysis {
     static public File getAnalysisStorageFor(ExperimentData experimentData, int run, IDataAnalysis analysis) {
         File dir = experimentData.getStorageDir().getParentFile();
         dir = new File(dir, "analysis");
-        dir = new File(dir, "runId" + Integer.toString(run));
-        ISensorData sensorData = analysis.getData();
-        dir = new File(dir, sensorData.getDataType());
+        dir = new File(dir, "run" + Integer.toString(run));
         dir = new File(dir, analysis.getIdentifier());
         return dir;
     }
