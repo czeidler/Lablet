@@ -35,7 +35,7 @@ public class VideoImportPlugin extends AbstractFileImportPlugin {
     }
 
     @Override
-    protected boolean importFile(Activity activity, File importFile, String importUid, File dataStorageDir) {
+    protected boolean importFile(Activity activity, File importFile, File dataStorageDir) {
         String fileName = importFile.getName();
         try {
             StorageLib.copyFile(importFile, new File(dataStorageDir, fileName), new StreamHelper.IProgressListener() {
@@ -50,7 +50,6 @@ public class VideoImportPlugin extends AbstractFileImportPlugin {
         }
 
         final VideoData videoData = new VideoData();
-        videoData.setUid(importUid);
 
         videoData.setVideoFileName(dataStorageDir, fileName);
         try {

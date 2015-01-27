@@ -19,13 +19,10 @@ import java.io.IOException;
  * Abstract base class for experiments.
  */
 abstract public class AbstractSensorData implements ISensorData {
-    private String uid = "";
-
     private File storageDir;
 
     private IExperimentSensor sourceSensor;
 
-    static public String UID_KEY = "uid";
     static public String DATA_KEY = "data";
     static public String DATA_TYPE_KEY = "data_type";
     static public String SENSOR_NAME_KEY = "sensor_name";
@@ -43,17 +40,7 @@ abstract public class AbstractSensorData implements ISensorData {
      * Create data to be filled by an experiment sensor.
      */
     public AbstractSensorData(IExperimentSensor sourceSensor) {
-        uid = generateNewUid();
         this.sourceSensor = sourceSensor;
-    }
-
-    @Override
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
     }
 
     @Override
@@ -64,7 +51,6 @@ abstract public class AbstractSensorData implements ISensorData {
     @Override
     public boolean loadExperimentData(Bundle bundle, File storageDir) {
         this.storageDir = storageDir;
-        uid = bundle.getString(UID_KEY);
         return true;
     }
 
@@ -108,7 +94,6 @@ abstract public class AbstractSensorData implements ISensorData {
      */
     protected Bundle experimentDataToBundle() {
         Bundle bundle = new Bundle();
-        bundle.putString(UID_KEY, uid);
         bundle.putString(DATA_TYPE_KEY, getDataType());
 
         return bundle;

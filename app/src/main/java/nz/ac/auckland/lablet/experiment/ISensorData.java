@@ -27,13 +27,6 @@ public interface ISensorData {
     final static String EXPERIMENT_DATA_FILE_NAME = "experiment_data.xml";
 
     /**
-     * A uid for a sensor data is for example the sensor name in combination with the recording date.
-     *
-     * @return the uid of the sensor data
-     */
-    String getUid();
-
-    /**
      * Only returns a valid file if {load, save}ExperimentData has been called.
      *
      * @return the storage directory of the sensor data.

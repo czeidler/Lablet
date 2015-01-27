@@ -24,7 +24,7 @@ public abstract class AbstractFileImportPlugin implements IImportPlugin {
 
     abstract protected String createUid(String fileName);
 
-    abstract protected boolean importFile(Activity activity, File importFile, String importUid, File dataStorageDir);
+    abstract protected boolean importFile(Activity activity, File importFile, File dataStorageDir);
 
     private boolean importInternal(final Activity activity, final File importFile, File storageBaseDir) {
         final String fileName = importFile.getName();
@@ -43,6 +43,6 @@ public abstract class AbstractFileImportPlugin implements IImportPlugin {
         }
 
         File dataStorageDir = experimentRun.getStorageDir();
-        return importFile(activity, importFile, uid, dataStorageDir);
+        return importFile(activity, importFile, dataStorageDir);
     }
 }
