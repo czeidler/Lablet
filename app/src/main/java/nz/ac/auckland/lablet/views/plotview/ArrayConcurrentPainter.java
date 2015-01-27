@@ -86,6 +86,11 @@ abstract public class ArrayConcurrentPainter extends ConcurrentPainter {
             if (dirtyRegion.getMin() < maxDirt.min || dirtyRegion.getMax() > maxDirt.max) {
                 maxDirt.min = Math.max(dirtyRegion.getMin(), maxDirt.min);
                 maxDirt.max = Math.min(dirtyRegion.getMax(), maxDirt.max);
+                if (maxDirt.max < maxDirt.min) {
+                    int temp = maxDirt.min;
+                    maxDirt.min = maxDirt.max;
+                    maxDirt.max = temp;
+                }
                 dirtyRegion.clear();
                 dirtyRegion.addRange(maxDirt);
             }
