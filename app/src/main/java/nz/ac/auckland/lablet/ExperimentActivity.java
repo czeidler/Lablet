@@ -240,7 +240,8 @@ public class ExperimentActivity extends FragmentActivity {
         MenuItem analyseItem = menu.findItem(R.id.action_analyse);
         assert analyseItem != null;
         analyseMenuItem.setMenuItem(analyseItem);
-        analyseItem.setEnabled(false);
+        if (!experiment.getCurrentExperimentRun().dataTaken())
+            analyseMenuItem.setEnabled(false);
         analyseItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
