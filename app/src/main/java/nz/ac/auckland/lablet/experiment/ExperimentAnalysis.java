@@ -71,10 +71,6 @@ public class ExperimentAnalysis {
 
     public static class AnalysisRunEntry {
         final public List<AnalysisDataEntry> analysisDataList = new ArrayList<>();
-
-        public AnalysisDataEntry getAnalysisDataEntry(int index) {
-            return analysisDataList.get(index);
-        }
     }
 
     protected ExperimentData experimentData = null;
@@ -133,8 +129,8 @@ public class ExperimentAnalysis {
             File analysisRunDir = getAnalysisRunStorage(experimentData, runDataList.indexOf(runData));
             String[] analysisDirs = analysisRunDir.list();
             if (analysisDirs != null && analysisDirs.length > 0) {
-                for (int i = 0; i < analysisDirs.length; i++) {
-                    File storage = new File(analysisRunDir, analysisDirs[i]);
+                for (String analysisDir : analysisDirs) {
+                    File storage = new File(analysisRunDir, analysisDir);
                     // try to load exiting analyses
                     AnalysisEntry analysisEntry = ExperimentHelper.loadSensorAnalysis(storage, runData.sensorDataList);
                     if (analysisEntry == null)
@@ -190,15 +186,6 @@ public class ExperimentAnalysis {
 
     public List<AnalysisRunEntry> getAnalysisRuns() {
         return analysisRuns;
-    }
-
-    public AnalysisEntry getAnalysisEntry(AnalysisRef ref) {
-        return analysisRuns.get(ref.runId).getAnalysisDataEntry(ref.dataId).getAnalysisEntry(ref.analysisId);
-    }
-
-
-    public IAnalysisPlugin getAnalysisPlugin(AnalysisRef analysisRef) {
-        return getAnalysisEntry(analysisRef).plugin;
     }
 
     public int getCurrentAnalysisRunIndex() {
