@@ -94,14 +94,15 @@ public class AudioAmplitudePlotDataAdapter extends AbstractXYDataAdapter {
     public void addData(float amplitudes[]) {
         if (amplitudes.length == 0)
             return;
+        int index = 0;
         if (data == null)
             data = new FixSizedBunchArray(amplitudes.length);
-
-        int oldSize = data.size();
+        else
+            index = data.size();
 
         data.add(amplitudes);
 
-        notifyDataAdded(oldSize, amplitudes.length);
+        notifyDataAdded(index, amplitudes.length);
     }
 
     public void clear() {
