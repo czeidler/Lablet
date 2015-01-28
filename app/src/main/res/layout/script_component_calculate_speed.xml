@@ -1,226 +1,235 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<GridLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
+<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical">
     <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Deriving average velocity and acceleration from displacement"
-            android:id="@+id/headerTextView" android:layout_row="0" android:layout_column="0"
-            android:layout_columnSpan="10" android:textStyle="bold"/>
-    <ScrollView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/scrollView1" android:layout_row="1" android:layout_column="0" android:layout_rowSpan="8"
-            android:paddingRight="10dp" android:minWidth="50dp">
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              class="nz.ac.auckland.lablet.views.table.TableView" android:id="@+id/dataTable" android:focusable="false"/>
-    </ScrollView>
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Fill the table:"
-            android:id="@+id/enterSpeedTextView" android:layout_row="1" android:layout_column="1"/>
-    <TableLayout
-            android:layout_width="700dp"
-            android:layout_height="wrap_content" android:layout_row="2" android:layout_column="1" android:layout_rowSpan="5" android:layout_columnSpan="5"
-            android:stretchColumns="*" android:background="@color/sc_question_background_color">
-        <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent" android:layout_column="0">
-            <TextView
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="time"
-                    android:id="@+id/textView"/>
-            <TextView
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="position"
-                    android:id="@+id/textView2"/>
-            <TextView
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="average velocity"
-                    android:id="@+id/textView3"/>
-            <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="avg. acceleration"
-                    android:id="@+id/textView4"/>
-        </TableRow>
-        <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent" android:layout_column="0">
-            <TextView
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="[ms]"
-                    android:id="@+id/textView5"/>
-            <TextView
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="[m]"
-                    android:id="@+id/positionUnitTextView"/>
-            <Spinner
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/speedUnitSpinner"/>
-            <Spinner
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/accelerationUnitSpinner"/>
-        </TableRow>
-        <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent">
-            <EditText
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:editable="false" android:enabled="true" android:focusable="false"
-                    android:id="@+id/time1EditText" android:selectAllOnFocus="false"/>
-            <EditText
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:inputType="number|numberDecimal|numberSigned"
-                    android:ems="10"
-                    android:nextFocusDown="@+id/position2EditText"
-                    android:id="@+id/position1EditText" android:selectAllOnFocus="true"/>
-            <Space
-                    android:layout_width="0dp" android:layout_height="20dp"/>
-            <Space
-                    android:layout_width="0dp" android:layout_height="20dp"/>
-        </TableRow>
-        <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent">
-            <Space
-                    android:layout_width="0dp" android:layout_height="20dp"/>
-            <Space
-                    android:layout_width="0dp" android:layout_height="20dp"/>
-            <EditText
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:inputType="number|numberDecimal|numberSigned"
-                    android:nextFocusDown="@+id/speed2EditText"
-                    android:id="@+id/speed1EditText" android:selectAllOnFocus="true"/>
-            <Space
-                    android:layout_width="0dp" android:layout_height="20dp"/>
-        </TableRow>
+            android:id="@+id/headerTextView" android:textStyle="bold"/>
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:orientation="horizontal">
+        <ScrollView
+            android:layout_width="wrap_content" android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:id="@+id/scrollView1" android:layout_weight="1" android:minWidth="50dp" android:paddingEnd="10dp">
+            <view android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  class="nz.ac.auckland.lablet.views.table.TableView" android:id="@+id/dataTable" android:focusable="false"/>
+        </ScrollView>
 
-        <TableRow
+        <LinearLayout android:layout_width="wrap_content"
+                      android:layout_height="match_parent" android:orientation="vertical">
+            <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent">
-            <EditText
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:editable="false" android:enabled="true" android:focusable="false"
-                    android:id="@+id/time2EditText"/>
-            <EditText
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:inputType="number|numberDecimal|numberSigned"
-                    android:ems="10"
-                    android:nextFocusDown="@+id/position3EditText"
-                    android:id="@+id/position2EditText" android:selectAllOnFocus="true"/>
-            <Space
-                    android:layout_width="0dp" android:layout_height="20dp"/>
-            <EditText
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:inputType="number|numberDecimal|numberSigned"
-                    android:ems="10"
-                    android:imeOptions="actionDone"
-                    android:id="@+id/acceleration1EditText" android:selectAllOnFocus="true"/>
-        </TableRow>
-        <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent">
-            <Space
-                    android:layout_width="0dp" android:layout_height="20dp"/>
-            <Space
-                    android:layout_width="0dp" android:layout_height="20dp"/>
-            <EditText
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:inputType="number|numberDecimal|numberSigned"
-                    android:nextFocusDown="@+id/acceleration1EditText"
-                    android:id="@+id/speed2EditText" android:selectAllOnFocus="true"/>
-            <Space
-                    android:layout_width="0dp" android:layout_height="20dp"/>
-        </TableRow>
-        <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent">
-            <EditText
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:editable="false" android:enabled="true" android:focusable="false"
-                    android:id="@+id/time3EditText"/>
-            <EditText
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:inputType="number|numberDecimal|numberSigned"
-                    android:ems="10"
-                    android:nextFocusDown="@+id/speed1EditText"
-                    android:id="@+id/position3EditText" android:selectAllOnFocus="true"/>
-            <Space
-                    android:layout_width="0dp" android:layout_height="20dp"/>
-            <Space
-                    android:layout_width="0dp" android:layout_height="20dp"/>
-        </TableRow>
-        <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent">
-            <Space
-                    android:layout_width="0dp" android:layout_height="20dp"/>
-            <CheckBox
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Fill the table:"
+                android:id="@+id/enterSpeedTextView"/>
+            <TableLayout
+                android:layout_width="700dp"
+                android:layout_height="wrap_content"
+                android:stretchColumns="*" android:background="@color/sc_question_background_color">
+                <TableRow
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="" android:checked="false" android:clickable="false"
-                    android:id="@+id/positionCheckBox"/>
-            <CheckBox
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="time"
+                        android:id="@+id/textView"/>
+                    <TextView
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="position"
+                        android:id="@+id/textView2"/>
+                    <TextView
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="average velocity"
+                        android:id="@+id/textView3"/>
+                    <TextView
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="avg. acceleration"
+                        android:id="@+id/textView4"/>
+                </TableRow>
+                <TableRow
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="" android:checked="false" android:clickable="false"
-                    android:id="@+id/speedCheckBox"/>
-            <CheckBox
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="[ms]"
+                        android:id="@+id/textView5"/>
+                    <TextView
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="[m]"
+                        android:id="@+id/positionUnitTextView"/>
+                    <Spinner
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/speedUnitSpinner"/>
+                    <Spinner
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/accelerationUnitSpinner"/>
+                </TableRow>
+                <TableRow
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="" android:checked="false" android:clickable="false"
-                    android:id="@+id/accelerationCheckBox"/>
-        </TableRow>
+                    android:layout_height="match_parent">
+                    <EditText
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:editable="false" android:enabled="true" android:focusable="false"
+                        android:id="@+id/time1EditText" android:selectAllOnFocus="false"/>
+                    <EditText
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="number|numberDecimal|numberSigned"
+                        android:ems="10"
+                        android:nextFocusDown="@+id/position2EditText"
+                        android:id="@+id/position1EditText" android:selectAllOnFocus="true"/>
+                    <Space
+                        android:layout_width="0dp" android:layout_height="20dp"/>
+                    <Space
+                        android:layout_width="0dp" android:layout_height="20dp"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                    <Space
+                        android:layout_width="0dp" android:layout_height="20dp"/>
+                    <Space
+                        android:layout_width="0dp" android:layout_height="20dp"/>
+                    <EditText
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="number|numberDecimal|numberSigned"
+                        android:nextFocusDown="@+id/speed2EditText"
+                        android:id="@+id/speed1EditText" android:selectAllOnFocus="true"/>
+                    <Space
+                        android:layout_width="0dp" android:layout_height="20dp"/>
+                </TableRow>
 
-    </TableLayout>
-    <ScrollView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/scrollView2" android:layout_row="1" android:layout_column="6"
-            android:paddingLeft="10dp" android:minWidth="50dp" android:layout_rowSpan="8">
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              class="nz.ac.auckland.lablet.views.table.TableView" android:id="@+id/speedTable" android:focusable="false"/>
-    </ScrollView>
-    <ScrollView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/scrollView3" android:layout_row="1" android:layout_column="7"
-            android:paddingLeft="10dp" android:minWidth="50dp" android:layout_rowSpan="8">
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              class="nz.ac.auckland.lablet.views.table.TableView" android:id="@+id/accelerationTable" android:focusable="false"/>
-    </ScrollView>
-</GridLayout>
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                    <EditText
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:editable="false" android:enabled="true" android:focusable="false"
+                        android:id="@+id/time2EditText"/>
+                    <EditText
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="number|numberDecimal|numberSigned"
+                        android:ems="10"
+                        android:nextFocusDown="@+id/position3EditText"
+                        android:id="@+id/position2EditText" android:selectAllOnFocus="true"/>
+                    <Space
+                        android:layout_width="0dp" android:layout_height="20dp"/>
+                    <EditText
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="number|numberDecimal|numberSigned"
+                        android:ems="10"
+                        android:imeOptions="actionDone"
+                        android:id="@+id/acceleration1EditText" android:selectAllOnFocus="true"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                    <Space
+                        android:layout_width="0dp" android:layout_height="20dp"/>
+                    <Space
+                        android:layout_width="0dp" android:layout_height="20dp"/>
+                    <EditText
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="number|numberDecimal|numberSigned"
+                        android:nextFocusDown="@+id/acceleration1EditText"
+                        android:id="@+id/speed2EditText" android:selectAllOnFocus="true"/>
+                    <Space
+                        android:layout_width="0dp" android:layout_height="20dp"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                    <EditText
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:editable="false" android:enabled="true" android:focusable="false"
+                        android:id="@+id/time3EditText"/>
+                    <EditText
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="number|numberDecimal|numberSigned"
+                        android:ems="10"
+                        android:nextFocusDown="@+id/speed1EditText"
+                        android:id="@+id/position3EditText" android:selectAllOnFocus="true"/>
+                    <Space
+                        android:layout_width="0dp" android:layout_height="20dp"/>
+                    <Space
+                        android:layout_width="0dp" android:layout_height="20dp"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                    <Space
+                        android:layout_width="0dp" android:layout_height="20dp"/>
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="" android:checked="false" android:clickable="false"
+                        android:id="@+id/positionCheckBox"/>
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="" android:checked="false" android:clickable="false"
+                        android:id="@+id/speedCheckBox"/>
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="" android:checked="false" android:clickable="false"
+                        android:id="@+id/accelerationCheckBox"/>
+                </TableRow>
+
+            </TableLayout>
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="wrap_content" android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:id="@+id/scrollView2"
+            android:layout_weight="1"
+            android:paddingLeft="10dp" android:minWidth="50dp">
+            <view android:layout_width="wrap_content"
+                  android:layout_height="match_parent"
+                  class="nz.ac.auckland.lablet.views.table.TableView" android:id="@+id/speedTable" android:focusable="false"/>
+        </ScrollView>
+        <ScrollView
+            android:layout_width="wrap_content" android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:layout_weight="1"
+            android:id="@+id/scrollView3" android:minWidth="50dp" >
+            <view android:layout_width="wrap_content"
+                  android:layout_height="match_parent"
+                  class="nz.ac.auckland.lablet.views.table.TableView" android:id="@+id/accelerationTable" android:focusable="false"
+                  android:paddingStart="10dp"/>
+        </ScrollView>
+    </LinearLayout>
+</LinearLayout>
