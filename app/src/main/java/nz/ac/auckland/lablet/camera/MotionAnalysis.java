@@ -311,7 +311,7 @@ public class MotionAnalysis implements IDataAnalysis {
     }
 
     private void updateOriginFromVideoRotation() {
-        VideoData cameraExperiment = (VideoData) getVideoData();
+        VideoData cameraExperiment = getVideoData();
 
         // read rotation from video
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();

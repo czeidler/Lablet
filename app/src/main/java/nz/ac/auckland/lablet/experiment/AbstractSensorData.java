@@ -102,17 +102,4 @@ abstract public class AbstractSensorData implements ISensorData {
     protected String getIdentifier() {
         return this.getClass().getSimpleName();
     }
-
-    protected String generateNewUid() {
-        CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", new java.util.Date());
-
-        String newUid = "";
-        String identifier = getIdentifier();
-        if (!identifier.equals("")) {
-            newUid += identifier;
-            newUid += "_";
-        }
-        newUid += dateString;
-        return newUid;
-    }
 }
