@@ -237,9 +237,8 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         final Intent intent = getActivity().getIntent();
         if (intent != null) {
             Bundle extras = intent.getExtras();
-            if (extras != null) {
-                if (extras.getBoolean("first_start_with_run_settings", false)
-                        && getSensorAnalysis().getTagMarkers().getMarkerCount() == 0) {
+            if (extras != null && getSensorAnalysis().getTagMarkers().getMarkerCount() == 0) {
+                if (extras.getBoolean("first_start_with_run_settings", false)) {
                     resumeWithRunSettings = true;
                 }
                 if (extras.getBoolean("first_start_with_run_settings_help", false)) {
