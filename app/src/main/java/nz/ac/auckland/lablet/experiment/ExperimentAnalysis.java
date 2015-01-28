@@ -17,76 +17,67 @@ import java.util.List;
 public class ExperimentAnalysis {
     public static class AnalysisRef {
         final static private String KEY_RUN_ID = "runID";
-        final static private String KEY_DATA_ID = "dataID";
-        final static private String KEY_ANALYSIS_ID = "analysisID";
+        final static private String KEY_ANALYSIS_UID = "analysisUID";
 
         final public int runId;
-        final public int dataId;
-        final public String analysisId;
+        final public String analysisUid;
 
         public AnalysisRef(Bundle archive) {
             runId = archive.getInt(KEY_RUN_ID);
-            dataId = archive.getInt(KEY_DATA_ID);
-            analysisId = archive.getString(KEY_ANALYSIS_ID);
+            analysisUid = archive.getString(KEY_ANALYSIS_UID);
         }
 
-        public AnalysisRef(int runId, int dataId, String analysisId) {
+        public AnalysisRef(int runId, String analysisUid) {
             this.runId = runId;
-            this.dataId = dataId;
-            this.analysisId = analysisId;
+            this.analysisUid = analysisUid;
         }
 
         public Bundle toBundle() {
             Bundle archive = new Bundle();
             archive.putInt(KEY_RUN_ID, runId);
-            archive.putInt(KEY_DATA_ID, dataId);
-            archive.putString(KEY_ANALYSIS_ID, analysisId);
+            archive.putString(KEY_ANALYSIS_UID, analysisUid);
             return archive;
         }
     }
 
     public static class AnalysisEntry {
         final public IDataAnalysis analysis;
+        final public String analysisUid;
         final public IAnalysisPlugin plugin;
         final public File storageDir;
 
-        public AnalysisEntry(IDataAnalysis analysis, IAnalysisPlugin plugin, File storageDir) {
+        public AnalysisEntry(IDataAnalysis analysis, String analysisUid, IAnalysisPlugin plugin, File storageDir) {
             this.analysis = analysis;
+            this.analysisUid = analysisUid;
             this.plugin = plugin;
             this.storageDir = storageDir;
         }
     }
 
-    public static class AnalysisDataEntry {
+    public static class AnalysisRunEntry {
         final public List<AnalysisEntry> analysisList = new ArrayList<>();
 
-        public AnalysisEntry getAnalysisEntry(String analysis) {
+        public AnalysisEntry getAnalysisEntry(String analysisUid) {
             for (AnalysisEntry analysisEntry : analysisList) {
-                if (analysisEntry.analysis.getIdentifier().equals(analysis))
+                if (analysisEntry.analysisUid.equals(analysisUid))
                     return analysisEntry;
             }
             return null;
         }
     }
 
-    public static class AnalysisRunEntry {
-        final public List<AnalysisDataEntry> analysisDataList = new ArrayList<>();
-    }
-
     protected ExperimentData experimentData = null;
 
     protected List<AnalysisRunEntry> analysisRuns = new ArrayList<>();
     protected AnalysisRunEntry currentAnalysisRun;
-    protected IDataAnalysis currentSensorAnalysis;
+    protected IDataAnalysis currentAnalysis;
 
     public int getNumberOfRuns() {
         return analysisRuns.size();
     }
 
-
-
-    public IDataAnalysis getCurrentSensorAnalysis() {
-        return currentSensorAnalysis;
+    public IDataAnalysis getCurrentAnalysis() {
+        return currentAnalysis;
     }
 
     static public File getAnalysisRunStorage(ExperimentData experimentData, int run) {
@@ -109,6 +100,15 @@ public class ExperimentAnalysis {
                 continue;
             return dir;
         }
+    }
+
+    protected String generateNewUid(IDataAnalysis dataAnalysis) {
+        CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", new java.util.Date());
+
+        String uid = dataAnalysis.getIdentifier();
+        uid += dateString + "_";
+        uid += (int)(100000f * Math.random());
+        return uid;
     }
 
     /**
@@ -136,9 +136,7 @@ public class ExperimentAnalysis {
                     if (analysisEntry == null)
                         continue;
 
-                    AnalysisDataEntry analysisDataEntry = new AnalysisDataEntry();
-                    analysisDataEntry.analysisList.add(analysisEntry);
-                    analysisRunEntry.analysisDataList.add(analysisDataEntry);
+                    analysisRunEntry.analysisList.add(analysisEntry);
                 }
             } else {
                 // assign analyses to the data
@@ -156,18 +154,17 @@ public class ExperimentAnalysis {
 
                     File storageDir = getAnalysisStorageFor(experimentData, runDataList.indexOf(runData), dataAnalysis);
 
-                    AnalysisDataEntry analysisDataEntry = new AnalysisDataEntry();
-                    analysisDataEntry.analysisList.add(new AnalysisEntry(dataAnalysis, plugin, storageDir));
-                    analysisRunEntry.analysisDataList.add(analysisDataEntry);
+                    analysisRunEntry.analysisList.add(new AnalysisEntry(dataAnalysis, generateNewUid(dataAnalysis),
+                            plugin, storageDir));
                 }
             }
         }
 
-        if (getNumberOfRuns() == 0 || getAnalysisRunAt(0).analysisDataList.size() == 0)
+        if (getNumberOfRuns() == 0 || getAnalysisRunAt(0).analysisList.size() == 0)
             return;
 
         setCurrentAnalysisRun(0);
-        setCurrentSensorAnalysis(0, 0);
+        setCurrentAnalysis(0);
     }
 
 
@@ -196,11 +193,11 @@ public class ExperimentAnalysis {
         if (index >= analysisRuns.size())
             return false;
         currentAnalysisRun = analysisRuns.get(index);
-        setCurrentSensorAnalysis(0, 0);
+        setCurrentAnalysis(0);
         return true;
     }
 
-    public void setCurrentSensorAnalysis(int sensor, int analysis) {
-        currentSensorAnalysis = currentAnalysisRun.analysisDataList.get(sensor).analysisList.get(analysis).analysis;
+    public void setCurrentAnalysis(int analysis) {
+        currentAnalysis = currentAnalysisRun.analysisList.get(analysis).analysis;
     }
 }

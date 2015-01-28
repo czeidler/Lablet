@@ -55,7 +55,7 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
 
             @Override
             public void onPageSelected(int position) {
-                experimentAnalysis.setCurrentSensorAnalysis(position, 0);
+                experimentAnalysis.setCurrentAnalysis(position);
 
                 // repopulate the menu
                 invalidateOptionsMenu();
@@ -86,19 +86,17 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
         final ExperimentData experimentData = experimentAnalysis.getExperimentData();
         List<ExperimentAnalysis.AnalysisRunEntry> analysisRuns = experimentAnalysis.getAnalysisRuns();
         for (ExperimentAnalysis.AnalysisRunEntry analysisRun : analysisRuns) {
-            for (ExperimentAnalysis.AnalysisDataEntry dataEntry : analysisRun.analysisDataList) {
-                for (ExperimentAnalysis.AnalysisEntry analysisEntry : dataEntry.analysisList) {
-                    try {
-                        IDataAnalysis analysis = analysisEntry.analysis;
-                        File storageDir = analysisEntry.storageDir;
-                        storageDir.mkdirs();
+            for (ExperimentAnalysis.AnalysisEntry analysisEntry : analysisRun.analysisList) {
+                try {
+                    IDataAnalysis analysis = analysisEntry.analysis;
+                    File storageDir = analysisEntry.storageDir;
+                    storageDir.mkdirs();
 
-                        ExperimentHelper.saveAnalysisData(analysisEntry.plugin, analysis, storageDir,
-                                experimentData.getRunDataList().get(analysisRuns.indexOf(analysisRun)).sensorDataList);
-                        exportTagMarkerCSVData(analysis, storageDir);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    ExperimentHelper.saveAnalysisData(analysisEntry, analysis, storageDir,
+                            experimentData.getRunDataList().get(analysisRuns.indexOf(analysisRun)).sensorDataList);
+                    exportTagMarkerCSVData(analysis, storageDir);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -139,13 +137,12 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
         }
 
         @Override
-        public android.support.v4.app.Fragment getItem(int sensor) {
+        public android.support.v4.app.Fragment getItem(int analysis) {
             int run = experimentAnalysis.getCurrentAnalysisRunIndex();
-            int analysisIndex = 0;
             ExperimentAnalysis.AnalysisEntry analysisEntry
-                    = experimentAnalysis.getCurrentAnalysisRun().analysisDataList.get(sensor).analysisList.get(analysisIndex);
-            ExperimentAnalysis.AnalysisRef analysisRef
-                    = new ExperimentAnalysis.AnalysisRef(run, sensor, analysisEntry.analysis.getIdentifier());
+                    = experimentAnalysis.getCurrentAnalysisRun().analysisList.get(analysis);
+
+            ExperimentAnalysis.AnalysisRef analysisRef = new ExperimentAnalysis.AnalysisRef(run, analysisEntry.analysisUid);
             return analysisEntry.plugin.createSensorAnalysisFragment(analysisRef);
         }
 
@@ -156,7 +153,7 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
             ExperimentAnalysis.AnalysisRunEntry currentAnalysisRun = experimentAnalysis.getCurrentAnalysisRun();
             if (currentAnalysisRun == null)
                 return 0;
-            return currentAnalysisRun.analysisDataList.size();
+            return currentAnalysisRun.analysisList.size();
         }
     }
 }

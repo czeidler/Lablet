@@ -52,6 +52,7 @@ public class ExperimentHelper {
     }
 
     final static private String PLUGIN_ID_KEY = "plugin_id";
+    final static private String ANALYSIS_UID_KEY = "analysis_uid";
     final static private String USED_DATA_KEY = "used_data";
     final static private String SENSOR_DATA_LIST_KEY = "sensor_data_list";
 
@@ -72,7 +73,7 @@ public class ExperimentHelper {
         for (int i = 0; i < dataList.length; i++)
             dataList[i] = allSensorData.get(integerList[i]);
 
-        String analysisPluginId= bundle.getString(PLUGIN_ID_KEY);
+        String analysisPluginId = bundle.getString(PLUGIN_ID_KEY);
         ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
         IAnalysisPlugin plugin = factory.findAnalysisPlugin(analysisPluginId);
         IDataAnalysis dataAnalysis = plugin.createDataAnalysis(dataList);
@@ -80,14 +81,17 @@ public class ExperimentHelper {
         if (!dataAnalysis.loadAnalysisData(analysisDataBundle, storageDir))
             return null;
 
-        return new ExperimentAnalysis.AnalysisEntry(dataAnalysis, plugin, storageDir);
+        String analysisUid = bundle.getString(ANALYSIS_UID_KEY);
+
+        return new ExperimentAnalysis.AnalysisEntry(dataAnalysis, analysisUid, plugin, storageDir);
     }
 
-    static public void saveAnalysisData(IAnalysisPlugin plugin, IDataAnalysis sensorAnalysis, File storageDir,
-                                        List<ISensorData> allSensorData) throws IOException {
+    static public void saveAnalysisData(ExperimentAnalysis.AnalysisEntry analysisEntry, IDataAnalysis sensorAnalysis,
+                                        File storageDir, List<ISensorData> allSensorData) throws IOException {
         Bundle bundle = new Bundle();
         // save plugin
-        bundle.putString(PLUGIN_ID_KEY, plugin.getIdentifier());
+        bundle.putString(PLUGIN_ID_KEY, analysisEntry.plugin.getIdentifier());
+        bundle.putString(ANALYSIS_UID_KEY, analysisEntry.plugin.getIdentifier());
 
         // save used data
         ISensorData[] dataList = sensorAnalysis.getData();
@@ -159,8 +163,7 @@ public class ExperimentHelper {
                                                        String experimentPath, Bundle options) {
 
         intent.putExtra("run_id", analysisRef.runId);
-        intent.putExtra("sensor_id", analysisRef.dataId);
-        intent.putExtra("analysis_id", analysisRef.analysisId);
+        intent.putExtra("analysis_id", analysisRef.analysisUid);
 
         intent.putExtra("experiment_path", experimentPath);
         if (options != null)

@@ -41,8 +41,7 @@ public class ExperimentAnalysisFragment extends android.support.v4.app.Fragment 
         final ExperimentAnalysis experimentAnalysis = experimentActivity.getExperimentAnalysis();
         analysisRef = new ExperimentAnalysis.AnalysisRef(getArguments());
         ExperimentAnalysis.AnalysisRunEntry runEntry = experimentAnalysis.getCurrentAnalysisRun();
-        sensorAnalysis = runEntry.analysisDataList.get(analysisRef.dataId).getAnalysisEntry(
-                analysisRef.analysisId).analysis;
+        sensorAnalysis = runEntry.getAnalysisEntry(analysisRef.analysisUid).analysis;
     }
 
     @Override
@@ -82,26 +81,25 @@ public class ExperimentAnalysisFragment extends android.support.v4.app.Fragment 
             }
         });
         // hide item if there is no more than one data
-        if (experimentAnalysis.getAnalysisRunAt(analysisRef.runId).analysisDataList.size() == 1)
+        if (experimentAnalysis.getAnalysisRunAt(analysisRef.runId).analysisList.size() == 1)
             dataItem.setVisible(false);
     }
 
     private void showDataMenu(ExperimentAnalysis experimentAnalysis) {
         final View menuView = getActivity().findViewById(R.id.action_data);
-        final List<ExperimentAnalysis.AnalysisDataEntry> dataList = experimentAnalysis.getAnalysisRunAt(
-                analysisRef.runId).analysisDataList;
         PopupMenu popup = new PopupMenu(getActivity(), menuView);
         final ViewPager pager = ((ExperimentAnalysisActivity) getActivity()).getViewPager();
-        int i = 0;
-        for (ExperimentAnalysis.AnalysisDataEntry entry : dataList) {
-            for (ExperimentAnalysis.AnalysisEntry analysisEntry : entry.analysisList) {
-                MenuItem item = popup.getMenu().add(1, i, Menu.NONE, analysisEntry.analysis.getDisplayName());
-                item.setCheckable(true);
 
-                if (pager.getCurrentItem() == i)
-                    item.setChecked(true);
-                i++;
-            }
+        final List<ExperimentAnalysis.AnalysisEntry> analysisList = experimentAnalysis.getAnalysisRunAt(
+                analysisRef.runId).analysisList;
+        int i = 0;
+        for (ExperimentAnalysis.AnalysisEntry analysisEntry : analysisList) {
+            MenuItem item = popup.getMenu().add(1, i, Menu.NONE, analysisEntry.analysis.getDisplayName());
+            item.setCheckable(true);
+
+            if (pager.getCurrentItem() == i)
+                item.setChecked(true);
+            i++;
         }
         popup.getMenu().setGroupCheckable(1, true, true);
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {

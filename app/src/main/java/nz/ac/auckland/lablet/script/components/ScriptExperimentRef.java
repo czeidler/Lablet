@@ -50,12 +50,10 @@ public class ScriptExperimentRef extends WeakListenable<ScriptExperimentRef.ILis
             return null;
 
         ExperimentAnalysis.AnalysisRunEntry experimentRun = experimentAnalysis.getAnalysisRunAt(run);
-        for (ExperimentAnalysis.AnalysisDataEntry analysisDataEntry : experimentRun.analysisDataList) {
-            for (ExperimentAnalysis.AnalysisEntry analysisEntry : analysisDataEntry.analysisList) {
+            for (ExperimentAnalysis.AnalysisEntry analysisEntry : experimentRun.analysisList) {
                 if (analysisEntry.analysis.getIdentifier().equals(analysisIdentifier))
                     return (T)(analysisEntry.analysis);
             }
-        }
         return null;
     }
 

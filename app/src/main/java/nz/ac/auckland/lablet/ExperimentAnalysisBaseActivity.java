@@ -46,7 +46,6 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
 
         String experimentPath = intent.getStringExtra("experiment_path");
         int runId = intent.getIntExtra("run_id", 0);
-        int sensorId = intent.getIntExtra("sensor_id", 0);
 
         ExperimentData experimentData = ExperimentHelper.loadExperimentData(experimentPath);
         if (!experimentData.getLoadError().equals("")) {
@@ -57,13 +56,13 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
         experimentAnalysis.setExperimentData(experimentData);
 
         if (experimentAnalysis.getNumberOfRuns() == 0
-                || experimentAnalysis.getAnalysisRunAt(0).analysisDataList.size() == 0) {
+                || experimentAnalysis.getAnalysisRunAt(0).analysisList.size() == 0) {
             showErrorAndFinish("No experiment found.");
             return false;
         }
 
         experimentAnalysis.setCurrentAnalysisRun(runId);
-        experimentAnalysis.setCurrentSensorAnalysis(sensorId, 0);
+        experimentAnalysis.setCurrentAnalysis(0);
         return true;
     }
 

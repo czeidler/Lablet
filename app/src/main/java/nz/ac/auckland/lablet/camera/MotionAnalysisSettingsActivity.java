@@ -134,7 +134,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        videoData = ((MotionAnalysis)experimentAnalysis.getCurrentSensorAnalysis()).getVideoData();
+        videoData = ((MotionAnalysis)experimentAnalysis.getCurrentAnalysis()).getVideoData();
 
         setContentView(R.layout.motion_analysis_settings);
 
@@ -241,7 +241,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         Bundle analysisSpecificData = extras.getBundle("analysisSpecificData");
         if (analysisSpecificData != null)
             runSettings = analysisSpecificData.getBundle("run_settings");
-        MotionAnalysis motionAnalysis = (MotionAnalysis)experimentAnalysis.getCurrentSensorAnalysis();
+        MotionAnalysis motionAnalysis = (MotionAnalysis)experimentAnalysis.getCurrentAnalysis();
         CalibrationVideoTimeData calibrationVideoTimeData = motionAnalysis.getCalibrationVideoTimeData();
         if (runSettings != null) {
             calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
