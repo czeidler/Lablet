@@ -28,7 +28,7 @@ class FrameRateHelper {
     }
 
     static public List<Float> getPossibleLowAnalysisFrameRates(float maxFrameRate) {
-        if (maxFrameRate > 10)
+        if (maxFrameRate > VideoData.LOW_FRAME_RATE)
             throw new RuntimeException("bad frame rate");
 
         List<Float> frameRateList = new ArrayList<>();

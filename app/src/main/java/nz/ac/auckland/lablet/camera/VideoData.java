@@ -137,8 +137,10 @@ public class VideoData extends AbstractSensorData {
         return videoDuration;
     }
 
+    final static int LOW_FRAME_RATE = 10;
+
     public boolean isRecordedAtReducedFrameRate() {
-        return recordingFrameRate < 30;
+        return recordingFrameRate < LOW_FRAME_RATE;
     }
 
     public void setRecordingFrameRate(float recordingFrameRate) {
