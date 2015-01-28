@@ -9,6 +9,7 @@ package nz.ac.auckland.lablet.script.components;
 
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -209,9 +210,9 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
     private CorrectPosAndVeloValues correctPosAndVeloValues = null;
     private CorrectAccelerationValues correctAccelerationValues = null;
 
-    private List<String> unitList = new ArrayList<>();
-    private String correctSpeedUnit = "[m/s]";
-    private String correctAccelerationUnit = "[m/s^2]";
+    private List<CharSequence> unitList = new ArrayList<>();
+    private CharSequence correctSpeedUnit = "[m/s]";
+    private CharSequence correctAccelerationUnit = Html.fromHtml("[m/s<sup><small>2</small></sup>]");
 
     protected MarkerDataModel tagMarker;
     protected ITimeData timeData;
@@ -285,12 +286,12 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
         unitList.add("[m]");
         unitList.add(correctSpeedUnit);
         unitList.add("[apples/s]");
-        unitList.add("[s^2/m]");
+        unitList.add(Html.fromHtml("[s<sup><small>2</small></sup>/m]"));
         unitList.add(correctAccelerationUnit);
-        unitList.add("[m^2/s^2]");
+        unitList.add(Html.fromHtml("[m<sup><small>2</small></sup>/s<sup><small>2</small></sup>]"));
         unitList.add("[s]");
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item, unitList);
 
         speedUnitSpinner.setAdapter(adapter);
@@ -575,7 +576,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
             return false;
         }
 
-        String unit = unitList.get(speedUnitSpinner.getSelectedItemPosition());
+        CharSequence unit = unitList.get(speedUnitSpinner.getSelectedItemPosition());
         if (!unit.equals(correctSpeedUnit))
             return false;
 
@@ -598,7 +599,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
             return false;
         }
 
-        String unit = unitList.get(accelerationUnitSpinner.getSelectedItemPosition());
+        CharSequence unit = unitList.get(accelerationUnitSpinner.getSelectedItemPosition());
         if (!unit.equals(correctAccelerationUnit))
             return false;
 
