@@ -433,7 +433,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
 
     private
     void installEditTextListener() {
-        position1EditText.addTextChangedListener(new TextWatcher() {
+        TextWatcher textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
 
@@ -446,79 +446,16 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
             public void afterTextChanged(Editable editable) {
                 update();
             }
-        });
-        position2EditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+        };
 
-            }
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+        position1EditText.addTextChangedListener(textWatcher);
+        position2EditText.addTextChangedListener(textWatcher);
+        position3EditText.addTextChangedListener(textWatcher);
 
-            }
-            @Override
-            public void afterTextChanged(Editable editable) {
-                update();
-            }
-        });
-        position3EditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+        speed1EditText.addTextChangedListener(textWatcher);
+        speed2EditText.addTextChangedListener(textWatcher);
 
-            }
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
-            }
-            @Override
-            public void afterTextChanged(Editable editable) {
-                update();
-            }
-        });
-
-        speed1EditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
-            }
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
-            }
-            @Override
-            public void afterTextChanged(Editable editable) {
-                update();
-            }
-        });
-        speed2EditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
-            }
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
-            }
-            @Override
-            public void afterTextChanged(Editable editable) {
-                update();
-            }
-        });
-
-        acceleration1EditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
-            }
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
-            }
-            @Override
-            public void afterTextChanged(Editable editable) {
-                update();
-            }
-        });
+        acceleration1EditText.addTextChangedListener(textWatcher);
     }
 
     private void setDone(boolean done) {
