@@ -17,7 +17,7 @@ public interface ITableAdapter {
     public int getColumnWeight(int column);
     public int getColumnCount();
 
-    public View getView(Context context, int row, int column);
+    public View getView(Context context, View recycle, int row, int column);
     public void updateView(View view, int row, int column);
 
     public void selectRow(int row);
