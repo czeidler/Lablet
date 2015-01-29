@@ -32,12 +32,11 @@ public class Fourier {
         return transformInternal(trafo);
     }
 
-    static public float[] transformOverlap(float[] prevAmplitudes, float[] amplitudes, float stepFactor) {
+    static public float[] transformOverlap(float[] prevAmplitudes, float[] amplitudes, int startPosition) {
         final int length = amplitudes.length;
-        final int step = (int)(length * stepFactor);
         final float trafo[] = new float[length];
-        System.arraycopy(prevAmplitudes, step, trafo, 0, length - step);
-        System.arraycopy(amplitudes, 0, trafo, length - step, step);
+        System.arraycopy(prevAmplitudes, startPosition, trafo, 0, length - startPosition);
+        System.arraycopy(amplitudes, 0, trafo, length - startPosition, startPosition);
         return transformInternal(trafo);
     }
 

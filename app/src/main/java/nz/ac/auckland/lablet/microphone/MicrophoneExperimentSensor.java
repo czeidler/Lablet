@@ -70,10 +70,14 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
 
         listener.onNewAmplitudeData(amplitudes);
 
-        // currently only works with stepFactor 0.5f
         if (prevAmplitudes != null) {
-            float[] frequencies = Fourier.transformOverlap(prevAmplitudes, amplitudes, liveStepFactor);
-            listener.onNewFrequencyData(frequencies);
+            int stepSize =  (int)(amplitudes.length * liveStepFactor);
+            int stepPosition = stepSize;
+            while (stepPosition < amplitudes.length) {
+                float[] frequencies = Fourier.transformOverlap(prevAmplitudes, amplitudes, stepPosition);
+                listener.onNewFrequencyData(frequencies);
+                stepPosition += stepSize;
+            }
         }
         float[] frequencies = Fourier.transform(amplitudes);
         listener.onNewFrequencyData(frequencies);
