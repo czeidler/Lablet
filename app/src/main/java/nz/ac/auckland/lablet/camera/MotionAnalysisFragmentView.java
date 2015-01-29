@@ -268,6 +268,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
         tableView = (TableView)sideBarView.findViewById(R.id.tableView);
         assert tableView != null;
+        tableView.setColumnWeights(1f, 1.8f, 1.4f, 1.4f);
         tableView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

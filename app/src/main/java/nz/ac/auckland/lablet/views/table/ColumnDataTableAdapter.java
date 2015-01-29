@@ -106,15 +106,11 @@ public class ColumnDataTableAdapter extends WeakListenable<ITableAdapter.IListen
     }
 
     @Override
-    public View getView(Context context, View recycle, int row, int column) throws IndexOutOfBoundsException {
+    public View getView(Context context, int row, int column) throws IndexOutOfBoundsException {
         if (row == 0)
             return makeHeaderCell(context, column);
 
-        TextView textView;
-        if (recycle == null)
-            textView = new TextView(context);
-        else
-            textView = (TextView)recycle;
+        TextView textView = new TextView(context);
         textView.setTextColor(Color.BLACK);
         textView.setBackgroundColor(Color.WHITE);
 
