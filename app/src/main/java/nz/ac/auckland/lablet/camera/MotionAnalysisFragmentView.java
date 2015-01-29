@@ -126,7 +126,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
     final private GraphView2D graphView;
     final private Spinner graphSpinner;
     final private ViewGroup sideBarView;
-    final private ScrollView scrollView;
     final private TableView tableView;
     final private MotionAnalysisSideBar sideBar;
     final private FrameDataSeekBar frameDataSeekBar;
@@ -206,7 +205,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
             sideBarView.setAlpha(0.4f);
             graphView.setClickable(false);
 
-            scrollView.setVisibility(GONE);
+            tableView.setVisibility(GONE);
             ViewGroup.LayoutParams params = sideBarView.getLayoutParams();
             params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
             sideBarView.setLayoutParams(params);
@@ -221,7 +220,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
             ViewGroup.LayoutParams params = sideBarView.getLayoutParams();
             params.height = ViewGroup.LayoutParams.MATCH_PARENT;
             sideBarView.setLayoutParams(params);
-            scrollView.setVisibility(VISIBLE);
+            tableView.setVisibility(VISIBLE);
         }
 
         @Override
@@ -278,9 +277,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
                 sensorAnalysis.getFrameDataModel().setCurrentFrame(i - 1);
             }
         });
-
-        scrollView = (ScrollView)sideBarView.findViewById(R.id.scrollView);
-        assert tableView != null;
 
         final View sensorAnalysisView = new CameraExperimentFrameView(context, sensorAnalysis);
         if (sensorAnalysisView == null)

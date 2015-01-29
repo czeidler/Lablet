@@ -33,13 +33,8 @@
           class="nz.ac.auckland.lablet.views.graph.GraphView2D" android:id="@+id/tagMarkerGraphView"
           android:layout_gravity="center_horizontal"/>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/scrollView" android:layout_gravity="center_horizontal" android:fillViewport="true">
-
-        <view android:layout_width="match_parent"
+    <view android:layout_width="match_parent"
               android:layout_height="match_parent"
               class="nz.ac.auckland.lablet.views.table.TableView" android:id="@+id/tableView"/>
-    </ScrollView>
+
 </LinearLayout>
