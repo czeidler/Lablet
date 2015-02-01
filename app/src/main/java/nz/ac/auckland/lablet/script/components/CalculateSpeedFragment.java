@@ -297,7 +297,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
         speedUnitSpinner.setAdapter(adapter);
         accelerationUnitSpinner.setAdapter(adapter);
 
-        speedUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        AdapterView.OnItemSelectedListener onItemSelectedListener = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 update();
@@ -307,18 +307,9 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
             public void onNothingSelected(AdapterView<?> adapterView) {
 
             }
-        });
-        accelerationUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                update();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
+        };
+        speedUnitSpinner.setOnItemSelectedListener(onItemSelectedListener);
+        accelerationUnitSpinner.setOnItemSelectedListener(onItemSelectedListener);
 
         return view;
     }
@@ -432,8 +423,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
         update();
     }
 
-    private
-    void installEditTextListener() {
+    private void installEditTextListener() {
         TextWatcher textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
