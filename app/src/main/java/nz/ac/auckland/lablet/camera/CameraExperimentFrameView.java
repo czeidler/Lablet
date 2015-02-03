@@ -10,19 +10,15 @@ package nz.ac.auckland.lablet.camera;
 import android.content.Context;
 import android.graphics.*;
 import android.view.View;
-import nz.ac.auckland.lablet.views.IExperimentFrameView;
 import nz.ac.auckland.lablet.views.VideoFrameView;
 
 import java.io.File;
 
 
 /**
- * Implementation of {@link nz.ac.auckland.lablet.views.IExperimentFrameView}.
- * <p>
  * Displays the video at a certain frame, depending on the current run value.
- * </p>
  */
-class CameraExperimentFrameView extends VideoFrameView implements IExperimentFrameView {
+class CameraExperimentFrameView extends VideoFrameView {
     final private MotionAnalysis motionAnalysis;
     final private VideoData sensorData;
     private int currentRun = -1;
@@ -33,14 +29,13 @@ class CameraExperimentFrameView extends VideoFrameView implements IExperimentFra
         setWillNotDraw(false);
 
         this.motionAnalysis = motionAnalysis;
-        this.sensorData = (VideoData)motionAnalysis.getVideoData();
+        this.sensorData = motionAnalysis.getVideoData();
 
         File storageDir = motionAnalysis.getVideoData().getStorageDir();
         File videoFile = new File(storageDir, sensorData.getVideoFileName());
         setVideoFilePath(videoFile.getPath());
     }
 
-    @Override
     public void setCurrentFrame(int frame) {
         currentRun = frame;
         CalibrationVideoTimeData timeData = motionAnalysis.getCalibrationVideoTimeData();
@@ -60,7 +55,6 @@ class CameraExperimentFrameView extends VideoFrameView implements IExperimentFra
             setCurrentFrame(currentRun);
     }
 
-    @Override
     public RectF getDataRange() {
         RectF range = new RectF();
         range.left = 0;

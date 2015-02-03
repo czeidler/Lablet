@@ -278,10 +278,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
             }
         });
 
-        final View sensorAnalysisView = new CameraExperimentFrameView(context, sensorAnalysis);
-        if (sensorAnalysisView == null)
-            return;
-
+        final CameraExperimentFrameView sensorAnalysisView = new CameraExperimentFrameView(context, sensorAnalysis);
         frameDataSeekBar.setTo(sensorAnalysis.getFrameDataModel(), sensorAnalysis.getTimeData());
 
         runContainerView.setTo(sensorAnalysisView, frameDataSeekBar, sensorAnalysis);

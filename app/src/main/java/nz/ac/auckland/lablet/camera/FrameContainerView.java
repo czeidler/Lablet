@@ -29,14 +29,14 @@ import nz.ac.auckland.lablet.views.*;
 
 
 /**
- * Container for the {@link nz.ac.auckland.lablet.views.IExperimentFrameView} and a marker view overlay.
+ * Container for the {@link nz.ac.auckland.lablet.camera.CameraExperimentFrameView} and a marker view overlay.
  * <p>
  * The resize behaviour of the run view is copied and the marker view is put exactly on top of the run view. In this way
  * the screen coordinates of the run view and the marker view are the same.
  * </p>
  */
 public class FrameContainerView extends RelativeLayout {
-    private View videoAnalysisView = null;
+    private CameraExperimentFrameView videoAnalysisView = null;
     private FrameDataSeekBar seekBar;
     private MarkerView markerView = null;
     private TagMarkerDataModelPainter painter = null;
@@ -50,7 +50,7 @@ public class FrameContainerView extends RelativeLayout {
     private FrameDataModel.IListener frameDataModelListener = new FrameDataModel.IListener() {
         @Override
         public void onFrameChanged(int newFrame) {
-            ((IExperimentFrameView) videoAnalysisView).setCurrentFrame(newFrame);
+            videoAnalysisView.setCurrentFrame(newFrame);
             markerView.setCurrentFrame(newFrame, null);
             markerView.invalidate();
             seekBarManager.open();
@@ -241,7 +241,7 @@ public class FrameContainerView extends RelativeLayout {
         }
     }
 
-    public void setTo(View runView, FrameDataSeekBar seekBar, MotionAnalysis analysis) {
+    public void setTo(CameraExperimentFrameView runView, FrameDataSeekBar seekBar, MotionAnalysis analysis) {
         this.seekBar = seekBar;
         seekBarManager = new SeekBarManager();
 
@@ -282,7 +282,7 @@ public class FrameContainerView extends RelativeLayout {
         markerView = new MarkerView(getContext());
         addView(markerView, makerViewParams);
 
-        RectF range = ((IExperimentFrameView) videoAnalysisView).getDataRange();
+        RectF range = videoAnalysisView.getDataRange();
         markerView.setRange(range);
         markerView.setMaxRange(range);
 
