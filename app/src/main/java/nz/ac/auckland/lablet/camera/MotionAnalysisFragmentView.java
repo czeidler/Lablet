@@ -282,9 +282,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
         frameDataSeekBar.setTo(sensorAnalysis.getFrameDataModel(), sensorAnalysis.getTimeData());
 
         runContainerView.setTo(sensorAnalysisView, frameDataSeekBar, sensorAnalysis);
-        runContainerView.addTagMarkerData(sensorAnalysis.getTagMarkers());
-        runContainerView.addXYCalibrationData(sensorAnalysis.getXYCalibrationMarkers());
-        runContainerView.addOriginData(sensorAnalysis.getOriginMarkers(), sensorAnalysis.getCalibrationXY());
 
         final Unit xUnit = sensorAnalysis.getXUnit();
         final Unit yUnit = sensorAnalysis.getYUnit();

@@ -24,6 +24,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
+import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.*;
 
@@ -41,7 +42,7 @@ public class FrameContainerView extends RelativeLayout {
     private MarkerView markerView = null;
     private TagMarkerDataModelPainter painter = null;
     private FrameDataModel frameDataModel = null;
-    private MotionAnalysis sensorAnalysis = null;
+    private MotionAnalysis motionAnalysis = null;
     private OriginMarkerPainter originMarkerPainter = null;
 
     private GestureDetector gestureDetector;
@@ -245,14 +246,14 @@ public class FrameContainerView extends RelativeLayout {
         this.seekBar = seekBar;
         seekBarManager = new SeekBarManager();
 
-        if (sensorAnalysis != null)
-            sensorAnalysis.removeListener(motionAnalysisListener);
-        sensorAnalysis = analysis;
-        sensorAnalysis.addListener(motionAnalysisListener);
+        if (motionAnalysis != null)
+            motionAnalysis.removeListener(motionAnalysisListener);
+        motionAnalysis = analysis;
+        motionAnalysis.addListener(motionAnalysisListener);
 
         if (frameDataModel != null)
             frameDataModel.removeListener(frameDataModelListener);
-        frameDataModel = sensorAnalysis.getFrameDataModel();
+        frameDataModel = motionAnalysis.getFrameDataModel();
         frameDataModel.addListener(frameDataModelListener);
 
         videoAnalysisView = runView;
@@ -293,35 +294,64 @@ public class FrameContainerView extends RelativeLayout {
                 return gestureDetector.onTouchEvent(motionEvent);
             }
         });
+
+        initData();
     }
 
-    public void addTagMarkerData(MarkerDataModel data) {
-        painter = new TagMarkerDataModelPainter(data);
+    private MarkerDataModel.IListener tagDataListener = new MarkerDataModel.IListener() {
+        @Override
+        public void onDataAdded(MarkerDataModel model, int index) {
+
+        }
+
+        @Override
+        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
+
+        }
+
+        @Override
+        public void onDataChanged(MarkerDataModel model, int index, int number) {
+            seekBarManager.open();
+        }
+
+        @Override
+        public void onAllDataChanged(MarkerDataModel model) {
+
+        }
+
+        @Override
+        public void onDataSelected(MarkerDataModel model, int index) {
+
+        }
+    };
+
+    public void initData() {
+        // tag markers
+        MarkerDataModel tagMarkers = motionAnalysis.getTagMarkers();
+        tagMarkers.addListener(tagDataListener);
+        painter = new TagMarkerDataModelPainter(tagMarkers);
         markerView.addPlotPainter(painter);
 
         frameDataModelListener.onFrameChanged(frameDataModel.getCurrentFrame());
-    }
 
-    public void addXYCalibrationData(MarkerDataModel data) {
-        CalibrationMarkerPainter painter = new CalibrationMarkerPainter(data);
+        // calibration markers
+        MarkerDataModel calibrationMarkers = motionAnalysis.getXYCalibrationMarkers();
+        CalibrationMarkerPainter painter = new CalibrationMarkerPainter(calibrationMarkers);
         markerView.addPlotPainter(painter);
-    }
 
-    public void removeOriginData() {
-        markerView.removePlotPainter(originMarkerPainter);
-    }
-
-    public void addOriginData(MarkerDataModel data, CalibrationXY calibrationXY) {
-        originMarkerPainter = new OriginMarkerPainter(data, calibrationXY);
-        if (sensorAnalysis.getShowCoordinateSystem())
+        // origin markers
+        MarkerDataModel originMarkers = motionAnalysis.getOriginMarkers();
+        CalibrationXY calibrationXY = motionAnalysis.getCalibrationXY();
+        originMarkerPainter = new OriginMarkerPainter(originMarkers, calibrationXY);
+        if (motionAnalysis.getShowCoordinateSystem())
             markerView.addPlotPainter(originMarkerPainter);
     }
 
     public void release() {
         if (markerView != null)
             markerView.release();
-        if (sensorAnalysis != null)
-            sensorAnalysis.removeListener(motionAnalysisListener);
+        if (motionAnalysis != null)
+            motionAnalysis.removeListener(motionAnalysisListener);
         if (frameDataModel != null)
             frameDataModel.removeListener(frameDataModelListener);
     }
@@ -331,7 +361,7 @@ public class FrameContainerView extends RelativeLayout {
      */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (sensorAnalysis == null) {
+        if (motionAnalysis == null) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             return;
         }
