@@ -92,8 +92,6 @@ public class FrameContainerView extends RelativeLayout {
                 return;
             open = true;
 
-            seekBar.setVisibility(View.VISIBLE);
-
             animate(FrameContainerView.this.getHeight(), FrameContainerView.this.getHeight() - seekBar.getHeight(),
                     new AnimatorListenerAdapter() {
                 @Override
@@ -103,32 +101,30 @@ public class FrameContainerView extends RelativeLayout {
                 }
 
                 @Override
-                public void onAnimationCancel(Animator animation) {
-                    animator = null;
+                public void onAnimationStart(Animator animation) {
+                    seekBar.setVisibility(View.VISIBLE);
                 }
             });
         }
 
         private void close() {
+            if (!open)
+                return;
+            open = false;
+
             animate(FrameContainerView.this.getHeight() - seekBar.getHeight(), FrameContainerView.this.getHeight(),
                     new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     animator = null;
-                    open = false;
                     seekBar.setVisibility(INVISIBLE);
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                    animator = null;
                 }
             });
         }
 
         private void animate(int startY, int endY, AnimatorListenerAdapter listener) {
             // startY == endY == 0 can happen during init, wait for the real open event
-            if (startY == endY) {
+            if (startY == 0 && endY == 0) {
                 open = false;
                 return;
             }
