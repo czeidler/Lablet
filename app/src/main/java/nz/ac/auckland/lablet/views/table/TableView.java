@@ -200,19 +200,28 @@ public class TableView extends ListView {
             RowView rowView;
             if (view != null) {
                 rowView = (RowView) view;
-                rowView.removeAllViews();
+                if (rowView.getChildCount() != adapter.getColumnCount())
+                    rowView.removeAllViews();
             } else
                 rowView = new RowView(viewGroup.getContext());
 
             for (int column = 0; column < adapter.getColumnCount(); column++) {
-                View cell = adapter.getView(viewGroup.getContext(), row, column);
+                View cell;
+                if (rowView.getChildCount() > column) {
+                    // recycle cell
+                    cell = rowView.getChildAt(column);
+                    adapter.getView(viewGroup.getContext(), cell, row, column);
+                } else {
+                    cell = adapter.getView(viewGroup.getContext(), null, row, column);
+                    rowView.addView(cell);
+                }
+
                 if (row == 0)
                     cell.setBackgroundColor(headerRowBackgroundColor);
                 else if (row == selectedRow)
                     cell.setBackgroundColor(selectedRowColor);
                 else
                     cell.setBackgroundColor(rowBackgroundColor);
-                rowView.addView(cell);
             }
 
             return rowView;

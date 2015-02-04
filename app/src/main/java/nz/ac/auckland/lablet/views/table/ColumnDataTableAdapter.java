@@ -78,15 +78,6 @@ public class ColumnDataTableAdapter extends WeakListenable<ITableAdapter.IListen
     }
 
     @Override
-    public void updateView(View view, int row, int column) {
-        if (row == 0) {
-            populateHeaderView((TextView)view, column);
-            return;
-        }
-        populateTextView((TextView)view, row, column);
-    }
-
-    @Override
     public void selectRow(int row) {
 
     }
@@ -96,21 +87,20 @@ public class ColumnDataTableAdapter extends WeakListenable<ITableAdapter.IListen
         return -1;
     }
 
-
-    private View makeHeaderCell(Context context, int column) {
-        TextView textView = new TextView(context);
-        textView.setTextColor(Color.WHITE);
-
-        populateHeaderView(textView, column);
-        return textView;
-    }
-
     @Override
-    public View getView(Context context, int row, int column) throws IndexOutOfBoundsException {
-        if (row == 0)
-            return makeHeaderCell(context, column);
+    public View getView(Context context, View recycleView, int row, int column) throws IndexOutOfBoundsException {
+        TextView textView;
+        if (recycleView == null)
+            textView = new TextView(context);
+        else
+            textView = (TextView)recycleView;
 
-        TextView textView = new TextView(context);
+        if (row == 0) {
+            textView.setTextColor(Color.WHITE);
+            populateHeaderView(textView, column);
+            return textView;
+        }
+
         textView.setTextColor(Color.BLACK);
         textView.setBackgroundColor(Color.WHITE);
 
