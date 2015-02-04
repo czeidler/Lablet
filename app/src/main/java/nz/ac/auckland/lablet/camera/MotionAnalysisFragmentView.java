@@ -291,7 +291,9 @@ class MotionAnalysisFragmentView extends FrameLayout {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (i == 0)
                     return;
-                sensorAnalysis.getFrameDataModel().setCurrentFrame(i - 1);
+                // ignore header row
+                int frameId = sensorAnalysis.getTagMarkers().getMarkerDataAt(i - 1).getId();
+                sensorAnalysis.getFrameDataModel().setCurrentFrame(frameId);
             }
         });
 
