@@ -56,10 +56,13 @@ class MotionAnalysisSideBar extends WeakListenable<MotionAnalysisSideBar.IListen
     }
 
     public void open() {
+        if (open)
+            return;
+        open = true;
+        notifyOnOpened();
+
         if (animator != null)
             animator.cancel();
-
-        sideBar.setVisibility(View.VISIBLE);
 
         animator = new AnimatorSet();
         int width = parent.getWidth();
@@ -68,21 +71,24 @@ class MotionAnalysisSideBar extends WeakListenable<MotionAnalysisSideBar.IListen
         animator.setInterpolator(new DecelerateInterpolator());
         animator.addListener(new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationEnd(Animator animation) {
-                animator = null;
-                open = true;
-                notifyOnOpened();
+            public void onAnimationStart(Animator animation) {
+                sideBar.setVisibility(View.VISIBLE);
             }
 
             @Override
-            public void onAnimationCancel(Animator animation) {
-                sideBar.setVisibility(View.INVISIBLE);
+            public void onAnimationEnd(Animator animation) {
+                animator = null;
             }
         });
         animator.start();
     }
 
     public void close() {
+        if (!open)
+            return;
+        open = false;
+        notifyOnClosed();
+
         if (animator != null)
             animator.cancel();
 
@@ -95,14 +101,6 @@ class MotionAnalysisSideBar extends WeakListenable<MotionAnalysisSideBar.IListen
             @Override
             public void onAnimationEnd(Animator animation) {
                 animator = null;
-                open = false;
-                notifyOnClosed();
-
-                sideBar.setVisibility(View.INVISIBLE);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
                 sideBar.setVisibility(View.INVISIBLE);
             }
         });
@@ -246,6 +244,25 @@ class MotionAnalysisFragmentView extends FrameLayout {
         }
     }
 
+    // keep hard reference to the listener!
+    private MotionAnalysisSideBar.IListener sideBarListener = new MotionAnalysisSideBar.IListener() {
+        @Override
+        public void onOpened() {
+            if (releaseAdaptersWhenDrawerClosed) {
+                selectGraphAdapter(graphSpinner.getSelectedItemPosition());
+                tableView.setAdapter(markerDataTableAdapter);
+            }
+        }
+
+        @Override
+        public void onClosed() {
+            if (releaseAdaptersWhenDrawerClosed) {
+                tableView.setAdapter((ITableAdapter) null);
+                selectGraphAdapter(-1);
+            }
+        }
+    };
+
     public MotionAnalysisFragmentView(Context context, final MotionAnalysis sensorAnalysis) {
         super(context);
 
@@ -334,23 +351,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
         });
 
         // setup the load/ unloading of the view data adapters
-        sideBar.addListener(new MotionAnalysisSideBar.IListener() {
-            @Override
-            public void onOpened() {
-                if (releaseAdaptersWhenDrawerClosed) {
-                    selectGraphAdapter(graphSpinner.getSelectedItemPosition());
-                    tableView.setAdapter(markerDataTableAdapter);
-                }
-            }
-
-            @Override
-            public void onClosed() {
-                if (releaseAdaptersWhenDrawerClosed) {
-                    tableView.setAdapter((ITableAdapter) null);
-                    selectGraphAdapter(-1);
-                }
-            }
-        });
+        sideBar.addListener(sideBarListener);
 
         if (!releaseAdaptersWhenDrawerClosed) {
             tableView.setAdapter(markerDataTableAdapter);
