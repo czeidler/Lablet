@@ -22,7 +22,7 @@ public class FrequencyAnalysis implements IDataAnalysis {
 
     final private MarkerDataModel hCursorMarkerModel;
     final private MarkerDataModel vCursorMarkerModel;
-    final private Unit xUnit = new Unit("s");
+    final private Unit xUnit = new Unit("s", Unit.MILLI);
     final private Unit yUnit = new Unit("Hz");
     final private FreqMapDisplaySettings freqMapDisplaySettings = new FreqMapDisplaySettings();
 

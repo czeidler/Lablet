@@ -68,7 +68,7 @@ public class YAxisView extends AbstractYAxis {
         // tick labels
         optimalWidth += maxLabelWidth + settings.getSpacing();
         // title and uni
-        if (!title.equals("") || !unit.equals(""))
+        if (!title.equals("") || !unit.getTotalUnit().equals(""))
             optimalWidth += labelHeight + settings.getSpacing();
 
         return optimalWidth;
@@ -90,14 +90,14 @@ public class YAxisView extends AbstractYAxis {
     protected void onDraw(Canvas canvas) {
         final float titleHeight = titlePaint.descent() - titlePaint.ascent();
 
-        boolean hasLabel = !title.equals("");
-        boolean hasUnit = !unit.equals("");
-        if (hasLabel || hasUnit) {
+        boolean hasTitle = !title.equals("");
+        boolean hasUnit = !unit.getTotalUnit().equals("");
+        if (hasTitle || hasUnit) {
             String completeLabel = title;
-            if (hasLabel && hasUnit)
+            if (hasTitle && hasUnit)
                 completeLabel += " ";
             if (hasUnit)
-                completeLabel += "[" + unit + "]";
+                completeLabel += "[" + unit.getTotalUnit() + "]";
             canvas.save();
             canvas.translate(titleHeight, (getHeight() + titlePaint.measureText(completeLabel)) / 2);
             canvas.rotate(-90);

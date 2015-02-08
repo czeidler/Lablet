@@ -90,7 +90,7 @@ class PreviewViewState implements AbstractExperimentSensor.State {
         amplitudePlotView.setYRange(MicrophoneExperimentSensorView.Settings.amplitudeMin,
                 MicrophoneExperimentSensorView.Settings.amplitudeMax);
         amplitudePlotView.getTitleView().setTitle("Signal Strength Vs Time");
-        amplitudePlotView.getXAxisView().setUnit("ms");
+        amplitudePlotView.getXAxisView().setUnit(experimentSensor.getTimeUnit());
         amplitudePlotView.getXAxisView().setTitle("Time");
         //amplitudePlotView.getBackgroundPainter().setShowYGrid(true);
 
@@ -104,9 +104,9 @@ class PreviewViewState implements AbstractExperimentSensor.State {
         frequencyMapPlotView.setYDraggable(true);
         frequencyMapPlotView.setXZoomable(true);
         frequencyMapPlotView.setYZoomable(true);
-        frequencyMapPlotView.getYAxisView().setUnit("Hz");
+        frequencyMapPlotView.getYAxisView().setUnit(experimentSensor.getFrequencyUnit());
         frequencyMapPlotView.getYAxisView().setTitle("Frequency");
-        frequencyMapPlotView.getXAxisView().setUnit("ms");
+        frequencyMapPlotView.getXAxisView().setUnit(experimentSensor.getTimeUnit());
         frequencyMapPlotView.getXAxisView().setTitle("Time");
 
         mainView.setVisibility(View.VISIBLE);
@@ -167,7 +167,7 @@ class RecordingViewState implements AbstractExperimentSensor.State {
         amplitudePlotView.setYRange(MicrophoneExperimentSensorView.Settings.amplitudeMin,
                 MicrophoneExperimentSensorView.Settings.amplitudeMax);
         amplitudePlotView.getTitleView().setTitle("Signal Strength Vs Time");
-        amplitudePlotView.getXAxisView().setUnit("ms");
+        amplitudePlotView.getXAxisView().setUnit(experimentSensor.getTimeUnit());
         amplitudePlotView.getXAxisView().setTitle("Time");
         //amplitudePlotView.getBackgroundPainter().setShowYGrid(true);
         amplitudePlotView.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_DISABLED);
@@ -181,9 +181,9 @@ class RecordingViewState implements AbstractExperimentSensor.State {
         frequencyMapPlotView.setXZoomable(false);
         frequencyMapPlotView.setYZoomable(false);
         frequencyMapPlotView.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_DISABLED);
-        frequencyMapPlotView.getYAxisView().setUnit("Hz");
+        frequencyMapPlotView.getYAxisView().setUnit(experimentSensor.getFrequencyUnit());
         frequencyMapPlotView.getYAxisView().setTitle("Frequency");
-        frequencyMapPlotView.getXAxisView().setUnit("ms");
+        frequencyMapPlotView.getXAxisView().setUnit(experimentSensor.getTimeUnit());
         frequencyMapPlotView.getXAxisView().setTitle("Time");
 
 
@@ -253,7 +253,7 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
         amplitudeView.setYRange(MicrophoneExperimentSensorView.Settings.amplitudeMin,
                 MicrophoneExperimentSensorView.Settings.amplitudeMax);
         amplitudeView.getTitleView().setTitle("Signal Strength Vs Time");
-        amplitudeView.getXAxisView().setUnit("ms");
+        amplitudeView.getXAxisView().setUnit(experimentSensor.getTimeUnit());
         amplitudeView.getXAxisView().setTitle("Time");
         amplitudeView.setAutoRange(PlotView.AUTO_RANGE_ZOOM_EXTENDING, PlotView.AUTO_RANGE_ZOOM_EXTENDING);
 

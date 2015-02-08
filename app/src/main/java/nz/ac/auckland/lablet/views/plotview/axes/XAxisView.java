@@ -52,7 +52,7 @@ public class XAxisView extends AbstractXAxis {
         // axis
         float optimalHeight = settings.getFullTickSize() + titleHeight;
         // title and uni
-        if (!title.equals("") || !unit.equals(""))
+        if (!title.equals("") || !unit.getTotalUnit().equals(""))
             optimalHeight += titleHeight;
 
         return optimalHeight;
@@ -71,14 +71,14 @@ public class XAxisView extends AbstractXAxis {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        boolean hasLabel = !title.equals("");
-        boolean hasUnit = !unit.equals("");
-        if (hasLabel || hasUnit) {
+        boolean hasTitle = !title.equals("");
+        boolean hasUnit = !unit.getTotalUnit().equals("");
+        if (hasTitle || hasUnit) {
             String completeLabel = title;
-            if (hasLabel && hasUnit)
+            if (hasTitle && hasUnit)
                 completeLabel += " ";
             if (hasUnit)
-                completeLabel += "[" + unit + "]";
+                completeLabel += "[" + unit.getTotalUnit() + "]";
 
             canvas.drawText(completeLabel, getWidth() / 2 - titlePaint.measureText(completeLabel) / 2,
                     getHeight() - titlePaint.descent(), titlePaint);

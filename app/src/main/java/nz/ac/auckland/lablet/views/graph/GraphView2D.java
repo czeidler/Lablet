@@ -13,7 +13,7 @@ import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
+import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.views.ZoomDialog;
 import nz.ac.auckland.lablet.views.plotview.*;
 
@@ -25,7 +25,8 @@ abstract class AbstractGraphAdapter extends AbstractXYDataAdapter {
     public interface IGraphDataAxis {
         int size();
         Number getValue(int index);
-        String getLabel();
+        String getTitle();
+        Unit getUnit();
         Number getMinRange();
     }
 
@@ -184,8 +185,10 @@ public class GraphView2D extends PlotView {
             return;
 
         getTitleView().setTitle(adapter.getTitle());
-        getXAxisView().setTitle(this.adapter.getXAxis().getLabel());
-        getYAxisView().setTitle(this.adapter.getYAxis().getLabel());
+        getXAxisView().setTitle(this.adapter.getXAxis().getTitle());
+        getXAxisView().setUnit(this.adapter.getXAxis().getUnit());
+        getYAxisView().setTitle(this.adapter.getYAxis().getTitle());
+        getYAxisView().setUnit(this.adapter.getYAxis().getUnit());
 
         setMinXRange(this.adapter.getXAxis().getMinRange().floatValue());
         setMinYRange(this.adapter.getYAxis().getMinRange().floatValue());

@@ -21,6 +21,7 @@ import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.AnimatedTabHostListener;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
+import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.views.*;
 import nz.ac.auckland.lablet.views.plotview.*;
 
@@ -80,7 +81,7 @@ public class FrequencyAnalysisView extends FrameLayout {
 
         this.frequencyAnalysis = analysis;
         this.freqMapDisplaySettings = analysis.getFreqMapDisplaySettings();
-        AudioData micSensorData = (AudioData) analysis.getAudioData();
+        AudioData micSensorData = analysis.getAudioData();
 
         File audioFile = micSensorData.getAudioFile();
         AudioWavInputStream audioWavInputStream;
@@ -324,9 +325,9 @@ public class FrequencyAnalysisView extends FrameLayout {
         frequencyMapPlotView.setYDraggable(true);
         frequencyMapPlotView.setXZoomable(true);
         frequencyMapPlotView.setYZoomable(true);
-        frequencyMapPlotView.getXAxisView().setUnit("ms");
+        frequencyMapPlotView.getXAxisView().setUnit(frequencyAnalysis.getXUnit());
         frequencyMapPlotView.getXAxisView().setTitle("Time");
-        frequencyMapPlotView.getYAxisView().setUnit("Hz");
+        frequencyMapPlotView.getYAxisView().setUnit(frequencyAnalysis.getYUnit());
         frequencyMapPlotView.getYAxisView().setTitle("Frequency");
         // set the listener after the initialization so that we don't get confused by the notifications
         frequencyView.setRangeListener(new RangeDrawingView.IRangeListener() {

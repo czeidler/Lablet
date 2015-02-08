@@ -34,8 +34,13 @@ public class TimeMarkerGraphAxis extends MarkerTimeGraphAxis {
     }
 
     @Override
-    public String getLabel() {
-        return tUnit.getName() + " [" + tUnit.getTotalUnit() + "]";
+    public String getTitle() {
+        return tUnit.getName();
+    }
+
+    @Override
+    public Unit getUnit() {
+        return tUnit;
     }
 
     @Override

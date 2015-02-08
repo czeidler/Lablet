@@ -33,8 +33,13 @@ public class YPositionMarkerGraphAxis extends MarkerGraphAxis {
     }
 
     @Override
-    public String getLabel() {
-        return unit.getName() + " [" + unit.getTotalUnit() + "]";
+    public String getTitle() {
+        return unit.getName();
+    }
+
+    @Override
+    public Unit getUnit() {
+        return unit;
     }
 
     @Override

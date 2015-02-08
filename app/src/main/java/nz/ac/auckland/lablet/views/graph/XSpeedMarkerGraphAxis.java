@@ -17,6 +17,7 @@ import nz.ac.auckland.lablet.misc.Unit;
 public class XSpeedMarkerGraphAxis extends MarkerTimeGraphAxis {
     final private Unit xUnit;
     final private Unit tUnit;
+    final private Unit vUnit = new Unit("m/s");
 
     public XSpeedMarkerGraphAxis(Unit xUnit, Unit tUnit) {
         this.xUnit = xUnit;
@@ -40,8 +41,13 @@ public class XSpeedMarkerGraphAxis extends MarkerTimeGraphAxis {
     }
 
     @Override
-    public String getLabel() {
-        return "velocity [" + xUnit.getBaseUnit() + "/" + tUnit.getBaseUnit() + "]";
+    public String getTitle() {
+        return "velocity";
+    }
+
+    @Override
+    public Unit getUnit() {
+        return vUnit;
     }
 
     @Override

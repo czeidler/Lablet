@@ -15,6 +15,7 @@ import nz.ac.auckland.lablet.misc.Unit;
 public class YSpeedMarkerGraphAxis extends MarkerTimeGraphAxis {
     final private Unit yUnit;
     final private Unit tUnit;
+    final private Unit vUnit = new Unit("m/s");
 
     public YSpeedMarkerGraphAxis(Unit yUnit, Unit tUnit) {
         this.yUnit = yUnit;
@@ -36,8 +37,13 @@ public class YSpeedMarkerGraphAxis extends MarkerTimeGraphAxis {
     }
 
     @Override
-    public String getLabel() {
-        return "velocity [" + yUnit.getBaseUnit() + "/" + tUnit.getBaseUnit() + "]";
+    public String getTitle() {
+        return "velocity";
+    }
+
+    @Override
+    public Unit getUnit() {
+        return vUnit;
     }
 
     @Override

@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
+import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.views.plotview.PlotView;
 
 import java.util.List;
@@ -40,9 +41,9 @@ class AxisSettings {
     }
 }
 
-abstract public class AbstractAxis extends ViewGroup {
+abstract public class AbstractAxis extends ViewGroup implements Unit.IListener {
     protected String title = "";
-    protected String unit = "";
+    protected Unit unit = new Unit("");
     protected Paint titlePaint = new Paint();
     protected Paint axisPaint = new Paint();
 
@@ -62,6 +63,13 @@ abstract public class AbstractAxis extends ViewGroup {
         init();
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+
+        unit.removeListener(this);
+    }
+
     private void init() {
         setWillNotDraw(false);
 
@@ -73,8 +81,8 @@ abstract public class AbstractAxis extends ViewGroup {
         axisPaint.setStyle(Paint.Style.STROKE);
     }
 
-    public void setTitle(String label) {
-        this.title = label;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getTitle() {
@@ -93,8 +101,15 @@ abstract public class AbstractAxis extends ViewGroup {
         return labels;
     }
 
-    public void setUnit(String unit) {
+    public void setUnit(Unit unit) {
+        this.unit.removeListener(this);
         this.unit = unit;
+        this.unit.addListener(this);
+    }
+
+    @Override
+    public void onBaseExponentChanged() {
+        requestLayout();
     }
 
     abstract protected void calculateLabels();

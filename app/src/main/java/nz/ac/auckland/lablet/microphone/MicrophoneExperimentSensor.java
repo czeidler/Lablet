@@ -20,6 +20,7 @@ import nz.ac.auckland.lablet.experiment.ISensorData;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.misc.AudioWavOutputStream;
 import nz.ac.auckland.lablet.misc.StorageLib;
+import nz.ac.auckland.lablet.misc.Unit;
 
 import java.io.*;
 import java.lang.ref.WeakReference;
@@ -35,6 +36,9 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     final public int SAMPLE_RATE = 44100;
     final public int FRAME_SIZE = 4096;
 
+    final private Unit timeUnit = new Unit("s", Unit.MILLI);
+    final private Unit frequencyUnit = new Unit("Hz");
+
     float[] prevAmplitudes = null;
     final String audioFileName = "audio.wav";
     private File audioFile = null;
@@ -47,6 +51,14 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     public interface ISensorDataListener {
         public void onNewAmplitudeData(float[] amplitudes);
         public void onNewFrequencyData(float[] frequencies);
+    }
+
+    public Unit getTimeUnit() {
+        return timeUnit;
+    }
+
+    public Unit getFrequencyUnit() {
+        return frequencyUnit;
     }
 
     public void setSensorDataListener(ISensorDataListener listener) {

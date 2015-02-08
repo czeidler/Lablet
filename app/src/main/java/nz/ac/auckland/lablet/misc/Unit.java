@@ -42,6 +42,11 @@ public class Unit extends WeakListenable<Unit.IListener> {
         setBaseUnit(unit, true);
     }
 
+    public Unit(String unit, int baseExponent) {
+        setBaseUnit(unit, true);
+        setBaseExponent(baseExponent);
+    }
+
     public Unit(String unit, boolean derivePrefixesFromUnit) {
         setBaseUnit(unit, derivePrefixesFromUnit);
     }
@@ -109,11 +114,17 @@ public class Unit extends WeakListenable<Unit.IListener> {
         this.prefixes = prefixes;
     }
 
+    static final public int MICRO = -6;
+    static final public int MILLI = -3;
+    static final public int CENTI = -2;
+    static final public int DECI = -1;
+    static final public int KILO = 3;
+
     static public List<Prefix> createSecondPrefixes() {
         List<Prefix> list = new ArrayList<>();
         list.add(new Prefix(-9, "n", "nano"));
-        list.add(new Prefix(-6, "\u00B5", "micro"));
-        list.add(new Prefix(-3, "m", "milli"));
+        list.add(new Prefix(MICRO, "\u00B5", "micro"));
+        list.add(new Prefix(MILLI, "m", "milli"));
         list.add(new Prefix(0, "", ""));
         return list;
     }
@@ -126,12 +137,12 @@ public class Unit extends WeakListenable<Unit.IListener> {
         list.add(new Prefix(-15, "f", "femto"));
         list.add(new Prefix(-12, "p", "pico"));
         list.add(new Prefix(-9, "n", "nano"));
-        list.add(new Prefix(-6, "\u00B5", "micro"));
-        list.add(new Prefix(-3, "m", "milli"));
-        list.add(new Prefix(-2, "c", "centi"));
-        list.add(new Prefix(-1, "d", "deci"));
+        list.add(new Prefix(MICRO, "\u00B5", "micro"));
+        list.add(new Prefix(MILLI, "m", "milli"));
+        list.add(new Prefix(CENTI, "c", "centi"));
+        list.add(new Prefix(DECI, "d", "deci"));
         list.add(new Prefix(0, "", ""));
-        list.add(new Prefix(3, "k", "kilo"));
+        list.add(new Prefix(KILO, "k", "kilo"));
         return list;
     }
 
@@ -149,10 +160,10 @@ public class Unit extends WeakListenable<Unit.IListener> {
         list.add(new Prefix(-15, "f", "femto"));
         list.add(new Prefix(-12, "p", "pico"));
         list.add(new Prefix(-9, "n", "nano"));
-        list.add(new Prefix(-6, "\u00B5", "micro"));
-        list.add(new Prefix(-3, "m", "milli"));
+        list.add(new Prefix(MICRO, "\u00B5", "micro"));
+        list.add(new Prefix(MILLI, "m", "milli"));
         list.add(new Prefix(0, "", ""));
-        list.add(new Prefix(3, "k", "kilo"));
+        list.add(new Prefix(KILO, "k", "kilo"));
         list.add(new Prefix(6, "M", "mega"));
         list.add(new Prefix(9, "G", "giga"));
         list.add(new Prefix(12, "T", "tera"));
