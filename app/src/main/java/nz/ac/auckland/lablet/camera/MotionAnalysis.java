@@ -11,6 +11,7 @@ import android.graphics.PointF;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.*;
+import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.views.graph.IMinRangeGetter;
 import nz.ac.auckland.lablet.views.table.*;
 
@@ -55,7 +56,7 @@ public class MotionAnalysis implements IDataAnalysis {
         xUnit.setName("x");
         yUnit.setName("y");
         tUnit.setName("time");
-        tUnit.setPrefix("m");
+        tUnit.setBaseExponent(-3); // milli seconds
 
         calibrationXY = new CalibrationXY();
         calibrationVideoTimeData = new CalibrationVideoTimeData(sensorData.getVideoDuration());
@@ -181,13 +182,6 @@ public class MotionAnalysis implements IDataAnalysis {
         return listenerList.remove(listener);
     }
 
-    public void setXUnitPrefix(String xUnitPrefix) {
-        this.xUnit.setPrefix(xUnitPrefix);
-    }
-    public void setYUnitPrefix(String yUnitPrefix) {
-        this.yUnit.setPrefix(yUnitPrefix);
-    }
-
     public IMinRangeGetter getXMinRangeGetter() {
         return new IMinRangeGetter() {
             @Override
@@ -211,6 +205,9 @@ public class MotionAnalysis implements IDataAnalysis {
             }
         };
     }
+
+    final private String X_UNIT_BASE_EXPONENT_KEY = "xUnitBaseExponent";
+    final private String Y_UNIT_BASE_EXPONENT_KEY = "yUnitBaseExponent";
 
     public boolean loadAnalysisData(Bundle bundle, File storageDir) {
         tagMarkers.clear();
@@ -253,10 +250,10 @@ public class MotionAnalysis implements IDataAnalysis {
         originCalibrationSetter.setOrigin(origin, axis1);
         calibrationXY.setSwapAxis(swapAxis);
 
-        if (bundle.containsKey("xUnitPrefix"))
-            setXUnitPrefix(bundle.getString("xUnitPrefix"));
-        if (bundle.containsKey("yUnitPrefix"))
-            setYUnitPrefix(bundle.getString("yUnitPrefix"));
+        if (bundle.containsKey(X_UNIT_BASE_EXPONENT_KEY))
+            xUnit.setBaseExponent(bundle.getInt(X_UNIT_BASE_EXPONENT_KEY));
+        if (bundle.containsKey(Y_UNIT_BASE_EXPONENT_KEY))
+            yUnit.setBaseExponent(bundle.getInt(Y_UNIT_BASE_EXPONENT_KEY));
 
         return true;
     }
@@ -287,8 +284,8 @@ public class MotionAnalysis implements IDataAnalysis {
         analysisDataBundle.putBoolean("originSwapAxis", calibrationXY.getSwapAxis());
         analysisDataBundle.putBoolean("showCoordinateSystem", showCoordinateSystem);
 
-        analysisDataBundle.putString("xUnitPrefix", getXUnit().getPrefix());
-        analysisDataBundle.putString("yUnitPrefix", getYUnit().getPrefix());
+        analysisDataBundle.putInt(X_UNIT_BASE_EXPONENT_KEY, getXUnit().getBaseExponent());
+        analysisDataBundle.putInt(Y_UNIT_BASE_EXPONENT_KEY, getYUnit().getBaseExponent());
 
         if (videoAnalysisSettings != null)
             analysisDataBundle.putBundle("video_analysis_settings", videoAnalysisSettings);

@@ -16,7 +16,7 @@ import android.widget.*;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.LengthCalibrationSetter;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.Unit;
+import nz.ac.auckland.lablet.misc.Unit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,14 +87,16 @@ public class ScaleSettingsDialog extends AlertDialog {
 
                 int spinnerPosition = spinnerUnit.getSelectedItemPosition();
                 if (spinnerPosition == 0) {
-                    xUnit.setPrefix("");
-                    yUnit.setPrefix("");
+                    xUnit.setBaseExponent(0);
+                    yUnit.setBaseExponent(0);
                 } else if (spinnerPosition == 1) {
-                    xUnit.setPrefix("c");
-                    yUnit.setPrefix("c");
+                    // centi
+                    xUnit.setBaseExponent(-2);
+                    yUnit.setBaseExponent(-2);
                 } else if (spinnerPosition == 2) {
-                    xUnit.setPrefix("m");
-                    yUnit.setPrefix("m");
+                    // milli
+                    xUnit.setBaseExponent(-3);
+                    yUnit.setBaseExponent(-3);
                 }
 
                 dismiss();

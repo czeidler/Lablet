@@ -29,7 +29,7 @@ public class CalculateXSpeedFragment extends CalculateSpeedFragment {
 
     @Override
     String getPositionUnit() {
-        return getMotionAnalysis().getXUnit().getUnit();
+        return getMotionAnalysis().getXUnit().getTotalUnit();
     }
 
     @Override

@@ -9,7 +9,7 @@ package nz.ac.auckland.lablet.views.table;
 
 import nz.ac.auckland.lablet.camera.ITimeData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
-import nz.ac.auckland.lablet.experiment.Unit;
+import nz.ac.auckland.lablet.misc.Unit;
 
 
 /**
@@ -41,15 +41,14 @@ public class XSpeedDataTableColumn extends UnitDataTableColumn {
 
     @Override
     public String getHeader() {
-        return "velocity [" + xUnit.getUnit() + "/" + tUnit.getBase() + "]";
+        return "velocity [" + xUnit.getTotalUnit() + "/" + tUnit.getBaseUnit() + "]";
     }
 
     public static Number getSpeed(int index, MarkerDataModel markersDataModel, ITimeData timeCalibration, Unit tUnit) {
         float delta = markersDataModel.getRealMarkerPositionAt(index + 1).x
                 - markersDataModel.getRealMarkerPositionAt(index).x;
         float deltaT = timeCalibration.getTimeAt(index + 1) - timeCalibration.getTimeAt(index);
-        if (tUnit.getPrefix().equals("m"))
-            deltaT /= 1000;
+        deltaT *= Math.pow(10, tUnit.getBaseExponent());
         return delta / deltaT;
     }
 }

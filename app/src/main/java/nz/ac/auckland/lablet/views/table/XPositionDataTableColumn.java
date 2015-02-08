@@ -8,7 +8,7 @@
 package nz.ac.auckland.lablet.views.table;
 
 
-import nz.ac.auckland.lablet.experiment.Unit;
+import nz.ac.auckland.lablet.misc.Unit;
 
 /**
  * Table column for the marker data table adapter. Provides the x-position.
@@ -34,6 +34,6 @@ public class XPositionDataTableColumn extends UnitDataTableColumn {
 
     @Override
     public String getHeader() {
-        return xUnit.getName() + " [" + xUnit.getUnit() + "]";
+        return xUnit.getName() + " [" + xUnit.getTotalUnit() + "]";
     }
 }

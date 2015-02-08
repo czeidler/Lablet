@@ -9,7 +9,7 @@ package nz.ac.auckland.lablet.views.table;
 
 
 import nz.ac.auckland.lablet.camera.ITimeData;
-import nz.ac.auckland.lablet.experiment.Unit;
+import nz.ac.auckland.lablet.misc.Unit;
 
 /**
  * Table column for the marker data table adapter. Provides a time column for the use in combination with an

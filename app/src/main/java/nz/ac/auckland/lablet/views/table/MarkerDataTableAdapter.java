@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.views.table;
 
 import nz.ac.auckland.lablet.experiment.*;
+import nz.ac.auckland.lablet.misc.Unit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,7 +123,7 @@ abstract class UnitDataTableColumn extends DataTableColumn implements Unit.IList
     }
 
     @Override
-    public void onPrefixChanged() {
+    public void onBaseExponentChanged() {
         dataModel.notifyAllDataChanged();
     }
 }

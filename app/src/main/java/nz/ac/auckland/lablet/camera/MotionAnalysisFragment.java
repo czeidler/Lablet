@@ -135,7 +135,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         LengthCalibrationSetter lengthCalibrationSetter = getSensorAnalysis().getLengthCalibrationSetter();
         MenuItem lengthItem = popup.getMenu().findItem(R.id.length_scale);
         String lengthTitle = lengthItem.getTitle() + " (" + lengthCalibrationSetter.getCalibrationValue() + " "
-                + getSensorAnalysis().getXUnit().getUnit() + ")";
+                + getSensorAnalysis().getXUnit().getTotalUnit() + ")";
         popup.getMenu().findItem(R.id.length_scale).setTitle(lengthTitle);
         popup.getMenu().findItem(R.id.showCoordinateSystem).setChecked(getSensorAnalysis().getShowCoordinateSystem());
         popup.getMenu().findItem(R.id.swapAxis).setChecked(getSensorAnalysis().getCalibrationXY().getSwapAxis());

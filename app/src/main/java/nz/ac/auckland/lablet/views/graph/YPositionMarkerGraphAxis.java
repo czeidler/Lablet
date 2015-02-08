@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.Unit;
+import nz.ac.auckland.lablet.misc.Unit;
 
 
 /**
@@ -34,7 +34,7 @@ public class YPositionMarkerGraphAxis extends MarkerGraphAxis {
 
     @Override
     public String getLabel() {
-        return unit.getName() + " [" + unit.getUnit() + "]";
+        return unit.getName() + " [" + unit.getTotalUnit() + "]";
     }
 
     @Override

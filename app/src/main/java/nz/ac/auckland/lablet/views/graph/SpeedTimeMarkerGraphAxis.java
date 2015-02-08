@@ -8,7 +8,7 @@
 package nz.ac.auckland.lablet.views.graph;
 
 
-import nz.ac.auckland.lablet.experiment.Unit;
+import nz.ac.auckland.lablet.misc.Unit;
 
 /**
  * Graph axis for the marker data graph adapter. Provides the time for a speed vs time graph.

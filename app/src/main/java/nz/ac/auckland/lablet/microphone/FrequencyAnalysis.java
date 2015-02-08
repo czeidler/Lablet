@@ -10,12 +10,11 @@ package nz.ac.auckland.lablet.microphone;
 import android.graphics.RectF;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.*;
+import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.views.table.CSVWriter;
 import nz.ac.auckland.lablet.views.table.MarkerDataTableAdapter;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class FrequencyAnalysis implements IDataAnalysis {

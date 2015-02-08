@@ -9,7 +9,7 @@ package nz.ac.auckland.lablet.views.table;
 
 
 import nz.ac.auckland.lablet.camera.ITimeData;
-import nz.ac.auckland.lablet.experiment.Unit;
+import nz.ac.auckland.lablet.misc.Unit;
 
 /**
  * Table column for the marker data table adapter. Provides the y-acceleration.
@@ -40,15 +40,13 @@ public class YAccelerationDataTableColumn extends UnitDataTableColumn {
         float delta = speed1 - speed0;
 
         float deltaT = (timeData.getTimeAt(index + 2) - timeData.getTimeAt(index)) / 2;
-        if (tUnit.getPrefix().equals("m"))
-            deltaT /= 1000;
+        deltaT *= Math.pow(10, tUnit.getBaseExponent());
 
         return delta / deltaT;
     }
 
     @Override
     public String getHeader() {
-        return "acceleration [" + yUnit.getUnit() + "/"
-                + tUnit.getBase() + "^2]";
+        return "acceleration [" + yUnit.getTotalUnit() + "/" + tUnit.getBaseUnit() + "^2]";
     }
 }

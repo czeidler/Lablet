@@ -8,7 +8,7 @@
 package nz.ac.auckland.lablet.views.graph;
 
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
-import nz.ac.auckland.lablet.experiment.Unit;
+import nz.ac.auckland.lablet.misc.Unit;
 
 
 /**
@@ -35,7 +35,7 @@ public class TimeMarkerGraphAxis extends MarkerTimeGraphAxis {
 
     @Override
     public String getLabel() {
-        return tUnit.getName() + " [" + tUnit.getUnit() + "]";
+        return tUnit.getName() + " [" + tUnit.getTotalUnit() + "]";
     }
 
     @Override
