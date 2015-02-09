@@ -81,16 +81,12 @@ public class Unit extends WeakListenable<Unit.IListener> {
         return name;
     }
 
+    public float transformToPrefix(float value, Prefix prefix) {
+        return value * (float)Math.pow(10, getBaseExponent() - prefix.exponent);
+    }
+
     public void setName(String name) {
         this.name = name;
-    }
-
-    private int getTotalExponent(Prefix prefix) {
-        return getTotalExponent(prefix.exponent);
-    }
-
-    private int getTotalExponent(int exponent) {
-        return baseExponent + exponent;
     }
 
     public String getPrefix() {
@@ -99,6 +95,12 @@ public class Unit extends WeakListenable<Unit.IListener> {
 
     public String getTotalUnit() {
         Prefix prefix = getPrefixFor(getBaseExponent());
+        return prefix.prefix + getBaseUnit();
+    }
+
+    public String getTotalUnit(Prefix prefix) {
+        if (prefix == null)
+            return getTotalUnit();
         return prefix.prefix + getBaseUnit();
     }
 
@@ -112,6 +114,10 @@ public class Unit extends WeakListenable<Unit.IListener> {
 
     public void setPrefixes(List<Prefix> prefixes) {
         this.prefixes = prefixes;
+    }
+
+    public List<Prefix> getPrefixes() {
+        return prefixes;
     }
 
     static final public int MICRO = -6;
