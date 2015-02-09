@@ -7,6 +7,8 @@
  */
 package nz.ac.auckland.lablet.misc;
 
+import android.support.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,23 +36,31 @@ public class Unit extends WeakListenable<Unit.IListener> {
     }
 
     private int baseExponent = 0;
-    private String unit = "";
+    private String baseUnit = "";
     private String name = "";
     private List<Prefix> prefixes;
 
-    public Unit(String unit) {
-        setBaseUnit(unit, true);
+    public Unit(String baseUnit) {
+        setBaseUnit(baseUnit, true);
     }
 
-    public Unit(String unit, int baseExponent) {
-        setBaseUnit(unit, true);
+    public Unit(String baseUnit, int baseExponent) {
+        setBaseUnit(baseUnit, true);
         setBaseExponent(baseExponent);
     }
 
-    public Unit(String unit, boolean derivePrefixesFromUnit) {
-        setBaseUnit(unit, derivePrefixesFromUnit);
+    public Unit(String baseUnit, boolean derivePrefixesFromUnit) {
+        setBaseUnit(baseUnit, derivePrefixesFromUnit);
     }
 
+    /**
+     * Sets the base exponent.
+     *
+     * The base exponent is the exponent of the associated data. For example, if the data is given in milli meter the
+     * base exponent is -3.
+     *
+     * @param baseExponent
+     */
     public void setBaseExponent(int baseExponent) {
         this.baseExponent = baseExponent;
         notifyBaseExponentChanged();
@@ -60,13 +70,23 @@ public class Unit extends WeakListenable<Unit.IListener> {
         return baseExponent;
     }
 
-    public void setBaseUnit(String unit, boolean derivePrefixesFromUnit) {
-        this.unit = unit;
+    /**
+     * Sets the base unit.
+     *
+     * The base unit is the unit without prefix. For example, "s" for seconds.
+     *
+     * If derivePrefixesFromUnit is true a fitting set of prefixes is searched.
+     *
+     * @param baseUnit for example "m" for meter
+     * @param derivePrefixesFromUnit determines if the prefixes should be derived from the base unit.
+     */
+    public void setBaseUnit(String baseUnit, boolean derivePrefixesFromUnit) {
+        this.baseUnit = baseUnit;
 
         if (derivePrefixesFromUnit) {
-            if (unit.equals("m")) {
+            if (baseUnit.equals("m")) {
                 setPrefixes(createMeterPrefixes());
-            } else if (unit.equals("s")) {
+            } else if (baseUnit.equals("s")) {
                 setPrefixes(createSecondPrefixes());
             } else
                 setPrefixes(createDefaultPrefixes());
@@ -74,7 +94,18 @@ public class Unit extends WeakListenable<Unit.IListener> {
     }
 
     public String getBaseUnit() {
-        return unit;
+        return baseUnit;
+    }
+
+    /**
+     * Sets the name of the unit.
+     *
+     * This can be an informal description of the unit. For example, "height" for the base unit "m".
+     *
+     * @param name the name of the unit.
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getName() {
@@ -85,20 +116,29 @@ public class Unit extends WeakListenable<Unit.IListener> {
         return value * (float)Math.pow(10, getBaseExponent() - prefix.exponent);
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getPrefix() {
         return getPrefixFor(getBaseExponent()).prefix;
     }
 
+    /**
+     * Returns a string of the base exponent prefix + the base unit.
+     *
+     * @return base exponent prefix + base unit.
+     */
     public String getTotalUnit() {
         Prefix prefix = getPrefixFor(getBaseExponent());
         return prefix.prefix + getBaseUnit();
     }
 
-    public String getTotalUnit(Prefix prefix) {
+    /**
+     * Returns a string of the given prefix + the base unit. For example, km (kilo + meter).
+     *
+     * If prefix is null {link getTotalUnit} is called.
+     *
+     * @param prefix the prefix that should be used. Can be null.
+     * @return prefix + base unit.
+     */
+    public String getTotalUnit(@Nullable Prefix prefix) {
         if (prefix == null)
             return getTotalUnit();
         return prefix.prefix + getBaseUnit();
@@ -112,6 +152,11 @@ public class Unit extends WeakListenable<Unit.IListener> {
         return null;
     }
 
+    /**
+     * Sets the prefixes that are valid for a base unit.
+     *
+     * @param prefixes list of prefixes.
+     */
     public void setPrefixes(List<Prefix> prefixes) {
         this.prefixes = prefixes;
     }
