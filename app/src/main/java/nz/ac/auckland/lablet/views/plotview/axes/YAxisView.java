@@ -37,20 +37,27 @@ public class YAxisView extends AbstractYAxis {
     }
 
     @Override
-    protected void calculateLabels() {
+    protected List<LabelPartitioner.LabelEntry> calculateLabels() {
+        determineUsedPrefix(realTop, realBottom);
+        float usedTop = realTop;
+        float usedBottom = realBottom;
+        if (usedPrefix != null) {
+            usedTop = unit.transformToPrefix(realTop, usedPrefix);
+            usedBottom = unit.transformToPrefix(realBottom, usedPrefix);
+        }
         final float titleHeight = titlePaint.descent() - titlePaint.ascent();
         final float axisLength = getAxisLength();
         if (axisLength <= 0)
-            return;
-        labels = labelPartitioner.calculate(titleHeight, axisLength, Math.min(realTop, realBottom),
-                Math.max(realTop, realBottom));
+            return null;
+        return labelPartitioner.calculate(titleHeight, axisLength, Math.min(usedTop, usedBottom),
+                Math.max(usedTop, usedBottom));
     }
 
     @Override
     public float optimalWidthForHeight(float height) {
         final float labelHeight = titlePaint.descent() - titlePaint.ascent();
 
-        List<LabelPartitioner.LabelEntry> labelEntries = labels;
+        List<LabelPartitioner.LabelEntry> labelEntries = getLabels();
         if (height != getAxisLength()) {
             labelEntries = labelPartitioner.calculate(labelHeight, height, Math.min(realTop, realBottom),
                     Math.max(realTop, realBottom));
@@ -81,23 +88,20 @@ public class YAxisView extends AbstractYAxis {
     }
 
     @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        if (changed)
-            calculateLabels();
-    }
-
-    @Override
     protected void onDraw(Canvas canvas) {
+        // first get the labels and the usedPrefix
+        List<LabelPartitioner.LabelEntry> labels = getLabels();
+
         final float titleHeight = titlePaint.descent() - titlePaint.ascent();
 
         boolean hasTitle = !title.equals("");
-        boolean hasUnit = !unit.getTotalUnit().equals("");
+        boolean hasUnit = !unit.getTotalUnit(usedPrefix).equals("");
         if (hasTitle || hasUnit) {
             String completeLabel = title;
             if (hasTitle && hasUnit)
                 completeLabel += " ";
             if (hasUnit)
-                completeLabel += "[" + unit.getTotalUnit() + "]";
+                completeLabel += "[" + unit.getTotalUnit(usedPrefix) + "]";
             canvas.save();
             canvas.translate(titleHeight, (getHeight() + titlePaint.measureText(completeLabel)) / 2);
             canvas.rotate(-90);

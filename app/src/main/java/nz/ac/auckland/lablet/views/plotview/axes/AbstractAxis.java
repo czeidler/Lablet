@@ -44,12 +44,13 @@ class AxisSettings {
 abstract public class AbstractAxis extends ViewGroup implements Unit.IListener {
     protected String title = "";
     protected Unit unit = new Unit("");
+    protected Unit.Prefix usedPrefix = null;
     protected Paint titlePaint = new Paint();
     protected Paint axisPaint = new Paint();
 
     protected LabelPartitioner labelPartitioner = new LabelPartitionerLinear();
 
-    protected List<LabelPartitioner.LabelEntry> labels;
+    private List<LabelPartitioner.LabelEntry> labels;
 
     public AbstractAxis(Context context) {
         super(context);
@@ -98,6 +99,8 @@ abstract public class AbstractAxis extends ViewGroup implements Unit.IListener {
     }
 
     public List<LabelPartitioner.LabelEntry> getLabels() {
+        if (labels == null)
+            labels = calculateLabels();
         return labels;
     }
 
@@ -112,10 +115,49 @@ abstract public class AbstractAxis extends ViewGroup implements Unit.IListener {
         requestLayout();
     }
 
-    abstract protected void calculateLabels();
+    abstract protected List<LabelPartitioner.LabelEntry> calculateLabels();
+
+    protected void invalidateLabels() {
+        labels = null;
+    }
 
     public void setLabelPartitioner(LabelPartitioner labelPartitioner) {
         this.labelPartitioner = labelPartitioner;
-        calculateLabels();
+        invalidateLabels();
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        if (changed)
+            invalidateLabels();
+    }
+
+    protected void determineUsedPrefix(float value0, float value1) {
+        usedPrefix = null;
+        if (unit == null)
+            return;
+        float diff = Math.abs(value0 - value1);
+        float diffOrderValue = LabelPartitionerHelper.getOrderValue(diff);
+        int diffExponent = (int)Math.log10(diffOrderValue);
+
+        int totalExponent = unit.getBaseExponent() + diffExponent;
+        List<Unit.Prefix> prefixes = unit.getPrefixes();
+        if (diffExponent > 4) {
+            for (int i = prefixes.size() - 1; i >= 0; i--) {
+                Unit.Prefix currentPrefix = prefixes.get(i);
+                if (currentPrefix.exponent <= totalExponent) {
+                    usedPrefix = currentPrefix;
+                    break;
+                }
+            }
+        } else if (diffExponent < -3) {
+            for (int i = 0; i < prefixes.size(); i++) {
+                Unit.Prefix currentPrefix = prefixes.get(i);
+                if (currentPrefix.exponent <= totalExponent) {
+                    usedPrefix = currentPrefix;
+                    break;
+                }
+            }
+        }
     }
 }

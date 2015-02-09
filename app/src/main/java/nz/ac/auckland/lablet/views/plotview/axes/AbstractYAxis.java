@@ -51,7 +51,7 @@ abstract public class AbstractYAxis extends AbstractAxis {
         realTop = top;
         realBottom = bottom;
 
-        calculateLabels();
+        invalidateLabels();
 
         invalidate();
     }

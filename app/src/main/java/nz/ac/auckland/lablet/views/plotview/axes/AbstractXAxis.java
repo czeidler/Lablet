@@ -30,7 +30,7 @@ abstract public class AbstractXAxis extends AbstractAxis {
         realLeft = left;
         realRight = right;
 
-        calculateLabels();
+        invalidateLabels();
 
         invalidate();
     }

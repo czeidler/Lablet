@@ -11,6 +11,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
+import java.util.List;
+
 
 public class XAxisView extends AbstractXAxis {
     private float axisLeftOffset = 0;
@@ -36,14 +38,21 @@ public class XAxisView extends AbstractXAxis {
     }
 
     @Override
-    protected void calculateLabels() {
+    protected List<LabelPartitioner.LabelEntry> calculateLabels() {
+        determineUsedPrefix(realLeft, realRight);
+        float usedLeft = realLeft;
+        float usedRight = realRight;
+        if (usedPrefix != null) {
+            usedLeft = unit.transformToPrefix(realLeft, usedPrefix);
+            usedRight = unit.transformToPrefix(realRight, usedPrefix);
+        }
         float axisLength = getAxisLength();
         if (axisLength <= 0)
-            return;
+            return null;
         float maxLabelWidth = titlePaint.measureText(LabelPartitionerHelper.createDummyLabel(
-                LabelPartitionerHelper.estimateLabelMetric(realLeft, realRight)));
-        labels = labelPartitioner.calculate(maxLabelWidth, axisLength, Math.min(realLeft, realRight),
-                Math.max(realLeft, realRight));
+                LabelPartitionerHelper.estimateLabelMetric(usedLeft, usedRight)));
+        return labelPartitioner.calculate(maxLabelWidth, axisLength, Math.min(usedLeft, usedRight),
+                Math.max(usedLeft, usedRight));
     }
 
     @Override
@@ -64,21 +73,18 @@ public class XAxisView extends AbstractXAxis {
     }
 
     @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        if (changed)
-            calculateLabels();
-    }
-
-    @Override
     protected void onDraw(Canvas canvas) {
+        // first get the labels and the usedPrefix
+        List<LabelPartitioner.LabelEntry> labels = getLabels();
+
         boolean hasTitle = !title.equals("");
-        boolean hasUnit = !unit.getTotalUnit().equals("");
+        boolean hasUnit = !unit.getTotalUnit(usedPrefix).equals("");
         if (hasTitle || hasUnit) {
             String completeLabel = title;
             if (hasTitle && hasUnit)
                 completeLabel += " ";
             if (hasUnit)
-                completeLabel += "[" + unit.getTotalUnit() + "]";
+                completeLabel += "[" + unit.getTotalUnit(usedPrefix) + "]";
 
             canvas.drawText(completeLabel, getWidth() / 2 - titlePaint.measureText(completeLabel) / 2,
                     getHeight() - titlePaint.descent(), titlePaint);
