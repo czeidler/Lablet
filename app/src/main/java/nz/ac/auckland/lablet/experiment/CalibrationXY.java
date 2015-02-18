@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.experiment;
 
 import android.graphics.PointF;
+import android.os.Bundle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,13 +48,43 @@ public class CalibrationXY implements ICalibrationXY {
     private PointF origin = new PointF(5, 5);
     private PointF axis1 = new PointF(15, 5);
     private float angle;
-    private boolean swapAxis = false;
+    private boolean swapAxes = false;
 
     final private List<IListener> listeners = new ArrayList<>();
 
     public CalibrationXY() {
         xScale = 1;
         yScale = 1;
+    }
+
+    final static private String ORIGIN_X_KEY = "originX";
+    final static private String ORIGIN_Y_KEY = "originY";
+    final static private String AXIS1_X_KEY = "axis1x";
+    final static private String AXIS1_Y_KEY = "axis1y";
+    final static private String SWAP_AXES_KEY = "swapAxes";
+
+    public Bundle toBundle() {
+        Bundle bundle = new Bundle();
+        bundle.putFloat(ORIGIN_X_KEY, getOrigin().x);
+        bundle.putFloat(ORIGIN_Y_KEY, getOrigin().y);
+        bundle.putFloat(AXIS1_X_KEY, getAxis1().x);
+        bundle.putFloat(AXIS1_Y_KEY, getAxis1().y);
+        bundle.putBoolean(SWAP_AXES_KEY, getSwapAxes());
+        return bundle;
+    }
+
+    public void fromBundle(Bundle bundle) {
+        if (bundle.containsKey(ORIGIN_X_KEY))
+            origin.x = bundle.getFloat(ORIGIN_X_KEY);
+        if (bundle.containsKey(ORIGIN_Y_KEY))
+            origin.y = bundle.getFloat(ORIGIN_Y_KEY);
+        if (bundle.containsKey(AXIS1_X_KEY))
+            axis1.x = bundle.getFloat(AXIS1_X_KEY);
+        if (bundle.containsKey(AXIS1_Y_KEY))
+            axis1.y = bundle.getFloat(AXIS1_Y_KEY);
+        if (bundle.containsKey(SWAP_AXES_KEY))
+            swapAxes = bundle.getBoolean(SWAP_AXES_KEY);
+        notifyCalibrationChanged();
     }
 
     /**
@@ -95,7 +126,7 @@ public class CalibrationXY implements ICalibrationXY {
         point.y = (float)Math.cos(Math.toRadians(angle)) * y - (float)Math.sin(Math.toRadians(angle)) * x;
 
         // swap axis
-        if (swapAxis) {
+        if (swapAxes) {
             // mirror at x and turn 90 degree to the right
             x = -point.x;
             y = point.y;
@@ -168,8 +199,8 @@ public class CalibrationXY implements ICalibrationXY {
      *
      * @param swap true to swap
      */
-    public void setSwapAxis(boolean swap) {
-        swapAxis = swap;
+    public void setSwapAxes(boolean swap) {
+        swapAxes = swap;
         notifyCalibrationChanged();
     }
 
@@ -192,8 +223,8 @@ public class CalibrationXY implements ICalibrationXY {
     public PointF getAxis1() {
         return axis1;
     }
-    public boolean getSwapAxis() {
-        return swapAxis;
+    public boolean getSwapAxes() {
+        return swapAxes;
     }
 
     private void notifyCalibrationChanged() {

@@ -208,6 +208,9 @@ public class MotionAnalysis implements IDataAnalysis {
 
     final private String X_UNIT_BASE_EXPONENT_KEY = "xUnitBaseExponent";
     final private String Y_UNIT_BASE_EXPONENT_KEY = "yUnitBaseExponent";
+    final private String LENGTH_CALIBRATION_KEY = "lengthCalibration";
+    final private String CALIBRATION_XY_KEY = "calibrationXY";
+    final private String SHOW_COORDINATE_SYSTEM_KEY = "showCoordinateSystem";
 
     public boolean loadAnalysisData(Bundle bundle, File storageDir) {
         tagMarkers.clear();
@@ -219,36 +222,14 @@ public class MotionAnalysis implements IDataAnalysis {
         if (tagMarkerBundle != null)
             tagMarkers.fromBundle(tagMarkerBundle);
 
-        PointF point1 = lengthCalibrationMarkers.getMarkerDataAt(0).getPosition();
-        PointF point2 = lengthCalibrationMarkers.getMarkerDataAt(1).getPosition();
-        if (bundle.containsKey("lengthCalibrationPoint1x"))
-            point1.x = bundle.getFloat("lengthCalibrationPoint1x");
-        if (bundle.containsKey("lengthCalibrationPoint1y"))
-            point1.y = bundle.getFloat("lengthCalibrationPoint1y");
-        if (bundle.containsKey("lengthCalibrationPoint2x"))
-            point2.x = bundle.getFloat("lengthCalibrationPoint2x");
-        if (bundle.containsKey("lengthCalibrationPoint2y"))
-            point2.y = bundle.getFloat("lengthCalibrationPoint2y");
-        if (bundle.containsKey("lengthCalibrationValue"))
-            lengthCalibrationSetter.setCalibrationValue(bundle.getFloat("lengthCalibrationValue"));
+        if (bundle.containsKey(LENGTH_CALIBRATION_KEY))
+            lengthCalibrationSetter.fromBundle(bundle.getBundle(LENGTH_CALIBRATION_KEY));
 
-        PointF origin = calibrationXY.getOrigin();
-        PointF axis1 = calibrationXY.getAxis1();
-        boolean swapAxis = false;
-        if (bundle.containsKey("originX"))
-            origin.x = bundle.getFloat("originX");
-        if (bundle.containsKey("originY"))
-            origin.y = bundle.getFloat("originY");
-        if (bundle.containsKey("originAxis1x"))
-            axis1.x = bundle.getFloat("originAxis1x");
-        if (bundle.containsKey("originAxis1y"))
-            axis1.y = bundle.getFloat("originAxis1y");
-        if (bundle.containsKey("originSwapAxis"))
-            swapAxis = bundle.getBoolean("originSwapAxis");
-        if (bundle.containsKey("showCoordinateSystem"))
-            showCoordinateSystem = bundle.getBoolean("showCoordinateSystem");
-        originCalibrationSetter.setOrigin(origin, axis1);
-        calibrationXY.setSwapAxis(swapAxis);
+        if (bundle.containsKey(CALIBRATION_XY_KEY))
+            calibrationXY.fromBundle(bundle.getBundle(CALIBRATION_XY_KEY));
+        originCalibrationSetter.setOrigin(calibrationXY.getOrigin(), calibrationXY.getAxis1());
+        if (bundle.containsKey(SHOW_COORDINATE_SYSTEM_KEY))
+            showCoordinateSystem = bundle.getBoolean(SHOW_COORDINATE_SYSTEM_KEY);
 
         if (bundle.containsKey(X_UNIT_BASE_EXPONENT_KEY))
             xUnit.setBaseExponent(bundle.getInt(X_UNIT_BASE_EXPONENT_KEY));
@@ -264,25 +245,13 @@ public class MotionAnalysis implements IDataAnalysis {
 
         analysisDataBundle.putInt("currentRun", frameDataModel.getCurrentFrame());
 
-        if (tagMarkers.getMarkerCount() > 0) {
-            Bundle tagMarkerBundle = tagMarkers.toBundle();
-            analysisDataBundle.putBundle("tagMarkers", tagMarkerBundle);
-        }
+        if (tagMarkers.getMarkerCount() > 0)
+            analysisDataBundle.putBundle("tagMarkers", tagMarkers.toBundle());
 
-        PointF point1 = lengthCalibrationMarkers.getMarkerDataAt(0).getPosition();
-        PointF point2 = lengthCalibrationMarkers.getMarkerDataAt(1).getPosition();
-        analysisDataBundle.putFloat("lengthCalibrationPoint1x", point1.x);
-        analysisDataBundle.putFloat("lengthCalibrationPoint1y", point1.y);
-        analysisDataBundle.putFloat("lengthCalibrationPoint2x", point2.x);
-        analysisDataBundle.putFloat("lengthCalibrationPoint2y", point2.y);
-        analysisDataBundle.putFloat("lengthCalibrationValue", lengthCalibrationSetter.getCalibrationValue());
+        analysisDataBundle.putBundle(LENGTH_CALIBRATION_KEY, lengthCalibrationSetter.toBundle());
 
-        analysisDataBundle.putFloat("originX", calibrationXY.getOrigin().x);
-        analysisDataBundle.putFloat("originY", calibrationXY.getOrigin().y);
-        analysisDataBundle.putFloat("originAxis1x", calibrationXY.getAxis1().x);
-        analysisDataBundle.putFloat("originAxis1y", calibrationXY.getAxis1().y);
-        analysisDataBundle.putBoolean("originSwapAxis", calibrationXY.getSwapAxis());
-        analysisDataBundle.putBoolean("showCoordinateSystem", showCoordinateSystem);
+        analysisDataBundle.putBundle(CALIBRATION_XY_KEY, calibrationXY.toBundle());
+        analysisDataBundle.putBoolean(SHOW_COORDINATE_SYSTEM_KEY, showCoordinateSystem);
 
         analysisDataBundle.putInt(X_UNIT_BASE_EXPONENT_KEY, getXUnit().getBaseExponent());
         analysisDataBundle.putInt(Y_UNIT_BASE_EXPONENT_KEY, getYUnit().getBaseExponent());

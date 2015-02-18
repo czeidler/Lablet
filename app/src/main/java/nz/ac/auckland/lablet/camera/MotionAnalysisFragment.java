@@ -127,7 +127,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                 } else if (item == R.id.showCoordinateSystem) {
                     getSensorAnalysis().setShowCoordinateSystem(!menuItem.isChecked());
                 } else if (item == R.id.swapAxis) {
-                    getSensorAnalysis().getCalibrationXY().setSwapAxis(!menuItem.isChecked());
+                    getSensorAnalysis().getCalibrationXY().setSwapAxes(!menuItem.isChecked());
                 }
                 return false;
             }
@@ -138,7 +138,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                 + getSensorAnalysis().getXUnit().getTotalUnit() + ")";
         popup.getMenu().findItem(R.id.length_scale).setTitle(lengthTitle);
         popup.getMenu().findItem(R.id.showCoordinateSystem).setChecked(getSensorAnalysis().getShowCoordinateSystem());
-        popup.getMenu().findItem(R.id.swapAxis).setChecked(getSensorAnalysis().getCalibrationXY().getSwapAxis());
+        popup.getMenu().findItem(R.id.swapAxis).setChecked(getSensorAnalysis().getCalibrationXY().getSwapAxes());
         popup.show();
     }
 

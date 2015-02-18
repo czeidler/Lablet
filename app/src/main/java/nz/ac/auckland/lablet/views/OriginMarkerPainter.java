@@ -149,7 +149,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         final float textXOffset = 1;
         final float textYOffset = 0;
         final float labelAxisLength = getScreenAxisLength() - LABEL_TO_AXIS_END_DISTANCE;
-        if (calibrationXY.getSwapAxis()) {
+        if (calibrationXY.getSwapAxes()) {
             label1 = "Y";
             label2 = "X";
             textAngle += 90;

@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.experiment;
 
 import android.graphics.PointF;
+import android.os.Bundle;
 
 
 /**
@@ -42,6 +43,37 @@ public class LengthCalibrationSetter implements MarkerDataModel.IListener {
 
     public void setCalibrationValue(float value) {
         calibrationValue = value;
+        calibrate();
+    }
+
+    public Bundle toBundle() {
+        Bundle bundle = new Bundle();
+
+        PointF point1 = calibrationMarkers.getMarkerDataAt(0).getPosition();
+        PointF point2 = calibrationMarkers.getMarkerDataAt(1).getPosition();
+        bundle.putFloat("lengthCalibrationPoint1x", point1.x);
+        bundle.putFloat("lengthCalibrationPoint1y", point1.y);
+        bundle.putFloat("lengthCalibrationPoint2x", point2.x);
+        bundle.putFloat("lengthCalibrationPoint2y", point2.y);
+        bundle.putFloat("lengthCalibrationValue", getCalibrationValue());
+
+        return bundle;
+    }
+
+    public void fromBundle(Bundle bundle) {
+        PointF point1 = calibrationMarkers.getMarkerDataAt(0).getPosition();
+        PointF point2 = calibrationMarkers.getMarkerDataAt(1).getPosition();
+        if (bundle.containsKey("lengthCalibrationPoint1x"))
+            point1.x = bundle.getFloat("lengthCalibrationPoint1x");
+        if (bundle.containsKey("lengthCalibrationPoint1y"))
+            point1.y = bundle.getFloat("lengthCalibrationPoint1y");
+        if (bundle.containsKey("lengthCalibrationPoint2x"))
+            point2.x = bundle.getFloat("lengthCalibrationPoint2x");
+        if (bundle.containsKey("lengthCalibrationPoint2y"))
+            point2.y = bundle.getFloat("lengthCalibrationPoint2y");
+        if (bundle.containsKey("lengthCalibrationValue"))
+            calibrationValue = bundle.getFloat("lengthCalibrationValue");
+
         calibrate();
     }
 
