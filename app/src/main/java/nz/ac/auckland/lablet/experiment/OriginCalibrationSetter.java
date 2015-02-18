@@ -25,14 +25,41 @@ import android.graphics.PointF;
  * </ol>
  * </p>
  */
-public class OriginCalibrationSetter implements MarkerDataModel.IListener {
+public class OriginCalibrationSetter {
     private CalibrationXY calibrationXY;
     private MarkerDataModel calibrationMarkers;
+
+    private MarkerDataModel.IListener dataListener = new MarkerDataModel.IListener() {
+        @Override
+        public void onDataAdded(MarkerDataModel model, int index) {
+            calibrate();
+        }
+
+        @Override
+        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
+            calibrate();
+        }
+
+        @Override
+        public void onDataChanged(MarkerDataModel model, int index, int number) {
+            calibrate();
+        }
+
+        @Override
+        public void onAllDataChanged(MarkerDataModel model) {
+            calibrate();
+        }
+
+        @Override
+        public void onDataSelected(MarkerDataModel model, int index) {
+
+        }
+    };
 
     public OriginCalibrationSetter(CalibrationXY calibrationXY, MarkerDataModel data) {
         this.calibrationXY = calibrationXY;
         this.calibrationMarkers = data;
-        this.calibrationMarkers.addListener(this);
+        this.calibrationMarkers.addListener(dataListener);
 
         calibrate();
     }
@@ -52,28 +79,4 @@ public class OriginCalibrationSetter implements MarkerDataModel.IListener {
         calibrationXY.setOrigin(origin, axis1);
     }
 
-    @Override
-    public void onDataAdded(MarkerDataModel model, int index) {
-        calibrate();
-    }
-
-    @Override
-    public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
-        calibrate();
-    }
-
-    @Override
-    public void onDataChanged(MarkerDataModel model, int index, int number) {
-        calibrate();
-    }
-
-    @Override
-    public void onAllDataChanged(MarkerDataModel model) {
-        calibrate();
-    }
-
-    @Override
-    public void onDataSelected(MarkerDataModel model, int index) {
-
-    }
 }

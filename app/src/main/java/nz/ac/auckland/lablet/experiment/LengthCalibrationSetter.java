@@ -26,15 +26,42 @@ import android.os.Bundle;
  * </ol>
  * </p>
  */
-public class LengthCalibrationSetter implements MarkerDataModel.IListener {
+public class LengthCalibrationSetter {
     private CalibrationXY calibrationXY;
     private MarkerDataModel calibrationMarkers;
 
     private float calibrationValue;
 
+    private MarkerDataModel.IListener dataListener = new MarkerDataModel.IListener() {
+        @Override
+        public void onDataAdded(MarkerDataModel model, int index) {
+            calibrate();
+        }
+
+        @Override
+        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
+            calibrate();
+        }
+
+        @Override
+        public void onDataChanged(MarkerDataModel model, int index, int number) {
+            calibrate();
+        }
+
+        @Override
+        public void onAllDataChanged(MarkerDataModel model) {
+            calibrate();
+        }
+
+        @Override
+        public void onDataSelected(MarkerDataModel model, int index) {
+
+        }
+    };
+
     public LengthCalibrationSetter(MarkerDataModel lengthCalibrationMarkers, CalibrationXY calibrationXY) {
         this.calibrationMarkers = lengthCalibrationMarkers;
-        this.calibrationMarkers.addListener(this);
+        this.calibrationMarkers.addListener(dataListener);
         this.calibrationXY = calibrationXY;
 
         calibrationValue = 1;
@@ -97,30 +124,5 @@ public class LengthCalibrationSetter implements MarkerDataModel.IListener {
             return;
         float value = calibrationValue / scaleLength();
         calibrationXY.setScale(value, value);
-    }
-
-    @Override
-    public void onDataAdded(MarkerDataModel model, int index) {
-        calibrate();
-    }
-
-    @Override
-    public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
-        calibrate();
-    }
-
-    @Override
-    public void onDataChanged(MarkerDataModel model, int index, int number) {
-        calibrate();
-    }
-
-    @Override
-    public void onAllDataChanged(MarkerDataModel model) {
-        calibrate();
-    }
-
-    @Override
-    public void onDataSelected(MarkerDataModel model, int index) {
-
     }
 }
