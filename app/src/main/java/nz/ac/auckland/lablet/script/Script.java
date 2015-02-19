@@ -101,11 +101,11 @@ public class Script {
 
         now.setToNow();
         String newUid = "";
-        if (!scriptName.equals("")) {
-            newUid += scriptName;
-            newUid += "_";
-        }
         newUid += dateString;
+        if (!scriptName.equals("")) {
+            newUid += "_";
+            newUid += scriptName;
+        }
         return newUid;
     }
 
