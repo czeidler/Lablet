@@ -114,7 +114,12 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
     public void onDraw(Canvas canvas) {
         if (firstDraw) {
             firstDraw = false;
-            updateMarkerScreenPositions(getMarkerScreenPosition(markerData.getMarkerDataAt(0)));
+            // update the angle
+            PointF originScreen = getMarkerScreenPosition(markerData.getMarkerDataAt(0));
+            PointF axis1Screen = getMarkerScreenPosition(markerData.getMarkerDataAt(1));
+            angleScreen = CalibrationXY.getAngle(originScreen, axis1Screen);
+            
+            updateMarkerScreenPositions(originScreen);
             updateTagMarkerPositions();
         }
 
