@@ -18,6 +18,8 @@ import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.camera.ITimeData;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 
+import java.text.DecimalFormat;
+
 
 /**
  * Seek bar to work with the {@link nz.ac.auckland.lablet.experiment.FrameDataModel}.
@@ -181,7 +183,7 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.ILi
         if (frameTime < 10000)
             timeLabel.setText("" + frameTime + " [ms]");
         else
-            timeLabel.setText("" + frameTime / 1000 + " [s]");
+            timeLabel.setText("" + new DecimalFormat("#.###").format((float)frameTime / 1000) + " [s]");
 
         seekBar.setMax(frameDataModel.getNumberOfFrames() - 1);
         seekBar.setProgress(run);
