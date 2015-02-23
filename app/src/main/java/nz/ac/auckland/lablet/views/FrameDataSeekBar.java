@@ -183,7 +183,7 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.ILi
         if (frameTime < 10000)
             timeLabel.setText("" + frameTime + " [ms]");
         else
-            timeLabel.setText("" + new DecimalFormat("#.###").format((float)frameTime / 1000) + " [s]");
+            timeLabel.setText(new DecimalFormat("#.###").format((float)frameTime / 1000) + " [s]");
 
         seekBar.setMax(frameDataModel.getNumberOfFrames() - 1);
         seekBar.setProgress(run);
