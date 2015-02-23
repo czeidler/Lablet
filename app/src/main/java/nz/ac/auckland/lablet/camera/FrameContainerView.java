@@ -66,7 +66,7 @@ public class FrameContainerView extends RelativeLayout {
     class SeekBarManager {
         boolean open = false;
         long lastOpenRequest = 0;
-        final int openTime = 3000;
+        final int openTime = 4000;
 
         final int animationDuration = 300;
         AnimatorSet animator = null;
