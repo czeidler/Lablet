@@ -48,7 +48,7 @@ public class ExportDirDialog extends AlertDialog {
     public void onCreate(Bundle savedInstanceState) {
         final LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View contentView = inflater.inflate(R.layout.export_dir_dialog, null);
-        setTitle("Sending...");
+        setTitle("Prepare data for sending...");
         addContentView(contentView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT));
 

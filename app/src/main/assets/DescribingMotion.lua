@@ -11,13 +11,13 @@ function onBuildExperimentScript(scriptBuilder)
 	scriptBuilder:add(takeVideosSheet)
 	takeVideosSheet:setMainLayoutOrientation("horizontal")
 	takeVideosSheet:setTitle("Take Videos:")
-	cameraExperimentItem = takeVideosSheet:addCameraExperiment();
+	local cameraExperimentItem = takeVideosSheet:addCameraExperiment();
 	cameraExperimentItem:setDescriptionText("Please take a free fall video:")
 	local experimentFreeFall = cameraExperimentItem:getExperiment()
-	cameraExperimentItem2 = takeVideosSheet:addCameraExperiment();
+	local cameraExperimentItem2 = takeVideosSheet:addCameraExperiment();
 	cameraExperimentItem2:setDescriptionText("Please take a up down video:")
 	local experimentUpDown = cameraExperimentItem2:getExperiment()
-	cameraExperimentItem3 = takeVideosSheet:addCameraExperiment()
+	local cameraExperimentItem3 = takeVideosSheet:addCameraExperiment()
 	cameraExperimentItem3:setDescriptionText("Please take a projectile video:")
 	local experimentProjectile = cameraExperimentItem3:getExperiment()
 
@@ -91,7 +91,7 @@ function onBuildExperimentScript(scriptBuilder)
 	
 	upDownMotionQuestions:addHeader("Estimating Energy Input")
 	upDownMotionQuestions:addText("Complete the following questions:")
-	pbjQuestion = upDownMotionQuestions:addPotentialEnergy1Question();
+	local pbjQuestion = upDownMotionQuestions:addPotentialEnergy1Question();
 	pbjQuestion:setMassQuestionText("Please enter the mass of the ball:")
 	pbjQuestion:setHeightQuestionText("What was the height of the ball at its peak?")
 	pbjQuestion:setEnergyQuestionText("How much energy input enabled the ball to reach this height?")
@@ -126,4 +126,7 @@ function onBuildExperimentScript(scriptBuilder)
 	projectileMotionQuestions:addHeader("Sources of uncertainties")
 	projectileMotionQuestions:addQuestion("How do your estimates of horizontal and vertical accelerations compare with your expected values? What are your expected values? If there is any difference, discuss the sources of uncertainties.")
 	projectileMotionQuestions:addCheckQuestion("Go to your demonstrator now and verify your results.")
+
+    projectileMotionQuestions:addHeader("Please export your data (USE THE UoAMailer APP):")
+    projectileMotionQuestions:addExportButton()
 end
