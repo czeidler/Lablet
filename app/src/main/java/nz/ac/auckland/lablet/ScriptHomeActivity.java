@@ -230,7 +230,7 @@ public class ScriptHomeActivity extends Activity {
             }
         };
 
-        copyResourceScripts(true);
+        copyResourceScripts(false);
     }
 
     private void updateSelectedMenuItem() {
@@ -335,9 +335,9 @@ public class ScriptHomeActivity extends Activity {
         scriptListAdaptor.notifyDataSetChanged();
     }
 
-    private void copyResourceScripts(boolean overwriteExisting) {
+    private void copyResourceScripts(boolean forceCopy) {
         SharedPreferences settings = getSharedPreferences(PREFERENCES_NAME, 0);
-        if (settings.getBoolean("scripts_copied", false))
+        if (!forceCopy && settings.getBoolean("scripts_copied", false))
             return;
 
         File scriptDir = getScriptDirectory(this);
@@ -352,7 +352,7 @@ public class ScriptHomeActivity extends Activity {
                     continue;
                 InputStream inputStream = getAssets().open(file);
                 File scriptOutFile = new File(scriptDir, file);
-                if (!overwriteExisting && scriptOutFile.exists())
+                if (!forceCopy && scriptOutFile.exists())
                     continue;
 
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(scriptOutFile, false));
