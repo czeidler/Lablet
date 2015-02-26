@@ -5,14 +5,21 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content">
 
-    <ImageView
+    <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/imageView" android:src="@drawable/ic_action_mail"/>
+        android:id="@+id/imageButton" android:background="#00000000"  android:src="@drawable/ic_action_mail"/>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Export"
         android:id="@+id/exportButton" android:singleLine="true" android:layout_gravity="center_vertical"
         android:ellipsize="none"/>
+    <CheckedTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+        android:text=""
+        android:id="@+id/statusView" android:checked="false" android:layout_marginLeft="10dp"
+        android:layout_gravity="center_vertical" android:visibility="invisible"/>
 </LinearLayout>

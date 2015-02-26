@@ -571,9 +571,10 @@ public class ScriptTreeNodeSheet extends ScriptTreeNodeSheetBase {
         return item;
     }
 
-    public void addExportButton(SheetGroupLayout parent) {
+    public Export addExportButton(SheetGroupLayout parent) {
         Export item = new Export();
         addItemViewHolder(item, parent);
+        return item;
     }
 }
 
