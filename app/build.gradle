@@ -18,7 +18,7 @@ android {
         minSdkVersion 18
         targetSdkVersion 18
         versionCode 290
-        versionName "3.0Dev"
+        versionName "3.0Beta"
         renderscriptTargetApi 18
         renderscriptSupportModeEnabled true
     }
