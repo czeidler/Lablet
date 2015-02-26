@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -34,6 +35,29 @@ public class ExportDirDialog extends AlertDialog {
     private File[] directories;
     private List<String> outputFiles = new ArrayList<>();
     private boolean canceled = false;
+
+    private String packageName = null;
+    private String className = null;
+
+    public void setClassName(String packageName, String className) {
+        this.packageName = packageName;
+        this.className = className;
+    }
+
+    public interface IActivityStarter {
+        void startActivity(Intent intent);
+    }
+
+    private IActivityStarter activityStarter = new IActivityStarter() {
+        @Override
+        public void startActivity(Intent intent) {
+            activity.startActivity(Intent.createChooser(intent, "Export"));
+        }
+    };
+
+    public void setActivityStarter(IActivityStarter activityStarter) {
+        this.activityStarter = activityStarter;
+    }
 
     public ExportDirDialog(Activity activity, File[] directories) {
         super(activity);
@@ -126,7 +150,9 @@ public class ExportDirDialog extends AlertDialog {
                 if (!result)
                     statusView.setText("Something went wrong!");
                 else {
-                    LabletDataProvider.mailData(activity, "Experiment", "", getOutputFiles());
+                    Intent intent = LabletDataProvider.makeMailIntent("Experiment", "", getOutputFiles(), packageName,
+                            className);
+                    activityStarter.startActivity(intent);
                     dismiss();
                 }
             }
