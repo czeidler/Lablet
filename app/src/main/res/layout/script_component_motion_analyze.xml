@@ -25,7 +25,7 @@
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Motion Analyse"
+            android:text="Motion Analysis"
             android:id="@+id/analyzeExperimentButton"/>
     <view android:layout_width="500dp"
           android:layout_height="350dp"
