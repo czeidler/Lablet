@@ -14,7 +14,7 @@
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Take New Video"
+            android:text=" Take New Video "
             android:id="@+id/takeExperimentButton"/>
     <VideoView
             android:layout_width="wrap_content"
