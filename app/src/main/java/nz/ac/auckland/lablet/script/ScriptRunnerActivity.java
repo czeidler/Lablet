@@ -180,13 +180,13 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             return -1;
         }
 
-        String scriptPath = bundle.getString("script_path");
-        if (scriptPath == null) {
+        String scriptName = bundle.getString("script_name");
+        if (scriptName == null) {
             lastErrorMessage = "bundle contains no script_name";
             return -1;
         }
 
-        scriptFile = new File(scriptPath);
+        scriptFile = new File(scriptUserDataDir, scriptName);
         if (!loadScript(scriptFile))
             return -1;
 
@@ -213,10 +213,21 @@ public class ScriptRunnerActivity extends FragmentActivity implements IScriptLis
             return false;
 
         Bundle bundle = new Bundle();
-        bundle.putString("script_path", scriptFile.getPath());
+        bundle.putString("script_name", scriptFile.getName());
         bundle.putInt("current_fragment", pager.getCurrentItem());
         if (!script.saveScriptState(bundle))
             return false;
+
+        // save script file
+        File scriptFileTarget = new File(scriptUserDataDir, scriptFile.getName());
+        if (!scriptFileTarget.exists()) {
+            try {
+                StorageLib.copyFile(scriptFile, scriptFileTarget);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
 
         File projectFile = new File(scriptUserDataDir, SCRIPT_USER_DATA_FILENAME);
         FileWriter fileWriter;
