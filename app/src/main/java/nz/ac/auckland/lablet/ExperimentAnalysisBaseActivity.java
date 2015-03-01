@@ -44,7 +44,7 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
     private boolean loadExperiment() {
         Intent intent = getIntent();
 
-        String experimentPath = intent.getStringExtra("experiment_path");
+        String experimentPath = intent.getStringExtra(ExperimentActivity.PATH);
         int runId = intent.getIntExtra("run_id", 0);
 
         ExperimentData experimentData = ExperimentHelper.loadExperimentData(experimentPath);

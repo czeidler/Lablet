@@ -9,6 +9,7 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import nz.ac.auckland.lablet.ExperimentActivity;
 import nz.ac.auckland.lablet.misc.PersistentBundle;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -165,7 +166,7 @@ public class ExperimentHelper {
         intent.putExtra("run_id", analysisRef.runId);
         intent.putExtra("analysis_id", analysisRef.analysisUid);
 
-        intent.putExtra("experiment_path", experimentPath);
+        intent.putExtra(ExperimentActivity.PATH, experimentPath);
         if (options != null)
             intent.putExtra("options", options);
     }

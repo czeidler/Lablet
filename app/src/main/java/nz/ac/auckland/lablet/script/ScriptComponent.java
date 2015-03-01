@@ -42,7 +42,7 @@ abstract public class ScriptComponent {
     }
 
     public void setListener(IScriptComponentListener listener) {
-        this.listener = new WeakReference<IScriptComponentListener>(listener);
+        this.listener = new WeakReference<>(listener);
     }
 
     public int getState() {

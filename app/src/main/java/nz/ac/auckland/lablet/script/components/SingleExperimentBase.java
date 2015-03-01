@@ -47,14 +47,14 @@ abstract class SingleExperimentBase extends ScriptComponentViewHolder {
         super.toBundle(bundle);
 
         if (experiment.getExperimentPath() != null)
-            bundle.putString("experiment_path", experiment.getExperimentPath());
+            bundle.putString(ExperimentActivity.PATH, experiment.getExperimentPath());
     }
 
     public boolean fromBundle(Bundle bundle) {
         if (!super.fromBundle(bundle))
             return false;
 
-        experiment.setExperimentPath(bundle.getString("experiment_path", ""));
+        experiment.setExperimentPath(bundle.getString(ExperimentActivity.PATH, ""));
         return true;
     }
 }
@@ -117,12 +117,12 @@ abstract class ScriptComponentSingleExperimentBaseView<ExperimentSensorPlugin ex
         if (requestCode == PERFORM_EXPERIMENT) {
             if (data == null)
                 return;
-            if (data.hasExtra("experiment_path")) {
+            if (data.hasExtra(ExperimentActivity.PATH)) {
                 String oldExperiment = experimentComponent.getExperiment().getExperimentPath();
                 if (!oldExperiment.equals(""))
                     StorageLib.recursiveDeleteFile(new File(oldExperiment));
 
-                String experimentPath = data.getStringExtra("experiment_path");
+                String experimentPath = data.getStringExtra(ExperimentActivity.PATH);
                 experimentComponent.getExperiment().setExperimentPath(experimentPath);
                 experimentComponent.setState(ScriptTreeNode.SCRIPT_STATE_DONE);
 

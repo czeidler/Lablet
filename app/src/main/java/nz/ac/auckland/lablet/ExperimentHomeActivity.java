@@ -387,7 +387,7 @@ public class ExperimentHomeActivity extends Activity {
 
     private void startAnalyzeActivity(String experimentPath) {
         Intent intent = new Intent(this, ExperimentAnalysisActivity.class);
-        intent.putExtra("experiment_path", experimentPath);
+        intent.putExtra(ExperimentActivity.PATH, experimentPath);
         startActivityForResult(intent, ANALYSE_EXPERIMENT);
     }
 
@@ -417,10 +417,10 @@ public class ExperimentHomeActivity extends Activity {
         if (requestCode == PERFORM_EXPERIMENT) {
             if (data == null)
                 return;
-            if (!data.getBooleanExtra("start_analysis", false))
+            if (!data.getBooleanExtra(ExperimentActivity.START_ANALYSIS, false))
                 return;
-            if (data.hasExtra("experiment_path")) {
-                String experimentPath = data.getStringExtra("experiment_path");
+            if (data.hasExtra(ExperimentActivity.PATH)) {
+                String experimentPath = data.getStringExtra(ExperimentActivity.PATH);
                 startAnalyzeActivity(experimentPath);
             }
             return;

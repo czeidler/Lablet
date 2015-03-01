@@ -653,6 +653,9 @@ public class ExperimentActivity extends FragmentActivity {
         finish();
     }
 
+    static public String PATH = "experiment_path";
+    static public String START_ANALYSIS = "start_analysis";
+
     private void finishExperiment(boolean startAnalysis) {
         try {
             File storageDir = new File(experimentBaseDir, experiment.generateNewUid());
@@ -660,8 +663,8 @@ public class ExperimentActivity extends FragmentActivity {
             experiment.finishExperiment(true, storageDir);
 
             Intent data = new Intent();
-            data.putExtra("experiment_path", storageDir.getPath());
-            data.putExtra("start_analysis", startAnalysis);
+            data.putExtra(PATH, storageDir.getPath());
+            data.putExtra(START_ANALYSIS, startAnalysis);
             setResult(RESULT_OK, data);
         } catch (IOException e) {
             e.printStackTrace();
