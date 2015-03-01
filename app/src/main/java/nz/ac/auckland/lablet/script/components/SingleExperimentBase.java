@@ -15,16 +15,22 @@ import nz.ac.auckland.lablet.ExperimentActivity;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
 import nz.ac.auckland.lablet.experiment.ISensorPlugin;
 import nz.ac.auckland.lablet.misc.StorageLib;
+import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptComponentViewHolder;
 import nz.ac.auckland.lablet.script.ScriptRunnerActivity;
 import nz.ac.auckland.lablet.script.ScriptTreeNode;
 
 import java.io.File;
+import java.net.URI;
 
 
 abstract class SingleExperimentBase extends ScriptComponentViewHolder {
     protected ScriptExperimentRef experiment = new ScriptExperimentRef();
     protected String descriptionText = "Please take an experiment:";
+
+    public SingleExperimentBase(Script script) {
+        super(script);
+    }
 
     @Override
     public boolean initCheck() {
@@ -46,15 +52,22 @@ abstract class SingleExperimentBase extends ScriptComponentViewHolder {
     public void toBundle(Bundle bundle) {
         super.toBundle(bundle);
 
-        if (experiment.getExperimentPath() != null)
-            bundle.putString(ExperimentActivity.PATH, experiment.getExperimentPath());
+        if (experiment.getExperimentPath() != null) {
+            // only save the relative path
+            URI path = new File(experiment.getExperimentPath()).toURI();
+            URI base = script.getUserDataDirectory().toURI();
+            String relative = base.relativize(path).getPath();
+
+            bundle.putString(ExperimentActivity.PATH, relative);
+        }
     }
 
     public boolean fromBundle(Bundle bundle) {
         if (!super.fromBundle(bundle))
             return false;
 
-        experiment.setExperimentPath(bundle.getString(ExperimentActivity.PATH, ""));
+        String relative = bundle.getString(ExperimentActivity.PATH, "");
+        experiment.setExperimentPath(new File(script.getUserDataDirectory(), relative).getPath());
         return true;
     }
 }
