@@ -10,6 +10,7 @@ package nz.ac.auckland.lablet.script;
 import android.os.Bundle;
 import android.text.format.Time;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,8 +23,18 @@ public class Script {
     private IScriptListener listener = null;
     private String lastError = "";
 
+    private File userDataDirectory = null;
+
     public void setListener(IScriptListener listener) {
         this.listener = listener;
+    }
+
+    public File getUserDataDirectory() {
+        return userDataDirectory;
+    }
+
+    public void setUserDataDirectory(File userDataDirectory) {
+        this.userDataDirectory = userDataDirectory;
     }
 
     /**
