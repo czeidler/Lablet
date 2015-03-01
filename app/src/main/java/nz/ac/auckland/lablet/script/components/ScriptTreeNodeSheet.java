@@ -31,7 +31,8 @@ class TextComponent extends ScriptComponentViewHolder {
     private String text = "";
     private int typeface = Typeface.NORMAL;
 
-    public TextComponent(String text) {
+    public TextComponent(Script script, String text) {
+        super(script);
         this.text = text;
         setState(ScriptTreeNode.SCRIPT_STATE_DONE);
     }
@@ -61,7 +62,8 @@ class TextComponent extends ScriptComponentViewHolder {
  */
 class CheckBoxQuestion extends ScriptComponentViewHolder {
     private String text = "";
-    public CheckBoxQuestion(String text) {
+    public CheckBoxQuestion(Script script, String text) {
+        super(script);
         this.text = text;
         setState(ScriptTreeNode.SCRIPT_STATE_ONGOING);
     }
@@ -102,7 +104,8 @@ class Question extends ScriptComponentViewHolder {
     private String text = "";
     private ScriptTreeNodeSheetBase component;
 
-    public Question(String text, ScriptTreeNodeSheetBase component) {
+    public Question(Script script, String text, ScriptTreeNodeSheetBase component) {
+        super(script);
         this.text = text;
         this.component = component;
 
@@ -143,7 +146,8 @@ class TextQuestion extends ScriptComponentViewHolder {
     private boolean optional = false;
     private ScriptTreeNodeSheetBase component;
 
-    public TextQuestion(String text, ScriptTreeNodeSheetBase component) {
+    public TextQuestion(Script script, String text, ScriptTreeNodeSheetBase component) {
+        super(script);
         this.text = text;
         this.component = component;
 
@@ -241,7 +245,8 @@ class MotionAnalysisGraphView extends ScriptComponentViewHolder {
     private String title = "Position Data";
     private ScriptExperimentRef.IListener experimentListener;
 
-    public MotionAnalysisGraphView(ScriptTreeNodeSheet experimentSheet, ScriptExperimentRef experiment) {
+    public MotionAnalysisGraphView(Script script, ScriptTreeNodeSheet experimentSheet, ScriptExperimentRef experiment) {
+        super(script);
         this.experimentSheet = experimentSheet;
         this.experiment = experiment;
         setState(ScriptTreeNode.SCRIPT_STATE_DONE);
@@ -517,62 +522,62 @@ public class ScriptTreeNodeSheet extends ScriptTreeNodeSheetBase {
     }
 
     public ScriptComponentViewHolder addText(String text, SheetGroupLayout parent) {
-        TextComponent textOnlyQuestion = new TextComponent(text);
+        TextComponent textOnlyQuestion = new TextComponent(script, text);
         addItemViewHolder(textOnlyQuestion, parent);
         return textOnlyQuestion;
     }
 
     public ScriptComponentViewHolder addHeader(String text, SheetGroupLayout parent) {
-        TextComponent component = new TextComponent(text);
+        TextComponent component = new TextComponent(script, text);
         component.setTypeface(Typeface.BOLD);
         addItemViewHolder(component, parent);
         return component;
     }
 
     public ScriptComponentViewHolder addQuestion(String text, SheetGroupLayout parent) {
-        Question component = new Question(text, this);
+        Question component = new Question(script, text, this);
         addItemViewHolder(component, parent);
         return component;
     }
 
     public ScriptComponentViewHolder addTextQuestion(String text, SheetGroupLayout parent) {
-        TextQuestion component = new TextQuestion(text, this);
+        TextQuestion component = new TextQuestion(script, text, this);
         addItemViewHolder(component, parent);
         return component;
     }
 
     public ScriptComponentViewHolder addCheckQuestion(String text, SheetGroupLayout parent) {
-        CheckBoxQuestion question = new CheckBoxQuestion(text);
+        CheckBoxQuestion question = new CheckBoxQuestion(script, text);
         addItemViewHolder(question, parent);
         return question;
     }
 
     public CameraExperiment addCameraExperiment(SheetGroupLayout parent) {
-        CameraExperiment cameraExperiment = new CameraExperiment();
+        CameraExperiment cameraExperiment = new CameraExperiment(script);
         addItemViewHolder(cameraExperiment, parent);
         return cameraExperiment;
     }
 
     public MicrophoneExperiment addMicrophoneExperiment(SheetGroupLayout parent) {
-        MicrophoneExperiment experiment = new MicrophoneExperiment();
+        MicrophoneExperiment experiment = new MicrophoneExperiment(script);
         addItemViewHolder(experiment, parent);
         return experiment;
     }
 
     public PotentialEnergy1 addPotentialEnergy1Question(SheetGroupLayout parent) {
-        PotentialEnergy1 question = new PotentialEnergy1();
+        PotentialEnergy1 question = new PotentialEnergy1(script);
         addItemViewHolder(question, parent);
         return question;
     }
 
     public MotionAnalysisGraphView addMotionAnalysisGraph(ScriptExperimentRef experiment, SheetGroupLayout parent) {
-        MotionAnalysisGraphView item = new MotionAnalysisGraphView(this, experiment);
+        MotionAnalysisGraphView item = new MotionAnalysisGraphView(script, this, experiment);
         addItemViewHolder(item, parent);
         return item;
     }
 
     public Export addExportButton(SheetGroupLayout parent) {
-        Export item = new Export();
+        Export item = new Export(script);
         addItemViewHolder(item, parent);
         return item;
     }

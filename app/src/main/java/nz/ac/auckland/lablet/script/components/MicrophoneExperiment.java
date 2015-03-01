@@ -15,6 +15,7 @@ import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
 import nz.ac.auckland.lablet.microphone.MicrophoneSensorPlugin;
+import nz.ac.auckland.lablet.script.Script;
 
 import java.io.File;
 
@@ -23,7 +24,8 @@ import java.io.File;
  * Script component that has view for starting  a microphone experiment.
  */
 public class MicrophoneExperiment extends SingleExperimentBase {
-    public MicrophoneExperiment() {
+    public MicrophoneExperiment(Script script) {
+        super(script);
         setDescriptionText("Please take an audio recording:");
     }
 

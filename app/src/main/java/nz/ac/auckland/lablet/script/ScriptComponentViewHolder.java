@@ -16,6 +16,10 @@ import android.view.View;
 abstract public class ScriptComponentViewHolder extends ScriptComponent implements ISheetLayoutItemParameters {
     private float weight = 1.f;
 
+    public ScriptComponentViewHolder(Script script) {
+        super(script);
+    }
+
     /**
      * Creates the view that displays the script component.
      *

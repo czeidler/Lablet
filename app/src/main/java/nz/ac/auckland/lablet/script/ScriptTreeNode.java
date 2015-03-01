@@ -14,16 +14,11 @@ import java.util.Map;
  * component. A {@link ScriptTreeNode} has a link to its parent (if it exists).
  */
 abstract public class ScriptTreeNode extends ScriptComponent implements Iterable<ScriptTreeNode> {
-    private Script script = null;
     private ScriptTreeNode parent = null;
-    private Map<Integer, ScriptTreeNode> connections = new HashMap<Integer, ScriptTreeNode>();
+    private Map<Integer, ScriptTreeNode> connections = new HashMap<>();
 
     public ScriptTreeNode(Script script) {
-        this.script = script;
-    }
-
-    public Script getScript() {
-        return script;
+        super(script);
     }
 
     /**
@@ -66,7 +61,7 @@ abstract public class ScriptTreeNode extends ScriptComponent implements Iterable
      * @return an ordered list of active child components
      */
     public List<ScriptTreeNode> getActiveChain() {
-        List<ScriptTreeNode> list = new ArrayList<ScriptTreeNode>();
+        List<ScriptTreeNode> list = new ArrayList<>();
         list.add(this);
         ScriptTreeNode current = this;
         while (true) {

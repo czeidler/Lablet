@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.R;
+import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptComponent;
 import nz.ac.auckland.lablet.script.ScriptTreeNode;
 import nz.ac.auckland.lablet.script.ScriptComponentViewHolder;
@@ -238,7 +239,8 @@ public class PotentialEnergy1 extends ScriptComponentViewHolder {
     private float energy = 0.0f;
     private float pbjValue = 0.0f;
 
-    public PotentialEnergy1() {
+    public PotentialEnergy1(Script script) {
+        super(script);
         setState(ScriptTreeNode.SCRIPT_STATE_ONGOING);
     }
 

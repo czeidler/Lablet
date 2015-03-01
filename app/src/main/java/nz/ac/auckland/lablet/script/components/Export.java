@@ -19,6 +19,7 @@ import android.widget.CheckedTextView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import nz.ac.auckland.lablet.R;
+import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptComponentViewHolder;
 import nz.ac.auckland.lablet.script.ScriptRunnerActivity;
 import nz.ac.auckland.lablet.script.ScriptTreeNode;
@@ -33,7 +34,8 @@ public class Export extends ScriptComponentViewHolder {
 
     private boolean dataExported = false;
 
-    public Export() {
+    public Export(Script script) {
+        super(script);
         setState(ScriptTreeNode.SCRIPT_STATE_DONE);
     }
 

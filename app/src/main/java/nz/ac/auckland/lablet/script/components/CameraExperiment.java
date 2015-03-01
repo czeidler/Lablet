@@ -20,6 +20,7 @@ import nz.ac.auckland.lablet.camera.CameraSensorPlugin;
 import nz.ac.auckland.lablet.experiment.ExperimentData;
 import nz.ac.auckland.lablet.experiment.ExperimentHelper;
 import nz.ac.auckland.lablet.experiment.ISensorData;
+import nz.ac.auckland.lablet.script.Script;
 
 import java.io.File;
 
@@ -32,7 +33,8 @@ public class CameraExperiment extends SingleExperimentBase {
     private int requestedVideoHeight = -1;
     private float recordingFrameRate = -1;
 
-    public CameraExperiment() {
+    public CameraExperiment(Script script) {
+        super(script);
         setDescriptionText("Please take a video:");
     }
 

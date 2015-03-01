@@ -20,6 +20,8 @@ import java.lang.ref.WeakReference;
  * been handled, e.g. all questions in a component have been answered.
  */
 abstract public class ScriptComponent {
+    protected Script script = null;
+
     final static public int SCRIPT_STATE_ONGOING = -1;
     final static public int SCRIPT_STATE_DONE = 0;
 
@@ -30,6 +32,14 @@ abstract public class ScriptComponent {
     private WeakReference<IScriptComponentListener> listener = null;
     private int state = SCRIPT_STATE_ONGOING;
     protected String lastErrorMessage = "";
+
+    public ScriptComponent(Script script) {
+        this.script = script;
+    }
+
+    public Script getScript() {
+        return script;
+    }
 
     /**
      * Checks if the component has all information to operate correctly, i.e., everything is setup correctly in the
