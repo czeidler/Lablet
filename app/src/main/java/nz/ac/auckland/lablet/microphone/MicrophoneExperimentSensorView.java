@@ -63,7 +63,8 @@ class PreviewViewState implements AbstractExperimentSensor.State {
         this.mainView = mainView;
         this.experimentSensor = experimentSensor;
 
-        StrategyPainter strategyPainter = new ThreadStrategyPainter();
+        ThreadStrategyPainter strategyPainter = new ThreadStrategyPainter();
+        strategyPainter.setForceInvalidateOnRangeChanged(false);
         //StrategyPainter strategyPainter = new BufferedDirectStrategyPainter();
         amplitudePlotAdapter = new AudioAmplitudePlotDataAdapter();
         amplitudePlotView = (PlotView)mainView.findViewById(R.id.audioSignalView);
@@ -74,6 +75,7 @@ class PreviewViewState implements AbstractExperimentSensor.State {
         frequencyMapPlotView = (PlotView)mainView.findViewById(R.id.audioFrequencyMapPlot);
         frequencyMapAdapter = new AudioFrequencyMapAdapter(experimentSensor.getLiveStepFactor());
         strategyPainter = new ThreadStrategyPainter();
+        strategyPainter.setForceInvalidateOnRangeChanged(false);
         AudioFrequencyMapConcurrentPainter audioFrequencyMapPainter
                 = new AudioFrequencyMapConcurrentPainter(frequencyMapAdapter);
         strategyPainter.addChild(audioFrequencyMapPainter);
