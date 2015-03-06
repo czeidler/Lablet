@@ -230,6 +230,7 @@ public class ScriptHomeActivity extends Activity {
             }
         };
 
+        //copyResourceScripts(true); // force overwrite
         copyResourceScripts(false);
     }
 
