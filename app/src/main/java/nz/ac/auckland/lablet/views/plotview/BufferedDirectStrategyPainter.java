@@ -29,7 +29,7 @@ public class BufferedDirectStrategyPainter extends BufferedStrategyPainter {
     protected void onNewDirtyRegions(RectF newDirt) {
         super.onNewDirtyRegions(newDirt);
 
-        containerView.invalidate();
+        invalidateContainerView();
     }
 
     @Override

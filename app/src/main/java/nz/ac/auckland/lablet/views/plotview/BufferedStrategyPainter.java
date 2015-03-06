@@ -54,6 +54,10 @@ class BitmapBuffer {
         setBuffer(bitmap);
         return buffer;
     }
+
+    public void release() {
+        bitmapReference = null;
+    }
 }
 
 abstract public class BufferedStrategyPainter extends StrategyPainter {
@@ -260,6 +264,6 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
         } else
             invalidate();
 
-        containerView.invalidate();
+        invalidateContainerView();
     }
 }

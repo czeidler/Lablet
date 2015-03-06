@@ -21,7 +21,7 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
         this.containerView = view;
         if (view == null)
             return;
-        containerView.invalidate();
+        invalidateContainerView();
         onAttachedToView();
     }
 
@@ -58,6 +58,10 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
 
     @Override
     public void invalidate() {
+        invalidateContainerView();
+    }
+
+    protected void invalidateContainerView() {
         if (containerView != null)
             containerView.invalidate();
     }
