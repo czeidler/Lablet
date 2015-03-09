@@ -11,9 +11,65 @@ import android.graphics.RectF;
 import nz.ac.auckland.lablet.microphone.FixSizedBunchArray;
 import nz.ac.auckland.lablet.views.plotview.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+
 
 public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
-    private FixSizedBunchArray data = null;
+    public interface DataBackend {
+        void clear();
+        void add(float frequencies[]);
+        int getBunchSize();
+        float[] getBunch(int index);
+        int getBunchCount();
+        DataBackend clone();
+    }
+
+    static private class InMemoryBackend implements DataBackend {
+        FixSizedBunchArray data;
+
+        public InMemoryBackend(int bunchSize) {
+            data = new FixSizedBunchArray(bunchSize);
+        }
+
+        private InMemoryBackend() {
+
+        }
+
+        @Override
+        public void clear() {
+            data.clear();
+        }
+
+        @Override
+        public void add(float[] frequencies) {
+            data.add(frequencies);
+        }
+
+        @Override
+        public int getBunchSize() {
+            return data.getBunchSize();
+        }
+
+        @Override
+        public float[] getBunch(int index) {
+            return data.getBunch(index);
+        }
+
+        @Override
+        public int getBunchCount() {
+            return data.getBunchCount();
+        }
+
+        @Override
+        public DataBackend clone() {
+            InMemoryBackend clone = new InMemoryBackend();
+            clone.data = new FixSizedBunchArray(data);
+            return clone;
+        }
+    }
+
+    private DataBackend data = null;
     private int sampleRate = 44100;
     private float stepFactor;
 
@@ -60,7 +116,7 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
         rightIndex ++;
         if (leftIndex < 0)
             leftIndex = 0;
-        int size = data.size();
+        int size = data.getBunchSize();
         if (rightIndex >= size)
             rightIndex = size - 1;
 
@@ -69,7 +125,7 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
 
     public void addData(float frequencies[]) {
         if (data == null)
-            data = new FixSizedBunchArray(frequencies.length);
+            data = new InMemoryBackend(frequencies.length);
 
         int oldSize = data.getBunchCount();
         data.add(frequencies);
@@ -77,10 +133,17 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
         notifyDataAdded(oldSize, 1);
     }
 
+    public void setDataFile(File file, int windowSize) throws FileNotFoundException {
+        if (data != null)
+            data.clear();
+        data = new FourierHelper.FrequencyFileReader(file, windowSize);
+        notifyAllDataChanged();
+    }
+
     public AudioFrequencyMapAdapter clone(Region1D region) {
         AudioFrequencyMapAdapter adapter = new AudioFrequencyMapAdapter(stepFactor);
         if (data != null)
-            adapter.data = new FixSizedBunchArray(data);
+            adapter.data = data.clone();
         return adapter;
     }
 
