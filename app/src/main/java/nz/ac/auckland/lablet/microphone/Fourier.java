@@ -40,7 +40,7 @@ public class Fourier {
         return transformInternal(trafo);
     }
 
-    static int getNSteps(int dataLength, int windowSize, int stepWidth) {
+    static public int getNSteps(int dataLength, int windowSize, int stepWidth) {
         return (dataLength - windowSize) / stepWidth + 1;
     }
 
