@@ -11,7 +11,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
-import nz.ac.auckland.lablet.microphone.AudioFrequencyMapAdapter;
 import nz.ac.auckland.lablet.views.plotview.*;
 
 import java.util.Arrays;
@@ -86,6 +85,18 @@ public class AudioFrequencyMapConcurrentPainter extends ArrayConcurrentPainter {
         return true;
     }
 
+    private int getDataPointsPerPixel(AudioFrequencyMapAdapter adapter, Range range) {
+        float rangeWidth = adapter.getX(range.max) - adapter.getX(range.min);
+        float indexWidth = range.max - range.min;
+        float viewPixelWidth = getContainerView().getWidth();
+        RectF viewRange = getContainerView().getRange();
+
+        float pointsPerPixel = indexWidth / rangeWidth * viewRange.width() / viewPixelWidth;
+        if (pointsPerPixel < 1)
+            return 1;
+        return (int)pointsPerPixel;
+    }
+
     @Override
     protected void drawRange(Canvas bitmapCanvas, ArrayRenderPayload payload, Range range) {
         AudioFrequencyMapAdapter adapter = (AudioFrequencyMapAdapter)payload.getAdapter();
@@ -111,13 +122,19 @@ public class AudioFrequencyMapConcurrentPainter extends ArrayConcurrentPainter {
         final int[] colors = new int[screenRectHeight];
         final int[] bitmapData = new int[screenRectWidth * screenRectHeight];
 
+        int dataPointsPerPixel = getDataPointsPerPixel(adapter, range);
+        int maxDataPointsPerPixel = 1;
+        int stepSize = dataPointsPerPixel / maxDataPointsPerPixel;
+        if (stepSize < 1)
+            stepSize = 1;
+
         int index = start;
         int startXPixel = -1;
         int startIndex = 0;
         while (index < start + count) {
             // advance till the next pixel
             int endXPixel = -1;
-            for (; index < start + count; index++) {
+            for (; index < start + count; index += stepSize) {
                 final float[] screenLeftTop = mapPoint(rangeMatrix, adapter.getX(index), payload.getRealDataRect().top);
                 endXPixel = (int)screenLeftTop[0] - xStartPixel;
                 if (endXPixel < 0)
