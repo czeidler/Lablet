@@ -330,9 +330,10 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
             }
 
             protected void onPostExecute(Void result) {
-                audioAmplitudePlotAdapter.addData(amplitudes);
-                int totalTime = audioAmplitudePlotAdapter.getTotalTime();
+                int totalTime = audioAmplitudePlotAdapter.getTotalTime(amplitudes.length);
+
                 amplitudeView.setXRange(0, totalTime);
+                audioAmplitudePlotAdapter.addData(amplitudes);
 
                 lengthTextView.setText(Integer.toString(totalTime) + " [ms]");
 
