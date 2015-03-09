@@ -18,6 +18,9 @@ public class AudioWavInputStream extends InputStream implements Closeable {
     private int sampleRate;
     private int byteRate;
     private int audioDataSize;
+    final static public int BYTES_PER_SAMPLE = 2;
+    private byte[] convertByteBuffer = new byte[BYTES_PER_SAMPLE];
+    private float[] convertFloatBuffer = new float[1];
 
     public AudioWavInputStream(File file) throws IOException {
         inputStream = new BufferedInputStream(new FileInputStream(file));
@@ -105,22 +108,31 @@ public class AudioWavInputStream extends InputStream implements Closeable {
     }
 
     static public float[] toAmplitudeData(byte[] buffer, int bufferSize) {
-        final int bytesPerSample = 2;
-        float frame[] = new float[bufferSize / bytesPerSample];
+        float outBuffer[] = new float[bufferSize / BYTES_PER_SAMPLE];
+        return toAmplitudeData(buffer, bufferSize, outBuffer);
+    }
 
+    static private float[] toAmplitudeData(byte[] buffer, int bufferSize, float[] outBuffer) {
         int frameIndex = 0;
-        for (int index = 0; index < bufferSize - bytesPerSample + 1; index += bytesPerSample) {
+        for (int index = 0; index < bufferSize - BYTES_PER_SAMPLE + 1; index += BYTES_PER_SAMPLE) {
             float sample = 0;
-            for (int b = 0; b < bytesPerSample; b++) {
+            for (int b = 0; b < BYTES_PER_SAMPLE; b++) {
                 int v = buffer[index + b];
-                if (b < bytesPerSample - 1 || bytesPerSample == 1) {
+                if (b < BYTES_PER_SAMPLE - 1 || BYTES_PER_SAMPLE == 1) {
                     v &= 0xFF;
                 }
                 sample += v << (b * 8);
             }
-            frame[frameIndex] = sample;
+            outBuffer[frameIndex] = sample;
             frameIndex++;
         }
-        return frame;
+        return outBuffer;
+    }
+
+    public float readFloatAmplitude() throws IOException {
+        convertByteBuffer[0] = (byte)read();
+        convertByteBuffer[1] = (byte)read();
+
+        return toAmplitudeData(convertByteBuffer, convertByteBuffer.length, convertFloatBuffer)[0];
     }
 }
