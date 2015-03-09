@@ -14,7 +14,7 @@ import java.util.*;
 
 class FixSizedBunchArray extends AbstractList<Float> {
     final public List<float[]> list;
-    final public int bunchSize;
+    public int bunchSize = -1;
     public int size = 0;
 
     public FixSizedBunchArray(int bunchSize) {
@@ -30,11 +30,16 @@ class FixSizedBunchArray extends AbstractList<Float> {
     }
 
     public void add(float[] data) {
+        if (bunchSize == -1)
+            bunchSize = data.length;
+        if (bunchSize != data.length)
+            throw new RuntimeException();
         list.add(data);
         size += bunchSize;
     }
 
     public void clear() {
+        bunchSize = -1;
         list.clear();
         size = 0;
     }
@@ -154,8 +159,12 @@ public class AudioAmplitudePlotDataAdapter extends AbstractXYDataAdapter {
         return data.size();
     }
 
+    public int getTotalTime(int nAmplitudes) {
+        return nAmplitudes / sampleRate * 1000;
+    }
+
     public int getTotalTime() {
-        return getSize() * 1000 / sampleRate;
+        return getTotalTime(getSize());
     }
 
     @Override
