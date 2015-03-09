@@ -108,14 +108,14 @@ class FourierRenderScript {
         script = new ScriptC_fft(renderScript, context.getResources(), R.raw.fft);
     }
 
-    public float[] renderScriptFFT(float[] data, int windowSize, float stepFactor) {
-        if (data.length == 0)
+    public float[] renderScriptFFT(float[] data, int length, int windowSize, float stepFactor) {
+        if (length == 0)
             return new float[0];
         final int stepWidth =  (int)(stepFactor * windowSize);
-        final int nSteps = Fourier.getNSteps(data.length, windowSize, stepWidth);
+        final int nSteps = Fourier.getNSteps(length, windowSize, stepWidth);
         final int outputSize = nSteps * windowSize / 2;
 
-        Allocation dataAllocation = Allocation.createSized(renderScript, Element.F32(renderScript), data.length,
+        Allocation dataAllocation = Allocation.createSized(renderScript, Element.F32(renderScript), length,
                 Allocation.USAGE_SHARED);
         dataAllocation.copyFrom(data);
         final float[] out = new float[outputSize];

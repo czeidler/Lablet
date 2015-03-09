@@ -440,7 +440,8 @@ public class FrequencyAnalysisView extends FrameLayout {
                     float[] frequencies;
                     if (useRenderScript) {
                         final FourierRenderScript fourierRenderScript = new FourierRenderScript(getContext());
-                        frequencies = fourierRenderScript.renderScriptFFT(amplitudes, newWindowSize, newStepFactor);
+                        frequencies = fourierRenderScript.renderScriptFFT(amplitudes, amplitudes.length, newWindowSize,
+                                newStepFactor);
                         fourierRenderScript.release();
                     } else
                         frequencies = Fourier.transform(amplitudes, newWindowSize, newStepFactor);
