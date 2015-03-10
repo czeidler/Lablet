@@ -23,7 +23,7 @@ public class AudioWavInputStream extends InputStream implements Closeable {
     private float[] convertFloatBuffer = new float[1];
 
     public AudioWavInputStream(File file) throws IOException {
-        inputStream = new BufferedInputStream(new FileInputStream(file));
+        inputStream = new FileInputStream(file);
         readHeader();
     }
 
@@ -112,7 +112,7 @@ public class AudioWavInputStream extends InputStream implements Closeable {
         return toAmplitudeData(buffer, bufferSize, outBuffer);
     }
 
-    static private float[] toAmplitudeData(byte[] buffer, int bufferSize, float[] outBuffer) {
+    static public float[] toAmplitudeData(byte[] buffer, int bufferSize, float[] outBuffer) {
         int frameIndex = 0;
         for (int index = 0; index < bufferSize - BYTES_PER_SAMPLE + 1; index += BYTES_PER_SAMPLE) {
             float sample = 0;
@@ -129,9 +129,21 @@ public class AudioWavInputStream extends InputStream implements Closeable {
         return outBuffer;
     }
 
-    public float readFloatAmplitude() throws IOException {
-        convertByteBuffer[0] = (byte)read();
-        convertByteBuffer[1] = (byte)read();
+    /**
+     * This method allows to read amplitude float data from a stream.
+     *
+     * AudioWavInputStream is not buffered this method allows to read from a buffered stream.
+     *
+     * @param inputStream the input stream to read the data from
+     * @param convertByteBuffer must have at least size 2
+     * @param convertFloatBuffer must have at least size 1
+     * @return
+     * @throws IOException
+     */
+    static public float readFloatAmplitude(InputStream inputStream, byte[] convertByteBuffer,
+                                           float[] convertFloatBuffer) throws IOException {
+        convertByteBuffer[0] = (byte)inputStream.read();
+        convertByteBuffer[1] = (byte)inputStream.read();
 
         return toAmplitudeData(convertByteBuffer, convertByteBuffer.length, convertFloatBuffer)[0];
     }
