@@ -136,7 +136,7 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
     public void setDataFile(File file, int windowSize) throws FileNotFoundException {
         if (data != null)
             data.clear();
-        data = new FourierHelper.FrequencyFileReader(file, windowSize);
+        data = new FrequencyFileReader(file, windowSize);
         notifyAllDataChanged();
     }
 

@@ -26,8 +26,8 @@ import nz.ac.auckland.lablet.views.plotview.PlotView;
 import nz.ac.auckland.lablet.views.plotview.StrategyPainter;
 import nz.ac.auckland.lablet.views.plotview.ThreadStrategyPainter;
 
-import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -147,7 +147,7 @@ class RecordingViewState implements AbstractExperimentSensor.State {
         frequencyMapPlotView = previewViewState.frequencyMapPlotView;
         frequencyMapAdapter = previewViewState.frequencyMapAdapter;
     }
-
+//TODO: discard data in adapter...
     private MicrophoneExperimentSensor.ISensorDataListener listener = new MicrophoneExperimentSensor.ISensorDataListener() {
         @Override
         public void onNewAmplitudeData(float[] amplitudes) {
@@ -219,7 +219,7 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
     final private AudioFrequencyMapAdapter frequencyMapAdapter;
 
     final float DEFAULT_STEP_FACTOR = 0.5f;
-    final int DEFAULT_SAMPLE_SIZE = 4096;
+    final int DEFAULT_WINDOW_SIZE = 4096;
 
     private MediaPlayer mediaPlayer;
 
@@ -301,59 +301,39 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
         audioAmplitudePlotAdapter.clear();
         frequencyMapAdapter.clear();
 
-        AsyncTask<File, Integer, Void> asyncTask = new AsyncTask<File, Integer, Void>() {
-            private float[] amplitudes;
-            private float[] frequencies;
+        final IFrequencyMapLoader frequencyMapLoader = FrequencyMapLoaderFactory.create(frequencyMapAdapter,
+                experimentSensor.getAudioFile());
+        final AudioWavInputStream audioWavInputStream;
+        try {
+            audioWavInputStream = new AudioWavInputStream(experimentSensor.getAudioFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        final int totalTime = audioWavInputStream.getDurationMilliSeconds();
 
-            final FourierRenderScript fourierRenderScript = new FourierRenderScript(playbackView.getContext());
+        amplitudeView.setXRange(0, totalTime);
+        lengthTextView.setText(Integer.toString(totalTime) + " [ms]");
 
+        frequencyMapLoader.loadWavFile(audioWavInputStream, new Runnable() {
             @Override
-            protected Void doInBackground(File... files) {
-                try {
-                    AudioWavInputStream audioWavInputStream = new AudioWavInputStream(files[0]);
-                    int size = audioWavInputStream.getSize();
-                    BufferedInputStream bufferedInputStream = new BufferedInputStream(audioWavInputStream);
-                    byte[] data = new byte[size];
-                    for (int i = 0; i < size; i++)
-                        data[i] = (byte)bufferedInputStream.read();
-
-                    amplitudes = AudioWavInputStream.toAmplitudeData(data, data.length);
-                    frequencies = fourierRenderScript.renderScriptFFT(amplitudes, DEFAULT_SAMPLE_SIZE,
-                            frequencyMapAdapter.getStepFactor());
-                    //frequencies = Fourier.transformOverlap(amplitudes, DEFAULT_SAMPLE_SIZE,
-                      //      frequencyMapAdapter.getStepFactor());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                return null;
+            public void run() {
+                frequencyMapLoader.updateFrequencies(playbackView.getContext(), frequencyMapAdapter.getStepFactor(),
+                        DEFAULT_WINDOW_SIZE, new IFrequencyMapLoader.IFrequenciesUpdatedListener() {
+                            @Override
+                            public void onFrequenciesUpdated(boolean canceled) {
+                                frequencyMapPlotView.setMaxXRange(0, totalTime);
+                                frequencyMapPlotView.setMaxYRange(1, experimentSensor.SAMPLE_RATE / 2);
+                                frequencyMapPlotView.setXRange(0, totalTime);
+                                frequencyMapPlotView.setYRange(1, experimentSensor.SAMPLE_RATE / 2);
+                                frequencyMapPlotView.setXDraggable(true);
+                                frequencyMapPlotView.setYDraggable(true);
+                                frequencyMapPlotView.setXZoomable(true);
+                                frequencyMapPlotView.setYZoomable(true);
+                            }
+                        });
             }
-
-            protected void onPostExecute(Void result) {
-                int totalTime = audioAmplitudePlotAdapter.getTotalTime(amplitudes.length);
-
-                amplitudeView.setXRange(0, totalTime);
-                audioAmplitudePlotAdapter.addData(amplitudes);
-
-                lengthTextView.setText(Integer.toString(totalTime) + " [ms]");
-
-                int freqSampleSize = DEFAULT_SAMPLE_SIZE / 2;
-                for (int i = 0; i < frequencies.length; i += freqSampleSize) {
-                    final float[] bunch = Arrays.copyOfRange(frequencies, i, i + freqSampleSize);
-                    frequencyMapAdapter.addData(bunch);
-                }
-
-                frequencyMapPlotView.setMaxXRange(0, totalTime);
-                frequencyMapPlotView.setMaxYRange(1, experimentSensor.SAMPLE_RATE / 2);
-                frequencyMapPlotView.setXRange(0, totalTime);
-                frequencyMapPlotView.setYRange(1, experimentSensor.SAMPLE_RATE / 2);
-                frequencyMapPlotView.setXDraggable(true);
-                frequencyMapPlotView.setYDraggable(true);
-                frequencyMapPlotView.setXZoomable(true);
-                frequencyMapPlotView.setYZoomable(true);
-            }
-        };
-        asyncTask.execute(experimentSensor.getAudioFile());
+        });
     }
 
     @Override
