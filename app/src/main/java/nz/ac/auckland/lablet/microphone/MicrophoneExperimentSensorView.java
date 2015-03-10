@@ -212,8 +212,6 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
     final private ToggleButton startPauseButton;
     final private SeekBar seekBar;
     final private TextView lengthTextView;
-    final private PlotView amplitudeView;
-    final private AudioAmplitudePlotDataAdapter audioAmplitudePlotAdapter;
 
     final private PlotView frequencyMapPlotView;
     final private AudioFrequencyMapAdapter frequencyMapAdapter;
@@ -244,23 +242,10 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
         startPauseButton = (ToggleButton)playbackView.findViewById(R.id.startPauseButton);
         seekBar = (SeekBar)playbackView.findViewById(R.id.seekBar);
         lengthTextView = (TextView)playbackView.findViewById(R.id.lengthTextView);
-        amplitudeView = (PlotView)playbackView.findViewById(R.id.playbackAmplitudeView);
         frequencyMapPlotView = (PlotView)playbackView.findViewById(R.id.frequencyMapPlotView);
 
-        // amplitude plot
-        StrategyPainter strategyPainter = new ThreadStrategyPainter();
-        audioAmplitudePlotAdapter = new AudioAmplitudePlotDataAdapter();
-        strategyPainter.addChild(new AudioAmplitudePainter(audioAmplitudePlotAdapter));
-        amplitudeView.addPlotPainter(strategyPainter);
-        amplitudeView.setYRange(MicrophoneExperimentSensorView.Settings.amplitudeMin,
-                MicrophoneExperimentSensorView.Settings.amplitudeMax);
-        amplitudeView.getTitleView().setTitle("Signal Strength Vs Time");
-        amplitudeView.getXAxisView().setUnit(experimentSensor.getTimeUnit());
-        amplitudeView.getXAxisView().setTitle("Time");
-        amplitudeView.setAutoRange(PlotView.AUTO_RANGE_ZOOM_EXTENDING, PlotView.AUTO_RANGE_ZOOM_EXTENDING);
-
         // frequency map
-        strategyPainter = new ThreadStrategyPainter();
+        StrategyPainter strategyPainter = new ThreadStrategyPainter();
         frequencyMapAdapter = new AudioFrequencyMapAdapter(DEFAULT_STEP_FACTOR);
         strategyPainter.addChild(new AudioFrequencyMapConcurrentPainter(frequencyMapAdapter));
         frequencyMapPlotView.addPlotPainter(strategyPainter);
@@ -298,7 +283,6 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
     }
 
     private void loadWavFileAsync() {
-        audioAmplitudePlotAdapter.clear();
         frequencyMapAdapter.clear();
 
         final IFrequencyMapLoader frequencyMapLoader = FrequencyMapLoaderFactory.create(frequencyMapAdapter,
@@ -312,7 +296,6 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
         }
         final int totalTime = audioWavInputStream.getDurationMilliSeconds();
 
-        amplitudeView.setXRange(0, totalTime);
         lengthTextView.setText(Integer.toString(totalTime) + " [ms]");
 
         frequencyMapLoader.loadWavFile(audioWavInputStream, new Runnable() {
@@ -369,7 +352,7 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
     public boolean stop() {
         playbackView.setVisibility(View.INVISIBLE);
 
-        audioAmplitudePlotAdapter.clear();
+        frequencyMapAdapter.clear();
 
         if (mediaPlayer != null) {
             mediaPlayer.stop();
