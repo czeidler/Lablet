@@ -74,13 +74,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/steppingSpinner" android:layout_alignParentEnd="true"
             android:layout_below="@+id/freqResEditText" android:layout_alignStart="@+id/freqResEditText"/>
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Render Script"
-            android:id="@+id/renderScriptCheckBox"
-            android:checked="false" android:layout_alignParentBottom="true"
-            android:layout_alignEnd="@+id/textView5"/>
         <SeekBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -94,7 +87,7 @@
             android:text="Contrast"
             android:id="@+id/textView6"
             android:layout_alignParentEnd="true"
-            android:layout_alignStart="@+id/renderScriptCheckBox" android:layout_below="@+id/contrastSeekBar"
+            android:layout_alignParentStart="true" android:layout_below="@+id/contrastSeekBar"
             android:gravity="center_horizontal"/>
         <SeekBar
             android:layout_width="wrap_content"
@@ -108,7 +101,7 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Brightness"
             android:id="@+id/textView7"
-            android:layout_alignStart="@+id/renderScriptCheckBox" android:layout_below="@+id/brightnessSeekBar"
+            android:layout_alignParentStart="true" android:layout_below="@+id/brightnessSeekBar"
             android:layout_alignParentEnd="true" android:gravity="center_horizontal"/>
         <CheckBox
             android:layout_width="wrap_content"
