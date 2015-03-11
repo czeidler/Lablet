@@ -88,6 +88,9 @@ class PreviewViewState implements AbstractExperimentSensor.State {
         amplitudePlotAdapter.clear();
         frequencyMapAdapter.clear();
 
+        amplitudePlotAdapter.setDiscardDataTime(-1);
+        frequencyMapAdapter.setDiscardDataTime(-1);
+
         amplitudePlotView.setXRange(0, MicrophoneExperimentSensorView.Settings.timeSpan);
         amplitudePlotView.setYRange(MicrophoneExperimentSensorView.Settings.amplitudeMin,
                 MicrophoneExperimentSensorView.Settings.amplitudeMax);
@@ -164,6 +167,9 @@ class RecordingViewState implements AbstractExperimentSensor.State {
     public void start() {
         amplitudePlotAdapter.clear();
         frequencyMapAdapter.clear();
+
+        amplitudePlotAdapter.setDiscardDataTime(MicrophoneExperimentSensorView.Settings.timeSpan + 1000);
+        frequencyMapAdapter.setDiscardDataTime(MicrophoneExperimentSensorView.Settings.timeSpan + 1000);
 
         amplitudePlotView.setXRange(0, MicrophoneExperimentSensorView.Settings.timeSpan);
         amplitudePlotView.setYRange(MicrophoneExperimentSensorView.Settings.amplitudeMin,

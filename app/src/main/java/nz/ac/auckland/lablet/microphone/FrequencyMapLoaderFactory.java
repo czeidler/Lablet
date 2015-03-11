@@ -308,7 +308,7 @@ class FileFrequencyMapLoader implements IFrequencyMapLoader {
 
 
 
-class FrequencyFileReader implements AudioFrequencyMapAdapter.DataBackend {
+class FrequencyFileReader implements AudioFrequencyMapAdapter.IDataBackend {
     final RandomAccessFile file;
     final long fileLength;
     final int bunchSize;
@@ -367,7 +367,7 @@ class FrequencyFileReader implements AudioFrequencyMapAdapter.DataBackend {
     }
 
     @Override
-    public AudioFrequencyMapAdapter.DataBackend clone() {
+    public AudioFrequencyMapAdapter.IDataBackend clone() {
         return new FrequencyFileReader(file, fileLength, bunchSize);
     }
 }

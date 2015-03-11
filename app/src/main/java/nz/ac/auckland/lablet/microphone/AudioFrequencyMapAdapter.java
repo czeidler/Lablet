@@ -8,7 +8,6 @@
 package nz.ac.auckland.lablet.microphone;
 
 import android.graphics.RectF;
-import nz.ac.auckland.lablet.microphone.FixSizedBunchArray;
 import nz.ac.auckland.lablet.views.plotview.*;
 
 import java.io.File;
@@ -16,24 +15,24 @@ import java.io.FileNotFoundException;
 
 
 public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
-    public interface DataBackend {
+    public interface IDataBackend {
         void clear();
         void add(float frequencies[]);
         int getBunchSize();
         float[] getBunch(int index);
         int getBunchCount();
-        DataBackend clone();
+        IDataBackend clone();
     }
 
-    static private class InMemoryBackend implements DataBackend {
+    static private class MemoryBackend implements IDataBackend {
         FixSizedBunchArray data;
 
-        public InMemoryBackend(int bunchSize) {
+        public MemoryBackend(int bunchSize) {
             data = new FixSizedBunchArray(bunchSize);
         }
 
-        private InMemoryBackend() {
-
+        private MemoryBackend(MemoryBackend parent) {
+            data = new FixSizedBunchArray(parent.data);
         }
 
         @Override
@@ -62,16 +61,73 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
         }
 
         @Override
-        public DataBackend clone() {
-            InMemoryBackend clone = new InMemoryBackend();
-            clone.data = new FixSizedBunchArray(data);
-            return clone;
+        public IDataBackend clone() {
+            return new MemoryBackend(this);
         }
     }
 
-    private DataBackend data = null;
+    private class DiscardMemoryBackend implements IDataBackend {
+        FixSizedBunchArray data;
+        int discardedBunches = 0;
+
+        public DiscardMemoryBackend(int bunchSize) {
+            data = new FixSizedBunchArray(bunchSize);
+        }
+
+        private DiscardMemoryBackend(DiscardMemoryBackend parent) {
+            data = new FixSizedBunchArray(parent.data);
+            discardedBunches = parent.discardedBunches;
+        }
+
+        @Override
+        public void clear() {
+            data.clear();
+            discardedBunches = 0;
+        }
+
+        @Override
+        public void add(float[] frequencies) {
+            float validTime = getX(data.getBunchCount());
+            if (validTime > discardDataTime * 1.5) {
+                // discard data
+                float bunchRate = getBunchRate();
+                int bunches = (int)Math.ceil(discardDataTime * bunchRate / 1000);
+                int bunchesToDiscard = data.getBunchCount() - bunches;
+                if (bunchesToDiscard > 0) {
+                    for (int i = 0; i < bunchesToDiscard; i++)
+                        data.removeBunch(0);
+                    discardedBunches += bunchesToDiscard;
+                }
+            }
+            data.add(frequencies);
+        }
+
+        @Override
+        public int getBunchSize() {
+            return data.getBunchSize();
+        }
+
+        @Override
+        public float[] getBunch(int index) {
+            return data.getBunch(index - discardedBunches);
+        }
+
+        @Override
+        public int getBunchCount() {
+            return discardedBunches + data.getBunchCount();
+        }
+
+        @Override
+        public IDataBackend clone() {
+            return new DiscardMemoryBackend(this);
+        }
+    }
+
+    private IDataBackend data = null;
     private int sampleRate = 44100;
     private float stepFactor;
+
+    private int discardDataTime = -1;
 
     public AudioFrequencyMapAdapter(float stepFactor) {
         setStepFactor(stepFactor);
@@ -92,6 +148,16 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
             stepFactor = 0.01f;
 
         this.stepFactor = stepFactor;
+    }
+
+    /**
+     * If set the data kept in memory is only discardDataTime long.
+     *
+     * This can, for example, be used to only display the last few seconds while recording.
+     * @param discardDataTime
+     */
+    public void setDiscardDataTime(int discardDataTime) {
+        this.discardDataTime = discardDataTime;
     }
 
     public float getStepFactor() {
@@ -124,8 +190,12 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
     }
 
     public void addData(float frequencies[]) {
-        if (data == null)
-            data = new InMemoryBackend(frequencies.length);
+        if (data == null) {
+            if (discardDataTime < 0)
+                data = new MemoryBackend(frequencies.length);
+            else
+                data = new DiscardMemoryBackend(frequencies.length);
+        }
 
         int oldSize = data.getBunchCount();
         data.add(frequencies);
@@ -152,6 +222,14 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
         // bunch size is half the window size so multiply it by 2
         float time = (float)(data.getBunchSize() * 2) / sampleRate * index * stepFactor;
         return time * 1000;
+    }
+
+    /**
+     *
+     * @return bunches / s
+     */
+    private float getBunchRate() {
+        return sampleRate / (data.getBunchSize() * 2 * stepFactor);
     }
 
     public float[] getY(int index) {
