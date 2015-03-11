@@ -84,6 +84,7 @@ class FixSizedBunchArray extends AbstractList<Float> {
 
     public void removeBunch(int bunchIndex) {
         list.remove(bunchIndex);
+        size -= bunchSize;
     }
 
     public int getBunchCount() {
@@ -233,9 +234,10 @@ public class AudioAmplitudePlotDataAdapter extends AbstractXYDataAdapter {
     }
 
     public void clear() {
-        if (data == null || data.size() == 0)
+        if (data == null)
             return;
         data.clear();
+        data = null;
         notifyAllDataChanged();
     }
 

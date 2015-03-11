@@ -165,10 +165,11 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
     }
 
     public void clear() {
-        if (data != null) {
-            data.clear();
-            data = null;
-        }
+        if (data == null)
+            return;
+
+        data.clear();
+        data = null;
         notifyAllDataChanged();
     }
 
