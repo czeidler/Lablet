@@ -9,7 +9,6 @@ package nz.ac.auckland.lablet.microphone;
 
 import android.content.Context;
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,10 +25,7 @@ import nz.ac.auckland.lablet.views.plotview.PlotView;
 import nz.ac.auckland.lablet.views.plotview.StrategyPainter;
 import nz.ac.auckland.lablet.views.plotview.ThreadStrategyPainter;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 
 
 class PreviewViewState implements AbstractExperimentSensor.State {
