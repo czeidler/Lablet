@@ -67,7 +67,8 @@ abstract class SingleExperimentBase extends ScriptComponentViewHolder {
             return false;
 
         String relative = bundle.getString(ExperimentActivity.PATH, "");
-        experiment.setExperimentPath(new File(script.getUserDataDirectory(), relative).getPath());
+        if (!relative.equals(""))
+            experiment.setExperimentPath(new File(script.getUserDataDirectory(), relative).getPath());
         return true;
     }
 }
