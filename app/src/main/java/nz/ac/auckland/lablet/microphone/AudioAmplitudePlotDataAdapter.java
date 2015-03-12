@@ -269,13 +269,17 @@ public class AudioAmplitudePlotDataAdapter extends AbstractXYDataAdapter {
 
         int leftIndex = Math.round(sampleRate * leftReal.floatValue() / 1000);
         int rightIndex = Math.round(sampleRate * rightReal.floatValue() / 1000);
+
         leftIndex -= 1;
         rightIndex ++;
         if (leftIndex < 0)
             leftIndex = 0;
         int size = data.size();
-        if (rightIndex >= size)
+        if (rightIndex >= size) {
             rightIndex = size - 1;
+            if (leftIndex > rightIndex)
+                leftIndex = rightIndex - 1;
+        }
 
         return new Range(leftIndex, rightIndex);
     }
