@@ -52,7 +52,7 @@ abstract class SingleExperimentBase extends ScriptComponentViewHolder {
     public void toBundle(Bundle bundle) {
         super.toBundle(bundle);
 
-        if (experiment.getExperimentPath() != null) {
+        if (!experiment.getExperimentPath().equals("")) {
             // only save the relative path
             URI path = new File(experiment.getExperimentPath()).toURI();
             URI base = script.getUserDataDirectory().toURI();
