@@ -146,7 +146,7 @@ class ScriptComponentCameraExperimentView extends ScriptComponentSingleExperimen
             @Override
             protected Object doInBackground(Object... objects) {
                 ExperimentData experimentData = ExperimentHelper.loadExperimentData(experimentPath);
-                if (experimentData == null)
+                if (experimentData == null || experimentData.getRunDataList().size() == 0)
                     return null;
 
                 // TODO fix if there are more than one runs or sensors
