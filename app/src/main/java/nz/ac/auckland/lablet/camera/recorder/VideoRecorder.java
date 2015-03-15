@@ -169,7 +169,7 @@ class CodecInputSurface {
  *
  * Brief description how the recording works:
  * 1) From a GL texture a SurfaceTexture is created. (This happens in the GLSurfaceView)
- * 2) The camera previews to this SurfaceTexture (setPreviewTexture)
+ * 2) Set the camera preview to that SurfaceTexture (setPreviewTexture)
  * 3) A MediaCodec is created and createInputSurface is used to setup a EGLSurface (using a shared EGLContext from the
  * GLSurfaceView)
  * 4) The recorder listens for new frames on the preview SurfaceTexture and draws the SurfaceTexture to the encoder
