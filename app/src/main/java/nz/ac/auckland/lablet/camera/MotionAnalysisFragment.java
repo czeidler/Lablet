@@ -190,10 +190,11 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 
             Bundle extras = data.getExtras();
             if (extras != null) {
-                Bundle settings = extras.getBundle("run_settings");
+                Bundle settings = extras.getBundle(MotionAnalysisSettingsActivity.RUN_SETTINGS_KEY);
                 if (settings != null)
                     sensorAnalysis.setVideoAnalysisSettings(settings);
-                boolean settingsChanged = extras.getBoolean("run_settings_changed", false);
+                boolean settingsChanged = extras.getBoolean(MotionAnalysisSettingsActivity.RUN_SETTINGS_CHANGED_KEY,
+                        false);
                 if (settingsChanged) {
                     sensorAnalysis.getTagMarkers().clear();
                     sensorAnalysis.getFrameDataModel().setCurrentFrame(0);

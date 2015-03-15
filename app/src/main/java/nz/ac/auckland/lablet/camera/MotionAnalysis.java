@@ -27,6 +27,16 @@ public class MotionAnalysis implements IDataAnalysis {
         void onShowCoordinateSystem(boolean show);
     }
 
+    final static public String ANALYSIS_FRAME_RATE_KEY = "analysis_frame_rate";
+    final static public String ANALYSIS_VIDEO_START_KEY = "analysis_video_start";
+    final static public String ANALYSIS_VIDEO_END_KEY = "analysis_video_end";
+
+    final private String X_UNIT_BASE_EXPONENT_KEY = "xUnitBaseExponent";
+    final private String Y_UNIT_BASE_EXPONENT_KEY = "yUnitBaseExponent";
+    final private String LENGTH_CALIBRATION_KEY = "lengthCalibration";
+    final private String CALIBRATION_XY_KEY = "calibrationXY";
+    final private String SHOW_COORDINATE_SYSTEM_KEY = "showCoordinateSystem";
+
     final private VideoData sensorData;
 
     final private FrameDataModel frameDataModel;
@@ -206,12 +216,6 @@ public class MotionAnalysis implements IDataAnalysis {
         };
     }
 
-    final private String X_UNIT_BASE_EXPONENT_KEY = "xUnitBaseExponent";
-    final private String Y_UNIT_BASE_EXPONENT_KEY = "yUnitBaseExponent";
-    final private String LENGTH_CALIBRATION_KEY = "lengthCalibration";
-    final private String CALIBRATION_XY_KEY = "calibrationXY";
-    final private String SHOW_COORDINATE_SYSTEM_KEY = "showCoordinateSystem";
-
     public boolean loadAnalysisData(Bundle bundle, File storageDir) {
         tagMarkers.clear();
 
@@ -319,9 +323,9 @@ public class MotionAnalysis implements IDataAnalysis {
         if (runSettings == null)
             return;
 
-        calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getFloat("analysis_video_start"));
-        calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getFloat("analysis_video_end"));
-        calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getFloat("analysis_frame_rate"));
+        calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getFloat(ANALYSIS_VIDEO_START_KEY));
+        calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getFloat(ANALYSIS_VIDEO_END_KEY));
+        calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getFloat(ANALYSIS_FRAME_RATE_KEY));
 
         int numberOfRuns = calibrationVideoTimeData.getNumberOfFrames();
         getFrameDataModel().setNumberOfFrames(numberOfRuns);
