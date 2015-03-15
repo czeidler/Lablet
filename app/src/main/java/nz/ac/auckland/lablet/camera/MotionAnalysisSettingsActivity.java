@@ -7,6 +7,8 @@
  */
 package nz.ac.auckland.lablet.camera;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -33,6 +35,9 @@ import java.util.List;
  * </p>
  */
 public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivity {
+    final static public String RUN_SETTINGS_CHANGED_KEY = "run_settings_changed";
+    final static public String RUN_SETTINGS_KEY = "run_settings";
+
     private VideoData videoData;
     private VideoFrameView videoFrameView;
 
@@ -47,10 +52,13 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     private EditText editVideoEnd = null;
     private EditText editFrames = null;
     private EditText editFrameLength = null;
+    private TextView warningTextView = null;
     private MotionAnalysisSettingsHelpView helpView = null;
 
     private float videoStartValue;
     private float videoEndValue;
+
+    private boolean moreThanOneDataPointTagged = false;
 
     // cache initial values to check if values have been changed
     private float initialFrameRate;
@@ -134,7 +142,10 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        videoData = ((MotionAnalysis)experimentAnalysis.getCurrentAnalysis()).getVideoData();
+        MotionAnalysis motionAnalysis = (MotionAnalysis)experimentAnalysis.getCurrentAnalysis();
+        if (motionAnalysis.getTagMarkers().getMarkerCount() > 1)
+            moreThanOneDataPointTagged = true;
+        videoData = motionAnalysis.getVideoData();
 
         setContentView(R.layout.motion_analysis_settings);
 
@@ -143,6 +154,9 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         File storageDir = videoData.getStorageDir();
         File videoFile = new File(storageDir, videoData.getVideoFileName());
         videoFrameView.setVideoFilePath(videoFile.getPath());
+
+        warningTextView = (TextView)findViewById(R.id.warningTextView);
+        assert warningTextView != null;
 
         seekBar = (SeekBar)findViewById(R.id.seekBar);
         assert seekBar != null;
@@ -202,6 +216,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
                 seekTo(Math.round(progress));
 
                 updateEditFrames();
+                updateWarning();
             }
 
             @Override
@@ -224,6 +239,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
             public void onValueChange(NumberPicker numberPicker, int old, int newValue) {
                 float frameRate = frameRateList.get(newValue);
                 setFrameRate(frameRate);
+                updateWarning();
             }
         });
 
@@ -240,13 +256,12 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         assert extras != null;
         Bundle analysisSpecificData = extras.getBundle("analysisSpecificData");
         if (analysisSpecificData != null)
-            runSettings = analysisSpecificData.getBundle("run_settings");
-        MotionAnalysis motionAnalysis = (MotionAnalysis)experimentAnalysis.getCurrentAnalysis();
+            runSettings = analysisSpecificData.getBundle(RUN_SETTINGS_KEY);
         CalibrationVideoTimeData calibrationVideoTimeData = motionAnalysis.getCalibrationVideoTimeData();
         if (runSettings != null) {
-            calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getInt("analysis_video_start"));
-            calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getInt("analysis_video_end"));
-            calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getFloat("analysis_frame_rate"));
+            calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getInt(MotionAnalysis.ANALYSIS_VIDEO_START_KEY));
+            calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getInt(MotionAnalysis.ANALYSIS_VIDEO_END_KEY));
+            calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getFloat(MotionAnalysis.ANALYSIS_FRAME_RATE_KEY));
         }
         float analysisFrameRate = calibrationVideoTimeData.getAnalysisFrameRate();
 
@@ -291,6 +306,8 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         setFrameRate(frameRate);
         // setAnalysisFrameRate set the seekBar max value so set the progress afterwards
         seekBar.setProgress(findFrame(videoStartValue));
+
+        updateWarning();
     }
 
     @Override
@@ -303,7 +320,39 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
 
     @Override
     public void onBackPressed() {
-        applySettingsAndFinish();
+        if (moreThanOneDataPointTagged && settingsChanged()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Warning: Settings changed, data points tagged so far will be deleted!");
+            builder.setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    applySettingsAndFinish();
+                }
+            });
+            builder.setNegativeButton(" Discard Settings Changes ", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finish();
+                }
+            });
+
+            builder.create().show();
+        } else {
+            applySettingsAndFinish();
+        }
+    }
+
+    private void updateWarning() {
+        if (!moreThanOneDataPointTagged) {
+            warningTextView.setVisibility(View.INVISIBLE);
+            return;
+        }
+
+        if (settingsChanged())
+            warningTextView.setVisibility(View.VISIBLE);
+        else
+            warningTextView.setVisibility(View.INVISIBLE);
+
     }
 
     private int findFrame(float milliSeconds) {
@@ -391,13 +440,13 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     private void applySettingsAndFinish() {
         Intent intent = new Intent();
 
-        intent.putExtra("run_settings_changed", settingsChanged());
+        intent.putExtra(RUN_SETTINGS_CHANGED_KEY, settingsChanged());
 
         Bundle runSettings = new Bundle();
-        runSettings.putFloat("analysis_frame_rate", getFrameRateFromPicker());
-        runSettings.putFloat("analysis_video_start", videoStartValue);
-        runSettings.putFloat("analysis_video_end", videoEndValue);
-        intent.putExtra("run_settings", runSettings);
+        runSettings.putFloat(MotionAnalysis.ANALYSIS_FRAME_RATE_KEY, getFrameRateFromPicker());
+        runSettings.putFloat(MotionAnalysis.ANALYSIS_VIDEO_START_KEY, videoStartValue);
+        runSettings.putFloat(MotionAnalysis.ANALYSIS_VIDEO_END_KEY, videoEndValue);
+        intent.putExtra(RUN_SETTINGS_KEY, runSettings);
 
         setResult(RESULT_OK, intent);
 

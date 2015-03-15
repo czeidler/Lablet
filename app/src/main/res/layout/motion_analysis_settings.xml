@@ -11,12 +11,23 @@
             android:layout_height="fill_parent"
             android:layout_alignParentTop="true" android:layout_toLeftOf="@+id/frameRateLayout"
             android:layout_above="@+id/seekBar" android:id="@+id/relativeLayout">
+        <FrameLayout android:layout_width="wrap_content"
+                     android:layout_height="match_parent"
+                     android:layout_gravity="center_horizontal"
+                     android:layout_centerHorizontal="true" android:layout_alignParentBottom="true"
+                     android:layout_alignParentTop="true">
             <view android:layout_width="wrap_content"
                   android:layout_height="match_parent"
-                  android:layout_gravity="center_horizontal"
                   class="nz.ac.auckland.lablet.views.VideoFrameView" android:id="@+id/videoFrameView"
-                  android:layout_centerHorizontal="true" android:layout_alignParentBottom="true"
-                  android:layout_alignParentTop="true"/>
+                />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:textColor="@android:color/holo_orange_light"
+                      android:text="Warning: Settings changed, data points tagged so far will be deleted!"
+                      android:autoText="false" android:gravity="center_horizontal" android:textSize="25dp"
+                      android:background="@color/dark_grey_transparent" android:id="@+id/warningTextView"
+                      android:layout_marginTop="20dp"/>
+        </FrameLayout>
+
     </RelativeLayout>
     <SeekBar
             android:layout_width="fill_parent"

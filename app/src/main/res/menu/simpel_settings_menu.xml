@@ -8,7 +8,7 @@
         yourapp:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/action_cancel"
           android:icon="@drawable/ic_action_cancel"
-          android:title="@string/action_cancel"
+          android:title="@string/action_discard"
           yourapp:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/action_apply"
           android:icon="@drawable/ic_action_accept"
