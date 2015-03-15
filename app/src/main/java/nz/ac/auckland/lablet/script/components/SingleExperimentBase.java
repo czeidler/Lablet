@@ -57,7 +57,6 @@ abstract class SingleExperimentBase extends ScriptComponentViewHolder {
             URI path = new File(experiment.getExperimentPath()).toURI();
             URI base = script.getUserDataDirectory().toURI();
             String relative = base.relativize(path).getPath();
-
             bundle.putString(ExperimentActivity.PATH, relative);
         }
     }
