@@ -7,7 +7,7 @@
           android:title="@string/action_delete"
           yourapp:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/action_video_settings"
-          android:icon="@drawable/ic_action_settings"
+          android:icon="@drawable/ic_cut"
           android:title="@string/action_video"
           yourapp:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/length_scale"
