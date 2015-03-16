@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.script.components;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -99,6 +100,13 @@ class ScriptComponentCameraExperimentView extends ScriptComponentSingleExperimen
 
         videoView = (VideoView)view.findViewById(R.id.videoView);
         assert videoView != null;
+        // Don't show an "Can't play this video." alert.
+        videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                return true;
+            }
+        });
         MediaController mediaController = new MediaController(context);
         mediaController.setAnchorView(videoView);
         videoView.setMediaController(mediaController);
