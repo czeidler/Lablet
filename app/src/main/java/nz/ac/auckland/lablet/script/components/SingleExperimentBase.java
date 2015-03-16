@@ -136,10 +136,9 @@ abstract class ScriptComponentSingleExperimentBaseView<ExperimentSensorPlugin ex
                     StorageLib.recursiveDeleteFile(new File(oldExperiment));
 
                 String experimentPath = data.getStringExtra(ExperimentActivity.PATH);
-                experimentComponent.getExperiment().setExperimentPath(experimentPath);
+                ScriptExperimentRef experimentRef = experimentComponent.getExperiment();
+                experimentRef.setExperimentPath(experimentPath);
                 experimentComponent.setState(ScriptTreeNode.SCRIPT_STATE_DONE);
-
-                experimentComponent.getExperiment().setExperimentPath(experimentPath);
 
                 onExperimentPerformed();
             }

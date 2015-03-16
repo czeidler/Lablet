@@ -33,6 +33,7 @@ public class ScriptExperimentRef extends WeakListenable<ScriptExperimentRef.ILis
     }
     public void setExperimentPath(String path) {
         experimentPath = path;
+        reloadExperimentAnalysis();
     }
 
     public MotionAnalysis getMotionAnalysis(int run) {
@@ -58,6 +59,10 @@ public class ScriptExperimentRef extends WeakListenable<ScriptExperimentRef.ILis
     }
 
     public void reloadExperimentAnalysis() {
+        // only reload if it was loaded before
+        if (experimentAnalysis == null)
+            return;
+
         experimentAnalysis = loadExperimentAnalysis();
 
         for (IListener listener : getListeners())
