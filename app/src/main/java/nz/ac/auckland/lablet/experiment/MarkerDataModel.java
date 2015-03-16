@@ -29,6 +29,12 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
     final protected List<MarkerData> markerDataList = new ArrayList<>();
     private int selectedDataIndex = -1;
 
+    public void setMarkerDataList(List<MarkerData> markerDataList) {
+        this.markerDataList.clear();
+        this.markerDataList.addAll(markerDataList);
+        notifyAllDataChanged();
+    }
+
     public void selectMarkerData(int index) {
         if (selectedDataIndex == index)
             return;

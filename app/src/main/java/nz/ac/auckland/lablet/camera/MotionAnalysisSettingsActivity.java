@@ -35,8 +35,9 @@ import java.util.List;
  * </p>
  */
 public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivity {
-    final static public String RUN_SETTINGS_CHANGED_KEY = "run_settings_changed";
-    final static public String RUN_SETTINGS_KEY = "run_settings";
+    final static public String MOTION_ANALYSIS_SETTINGS_KEY = "motion_analysis_settings";
+    final static public String FRAME_RATE_CHANGED_KEY = "frame_rate_changed";
+    final static public String RANGE_CHANGED_KEY = "range_changed";
 
     private VideoData videoData;
     private VideoFrameView videoFrameView;
@@ -256,7 +257,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         assert extras != null;
         Bundle analysisSpecificData = extras.getBundle("analysisSpecificData");
         if (analysisSpecificData != null)
-            runSettings = analysisSpecificData.getBundle(RUN_SETTINGS_KEY);
+            runSettings = analysisSpecificData.getBundle(MOTION_ANALYSIS_SETTINGS_KEY);
         CalibrationVideoTimeData calibrationVideoTimeData = motionAnalysis.getCalibrationVideoTimeData();
         if (runSettings != null) {
             calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getInt(MotionAnalysis.ANALYSIS_VIDEO_START_KEY));
@@ -440,25 +441,38 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     private void applySettingsAndFinish() {
         Intent intent = new Intent();
 
-        intent.putExtra(RUN_SETTINGS_CHANGED_KEY, settingsChanged());
+        intent.putExtra(FRAME_RATE_CHANGED_KEY, frameRateRanged());
+        intent.putExtra(RANGE_CHANGED_KEY, rangeChanged());
 
         Bundle runSettings = new Bundle();
         runSettings.putFloat(MotionAnalysis.ANALYSIS_FRAME_RATE_KEY, getFrameRateFromPicker());
         runSettings.putFloat(MotionAnalysis.ANALYSIS_VIDEO_START_KEY, videoStartValue);
         runSettings.putFloat(MotionAnalysis.ANALYSIS_VIDEO_END_KEY, videoEndValue);
-        intent.putExtra(RUN_SETTINGS_KEY, runSettings);
+        intent.putExtra(MOTION_ANALYSIS_SETTINGS_KEY, runSettings);
 
         setResult(RESULT_OK, intent);
 
         finish();
     }
 
-    private boolean settingsChanged() {
+    private boolean frameRateRanged() {
         if (initialFrameRate != getFrameRateFromPicker())
             return true;
+        return false;
+    }
+
+    private boolean rangeChanged() {
         if (initialVideoStartValue != videoStartValue)
             return true;
         if (initialVideoEndValue != videoEndValue)
+            return true;
+        return false;
+    }
+
+    private boolean settingsChanged() {
+        if (frameRateRanged())
+            return true;
+        if (rangeChanged())
             return true;
         return false;
     }
