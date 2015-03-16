@@ -100,7 +100,7 @@ class ScriptComponentCameraExperimentView extends ScriptComponentSingleExperimen
 
         videoView = (VideoView)view.findViewById(R.id.videoView);
         assert videoView != null;
-        // Don't show an "Can't play this video." alert.
+        // Don't show a "Can't play this video." alert.
         videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
