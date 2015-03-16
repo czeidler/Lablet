@@ -196,27 +196,21 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                 Bundle settings = extras.getBundle(MotionAnalysisSettingsActivity.MOTION_ANALYSIS_SETTINGS_KEY);
                 CalibrationVideoTimeData timeData = (CalibrationVideoTimeData)sensorAnalysis.getTimeData();
                 float oldStart = timeData.getAnalysisVideoStart();
+                float oldFrameRate = timeData.getAnalysisFrameRate();
 
                 if (settings != null)
                     sensorAnalysis.setVideoAnalysisSettings(settings);
-                boolean frameRateChanged = extras.getBoolean(MotionAnalysisSettingsActivity.FRAME_RATE_CHANGED_KEY,
+                boolean settingsChanged = extras.getBoolean(MotionAnalysisSettingsActivity.SETTINGS_CHANGED_KEY,
                         false);
-                boolean rangeChanged = extras.getBoolean(MotionAnalysisSettingsActivity.RANGE_CHANGED_KEY,
-                        false);
-                if (frameRateChanged) {
-                    sensorAnalysis.getTagMarkers().clear();
-                    sensorAnalysis.getFrameDataModel().setCurrentFrame(0);
-                } else if (rangeChanged) {
-                    int offset = RangeChangedMarkerUpdater.getFrameOffset(oldStart, timeData.getAnalysisVideoStart(),
+                if (settingsChanged) {
+                    RangeChangedMarkerUpdater updater = new RangeChangedMarkerUpdater(oldStart, oldFrameRate,
+                            timeData.getAnalysisVideoStart(), timeData.getAnalysisVideoEnd(),
                             timeData.getAnalysisFrameRate());
-                    List<MarkerData> updatedMarkers = RangeChangedMarkerUpdater.update(sensorAnalysis.getTagMarkers(),
-                            offset, timeData.getNumberOfFrames());
+                    List<MarkerData> updatedMarkers = updater.update(sensorAnalysis.getTagMarkers());
                     sensorAnalysis.getTagMarkers().setMarkerDataList(updatedMarkers);
-                    int newCurrentFrame = sensorAnalysis.getFrameDataModel().getCurrentFrame() - offset;
-                    if (newCurrentFrame < 0)
-                        newCurrentFrame = 0;
-                    else if (newCurrentFrame >= timeData.getNumberOfFrames())
-                        newCurrentFrame = timeData.getNumberOfFrames() - 1;
+                    // update current frame
+                    int newCurrentFrame = updater.getNewCurrentFrame(updatedMarkers,
+                            sensorAnalysis.getFrameDataModel().getCurrentFrame());
                     sensorAnalysis.getFrameDataModel().setCurrentFrame(newCurrentFrame);
                 }
             }
@@ -224,25 +218,62 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
     }
 
     static public class RangeChangedMarkerUpdater {
-        static public int getFrameOffset(float start, float newStart, float frameRate) {
-            int oldFrameStart = Math.round(start * frameRate / 1000);
-            int newFrameStart = Math.round(newStart * frameRate / 1000);
-            return newFrameStart - oldFrameStart;
+        final private CalibrationVideoTimeData oldTimeData;
+        final private CalibrationVideoTimeData newTimeData;
+
+        public RangeChangedMarkerUpdater(float oldStart, float oldFrameRate, float newStart, float newEnd,
+                                         float newFrameRate) {
+            oldTimeData = new CalibrationVideoTimeData(0);
+            oldTimeData.setAnalysisVideoStart(oldStart);
+            oldTimeData.setAnalysisFrameRate(oldFrameRate);
+
+            newTimeData = new CalibrationVideoTimeData(0);
+            newTimeData.setAnalysisVideoStart(newStart);
+            newTimeData.setAnalysisVideoEnd(newEnd);
+            newTimeData.setAnalysisFrameRate(newFrameRate);
         }
 
-        static public List<MarkerData> update(MarkerDataModel dataModel, int offset, int newNumberOfFrames) {
-
+        public List<MarkerData> update(MarkerDataModel dataModel) {
             List<MarkerData> newMarkerData = new ArrayList<>();
             for (int i = 0; i < dataModel.getMarkerCount(); i++) {
                 MarkerData markerData = dataModel.getMarkerDataAt(i);
-                int newFrame = markerData.getId() - offset;
-                if (newFrame < 0 || newFrame >= newNumberOfFrames)
+                float time = oldTimeData.getFrameTime(markerData.getId());
+                int newFrame = newTimeData.getClosestFrame(time);
+                float frameTime = newTimeData.getFrameTime(newFrame);
+
+                if (!isFuzzyEqual(time, frameTime))
                     continue;
+                if (time < newTimeData.getAnalysisVideoStart() || time > newTimeData.getAnalysisVideoEnd())
+                    continue;
+
                 MarkerData clone = new MarkerData(newFrame);
                 clone.setPosition(markerData.getPosition());
                 newMarkerData.add(clone);
             }
             return newMarkerData;
+        }
+
+        private boolean isFuzzyEqual(float value1, float value2) {
+            return Math.abs(value1 - value2) < 0.01;
+        }
+
+        public int getNewCurrentFrame(List<MarkerData> newMarkerList, int oldCurrentFrame) {
+            float oldTime = oldTimeData.getFrameTime(oldCurrentFrame);
+            int newCurrentFrame = 0;
+            float minDiff = Float.MAX_VALUE;
+            for (int i = 0; i < newMarkerList.size(); i++) {
+                MarkerData markerData = newMarkerList.get(i);
+                int newFrame = markerData.getId();
+                float time = newTimeData.getFrameTime(newFrame);
+                float currentDiff = Math.abs(time - oldTime);
+                if (currentDiff < minDiff) {
+                    newCurrentFrame = newFrame;
+                    minDiff = currentDiff;
+                }
+                if (minDiff == 0f)
+                    break;
+            }
+            return newCurrentFrame;
         }
     }
 

@@ -35,9 +35,10 @@ import java.util.List;
  * </p>
  */
 public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivity {
+    final private String WARNING_TEXT = "Warning: Settings changed, some already tagged data points will be deleted!";
+
     final static public String MOTION_ANALYSIS_SETTINGS_KEY = "motion_analysis_settings";
-    final static public String FRAME_RATE_CHANGED_KEY = "frame_rate_changed";
-    final static public String RANGE_CHANGED_KEY = "range_changed";
+    final static public String SETTINGS_CHANGED_KEY = "settings_changed";
 
     private VideoData videoData;
     private VideoFrameView videoFrameView;
@@ -58,8 +59,6 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
 
     private float videoStartValue;
     private float videoEndValue;
-
-    private boolean moreThanOneDataPointTagged = false;
 
     // cache initial values to check if values have been changed
     private float initialFrameRate;
@@ -144,8 +143,6 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         super.onCreate(savedInstanceState);
 
         MotionAnalysis motionAnalysis = (MotionAnalysis)experimentAnalysis.getCurrentAnalysis();
-        if (motionAnalysis.getTagMarkers().getMarkerCount() > 1)
-            moreThanOneDataPointTagged = true;
         videoData = motionAnalysis.getVideoData();
 
         setContentView(R.layout.motion_analysis_settings);
@@ -321,9 +318,9 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
 
     @Override
     public void onBackPressed() {
-        if (moreThanOneDataPointTagged && settingsChanged()) {
+        if (settingsChanged() && warningNeeded()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Warning: Settings changed, data points tagged so far will be deleted!");
+            builder.setTitle(WARNING_TEXT);
             builder.setPositiveButton("Apply", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -343,15 +340,22 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         }
     }
 
-    private void updateWarning() {
-        if (!moreThanOneDataPointTagged) {
-            warningTextView.setVisibility(View.INVISIBLE);
-            return;
-        }
+    private boolean warningNeeded() {
+        MotionAnalysisFragment.RangeChangedMarkerUpdater updater
+                = new MotionAnalysisFragment.RangeChangedMarkerUpdater(initialVideoStartValue, initialFrameRate,
+                videoStartValue, videoEndValue, getFrameRateFromPicker());
 
-        if (settingsChanged())
+        MotionAnalysis motionAnalysis = (MotionAnalysis)experimentAnalysis.getCurrentAnalysis();
+        List<MarkerData> newMarkerData = updater.update(motionAnalysis.getTagMarkers());
+
+        return newMarkerData.size() != motionAnalysis.getTagMarkers().getMarkerCount();
+    }
+
+    private void updateWarning() {
+        if (settingsChanged() && warningNeeded()) {
             warningTextView.setVisibility(View.VISIBLE);
-        else
+            warningTextView.setText(WARNING_TEXT);
+        } else
             warningTextView.setVisibility(View.INVISIBLE);
 
     }
@@ -441,8 +445,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     private void applySettingsAndFinish() {
         Intent intent = new Intent();
 
-        intent.putExtra(FRAME_RATE_CHANGED_KEY, frameRateRanged());
-        intent.putExtra(RANGE_CHANGED_KEY, rangeChanged());
+        intent.putExtra(SETTINGS_CHANGED_KEY, settingsChanged());
 
         Bundle runSettings = new Bundle();
         runSettings.putFloat(MotionAnalysis.ANALYSIS_FRAME_RATE_KEY, getFrameRateFromPicker());

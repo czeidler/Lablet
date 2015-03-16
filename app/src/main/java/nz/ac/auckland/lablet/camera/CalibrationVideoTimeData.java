@@ -44,6 +44,10 @@ public class CalibrationVideoTimeData implements ITimeData {
         return analysisVideoStart + (float)1000 / analysisFrameRate * frame;
     }
 
+    public int getClosestFrame(float time) {
+        return Math.round((time - analysisVideoStart) * analysisFrameRate / 1000);
+    }
+
     /**
      * Set the frame rate at which the video should be analysed.
      * <p>
