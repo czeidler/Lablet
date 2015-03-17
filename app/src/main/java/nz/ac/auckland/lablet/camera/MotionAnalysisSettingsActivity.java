@@ -10,6 +10,7 @@ package nz.ac.auckland.lablet.camera;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -306,6 +307,8 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         seekBar.setProgress(findFrame(videoStartValue));
 
         updateWarning();
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
     @Override
@@ -341,11 +344,14 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     }
 
     private boolean warningNeeded() {
+        MotionAnalysis motionAnalysis = (MotionAnalysis)experimentAnalysis.getCurrentAnalysis();
+        if (motionAnalysis.getTagMarkers().getMarkerCount() <= 1)
+            return false;
+
         MotionAnalysisFragment.RangeChangedMarkerUpdater updater
                 = new MotionAnalysisFragment.RangeChangedMarkerUpdater(initialVideoStartValue, initialFrameRate,
                 videoStartValue, videoEndValue, getFrameRateFromPicker());
 
-        MotionAnalysis motionAnalysis = (MotionAnalysis)experimentAnalysis.getCurrentAnalysis();
         List<MarkerData> newMarkerData = updater.update(motionAnalysis.getTagMarkers());
 
         return newMarkerData.size() != motionAnalysis.getTagMarkers().getMarkerCount();
