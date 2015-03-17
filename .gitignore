@@ -8,6 +8,7 @@ LabletTests/gen/*
 workspace.xml
 build.xml
 local.properties
+keystore.properties
 Project_Default.xml
 profiles_settings.xml
 .idea/libraries/*

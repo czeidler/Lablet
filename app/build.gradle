@@ -17,7 +17,7 @@ android {
         applicationId "nz.ac.auckland.lablet"
         minSdkVersion 18
         targetSdkVersion 18
-        versionCode 290
+        versionCode 291
         versionName "3.0Beta"
         renderscriptTargetApi 18
         renderscriptSupportModeEnabled true
@@ -27,9 +27,24 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+
+    signingConfigs {
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('keystore.properties').newDataInputStream())
+
+        release {
+            storeFile file(properties.getProperty('localStoreFile'))
+            storePassword properties.getProperty('localStorePassword')
+            keyAlias properties.getProperty('localKeyAlias')
+            keyPassword properties.getProperty('localKeyPassword')
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
+            zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
