@@ -12,6 +12,11 @@ package nz.ac.auckland.lablet.views.table;
  * Table column for the marker data table adapter. Provides the run id.
  */
 public class RunIdDataTableColumn extends DataTableColumn {
+    private String header = "id";
+    public RunIdDataTableColumn(String header) {
+        this.header = header;
+    }
+
     public int size() {
         return dataModel.getMarkerCount();
     }
@@ -28,6 +33,6 @@ public class RunIdDataTableColumn extends DataTableColumn {
     }
 
     public String getHeader() {
-        return "id";
+        return header;
     }
 }

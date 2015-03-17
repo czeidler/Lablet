@@ -268,7 +268,7 @@ public class MotionAnalysis implements IDataAnalysis {
     @Override
     public void exportTagMarkerCSVData(Writer writer) {
         MarkerDataTableAdapter tableAdapter = new MarkerDataTableAdapter(tagMarkers);
-        tableAdapter.addColumn(new RunIdDataTableColumn());
+        tableAdapter.addColumn(new RunIdDataTableColumn("frame"));
         tableAdapter.addColumn(new XPositionDataTableColumn(xUnit));
         tableAdapter.addColumn(new YPositionDataTableColumn(yUnit));
         tableAdapter.addColumn(new TimeDataTableColumn(tUnit, timeData));
