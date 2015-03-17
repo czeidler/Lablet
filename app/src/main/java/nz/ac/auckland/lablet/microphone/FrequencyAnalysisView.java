@@ -30,6 +30,9 @@ import java.util.List;
 
 
 public class FrequencyAnalysisView extends FrameLayout {
+    final static public String LOAD_WAV_FILE_STRING = "Load WAV file...";
+    final static public String FOURIER_ANALYSIS_STRING = "Fourier Analysis...";
+
     final private FrequencyAnalysis frequencyAnalysis;
     final private FrequencyAnalysis.FreqMapDisplaySettings freqMapDisplaySettings;
     private AudioFrequencyMapAdapter audioFrequencyMapAdapter;
@@ -90,7 +93,6 @@ public class FrequencyAnalysisView extends FrameLayout {
         frequencyView = (PlotView)view.findViewById(R.id.frequencyMapView);
         FrameLayout frameLayout = (FrameLayout)view.findViewById(R.id.plotViewFrameLayout);
         loadingView = (ViewGroup)inflater.inflate(R.layout.loading_overlay, frameLayout, false);
-        loadingView.setMinimumWidth(frequencyView.getLayoutParams().width);
         hideLoadingView();
         frameLayout.addView(loadingView);
 
@@ -125,7 +127,7 @@ public class FrequencyAnalysisView extends FrameLayout {
         setupFourierControls(view, audioWavInputStream.getSampleRate());
 
         frequencyMapLoader = FrequencyMapLoaderFactory.create(audioFrequencyMapAdapter, audioFile);
-        showLoadingView("Load WAV file...");
+        showLoadingView(LOAD_WAV_FILE_STRING);
         frequencyMapLoader.loadWavFile(audioWavInputStream, new Runnable() {
             @Override
             public void run() {
@@ -374,7 +376,7 @@ public class FrequencyAnalysisView extends FrameLayout {
             return;
 
         // do the update
-        showLoadingView("Fourier Analysis...");
+        showLoadingView(FOURIER_ANALYSIS_STRING);
 
         freqMapDisplaySettings.setWindowSize(-1);
         final int newWindowSize = Integer.parseInt(windowSizeList.get(windowSizeSpinner.getSelectedItemPosition()));

@@ -25,10 +25,13 @@
                   android:layout_height="match_parent"
                   android:id="@+id/playbackView" android:weightSum="1">
 
-        <view android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/frequencyMapPlotView"
-              android:layout_weight="1"/>
+        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                     android:layout_weight="1" android:id="@+id/plotViewFrameLayout">
+            <view android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  class="nz.ac.auckland.lablet.views.plotview.PlotView" android:id="@+id/frequencyMapPlotView"/>
+
+        </FrameLayout>
 
         <LinearLayout
             android:orientation="horizontal"

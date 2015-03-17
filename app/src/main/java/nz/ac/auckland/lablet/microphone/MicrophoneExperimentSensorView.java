@@ -13,10 +13,7 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.ToggleButton;
+import android.widget.*;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensorView;
@@ -217,6 +214,7 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
 
     final private PlotView frequencyMapPlotView;
     final private AudioFrequencyMapAdapter frequencyMapAdapter;
+    final private ViewGroup loadingView;
 
     final float DEFAULT_STEP_FACTOR = 0.5f;
     final int DEFAULT_WINDOW_SIZE = 4096;
@@ -245,6 +243,14 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
         seekBar = (SeekBar)playbackView.findViewById(R.id.seekBar);
         lengthTextView = (TextView)playbackView.findViewById(R.id.lengthTextView);
         frequencyMapPlotView = (PlotView)playbackView.findViewById(R.id.frequencyMapPlotView);
+
+        // loading view
+        LayoutInflater inflater = (LayoutInflater)playbackView.getContext().getSystemService(
+                Context.LAYOUT_INFLATER_SERVICE);
+        FrameLayout frameLayout = (FrameLayout)playbackView.findViewById(R.id.plotViewFrameLayout);
+        loadingView = (ViewGroup)inflater.inflate(R.layout.loading_overlay, frameLayout, false);
+        hideLoadingView();
+        frameLayout.addView(loadingView);
 
         // frequency map
         StrategyPainter strategyPainter = new ThreadStrategyPainter();
@@ -284,6 +290,15 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
         });
     }
 
+    private void showLoadingView(String message) {
+        loadingView.setVisibility(View.VISIBLE);
+        ((TextView)loadingView.findViewById(R.id.loadingTextView)).setText(message);
+    }
+
+    private void hideLoadingView() {
+        loadingView.setVisibility(View.INVISIBLE);
+    }
+
     private void loadWavFileAsync() {
         frequencyMapAdapter.clear();
 
@@ -297,24 +312,27 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
             return;
         }
         final int totalTime = audioWavInputStream.getDurationMilliSeconds();
+        frequencyMapPlotView.setMaxXRange(0, totalTime);
+        frequencyMapPlotView.setMaxYRange(1, experimentSensor.SAMPLE_RATE / 2);
+        frequencyMapPlotView.setXRange(0, totalTime);
+        frequencyMapPlotView.setYRange(1, experimentSensor.SAMPLE_RATE / 2);
+        frequencyMapPlotView.setXDraggable(true);
+        frequencyMapPlotView.setYDraggable(true);
+        frequencyMapPlotView.setXZoomable(true);
+        frequencyMapPlotView.setYZoomable(true);
 
         lengthTextView.setText(Integer.toString(totalTime) + " [ms]");
 
+        showLoadingView(FrequencyAnalysisView.LOAD_WAV_FILE_STRING);
         frequencyMapLoader.loadWavFile(audioWavInputStream, new Runnable() {
             @Override
             public void run() {
+                showLoadingView(FrequencyAnalysisView.FOURIER_ANALYSIS_STRING);
                 frequencyMapLoader.updateFrequencies(playbackView.getContext(), frequencyMapAdapter.getStepFactor(),
                         DEFAULT_WINDOW_SIZE, new IFrequencyMapLoader.IFrequenciesUpdatedListener() {
                             @Override
                             public void onFrequenciesUpdated(boolean canceled) {
-                                frequencyMapPlotView.setMaxXRange(0, totalTime);
-                                frequencyMapPlotView.setMaxYRange(1, experimentSensor.SAMPLE_RATE / 2);
-                                frequencyMapPlotView.setXRange(0, totalTime);
-                                frequencyMapPlotView.setYRange(1, experimentSensor.SAMPLE_RATE / 2);
-                                frequencyMapPlotView.setXDraggable(true);
-                                frequencyMapPlotView.setYDraggable(true);
-                                frequencyMapPlotView.setXZoomable(true);
-                                frequencyMapPlotView.setYZoomable(true);
+                                hideLoadingView();
                             }
                         });
             }
