@@ -638,11 +638,25 @@ public class PlotView extends ViewGroup {
     }
 
     public void setMaxXRange(float left, float right) {
-        mainView.setMaxXRange(left, right);
+        if (mainView.setMaxXRange(left, right)) {
+            // always use the validated range values from the mainView!
+            if (hasXAxis())
+                xAxisView.setDataRange(mainView.getRangeLeft(), mainView.getRangeRight());
+
+            // request layout in case the axis changed its size
+            requestLayout();
+        }
     }
 
     public void setMaxYRange(float bottom, float top) {
-        mainView.setMaxYRange(bottom, top);
+       if (mainView.setMaxYRange(bottom, top)) {
+           // always use the validated range values from the mainView!
+           if (hasYAxis())
+               yAxisView.setDataRange(mainView.getRangeBottom(), mainView.getRangeTop());
+
+           // request layout in case the axis changed its size
+           requestLayout();
+       }
     }
 
     public void setMaxRange(RectF range) {

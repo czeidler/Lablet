@@ -56,20 +56,34 @@ public class RangeDrawingView extends ViewGroup {
         return toScreen(getRange());
     }
 
-    public void setMaxXRange(float left, float right) {
+    /**
+     * Set the max range and return true if the range has change due to the new max range.
+     *
+     * @param left
+     * @param right
+     * @return
+     */
+    public boolean setMaxXRange(float left, float right) {
         maxRange.left = left;
         maxRange.right = right;
 
         // reset range
-        setXRange(getRangeLeft(), getRangeRight());
+        return setXRange(getRangeLeft(), getRangeRight());
     }
 
-    public void setMaxYRange(float bottom, float top) {
+    /**
+     * Set the max range and return true if the range has change due to the new max range.
+     *
+     * @param bottom
+     * @param top
+     * @return
+     */
+    public boolean setMaxYRange(float bottom, float top) {
         maxRange.bottom = bottom;
         maxRange.top = top;
 
         // reset range
-        setYRange(getRangeBottom(), getRangeTop());
+        return setYRange(getRangeBottom(), getRangeTop());
     }
 
     final public void setMaxRange(RectF range) {
@@ -106,20 +120,20 @@ public class RangeDrawingView extends ViewGroup {
         return new RectF(maxRange);
     }
 
-    public float getMinXRange() {
-        return minXRange;
-    }
-
     public void setMinXRange(float minXRange) {
         this.minXRange = minXRange;
     }
 
-    public float getMinYRange() {
-        return minYRange;
-    }
-
     public void setMinYRange(float minYRange) {
         this.minYRange = minYRange;
+    }
+
+    public float getMinXRange() {
+        return minXRange;
+    }
+
+    public float getMinYRange() {
+        return minYRange;
     }
 
     public PointF getRangeMiddle() {
@@ -138,7 +152,9 @@ public class RangeDrawingView extends ViewGroup {
 
     private void validateXRange(RangeF range) {
         if (maxRange.left != Float.MAX_VALUE) {
-            if (range.end > range.start) {
+            if (range.start == Float.MAX_VALUE)
+                range.start = maxRange.left;
+            else if (range.end > range.start) {
                 if (range.start < maxRange.left)
                     range.start = maxRange.left;
             } else {
@@ -147,7 +163,9 @@ public class RangeDrawingView extends ViewGroup {
             }
         }
         if (maxRange.right != Float.MAX_VALUE) {
-            if (range.end > range.start) {
+            if (range.end == Float.MAX_VALUE)
+                range.end = maxRange.right;
+            else if (range.end > range.start) {
                 if (range.end > maxRange.right)
                     range.end = maxRange.right;
             } else {
@@ -171,7 +189,9 @@ public class RangeDrawingView extends ViewGroup {
 
     private void validateYRange(RangeF range) {
         if (maxRange.bottom != Float.MAX_VALUE) {
-            if (range.end > range.start) {
+            if (range.start == Float.MAX_VALUE)
+                range.start = maxRange.bottom;
+            else if (range.end > range.start) {
                 if (range.start < maxRange.bottom)
                     range.start = maxRange.bottom;
             } else {
@@ -180,7 +200,9 @@ public class RangeDrawingView extends ViewGroup {
             }
         }
         if (maxRange.top != Float.MAX_VALUE) {
-            if (range.end > range.start) {
+            if (range.end == Float.MAX_VALUE)
+                range.end = maxRange.top;
+            else if (range.end > range.start) {
                 if (range.end > maxRange.top)
                     range.end = maxRange.top;
             } else {
