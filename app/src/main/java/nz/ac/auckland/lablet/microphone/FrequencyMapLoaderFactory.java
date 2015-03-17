@@ -191,7 +191,7 @@ class FileFrequencyMapLoader implements IFrequencyMapLoader {
                     outFile = convertToFourier(context, audioWavInputStream, windowSize, stepFactor);
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishProgress(null);
+                    publishProgress(new File[0]);
                 }
 
                 publishProgress(outFile);
@@ -200,7 +200,7 @@ class FileFrequencyMapLoader implements IFrequencyMapLoader {
 
             @Override
             protected void onProgressUpdate(File... values) {
-                if (values[0] == null)
+                if (values.length == 0)
                     return;
 
                 try {
