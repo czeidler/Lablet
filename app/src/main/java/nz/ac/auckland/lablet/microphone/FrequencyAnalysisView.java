@@ -378,7 +378,6 @@ public class FrequencyAnalysisView extends FrameLayout {
         // do the update
         showLoadingView(FOURIER_ANALYSIS_STRING);
 
-        freqMapDisplaySettings.setWindowSize(-1);
         final int newWindowSize = Integer.parseInt(windowSizeList.get(windowSizeSpinner.getSelectedItemPosition()));
         final float newStepFactor = overlapSpinnerEntryList.get(
                 windowOverlapSpinner.getSelectedItemPosition()).stepFactor;
