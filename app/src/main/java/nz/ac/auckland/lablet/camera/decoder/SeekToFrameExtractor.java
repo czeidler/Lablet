@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views;
+package nz.ac.auckland.lablet.camera.decoder;
 
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
@@ -25,9 +25,15 @@ import java.util.concurrent.Semaphore;
 /**
  * Reads a video file and displays it at given time position on the surface. The surface must be fully initialized.
  */
-class SeekToFrameExtractor {
-    SeekToThread seekToThread;
+public class SeekToFrameExtractor {
+    public interface IListener {
+        void onFrameExtracted();
+    }
+
+    private SeekToThread seekToThread;
     private final Semaphore threadReadySemaphore = new Semaphore(0);
+    private Handler listenerHandler;
+    private IListener listener = null;
 
     public SeekToFrameExtractor(File mediaFile, Surface surface) throws IOException {
         seekToThread = new SeekToThread(mediaFile, surface);
@@ -38,6 +44,11 @@ class SeekToFrameExtractor {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setListener(IListener listener) {
+        this.listener = listener;
+        listenerHandler = new Handler();
     }
 
     public void release() {
@@ -167,8 +178,17 @@ class SeekToFrameExtractor {
                         }
 
                         decoder.releaseOutputBuffer(outIndex, render);
-                        if (render)
+                        if (render) {
                             decoder.flush();
+                            if (listener != null) {
+                                listenerHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        listener.onFrameExtracted();
+                                    }
+                                });
+                            }
+                        }
                         break;
                 }
             }
