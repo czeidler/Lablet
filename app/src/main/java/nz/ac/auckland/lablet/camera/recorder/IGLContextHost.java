@@ -7,8 +7,8 @@
  */
 package nz.ac.auckland.lablet.camera.recorder;
 
-
 import java.io.IOException;
+
 
 public interface IGLContextHost {
     interface IChild {

@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.camera.recorder;
 
-import android.opengl.EGL14;
 import android.opengl.GLSurfaceView;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -15,7 +14,7 @@ import javax.microedition.khronos.opengles.GL10;
 import java.io.IOException;
 
 
-public class CameraPreviewRender implements GLSurfaceView.Renderer, IGLContextHost{
+public class CameraPreviewRender implements GLSurfaceView.Renderer, IGLContextHost {
     private CameraGLTextureProducer producer;
     private TextureRender textureRender;
     private GLSurfaceView parent;
