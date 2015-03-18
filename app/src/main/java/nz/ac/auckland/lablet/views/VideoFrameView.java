@@ -11,9 +11,14 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
+import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.widget.Toast;
+import nz.ac.auckland.lablet.camera.decoder.CodecOutputSurface;
+import nz.ac.auckland.lablet.camera.decoder.FrameRenderer;
+import nz.ac.auckland.lablet.camera.decoder.SeekToFrameExtractor;
+import nz.ac.auckland.lablet.camera.recorder.CameraPreviewRender;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,12 +28,12 @@ import java.io.IOException;
  * Displays a video at a certain frame.
  * <p>
  * A normal {@link android.widget.VideoView} can't seek to an exact position in a video, this view can. To do so the
- * {@link nz.ac.auckland.lablet.views.SeekToFrameExtractor} is leveraged.
+ * {@link nz.ac.auckland.lablet.camera.decoder.SeekToFrameExtractor} is leveraged.
  * </p>
  */
-public class VideoFrameView extends RatioSurfaceView {
-    protected SeekToFrameExtractor seekToFrameExtractor = null;
-    protected Rect frame = new Rect();
+public class VideoFrameView extends RatioGLSurfaceView {
+    protected SeekToFrameExtractor seekToFrameExtractor;
+    private CodecOutputSurface outputSurface;
 
     protected String videoFilePath = "";
 
@@ -36,50 +41,47 @@ public class VideoFrameView extends RatioSurfaceView {
 
     public VideoFrameView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     public VideoFrameView(Context context) {
         super(context);
-        init();
     }
 
-    private void init() {
+    private void init(int width, int height) {
         setWillNotDraw(false);
-        getHolder().addCallback(surfaceCallback);
+        setEGLContextClientVersion(2);
+        setPreserveEGLContextOnPause(true);
+
+        outputSurface = new CodecOutputSurface(width, height);
+
+        FrameRenderer frameRenderer = new FrameRenderer(outputSurface);
+        setRenderer(frameRenderer);
+        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+
+        File videoFile = new File(videoFilePath);
+        try {
+            seekToFrameExtractor = new SeekToFrameExtractor(videoFile, outputSurface.getSurface());
+            seekToFrameExtractor.setListener(new SeekToFrameExtractor.IListener() {
+                @Override
+                public void onFrameExtracted() {
+                    requestRender();
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
-        public void surfaceCreated(SurfaceHolder holder) {
-        }
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
 
-        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-            getDrawingRect(frame);
-            File videoFile = new File(videoFilePath);
-            try {
-                if (seekToFrameExtractor != null) {
-                    seekToFrameExtractor.release();
-                    seekToFrameExtractor = null;
-                }
-                seekToFrameExtractor = new SeekToFrameExtractor(videoFile, holder.getSurface());
+        if (seekToFrameExtractor != null)
+            seekToFrameExtractor.release();
+        seekToFrameExtractor = null;
 
-                if (queuedRequest >= 0) {
-                    seekToFrame(queuedRequest);
-                    queuedRequest = -1;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                toastMessage("can't open video file");
-            }
-            requestLayout();
-        }
-
-        public void surfaceDestroyed(SurfaceHolder holder) {
-            if (seekToFrameExtractor != null)
-                seekToFrameExtractor.release();
-            seekToFrameExtractor = null;
-        }
-    };
+        outputSurface.release();
+    }
 
     public void setVideoFilePath(String path) {
         videoFilePath = path;
@@ -108,6 +110,10 @@ public class VideoFrameView extends RatioSurfaceView {
         }
 
         setRatio(((float)(videoWidth) / videoHeight));
+
+        init(videoWidth, videoHeight);
+        if (queuedRequest > 0)
+            seekToFrame(queuedRequest);
     }
 
     public void seekToFrame(long positionMicroSeconds) {
@@ -115,13 +121,6 @@ public class VideoFrameView extends RatioSurfaceView {
             seekToFrameExtractor.seekToFrame(positionMicroSeconds);
         else
             queuedRequest = positionMicroSeconds;
-    }
-
-    protected void toastMessage(String message) {
-        Context context = getContext();
-        assert context != null;
-        Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
-        toast.show();
     }
 
 }
