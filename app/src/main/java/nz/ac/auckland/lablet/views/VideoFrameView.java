@@ -47,14 +47,14 @@ public class VideoFrameView extends RatioGLSurfaceView {
         super(context);
     }
 
-    private void init(int width, int height) {
+    private void init(int width, int height, int videoRotation) {
         setWillNotDraw(false);
         setEGLContextClientVersion(2);
         setPreserveEGLContextOnPause(true);
 
         outputSurface = new CodecOutputSurface(width, height);
 
-        FrameRenderer frameRenderer = new FrameRenderer(outputSurface);
+        FrameRenderer frameRenderer = new FrameRenderer(outputSurface, videoRotation);
         setRenderer(frameRenderer);
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
@@ -84,6 +84,10 @@ public class VideoFrameView extends RatioGLSurfaceView {
     }
 
     public void setVideoFilePath(String path) {
+        setVideoFilePath(path, 0);
+    }
+
+    public void setVideoFilePath(String path, int videoRotation) {
         videoFilePath = path;
 
         int videoWidth = 1;
@@ -105,13 +109,19 @@ public class VideoFrameView extends RatioGLSurfaceView {
 
                 videoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
                 videoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
+
+                if (videoRotation == 90 || videoRotation == 270) {
+                    int temp = videoWidth;
+                    videoWidth = videoHeight;
+                    videoHeight = temp;
+                }
                 break;
             }
         }
 
         setRatio(((float)(videoWidth) / videoHeight));
 
-        init(videoWidth, videoHeight);
+        init(videoWidth, videoHeight, videoRotation);
         if (queuedRequest > 0)
             seekToFrame(queuedRequest);
     }

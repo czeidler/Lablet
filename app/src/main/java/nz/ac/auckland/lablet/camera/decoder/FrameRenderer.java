@@ -11,9 +11,11 @@ import javax.microedition.khronos.opengles.GL10;
 public class FrameRenderer implements GLSurfaceView.Renderer {
     private TextureRender textureRender;
     private CodecOutputSurface outputSurface;
+    final private int videoRotation;
 
-    public FrameRenderer(CodecOutputSurface outputSurface) {
+    public FrameRenderer(CodecOutputSurface outputSurface, int videoRotation) {
         this.outputSurface = outputSurface;
+        this.videoRotation = videoRotation;
     }
 
     @Override
@@ -38,6 +40,7 @@ public class FrameRenderer implements GLSurfaceView.Renderer {
         outputSurface.awaitNewImage();
         outputSurface.drawImage(true);
 
-        textureRender.render(outputSurface.getTextureRender().getTextureId(), outputSurface.getSurfaceTexture(), 0);
+        textureRender.render(outputSurface.getTextureRender().getTextureId(), outputSurface.getSurfaceTexture(),
+                videoRotation);
     }
 }

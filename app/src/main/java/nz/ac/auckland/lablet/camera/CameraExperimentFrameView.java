@@ -33,7 +33,7 @@ class CameraExperimentFrameView extends VideoFrameView {
 
         File storageDir = motionAnalysis.getVideoData().getStorageDir();
         File videoFile = new File(storageDir, sensorData.getVideoFileName());
-        setVideoFilePath(videoFile.getPath());
+        setVideoFilePath(videoFile.getPath(), motionAnalysis.getVideoRotation());
     }
 
     public void setCurrentFrame(int frame) {

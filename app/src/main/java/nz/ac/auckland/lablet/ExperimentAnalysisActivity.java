@@ -66,8 +66,6 @@ public class ExperimentAnalysisActivity extends ExperimentAnalysisBaseActivity {
 
             }
         });
-
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
     @Override

@@ -58,6 +58,9 @@ public class MotionAnalysis implements IDataAnalysis {
 
     private Bundle videoAnalysisSettings = null;
 
+    private int videoRotation = 0;
+
+
     final private List<IListener> listenerList = new ArrayList<>();
 
     public MotionAnalysis(VideoData sensorData) {
@@ -119,6 +122,10 @@ public class MotionAnalysis implements IDataAnalysis {
 
     protected void setOrigin(PointF origin, PointF axis1) {
         originCalibrationSetter.setOrigin(origin, axis1);
+    }
+
+    public int getVideoRotation() {
+        return videoRotation;
     }
 
     @Override
@@ -286,36 +293,20 @@ public class MotionAnalysis implements IDataAnalysis {
         // read rotation from video
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         mediaMetadataRetriever.setDataSource(cameraExperiment.getVideoFile().getPath());
-        String rotationString = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
+        String rotationString = mediaMetadataRetriever.extractMetadata(
+                MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
 
-        PointF origin = new PointF();
-        origin.set(calibrationXY.getOrigin());
-        float xOffset = origin.x;
-        float yOffset = origin.y;
-        PointF axis1 = new PointF();
-        axis1.set(calibrationXY.getAxis1());
         switch (rotationString) {
             case "90":
-                origin.x = cameraExperiment.getMaxRawX() - xOffset;
-                origin.y = yOffset;
-                axis1.x = origin.x;
-                axis1.y = origin.y + 10;
+                videoRotation = 270;
                 break;
             case "180":
-                origin.x = cameraExperiment.getMaxRawX() - xOffset;
-                origin.y = cameraExperiment.getMaxRawY() - yOffset;
-                axis1.x = origin.x - 10;
-                axis1.y = origin.y;
+                videoRotation = 180;
                 break;
             case "270":
-                origin.x = xOffset;
-                origin.y = cameraExperiment.getMaxRawY() - yOffset;
-                axis1.x = origin.x;
-                axis1.y = origin.y - 10;
+                videoRotation = 90;
                 break;
         }
-
-        setOrigin(origin, axis1);
     }
 
     protected void onVideoAnalysisSettingsChanged() {

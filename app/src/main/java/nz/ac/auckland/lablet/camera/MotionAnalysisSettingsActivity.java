@@ -152,7 +152,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         assert videoFrameView != null;
         File storageDir = videoData.getStorageDir();
         File videoFile = new File(storageDir, videoData.getVideoFileName());
-        videoFrameView.setVideoFilePath(videoFile.getPath());
+        videoFrameView.setVideoFilePath(videoFile.getPath(), motionAnalysis.getVideoRotation());
 
         warningTextView = (TextView)findViewById(R.id.warningTextView);
         assert warningTextView != null;
@@ -307,8 +307,6 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         seekBar.setProgress(findFrame(videoStartValue));
 
         updateWarning();
-
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
     @Override
