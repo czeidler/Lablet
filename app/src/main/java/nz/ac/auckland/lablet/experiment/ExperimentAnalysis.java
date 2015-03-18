@@ -16,15 +16,15 @@ import java.util.List;
 
 public class ExperimentAnalysis {
     public static class AnalysisRef {
-        final static private String KEY_RUN_ID = "runID";
-        final static private String KEY_ANALYSIS_UID = "analysisUID";
+        final static public String RUN_ID_KEY = "runID";
+        final static public String ANALYSIS_UID_KEY = "analysisUID";
 
         final public int runId;
         final public String analysisUid;
 
         public AnalysisRef(Bundle archive) {
-            runId = archive.getInt(KEY_RUN_ID);
-            analysisUid = archive.getString(KEY_ANALYSIS_UID);
+            runId = archive.getInt(RUN_ID_KEY);
+            analysisUid = archive.getString(ANALYSIS_UID_KEY);
         }
 
         public AnalysisRef(int runId, String analysisUid) {
@@ -34,8 +34,8 @@ public class ExperimentAnalysis {
 
         public Bundle toBundle() {
             Bundle archive = new Bundle();
-            archive.putInt(KEY_RUN_ID, runId);
-            archive.putString(KEY_ANALYSIS_UID, analysisUid);
+            archive.putInt(RUN_ID_KEY, runId);
+            archive.putString(ANALYSIS_UID_KEY, analysisUid);
             return archive;
         }
     }
@@ -199,5 +199,16 @@ public class ExperimentAnalysis {
 
     public void setCurrentAnalysis(int analysis) {
         currentAnalysis = currentAnalysisRun.analysisList.get(analysis).analysis;
+    }
+
+    public boolean setCurrentAnalysis(String analysisId) {
+        for (int i = 0; i < currentAnalysisRun.analysisList.size(); i++) {
+            AnalysisEntry analysisEntry = currentAnalysisRun.analysisList.get(i);
+            if (analysisEntry.analysisUid.equals(analysisId)) {
+                setCurrentAnalysis(i);
+                return true;
+            }
+        }
+        return false;
     }
 }

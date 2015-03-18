@@ -92,7 +92,7 @@ public class ExperimentHelper {
         Bundle bundle = new Bundle();
         // save plugin
         bundle.putString(PLUGIN_ID_KEY, analysisEntry.plugin.getIdentifier());
-        bundle.putString(ANALYSIS_UID_KEY, analysisEntry.plugin.getIdentifier());
+        bundle.putString(ANALYSIS_UID_KEY, analysisEntry.analysisUid);
 
         // save used data
         ISensorData[] dataList = sensorAnalysis.getData();
@@ -163,8 +163,8 @@ public class ExperimentHelper {
     static public void packStartAnalysisSettingsIntent(Intent intent, ExperimentAnalysis.AnalysisRef analysisRef,
                                                        String experimentPath, Bundle options) {
 
-        intent.putExtra("run_id", analysisRef.runId);
-        intent.putExtra("analysis_id", analysisRef.analysisUid);
+        intent.putExtra(ExperimentAnalysis.AnalysisRef.RUN_ID_KEY, analysisRef.runId);
+        intent.putExtra(ExperimentAnalysis.AnalysisRef.ANALYSIS_UID_KEY, analysisRef.analysisUid);
 
         intent.putExtra(ExperimentActivity.PATH, experimentPath);
         if (options != null)

@@ -45,7 +45,8 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
         Intent intent = getIntent();
 
         String experimentPath = intent.getStringExtra(ExperimentActivity.PATH);
-        int runId = intent.getIntExtra("run_id", 0);
+        int runId = intent.getIntExtra(ExperimentAnalysis.AnalysisRef.RUN_ID_KEY, 0);
+        String analysisId = intent.getStringExtra(ExperimentAnalysis.AnalysisRef.ANALYSIS_UID_KEY);
 
         ExperimentData experimentData = ExperimentHelper.loadExperimentData(experimentPath);
         if (!experimentData.getLoadError().equals("")) {
@@ -62,7 +63,7 @@ abstract public class ExperimentAnalysisBaseActivity extends FragmentActivity {
         }
 
         experimentAnalysis.setCurrentAnalysisRun(runId);
-        experimentAnalysis.setCurrentAnalysis(0);
+        experimentAnalysis.setCurrentAnalysis(analysisId);
         return true;
     }
 
