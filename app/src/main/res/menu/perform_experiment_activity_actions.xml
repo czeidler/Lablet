@@ -15,12 +15,12 @@
           android:icon="@drawable/ic_eye"
           android:title="@string/action_view"
           yourapp:showAsAction="ifRoom|withText"/>
-    <item android:id="@+id/action_done"
-          android:icon="@drawable/ic_action_back"
-          android:title="@string/action_done"
-          yourapp:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/action_analyse"
           android:icon="@drawable/ic_chart_line"
           android:title="@string/action_analyse"
+          yourapp:showAsAction="ifRoom|withText"/>
+    <item android:id="@+id/action_done"
+          android:icon="@drawable/ic_action_back"
+          android:title="@string/action_done"
           yourapp:showAsAction="ifRoom|withText"/>
 </menu>
