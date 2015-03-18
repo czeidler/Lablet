@@ -141,9 +141,12 @@ public class FrequencyAnalysisView extends FrameLayout {
     }
 
     @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
 
+        // for some reason not calling clear causes a memory leak!
+        audioFrequencyMapAdapter.clear();
+        // call release, e.g. to delete tmp files from the file backend
         frequencyMapLoader.release();
     }
 

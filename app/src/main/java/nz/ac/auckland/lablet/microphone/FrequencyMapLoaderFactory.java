@@ -53,6 +53,7 @@ class MemoryFrequencyMapLoader implements IFrequencyMapLoader {
         }
     }
 
+    @Override
     public void loadWavFile(final AudioWavInputStream audioWavInputStream, final Runnable onLoadedCallback) {
         AsyncTask<Void, DataContainer, Void> asyncTask = new AsyncTask<Void, DataContainer, Void>() {
             float[] data;
@@ -146,7 +147,7 @@ class MemoryFrequencyMapLoader implements IFrequencyMapLoader {
 
     @Override
     public void release() {
-
+        amplitudes = null;
     }
 
     private void onFinished(IFrequenciesUpdatedListener listener, boolean canceled) {

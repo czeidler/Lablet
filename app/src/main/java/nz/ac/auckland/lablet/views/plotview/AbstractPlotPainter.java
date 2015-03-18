@@ -29,6 +29,10 @@ abstract public class AbstractPlotPainter implements IPlotPainter {
 
     }
 
+    public void release() {
+
+    }
+
     public PlotPainterContainerView getContainerView() {
         return containerView;
     }

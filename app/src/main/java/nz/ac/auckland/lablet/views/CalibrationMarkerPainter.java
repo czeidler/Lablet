@@ -50,6 +50,9 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
     public void setContainer(PlotPainterContainerView view) {
         super.setContainer(view);
 
+        if (view == null)
+            return;
+
         FONT_SIZE = toPixel(FONT_SIZE_DP);
         LINE_WIDTH = toPixel(LINE_WIDTH_DP);
         WING_LENGTH = toPixel(WING_LENGTH_DP);

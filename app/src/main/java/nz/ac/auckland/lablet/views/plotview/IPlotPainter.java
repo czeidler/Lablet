@@ -13,20 +13,22 @@ import android.view.MotionEvent;
 
 
 public interface IPlotPainter {
-    public void setContainer(PlotPainterContainerView view);
+    void setContainer(PlotPainterContainerView view);
 
-    public void onSizeChanged(int width, int height, int oldw, int oldh);
-    public void onDraw(Canvas canvas);
-    public boolean onTouchEvent(MotionEvent event);
+    void onSizeChanged(int width, int height, int oldw, int oldh);
+    void onDraw(Canvas canvas);
+    boolean onTouchEvent(MotionEvent event);
     /**
      * Invalidate the state of the painter.
      *
      * For example, cached drawings have to be invalidated or a complete redraw has to be triggered.
      */
-    public void invalidate();
+    void invalidate();
 
-    public void setXScale(IScale xScale);
-    public void setYScale(IScale yScale);
+    void setXScale(IScale xScale);
+    void setYScale(IScale yScale);
 
-    public void onRangeChanged(RectF range, RectF oldRange, boolean keepDistance);
+    void onRangeChanged(RectF range, RectF oldRange, boolean keepDistance);
+
+    void release();
 }

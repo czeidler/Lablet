@@ -185,4 +185,9 @@ public class LegendPainter implements IPlotPainter {
     public void onRangeChanged(RectF range, RectF oldRange, boolean keepDistance) {
 
     }
+
+    @Override
+    public void release() {
+
+    }
 }

@@ -532,7 +532,8 @@ public class PlotView extends ViewGroup {
     }
 
     protected void removePlotPainter(IPlotPainter painter) {
-        mainView.removePlotPainter(painter);
+        if (!mainView.removePlotPainter(painter))
+            return;
 
         if (autoRange != null)
             autoRange.removePainter(painter);

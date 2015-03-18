@@ -18,79 +18,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-class ThreadRenderTask {
-    final private ThreadStrategyPainter plotPainter;
-
-    final private AtomicBoolean running = new AtomicBoolean();
-    private Future thread;
-    private ExecutorService threadPool = Executors.newCachedThreadPool();
-    final private Handler uiHandler = new Handler();
-    private ThreadStrategyPainter.ThreadCookie cookie;
-
-    public ThreadRenderTask(ThreadStrategyPainter plotPainter) {
-        this.plotPainter = plotPainter;
-        running.set(false);
-    }
-
-    Runnable renderRunnable = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                Bitmap bitmap = cookie.bitmap;
-                Canvas bitmapCanvas = new Canvas(bitmap);
-                for (StrategyPainter.RenderPayload payload : cookie.payloads)
-                    payload.getPainter().render(bitmapCanvas, payload);
-
-                publishBitmap(cookie);
-            } catch (Exception e) {
-                e.printStackTrace();
-                running.set(false);
-            }
-        }
-    };
-
-    private void publishBitmap(final ThreadStrategyPainter.ThreadCookie cookie) {
-        uiHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                plotPainter.onMergeOffScreenRendering(cookie);
-
-                running.set(false);
-
-                plotPainter.onRenderingFinished();
-            }
-        });
-    }
-
-    public boolean start(ThreadStrategyPainter.ThreadCookie threadCookie) {
-        if (running.get())
-            return false;
-        this.cookie = threadCookie;
-        running.set(true);
-        thread = threadPool.submit(renderRunnable);
-        return true;
-    }
-
-    public void stop() {
-        if (!running.get())
-            return;
-        running.set(false);
-        try {
-            thread.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public boolean isRendering() {
-        return running.get();
-    }
-}
-
 public class ThreadStrategyPainter extends BufferedStrategyPainter {
-    final private ThreadRenderTask renderTask = new ThreadRenderTask(this);
+    final private ThreadRenderTask renderTask = new ThreadRenderTask();
     final private BitmapBuffer threadBitmap = new BitmapBuffer();
     private boolean invalidated = false;
 
@@ -107,6 +36,83 @@ public class ThreadStrategyPainter extends BufferedStrategyPainter {
             this.bitmapRealRange = bitmapRealRange;
             this.isCompleteRedraw = isCompleteRedraw;
         }
+    }
+
+    class ThreadRenderTask {
+        final private AtomicBoolean running = new AtomicBoolean();
+        private Future thread;
+        private ExecutorService threadPool = Executors.newCachedThreadPool();
+        final private Handler uiHandler = new Handler();
+        private ThreadStrategyPainter.ThreadCookie cookie;
+
+        public ThreadRenderTask() {
+            running.set(false);
+        }
+
+        Runnable renderRunnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Bitmap bitmap = cookie.bitmap;
+                    Canvas bitmapCanvas = new Canvas(bitmap);
+                    for (StrategyPainter.RenderPayload payload : cookie.payloads)
+                        payload.getPainter().render(bitmapCanvas, payload);
+
+                    publishBitmap(cookie);
+                    cookie = null;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    running.set(false);
+                    cookie = null;
+                }
+            }
+        };
+
+        private void publishBitmap(final ThreadStrategyPainter.ThreadCookie cookie) {
+            uiHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    onMergeOffScreenRendering(cookie);
+
+                    running.set(false);
+
+                    onRenderingFinished();
+                }
+            });
+        }
+
+        public boolean start(ThreadStrategyPainter.ThreadCookie threadCookie) {
+            if (running.get())
+                return false;
+            this.cookie = threadCookie;
+            running.set(true);
+            thread = threadPool.submit(renderRunnable);
+            return true;
+        }
+
+        public void stop() {
+            if (!running.get())
+                return;
+            running.set(false);
+            try {
+                thread.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public boolean isRendering() {
+            return running.get();
+        }
+    }
+
+    @Override
+    public void release() {
+        super.release();
+
+        threadBitmap.release();
     }
 
     @Override

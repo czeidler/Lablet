@@ -100,6 +100,14 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
         }
     }
 
+    @Override
+    public void release() {
+        bufferBitmap = null;
+        bufferCache.release();
+
+        bufferCanvas.setBitmap(null);
+    }
+
     protected RectF enlargeViewRangeToBufferScreenRange(RectF range) {
         int bufferScreenWidth = (int)(containerView.getWidth() * enlargementFactor) + 2;
         int bufferScreenHeight = (int)(containerView.getHeight() * enlargementFactor) + 2;
