@@ -380,9 +380,9 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         float frameRate = getFrameRateFromPicker();
         float duration = getDurationAtFrameRate(frameRate);
 
-        float start = startEndSeekBar.getMarkerDataModel().getMarkerDataAt(0).getPosition().x;
+        float start = startEndSeekBar.getStart();
         start *= duration;
-        float end = startEndSeekBar.getMarkerDataModel().getMarkerDataAt(1).getPosition().x;
+        float end = startEndSeekBar.getEnd();
         end *= duration;
 
         int numberOfFrames = (int)((frameRate * (end - start)) / 1000) + 1;
