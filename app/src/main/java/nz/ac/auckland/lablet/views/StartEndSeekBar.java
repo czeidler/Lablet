@@ -9,7 +9,10 @@ package nz.ac.auckland.lablet.views;
 
 import android.content.Context;
 import android.graphics.*;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.plotview.IPlotPainter;
@@ -255,6 +258,84 @@ public class StartEndSeekBar extends PlotPainterContainerView {
         startEndPainter = new StartEndPainter(markerDataModel);
         addPlotPainter(startEndPainter);
         invalidate();
+    }
+
+    public float getStart() {
+        return markerDataModel.getMarkerDataAt(0).getPosition().x;
+    }
+
+    public float getEnd() {
+        return markerDataModel.getMarkerDataAt(1).getPosition().x;
+    }
+
+    private void setStart(float start) {
+        PointF point = markerDataModel.getMarkerDataAt(0).getPosition();
+        point.x = start;
+        markerDataModel.setMarkerPosition(point, 0);
+    }
+
+    private void setEnd(float end) {
+        PointF point = markerDataModel.getMarkerDataAt(1).getPosition();
+        point.x = end;
+        markerDataModel.setMarkerPosition(point, 1);
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState() {
+        Parcelable superState = super.onSaveInstanceState();
+
+        SavedState savedState = new SavedState(superState);
+        savedState.start = getStart();
+        savedState.end = getEnd();
+
+        return savedState;
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        if(!(state instanceof SavedState)) {
+            super.onRestoreInstanceState(state);
+            return;
+        }
+
+        SavedState savedState = (SavedState)state;
+        super.onRestoreInstanceState(savedState.getSuperState());
+
+        setStart(savedState.start);
+        setEnd(savedState.end);
+    }
+
+    static class SavedState extends BaseSavedState {
+        float start;
+        float end;
+
+        SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        private SavedState(Parcel in) {
+            super(in);
+            start = in.readFloat();
+            end = in.readFloat();
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            out.writeFloat(start);
+            out.writeFloat(end);
+        }
+
+        //required field that makes Parcelables from a Parcel
+        public static final Parcelable.Creator<SavedState> CREATOR =
+                new Parcelable.Creator<SavedState>() {
+                    public SavedState createFromParcel(Parcel in) {
+                        return new SavedState(in);
+                    }
+                    public SavedState[] newArray(int size) {
+                        return new SavedState[size];
+                    }
+                };
     }
 
     @Override
