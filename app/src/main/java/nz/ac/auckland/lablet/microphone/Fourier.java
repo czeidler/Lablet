@@ -41,7 +41,18 @@ public class Fourier {
     }
 
     static public int getNSteps(int dataLength, int windowSize, int stepWidth) {
+        if (dataLength < windowSize)
+            return 0;
         return (dataLength - windowSize) / stepWidth + 1;
+    }
+
+    static public int getEffectiveLength(int totalLength, int windowSize, int stepWidth) {
+        return (getNSteps(totalLength, windowSize, stepWidth) - 1) * stepWidth + windowSize;
+    }
+
+    static public int getEffectiveLength(int totalLength, int windowSize, float stepFactor) {
+        final int stepWidth =  (int)(stepFactor * windowSize);
+        return getEffectiveLength(totalLength, windowSize, stepWidth);
     }
 
     static public float[] transform(float[] data, int windowSize, float stepFactor) {

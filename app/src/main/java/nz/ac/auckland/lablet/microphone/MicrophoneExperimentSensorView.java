@@ -311,7 +311,8 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
             e.printStackTrace();
             return;
         }
-        final int totalTime = audioWavInputStream.getDurationMilliSeconds();
+        final int totalTime = audioWavInputStream.lengthToMilliSeconds(Fourier.getEffectiveLength(
+                audioWavInputStream.getSize(), DEFAULT_WINDOW_SIZE, frequencyMapAdapter.getStepFactor()));
         frequencyMapPlotView.setMaxXRange(0, totalTime);
         frequencyMapPlotView.setMaxYRange(1, experimentSensor.SAMPLE_RATE / 2);
         frequencyMapPlotView.setXRange(0, totalTime);
