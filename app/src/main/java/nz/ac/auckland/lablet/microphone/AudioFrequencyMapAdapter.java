@@ -183,7 +183,7 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
         rightIndex ++;
         if (leftIndex < 0)
             leftIndex = 0;
-        int size = data.getBunchCount();
+        int size = getSize();
         if (rightIndex >= size) {
             rightIndex = size - 1;
             if (leftIndex > rightIndex)
@@ -237,6 +237,9 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
     }
 
     public float[] getY(int index) {
+        // Handle the hack, see getSize
+        if (index >= data.getBunchCount())
+            return data.getBunch(data.getBunchCount() - 1);
         return data.getBunch(index);
     }
 
@@ -244,7 +247,8 @@ public class AudioFrequencyMapAdapter extends CloneablePlotDataAdapter {
     public int getSize() {
         if (data == null)
             return 0;
-        return data.getBunchCount();
+        // Increase size by one, this is a hack do draw the last data point completely
+        return data.getBunchCount() + 1;
     }
 
     class FrequencyMapDataStatistics extends DataStatistics {

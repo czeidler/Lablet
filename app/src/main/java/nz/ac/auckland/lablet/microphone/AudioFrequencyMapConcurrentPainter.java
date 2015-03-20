@@ -122,8 +122,8 @@ public class AudioFrequencyMapConcurrentPainter extends ArrayConcurrentPainter {
         final int[] colors = new int[screenRectHeight];
         final int[] bitmapData = new int[screenRectWidth * screenRectHeight];
 
-        int dataPointsPerPixel = getDataPointsPerPixel(adapter, range);
-        int maxDataPointsPerPixel = 1;
+        final int dataPointsPerPixel = getDataPointsPerPixel(adapter, range);
+        final int maxDataPointsPerPixel = 1;
         int stepSize = dataPointsPerPixel / maxDataPointsPerPixel;
         if (stepSize < 1)
             stepSize = 1;
@@ -169,7 +169,6 @@ public class AudioFrequencyMapConcurrentPainter extends ArrayConcurrentPainter {
             startXPixel = endXPixel;
             startIndex = index;
         }
-
         bitmapCanvas.drawBitmap(bitmapData, 0, screenRectWidth, startLeftTop[0], startLeftTop[1],
                 screenRectWidth, screenRectHeight, true, null);
     }
