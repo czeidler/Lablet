@@ -18,10 +18,18 @@ public class RatioGLSurfaceView extends GLSurfaceView {
 
     public RatioGLSurfaceView(Context context) {
         super(context);
+
+        init();
     }
 
     public RatioGLSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        init();
+    }
+
+    private void init() {
+        setPreserveEGLContextOnPause(true);
     }
 
     public void setRatio(float ratio) {
