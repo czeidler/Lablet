@@ -20,6 +20,7 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
@@ -92,7 +93,8 @@ public class FrameContainerView extends RelativeLayout {
                 return;
             open = true;
 
-            animate(FrameContainerView.this.getHeight(), FrameContainerView.this.getHeight() - seekBar.getHeight(),
+            ViewGroup parent = (ViewGroup)FrameContainerView.this.getParent();
+            animate(parent.getBottom(), parent.getBottom() - seekBar.getHeight(),
                     new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
@@ -112,14 +114,15 @@ public class FrameContainerView extends RelativeLayout {
                 return;
             open = false;
 
-            animate(FrameContainerView.this.getHeight() - seekBar.getHeight(), FrameContainerView.this.getHeight(),
+            ViewGroup parent = (ViewGroup)FrameContainerView.this.getParent();
+            animate(parent.getBottom() - seekBar.getHeight(), parent.getBottom(),
                     new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    animator = null;
-                    seekBar.setVisibility(INVISIBLE);
-                }
-            });
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            animator = null;
+                            seekBar.setVisibility(INVISIBLE);
+                        }
+                    });
         }
 
         private void animate(int startY, int endY, AnimatorListenerAdapter listener) {
