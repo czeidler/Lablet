@@ -129,26 +129,26 @@ public class AudioFrequencyMapConcurrentPainter extends ArrayConcurrentPainter {
             stepSize = 1;
 
         int index = start;
-        int startXPixel = -1;
+        int xCurrentPixel = -1;
         int startIndex = 0;
         while (index < start + count) {
             // advance till the next pixel
-            int endXPixel = -1;
+            int xEndPixel = -1;
             for (; index < start + count; index += stepSize) {
                 final float[] screenLeftTop = mapPoint(rangeMatrix, adapter.getX(index), payload.getRealDataRect().top);
-                endXPixel = (int)screenLeftTop[0] - xStartPixel;
-                if (endXPixel < 0)
+                xEndPixel = (int)screenLeftTop[0] - xStartPixel;
+                if (xEndPixel < 0)
                     continue;
-                if (startXPixel < 0) {
-                    startXPixel = endXPixel;
+                if (xCurrentPixel < 0) {
+                    xCurrentPixel = xEndPixel;
                     startIndex = index;
                     continue;
                 }
-                if (startXPixel != endXPixel)
+                if (xCurrentPixel != xEndPixel)
                     break;
             }
 
-            if (startXPixel < 0)
+            if (xCurrentPixel < 0)
                 break;
             //if (index + 1 == start + count)
               //  endXPixel = screenRectWidth;
@@ -156,17 +156,17 @@ public class AudioFrequencyMapConcurrentPainter extends ArrayConcurrentPainter {
             // do the drawing
             final float[] frequencies = adapter.getY(startIndex);
             getColors(colors, frequencies, payload);
-            for (int column = startXPixel; column <= endXPixel; column++) {
+            for (int column = xCurrentPixel; column <= xEndPixel; column++) {
                 if (column >= screenRectWidth)
                     break;
                 for (int row = 0; row < colors.length; row++)
                     bitmapData[column + row * screenRectWidth] = colors[row];
             }
 
-            if (endXPixel >= screenRectWidth)
+            if (xEndPixel >= screenRectWidth)
                 break;
 
-            startXPixel = endXPixel;
+            xCurrentPixel = xEndPixel;
             startIndex = index;
         }
         bitmapCanvas.drawBitmap(bitmapData, 0, screenRectWidth, startLeftTop[0], startLeftTop[1],
