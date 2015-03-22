@@ -13,6 +13,7 @@ import android.support.v8.renderscript.Element;
 import android.support.v8.renderscript.RenderScript;
 import edu.emory.mathcs.jtransforms.dct.FloatDCT_1D;
 import nz.ac.auckland.lablet.R;
+import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 
 import java.util.Arrays;
 
@@ -46,13 +47,10 @@ public class Fourier {
         return (dataLength - windowSize) / stepWidth + 1;
     }
 
-    static public int getEffectiveLength(int totalLength, int windowSize, int stepWidth) {
-        return (getNSteps(totalLength, windowSize, stepWidth) - 1) * stepWidth + windowSize;
-    }
-
-    static public int getEffectiveLength(int totalLength, int windowSize, float stepFactor) {
-        final int stepWidth =  (int)(stepFactor * windowSize);
-        return getEffectiveLength(totalLength, windowSize, stepWidth);
+    static public int getEffectiveDuration(AudioWavInputStream audioWavInputStream, int windowSize, float stepFactor) {
+        final int stepWidth = (int)(stepFactor * windowSize);
+        final int nSteps = Fourier.getNSteps(audioWavInputStream.getSize() / 2, windowSize, stepWidth);
+        return audioWavInputStream.lengthToMilliSeconds(nSteps * stepWidth * audioWavInputStream.BYTES_PER_SAMPLE);
     }
 
     static public float[] transform(float[] data, int windowSize, float stepFactor) {
