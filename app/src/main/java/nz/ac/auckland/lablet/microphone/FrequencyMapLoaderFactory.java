@@ -213,8 +213,15 @@ class FileFrequencyMapLoader implements IFrequencyMapLoader {
             }
 
             @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                updateAsyncTask = null;
+            }
+
+            @Override
             protected void onCancelled() {
                 super.onCancelled();
+                updateAsyncTask = null;
                 listener.onFrequenciesUpdated(true);
             }
 
