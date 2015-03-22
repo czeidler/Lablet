@@ -42,6 +42,7 @@ public class FrequencyAnalysisView extends FrameLayout {
     private Spinner windowOverlapSpinner;
     final private List<OverlapSpinnerEntry> overlapSpinnerEntryList = new ArrayList<>();
 
+    private AudioWavInputStream audioWavInputStream;
     private AudioFrequencyMapConcurrentPainter audioFrequencyMapPainter;
     private boolean wavFileLoaded = false;
     private ThreadStrategyPainter threadStrategyPainter;
@@ -82,7 +83,6 @@ public class FrequencyAnalysisView extends FrameLayout {
         AudioData micSensorData = analysis.getAudioData();
 
         File audioFile = micSensorData.getAudioFile();
-        AudioWavInputStream audioWavInputStream;
         try {
             audioWavInputStream = new AudioWavInputStream(audioFile);
         } catch (IOException e) {
@@ -351,7 +351,6 @@ public class FrequencyAnalysisView extends FrameLayout {
         VCursorDataModelPainter vCursorDataModelPainter = new VCursorDataModelPainter(vMarkerModel);
         vCursorDataModelPainter.setMarkerPainterGroup(hCursorDataModelPainter.getMarkerPainterGroup());
         frequencyMapPlotView.addPlotPainter(vCursorDataModelPainter);
-
     }
 
     private boolean isUpToDate() {
@@ -392,6 +391,9 @@ public class FrequencyAnalysisView extends FrameLayout {
                 if (!canceled) {
                     freqMapDisplaySettings.setWindowSize(newWindowSize);
                     freqMapDisplaySettings.setStepFactor(newStepFactor);
+
+                    int duration = Fourier.getEffectiveDuration(audioWavInputStream, newWindowSize, newStepFactor);
+                    frequencyView.setMaxXRange(0, duration);
                 }
                 update();
                 hideLoadingView();
