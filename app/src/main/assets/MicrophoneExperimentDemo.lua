@@ -1,15 +1,18 @@
+Lablet = {
+    interface = 1.0
+}
 
-function onBuildExperimentScript(scriptBuilder)
-	local takeVideoSheet = scriptBuilder:create("Sheet")
-	scriptBuilder:add(takeVideoSheet)
+
+function Lablet.buildActivity(builder)
+	local takeVideoSheet = builder:create("Sheet")
+    builder:add(takeVideoSheet)
 	takeVideoSheet:setTitle("Microphone Experiment:")
 	experimentView = takeVideoSheet:addMicrophoneExperiment();
 	experimentView:setDescriptionText("Please record some sound:")
 	local micExperiment = experimentView:getExperiment()
 
-	local experimentAnalysis = scriptBuilder:create("FrequencyAnalysis")
-	scriptBuilder:add(experimentAnalysis)
+	local experimentAnalysis = builder:create("FrequencyAnalysis")
+    builder:add(experimentAnalysis)
 	experimentAnalysis:setTitle("Analyze the audio recording:")
 	experimentAnalysis:setExperiment(micExperiment)
-
 end

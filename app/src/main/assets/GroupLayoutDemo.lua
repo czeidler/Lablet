@@ -1,7 +1,11 @@
+Lablet = {
+    interface = 1.0
+}
 
-function onBuildExperimentScript(scriptBuilder)
-	local sheet = scriptBuilder:create("Sheet")
-	scriptBuilder:add(sheet)
+
+function Lablet.buildActivity(builder)
+	local sheet = builder:create("Sheet")
+    builder:add(sheet)
 	--sheet:setMainLayoutOrientation("horizontal")
 
 	sheet:setTitle("Group Layout Demo")
@@ -22,5 +26,4 @@ function onBuildExperimentScript(scriptBuilder)
 	sheet:addCheckQuestion("This is a check box question, please tick!")
 	sheet:addQuestion("A text only question, can you see?")
 	sheet:addTextQuestion("A text input field. Please enter some text:")
-
 end

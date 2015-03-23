@@ -10,6 +10,7 @@ package nz.ac.auckland.lablet.script;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.ast.Str;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
@@ -22,6 +23,10 @@ import java.io.FileInputStream;
  * Load a lua script file from disk.
  */
 public class LuaScriptLoader {
+    final static private String NAMESPACE = "Lablet";
+    final static private String INTERFACE_VAR = "interface";
+    final static private String ENTRY_POINT_METHOD_KEY = "buildActivity";
+
     /**
      * Simple script builder. Only supports components with one child.
      */
@@ -104,7 +109,14 @@ public class LuaScriptLoader {
             LuaValue chunk = loadfile(globals, scriptFile.getPath());
             chunk.call();
 
-            LuaValue hookFunction = globals.get("onBuildExperimentScript");
+            LuaValue labletNamespace = globals.get(NAMESPACE);
+            float version = labletNamespace.get(INTERFACE_VAR).tofloat();
+            if (version != 1.0) {
+                lastError = "Incompatible script interface or the interface variable is missing.";
+                return null;
+            }
+
+            LuaValue hookFunction = labletNamespace.get(ENTRY_POINT_METHOD_KEY);
             LuaValue arg = CoerceJavaToLua.coerce(builder);
             hookFunction.call(arg);
         } catch (LuaError e) {

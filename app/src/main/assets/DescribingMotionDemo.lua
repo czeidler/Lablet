@@ -1,14 +1,19 @@
-function onBuildExperimentScript(scriptBuilder)
-	local intro = scriptBuilder:create("Sheet")
-	scriptBuilder:add(intro)
+Lablet = {
+    interface = 1.0
+}
+
+
+function Lablet.buildActivity(builder)
+	local intro = builder:create("Sheet")
+	builder:add(intro)
 	intro:setTitle("Stage 1 Physics Laboratory")
 	intro:addHeader("Lab equipment:")
 	intro:addText("Have you got the lab equipment? Check the following:")
 	intro:addCheckQuestion("a metre rule for setting the length scale in the video")
 	intro:addCheckQuestion("a ball")
 
-	local takeVideosSheet = scriptBuilder:create("Sheet")
-	scriptBuilder:add(takeVideosSheet)
+	local takeVideosSheet = builder:create("Sheet")
+	builder:add(takeVideosSheet)
 	takeVideosSheet:setMainLayoutOrientation("horizontal")
 	takeVideosSheet:setTitle("Take Videos:")
 	local cameraExperimentItem = takeVideosSheet:addCameraExperiment();
@@ -21,8 +26,8 @@ function onBuildExperimentScript(scriptBuilder)
 	cameraExperimentItem3:setDescriptionText("Please take a projectile video:")
 	local experimentProjectile = cameraExperimentItem3:getExperiment()
 
-	local info = scriptBuilder:create("Sheet")
-	scriptBuilder:add(info)
+	local info = builder:create("Sheet")
+	builder:add(info)
 	info:setTitle("Info")
 	info:addText("Check with your demonstrator about your videos and get ticked off before your proceed to video analysis.")
 	
@@ -32,20 +37,20 @@ function onBuildExperimentScript(scriptBuilder)
 	info:addText("You can now tag the positions of the ball from the initial position to the final position. Find the cross-hair with green rings, drag it by the outer ring to tag the ball and advance to the next frame. Repeat until you have finished tagging. Click “Done” to analyse other videos (e.g. vertical linear motion and projectile motion).")
 
 	-- tagging
-	local experimentAnalysisFreeFall = scriptBuilder:create("MotionAnalysis")
-	scriptBuilder:add(experimentAnalysisFreeFall)
+	local experimentAnalysisFreeFall = builder:create("MotionAnalysis")
+	builder:add(experimentAnalysisFreeFall)
 	experimentAnalysisFreeFall:setTitle("Mark Data Points")
 	experimentAnalysisFreeFall:setExperiment(experimentFreeFall)
 	experimentAnalysisFreeFall:setDescriptionText("Please analyse the free fall video:")
 
-	local experimentAnalysisUpDown = scriptBuilder:create("MotionAnalysis")
-	scriptBuilder:add(experimentAnalysisUpDown)
+	local experimentAnalysisUpDown = builder:create("MotionAnalysis")
+	builder:add(experimentAnalysisUpDown)
 	experimentAnalysisUpDown:setTitle("Mark Data Points")
 	experimentAnalysisUpDown:setExperiment(experimentUpDown)
 	experimentAnalysisUpDown:setDescriptionText("Please analyse the up down video:")
 
-	local experimentAnalysisProjectile = scriptBuilder:create("MotionAnalysis")
-	scriptBuilder:add(experimentAnalysisProjectile)
+	local experimentAnalysisProjectile = builder:create("MotionAnalysis")
+	builder:add(experimentAnalysisProjectile)
 	experimentAnalysisProjectile:setTitle("Mark Data Points")
 	experimentAnalysisProjectile:setExperiment(experimentProjectile)
 	experimentAnalysisProjectile:setDescriptionText("Please analyse the projectile video:")
@@ -53,14 +58,14 @@ function onBuildExperimentScript(scriptBuilder)
 	-- analysis
 
 	-- free fall motion
-	local calculateYSpeed = scriptBuilder:create("CalculateYSpeed")
-	scriptBuilder:add(calculateYSpeed)
+	local calculateYSpeed = builder:create("CalculateYSpeed")
+	builder:add(calculateYSpeed)
 	calculateYSpeed:setExperiment(experimentFreeFall)
 	calculateYSpeed:setTitle("Free fall")
 	calculateYSpeed:setHeader("Deriving average y-velocity and y-acceleration from displacement")
 
-	local freeFallQuestions = scriptBuilder:create("Sheet")
-	scriptBuilder:add(freeFallQuestions)
+	local freeFallQuestions = builder:create("Sheet")
+	builder:add(freeFallQuestions)
 	freeFallQuestions:setTitle("Free Fall")
 	freeFallQuestions:addHeader("Estimating impact velocity")
 	freeFallQuestions:addText("Go to your demonstrator once you finished answering the questions on this page:")
@@ -72,8 +77,8 @@ function onBuildExperimentScript(scriptBuilder)
 	freeFallQuestions:addCheckQuestion("Go to your demonstrator now and verify your results.")
 
 	-- up down motion
-	local upDownMotionQuestions = scriptBuilder:create("Sheet")
-	scriptBuilder:add(upDownMotionQuestions)
+	local upDownMotionQuestions = builder:create("Sheet")
+	builder:add(upDownMotionQuestions)
 	upDownMotionQuestions:setTitle("Vertical linear motion")
 	upDownMotionQuestions:addHeader("Analysing graphs:")
 	upDownMotionQuestions:addText("Use the position-time graph and the velocity-time graph to complete the questions below.")
@@ -99,8 +104,8 @@ function onBuildExperimentScript(scriptBuilder)
 	upDownMotionQuestions:addCheckQuestion("Go to your demonstrator now and verify your results.")
 
 	-- projectile motion
-	local projectileMotionQuestions = scriptBuilder:create("Sheet")
-	scriptBuilder:add(projectileMotionQuestions)
+	local projectileMotionQuestions = builder:create("Sheet")
+	builder:add(projectileMotionQuestions)
 	projectileMotionQuestions:setTitle("Projectile Motion")
 	projectileMotionQuestions:addHeader("Analysing graphs")
 	projectileMotionQuestions:addText("The position-time graphs and the velocity-time graphs are created from your measurements. Use these graphs to complete the questions below.")
@@ -127,6 +132,7 @@ function onBuildExperimentScript(scriptBuilder)
 	projectileMotionQuestions:addQuestion("How do your estimates of horizontal and vertical accelerations compare with your expected values? What are your expected values? If there is any difference, discuss the sources of uncertainties.")
 	projectileMotionQuestions:addCheckQuestion("Go to your demonstrator now and verify your results.")
 
-    projectileMotionQuestions:addHeader("Please export your data (USE THE UoAMailer APP):")
-    projectileMotionQuestions:addExportButton()
+    projectileMotionQuestions:addHeader("Please export your data:")
+    local exportButton = projectileMotionQuestions:addExportButton()
+    exportButton:setMailerClassName("nz.ac.auckland.lablet.mailer", "nz.ac.auckland.lablet.mailer.Mailer");
 end
