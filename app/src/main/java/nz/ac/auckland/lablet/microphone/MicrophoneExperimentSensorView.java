@@ -90,6 +90,7 @@ class PreviewViewState implements AbstractExperimentSensor.State {
         amplitudePlotView.getTitleView().setTitle("Signal Strength Vs Time");
         amplitudePlotView.getXAxisView().setUnit(experimentSensor.getTimeUnit());
         amplitudePlotView.getXAxisView().setTitle("Time");
+        amplitudePlotView.setAutoRange(PlotView.AUTO_RANGE_DISABLED, PlotView.AUTO_RANGE_DISABLED);
         //amplitudePlotView.getBackgroundPainter().setShowYGrid(true);
 
         frequencyMapPlotView.setXRange(0, MicrophoneExperimentSensorView.Settings.timeSpan);
@@ -143,7 +144,7 @@ class RecordingViewState implements AbstractExperimentSensor.State {
         frequencyMapPlotView = previewViewState.frequencyMapPlotView;
         frequencyMapAdapter = previewViewState.frequencyMapAdapter;
     }
-//TODO: discard data in adapter...
+
     private MicrophoneExperimentSensor.ISensorDataListener listener = new MicrophoneExperimentSensor.ISensorDataListener() {
         @Override
         public void onNewAmplitudeData(float[] amplitudes) {
