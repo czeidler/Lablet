@@ -108,7 +108,7 @@ public class Script {
      */
     static public String generateScriptUid(String scriptName) {
         Time now = new Time(Time.getCurrentTimezone());
-        CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", new java.util.Date());
+        CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_HH-mm-ss", new java.util.Date());
 
         now.setToNow();
         String newUid = "";

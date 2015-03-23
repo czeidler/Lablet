@@ -103,7 +103,7 @@ public class ExperimentAnalysis {
     }
 
     protected String generateNewUid(IDataAnalysis dataAnalysis) {
-        CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", new java.util.Date());
+        CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_HH-mm-ss", new java.util.Date());
 
         String uid = dataAnalysis.getIdentifier();
         uid += dateString + "_";

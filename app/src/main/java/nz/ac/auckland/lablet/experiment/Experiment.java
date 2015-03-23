@@ -50,7 +50,7 @@ public class Experiment extends WeakListenable<Experiment.IListener> {
      * @return a uid string.
      */
     public String generateNewUid() {
-        CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", new java.util.Date());
+        CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_HH-mm-ss", new java.util.Date());
 
         String sensorsString = "";
         if (experimentRuns.size() > 0) {

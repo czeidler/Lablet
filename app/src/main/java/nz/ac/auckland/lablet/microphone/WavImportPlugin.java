@@ -29,7 +29,7 @@ public class WavImportPlugin extends AbstractFileImportPlugin {
 
     @Override
     protected String createUid(String importFileName) {
-        CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", new java.util.Date());
+        CharSequence dateString = android.text.format.DateFormat.format("yyyy-MM-dd_HH-mm-ss", new java.util.Date());
 
         return dateString + "_Imported_Audio_" + importFileName;
     }
