@@ -192,7 +192,6 @@ class FileFrequencyMapLoader implements IFrequencyMapLoader {
                     outFile = convertToFourier(context, audioWavInputStream, windowSize, stepFactor);
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishProgress(new File[0]);
                 }
 
                 publishProgress(outFile);
@@ -201,11 +200,14 @@ class FileFrequencyMapLoader implements IFrequencyMapLoader {
 
             @Override
             protected void onProgressUpdate(File... values) {
-                if (values.length == 0)
+                deleteTmpFile();
+
+                if (values[0] == null)
                     return;
 
                 try {
-                    audioFrequencyMapAdapter.setDataFile(values[0], windowSize);
+                    frequencyFile = values[0];
+                    audioFrequencyMapAdapter.setDataFile(frequencyFile, windowSize);
                     listener.onFrequenciesUpdated(false);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -215,14 +217,23 @@ class FileFrequencyMapLoader implements IFrequencyMapLoader {
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                updateAsyncTask = null;
+                onFinish();
             }
 
             @Override
             protected void onCancelled() {
                 super.onCancelled();
-                updateAsyncTask = null;
+                onFinish();
                 listener.onFrequenciesUpdated(true);
+            }
+
+            private void onFinish() {
+                updateAsyncTask = null;
+                try {
+                    audioWavInputStream.rewind();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
             private File convertToFourier(Context context, AudioWavInputStream audioWavInputStream, int windowSize,
