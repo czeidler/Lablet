@@ -17,9 +17,9 @@ import java.util.Arrays;
 
 
 public class FrequencyMapLoaderFactory {
-    final static int MAX_IN_MEMORY_FILE_SIZE = 2 * 1024 * 1024;
+    final static int MAX_IN_MEMORY_FILE_SIZE = 9 * 1024 * 1024;
     static IFrequencyMapLoader create(AudioFrequencyMapAdapter audioFrequencyMapAdapter, File wavFile) {
-        if (wavFile.length() > MAX_IN_MEMORY_FILE_SIZE)
+        if (wavFile.length() < MAX_IN_MEMORY_FILE_SIZE)
             return new MemoryFrequencyMapLoader(audioFrequencyMapAdapter);
 
         return new FileFrequencyMapLoader(audioFrequencyMapAdapter);
