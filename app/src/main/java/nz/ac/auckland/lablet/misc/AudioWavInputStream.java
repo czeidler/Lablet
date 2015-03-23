@@ -13,18 +13,23 @@ import java.nio.ByteOrder;
 
 
 public class AudioWavInputStream extends InputStream implements Closeable {
-    private InputStream inputStream;
+    private File file;
+    private FileInputStream inputStream;
     private int channelCount;
     private int sampleRate;
     private int byteRate;
     private int audioDataSize;
     final static public int BYTES_PER_SAMPLE = 2;
-    private byte[] convertByteBuffer = new byte[BYTES_PER_SAMPLE];
-    private float[] convertFloatBuffer = new float[1];
 
     public AudioWavInputStream(File file) throws IOException {
+        this.file = file;
         inputStream = new FileInputStream(file);
         readHeader();
+    }
+
+    public void rewind() throws IOException {
+        inputStream = new FileInputStream(file);
+        inputStream.skip(44);
     }
 
     @Override
