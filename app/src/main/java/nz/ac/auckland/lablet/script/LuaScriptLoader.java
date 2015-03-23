@@ -82,7 +82,7 @@ public class LuaScriptLoader {
     }
 
     // this is basically a copy from the luaj code but it uses a BufferedInputStream
-    private LuaValue loadfile(Globals globals, String filename) {
+    static private LuaValue loadfile(Globals globals, String filename) {
         try {
             BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(filename));
             return globals.load(inputStream, "@" + filename, "bt", globals);
@@ -130,6 +130,25 @@ public class LuaScriptLoader {
             return null;
         }
         return script;
+    }
+
+    static public ScriptMetaData getScriptMetaData(File scriptFile) {
+        if (!scriptFile.exists()) {
+            return null;
+        }
+
+        try {
+            Globals globals = JsePlatform.standardGlobals();
+            //LuaValue chunk = globals.loadfile(scriptFile.getPath());
+            LuaValue chunk = loadfile(globals, scriptFile.getPath());
+            chunk.call();
+
+            LuaValue labletNamespace = globals.get(NAMESPACE);
+            float version = labletNamespace.get(INTERFACE_VAR).tofloat();
+            return new ScriptMetaData(scriptFile, version);
+        } catch (LuaError e) {
+            return null;
+        }
     }
 
     /**

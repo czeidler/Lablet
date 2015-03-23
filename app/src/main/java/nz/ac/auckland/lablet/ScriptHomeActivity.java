@@ -16,18 +16,20 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.misc.NaturalOrderComparator;
 import nz.ac.auckland.lablet.misc.StorageLib;
+import nz.ac.auckland.lablet.script.LuaScriptLoader;
+import nz.ac.auckland.lablet.script.ScriptMetaData;
 import nz.ac.auckland.lablet.views.*;
 import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptRunnerActivity;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,8 +41,8 @@ import java.util.List;
  * </p>
  */
 public class ScriptHomeActivity extends Activity {
-    private List<String> scriptList = null;
-    private ArrayAdapter<String> scriptListAdaptor = null;
+    private List<ScriptMetaData> scriptList = null;
+    private ArrayAdapter<ScriptMetaData> scriptListAdaptor = null;
     private ArrayList<CheckBoxListEntry> existingScriptList = null;
     private CheckBoxListEntry.OnCheckBoxListEntryListener checkBoxListEntryListener;
     private CheckBoxAdapter existingScriptListAdaptor = null;
@@ -50,8 +52,9 @@ public class ScriptHomeActivity extends Activity {
     private AlertDialog infoAlertBox = null;
     private CheckBox selectAllCheckBox = null;
 
-    final int START_SCRIPT = 1;
-    final String PREFERENCES_NAME = "lablet_preferences";
+    final static private String SCRIPTS_COPIED_KEY = "scripts_copied_v1";
+    final static private int START_SCRIPT = 1;
+    final static private String PREFERENCES_NAME = "lablet_preferences";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -187,14 +190,12 @@ public class ScriptHomeActivity extends Activity {
         scriptList = new ArrayList<>();
         scriptListAdaptor = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1, scriptList);
-
         scriptListView.setAdapter(scriptListAdaptor);
-
         scriptListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String id = scriptList.get(i);
-                startScript(id);
+                ScriptMetaData metaData = scriptList.get(i);
+                startScript(metaData);
             }
         });
 
@@ -230,8 +231,27 @@ public class ScriptHomeActivity extends Activity {
             }
         };
 
-        //copyResourceScripts(true); // force overwrite
-        copyResourceScripts(false);
+        copyResourceScripts(true); // force overwrite
+        //copyResourceScripts(false);
+    }
+
+    public void showScriptMenu(final View parent) {
+        PopupMenu popup = new PopupMenu(this, parent);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.script_popup, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.showScriptFolder:
+                        return true;
+                    default:
+                        return false;
+                }
+
+            }
+        });
+        popup.show();
     }
 
     private void updateSelectedMenuItem() {
@@ -251,27 +271,27 @@ public class ScriptHomeActivity extends Activity {
 
     /**
      * The script directory is the directory the stores the script files, i.e., the lua files.
-     * @param context
+     * @param context the context
      * @return the script directory File
      */
     static public File getScriptDirectory(Context context) {
         File baseDir = context.getExternalFilesDir(null);
         File scriptDir = new File(baseDir, "scripts");
-        if (!scriptDir.exists())
-            scriptDir.mkdir();
+        if (!scriptDir.exists() && !scriptDir.mkdir())
+            return null;
         return scriptDir;
     }
 
     /**
      * The script user data is the directory that contains the stored script state, i.e., the results.
-     * @param context
+     * @param context the context
      * @return the script user data
      */
     private File getScriptUserDataDir(Context context) {
         File baseDir = context.getExternalFilesDir(null);
         File scriptDir = new File(baseDir, "script_user_data");
-        if (!scriptDir.exists())
-            scriptDir.mkdir();
+        if (!scriptDir.exists() && !scriptDir.mkdir())
+            return null;
         return scriptDir;
     }
 
@@ -299,13 +319,11 @@ public class ScriptHomeActivity extends Activity {
         updateExistingScriptList();
     }
 
-    private void startScript(String scriptId) {
-        String fileName = scriptId + ".lua";
-
-        File scriptPath = new File(getScriptDirectory(this), fileName);
+    private void startScript(ScriptMetaData metaData) {
+        String scriptId = metaData.getScriptFileName();
         File scriptUserDataDir = new File(getScriptUserDataDir(this), Script.generateScriptUid(scriptId));
         Intent intent = new Intent(this, ScriptRunnerActivity.class);
-        intent.putExtra("script_path", scriptPath.getPath());
+        intent.putExtra("script_path", metaData.file.getPath());
         intent.putExtra("script_user_data_dir", scriptUserDataDir.getPath());
         startActivityForResult(intent, START_SCRIPT);
     }
@@ -323,22 +341,28 @@ public class ScriptHomeActivity extends Activity {
         scriptList.clear();
         File scriptDir = getScriptDirectory(this);
         if (scriptDir.isDirectory()) {
-            File[] children = scriptDir.listFiles();
-            for (File child : children != null ? children : new File[0]) {
-                String name = child.getName();
-                if (!isLuaFile(name))
-                    continue;
-                name = name.substring(0, name.length() - 4);
-                scriptList.add(name);
-            }
+            readScriptsFromDir(scriptDir, scriptList);
         }
 
         scriptListAdaptor.notifyDataSetChanged();
     }
 
+    private void readScriptsFromDir(File scriptDir, List<ScriptMetaData> scripts) {
+        File[] children = scriptDir.listFiles();
+        for (File child : children != null ? children : new File[0]) {
+            String name = child.getName();
+            if (!isLuaFile(name))
+                continue;
+            ScriptMetaData metaData = LuaScriptLoader.getScriptMetaData(child);
+            if (metaData == null)
+                continue;
+            scripts.add(metaData);
+        }
+    }
+
     private void copyResourceScripts(boolean forceCopy) {
         SharedPreferences settings = getSharedPreferences(PREFERENCES_NAME, 0);
-        if (!forceCopy && settings.getBoolean("scripts_copied", false))
+        if (!forceCopy && settings.getBoolean(SCRIPTS_COPIED_KEY, false))
             return;
 
         File scriptDir = getScriptDirectory(this);
@@ -373,7 +397,7 @@ public class ScriptHomeActivity extends Activity {
             e.printStackTrace();
         }
 
-        settings.edit().putBoolean("scripts_copied", true).commit();
+        settings.edit().putBoolean(SCRIPTS_COPIED_KEY, true).apply();
     }
 
     private boolean isLuaFile(String name) {
@@ -384,10 +408,12 @@ public class ScriptHomeActivity extends Activity {
         existingScriptList.clear();
         File scriptDir = getScriptUserDataDir(this);
         if (scriptDir.isDirectory()) {
-            List<File> children = Arrays.asList(scriptDir.listFiles());
+            List<String> children = new ArrayList<>();
+            for (File file : scriptDir.listFiles())
+                children.add(file.getName());
             Collections.sort(children, Collections.reverseOrder(new NaturalOrderComparator()));
-            for (File child : children)
-                existingScriptList.add(new CheckBoxListEntry(child.getName(), checkBoxListEntryListener));
+            for (String child : children)
+                existingScriptList.add(new CheckBoxListEntry(child, checkBoxListEntryListener));
         }
 
         existingScriptListAdaptor.notifyDataSetChanged();
