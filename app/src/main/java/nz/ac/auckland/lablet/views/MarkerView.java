@@ -325,7 +325,8 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
                         return;
 
                     if (selectedForDragPainter == painter && selectedForDragMarker == marker) {
-                        selectedForDragPainter.containerView.invalidate();
+                        if (selectedForDragPainter.containerView != null)
+                            selectedForDragPainter.containerView.invalidate();
                         if (selectOnDrag)
                             selectedForDragPainter.markerData.selectMarkerData(-1);
                         selectedForDragPainter = null;
@@ -338,7 +339,8 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
                     selectedForDragMarker.setSelectedForDrag(false);
                     if (selectOnDrag)
                         selectedForDragPainter.markerData.selectMarkerData(-1);
-                    selectedForDragPainter.containerView.invalidate();
+                    if (selectedForDragPainter.containerView != null)
+                        selectedForDragPainter.containerView.invalidate();
                 }
 
                 selectedForDragPainter = painter;

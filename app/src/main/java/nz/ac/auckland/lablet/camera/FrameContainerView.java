@@ -216,7 +216,7 @@ public class FrameContainerView extends RelativeLayout {
         @Override
         public void onShowCoordinateSystem(boolean show) {
             if (show)
-                markerView.addPlotPainter(originMarkerPainter);
+                addOriginMarkerPainter();
             else
                 markerView.removePlotPainter(originMarkerPainter);
         }
@@ -339,11 +339,16 @@ public class FrameContainerView extends RelativeLayout {
         markerView.addPlotPainter(painter);
 
         // origin markers
+        if (motionAnalysis.getShowCoordinateSystem())
+            addOriginMarkerPainter();
+
+    }
+
+    private void addOriginMarkerPainter() {
         MarkerDataModel originMarkers = motionAnalysis.getOriginMarkers();
         CalibrationXY calibrationXY = motionAnalysis.getCalibrationXY();
         originMarkerPainter = new OriginMarkerPainter(originMarkers, calibrationXY);
-        if (motionAnalysis.getShowCoordinateSystem())
-            markerView.addPlotPainter(originMarkerPainter);
+        markerView.addPlotPainter(originMarkerPainter);
     }
 
     public void release() {

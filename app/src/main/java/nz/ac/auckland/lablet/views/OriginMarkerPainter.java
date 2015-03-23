@@ -337,6 +337,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
     @Override
     public void onCalibrationChanged() {
         // just trigger a redraw
-        containerView.invalidate();
+        if (containerView != null)
+            containerView.invalidate();
     }
 }
