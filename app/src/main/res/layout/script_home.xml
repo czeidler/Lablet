@@ -14,64 +14,64 @@
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     tools:context=".AndroidPhysicsTracker">
-    <LinearLayout
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/newTopLayout"
+                android:layout_below="@+id/newExperiments" android:layout_alignParentLeft="true"
+                android:layout_margin="5dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/addImageView" android:src="@drawable/ic_action_add"/>
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Start a new lab activity:"
+                    android:id="@+id/textView" android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="5dp"/>
+        </LinearLayout>
+        <ListView
+                android:layout_width="wrap_content"
+                android:layout_height="151dp"
+                android:id="@+id/scriptList" android:choiceMode="singleChoice"
+                android:layout_alignParentLeft="true" android:layout_marginLeft="0dp"
+                android:layout_below="@+id/newTopLayout"/>
+        <LinearLayout
             android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/newTopLayout"
-            android:layout_below="@+id/newExperiments" android:layout_alignParentLeft="true"
+            android:id="@+id/newBottomLayout"
+            android:layout_below="@+id/scriptList" android:layout_alignParentLeft="true"
             android:layout_margin="5dp">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/addImageView" android:src="@drawable/ic_action_add"/>
-        <TextView
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Start a new lab activity:"
-                android:id="@+id/textView" android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
-                android:layout_marginLeft="5dp"/>
-    </LinearLayout>
-    <ListView
-            android:layout_width="wrap_content"
-            android:layout_height="151dp"
-            android:id="@+id/scriptList" android:choiceMode="singleChoice"
-            android:layout_alignParentLeft="true" android:layout_marginLeft="0dp"
-            android:layout_below="@+id/newTopLayout"/>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/newBottomLayout"
-        android:layout_below="@+id/scriptList" android:layout_alignParentLeft="true"
-        android:layout_margin="5dp">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/loadImageView" android:src="@drawable/ic_action_load"/>
-        <TextView
+                android:id="@+id/loadImageView" android:src="@drawable/ic_action_load"/>
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Continue a lab activity:"
+                    android:id="@+id/textView2"
+                    android:layout_marginLeft="5dp"/>
+        </LinearLayout>
+        <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Continue a lab activity:"
-                android:id="@+id/textView2"
+                android:text="All"
+                android:id="@+id/checkBoxSelectAll"
+                android:layout_below="@+id/newBottomLayout"
+                android:layout_alignParentLeft="true"
                 android:layout_marginLeft="5dp"/>
-    </LinearLayout>
-    <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="All"
-            android:id="@+id/checkBoxSelectAll"
-            android:layout_below="@+id/newBottomLayout"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="5dp"/>
-    <ListView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/existingScriptListView"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true" android:layout_below="@+id/checkBoxSelectAll"/>
+        <ListView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/existingScriptListView"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true" android:layout_below="@+id/checkBoxSelectAll"/>
     </RelativeLayout>
 
 </LinearLayout>

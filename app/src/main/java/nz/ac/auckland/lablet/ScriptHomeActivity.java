@@ -61,6 +61,17 @@ public class ScriptHomeActivity extends Activity {
         menu.clear();
         getMenuInflater().inflate(R.menu.script_activity_actions, menu);
 
+        // script options
+        MenuItem scriptOptions = menu.findItem(R.id.action_script_options);
+        assert (scriptOptions != null);
+        scriptOptions.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                showScriptMenu();
+                return true;
+            }
+        });
+
         // to stand alone experiment screen
         MenuItem standAlone = menu.findItem(R.id.action_stand_alone);
         assert(standAlone != null);
@@ -231,11 +242,12 @@ public class ScriptHomeActivity extends Activity {
             }
         };
 
-        copyResourceScripts(true); // force overwrite
-        //copyResourceScripts(false);
+        copyResourceScripts(false);
     }
 
-    public void showScriptMenu(final View parent) {
+    public void showScriptMenu() {
+        final View parent = findViewById(R.id.action_script_options);
+
         PopupMenu popup = new PopupMenu(this, parent);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.script_popup, popup.getMenu());
@@ -243,7 +255,8 @@ public class ScriptHomeActivity extends Activity {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
-                    case R.id.showScriptFolder:
+                    case R.id.resetDefaultActivities:
+                        resetDefaultActivities();
                         return true;
                     default:
                         return false;
@@ -252,6 +265,25 @@ public class ScriptHomeActivity extends Activity {
             }
         });
         popup.show();
+    }
+
+    private void resetDefaultActivities() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Reset the pre-installed lab activities?");
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                copyResourceScripts(true);
+                updateScriptList();
+            }
+        });
+        builder.create().show();
     }
 
     private void updateSelectedMenuItem() {
@@ -340,9 +372,12 @@ public class ScriptHomeActivity extends Activity {
     private void updateScriptList() {
         scriptList.clear();
         File scriptDir = getScriptDirectory(this);
-        if (scriptDir.isDirectory()) {
+        if (scriptDir.isDirectory())
             readScriptsFromDir(scriptDir, scriptList);
-        }
+
+        scriptDir = getResourceScriptDir();
+        if (scriptDir.isDirectory())
+            readScriptsFromDir(scriptDir, scriptList);
 
         scriptListAdaptor.notifyDataSetChanged();
     }
@@ -360,12 +395,16 @@ public class ScriptHomeActivity extends Activity {
         }
     }
 
+    private File getResourceScriptDir() {
+        return new File(getScriptDirectory(this), "demo");
+    }
+
     private void copyResourceScripts(boolean forceCopy) {
         SharedPreferences settings = getSharedPreferences(PREFERENCES_NAME, 0);
         if (!forceCopy && settings.getBoolean(SCRIPTS_COPIED_KEY, false))
             return;
 
-        File scriptDir = getScriptDirectory(this);
+        File scriptDir = getResourceScriptDir();
         if (!scriptDir.exists()) {
             if (!scriptDir.mkdir())
                 return;

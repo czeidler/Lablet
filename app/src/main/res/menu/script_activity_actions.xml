@@ -14,6 +14,10 @@
           android:icon="@drawable/ic_lab"
           android:title="@string/standalone_experiments"
           yourapp:showAsAction="ifRoom|withText"/>
+    <item android:id="@+id/action_script_options"
+          android:icon="@drawable/ic_console"
+          android:title="@string/action_script_options"
+          android:showAsAction="always"/>
     <item android:id="@+id/action_info"
           android:icon="@drawable/ic_info"
           android:title="@string/action_info"

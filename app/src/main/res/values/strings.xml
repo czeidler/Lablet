@@ -20,4 +20,6 @@
     <string name="action_scripts">Lab Activities</string>
     <string name="standalone_experiments">Single Experiments</string>
     <string name="action_import">Import</string>
+    <string name="action_script_options">Script Options</string>
+    <string name="reset_default_activities">Reset Default Lab Activities</string>
 </resources>
