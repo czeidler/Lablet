@@ -15,6 +15,7 @@ import android.hardware.Camera;
 import android.hardware.SensorManager;
 import android.media.CamcorderProfile;
 import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.*;
@@ -51,7 +52,7 @@ class CameraExperimentView extends AbstractExperimentSensorView {
         this.camera = cameraExperimentSensor.getCamera();
 
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.camera_experiment_view, null, false);
+        View view = inflater.inflate(R.layout.camera_experiment_view, this, false);
         addView(view);
 
         preview = (RatioGLSurfaceView)view.findViewById(R.id.glSurfaceView);
@@ -140,6 +141,117 @@ class CameraExperimentView extends AbstractExperimentSensorView {
     }
 }
 
+/**
+ * Helper class to match a camera recording size with a camcorder profile matching for that size.
+ */
+class VideoSettings {
+    public CamcorderSettings camcorderSettings;
+    public int width;
+    public int height;
+    public int previewWidth;
+    public int previewHeight;
+}
+
+class CamcorderSettings {
+    public Integer cameraProfile;
+    public int width;
+    public int height;
+    public int bitRate;
+}
+
+interface IRecorderStrategy {
+    void release();
+
+    void start(int hintRotation, float recordingFrameRate, VideoSettings videoSettings, String path);
+    void stop();
+}
+
+class VideoRecorderStrategy implements IRecorderStrategy {
+    private VideoRecorder videoRecorder;
+    private Camera camera;
+    private VideoSettings videoSettings;
+
+    public VideoRecorderStrategy(CameraGLTextureProducer producer, Camera camera) {
+        videoRecorder = new VideoRecorder();
+        videoRecorder.setCameraSource(producer);
+        this.camera = camera;
+    }
+
+    @Override
+    public void release() {
+        if (videoRecorder != null) {
+            videoRecorder.release();
+            videoRecorder = null;
+        }
+    }
+
+    @Override
+    public void start(int hintRotation, float recordingFrameRate, VideoSettings settings, String path) {
+        videoRecorder.setRotation(hintRotation);
+        videoRecorder.setRecordingFrameRate(recordingFrameRate);
+        videoRecorder.startRecording(settings.previewWidth, settings.previewHeight, settings.camcorderSettings.bitRate,
+                30, path);
+    }
+
+    @Override
+    public void stop() {
+        videoRecorder.stopRecording();
+    }
+}
+
+class MediaRecorderStrategy implements IRecorderStrategy {
+    private MediaRecorder recorder;
+    private Camera camera;
+
+    public MediaRecorderStrategy(Camera camera) {
+        recorder = new MediaRecorder();
+        this.camera = camera;
+    }
+
+    @Override
+    public void release() {
+        recorder.release();
+    }
+
+    @Override
+    public void start(int hintRotation, float recordingFrameRate, VideoSettings settings, String path) {
+        // init state
+        camera.unlock();
+        recorder.setCamera(camera);
+        recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+
+        // move to data source config state
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+
+        // data source config state
+        CamcorderProfile profile = CamcorderProfile.get(settings.camcorderSettings.cameraProfile);
+        recorder.setVideoEncoder(profile.videoCodec);
+        recorder.setVideoFrameRate(profile.videoFrameRate);
+        recorder.setVideoEncodingBitRate(profile.videoBitRate);
+        recorder.setVideoSize(settings.width, settings.height);
+        recorder.setOrientationHint(hintRotation);
+
+        recorder.setOutputFile(path);
+
+        // prepare
+        try {
+            recorder.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
+        recorder.start();   // Recording is now started
+    }
+
+    @Override
+    public void stop() {
+        recorder.stop();
+        recorder.reset();
+
+        camera.lock();
+    }
+}
+
 public class CameraExperimentSensor extends AbstractExperimentSensor {
     private Activity activity;
 
@@ -147,8 +259,9 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
     private Camera camera = null;
     private CameraGLTextureProducer producer = null;
-    private VideoRecorder videoRecorder;
+    private IRecorderStrategy recorderStrategy;
 
+    private boolean useVideoRecorder = false;
     private int cameraId = 0;
     private int rotation;
     private int rotationDegree = 0;
@@ -208,14 +321,6 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         frameRateList.add(30f);
 
         return frameRateList;
-    }
-
-    /**
-     * Helper class to match a camera recording size with a camcorder profile matching for that size.
-     */
-    class VideoSettings {
-        public Integer cameraProfile;
-        public Camera.Size videoSize;
     }
 
     @Override
@@ -287,14 +392,14 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         producer = new CameraGLTextureProducer(camera);
 
         // video size
-        supportedVideoSettings = getSupportedCamcorderProfiles();
+        supportedVideoSettings = getSupportedCamcorderProfiles(cameraId, camera);
         // select the first or the best matching requested settings
-        VideoSettings newVideoSettings = supportedVideoSettings.get(0);
+        VideoSettings newVideoSettings = pickBestVideoSettings(supportedVideoSettings);
         if (requestedVideoWidth > 0 && requestedVideoHeight > 0) {
             int bestMatchValue = Integer.MAX_VALUE;
             for (VideoSettings settings : supportedVideoSettings) {
-                int matchValue = (int)Math.pow(settings.videoSize.width - requestedVideoWidth, 2)
-                        + (int)Math.pow(settings.videoSize.height - requestedVideoHeight, 2);
+                int matchValue = (int)Math.pow(settings.previewWidth - requestedVideoWidth, 2)
+                        + (int)Math.pow(settings.previewHeight - requestedVideoHeight, 2);
                 if (matchValue < bestMatchValue) {
                     bestMatchValue = matchValue;
                     newVideoSettings = settings;
@@ -304,9 +409,6 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             }
         }
         onCamcorderProfileChanged(newVideoSettings);
-
-        videoRecorder = new VideoRecorder();
-        videoRecorder.setCameraSource(producer);
 
         // orientation
         rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
@@ -336,16 +438,19 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
         orientationEventListener.disable();
 
-        if (videoRecorder != null) {
-            videoRecorder.release();
-            videoRecorder = null;
-        }
+        setRecorderStrategy(null);
+    }
+
+    private void setRecorderStrategy(IRecorderStrategy strategy) {
+        if (recorderStrategy != null)
+            recorderStrategy.release();
+        recorderStrategy = strategy;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putInt("selected_video_width", selectedVideoSettings.videoSize.width);
-        outState.putInt("selected_video_height", selectedVideoSettings.videoSize.height);
+        outState.putInt("selected_video_width", selectedVideoSettings.previewWidth);
+        outState.putInt("selected_video_height", selectedVideoSettings.previewHeight);
 
         if (videoFile != null)
             outState.putString("unsaved_recording", videoFile.getPath());
@@ -398,11 +503,11 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         final int RESOLUTION_ITEM_BASE = 0;
         final int RESOLUTION_GROUP_ID = 1;
         for (int i = 0; i < supportedVideoSettings.size(); i++) {
-            Camera.Size size = supportedVideoSettings.get(i).videoSize;
+            VideoSettings videoSettings = supportedVideoSettings.get(i);
             String label = "";
-            label += size.width;
+            label += videoSettings.width;
             label += " x ";
-            label += size.height;
+            label += videoSettings.height;
 
             MenuItem item = popup.getMenu().add(RESOLUTION_GROUP_ID, RESOLUTION_ITEM_BASE + i, Menu.NONE, label);
             item.setCheckable(true);
@@ -452,9 +557,11 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         File outputDir = activity.getExternalCacheDir();
         videoFile = new File(outputDir, getVideoFileName());
 
-        videoRecorder.setRotation(getHintRotation());
-        videoRecorder.setRecordingFrameRate(recordingFrameRate);
-        videoRecorder.startRecording(CamcorderProfile.get(selectedVideoSettings.cameraProfile), videoFile.getPath());
+        if (useVideoRecorder)
+            setRecorderStrategy(new VideoRecorderStrategy(producer, camera));
+        else
+            setRecorderStrategy(new MediaRecorderStrategy(camera));
+        recorderStrategy.start(getHintRotation(), recordingFrameRate, selectedVideoSettings, videoFile.getPath());
 
         super.startRecording();
     }
@@ -463,7 +570,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
     public boolean stopRecording() {
         boolean dataTaken = true;
 
-        videoRecorder.stopRecording();
+        recorderStrategy.stop();
 
         super.stopRecording();
 
@@ -498,72 +605,22 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         selectedVideoSettings = videoSettings;
         Camera.Parameters parameters = camera.getParameters();
         parameters.setRecordingHint(true);
-        parameters.setPreviewSize(selectedVideoSettings.videoSize.width, selectedVideoSettings.videoSize.height);
+        parameters.setPreviewSize(selectedVideoSettings.width, selectedVideoSettings.height);
+        parameters.set("cam_mode", 1);
+        parameters.set("camera_mode", 1);
 
         camera.stopPreview();
-        camera.setParameters(parameters);
+        try {
+            camera.setParameters(parameters);
+            useVideoRecorder = true;
+        } catch (RuntimeException e) {
+            parameters.setPreviewSize(selectedVideoSettings.previewWidth, selectedVideoSettings.previewHeight);
+            camera.setParameters(parameters);
+            useVideoRecorder = false;
+        }
         camera.startPreview();
 
         notifySettingsChanged();
-    }
-
-
-    private void addProfileIfSupported(List<VideoSettings> list, int profile, int timeLapseProfile) {
-        if (CamcorderProfile.hasProfile(cameraId, profile)) {
-            VideoSettings videoSettings = new VideoSettings();
-            videoSettings.cameraProfile = profile;
-            list.add(videoSettings);
-        }
-    }
-
-    /**
-     * Find a suitable profile for the provided camera sizes.
-     *
-     * For each camera size a profile is selected that has a video size that is equal or just bigger than the camera
-     * size. It is assumed that the profiles are sorted; lowest quality first.
-     *
-     * @return the list of found VideoSettings
-     */
-    private List<VideoSettings> getSupportedCamcorderProfiles() {
-        List<VideoSettings> supportedProfiles = new ArrayList<>();
-        addProfileIfSupported(supportedProfiles, CamcorderProfile.QUALITY_QCIF,
-                CamcorderProfile.QUALITY_TIME_LAPSE_QCIF);
-        addProfileIfSupported(supportedProfiles, CamcorderProfile.QUALITY_QVGA,
-                CamcorderProfile.QUALITY_TIME_LAPSE_QVGA);
-        addProfileIfSupported(supportedProfiles, CamcorderProfile.QUALITY_CIF,
-                CamcorderProfile.QUALITY_TIME_LAPSE_CIF);
-        addProfileIfSupported(supportedProfiles, CamcorderProfile.QUALITY_480P,
-                CamcorderProfile.QUALITY_TIME_LAPSE_480P);
-        addProfileIfSupported(supportedProfiles, CamcorderProfile.QUALITY_720P,
-                CamcorderProfile.QUALITY_TIME_LAPSE_720P);
-        addProfileIfSupported(supportedProfiles, CamcorderProfile.QUALITY_1080P,
-                CamcorderProfile.QUALITY_TIME_LAPSE_1080P);
-        addProfileIfSupported(supportedProfiles, CamcorderProfile.QUALITY_HIGH,
-                CamcorderProfile.QUALITY_TIME_LAPSE_HIGH);
-
-        List<Camera.Size> cameraSizes = camera.getParameters().getSupportedVideoSizes();
-
-        Collections.sort(cameraSizes, new Comparator<Camera.Size>() {
-            @Override
-            public int compare(Camera.Size size, Camera.Size size2) {
-                Integer area1 = size.height * size.width;
-                Integer area2 = size2.height * size2.width;
-                return area2.compareTo(area1);
-            }
-        });
-
-        List<VideoSettings> filteredProfiles = new ArrayList<>();
-        for (Camera.Size cameraSize : cameraSizes) {
-            for (VideoSettings settings : supportedProfiles) {
-                CamcorderProfile profile = CamcorderProfile.get(settings.cameraProfile);
-                if (profile.videoFrameWidth == cameraSize.width && profile.videoFrameHeight == cameraSize.height) {
-                    settings.videoSize = cameraSize;
-                    filteredProfiles.add(settings);
-                    break;
-                }
-            }
-        }
-        return filteredProfiles;
     }
 
     private int getHintRotation() {
@@ -599,6 +656,88 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         return hintRotation;
     }
 
+    private void addProfileIfSupported(int cameraId, List<CamcorderSettings> list, int profile) {
+        if (CamcorderProfile.hasProfile(cameraId, profile)) {
+            CamcorderSettings camcorderSettings = new CamcorderSettings();
+            camcorderSettings.cameraProfile = profile;
+            CamcorderProfile camcorderProfile = CamcorderProfile.get(profile);
+            camcorderSettings.bitRate = camcorderProfile.videoBitRate;
+            camcorderSettings.width = camcorderProfile.videoFrameWidth;
+            camcorderSettings.height = camcorderProfile.videoFrameHeight;
+            list.add(camcorderSettings);
+        }
+    }
+
+    public List<VideoSettings> getSupportedCamcorderProfiles(int cameraId, Camera camera) {
+        // use the camcorder profile only to get the video bit rate
+        List<CamcorderSettings> supportedProfiles = new ArrayList<>();
+        addProfileIfSupported(cameraId, supportedProfiles, CamcorderProfile.QUALITY_QCIF);
+        addProfileIfSupported(cameraId, supportedProfiles, CamcorderProfile.QUALITY_QVGA);
+        addProfileIfSupported(cameraId, supportedProfiles, CamcorderProfile.QUALITY_CIF);
+        addProfileIfSupported(cameraId, supportedProfiles, CamcorderProfile.QUALITY_480P);
+        addProfileIfSupported(cameraId, supportedProfiles, CamcorderProfile.QUALITY_720P);
+        addProfileIfSupported(cameraId, supportedProfiles, CamcorderProfile.QUALITY_1080P);
+        addProfileIfSupported(cameraId, supportedProfiles, CamcorderProfile.QUALITY_HIGH);
+
+        List<Camera.Size> videoSizes = camera.getParameters().getSupportedVideoSizes();
+        if (videoSizes == null)
+            videoSizes = camera.getParameters().getSupportedPreviewSizes();
+
+        Collections.sort(videoSizes, new Comparator<Camera.Size>() {
+            @Override
+            public int compare(Camera.Size size, Camera.Size size2) {
+                Integer area1 = size.height * size.width;
+                Integer area2 = size2.height * size2.width;
+                return area2.compareTo(area1);
+            }
+        });
+
+        List<VideoSettings> filteredProfiles = new ArrayList<>();
+        for (Camera.Size videoSize : videoSizes) {
+            double minDiff = Double.MAX_VALUE;
+            CamcorderSettings bestMatch = null;
+            for (CamcorderSettings settings : supportedProfiles) {
+                double diff = Math.pow(videoSize.width - settings.width, 2)
+                        + Math.pow(videoSize.height - settings.height, 2);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    bestMatch = settings;
+                }
+            }
+            VideoSettings settings = new VideoSettings();
+            settings.camcorderSettings = bestMatch;
+            settings.width = videoSize.width;
+            settings.height = videoSize.height;
+            filteredProfiles.add(settings);
+        }
+
+        List<Camera.Size> previewSizes = camera.getParameters().getSupportedPreviewSizes();
+        for (VideoSettings videoSettings : filteredProfiles) {
+            float settingsRatio = (float)videoSettings.width / videoSettings.height;
+            Camera.Size bestMatch = null;
+            double minDiff = Double.MAX_VALUE;
+            for (Camera.Size previewSize : previewSizes) {
+                float ratio = (float)previewSize.width / previewSize.height;
+                if (Math.abs(settingsRatio - ratio) < 0.0001) {
+                    double diff = Math.pow(videoSettings.width - previewSize.width, 2)
+                            + Math.pow(videoSettings.height - previewSize.height, 2);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        bestMatch = previewSize;
+                    }
+                }
+            }
+            videoSettings.previewWidth = bestMatch.width;
+            videoSettings.previewHeight = bestMatch.height;
+        }
+
+        return filteredProfiles;
+    }
+
+    public VideoSettings pickBestVideoSettings(List<VideoSettings> videoSettings) {
+        return videoSettings.get(0);
+    }
+
     // partly copied from android dev page
     private void setCameraDisplayOrientation(int cameraId, android.hardware.Camera camera) {
         android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
@@ -628,12 +767,12 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         switch (rotation) {
             case Surface.ROTATION_90:
             case Surface.ROTATION_270:
-                ratio = (float)selectedVideoSettings.videoSize.height / selectedVideoSettings.videoSize.width;
+                ratio = (float)selectedVideoSettings.previewHeight / selectedVideoSettings.previewWidth;
                 if (orientation == Configuration.ORIENTATION_LANDSCAPE)
                     ratio = 1.f / ratio;
                 break;
             default:
-                ratio = (float)selectedVideoSettings.videoSize.width / selectedVideoSettings.videoSize.height;
+                ratio = (float)selectedVideoSettings.previewWidth / selectedVideoSettings.previewHeight;
                 if (orientation == Configuration.ORIENTATION_PORTRAIT)
                     ratio = 1.f / ratio;
         }
