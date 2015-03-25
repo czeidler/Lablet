@@ -561,6 +561,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             setRecorderStrategy(new VideoRecorderStrategy(producer, camera));
         else
             setRecorderStrategy(new MediaRecorderStrategy(camera));
+
         recorderStrategy.start(getHintRotation(), recordingFrameRate, selectedVideoSettings, videoFile.getPath());
 
         super.startRecording();
@@ -606,10 +607,11 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         Camera.Parameters parameters = camera.getParameters();
         parameters.setRecordingHint(true);
         parameters.setPreviewSize(selectedVideoSettings.width, selectedVideoSettings.height);
-        parameters.set("cam_mode", 1);
-        parameters.set("camera_mode", 1);
+        parameters.setRecordingHint(true);
+        parameters.set("video-size", "" + selectedVideoSettings.width + "x" +selectedVideoSettings.height);
 
         camera.stopPreview();
+
         try {
             camera.setParameters(parameters);
             useVideoRecorder = true;
