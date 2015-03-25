@@ -314,18 +314,17 @@ public class VideoRecorder {
         }
     }
 
-    private void prepareEncoder(CamcorderProfile profile) {
+    private void prepareEncoder(int width, int height, int videoBitRate) {
         bufferInfo = new MediaCodec.BufferInfo();
 
-        MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, profile.videoFrameWidth,
-                profile.videoFrameHeight);
+        MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, width, height);
 
         // Set some properties.  Failing to specify some of these can cause the MediaCodec
         // configure() call to throw an unhelpful exception.
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                 MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-        format.setInteger(MediaFormat.KEY_BIT_RATE, profile.videoBitRate);
-        format.setInteger(MediaFormat.KEY_FRAME_RATE, profile.videoFrameRate);
+        format.setInteger(MediaFormat.KEY_BIT_RATE, videoBitRate);
+        format.setInteger(MediaFormat.KEY_FRAME_RATE, 30);
         format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
 
         // Create a MediaCodec encoder, and configure it with our format.  Get a Surface
@@ -365,11 +364,11 @@ public class VideoRecorder {
         isRecording = false;
     }
 
-    public void startRecording(CamcorderProfile camcorderProfile, String outputPath) {
+    public void startRecording(int width, int height, int videoBitRate, int frameRate, String outputPath) {
         synchronized (lock) {
             try {
                 recordedFrames = 0;
-                prepareEncoder(camcorderProfile);
+                prepareEncoder(width, height, videoBitRate);
                 muxer = new MediaMuxer(outputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
                 muxer.setOrientationHint(orientationHintDegrees);
 
