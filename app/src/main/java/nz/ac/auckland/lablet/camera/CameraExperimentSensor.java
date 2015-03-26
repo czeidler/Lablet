@@ -163,6 +163,11 @@ interface IRecorderStrategy {
     void stop();
 }
 
+/**
+ * The VideoRecorder can only record an image from a Surface, i.e. the camera video preview. However, some cameras have
+ * smaller preview than video resolution. That can make this strategy unsuitable for some devices because the recorded
+ * video resolution is too small.
+ */
 class VideoRecorderStrategy implements IRecorderStrategy {
     private VideoRecorder videoRecorder;
     private Camera camera;
