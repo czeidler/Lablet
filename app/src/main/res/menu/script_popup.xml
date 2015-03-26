@@ -2,4 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/resetDefaultActivities"
           android:title="@string/reset_default_activities"/>
+    <item android:id="@+id/deleteActivities"
+          android:title="@string/delete_activities"/>
+    <item android:id="@+id/addRemoteActivity"
+          android:title="@string/download_activity"/>
 </menu>

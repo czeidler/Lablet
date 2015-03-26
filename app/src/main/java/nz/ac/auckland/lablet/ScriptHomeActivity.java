@@ -247,6 +247,7 @@ public class ScriptHomeActivity extends Activity {
 
     public void showScriptMenu() {
         final View parent = findViewById(R.id.action_script_options);
+        final ScriptHomeActivity that = this;
 
         PopupMenu popup = new PopupMenu(this, parent);
         MenuInflater inflater = popup.getMenuInflater();
@@ -257,6 +258,13 @@ public class ScriptHomeActivity extends Activity {
                 switch (menuItem.getItemId()) {
                     case R.id.resetDefaultActivities:
                         resetDefaultActivities();
+                        return true;
+                    case R.id.deleteActivities:
+
+                        return true;
+                    case R.id.addRemoteActivity:
+                        AddRemoteScriptDialog dialog = new AddRemoteScriptDialog(that);
+                        dialog.show();
                         return true;
                     default:
                         return false;
@@ -369,15 +377,18 @@ public class ScriptHomeActivity extends Activity {
         return true;
     }
 
-    private void updateScriptList() {
+    public void updateScriptList() {
         scriptList.clear();
-        File scriptDir = getScriptDirectory(this);
-        if (scriptDir.isDirectory())
-            readScriptsFromDir(scriptDir, scriptList);
+        File[] scriptDirs = {
+                getScriptDirectory(this),
+                getResourceScriptDir(),
+                getRemoteScriptDir(this)
+        };
 
-        scriptDir = getResourceScriptDir();
-        if (scriptDir.isDirectory())
-            readScriptsFromDir(scriptDir, scriptList);
+        for (File scriptDir : scriptDirs) {
+            if (scriptDir.isDirectory())
+                readScriptsFromDir(scriptDir, scriptList);
+        }
 
         scriptListAdaptor.notifyDataSetChanged();
     }
@@ -397,6 +408,10 @@ public class ScriptHomeActivity extends Activity {
 
     private File getResourceScriptDir() {
         return new File(getScriptDirectory(this), "demo");
+    }
+
+    static public File getRemoteScriptDir(Context context) {
+        return new File(getScriptDirectory(context), "remotes");
     }
 
     private void copyResourceScripts(boolean forceCopy) {
@@ -439,7 +454,9 @@ public class ScriptHomeActivity extends Activity {
         settings.edit().putBoolean(SCRIPTS_COPIED_KEY, true).apply();
     }
 
-    private boolean isLuaFile(String name) {
+    static public boolean isLuaFile(String name) {
+        if (name.length() < 5)
+            return false;
         return name.lastIndexOf(".lua") == name.length() - 4;
     }
 

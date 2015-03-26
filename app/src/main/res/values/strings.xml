@@ -22,4 +22,6 @@
     <string name="action_import">Import</string>
     <string name="action_script_options">Script Options</string>
     <string name="reset_default_activities">Reset Default Lab Activities</string>
+    <string name="delete_activities">Delete Activities</string>
+    <string name="download_activity">Download Lab Activity</string>
 </resources>
