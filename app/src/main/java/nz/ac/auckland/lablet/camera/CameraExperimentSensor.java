@@ -33,10 +33,7 @@ import nz.ac.auckland.lablet.views.RatioGLSurfaceView;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 
 class CameraExperimentView extends AbstractExperimentSensorView {
@@ -169,7 +166,6 @@ interface IRecorderStrategy {
 class VideoRecorderStrategy implements IRecorderStrategy {
     private VideoRecorder videoRecorder;
     private Camera camera;
-    private VideoSettings videoSettings;
 
     public VideoRecorderStrategy(CameraGLTextureProducer producer, Camera camera) {
         videoRecorder = new VideoRecorder();
@@ -252,6 +248,7 @@ class MediaRecorderStrategy implements IRecorderStrategy {
     }
 }
 
+
 public class CameraExperimentSensor extends AbstractExperimentSensor {
     private Activity activity;
 
@@ -261,7 +258,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
     private CameraGLTextureProducer producer = null;
     private IRecorderStrategy recorderStrategy;
 
-    private boolean useVideoRecorder = false;
+    private boolean supportsPreviewEqualsVideoSize = false;
     private int cameraId = 0;
     private int rotation;
     private int rotationDegree = 0;
@@ -295,11 +292,34 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
     private float recordingFrameRate = 30f;
 
     public void setRecordingFrameRate(float recordingFrameRate) {
+        boolean wasLowFrameRate = isLowRecordingFrameRate();
+
         this.recordingFrameRate = recordingFrameRate;
+
+        // re-enable all video settings, also see onCamcorderProfileChanged
+        if (wasLowFrameRate && !isLowRecordingFrameRate()) {
+            supportedVideoSettings = getSupportedVideoSettings(cameraId, camera);
+            if (selectedVideoSettings != null) {
+                for (VideoSettings settings : supportedVideoSettings) {
+                    if (settings.width == selectedVideoSettings.width
+                            && settings.height == selectedVideoSettings.height) {
+                        selectedVideoSettings = settings;
+                        break;
+                    }
+                }
+            }
+        }
+        onCamcorderProfileChanged(selectedVideoSettings);
     }
 
     public float getRecordingFrameRate() {
         return recordingFrameRate;
+    }
+
+    private boolean isLowRecordingFrameRate() {
+        if (recordingFrameRate < 29)
+            return true;
+        return false;
     }
 
     public List<Float> getListOfAllowedFrameRates() {
@@ -370,7 +390,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
                     bestFrameRate = current;
                 }
             }
-            setRecordingFrameRate(bestFrameRate);
+            recordingFrameRate = bestFrameRate;
         }
 
         experimentData = new VideoData(this);
@@ -392,7 +412,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         producer = new CameraGLTextureProducer(camera);
 
         // video size
-        supportedVideoSettings = getSupportedCamcorderProfiles(cameraId, camera);
+        supportedVideoSettings = getSupportedVideoSettings(cameraId, camera);
         // select the first or the best matching requested settings
         VideoSettings newVideoSettings = pickBestVideoSettings(supportedVideoSettings);
         if (requestedVideoWidth > 0 && requestedVideoHeight > 0) {
@@ -557,7 +577,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         File outputDir = activity.getExternalCacheDir();
         videoFile = new File(outputDir, getVideoFileName());
 
-        if (useVideoRecorder)
+        if (supportsPreviewEqualsVideoSize || getRecordingFrameRate() < 29)
             setRecorderStrategy(new VideoRecorderStrategy(producer, camera));
         else
             setRecorderStrategy(new MediaRecorderStrategy(camera));
@@ -614,11 +634,24 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
         try {
             camera.setParameters(parameters);
-            useVideoRecorder = true;
+            supportsPreviewEqualsVideoSize = true;
         } catch (RuntimeException e) {
             parameters.setPreviewSize(selectedVideoSettings.previewWidth, selectedVideoSettings.previewHeight);
             camera.setParameters(parameters);
-            useVideoRecorder = false;
+            supportsPreviewEqualsVideoSize = false;
+
+            if (isLowRecordingFrameRate()) {
+                // We really want the video size to be equal to the preview size because its a requirement for the
+                // VideoRecorder. So filter possible video settings and redo onCamcorderProfileChanged.
+                forcePreviewEqualsVideoSize(supportedVideoSettings);
+                if (!supportedVideoSettings.contains(selectedVideoSettings))
+                    selectedVideoSettings = pickBestVideoSettings(supportedVideoSettings);
+
+                camera.startPreview();
+
+                onCamcorderProfileChanged(selectedVideoSettings);
+                return;
+            }
         }
         camera.startPreview();
 
@@ -670,7 +703,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         }
     }
 
-    public List<VideoSettings> getSupportedCamcorderProfiles(int cameraId, Camera camera) {
+    private List<VideoSettings> getSupportedVideoSettings(int cameraId, Camera camera) {
         // use the camcorder profile only to get the video bit rate
         List<CamcorderSettings> supportedProfiles = new ArrayList<>();
         addProfileIfSupported(cameraId, supportedProfiles, CamcorderProfile.QUALITY_QCIF);
@@ -734,6 +767,14 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         }
 
         return filteredProfiles;
+    }
+
+    private void forcePreviewEqualsVideoSize(List<VideoSettings> supportedVideoSettings) {
+        for (Iterator<VideoSettings> iterator = supportedVideoSettings.iterator(); iterator.hasNext(); ) {
+            VideoSettings settings = iterator.next();
+            if (settings.previewWidth != settings.width || settings.previewHeight != settings.height)
+                iterator.remove();
+        }
     }
 
     public VideoSettings pickBestVideoSettings(List<VideoSettings> videoSettings) {
