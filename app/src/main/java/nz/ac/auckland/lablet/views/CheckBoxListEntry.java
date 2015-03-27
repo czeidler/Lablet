@@ -16,7 +16,7 @@ public class CheckBoxListEntry {
     private OnCheckBoxListEntryListener listener = null;
 
     public interface OnCheckBoxListEntryListener {
-        public void onSelected(CheckBoxListEntry entry);
+        void onSelected(CheckBoxListEntry entry);
     }
 
     public CheckBoxListEntry(String name, OnCheckBoxListEntryListener listener) {
