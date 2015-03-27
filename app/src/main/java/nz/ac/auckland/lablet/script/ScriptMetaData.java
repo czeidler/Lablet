@@ -7,7 +7,12 @@
  */
 package nz.ac.auckland.lablet.script;
 
+import nz.ac.auckland.lablet.ScriptHomeActivity;
+import nz.ac.auckland.lablet.misc.StorageLib;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 
 
 public class ScriptMetaData {
@@ -20,8 +25,7 @@ public class ScriptMetaData {
     }
 
     public String getScriptFileName() {
-        String name = file.getName();
-        return name.substring(0, name.length() - 4);
+        return StorageLib.removeExtension(file.getName());
     }
 
     public String getLabel() {
@@ -30,5 +34,20 @@ public class ScriptMetaData {
 
     public String toString() {
         return getLabel();
+    }
+
+    public String readRemote() {
+        File parent = file.getParentFile();
+        File remoteFile = new File(parent, getScriptFileName() + "." + ScriptHomeActivity.REMOTE_TYPE);
+
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(remoteFile));
+            return reader.readLine();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 }

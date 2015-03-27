@@ -28,8 +28,6 @@ import java.util.List;
 
 
 class ActivityRemoteEntry {
-    static final String REMOTE_TYPE = "remote";
-
     final public String name;
     final public URL url;
 
@@ -49,9 +47,10 @@ class ActivityRemoteEntry {
             if (!file.isFile())
                 continue;
             String name = file.getName();
-            if (name.lastIndexOf("." + REMOTE_TYPE) != name.length() - (REMOTE_TYPE.length() + 1))
+            if (name.lastIndexOf("." + ScriptHomeActivity.REMOTE_TYPE)
+                    != name.length() - (ScriptHomeActivity.REMOTE_TYPE.length() + 1))
                 continue;
-            name = removeExtension(name);
+            name = StorageLib.removeExtension(name);
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(file));
                 String line = reader.readLine();
@@ -64,26 +63,20 @@ class ActivityRemoteEntry {
         }
         return list;
     }
-
-    static public String removeExtension(String fileName) {
-        if (fileName.indexOf(".") > 0)
-            fileName = fileName.substring(0, fileName.lastIndexOf("."));
-        return fileName;
-    }
 }
 
 
 public class AddRemoteScriptDialog extends AlertDialog {
     static final String HISTORY_DIR = "history";
 
-    private ScriptHomeActivity activity;
+    private ScriptManagerActivity activity;
 
     private URL url = null;
     private TextView statusView;
 
     private List<ActivityRemoteEntry> existingRemoteEntries;
 
-    public AddRemoteScriptDialog(ScriptHomeActivity activity) {
+    public AddRemoteScriptDialog(ScriptManagerActivity activity) {
         super(activity);
 
         this.activity = activity;
@@ -91,10 +84,10 @@ public class AddRemoteScriptDialog extends AlertDialog {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        existingRemoteEntries = ActivityRemoteEntry.getActivityRemoteEntries(ScriptHomeActivity.getRemoteScriptDir(
+        existingRemoteEntries = ActivityRemoteEntry.getActivityRemoteEntries(ScriptDirs.getRemoteScriptDir(
                 getContext()));
         List<ActivityRemoteEntry> historyRemoteEntries = ActivityRemoteEntry.getActivityRemoteEntries(
-                new File(ScriptHomeActivity.getRemoteScriptDir(getContext()), HISTORY_DIR));
+                new File(ScriptDirs.getRemoteScriptDir(getContext()), HISTORY_DIR));
         List<String> remoteHistory = new ArrayList<>();
         for (ActivityRemoteEntry entry : historyRemoteEntries)
             remoteHistory.add(entry.url.toString());
@@ -149,7 +142,7 @@ public class AddRemoteScriptDialog extends AlertDialog {
 
                 if (validUrl) {
                     String name = new File(url.getPath()).getName();
-                    if (!ScriptHomeActivity.isLuaFile(name))
+                    if (!ScriptDirs.isLuaFile(name))
                         validUrl = false;
                 }
 
@@ -189,7 +182,7 @@ public class AddRemoteScriptDialog extends AlertDialog {
 
     private void download() {
         setStatus("Downloading...");
-        final File remoteDir = ScriptHomeActivity.getRemoteScriptDir(getContext());
+        final File remoteDir = ScriptDirs.getRemoteScriptDir(getContext());
         remoteDir.mkdirs();
         String target = getFileName();
         File temp;
@@ -201,7 +194,7 @@ public class AddRemoteScriptDialog extends AlertDialog {
                 break;
         }
         final File targetFile = temp;
-        final File targetRemoteFile = new File(remoteDir, target + "." + ActivityRemoteEntry.REMOTE_TYPE);
+        final File targetRemoteFile = new File(remoteDir, target + "." + ScriptHomeActivity.REMOTE_TYPE);
 
         final AsyncTask<Void, String, Boolean> downloadTask = new AsyncTask<Void, String, Boolean>() {
             @Override

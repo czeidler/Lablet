@@ -34,6 +34,105 @@ import java.util.Collections;
 import java.util.List;
 
 
+class ScriptDirs {
+    final static private String SCRIPTS_COPIED_KEY = "scripts_copied_v1";
+    final static private String PREFERENCES_NAME = "lablet_preferences";
+
+    static public void readScriptsFromDir(File scriptDir, List<ScriptMetaData> scripts) {
+        File[] children = scriptDir.listFiles();
+        for (File child : children != null ? children : new File[0]) {
+            String name = child.getName();
+            if (!isLuaFile(name))
+                continue;
+            ScriptMetaData metaData = LuaScriptLoader.getScriptMetaData(child);
+            if (metaData == null)
+                continue;
+            scripts.add(metaData);
+        }
+    }
+
+    /**
+     * The script directory is the directory the stores the script files, i.e., the lua files.
+     * @param context the context
+     * @return the script directory File
+     */
+    static public File getScriptDirectory(Context context) {
+        File baseDir = context.getExternalFilesDir(null);
+        File scriptDir = new File(baseDir, "scripts");
+        if (!scriptDir.exists() && !scriptDir.mkdir())
+            return null;
+        return scriptDir;
+    }
+
+    static public File getResourceScriptDir(Context context) {
+        return new File(getScriptDirectory(context), "demo");
+    }
+
+    static public File getRemoteScriptDir(Context context) {
+        return new File(getScriptDirectory(context), "remotes");
+    }
+
+    static public void copyResourceScripts(Activity activity, boolean forceCopy) {
+        SharedPreferences settings = activity.getSharedPreferences(PREFERENCES_NAME, 0);
+        if (!forceCopy && settings.getBoolean(SCRIPTS_COPIED_KEY, false))
+            return;
+
+        File scriptDir = getResourceScriptDir(activity);
+        if (!scriptDir.exists()) {
+            if (!scriptDir.mkdir())
+                return;
+        }
+        try {
+            String[] files = activity.getAssets().list("");
+            for (String file : files) {
+                if (!isLuaFile(file))
+                    continue;
+                InputStream inputStream = activity.getAssets().open(file);
+                File scriptOutFile = new File(scriptDir, file);
+                if (!forceCopy && scriptOutFile.exists())
+                    continue;
+
+                OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(scriptOutFile, false));
+                byte[] buffer = new byte[16384];
+                while(true) {
+                    int n = inputStream.read(buffer);
+                    if (n <= -1)
+                        break;
+                    outputStream.write(buffer, 0, n);
+                }
+
+                inputStream.close();
+                outputStream.flush();
+                outputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        settings.edit().putBoolean(SCRIPTS_COPIED_KEY, true).apply();
+    }
+
+    static public boolean isLuaFile(String name) {
+        if (name.length() < 5)
+            return false;
+        return name.lastIndexOf(".lua") == name.length() - 4;
+    }
+
+
+    static public void readScriptList(List<ScriptMetaData> scriptList, Context context) {
+        File[] scriptDirs = {
+                getScriptDirectory(context),
+                getResourceScriptDir(context),
+                getRemoteScriptDir(context)
+        };
+
+        for (File scriptDir : scriptDirs) {
+            if (scriptDir.isDirectory())
+                readScriptsFromDir(scriptDir, scriptList);
+        }
+    }
+}
+
 /**
  * Main or home activity to manage scripts (lab activities).
  * <p>
@@ -41,6 +140,8 @@ import java.util.List;
  * </p>
  */
 public class ScriptHomeActivity extends Activity {
+    static final public String REMOTE_TYPE = "remote";
+
     private List<ScriptMetaData> scriptList = null;
     private ArrayAdapter<ScriptMetaData> scriptListAdaptor = null;
     private ArrayList<CheckBoxListEntry> existingScriptList = null;
@@ -52,9 +153,7 @@ public class ScriptHomeActivity extends Activity {
     private AlertDialog infoAlertBox = null;
     private CheckBox selectAllCheckBox = null;
 
-    final static private String SCRIPTS_COPIED_KEY = "scripts_copied_v1";
     final static private int START_SCRIPT = 1;
-    final static private String PREFERENCES_NAME = "lablet_preferences";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -242,7 +341,7 @@ public class ScriptHomeActivity extends Activity {
             }
         };
 
-        copyResourceScripts(false);
+        ScriptDirs.copyResourceScripts(this, false);
     }
 
     public void showScriptMenu() {
@@ -256,15 +355,9 @@ public class ScriptHomeActivity extends Activity {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
-                    case R.id.resetDefaultActivities:
-                        resetDefaultActivities();
-                        return true;
-                    case R.id.deleteActivities:
-
-                        return true;
-                    case R.id.addRemoteActivity:
-                        AddRemoteScriptDialog dialog = new AddRemoteScriptDialog(that);
-                        dialog.show();
+                    case R.id.scriptManager:
+                        Intent intent = new Intent(that, ScriptManagerActivity.class);
+                        startActivity(intent);
                         return true;
                     default:
                         return false;
@@ -273,25 +366,6 @@ public class ScriptHomeActivity extends Activity {
             }
         });
         popup.show();
-    }
-
-    private void resetDefaultActivities() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Reset the pre-installed lab activities?");
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-            }
-        });
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                copyResourceScripts(true);
-                updateScriptList();
-            }
-        });
-        builder.create().show();
     }
 
     private void updateSelectedMenuItem() {
@@ -310,24 +384,11 @@ public class ScriptHomeActivity extends Activity {
     }
 
     /**
-     * The script directory is the directory the stores the script files, i.e., the lua files.
-     * @param context the context
-     * @return the script directory File
-     */
-    static public File getScriptDirectory(Context context) {
-        File baseDir = context.getExternalFilesDir(null);
-        File scriptDir = new File(baseDir, "scripts");
-        if (!scriptDir.exists() && !scriptDir.mkdir())
-            return null;
-        return scriptDir;
-    }
-
-    /**
      * The script user data is the directory that contains the stored script state, i.e., the results.
      * @param context the context
      * @return the script user data
      */
-    private File getScriptUserDataDir(Context context) {
+    static public File getScriptUserDataDir(Context context) {
         File baseDir = context.getExternalFilesDir(null);
         File scriptDir = new File(baseDir, "script_user_data");
         if (!scriptDir.exists() && !scriptDir.mkdir())
@@ -379,85 +440,9 @@ public class ScriptHomeActivity extends Activity {
 
     public void updateScriptList() {
         scriptList.clear();
-        File[] scriptDirs = {
-                getScriptDirectory(this),
-                getResourceScriptDir(),
-                getRemoteScriptDir(this)
-        };
-
-        for (File scriptDir : scriptDirs) {
-            if (scriptDir.isDirectory())
-                readScriptsFromDir(scriptDir, scriptList);
-        }
+        ScriptDirs.readScriptList(scriptList, this);
 
         scriptListAdaptor.notifyDataSetChanged();
-    }
-
-    private void readScriptsFromDir(File scriptDir, List<ScriptMetaData> scripts) {
-        File[] children = scriptDir.listFiles();
-        for (File child : children != null ? children : new File[0]) {
-            String name = child.getName();
-            if (!isLuaFile(name))
-                continue;
-            ScriptMetaData metaData = LuaScriptLoader.getScriptMetaData(child);
-            if (metaData == null)
-                continue;
-            scripts.add(metaData);
-        }
-    }
-
-    private File getResourceScriptDir() {
-        return new File(getScriptDirectory(this), "demo");
-    }
-
-    static public File getRemoteScriptDir(Context context) {
-        return new File(getScriptDirectory(context), "remotes");
-    }
-
-    private void copyResourceScripts(boolean forceCopy) {
-        SharedPreferences settings = getSharedPreferences(PREFERENCES_NAME, 0);
-        if (!forceCopy && settings.getBoolean(SCRIPTS_COPIED_KEY, false))
-            return;
-
-        File scriptDir = getResourceScriptDir();
-        if (!scriptDir.exists()) {
-            if (!scriptDir.mkdir())
-                return;
-        }
-        try {
-            String[] files = getAssets().list("");
-            for (String file : files) {
-                if (!isLuaFile(file))
-                    continue;
-                InputStream inputStream = getAssets().open(file);
-                File scriptOutFile = new File(scriptDir, file);
-                if (!forceCopy && scriptOutFile.exists())
-                    continue;
-
-                OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(scriptOutFile, false));
-                byte[] buffer = new byte[16384];
-                while(true) {
-                    int n = inputStream.read(buffer);
-                    if (n <= -1)
-                        break;
-                    outputStream.write(buffer, 0, n);
-                }
-
-                inputStream.close();
-                outputStream.flush();
-                outputStream.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        settings.edit().putBoolean(SCRIPTS_COPIED_KEY, true).apply();
-    }
-
-    static public boolean isLuaFile(String name) {
-        if (name.length() < 5)
-            return false;
-        return name.lastIndexOf(".lua") == name.length() - 4;
     }
 
     private void updateExistingScriptList() {

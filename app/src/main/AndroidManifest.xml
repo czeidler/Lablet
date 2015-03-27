@@ -39,6 +39,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name="nz.ac.auckland.lablet.ScriptManagerActivity"
+                  android:icon="@drawable/ic_console" />
         <activity android:name="nz.ac.auckland.lablet.script.ScriptRunnerActivity"
                   android:icon="@drawable/ic_console"
                   android:windowSoftInputMode="stateHidden"/>
