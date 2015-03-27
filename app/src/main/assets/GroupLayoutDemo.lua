@@ -1,5 +1,6 @@
 Lablet = {
-    interface = 1.0
+    interface = 1.0,
+    label = "Demo: Group Layout (Lab Activity Script)"
 }
 
 

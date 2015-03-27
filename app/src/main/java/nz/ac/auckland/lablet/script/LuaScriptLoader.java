@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 public class LuaScriptLoader {
     final static private String NAMESPACE = "Lablet";
     final static private String INTERFACE_VAR = "interface";
+    final static private String LABEL_VAR = "label";
     final static private String ENTRY_POINT_METHOD_KEY = "buildActivity";
 
     /**
@@ -137,6 +138,7 @@ public class LuaScriptLoader {
             return null;
         }
 
+        ScriptMetaData scriptMetaData = new ScriptMetaData(scriptFile);
         try {
             Globals globals = JsePlatform.standardGlobals();
             //LuaValue chunk = globals.loadfile(scriptFile.getPath());
@@ -145,10 +147,15 @@ public class LuaScriptLoader {
 
             LuaValue labletNamespace = globals.get(NAMESPACE);
             float version = labletNamespace.get(INTERFACE_VAR).tofloat();
-            return new ScriptMetaData(scriptFile, version);
+            String label = labletNamespace.get(LABEL_VAR).toString();
+            scriptMetaData.setInterfaceVersion(version);
+            if (!label.equals("nil"))
+                scriptMetaData.setLabel(label);
+
         } catch (LuaError e) {
-            return null;
+            scriptMetaData.setLoadingError(e.getMessage());
         }
+        return scriptMetaData;
     }
 
     /**

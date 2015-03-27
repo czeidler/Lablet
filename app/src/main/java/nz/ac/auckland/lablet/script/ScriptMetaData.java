@@ -17,11 +17,32 @@ import java.io.FileReader;
 
 public class ScriptMetaData {
     final public File file;
-    final public float interfaceVersion;
+    private float interfaceVersion;
+    private String label = "";
+    private String loadingError = "";
 
-    public ScriptMetaData(File file, float interfaceVersion) {
+    public ScriptMetaData(File file) {
         this.file = file;
+    }
+
+    public float getInterfaceVersion() {
+        return interfaceVersion;
+    }
+
+    public void setInterfaceVersion(float interfaceVersion) {
         this.interfaceVersion = interfaceVersion;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getLoadingError() {
+        return loadingError;
+    }
+
+    public void setLoadingError(String loadingError) {
+        this.loadingError = loadingError;
     }
 
     public String getScriptFileName() {
@@ -29,6 +50,8 @@ public class ScriptMetaData {
     }
 
     public String getLabel() {
+        if (!label.equals(""))
+            return label;
         return getScriptFileName();
     }
 
