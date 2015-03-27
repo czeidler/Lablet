@@ -70,7 +70,6 @@ public class ScriptManagerActivity extends Activity {
         deleteAction.setVisible(false);
 
         // update
-        final Context context = this;
         MenuItem updateAction = menu.findItem(R.id.action_update);
         assert(updateAction != null);
         updateAction.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -92,7 +91,7 @@ public class ScriptManagerActivity extends Activity {
                             if (isRemote(scriptMetaData))
                                 listToUpdate.add(scriptMetaData);
                         }
-                        UpdateRemoteScriptDialog dialog = new UpdateRemoteScriptDialog(context, listToUpdate);
+                        UpdateRemoteScriptDialog dialog = new UpdateRemoteScriptDialog(activity, listToUpdate);
                         dialog.show();
                     }
                 });

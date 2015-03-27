@@ -26,10 +26,12 @@ import java.util.List;
 public class UpdateRemoteScriptDialog extends AlertDialog {
     private TextView statusView;
     final private List<ScriptMetaData> listToUpdate;
+    final private ScriptManagerActivity activity;
 
-    public UpdateRemoteScriptDialog(Context context, List<ScriptMetaData> listToUpdate) {
-        super(context);
+    public UpdateRemoteScriptDialog(ScriptManagerActivity activity, List<ScriptMetaData> listToUpdate) {
+        super(activity);
 
+        this.activity = activity;
         this.listToUpdate = listToUpdate;
     }
 
@@ -101,6 +103,7 @@ public class UpdateRemoteScriptDialog extends AlertDialog {
 
             @Override
             protected void onPostExecute(Boolean result) {
+                activity.updateScriptList();
                 dismiss();
             }
         };
