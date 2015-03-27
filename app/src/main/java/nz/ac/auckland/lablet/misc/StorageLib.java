@@ -76,4 +76,10 @@ public class StorageLib {
         FileOutputStream outStream = new FileOutputStream(destination);
         StreamHelper.copy(inStream, outStream, listener, reportingStep);
     }
+
+    static public String removeExtension(String fileName) {
+        if (fileName.indexOf(".") > 0)
+            fileName = fileName.substring(0, fileName.lastIndexOf("."));
+        return fileName;
+    }
 }
