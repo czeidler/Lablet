@@ -31,6 +31,7 @@ import nz.ac.auckland.lablet.script.ScriptRunnerActivity;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -441,6 +442,13 @@ public class ScriptHomeActivity extends Activity {
     public void updateScriptList() {
         scriptList.clear();
         ScriptDirs.readScriptList(scriptList, this);
+
+        Collections.sort(scriptList, new Comparator<ScriptMetaData>() {
+            @Override
+            public int compare(ScriptMetaData metaData, ScriptMetaData metaData2) {
+                return metaData.getLabel().compareTo(metaData2.getLabel());
+            }
+        });
 
         scriptListAdaptor.notifyDataSetChanged();
     }

@@ -24,6 +24,8 @@ import nz.ac.auckland.lablet.views.CheckBoxListEntry;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -165,6 +167,13 @@ public class ScriptManagerActivity extends Activity {
         scriptList.clear();
         ScriptDirs.readScriptList(scriptList, this);
 
+        Collections.sort(scriptList, new Comparator<ScriptMetaData>() {
+            @Override
+            public int compare(ScriptMetaData metaData, ScriptMetaData metaData2) {
+                return metaData.getLabel().compareTo(metaData2.getLabel());
+            }
+        });
+
         checkBoxList.clear();
         CheckBoxListEntry.OnCheckBoxListEntryListener onCheckBoxListEntryListener
                 = new CheckBoxListEntry.OnCheckBoxListEntryListener() {
@@ -182,6 +191,8 @@ public class ScriptManagerActivity extends Activity {
             }
             checkBoxList.add(new CheckBoxListEntry(label, onCheckBoxListEntryListener));
         }
+
+
         checkBoxAdapter.notifyDataSetChanged();
     }
 
