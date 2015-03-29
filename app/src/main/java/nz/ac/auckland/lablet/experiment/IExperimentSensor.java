@@ -18,19 +18,19 @@ import java.io.IOException;
 
 
 public interface IExperimentSensor {
-    public interface IListener {
-        public void onStartPreview();
-        public void onStopPreview();
-        public void onStartRecording();
-        public void onStopRecording();
-        public void onStartPlayback();
-        public void onStopPlayback();
-        public void onSettingsChanged();
+    interface IListener {
+        void onStartPreview();
+        void onStopPreview();
+        void onStopRecording();
+        void onStartRecording();
+        void onStartPlayback();
+        void onStopPlayback();
+        void onSettingsChanged();
     }
 
-    public String getSensorName();
+    String getSensorName();
 
-    public View createExperimentView(Context context);
+    View createExperimentView(Context context);
 
     /**
      * Prepares a option menu for the experiment.
@@ -38,16 +38,16 @@ public interface IExperimentSensor {
      * @param menuItem the menu item for the option menu
      * @return false if there is no option menu
      */
-    public boolean onPrepareOptionsMenu(MenuItem menuItem);
+    boolean onPrepareOptionsMenu(MenuItem menuItem);
 
-    public void onSaveInstanceState(Bundle outState);
-    public void onRestoreInstanceState(Bundle savedInstanceState);
+    void onSaveInstanceState(Bundle outState);
+    void onRestoreInstanceState(Bundle savedInstanceState);
 
-    public ExperimentRun getExperimentRun();
-    public void setExperimentRun(ExperimentRun experimentRun);
+    ExperimentRun getExperimentRun();
+    void setExperimentRun(ExperimentRun experimentRun);
 
-    public void init(Activity activity);
-    public void destroy();
+    void init(Activity activity);
+    void destroy();
 
     /**
      * Finishes the experiment by either saving or discarding the data.
@@ -60,20 +60,20 @@ public interface IExperimentSensor {
      * @param storageBaseDir the data should be saved into a sub directory of storageBaseDir
      * @throws IOException
      */
-    public void finishExperiment(boolean saveData, File storageBaseDir) throws IOException;
-    public boolean dataTaken();
+    void finishExperiment(boolean saveData, File storageBaseDir) throws IOException;
+    boolean dataTaken();
 
-    public void startPreview();
-    public void stopPreview();
-    public void startRecording() throws Exception;
+    void startPreview();
+    void stopPreview();
+    void startRecording() throws Exception;
     /**
      * Stops the recording.
      *
      * @return true if some data has been taken otherwise false
      */
-    public boolean stopRecording();
-    public void startPlayback();
-    public void stopPlayback();
+    boolean stopRecording();
+    void startPlayback();
+    void stopPlayback();
 
-    public ISensorData getExperimentData();
+    ISensorData getExperimentData();
 }

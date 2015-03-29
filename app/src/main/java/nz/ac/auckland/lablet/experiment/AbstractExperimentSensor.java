@@ -14,8 +14,8 @@ import java.lang.ref.WeakReference;
 
 abstract public class AbstractExperimentSensor implements IExperimentSensor {
     public interface State {
-        public void start();
-        public boolean stop();
+        void start();
+        boolean stop();
     }
 
     private ExperimentRun experimentRun;
