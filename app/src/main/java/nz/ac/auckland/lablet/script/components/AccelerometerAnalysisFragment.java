@@ -1,5 +1,5 @@
 /*
- * Copyright 2014.
+ * Copyright 2015.
  * Distributed under the terms of the GPLv3 License.
  *
  * Authors:
@@ -16,8 +16,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
+import android.widget.Toast;
 import nz.ac.auckland.lablet.ExperimentActivity;
 import nz.ac.auckland.lablet.ExperimentAnalysisActivity;
+import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptComponent;
@@ -29,11 +31,11 @@ import java.io.File;
 /**
  * Script component that can create a fragment for the experiment analysis.
  */
-class ScriptTreeNodeFrequencyAnalysis extends ScriptTreeNodeFragmentHolder {
+class ScriptTreeNodeAccelerometerAnalysis extends ScriptTreeNodeFragmentHolder {
     private ScriptExperimentRef experiment;
     private String descriptionText = "";
 
-    public ScriptTreeNodeFrequencyAnalysis(Script script) {
+    public ScriptTreeNodeAccelerometerAnalysis(Script script) {
         super(script);
     }
 
@@ -48,7 +50,7 @@ class ScriptTreeNodeFrequencyAnalysis extends ScriptTreeNodeFragmentHolder {
 
     @Override
     public ScriptComponentGenericFragment createFragment() {
-        ScriptComponentGenericFragment fragment = new FrequencyAnalysisFragment();
+        ScriptComponentGenericFragment fragment = new AccelerometerAnalysisFragment();
         fragment.setScriptComponent(this);
         return fragment;
     }
@@ -74,7 +76,7 @@ class ScriptTreeNodeFrequencyAnalysis extends ScriptTreeNodeFragmentHolder {
 /**
  * Fragment to start an experiment analysis.
  */
-public class FrequencyAnalysisFragment extends ScriptComponentGenericFragment {
+public class AccelerometerAnalysisFragment extends ScriptComponentGenericFragment {
     static final int ANALYSE_EXPERIMENT = 0;
 
     private CheckedTextView takenExperimentInfo = null;
@@ -85,10 +87,10 @@ public class FrequencyAnalysisFragment extends ScriptComponentGenericFragment {
         if (component == null)
             return view;
 
-        View child = setChild(R.layout.script_component_frequency_analysis);
+        View child = setChild(R.layout.script_component_accelerometer_analysis);
         assert child != null;
 
-        ScriptTreeNodeFrequencyAnalysis analysisComponent = (ScriptTreeNodeFrequencyAnalysis)this.component;
+        ScriptTreeNodeAccelerometerAnalysis analysisComponent = (ScriptTreeNodeAccelerometerAnalysis)this.component;
 
         TextView descriptionTextView = (TextView)child.findViewById(R.id.descriptionText);
         assert descriptionTextView != null;
@@ -102,7 +104,7 @@ public class FrequencyAnalysisFragment extends ScriptComponentGenericFragment {
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), ExperimentAnalysisActivity.class);
                 intent.putExtra(ExperimentActivity.PATH,
-                        ((ScriptTreeNodeFrequencyAnalysis)component).getExperiment().getExperimentPath());
+                        ((ScriptTreeNodeAccelerometerAnalysis)component).getExperiment().getExperimentPath());
                 intent.putExtra("first_start_with_run_settings", true);
                 intent.putExtra("first_start_with_run_settings_help", true);
                 startActivityForResult(intent, ANALYSE_EXPERIMENT);

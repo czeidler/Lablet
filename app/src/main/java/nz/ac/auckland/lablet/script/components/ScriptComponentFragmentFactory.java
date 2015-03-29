@@ -25,6 +25,8 @@ public class ScriptComponentFragmentFactory implements IScriptComponentFactory {
             return new ScriptTreeNodeMotionAnalysis(script);
         if (componentName.equals("FrequencyAnalysis"))
             return new ScriptTreeNodeFrequencyAnalysis(script);
+        if (componentName.equals("AccelerometerAnalysis"))
+            return new ScriptTreeNodeAccelerometerAnalysis(script);
         if (componentName.equals("CalculateXSpeed"))
             return new ScriptTreeNodeCalculateSpeed(script, true);
         if (componentName.equals("CalculateYSpeed"))

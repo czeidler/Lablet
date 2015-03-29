@@ -552,6 +552,12 @@ public class ScriptTreeNodeSheet extends ScriptTreeNodeSheetBase {
         return question;
     }
 
+    public AccelerometerExperiment addAccelerometerExperiment(SheetGroupLayout parent) {
+        AccelerometerExperiment experiment = new AccelerometerExperiment(script);
+        addItemViewHolder(experiment, parent);
+        return experiment;
+    }
+
     public CameraExperiment addCameraExperiment(SheetGroupLayout parent) {
         CameraExperiment cameraExperiment = new CameraExperiment(script);
         addItemViewHolder(cameraExperiment, parent);
