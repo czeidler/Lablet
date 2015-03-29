@@ -17,6 +17,7 @@ import android.media.CamcorderProfile;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.MediaController;
@@ -634,15 +635,33 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         }
     }
 
+    /**
+     * Returns true if the device supports preview == video size even it says it does not do that.
+     *
+     * This is a workaround for GT-P5210, when recording at 1280 x 720 but with a smaller preview size the recorded
+     * video is messed up.
+     *
+     * @return
+     */
+    private boolean forcePreviewEqualVideo() {
+        if (Build.DEVICE.equals("GT-P5210"))
+            return true;
+
+        return false;
+    }
+
     private void onCamcorderProfileChanged(VideoSettings videoSettings) {
         selectedVideoSettings = videoSettings;
         Camera.Parameters parameters = camera.getParameters();
         if (isLowRecordingFrameRate()) {
             parameters.setPreviewSize(selectedVideoSettings.width, selectedVideoSettings.height);
         } else {
-            parameters.setRecordingHint(true);
-            parameters.setPreviewSize(selectedVideoSettings.previewWidth, selectedVideoSettings.previewHeight);
+            if (forcePreviewEqualVideo())
+                parameters.setPreviewSize(selectedVideoSettings.previewWidth, selectedVideoSettings.previewHeight);
+            else
+                parameters.setPreviewSize(selectedVideoSettings.width, selectedVideoSettings.height);
             parameters.set("video-size", "" + selectedVideoSettings.width + "x" + selectedVideoSettings.height);
+            parameters.setRecordingHint(true);
         }
         camera.stopPreview();
 
