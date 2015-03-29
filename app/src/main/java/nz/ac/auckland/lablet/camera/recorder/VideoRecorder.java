@@ -364,7 +364,7 @@ public class VideoRecorder {
         isRecording = false;
     }
 
-    public void startRecording(int width, int height, int videoBitRate, int frameRate, String outputPath) {
+    public void startRecording(int width, int height, int videoBitRate, String outputPath) {
         synchronized (lock) {
             try {
                 recordedFrames = 0;

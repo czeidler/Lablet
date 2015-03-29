@@ -57,7 +57,7 @@ class CameraExperimentView extends AbstractExperimentSensorView {
         preview.setEGLContextClientVersion(2);
         preview.setRenderer(new CameraPreviewRender(preview, cameraExperimentSensor.getCameraGLTextureProducer()));
         preview.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-        preview.setPreserveEGLContextOnPause(true);
+        preview.setPreserveEGLContextOnPause(false);
 
         preview.setVisibility(INVISIBLE);
 
@@ -68,6 +68,21 @@ class CameraExperimentView extends AbstractExperimentSensorView {
         preview.setVisibility(View.VISIBLE);
         videoView.setVisibility(View.INVISIBLE);
 
+        // set ratio on orientation changes
+        preview.addOnLayoutChangeListener(new OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View view, int left, int top, int right, int bottom, int oldLeft, int oldTop,
+                                       int oldRight, int oldBottom) {
+                if (right - left != oldRight - oldLeft || bottom - top != oldBottom - oldTop) {
+                    post(new Runnable() {
+                        @Override
+                        public void run() {
+                            setRatio();
+                        }
+                    });
+                }
+            }
+        });
         setRatio();
     }
 
@@ -192,7 +207,7 @@ class VideoRecorderStrategy implements IRecorderStrategy {
         videoRecorder.setRotation(hintRotation);
         videoRecorder.setRecordingFrameRate(recordingFrameRate);
         videoRecorder.startRecording(settings.previewWidth, settings.previewHeight, settings.camcorderSettings.bitRate,
-                30, path);
+                path);
     }
 
     @Override
@@ -482,6 +497,8 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         outState.putInt("selected_video_width", selectedVideoSettings.previewWidth);
         outState.putInt("selected_video_height", selectedVideoSettings.previewHeight);
 
+        outState.putFloat("selected_recording_frame_rate", recordingFrameRate);
+
         if (videoFile != null)
             outState.putString("unsaved_recording", videoFile.getPath());
     }
@@ -493,6 +510,8 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             requestedVideoWidth = savedInstanceState.getInt("selected_video_width");
             requestedVideoHeight = savedInstanceState.getInt("selected_video_height");
         }
+        if (savedInstanceState.containsKey("selected_recording_frame_rate"))
+            recordingFrameRate = savedInstanceState.getFloat("selected_recording_frame_rate");
 
         if (savedInstanceState.containsKey("unsaved_recording")) {
             String filePath = savedInstanceState.getString("unsaved_recording");

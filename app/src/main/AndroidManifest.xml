@@ -27,7 +27,8 @@
                   android:icon="@drawable/ic_lablet"/>
 
         <activity android:name="nz.ac.auckland.lablet.ExperimentActivity"
-                  android:icon="@drawable/ic_lab"/>
+                  android:icon="@drawable/ic_lab"
+                  android:configChanges="keyboardHidden|orientation|screenSize"/>
         <activity android:name=".camera.MotionAnalysisSettingsActivity"
                   android:icon="@drawable/ic_cut" />
 
