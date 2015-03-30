@@ -663,7 +663,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
      * @return
      */
     private boolean forcePreviewEqualVideo() {
-        if (Build.DEVICE.equals("GT-P5210"))
+        if (Build.MODEL.equals("GT-P5210"))
             return true;
 
         return false;
@@ -676,9 +676,9 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             parameters.setPreviewSize(selectedVideoSettings.width, selectedVideoSettings.height);
         } else {
             if (forcePreviewEqualVideo())
-                parameters.setPreviewSize(selectedVideoSettings.previewWidth, selectedVideoSettings.previewHeight);
-            else
                 parameters.setPreviewSize(selectedVideoSettings.width, selectedVideoSettings.height);
+            else
+                parameters.setPreviewSize(selectedVideoSettings.previewWidth, selectedVideoSettings.previewHeight);
             parameters.set("video-size", "" + selectedVideoSettings.width + "x" + selectedVideoSettings.height);
             parameters.setRecordingHint(true);
         }
