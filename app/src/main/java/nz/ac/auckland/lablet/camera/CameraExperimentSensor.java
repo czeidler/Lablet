@@ -845,16 +845,26 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
     public float getPreviewRatio() {
         // get preview ratio
         int orientation = activity.getResources().getConfiguration().orientation;
+        float width = selectedVideoSettings.previewWidth;
+        float height = selectedVideoSettings.previewHeight;
+        float r = width / height;
+        if (Math.abs(r - 4f/3f) < Math.abs(r - 16f/9f)) {
+            width = 4;
+            height = 3;
+        } else {
+            width = 16;
+            height = 9;
+        }
         float ratio;
         switch (rotation) {
             case Surface.ROTATION_90:
             case Surface.ROTATION_270:
-                ratio = (float)selectedVideoSettings.previewHeight / selectedVideoSettings.previewWidth;
+                ratio = height / width;
                 if (orientation == Configuration.ORIENTATION_LANDSCAPE)
                     ratio = 1.f / ratio;
                 break;
             default:
-                ratio = (float)selectedVideoSettings.previewWidth / selectedVideoSettings.previewHeight;
+                ratio = width / height;
                 if (orientation == Configuration.ORIENTATION_PORTRAIT)
                     ratio = 1.f / ratio;
         }
