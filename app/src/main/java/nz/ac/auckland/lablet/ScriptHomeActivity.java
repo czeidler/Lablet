@@ -446,7 +446,7 @@ public class ScriptHomeActivity extends Activity {
         Collections.sort(scriptList, new Comparator<ScriptMetaData>() {
             @Override
             public int compare(ScriptMetaData metaData, ScriptMetaData metaData2) {
-                return metaData.getLabel().compareTo(metaData2.getLabel());
+                return metaData.getTitle().compareTo(metaData2.getTitle());
             }
         });
 

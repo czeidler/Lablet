@@ -18,7 +18,7 @@ import java.io.FileReader;
 public class ScriptMetaData {
     final public File file;
     private float interfaceVersion;
-    private String label = "";
+    private String title = "";
     private String loadingError = "";
 
     public ScriptMetaData(File file) {
@@ -33,8 +33,8 @@ public class ScriptMetaData {
         this.interfaceVersion = interfaceVersion;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getLoadingError() {
@@ -49,14 +49,14 @@ public class ScriptMetaData {
         return StorageLib.removeExtension(file.getName());
     }
 
-    public String getLabel() {
-        if (!label.equals(""))
-            return label;
+    public String getTitle() {
+        if (!title.equals(""))
+            return title;
         return getScriptFileName();
     }
 
     public String toString() {
-        return getLabel();
+        return getTitle();
     }
 
     public String readRemote() {

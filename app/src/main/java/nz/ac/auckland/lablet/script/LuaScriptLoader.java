@@ -10,7 +10,6 @@ package nz.ac.auckland.lablet.script;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.ast.Str;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
@@ -25,7 +24,7 @@ import java.io.FileInputStream;
 public class LuaScriptLoader {
     final static private String NAMESPACE = "Lablet";
     final static private String INTERFACE_VAR = "interface";
-    final static private String LABEL_VAR = "label";
+    final static private String TITLE_VAR = "title";
     final static private String ENTRY_POINT_METHOD_KEY = "buildActivity";
 
     /**
@@ -147,10 +146,10 @@ public class LuaScriptLoader {
 
             LuaValue labletNamespace = globals.get(NAMESPACE);
             float version = labletNamespace.get(INTERFACE_VAR).tofloat();
-            String label = labletNamespace.get(LABEL_VAR).toString();
+            String title = labletNamespace.get(TITLE_VAR).toString();
             scriptMetaData.setInterfaceVersion(version);
-            if (!label.equals("nil"))
-                scriptMetaData.setLabel(label);
+            if (!title.equals("nil"))
+                scriptMetaData.setTitle(title);
 
         } catch (LuaError e) {
             scriptMetaData.setLoadingError(e.getMessage());

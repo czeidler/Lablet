@@ -9,7 +9,6 @@ package nz.ac.auckland.lablet;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Menu;
@@ -170,7 +169,7 @@ public class ScriptManagerActivity extends Activity {
         Collections.sort(scriptList, new Comparator<ScriptMetaData>() {
             @Override
             public int compare(ScriptMetaData metaData, ScriptMetaData metaData2) {
-                return metaData.getLabel().compareTo(metaData2.getLabel());
+                return metaData.getTitle().compareTo(metaData2.getTitle());
             }
         });
 
@@ -183,7 +182,7 @@ public class ScriptManagerActivity extends Activity {
             }
         };
         for (ScriptMetaData metaData : scriptList) {
-            String label = metaData.getLabel();
+            String label = metaData.getTitle();
             if (isRemote(metaData)) {
                 String remote = metaData.readRemote();
                 if (!remote.equals(""))
