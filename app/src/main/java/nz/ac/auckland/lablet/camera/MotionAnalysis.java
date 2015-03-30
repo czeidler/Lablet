@@ -7,6 +7,7 @@
  */
 package nz.ac.auckland.lablet.camera;
 
+import android.content.res.Configuration;
 import android.graphics.PointF;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
@@ -298,13 +299,13 @@ public class MotionAnalysis implements IDataAnalysis {
 
         switch (rotationString) {
             case "90":
-                videoRotation = 270;
+                videoRotation = 90;
                 break;
             case "180":
                 videoRotation = 180;
                 break;
             case "270":
-                videoRotation = 90;
+                videoRotation = 270;
                 break;
         }
     }
