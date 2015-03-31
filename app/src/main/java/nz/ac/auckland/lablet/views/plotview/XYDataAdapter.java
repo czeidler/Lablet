@@ -111,6 +111,9 @@ public class XYDataAdapter extends AbstractXYDataAdapter {
         if (start > 0)
             start--;
         int end = region.getMax();
+        int size = getSize();
+        if (end >= size)
+            end = size - 1;
 
         XYDataAdapter clone = new XYDataAdapter(start);
 

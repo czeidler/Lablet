@@ -65,6 +65,8 @@ public class XYConcurrentPainter extends ArrayConcurrentPainter {
         AbstractXYDataAdapter adapter = (AbstractXYDataAdapter)payload.getAdapter();
         List<PointF> screenPoints = new ArrayList<>();
         for (int i = range.min; i < range.max + 1; i++) {
+            if (i >= adapter.getSize())
+                break;
             float[] screenPoint = new float[2];
             screenPoint[0] = adapter.getX(i).floatValue();
             screenPoint[1] = adapter.getY(i).floatValue();
