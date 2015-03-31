@@ -1,6 +1,6 @@
 Lablet = {
     interface = 1.0,
-    label = "Demo: Complex Camera Activity"
+    title = "Demo 2: Motion analysis"
 }
 
 
@@ -135,5 +135,4 @@ function Lablet.buildActivity(builder)
 
     projectileMotionQuestions:addHeader("Please export your data:")
     local exportButton = projectileMotionQuestions:addExportButton()
-    exportButton:setMailerClassName("nz.ac.auckland.lablet.mailer", "nz.ac.auckland.lablet.mailer.Mailer");
 end

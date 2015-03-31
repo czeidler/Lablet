@@ -1,6 +1,6 @@
 Lablet = {
     interface = 1.0,
-    label = "Demo: Camera (low frame rate)"
+    title = "Demo 3: Camera (low frame rate recording)"
 }
 
 

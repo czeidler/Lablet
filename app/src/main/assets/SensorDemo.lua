@@ -1,6 +1,6 @@
 Lablet = {
     interface = 1.0,
-    label = "Demo: Microphone Activity"
+    title = "Demo 1: Sensors"
 }
 
 
@@ -14,9 +14,9 @@ function Lablet.buildActivity(builder)
 
 	local experimentAnalysis = builder:create("MotionAnalysis")
 	builder:add(experimentAnalysis)
-	experimentAnalysis:setTitle("Analyze the Video:")
+	experimentAnalysis:setTitle("Analyse the Video:")
 	experimentAnalysis:setExperiment(cameraExperiment)
-	experimentAnalysis:setDescriptionText("Please tag data points from the video:")
+	experimentAnalysis:setDescriptionText("Please tag data points in the video:")
 
 	local recordAudioSheet = builder:create("Sheet")
     builder:add(recordAudioSheet)
@@ -27,7 +27,7 @@ function Lablet.buildActivity(builder)
 
 	local experimentAnalysis = builder:create("FrequencyAnalysis")
     builder:add(experimentAnalysis)
-	experimentAnalysis:setTitle("Analyze the audio recording:")
+	experimentAnalysis:setTitle("Analyse the audio recording:")
 	experimentAnalysis:setExperiment(micExperiment)
 
 	local takeAccelerometerDataSheet = builder:create("Sheet")
@@ -39,6 +39,6 @@ function Lablet.buildActivity(builder)
 
 	local experimentAnalysis = builder:create("AccelerometerAnalysis")
 	builder:add(experimentAnalysis)
-	experimentAnalysis:setTitle("Analyze the accelerometer data:")
+	experimentAnalysis:setTitle("Analyse the accelerometer data:")
 	experimentAnalysis:setExperiment(accelerometerExperiment)
 end
