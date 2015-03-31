@@ -21,5 +21,5 @@
     <item android:id="@+id/action_info"
           android:icon="@drawable/ic_info"
           android:title="@string/action_info"
-          yourapp:showAsAction="ifRoom|withText"/>
+          yourapp:showAsAction="ifRoom"/>
 </menu>
