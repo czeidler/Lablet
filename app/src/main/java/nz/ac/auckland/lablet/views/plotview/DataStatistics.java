@@ -16,7 +16,7 @@ public abstract class DataStatistics {
     protected RectF previousLimits = null;
 
     public interface IListener {
-        public void onLimitsChanged(DataStatistics dataStatistics);
+        void onLimitsChanged(DataStatistics dataStatistics);
     }
 
     public void setListener(IListener listener) {
