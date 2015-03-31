@@ -15,6 +15,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.FileObserver;
 import android.view.*;
@@ -38,31 +39,32 @@ import java.util.List;
 class InfoHelper {
     static private String getAuthorList() {
         String authors = "Authors:\n";
-        authors += "\tClemens Zeidler <czei002@aucklanduni.ac.nz> (2013, 2014)\n";
+        authors += "\tClemens Zeidler <czei002@aucklanduni.ac.nz> (2013 - 2015)\n";
         return authors;
     }
 
     static public AlertDialog createAlertInfoBox(final Activity activity) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("Lablet " + getVersionString(activity));
-        builder.setNeutralButton("leave me alone", new DialogInterface.OnClickListener() {
+        builder.setNeutralButton("Leave me Alone", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
             }
         });
-        builder.setNegativeButton("no thanks", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("No Thanks", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Toast toast = Toast.makeText(activity.getApplicationContext(), "$%#@*!?", Toast.LENGTH_SHORT);
                 toast.show();
             }
         });
-        builder.setPositiveButton("love it", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Like it! (App Store)", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Toast toast = Toast.makeText(activity.getApplicationContext(), "+1", Toast.LENGTH_SHORT);
-                toast.show();
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("market://details?id=nz.ac.auckland.lablet"));
+                activity.startActivity(intent);
             }
         });
         AlertDialog infoAlertBox = builder.create();
