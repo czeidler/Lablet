@@ -359,5 +359,14 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             startRunSettingsActivity(options);
             resumeWithRunSettings = false;
         }
+
+        view.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        view.onPause();
     }
 }

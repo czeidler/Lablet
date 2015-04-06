@@ -10,7 +10,6 @@ package nz.ac.auckland.lablet.camera;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -310,11 +309,18 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+        videoFrameView.onPause();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
-        if (videoFrameView != null)
-            videoFrameView.seekToFrame(0);
+        videoFrameView.onResume();
+        videoFrameView.seekToFrame(0);
     }
 
     @Override

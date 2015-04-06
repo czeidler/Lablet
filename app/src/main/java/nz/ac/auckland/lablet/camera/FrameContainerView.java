@@ -64,6 +64,14 @@ public class FrameContainerView extends RelativeLayout {
         }
     };
 
+    public void onPause() {
+        videoAnalysisView.onPause();
+    }
+
+    public void onResume() {
+        videoAnalysisView.onResume();
+    }
+
     class SeekBarManager {
         boolean open = false;
         long lastOpenRequest = 0;

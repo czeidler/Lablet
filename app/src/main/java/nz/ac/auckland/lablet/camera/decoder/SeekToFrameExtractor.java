@@ -88,7 +88,6 @@ public class SeekToFrameExtractor {
                     extractor.selectTrack(i);
                     decoder = MediaCodec.createDecoderByType(mime);
                     decoder.configure(format, surface, null, 0);
-
                     break;
                 }
             }

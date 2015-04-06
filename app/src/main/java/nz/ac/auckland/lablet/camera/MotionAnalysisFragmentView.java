@@ -408,4 +408,12 @@ class MotionAnalysisFragmentView extends FrameLayout {
             entry.release();
         graphSpinnerEntryList.clear();
     }
+
+    public void onPause() {
+        runContainerView.onPause();
+    }
+
+    public void onResume() {
+        runContainerView.onResume();
+    }
 }
