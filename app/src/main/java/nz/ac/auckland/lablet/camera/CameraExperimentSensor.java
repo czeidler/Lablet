@@ -761,7 +761,8 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         addProfileIfSupported(cameraId, supportedProfiles, CamcorderProfile.QUALITY_1080P);
         addProfileIfSupported(cameraId, supportedProfiles, CamcorderProfile.QUALITY_HIGH);
 
-        List<Camera.Size> videoSizes = camera.getParameters().getSupportedVideoSizes();
+        Camera.Parameters parameters = camera.getParameters();
+        List<Camera.Size> videoSizes = parameters.getSupportedVideoSizes();
         if (videoSizes == null || previewOnly)
             videoSizes = camera.getParameters().getSupportedPreviewSizes();
 
@@ -793,27 +794,34 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             filteredProfiles.add(settings);
         }
 
-        List<Camera.Size> previewSizes = camera.getParameters().getSupportedPreviewSizes();
+        List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
         for (VideoSettings videoSettings : filteredProfiles) {
-            float settingsRatio = (float)videoSettings.width / videoSettings.height;
-            Camera.Size bestMatch = null;
-            double minDiff = Double.MAX_VALUE;
-            for (Camera.Size previewSize : previewSizes) {
-                float ratio = (float)previewSize.width / previewSize.height;
-                if (Math.abs(settingsRatio - ratio) < 0.0001) {
-                    double diff = Math.pow(videoSettings.width - previewSize.width, 2)
-                            + Math.pow(videoSettings.height - previewSize.height, 2);
-                    if (diff < minDiff) {
-                        minDiff = diff;
-                        bestMatch = previewSize;
-                    }
-                }
-            }
+            Camera.Size bestMatch = matchPreviewSize(videoSettings, previewSizes, 0.0001f);
+            if (bestMatch == null)
+                bestMatch = matchPreviewSize(videoSettings, previewSizes, Float.MAX_VALUE);
             videoSettings.previewWidth = bestMatch.width;
             videoSettings.previewHeight = bestMatch.height;
         }
 
         return filteredProfiles;
+    }
+
+    private Camera.Size matchPreviewSize(VideoSettings videoSettings, List<Camera.Size> previewSizes, float ratioTolerance) {
+        float settingsRatio = (float)videoSettings.width / videoSettings.height;
+        Camera.Size bestMatch = null;
+        double minDiff = Double.MAX_VALUE;
+        for (Camera.Size previewSize : previewSizes) {
+            float ratio = (float)previewSize.width / previewSize.height;
+            if (Math.abs(settingsRatio - ratio) < ratioTolerance) {
+                double diff = Math.pow(videoSettings.width - previewSize.width, 2)
+                        + Math.pow(videoSettings.height - previewSize.height, 2);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    bestMatch = previewSize;
+                }
+            }
+        }
+        return bestMatch;
     }
 
     public VideoSettings pickBestVideoSettings(List<VideoSettings> videoSettings) {
@@ -847,6 +855,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         int orientation = activity.getResources().getConfiguration().orientation;
         float width = selectedVideoSettings.previewWidth;
         float height = selectedVideoSettings.previewHeight;
+
         float r = width / height;
         if (Math.abs(r - 4f/3f) < Math.abs(r - 16f/9f)) {
             width = 4;
@@ -855,16 +864,15 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             width = 16;
             height = 9;
         }
-        float ratio;
+
+        float ratio = height / width;
         switch (rotation) {
             case Surface.ROTATION_90:
             case Surface.ROTATION_270:
-                ratio = height / width;
                 if (orientation == Configuration.ORIENTATION_LANDSCAPE)
                     ratio = 1.f / ratio;
                 break;
             default:
-                ratio = width / height;
                 if (orientation == Configuration.ORIENTATION_PORTRAIT)
                     ratio = 1.f / ratio;
         }
