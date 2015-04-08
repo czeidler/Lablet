@@ -13,7 +13,7 @@
     <item android:id="@+id/length_scale"
           android:icon="@drawable/ic_ruler"
           android:title="@string/action_calibration"
-          yourapp:showAsAction="ifRoom|withText"/>
+          yourapp:showAsAction="always|withText"/>
     <item android:id="@+id/action_view"
           android:icon="@drawable/ic_chart_line"
           android:title="@string/action_view"
