@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="wrap_content"
+              android:layout_height="match_parent">
+
+    <view android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          class="nz.ac.auckland.lablet.views.InfoSideBar" android:id="@+id/infoSideBar"
+          android:layout_gravity="bottom"/>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:tools="http://schemas.android.com/tools" android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    tools:context=".AndroidPhysicsTracker">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/newExperimentTopLayout"
+            android:layout_margin="5dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/addImageView" android:src="@drawable/ic_action_add"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Start New Experiment:"
+                android:id="@+id/textView"
+                android:layout_marginLeft="5dp"/>
+        </LinearLayout>
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="151dp"
+            android:id="@+id/newExperiments" android:choiceMode="singleChoice"
+            android:layout_marginLeft="0dp"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/existingExperimentTopLayout"
+            android:layout_margin="5dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/loadImageView" android:src="@drawable/ic_action_load"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Load Experiments:"
+                android:layout_marginLeft="5dp" android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All"
+            android:id="@+id/checkBoxSelectAll"
+            android:layout_marginStart="5dp"/>
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/existingExperimentListView"/>
+    </LinearLayout>
+</LinearLayout>

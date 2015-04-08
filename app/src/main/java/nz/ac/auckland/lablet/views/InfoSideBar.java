@@ -9,8 +9,10 @@ package nz.ac.auckland.lablet.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -40,6 +42,11 @@ public class InfoSideBar extends FrameLayout {
 
         infoTextView = (TextView)view.findViewById(R.id.infoSideBarText);
         assert infoTextView != null;
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(metrics);
+        if (metrics.densityDpi <= DisplayMetrics.DENSITY_XHIGH)
+            infoTextView.setVisibility(GONE);
     }
 
     public void setIcon(int resource) {

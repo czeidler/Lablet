@@ -295,12 +295,10 @@ public class ScriptHomeActivity extends Activity {
         infoSideBar.setBackground(new InfoBarBackgroundDrawable(Color.argb(255, 22, 115, 155)));
 
         // experiment list
-        ListView scriptListView = (ListView)findViewById(R.id.scriptList);
-        assert(scriptListView != null);
-        scriptListView.setBackgroundColor(listBackgroundColor);
         scriptList = new ArrayList<>();
-        scriptListAdaptor = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, scriptList);
+        scriptListAdaptor = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, scriptList);
+        ListView scriptListView = (ListView)findViewById(R.id.scriptList);
+        scriptListView.setBackgroundColor(listBackgroundColor);
         scriptListView.setAdapter(scriptListAdaptor);
         scriptListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
