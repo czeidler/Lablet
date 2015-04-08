@@ -41,13 +41,11 @@ class CameraExperimentView extends AbstractExperimentSensorView {
     private RatioGLSurfaceView preview = null;
     private VideoView videoView = null;
     final private CameraExperimentSensor cameraExperimentSensor;
-    final private Camera camera;
 
     public CameraExperimentView(Context context, CameraExperimentSensor cameraExperimentSensor) {
         super(context);
 
         this.cameraExperimentSensor = cameraExperimentSensor;
-        this.camera = cameraExperimentSensor.getCamera();
 
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.camera_experiment_view, this, false);
@@ -186,12 +184,10 @@ interface IRecorderStrategy {
  */
 class VideoRecorderStrategy implements IRecorderStrategy {
     private VideoRecorder videoRecorder;
-    private Camera camera;
 
     public VideoRecorderStrategy(CameraGLTextureProducer producer, Camera camera) {
         videoRecorder = new VideoRecorder();
         videoRecorder.setCameraSource(producer);
-        this.camera = camera;
     }
 
     @Override
@@ -865,14 +861,16 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
             height = 9;
         }
 
-        float ratio = height / width;
+        float ratio;
         switch (rotation) {
             case Surface.ROTATION_90:
             case Surface.ROTATION_270:
+                ratio = height / width;
                 if (orientation == Configuration.ORIENTATION_LANDSCAPE)
                     ratio = 1.f / ratio;
                 break;
             default:
+                ratio =  width / height;
                 if (orientation == Configuration.ORIENTATION_PORTRAIT)
                     ratio = 1.f / ratio;
         }
