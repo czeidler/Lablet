@@ -42,10 +42,13 @@ public class InfoSideBar extends FrameLayout {
 
         infoTextView = (TextView)view.findViewById(R.id.infoSideBarText);
         assert infoTextView != null;
+    }
 
-        DisplayMetrics metrics = new DisplayMetrics();
-        ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(metrics);
-        if (metrics.densityDpi <= DisplayMetrics.DENSITY_XHIGH)
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
+        if (getLayoutParams().width == LayoutParams.WRAP_CONTENT)
             infoTextView.setVisibility(GONE);
     }
 
