@@ -1,8 +1,13 @@
+/*
+ * Copyright 2014.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
 package nz.ac.auckland.lablet.camera.decoder;
 
-
 import android.opengl.GLSurfaceView;
-import nz.ac.auckland.lablet.camera.recorder.TextureRender;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -40,7 +45,6 @@ public class FrameRenderer implements GLSurfaceView.Renderer {
         outputSurface.awaitNewImage();
         outputSurface.drawImage(true);
 
-        textureRender.render(outputSurface.getTextureRender().getTextureId(), outputSurface.getSurfaceTexture(),
-                videoRotation);
+        textureRender.render(outputSurface.getTextureRender().getTextureId(), videoRotation);
     }
 }

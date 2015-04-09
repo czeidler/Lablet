@@ -88,39 +88,11 @@ public class VideoFrameView extends RatioGLSurfaceView {
         }
     }
 
-    private int rotationToScreen(int rotation, int deviceOrientation, int displayRotation) {
-        if (rotation == 90)
-            rotation = 270;
-        else if (rotation == 270)
-            rotation = 90;
-
-        int shift = 0;
-        if (rotation == 90)
-            shift = -90;
-        if (rotation == 180)
-            shift = 180;
-        if (rotation == 270)
-            shift = 90;
-
-        if (deviceOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            if (displayRotation == Surface.ROTATION_0 || displayRotation == Surface.ROTATION_180)
-                rotation = (rotation + shift) % 360;
-        }
-        if (deviceOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (displayRotation == Surface.ROTATION_90 || displayRotation == Surface.ROTATION_270)
-                rotation = (rotation + shift) % 360;
-        }
-
-        return rotation;
-    }
 
     public void setVideoFilePath(String path, int videoRotation) {
         videoFilePath = path;
 
-        Display display = ((WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        int displayRotation = display.getRotation();
-        int deviceOrientation = getContext().getResources().getConfiguration().orientation;
-        int screenVideoRotation = rotationToScreen(videoRotation, deviceOrientation, displayRotation);
+        int screenVideoRotation = (videoRotation + 180) % 360;
 
         int videoWidth = 1;
         int videoHeight = 1;

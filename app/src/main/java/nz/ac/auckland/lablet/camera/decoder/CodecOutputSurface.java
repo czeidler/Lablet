@@ -44,10 +44,6 @@ public class CodecOutputSurface implements SurfaceTexture.OnFrameAvailableListen
         setup();
     }
 
-    public SurfaceTexture getSurfaceTexture() {
-        return mSurfaceTexture;
-    }
-
     public STextureRender getTextureRender() {
         return mTextureRender;
     }
