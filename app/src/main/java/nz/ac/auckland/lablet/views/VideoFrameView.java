@@ -92,8 +92,6 @@ public class VideoFrameView extends RatioGLSurfaceView {
     public void setVideoFilePath(String path, int videoRotation) {
         videoFilePath = path;
 
-        int screenVideoRotation = (videoRotation + 180) % 360;
-
         int videoWidth = 1;
         int videoHeight = 1;
 
@@ -125,7 +123,12 @@ public class VideoFrameView extends RatioGLSurfaceView {
 
         setRatio(((float)(videoWidth) / videoHeight));
 
-        init(videoWidth, videoHeight, screenVideoRotation);
+        // sanitize video rotation
+        while (videoRotation < 0)
+            videoRotation += 360;
+        videoRotation = videoRotation % 360;
+
+        init(videoWidth, videoHeight, videoRotation);
     }
 
     public void seekToFrame(long positionMicroSeconds) {

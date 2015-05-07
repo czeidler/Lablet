@@ -61,6 +61,8 @@ public class TextureRender {
 
     // model view projection
     private float[] mMVPMatrix = new float[16];
+    // texture
+    private float[] mSTMatrix = new float[16];
 
     private int mProgram;
     private int muMVPMatrixHandle;
@@ -89,12 +91,48 @@ public class TextureRender {
         checkLocation(muSTMatrixHandle, "uSTMatrix");
     }
 
-    public void render(int textureId) {
-        render(textureId, 0);
+    public void render(int textureId, SurfaceTexture st) {
+        render(textureId, st, 0);
     }
 
-    public void render(int textureId, int rotation) {
+    public void render(int textureId, SurfaceTexture st, int rotation) {
         checkGlError("onDrawFrame start");
+        st.getTransformMatrix(mSTMatrix);
+
+        float[] decoderRotationMatrix = new float[16];
+        Matrix.setIdentityM(decoderRotationMatrix, 0);
+        decoderRotationMatrix[0] = Math.signum(mSTMatrix[0]);
+        decoderRotationMatrix[1] = Math.signum(mSTMatrix[1]);
+        decoderRotationMatrix[4] = Math.signum(mSTMatrix[4]);
+        decoderRotationMatrix[5] = Math.signum(mSTMatrix[5]);
+
+        float[] rotationMatrix = new float[16];
+        Matrix.setIdentityM(rotationMatrix, 0);
+        if (rotation == 90) {
+            rotationMatrix[0] = 0;
+            rotationMatrix[1] = 1;
+            rotationMatrix[4] = -1;
+            rotationMatrix[5] = 0;
+        } else if (rotation == 180) {
+            rotationMatrix[0] = -1;
+            rotationMatrix[1] = 0;
+            rotationMatrix[4] = 0;
+            rotationMatrix[5] = -1;
+        } else if (rotation == 270) {
+            rotationMatrix[0] = 0;
+            rotationMatrix[1] = -1;
+            rotationMatrix[4] = 1;
+            rotationMatrix[5] = 0;
+        }
+
+        // for some reason the picture is mirrored...
+        float[] mirrorYMatrix = new float[16];
+        Matrix.setIdentityM(mirrorYMatrix, 0);
+        mirrorYMatrix[5] = -1;
+
+        float[] tmp = new float[16];
+        Matrix.multiplyMM(tmp, 0, rotationMatrix, 0, decoderRotationMatrix, 0);
+        Matrix.multiplyMM(mMVPMatrix, 0, mirrorYMatrix, 0, tmp, 0);
 
         // (optional) clear to green so we can see if we're failing to set pixels
         GLES20.glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
@@ -120,11 +158,8 @@ public class TextureRender {
         GLES20.glEnableVertexAttribArray(maTextureHandle);
         checkGlError("glEnableVertexAttribArray maTextureHandle");
 
-        Matrix.setIdentityM(mMVPMatrix, 0);
-        if (rotation != 0)
-            Matrix.rotateM(mMVPMatrix, 0, rotation, 0f, 0f, 1f);
-
         GLES20.glUniformMatrix4fv(muMVPMatrixHandle, 1, false, mMVPMatrix, 0);
+        GLES20.glUniformMatrix4fv(muSTMatrixHandle, 1, false, mSTMatrix, 0);
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
         checkGlError("glDrawArrays");

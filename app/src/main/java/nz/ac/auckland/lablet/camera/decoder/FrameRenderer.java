@@ -45,6 +45,7 @@ public class FrameRenderer implements GLSurfaceView.Renderer {
         outputSurface.awaitNewImage();
         outputSurface.drawImage(true);
 
-        textureRender.render(outputSurface.getTextureRender().getTextureId(), videoRotation);
+        textureRender.render(outputSurface.getTextureRender().getTextureId(), outputSurface.getSurfaceTexture(),
+                videoRotation);
     }
 }
