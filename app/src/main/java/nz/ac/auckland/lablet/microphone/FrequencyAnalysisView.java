@@ -174,9 +174,8 @@ public class FrequencyAnalysisView extends FrameLayout {
                 update();
 
                 int windowSize = Integer.parseInt(windowSizeList.get(i));
-                float freqResolution = (float) sampleRate / windowSize;
-                freqResEditText.setText(String.format("%.2f", freqResolution));
 
+                updateFrequencyResolutionView(windowSize, sampleRate);
                 updateTimeStepSizeView(windowSize, sampleRate);
             }
 
@@ -303,6 +302,11 @@ public class FrequencyAnalysisView extends FrameLayout {
         paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
         threadStrategyPainter.setOffScreenPaint(paint);
         frequencyView.invalidate();
+    }
+
+    private void updateFrequencyResolutionView(int windowSize, int sampleRate) {
+        float freqResolution = (float) sampleRate / (windowSize - 1);
+        freqResEditText.setText(String.format("%.2f", freqResolution));
     }
 
     private void updateTimeStepSizeView(int windowSize, int sampleRate) {
