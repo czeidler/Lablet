@@ -139,6 +139,9 @@ abstract public class BufferedStrategyPainter extends StrategyPainter {
     @Override
     public void onSizeChanged(int width, int height, int oldw, int oldh) {
         updateBufferRect();
+        if (Float.isNaN(bufferScreenRect.left) || Float.isNaN(bufferScreenRect.top)
+                || Float.isNaN(bufferScreenRect.right) || Float.isNaN(bufferScreenRect.bottom))
+            return;
 
         int bitmapWidth = (int)bufferScreenRect.width();
         int bitmapHeight = (int)bufferScreenRect.height();
