@@ -68,7 +68,11 @@ public class IntegralView extends FrameLayout {
                 (Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.accelerometer_integral, this, true);
 
-        AccelerometerSensorData data = (AccelerometerSensorData)analysis.getAccelerometerData();
+        accelerometerPlotView = (PlotView)view.findViewById(R.id.accelerometerPlotView);
+        velocityPlotView = (PlotView)view.findViewById(R.id.velocityPlotView);
+        distancePlotView = (PlotView)view.findViewById(R.id.distancePlotView);
+
+        AccelerometerSensorData data = analysis.getAccelerometerData();
 
         Spinner spinner = (Spinner)view.findViewById(R.id.spinner);
         spinnerEntryList.add(new SpinnerEntry("x-Acceleration", analysis.getXCalibration(), data.getXValues(), "x",
@@ -93,10 +97,6 @@ public class IntegralView extends FrameLayout {
             }
         });
         spinner.setSelection(3);
-
-        accelerometerPlotView = (PlotView)view.findViewById(R.id.accelerometerPlotView);
-        velocityPlotView = (PlotView)view.findViewById(R.id.velocityPlotView);
-        distancePlotView = (PlotView)view.findViewById(R.id.distancePlotView);
     }
 
     private MarkerDataModel.IListener dataListener = new MarkerDataModel.IListener() {
@@ -132,7 +132,7 @@ public class IntegralView extends FrameLayout {
         if (currentEntry != null)
             currentEntry.calibration.getBaseLineMarker().removeListener(dataListener);
 
-        AccelerometerSensorData data = (AccelerometerSensorData)analysis.getAccelerometerData();
+        AccelerometerSensorData data = analysis.getAccelerometerData();
         currentEntry = spinnerEntryList.get(index);
 
         final AccelerometerAnalysis.Calibration calibration = currentEntry.calibration;
@@ -182,7 +182,7 @@ public class IntegralView extends FrameLayout {
         plotView.getXAxisView().setTitle("time [ms]");
         plotView.getYAxisView().setTitle(yAxisTitle);
 
-        StrategyPainter strategyPainter = new BufferedDirectStrategyPainter();
+        StrategyPainter strategyPainter = new ThreadStrategyPainter();
 
         XYDataAdapter zData = new XYDataAdapter(x, y);
         XYConcurrentPainter painter = new XYConcurrentPainter(zData, getContext());
