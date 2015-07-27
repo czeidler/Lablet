@@ -43,6 +43,9 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     private VideoData videoData;
     private VideoFrameView videoFrameView;
 
+    private boolean isAutoTrackingEnabled = false;
+
+
     private SeekBar seekBar = null;
     private StartEndSeekBar startEndSeekBar = null;
 
@@ -144,6 +147,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
 
         MotionAnalysis motionAnalysis = (MotionAnalysis)experimentAnalysis.getCurrentAnalysis();
         videoData = motionAnalysis.getVideoData();
+        //videoData.getVideoFile()
 
         setContentView(R.layout.motion_analysis_settings);
 
@@ -495,6 +499,12 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     }
 
     public void seekTo(int time) {
+        if(isAutoTrackingEnabled)
+        {
+
+        }
+
+
         videoFrameView.seekToFrame(time * 1000);
     }
 }

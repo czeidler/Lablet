@@ -45,6 +45,7 @@ public class FrameContainerView extends RelativeLayout {
     private FrameDataModel frameDataModel = null;
     private MotionAnalysis motionAnalysis = null;
     private OriginMarkerPainter originMarkerPainter = null;
+    private RectMarkerPainter rectMarkerPainter = null;
 
     private GestureDetector gestureDetector;
     final Handler handler = new Handler();
@@ -345,6 +346,10 @@ public class FrameContainerView extends RelativeLayout {
         MarkerDataModel calibrationMarkers = motionAnalysis.getXYCalibrationMarkers();
         CalibrationMarkerPainter painter = new CalibrationMarkerPainter(calibrationMarkers);
         markerView.addPlotPainter(painter);
+
+        MarkerDataModel rectMarker = motionAnalysis.getRectMarkers();
+        RectMarkerPainter rectMarkerPainter = new RectMarkerPainter(rectMarker);
+        markerView.addPlotPainter(rectMarkerPainter);
 
         // origin markers
         if (motionAnalysis.getShowCoordinateSystem())

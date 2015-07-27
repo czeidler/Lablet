@@ -52,6 +52,7 @@ public class MotionAnalysis implements IDataAnalysis {
     final private CalibratedMarkerDataModel tagMarkers;
     final private MarkerDataModel lengthCalibrationMarkers;
     final private MarkerDataModel originMarkers;
+    final private MarkerDataModel rectMarkers;
 
     final private LengthCalibrationSetter lengthCalibrationSetter;
     final private OriginCalibrationSetter originCalibrationSetter;
@@ -92,6 +93,19 @@ public class MotionAnalysis implements IDataAnalysis {
 
         float maxXValue = sensorData.getMaxRawX();
         float maxYValue = sensorData.getMaxRawY();
+
+        //Rect marker data
+        MarkerData topLeft = new MarkerData(-1);
+        MarkerData btmRight = new MarkerData(-2);
+        float length = 10;
+        float half = length / 2;
+        topLeft.setPosition(new PointF(maxXValue * 0.1f, maxYValue * 0.9f));
+        btmRight.setPosition(new PointF(maxXValue * 0.9f, maxYValue * 0.1f));
+
+        rectMarkers = new MarkerDataModel();
+        rectMarkers.addMarkerData(topLeft);
+        rectMarkers.addMarkerData(btmRight);
+
         lengthCalibrationMarkers = new MarkerDataModel();
         MarkerData point1 = new MarkerData(-1);
         point1.setPosition(new PointF(maxXValue * 0.1f, maxYValue * 0.9f));
@@ -117,6 +131,8 @@ public class MotionAnalysis implements IDataAnalysis {
         point3.setPosition(origin);
         originMarkers.addMarkerData(point3);
         originCalibrationSetter = new OriginCalibrationSetter(calibrationXY, originMarkers);
+
+
 
         updateOriginFromVideoRotation();
     }
@@ -159,6 +175,7 @@ public class MotionAnalysis implements IDataAnalysis {
         return tagMarkers;
     }
     public MarkerDataModel getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
+    public MarkerDataModel getRectMarkers() {return rectMarkers;}
     public MarkerDataModel getOriginMarkers(){
         return originMarkers;
     }

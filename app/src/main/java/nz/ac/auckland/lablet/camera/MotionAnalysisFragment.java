@@ -26,6 +26,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 
     private boolean resumeWithRunSettings = false;
     private boolean resumeWithRunSettingsHelp = false;
+    private boolean isTrackingChecked = false;
 
     public MotionAnalysisFragment() {
         super();
@@ -107,7 +108,36 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             }
         });
 
+        final MenuItem trackMenu = menu.findItem(R.id.action_track);
+        assert trackMenu != null;
+
+        trackMenu.setChecked(isTrackingChecked);
+        trackMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                isTrackingChecked = !menuItem.isChecked();
+                menuItem.setChecked(isTrackingChecked);
+                if(isTrackingChecked)
+                {
+                    menuItem.setIcon(R.drawable.ic_eye_green);
+                }
+                else
+                {
+                    menuItem.setIcon(R.drawable.ic_eye);
+                }
+
+                return true;
+            }
+        });
+
         setupStandardMenu(menu, inflater);
+    }
+
+    /*
+        Initializes the OpenCV based object tracker
+     */
+    private void initializeObjectTracker() {
+        //Do something here
     }
 
     private void showLengthScaleDialog() {
