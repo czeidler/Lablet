@@ -6,7 +6,7 @@
     <item android:id="@+id/action_track"
         android:icon="@drawable/ic_eye"
         android:checkable="true"
-        android:title="Auto Tracking"
+        android:title="Set Object"
         yourapp:showAsAction="always|withText"/>
     <item android:id="@+id/action_delete"
           android:icon="@drawable/ic_delete_marker"

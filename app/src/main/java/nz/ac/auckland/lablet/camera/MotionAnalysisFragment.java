@@ -115,29 +115,26 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         trackMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                isTrackingChecked = !menuItem.isChecked();
-                menuItem.setChecked(isTrackingChecked);
-                if(isTrackingChecked)
-                {
-                    menuItem.setIcon(R.drawable.ic_eye_green);
-                }
-                else
-                {
-                    menuItem.setIcon(R.drawable.ic_eye);
-                }
+                MotionAnalysis motionAnalysis = getSensorAnalysis();
+                view.setRegionOfInterest(motionAnalysis);
+
+//                isTrackingChecked = !menuItem.isChecked();
+//                menuItem.setChecked(isTrackingChecked);
+//                if(isTrackingChecked)
+//                {
+//                    //menuItem.setIcon(R.drawable.ic_eye_green);
+//
+//                }
+//                else
+//                {
+//                    //menuItem.setIcon(R.drawable.ic_eye);
+//                }
 
                 return true;
             }
         });
 
         setupStandardMenu(menu, inflater);
-    }
-
-    /*
-        Initializes the OpenCV based object tracker
-     */
-    private void initializeObjectTracker() {
-        //Do something here
     }
 
     private void showLengthScaleDialog() {

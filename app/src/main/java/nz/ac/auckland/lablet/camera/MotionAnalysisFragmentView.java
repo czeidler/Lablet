@@ -12,10 +12,27 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.graphics.PointF;
+import android.util.Log;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
+
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
+import org.opencv.core.Mat;
+import org.opencv.core.Rect;
+import org.opencv.core.RotatedRect;
+import org.opencv.core.Size;
+
 import nz.ac.auckland.lablet.R;
+//import nz.ac.auckland.lablet.accelerometer.AccelerometerSensorData;
+import nz.ac.auckland.lablet.experiment.FrameDataModel;
+import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.misc.WeakListenable;
@@ -23,7 +40,10 @@ import nz.ac.auckland.lablet.views.FrameDataSeekBar;
 import nz.ac.auckland.lablet.views.graph.*;
 import nz.ac.auckland.lablet.views.plotview.LinearFitPainter;
 import nz.ac.auckland.lablet.views.table.*;
+import nz.ac.auckland.lablet.vision_algorithms.CamShiftTracker;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,6 +149,9 @@ class MotionAnalysisFragmentView extends FrameLayout {
     final private FrameDataSeekBar frameDataSeekBar;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
     private boolean releaseAdaptersWhenDrawerClosed = false;
+    final private FrameDataModel.IListener dataListenerStrongRef;
+    private CamShiftTracker tracker;// = new CamShiftTracker();
+    private int previousFrame = -1;
 
     private class GraphSpinnerEntry {
         private String name;
@@ -299,6 +322,52 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
         final CameraExperimentFrameView sensorAnalysisView = new CameraExperimentFrameView(context, sensorAnalysis);
         frameDataSeekBar.setTo(sensorAnalysis.getFrameDataModel(), sensorAnalysis.getTimeData());
+        tracker = new CamShiftTracker();
+
+        dataListenerStrongRef = new FrameDataModel.IListener() {
+
+            @Override
+            public void onFrameChanged(int newFrame) {
+                if(tracker.isROISet())
+                {
+                    long startFrameTime = (long)sensorAnalysis.getTimeData().getTimeAt(newFrame-1) * 1000;
+                    long endFrameTime = (long)sensorAnalysis.getTimeData().getTimeAt(newFrame) * 1000;
+
+                    RotatedRect result = new RotatedRect();
+                    int frameRate = sensorAnalysis.getVideoData().getVideoFrameRate();
+                    long increment = 1000*1000/30;
+
+                    for(long i = startFrameTime; i <= endFrameTime; i+=increment) {
+                        Bitmap bmp = sensorAnalysis.getVideoData().getVideoFrame(i);
+                        //saveFrame(bmp);
+                        result = tracker.findObject(bmp);
+                    }
+
+                    int currentMarker = sensorAnalysis.getTagMarkers().getSelectedMarkerData();
+                    PointF newPos = sensorAnalysis.getVideoData().videoToMarkerPos(new Point((int)result.center.x, (int)result.center.y));
+                    sensorAnalysis.getTagMarkers().setMarkerPosition(newPos, currentMarker);
+
+                    //Set marker position in new window. TODO: hacky for now as doesn't take rotation into account
+                    //MarkerData topLeft = sensorAnalysis.getRectMarkers() .getRectMarkers().getMarkerDataAt(1);
+                    //MarkerData btmRight = sensorAnalysis.getRectMarkers().getMarkerDataAt(0);
+
+                    //int width = (int)result.size.width;
+                    //int height = (int)result.size.height;
+                    //int x = (int)result.center.x - width/2;
+                    //int y = (int)result.center.y - height/2;
+
+                    //topLeft.setPosition();
+                    //btmRight.setPosition(sensorAnalysis.getVideoData().videoToMarkerPos(new Point(result.width, result.height)));
+                }
+            }
+
+            @Override
+            public void onNumberOfFramesChanged() {
+
+            }
+        };
+
+        sensorAnalysis.getFrameDataModel().addListener(dataListenerStrongRef);
 
         runContainerView.setTo(sensorAnalysisView, frameDataSeekBar, sensorAnalysis);
 
@@ -361,6 +430,47 @@ class MotionAnalysisFragmentView extends FrameLayout {
         }
     }
 
+    public void setRegionOfInterest(MotionAnalysis sensorAnalysis)
+    {
+        int currentFrame = sensorAnalysis.getFrameDataModel().getCurrentFrame();
+        float startFrameTime =  sensorAnalysis.getTimeData().getTimeAt(currentFrame);
+        Bitmap bmp = sensorAnalysis.getVideoData().getVideoFrame((long) (startFrameTime * 1000.0));
+        //this.saveFrame(bmp);
+
+        PointF tLeftM = sensorAnalysis.getRectMarkers().getMarkerDataAt(1).getPosition();
+        PointF bRightM = sensorAnalysis.getRectMarkers().getMarkerDataAt(0).getPosition();
+
+        Point topLeft = sensorAnalysis.getVideoData().markerToVideoPos(tLeftM);
+        Point btmRight = sensorAnalysis.getVideoData().markerToVideoPos(bRightM);
+
+        int x = topLeft.x;
+        int y = topLeft.y;
+        int width = btmRight.x - topLeft.x;
+        int height = btmRight.y - topLeft.y;
+
+        tracker.setROI(bmp, x, y, width, height);
+    }
+
+    public void saveFrame(Bitmap bmp)
+    {
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream("/sdcard/screen.png");
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+            // PNG is a lossless format, the compression factor (100) is ignored
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     /**
      *
      * @return an icon id for the new state
@@ -416,4 +526,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
     public void onResume() {
         runContainerView.onResume();
     }
+
+
+
 }
