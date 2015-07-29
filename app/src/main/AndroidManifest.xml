@@ -15,7 +15,7 @@
     <uses-feature android:name="android.hardware.microphone"/>
 
     <supports-screens android:smallScreens="false"
-                      android:normalScreens="false"
+                      android:normalScreens="true"
                       android:largeScreens="true"
                       android:xlargeScreens="true"
                       android:requiresSmallestWidthDp="320"/>
