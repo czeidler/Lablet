@@ -18,7 +18,7 @@ import java.io.IOException;
 
 
 /**
- * Holds all important data for the camera experiment.
+ * Holds all important data from a camera experiment.
  */
 public class VideoData extends AbstractSensorData {
     private String videoFileName;
@@ -39,7 +39,7 @@ public class VideoData extends AbstractSensorData {
 
     @Override
     public String getDataType() {
-        return "Video";
+        return DATA_TYPE;
     }
 
     public VideoData() {
