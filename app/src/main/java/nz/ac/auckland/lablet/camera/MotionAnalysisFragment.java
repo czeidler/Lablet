@@ -26,7 +26,8 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 
     private boolean resumeWithRunSettings = false;
     private boolean resumeWithRunSettingsHelp = false;
-    private boolean isTrackingChecked = false;
+    private boolean isObjectSet = false;
+    private int roiFrame;
 
     public MotionAnalysisFragment() {
         super();
@@ -108,28 +109,32 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             }
         });
 
-        final MenuItem trackMenu = menu.findItem(R.id.action_track);
-        assert trackMenu != null;
+        final MenuItem setObjectMenu = menu.findItem(R.id.action_set_object);
+        assert setObjectMenu != null;
 
-        trackMenu.setChecked(isTrackingChecked);
-        trackMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        final MenuItem gotoObjectMenu = menu.findItem(R.id.action_goto_object);
+        assert gotoObjectMenu != null;
+        gotoObjectMenu.setVisible(isObjectSet);
+
+        setObjectMenu.setChecked(isObjectSet);
+        setObjectMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 MotionAnalysis motionAnalysis = getSensorAnalysis();
                 view.setRegionOfInterest(motionAnalysis);
+                roiFrame = motionAnalysis.getFrameDataModel().getCurrentFrame();
+                isObjectSet = true;
+                gotoObjectMenu.setVisible(isObjectSet); //When ROI set, show button to track object. TODO: when load video, if ROI set then show button
+                return true;
+            }
+        });
 
-//                isTrackingChecked = !menuItem.isChecked();
-//                menuItem.setChecked(isTrackingChecked);
-//                if(isTrackingChecked)
-//                {
-//                    //menuItem.setIcon(R.drawable.ic_eye_green);
-//
-//                }
-//                else
-//                {
-//                    //menuItem.setIcon(R.drawable.ic_eye);
-//                }
-
+        gotoObjectMenu.setChecked(isObjectSet);
+        gotoObjectMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                MotionAnalysis motionAnalysis = getSensorAnalysis();
+                motionAnalysis.getFrameDataModel().setCurrentFrame(roiFrame); //Goto set object frame;
                 return true;
             }
         });

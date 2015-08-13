@@ -10,6 +10,7 @@ package nz.ac.auckland.lablet.experiment;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.List;
 
 
@@ -24,6 +25,26 @@ public class FrameDataModel extends WeakListenable<FrameDataModel.IListener>{
 
     private int currentFrame;
     private int numberOfFrames;
+    private Dictionary<Integer, Boolean> frames;
+
+    public void setObjectPicked(int frame, boolean isObjectPicked)
+    {
+        this.frames.put(frame, isObjectPicked);
+    }
+
+    public Boolean isObjectPicked(int frame)
+    {
+        Boolean isPicked = this.frames.get(frame);
+
+        if(isPicked == null)
+        {
+            return false;
+        }
+        else
+        {
+            return isPicked;
+        }
+    }
 
     public int getCurrentFrame() {
         return currentFrame;

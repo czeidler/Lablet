@@ -328,14 +328,14 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
             @Override
             public void onFrameChanged(int newFrame) {
-                if(tracker.isROISet())
+                if(tracker.isROISet() && !sensorAnalysis.getFrameDataModel().isObjectPicked(newFrame))
                 {
                     long startFrameTime = (long)sensorAnalysis.getTimeData().getTimeAt(newFrame-1) * 1000;
                     long endFrameTime = (long)sensorAnalysis.getTimeData().getTimeAt(newFrame) * 1000;
 
                     RotatedRect result = new RotatedRect();
                     int frameRate = sensorAnalysis.getVideoData().getVideoFrameRate();
-                    long increment = 1000*1000/30;
+                    long increment = 1000*1000/frameRate;
 
                     for(long i = startFrameTime; i <= endFrameTime; i+=increment) {
                         Bitmap bmp = sensorAnalysis.getVideoData().getVideoFrame(i);
@@ -343,9 +343,11 @@ class MotionAnalysisFragmentView extends FrameLayout {
                         result = tracker.findObject(bmp);
                     }
 
+                    sensorAnalysis.getFrameDataModel().setObjectPicked(newFrame, true);
                     int currentMarker = sensorAnalysis.getTagMarkers().getSelectedMarkerData();
-                    PointF newPos = sensorAnalysis.getVideoData().videoToMarkerPos(new Point((int)result.center.x, (int)result.center.y));
+                    PointF newPos = sensorAnalysis.getVideoData().videoToMarkerPos(new Point((int)result.center.x, (int) result.center.y));
                     sensorAnalysis.getTagMarkers().setMarkerPosition(newPos, currentMarker);
+
 
                     //Set marker position in new window. TODO: hacky for now as doesn't take rotation into account
                     //MarkerData topLeft = sensorAnalysis.getRectMarkers() .getRectMarkers().getMarkerDataAt(1);
@@ -449,6 +451,12 @@ class MotionAnalysisFragmentView extends FrameLayout {
         int height = btmRight.y - topLeft.y;
 
         tracker.setROI(bmp, x, y, width, height);
+
+        //TODO: set this marker to middle of rectangle
+        //sensorAnalysis.getFrameDataModel().setObjectPicked(newFrame, true);
+        int currentMarker = sensorAnalysis.getTagMarkers().getSelectedMarkerData();
+        PointF newPos = sensorAnalysis.getVideoData().videoToMarkerPos(new Point((int)result.center.x, (int) result.center.y));
+        sensorAnalysis.getTagMarkers().setMarkerPosition(newPos, currentMarker);
     }
 
     public void saveFrame(Bitmap bmp)
