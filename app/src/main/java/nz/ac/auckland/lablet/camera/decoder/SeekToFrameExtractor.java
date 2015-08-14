@@ -27,12 +27,14 @@ import java.util.concurrent.Semaphore;
  */
 public class SeekToFrameExtractor {
     public interface IListener {
+        /**
+         * Is called from the extractor thread.
+         */
         void onFrameExtracted();
     }
 
     private SeekToThread seekToThread;
     private final Semaphore threadReadySemaphore = new Semaphore(0);
-    private Handler listenerHandler;
     private IListener listener = null;
 
     public SeekToFrameExtractor(File mediaFile, Surface surface) throws IOException {
@@ -48,7 +50,6 @@ public class SeekToFrameExtractor {
 
     public void setListener(IListener listener) {
         this.listener = listener;
-        listenerHandler = new Handler();
     }
 
     public void release() {
@@ -179,14 +180,8 @@ public class SeekToFrameExtractor {
                         decoder.releaseOutputBuffer(outIndex, render);
                         if (render) {
                             decoder.flush();
-                            if (listener != null) {
-                                listenerHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        listener.onFrameExtracted();
-                                    }
-                                });
-                            }
+                            if (listener != null)
+                                listener.onFrameExtracted();
                         }
                         break;
                 }

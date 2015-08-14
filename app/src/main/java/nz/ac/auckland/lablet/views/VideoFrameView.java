@@ -8,15 +8,12 @@
 package nz.ac.auckland.lablet.views;
 
 import android.content.Context;
-import android.content.res.Configuration;
+import android.graphics.SurfaceTexture;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.opengl.GLSurfaceView;
+import android.os.Handler;
 import android.util.AttributeSet;
-import android.view.Display;
-import android.view.Surface;
-import android.view.WindowManager;
-import nz.ac.auckland.lablet.camera.decoder.CodecOutputSurface;
 import nz.ac.auckland.lablet.camera.decoder.FrameRenderer;
 import nz.ac.auckland.lablet.camera.decoder.SeekToFrameExtractor;
 
@@ -32,8 +29,9 @@ import java.io.IOException;
  * </p>
  */
 public class VideoFrameView extends RatioGLSurfaceView {
+    protected long targetSeekPosition = -1;
     protected SeekToFrameExtractor seekToFrameExtractor;
-    private CodecOutputSurface outputSurface;
+    protected FrameRenderer frameRenderer;
 
     protected String videoFilePath = "";
 
@@ -45,18 +43,20 @@ public class VideoFrameView extends RatioGLSurfaceView {
         super(context);
     }
 
-    private void init(int width, int height, int videoRotation) {
+    private void init(int videoRotation) {
         setWillNotDraw(false);
         setEGLContextClientVersion(2);
         setPreserveEGLContextOnPause(true);
 
-        outputSurface = new CodecOutputSurface(width, height);
-
-        FrameRenderer frameRenderer = new FrameRenderer(outputSurface, videoRotation);
+        frameRenderer = new FrameRenderer(videoRotation, new Runnable() {
+            @Override
+            public void run() {
+                pauseStartSeekToFrameExtractor();
+                startSeekToFrameExtractor();
+            }
+        });
         setRenderer(frameRenderer);
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-
-        startSeekToFrameExtractor();
     }
 
     @Override
@@ -64,7 +64,6 @@ public class VideoFrameView extends RatioGLSurfaceView {
         super.onDetachedFromWindow();
 
         pauseStartSeekToFrameExtractor();
-        outputSurface.release();
     }
 
     private void pauseStartSeekToFrameExtractor() {
@@ -76,18 +75,20 @@ public class VideoFrameView extends RatioGLSurfaceView {
     private void startSeekToFrameExtractor() {
         File videoFile = new File(videoFilePath);
         try {
-            seekToFrameExtractor = new SeekToFrameExtractor(videoFile, outputSurface.getSurface());
-            seekToFrameExtractor.setListener(new SeekToFrameExtractor.IListener() {
+            seekToFrameExtractor = new SeekToFrameExtractor(videoFile, frameRenderer.getSurface());
+            frameRenderer.getSurfaceTexture().setOnFrameAvailableListener(
+                    new SurfaceTexture.OnFrameAvailableListener() {
                 @Override
-                public void onFrameExtracted() {
+                public void onFrameAvailable(SurfaceTexture surfaceTexture) {
                     requestRender();
                 }
             });
+            if (targetSeekPosition >= 0)
+                seekToFrame(targetSeekPosition);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 
     public void setVideoFilePath(String path, int videoRotation) {
         videoFilePath = path;
@@ -128,19 +129,14 @@ public class VideoFrameView extends RatioGLSurfaceView {
             videoRotation += 360;
         videoRotation = videoRotation % 360;
 
-        init(videoWidth, videoHeight, videoRotation);
+        init(videoRotation);
     }
 
     public void seekToFrame(long positionMicroSeconds) {
+        targetSeekPosition = positionMicroSeconds;
         if (seekToFrameExtractor == null)
-            startSeekToFrameExtractor();
+            return;
+
         seekToFrameExtractor.seekToFrame(positionMicroSeconds);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        pauseStartSeekToFrameExtractor();
     }
 }
