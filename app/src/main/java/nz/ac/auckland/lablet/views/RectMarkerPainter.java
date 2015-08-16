@@ -4,6 +4,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+
+import nz.ac.auckland.lablet.camera.VideoData;
+import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
@@ -23,15 +26,22 @@ class RectMarker extends SimpleMarker {
         if (isSelectedForDrag())
             super.onDraw(canvas, priority);
     }
-}
 
-/**
- * Draws a rectangle used for a region of interest.
- * <p>
- * The painter expect a {@link MarkerDataModel} with two data points; top left corner
- * and bottom right corner of the rectangle.
- * </p>
- */
+    /**
+     * Dragging a origin marker needs special treatment since it also affects the other two markers in the coordinate
+     * system.
+     * <p>
+     * Call the painter class that then updates all the markers.
+     * </p>
+     *
+     * @param point the new position the marker was dragged to
+     */
+    @Override
+    protected void onDraggedTo(PointF point) {
+        RectMarkerPainter rectMarkerPainter = (RectMarkerPainter)parent;
+        rectMarkerPainter.onDraggedTo(this, point);
+    }
+}
 public class RectMarkerPainter extends AbstractMarkerPainter {
     // device independent sizes:
     private final int FONT_SIZE_DP = 20;
@@ -42,6 +52,13 @@ public class RectMarkerPainter extends AbstractMarkerPainter {
     private int FONT_SIZE;
     private float LINE_WIDTH;
     private float WING_LENGTH;
+    private boolean isVisible = true;
+
+    public static final int TOP_LEFT = 3;
+    public static final int TOP_RIGHT = 2;
+    public static final int BTM_LEFT = 1;
+    public static final int BTM_RIGHT = 0;
+
 
     public RectMarkerPainter(MarkerDataModel model) {
         super(model);
@@ -68,24 +85,94 @@ public class RectMarkerPainter extends AbstractMarkerPainter {
         return ((DraggableMarker)markerList.get(markerIndex)).getCachedScreenPosition();
     }
 
+    protected void onDraggedTo(DraggableMarker marker, PointF newPosition)
+    {
+        int index = markerList.indexOf(marker);
+        MarkerDataModel model  = this.getMarkerModel();
+
+        PointF newPositionReal = new PointF();
+        containerView.fromScreen(newPosition, newPositionReal);
+
+        switch (index) {
+            case TOP_LEFT:
+                PointF btmRightScreen = getCurrentScreenPos(BTM_RIGHT);
+                PointF btmRightReal = new PointF();
+                containerView.fromScreen(btmRightScreen, btmRightReal);
+
+                model.getMarkerDataAt(TOP_RIGHT).setPosition(new PointF(btmRightReal.x, newPositionReal.y));
+                model.getMarkerDataAt(BTM_LEFT).setPosition(new PointF(newPositionReal.x, btmRightReal.y));
+                break;
+
+            case TOP_RIGHT:
+                PointF btmLeftScreen = getCurrentScreenPos(BTM_LEFT);
+                PointF btmLeftReal = new PointF();
+                containerView.fromScreen(btmLeftScreen, btmLeftReal);
+
+                model.getMarkerDataAt(TOP_LEFT).setPosition(new PointF(btmLeftReal.x, newPositionReal.y));
+                model.getMarkerDataAt(BTM_RIGHT).setPosition(new PointF(newPositionReal.x, btmLeftReal.y));
+                break;
+
+            case BTM_LEFT:
+                PointF topRightScreen = getCurrentScreenPos(TOP_RIGHT);
+                PointF topRightReal = new PointF();
+                containerView.fromScreen(topRightScreen, topRightReal);
+
+                model.getMarkerDataAt(TOP_LEFT).setPosition(new PointF(newPositionReal.x, topRightReal.y));
+                model.getMarkerDataAt(BTM_RIGHT).setPosition(new PointF(topRightReal.x, newPositionReal.y));
+                break;
+
+            case BTM_RIGHT:
+                PointF topLeftScreen = getCurrentScreenPos(TOP_LEFT);
+                PointF topLeftReal = new PointF();
+                containerView.fromScreen(topLeftScreen, topLeftReal);
+                model.getMarkerDataAt(TOP_RIGHT).setPosition(new PointF(newPositionReal.x, topLeftReal.y));
+                model.getMarkerDataAt(BTM_LEFT).setPosition(new PointF(topLeftReal.x, newPositionReal.y));
+                break;
+        }
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
 
-        // Rectangle corner points
-        PointF btmRight = getCurrentScreenPos(0);
-        PointF topLeft = getCurrentScreenPos(1);
+        if(this.getMarkerModel().isVisible())
+        {
+            for (IMarker marker : markerList)
+                marker.onDraw(canvas, 1);
 
-        // Line settings
-        Paint paint = new Paint();
-        paint.setStrokeCap(Paint.Cap.BUTT);
-        paint.setStrokeWidth(LINE_WIDTH);
-        paint.setAntiAlias(true);
-        paint.setColor(Color.GREEN);
-        paint.setStyle(Paint.Style.STROKE);
+            float left;
+            float top;
+            float right;
+            float bottom;
 
-        canvas.drawRect(topLeft.x, topLeft.y, btmRight.x, btmRight.y, paint); //See android.Graphics.Rect constructor for meaning of params
-       // canvas.drawRect(10, 10, 100, 100, paint);
-        //for (IMarker marker : markerList)
-         //   marker.onDraw(canvas, 1);
+            if(markerList.get(BTM_LEFT).isSelectedForDrag() || markerList.get(TOP_RIGHT).isSelectedForDrag())
+            {
+                PointF topRight = getCurrentScreenPos(TOP_RIGHT);
+                PointF btmLeft = getCurrentScreenPos(BTM_LEFT);
+                left = btmLeft.x;
+                top = topRight.y;
+                right = topRight.x;
+                bottom = btmLeft.y;
+            }
+            else
+            {
+                PointF topLeft = getCurrentScreenPos(TOP_LEFT);
+                PointF btmRight = getCurrentScreenPos(BTM_RIGHT);
+                left = topLeft.x;
+                top = topLeft.y;
+                right = btmRight.x;
+                bottom = btmRight.y;
+            }
+
+            // Line settings
+            Paint paint = new Paint();
+            paint.setStrokeCap(Paint.Cap.BUTT);
+            paint.setStrokeWidth(LINE_WIDTH);
+            paint.setAntiAlias(true);
+            paint.setColor(Color.GREEN);
+            paint.setStyle(Paint.Style.STROKE);
+
+            canvas.drawRect(left, top, right, bottom, paint); //See android.Graphics.Rect constructor for meaning of params
+
+        }
     }
 }

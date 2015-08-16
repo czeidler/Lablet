@@ -26,8 +26,6 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 
     private boolean resumeWithRunSettings = false;
     private boolean resumeWithRunSettingsHelp = false;
-    private boolean isObjectSet = false;
-    private int roiFrame;
 
     public MotionAnalysisFragment() {
         super();
@@ -109,32 +107,52 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             }
         });
 
+        final MenuItem trackObjectMenu = menu.findItem(R.id.action_track_object);
+        assert trackObjectMenu != null;
+
         final MenuItem setObjectMenu = menu.findItem(R.id.action_set_object);
         assert setObjectMenu != null;
 
         final MenuItem gotoObjectMenu = menu.findItem(R.id.action_goto_object);
         assert gotoObjectMenu != null;
-        gotoObjectMenu.setVisible(isObjectSet);
 
-        setObjectMenu.setChecked(isObjectSet);
+        boolean rectMarkersVisible = getSensorAnalysis().getRectMarkers().isVisible();
+
+
+
+        Integer roiFrame = getSensorAnalysis().getFrameDataModel().getROIFrame();
+        gotoObjectMenu.setVisible(roiFrame != null);
+        setObjectMenu.setVisible(!(rectMarkersVisible || roiFrame !=null));
+        trackObjectMenu.setVisible(!(rectMarkersVisible || roiFrame !=null));
+        //trackObjectMenu.setVisible(!rectMarkersVisible || roiFrame !=null);
+
+        trackObjectMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                MotionAnalysis motionAnalysis = getSensorAnalysis();
+                motionAnalysis.getRectMarkers().setVisibility(true);
+                trackObjectMenu.setVisible(false);
+                setObjectMenu.setVisible(true);
+                return true;
+            }
+        });
+
         setObjectMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 MotionAnalysis motionAnalysis = getSensorAnalysis();
                 view.setRegionOfInterest(motionAnalysis);
-                roiFrame = motionAnalysis.getFrameDataModel().getCurrentFrame();
-                isObjectSet = true;
-                gotoObjectMenu.setVisible(isObjectSet); //When ROI set, show button to track object. TODO: when load video, if ROI set then show button
+                gotoObjectMenu.setVisible(true); //When ROI set, show button to track object. TODO: when load video, if ROI set then show button
                 return true;
             }
         });
 
-        gotoObjectMenu.setChecked(isObjectSet);
         gotoObjectMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 MotionAnalysis motionAnalysis = getSensorAnalysis();
-                motionAnalysis.getFrameDataModel().setCurrentFrame(roiFrame); //Goto set object frame;
+                view.showRegionOfInterest(motionAnalysis);
+                setObjectMenu.setVisible(true);
                 return true;
             }
         });

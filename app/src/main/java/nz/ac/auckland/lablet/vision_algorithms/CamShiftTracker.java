@@ -18,6 +18,7 @@ import org.opencv.video.Video;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Jamie on 27/07/2015.
@@ -39,6 +40,7 @@ public class CamShiftTracker {
     private Mat roiHist;
     private Rect roiWindow;
     private TermCriteria termCriteria;
+    private HashMap<Integer, RotatedRect> rotatedRectangles = new HashMap<Integer, RotatedRect>();
 
     public CamShiftTracker() {
         roiHist = new Mat();
@@ -114,7 +116,7 @@ public class CamShiftTracker {
      * will be thrown.
      */
 
-    public RotatedRect findObject(Bitmap bmp)
+    public boolean findObject(int frameNum, Bitmap bmp)
     {
         if(roiWindow != null) {
             //Get current Mat frame and convert to HSV colour space
@@ -128,13 +130,25 @@ public class CamShiftTracker {
             Mat output = new Mat();
             Imgproc.calcBackProject(images, new MatOfInt(0), roiHist, output, new MatOfFloat(0, 180), 1);
 
-            //Camshift
-            return Video.CamShift(output, roiWindow, termCriteria);
+            RotatedRect result = Video.CamShift(output, roiWindow, termCriteria); //Camshift todo:  check if back project was successful
+            this.rotatedRectangles.put(frameNum, result);
+
+            return true;
         }
         else
         {
             throw new IllegalStateException("CamShiftTracker: Please set a region of interest with the setROI method");
         }
+    }
+
+    /**
+     *
+     * @return RotatedRect. Returns null if no object found.
+     */
+
+    public RotatedRect getRotatedRect(int frameNum)
+    {
+        return this.rotatedRectangles.get(frameNum);
     }
 
 }

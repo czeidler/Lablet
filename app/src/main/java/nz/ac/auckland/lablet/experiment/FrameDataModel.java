@@ -11,6 +11,8 @@ import nz.ac.auckland.lablet.misc.WeakListenable;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -25,7 +27,18 @@ public class FrameDataModel extends WeakListenable<FrameDataModel.IListener>{
 
     private int currentFrame;
     private int numberOfFrames;
-    private Dictionary<Integer, Boolean> frames;
+    private Integer roiFrame = null;
+    private HashMap<Integer, Boolean> frames = new HashMap<Integer, Boolean>();
+
+    public Integer getROIFrame()
+    {
+        return this.roiFrame;
+    }
+
+    public void setROIFrame(int roiFrame)
+    {
+        this.roiFrame = roiFrame;
+    }
 
     public void setObjectPicked(int frame, boolean isObjectPicked)
     {

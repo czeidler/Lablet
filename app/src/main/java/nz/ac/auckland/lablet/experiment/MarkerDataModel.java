@@ -28,6 +28,7 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
 
     final protected List<MarkerData> markerDataList = new ArrayList<>();
     private int selectedDataIndex = -1;
+    private boolean visibility = true;
 
     public void setMarkerDataList(List<MarkerData> markerDataList) {
         this.markerDataList.clear();
@@ -51,6 +52,16 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
 
     public int getSelectedMarkerData() {
         return selectedDataIndex;
+    }
+
+    public void setVisibility(boolean visibility)
+    {
+        this.visibility = visibility;
+    }
+
+    public boolean isVisible()
+    {
+        return this.visibility;
     }
 
     public void setMarkerPosition(PointF position, int index) {
@@ -112,6 +123,7 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
         bundle.putIntArray("runIds", runIds);
         bundle.putFloatArray("xPositions", xPositions);
         bundle.putFloatArray("yPositions", yPositions);
+        bundle.putBoolean("visibility", this.visibility);
         return bundle;
     }
 

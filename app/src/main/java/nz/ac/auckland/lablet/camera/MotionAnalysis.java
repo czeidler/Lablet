@@ -94,17 +94,24 @@ public class MotionAnalysis implements IDataAnalysis {
         float maxXValue = sensorData.getMaxRawX();
         float maxYValue = sensorData.getMaxRawY();
 
-        //Rect marker data
+        //Rect marker data todo: move to method, want to create from method call from gui
         MarkerData topLeft = new MarkerData(-1);
-        MarkerData btmRight = new MarkerData(-2);
+        MarkerData topRight = new MarkerData(-2);
+        MarkerData btmLeft = new MarkerData(-3);
+        MarkerData btmRight = new MarkerData(-4);
         float length = 10;
         float half = length / 2;
-        topLeft.setPosition(new PointF(maxXValue * 0.1f, maxYValue * 0.9f));
-        btmRight.setPosition(new PointF(maxXValue * 0.9f, maxYValue * 0.1f));
+        topLeft.setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.7f));
+        topRight.setPosition(new PointF(maxXValue * 0.7f, maxYValue * 0.7f));
+        btmLeft.setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.3f));
+        btmRight.setPosition(new PointF(maxXValue * 0.7f, maxYValue * 0.3f));
 
         rectMarkers = new MarkerDataModel();
         rectMarkers.addMarkerData(topLeft);
+        rectMarkers.addMarkerData(topRight);
+        rectMarkers.addMarkerData(btmLeft);
         rectMarkers.addMarkerData(btmRight);
+        rectMarkers.setVisibility(false);
 
         lengthCalibrationMarkers = new MarkerDataModel();
         MarkerData point1 = new MarkerData(-1);

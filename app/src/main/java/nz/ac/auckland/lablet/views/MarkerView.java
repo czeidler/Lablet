@@ -371,6 +371,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
 
         @Override
         public void onDataChanged(MarkerDataModel model, int index, int number) {
+            rebuildMarkerList(); //TODO: bug, if I don't call this then view doesn't update when setMarkerPosition called.
             containerView.invalidate();
         }
 
