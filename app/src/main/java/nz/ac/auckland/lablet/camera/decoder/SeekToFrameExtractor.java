@@ -67,6 +67,26 @@ public class SeekToFrameExtractor {
         return seekHandler.sendMessage(message);
     }
 
+    static class SeekHandler extends Handler {
+        final SeekToThread thread;
+
+        public SeekHandler(SeekToThread thread) {
+            this.thread = thread;
+        }
+
+        @Override
+        public void handleMessage(Message message)
+        {
+            if (message.what != SeekToThread.SEEK_MESSAGE)
+                return;
+            Bundle data = message.peekData();
+            assert data != null;
+
+            long positionMicroSeconds = data.getLong("position");
+            thread.performSeekTo(positionMicroSeconds);
+        }
+    }
+
     class SeekToThread extends Thread {
         final static int SEEK_MESSAGE = 1;
 
@@ -120,20 +140,7 @@ public class SeekToFrameExtractor {
 
         public void run() {
             Looper.prepare();
-            seekHandler = new Handler() {
-                @Override
-                public void handleMessage(Message message)
-                {
-                    if (message.what != SEEK_MESSAGE)
-                        return;
-                    Bundle data = message.peekData();
-                    assert data != null;
-
-                    long positionMicroSeconds = data.getLong("position");
-                    performSeekTo(positionMicroSeconds);
-                }
-
-            };
+            seekHandler = new SeekHandler(this);
             threadReadySemaphore.release();
             Looper.loop();
         }
