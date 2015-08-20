@@ -148,7 +148,6 @@ public class SeekToFrameExtractor {
         private void performSeekTo(long seekTarget) {
             final int DEQUE_TIMEOUT = 1000;
 
-            decoder.flush();
             inputBuffers = decoder.getInputBuffers();
 
             // coarse seek
