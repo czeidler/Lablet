@@ -82,11 +82,13 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
 
             @Override
             public void afterTextChanged(Editable editable) {
+                float value = 0;
                 try {
-                    setMass(Float.parseFloat(editable.toString()));
+                    value = Float.parseFloat(editable.toString());
                 } catch (NumberFormatException e) {
                     System.out.println(e.getMessage());
                 }
+                setMass(value);
             }
         });
         heightEditText.addTextChangedListener(new TextWatcher() {
@@ -102,11 +104,13 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
 
             @Override
             public void afterTextChanged(Editable editable) {
+                float value = 0;
                 try {
-                    setHeight(Float.parseFloat(editable.toString()));
+                    value = Float.parseFloat(editable.toString());
                 } catch (NumberFormatException e) {
                     System.out.println(e.getMessage());
                 }
+                setHeight(value);
             }
         });
         energyEditText.addTextChangedListener(new TextWatcher() {
@@ -122,11 +126,13 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
 
             @Override
             public void afterTextChanged(Editable editable) {
+                float value = 0;
                 try {
-                    setEnergy(Float.parseFloat(editable.toString()));
+                    value = Float.parseFloat(editable.toString());
                 } catch (NumberFormatException e) {
                     System.out.println(e.getMessage());
                 }
+                setEnergy(value);
             }
         });
         pbjEditText.addTextChangedListener(new TextWatcher() {
@@ -142,11 +148,13 @@ class ScriptComponentPotentialEnergy1View extends FrameLayout {
 
             @Override
             public void afterTextChanged(Editable editable) {
+                float value = 0;
                 try {
-                    setPbjValue(Float.parseFloat(editable.toString()));
+                    value = Float.parseFloat(editable.toString());
                 } catch (NumberFormatException e) {
                     System.out.println(e.getMessage());
                 }
+                setPbjValue(value);
             }
         });
 
