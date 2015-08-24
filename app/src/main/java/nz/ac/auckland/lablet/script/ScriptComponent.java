@@ -26,7 +26,7 @@ abstract public class ScriptComponent {
     final static public int SCRIPT_STATE_DONE = 0;
 
     public interface IScriptComponentListener {
-        public void onStateChanged(ScriptComponent item, int state);
+        void onStateChanged(ScriptComponent item, int state);
     }
 
     private WeakReference<IScriptComponentListener> listener = null;
