@@ -13,7 +13,7 @@ import android.graphics.PointF;
 /**
  * Data model for the a list of {@link MarkerData} including a xy calibration.
  */
-public class CalibratedMarkerDataModel extends MarkerDataModel implements CalibrationXY.IListener {
+public class CalibratedMarkerDataModel extends PointDataModel implements CalibrationXY.IListener {
     private CalibrationXY calibrationXY;
 
     public CalibratedMarkerDataModel(CalibrationXY calibrationXY) {

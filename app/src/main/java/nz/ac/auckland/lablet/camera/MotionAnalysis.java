@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.camera;
 
-import android.content.res.Configuration;
 import android.graphics.PointF;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
@@ -50,9 +49,9 @@ public class MotionAnalysis implements IDataAnalysis {
     final private Unit tUnit = new Unit("s");
 
     final private CalibratedMarkerDataModel tagMarkers;
-    final private MarkerDataModel lengthCalibrationMarkers;
-    final private MarkerDataModel originMarkers;
-    final private MarkerDataModel rectMarkers;
+    final private PointDataModel lengthCalibrationMarkers;
+    final private PointDataModel originMarkers;
+    final private PointDataModel rectMarkers;
 
     final private LengthCalibrationSetter lengthCalibrationSetter;
     final private OriginCalibrationSetter originCalibrationSetter;
@@ -106,14 +105,14 @@ public class MotionAnalysis implements IDataAnalysis {
         btmLeft.setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.3f));
         btmRight.setPosition(new PointF(maxXValue * 0.7f, maxYValue * 0.3f));
 
-        rectMarkers = new MarkerDataModel();
+        rectMarkers = new PointDataModel();
         rectMarkers.addMarkerData(topLeft);
         rectMarkers.addMarkerData(topRight);
         rectMarkers.addMarkerData(btmLeft);
         rectMarkers.addMarkerData(btmRight);
         rectMarkers.setVisibility(false);
 
-        lengthCalibrationMarkers = new MarkerDataModel();
+        lengthCalibrationMarkers = new PointDataModel();
         MarkerData point1 = new MarkerData(-1);
         point1.setPosition(new PointF(maxXValue * 0.1f, maxYValue * 0.9f));
         lengthCalibrationMarkers.addMarkerData(point1);
@@ -124,7 +123,7 @@ public class MotionAnalysis implements IDataAnalysis {
 
         PointF origin = calibrationXY.getOrigin();
         PointF axis1 = calibrationXY.getAxis1();
-        originMarkers = new MarkerDataModel();
+        originMarkers = new PointDataModel();
         // y-axis
         point1 = new MarkerData(-1);
         point1.setPosition(new PointF(10, 10));
@@ -178,12 +177,12 @@ public class MotionAnalysis implements IDataAnalysis {
     public CalibrationVideoTimeData getCalibrationVideoTimeData() {
         return calibrationVideoTimeData;
     }
-    public MarkerDataModel getTagMarkers() {
+    public PointDataModel getTagMarkers() {
         return tagMarkers;
     }
-    public MarkerDataModel getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
-    public MarkerDataModel getRectMarkers() {return rectMarkers;}
-    public MarkerDataModel getOriginMarkers(){
+    public PointDataModel getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
+    public PointDataModel getRectMarkers() {return rectMarkers;}
+    public PointDataModel getOriginMarkers(){
         return originMarkers;
     }
     public Bundle getVideoAnalysisSettings() { return videoAnalysisSettings; }

@@ -12,7 +12,7 @@ import nz.ac.auckland.lablet.experiment.CalibrationXY;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.PointDataModel;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 
@@ -50,7 +50,7 @@ class OriginMarker extends SimpleMarker {
 /**
  * Draws the origin coordinate system.
  * <p>
- * Expects a MarkerDataModel with two data points. One for the origin and one for the first axis.
+ * Expects a PointDataModel with two data points. One for the origin and one for the first axis.
  * </p>
  */
 public class OriginMarkerPainter extends AbstractMarkerPainter implements CalibrationXY.IListener {
@@ -73,7 +73,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
     private float ARROW_AXIS_OVERLAP;
     private float LABEL_TO_AXIS_END_DISTANCE;
 
-    public OriginMarkerPainter(MarkerDataModel model, CalibrationXY calibrationXY) {
+    public OriginMarkerPainter(PointDataModel model, CalibrationXY calibrationXY) {
         super(model);
         this.calibrationXY = calibrationXY;
         this.calibrationXY.addListener(this);

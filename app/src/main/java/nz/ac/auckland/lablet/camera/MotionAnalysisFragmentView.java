@@ -15,29 +15,21 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.util.Log;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
 
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
-import org.opencv.android.Utils;
-import org.opencv.core.Mat;
-import org.opencv.core.Rect;
 import org.opencv.core.RotatedRect;
-import org.opencv.core.Size;
 
 import nz.ac.auckland.lablet.R;
 //import nz.ac.auckland.lablet.accelerometer.AccelerometerSensorData;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.PointDataModel;
 import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 import nz.ac.auckland.lablet.views.FrameDataSeekBar;
-import nz.ac.auckland.lablet.views.RectMarkerPainter;
+import nz.ac.auckland.lablet.views.ROIMarkerPainter;
 import nz.ac.auckland.lablet.views.graph.*;
 import nz.ac.auckland.lablet.views.plotview.LinearFitPainter;
 import nz.ac.auckland.lablet.views.table.*;
@@ -151,7 +143,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
     private boolean releaseAdaptersWhenDrawerClosed = false;
     final private FrameDataModel.IListener dataListenerStrongRef;
-    //final private MarkerDataModel.IListener markerListenerStrongRef;
+    //final private PointDataModel.IListener markerListenerStrongRef;
     private boolean changingFrames = false;
     int curMarker;
     private PointF nextPos;
@@ -320,7 +312,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
                 if (i == 0)
                     return;
                 // ignore header row
-                int frameId = sensorAnalysis.getTagMarkers().getMarkerDataAt(i - 1).getId();
+                int frameId = sensorAnalysis.getTagMarkers().getMarkerDataAt(i - 1).getFrameId();
                 sensorAnalysis.getFrameDataModel().setCurrentFrame(frameId);
             }
         });
@@ -354,9 +346,8 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
                     for(long i = startFrameTime; i <= endFrameTime; i+=increment) {
                         Bitmap bmp = sensorAnalysis.getVideoData().getVideoFrame(i);
-                        //saveFrame(bmp);
-                        boolean success = tracker.findObject(newFrame, bmp);
-                        result = tracker.getRotatedRect(newFrame);
+                        tracker.findObject(newFrame, bmp);
+                        result = tracker.getOutput(newFrame);
                     }
                     //sensorAnalysis.getFrameDataModel().g
                     sensorAnalysis.getFrameDataModel().setObjectPicked(newFrame, true);
@@ -374,6 +365,20 @@ class MotionAnalysisFragmentView extends FrameLayout {
                     nextTag.setPosition(nextPos);
                     sensorAnalysis.getTagMarkers().addMarkerData(nextTag); //Have to add marker here rather than edit its position as TagMarkerDataModelPainter.setCurrentFrame (which adds markers) is called after this method
 
+                    MarkerData topLeft = new MarkerData(newFrame);
+                    MarkerData topRight = new MarkerData(newFrame);
+                    MarkerData btmRight = new MarkerData(newFrame);
+                    MarkerData btmLeft = new MarkerData(newFrame);
+                    topLeft.setPosition(nextPos);
+                    topRight.setPosition(nextPos);
+                    btmRight.setPosition(nextPos);
+                    btmLeft.setPosition(nextPos);
+                    sensorAnalysis.getOriginMarkers().getMarkerDataAt(1);
+
+                    sensorAnalysis.getDebugMarkers().addMarkerData(topLeft);
+                    sensorAnalysis.getDebugMarkers().addMarkerData(topRight);
+                    sensorAnalysis.getDebugMarkers().addMarkerData(btmRight);
+                    sensorAnalysis.getDebugMarkers().addMarkerData(btmLeft);
                     //
 
                             //.setMarkerPosition(nextPos, -1);
@@ -381,7 +386,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
                     //changingFrames = true;
                     //sensorAnalysis.getTagMarkers().setMarkerPosition(newPos, currentMarker);
-                    //MarkerDataModel model = sensorAnalysis.getTagMarkers().addListener();
+                    //PointDataModel model = sensorAnalysis.getTagMarkers().addListener();
 
                     //sensorAnalysis.addListener();
                     int i = 0;
@@ -408,10 +413,10 @@ class MotionAnalysisFragmentView extends FrameLayout {
         sensorAnalysis.getFrameDataModel().addListener(dataListenerStrongRef);
 
 
-//        markerListenerStrongRef = new MarkerDataModel.IListener() {
+//        markerListenerStrongRef = new PointDataModel.IListener() {
 //
 //            @Override
-//            public void onDataAdded(MarkerDataModel model, int index) {
+//            public void onDataAdded(PointDataModel model, int index) {
 //
 //                if(changingFrames && nextPos != null)
 //                {
@@ -421,25 +426,25 @@ class MotionAnalysisFragmentView extends FrameLayout {
 //            }
 //
 //            @Override
-//            public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
+//            public void onDataRemoved(PointDataModel model, int index, MarkerData data) {
 //                int i = 0;
 //                int j = 1;
 //            }
 //
 //            @Override
-//            public void onDataChanged(MarkerDataModel model, int index, int number) {
+//            public void onDataChanged(PointDataModel model, int index, int number) {
 //                int i = 0;
 //                int j = 1;
 //            }
 //
 //            @Override
-//            public void onAllDataChanged(MarkerDataModel model) {
+//            public void onAllDataChanged(PointDataModel model) {
 //                int i = 0;
 //                int j = 1;
 //            }
 //
 //            @Override
-//            public void onDataSelected(MarkerDataModel model, int index) {
+//            public void onDataSelected(PointDataModel model, int index) {
 //                int i = 0;
 //                int j = 1;
 //            }
@@ -461,7 +466,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
         markerDataTableAdapter.addColumn(new XPositionDataTableColumn(xUnit));
         markerDataTableAdapter.addColumn(new YPositionDataTableColumn(yUnit));
 
-        MarkerDataModel markerDataModel = sensorAnalysis.getTagMarkers();
+        PointDataModel markerDataModel = sensorAnalysis.getTagMarkers();
         ITimeData timeCalibration = sensorAnalysis.getTimeData();
         if (timeCalibration.getSize() > 400)
             releaseAdaptersWhenDrawerClosed = true;
@@ -522,8 +527,8 @@ class MotionAnalysisFragmentView extends FrameLayout {
         Bitmap bmp = sensorAnalysis.getVideoData().getVideoFrame((long) (startFrameTime * 1000.0));
         //this.saveFrame(bmp);
 
-        PointF tLeftM = sensorAnalysis.getRectMarkers().getMarkerDataAt(RectMarkerPainter.TOP_LEFT).getPosition();
-        PointF bRightM = sensorAnalysis.getRectMarkers().getMarkerDataAt(RectMarkerPainter.BTM_RIGHT).getPosition();
+        PointF tLeftM = sensorAnalysis.getRectMarkers().getMarkerDataAt(ROIMarkerPainter.TOP_LEFT).getPosition();
+        PointF bRightM = sensorAnalysis.getRectMarkers().getMarkerDataAt(ROIMarkerPainter.BTM_RIGHT).getPosition();
 
         Point topLeft = sensorAnalysis.getVideoData().markerToVideoPos(tLeftM);
         Point btmRight = sensorAnalysis.getVideoData().markerToVideoPos(bRightM);

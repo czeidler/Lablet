@@ -9,7 +9,7 @@ package nz.ac.auckland.lablet.views;
 
 import android.graphics.*;
 import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.PointDataModel;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -149,7 +149,7 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
         return positionDecimalFormat;
     }
 
-    public CursorDataModelPainter(MarkerDataModel data) {
+    public CursorDataModelPainter(PointDataModel data) {
         super(data);
 
         getMarkerPainterGroup().setSelectOnDrag(true);
@@ -183,7 +183,7 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
 
         int selectedMarkerId = -1;
         if (marker.isSelectedForDrag())
-            selectedMarkerId = markerData.getMarkerDataAt(markerList.indexOf(marker)).getId();
+            selectedMarkerId = markerData.getMarkerDataAt(markerList.indexOf(marker)).getFrameId();
 
         if (!isDragging)
             sort();
@@ -191,7 +191,7 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
         if (selectedMarkerId >= 0) {
             for (int i = 0; i < markerData.getMarkerCount(); i++) {
                 MarkerData data = markerData.getMarkerDataAt(i);
-                if (data.getId() == selectedMarkerId) {
+                if (data.getFrameId() == selectedMarkerId) {
                     if (!markerList.get(i).isSelectedForDrag())
                         markerList.get(i).setSelectedForDrag(true);
                     break;

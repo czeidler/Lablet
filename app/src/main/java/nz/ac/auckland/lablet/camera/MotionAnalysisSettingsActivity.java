@@ -20,7 +20,7 @@ import android.widget.*;
 import nz.ac.auckland.lablet.*;
 import nz.ac.auckland.lablet.ExperimentAnalysisBaseActivity;
 import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.PointDataModel;
 import nz.ac.auckland.lablet.views.StartEndSeekBar;
 import nz.ac.auckland.lablet.views.VideoFrameView;
 
@@ -50,7 +50,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     private StartEndSeekBar startEndSeekBar = null;
 
     // The marker data model keeps listeners as weak references. Thus we have to maintain our own hard reference.
-    private MarkerDataModel.IListener startEndSeekBarListener = null;
+    private PointDataModel.IListener startEndSeekBarListener = null;
 
     private NumberPicker frameRatePicker = null;
     private EditText editVideoStart = null;
@@ -188,19 +188,19 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         startEndSeekBar.setPadding(seekBar.getPaddingLeft(), seekBar.getPaddingTop(), seekBar.getPaddingRight(),
                 seekBar.getPaddingBottom());
 
-        startEndSeekBarListener = new MarkerDataModel.IListener() {
+        startEndSeekBarListener = new PointDataModel.IListener() {
             @Override
-            public void onDataAdded(MarkerDataModel model, int index) {
+            public void onDataAdded(PointDataModel model, int index) {
 
             }
 
             @Override
-            public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
+            public void onDataRemoved(PointDataModel model, int index, MarkerData data) {
 
             }
 
             @Override
-            public void onDataChanged(MarkerDataModel model, int index, int number) {
+            public void onDataChanged(PointDataModel model, int index, int number) {
                 float frameRate = getFrameRateFromPicker();
                 float duration = getDurationAtFrameRate(frameRate);
 
@@ -222,12 +222,12 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
             }
 
             @Override
-            public void onAllDataChanged(MarkerDataModel model) {
+            public void onAllDataChanged(PointDataModel model) {
 
             }
 
             @Override
-            public void onDataSelected(MarkerDataModel model, int index) {
+            public void onDataSelected(PointDataModel model, int index) {
 
             }
         };

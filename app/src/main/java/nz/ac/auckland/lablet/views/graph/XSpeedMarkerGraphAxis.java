@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.PointDataModel;
 import nz.ac.auckland.lablet.misc.Unit;
 
 
@@ -31,7 +31,7 @@ public class XSpeedMarkerGraphAxis extends MarkerTimeGraphAxis {
 
     @Override
     public Number getValue(int index) {
-        MarkerDataModel data = getData();
+        PointDataModel data = getData();
 
         float deltaX = data.getRealMarkerPositionAt(index + 1).x - data.getRealMarkerPositionAt(index).x;
         float deltaT = getTimeData().getTimeAt(index + 1) - getTimeData().getTimeAt(index);

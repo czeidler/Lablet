@@ -20,8 +20,8 @@ import java.io.*;
 public class FrequencyAnalysis implements IDataAnalysis {
     final private AudioData sensorData;
 
-    final private MarkerDataModel hCursorMarkerModel;
-    final private MarkerDataModel vCursorMarkerModel;
+    final private PointDataModel hCursorMarkerModel;
+    final private PointDataModel vCursorMarkerModel;
     final private Unit xUnit = new Unit("s", Unit.MILLI);
     final private Unit yUnit = new Unit("Hz");
     final private FreqMapDisplaySettings freqMapDisplaySettings = new FreqMapDisplaySettings();
@@ -103,8 +103,8 @@ public class FrequencyAnalysis implements IDataAnalysis {
 
         xUnit.setName("time");
         yUnit.setName("frequency");
-        hCursorMarkerModel = new MarkerDataModel();
-        vCursorMarkerModel = new MarkerDataModel();
+        hCursorMarkerModel = new PointDataModel();
+        vCursorMarkerModel = new PointDataModel();
     }
 
     public Unit getXUnit() {
@@ -182,11 +182,11 @@ public class FrequencyAnalysis implements IDataAnalysis {
         CSVWriter.writeTable(vTableAdapter, writer, ',');
     }
 
-    public MarkerDataModel getHCursorMarkerModel() {
+    public PointDataModel getHCursorMarkerModel() {
         return hCursorMarkerModel;
     }
 
-    public MarkerDataModel getVCursorMarkerModel() {
+    public PointDataModel getVCursorMarkerModel() {
         return vCursorMarkerModel;
     }
 }

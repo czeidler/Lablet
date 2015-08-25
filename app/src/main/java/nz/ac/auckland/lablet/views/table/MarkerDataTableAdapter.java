@@ -15,9 +15,9 @@ import java.util.List;
 
 
 public class MarkerDataTableAdapter extends ColumnDataTableAdapter {
-    protected MarkerDataModel model;
+    protected PointDataModel model;
 
-    public MarkerDataTableAdapter(MarkerDataModel model) {
+    public MarkerDataTableAdapter(PointDataModel model) {
         this.model = model;
         model.addListener(markerListener);
     }
@@ -52,29 +52,29 @@ public class MarkerDataTableAdapter extends ColumnDataTableAdapter {
         return model.getSelectedMarkerData();
     }
 
-    private MarkerDataModel.IListener markerListener = new MarkerDataModel.IListener() {
+    private PointDataModel.IListener markerListener = new PointDataModel.IListener() {
         @Override
-        public void onDataAdded (MarkerDataModel model,int index){
+        public void onDataAdded (PointDataModel model,int index){
             notifyRowAdded(index + 1);
         }
 
         @Override
-        public void onDataRemoved (MarkerDataModel model,int index, MarkerData data){
+        public void onDataRemoved (PointDataModel model,int index, MarkerData data){
             notifyRowRemoved(index + 1);
         }
 
         @Override
-        public void onDataChanged (MarkerDataModel model,int index, int number){
+        public void onDataChanged (PointDataModel model,int index, int number){
             notifyRowChanged(index + 1, number);
         }
 
         @Override
-        public void onAllDataChanged (MarkerDataModel model){
+        public void onAllDataChanged (PointDataModel model){
             notifyAllRowsChanged();
         }
 
         @Override
-        public void onDataSelected (MarkerDataModel model,int index){
+        public void onDataSelected (PointDataModel model,int index){
             notifyRowSelected(index);
         }
     };

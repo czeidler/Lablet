@@ -12,9 +12,9 @@ import android.graphics.*;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.SparseArray;
+
 import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.PointDataModel;
 import nz.ac.auckland.lablet.views.plotview.IPlotPainter;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
@@ -172,7 +172,7 @@ class StartEndPainter extends AbstractMarkerPainter {
      *
      * @param data should contain exactly two data points, one for the start and one for the end marker
      */
-    public StartEndPainter(MarkerDataModel data) {
+    public StartEndPainter(PointDataModel data) {
         super(data);
     }
 
@@ -239,7 +239,7 @@ class StartEndPainter extends AbstractMarkerPainter {
  * A seek bar with a start and an end marker. For example, used to select video start and end point.
  */
 public class StartEndSeekBar extends PlotPainterContainerView {
-    private MarkerDataModel markerDataModel;
+    private PointDataModel markerDataModel;
     private StartEndPainter startEndPainter;
 
     // dimensions in density-independent  pixels
@@ -248,7 +248,7 @@ public class StartEndSeekBar extends PlotPainterContainerView {
     public StartEndSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        markerDataModel = new MarkerDataModel();
+        markerDataModel = new PointDataModel();
         markerDataModel.addMarkerData(new MarkerData(0));
         markerDataModel.addMarkerData(new MarkerData(1));
 
@@ -351,7 +351,7 @@ public class StartEndSeekBar extends PlotPainterContainerView {
         setMeasuredDimension(params.width, startEndPainter.toPixel(HEIGHT_DP));
     }
 
-    public MarkerDataModel getMarkerDataModel() {
+    public PointDataModel getMarkerDataModel() {
         return markerDataModel;
     }
 

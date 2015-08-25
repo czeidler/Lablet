@@ -45,7 +45,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 
         final MenuItem deleteItem = menu.findItem(R.id.action_delete);
         assert deleteItem != null;
-        final MarkerDataModel markerDataModel = getSensorAnalysis().getTagMarkers();
+        final PointDataModel markerDataModel = getSensorAnalysis().getTagMarkers();
         final FrameDataModel frameDataModel = getSensorAnalysis().getFrameDataModel();
         if (markerDataModel.getMarkerCount() <= 1)
             deleteItem.setVisible(false);
@@ -67,7 +67,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                     newSelectedIndex = selectedIndex;
                 else
                     newSelectedIndex = selectedIndex - 1;
-                frameDataModel.setCurrentFrame(markerDataModel.getMarkerDataAt(newSelectedIndex).getId());
+                frameDataModel.setCurrentFrame(markerDataModel.getMarkerDataAt(newSelectedIndex).getFrameId());
 
                 if (markerDataModel.getMarkerCount() <= 1)
                     getActivity().invalidateOptionsMenu();
@@ -283,11 +283,11 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             newTimeData.setAnalysisFrameRate(newFrameRate);
         }
 
-        public List<MarkerData> update(MarkerDataModel dataModel) {
+        public List<MarkerData> update(PointDataModel dataModel) {
             List<MarkerData> newMarkerData = new ArrayList<>();
             for (int i = 0; i < dataModel.getMarkerCount(); i++) {
                 MarkerData markerData = dataModel.getMarkerDataAt(i);
-                float time = oldTimeData.getFrameTime(markerData.getId());
+                float time = oldTimeData.getFrameTime(markerData.getFrameId());
                 int newFrame = newTimeData.getClosestFrame(time);
                 float frameTime = newTimeData.getFrameTime(newFrame);
 
@@ -313,7 +313,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             float minDiff = Float.MAX_VALUE;
             for (int i = 0; i < newMarkerList.size(); i++) {
                 MarkerData markerData = newMarkerList.get(i);
-                int newFrame = markerData.getId();
+                int newFrame = markerData.getFrameId();
                 float time = newTimeData.getFrameTime(newFrame);
                 float currentDiff = Math.abs(time - oldTime);
                 if (currentDiff < minDiff) {
@@ -327,30 +327,30 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         }
     }
 
-    private MarkerDataModel.IListener menuDataListener = new MarkerDataModel.IListener() {
+    private PointDataModel.IListener menuDataListener = new PointDataModel.IListener() {
         @Override
-        public void onDataAdded(MarkerDataModel model, int index) {
+        public void onDataAdded(PointDataModel model, int index) {
             if (model.getMarkerCount() > 1)
                 getActivity().invalidateOptionsMenu();
         }
 
         @Override
-        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
+        public void onDataRemoved(PointDataModel model, int index, MarkerData data) {
 
         }
 
         @Override
-        public void onDataChanged(MarkerDataModel model, int index, int number) {
+        public void onDataChanged(PointDataModel model, int index, int number) {
 
         }
 
         @Override
-        public void onAllDataChanged(MarkerDataModel model) {
+        public void onAllDataChanged(PointDataModel model) {
 
         }
 
         @Override
-        public void onDataSelected(MarkerDataModel model, int index) {
+        public void onDataSelected(PointDataModel model, int index) {
 
         }
     };

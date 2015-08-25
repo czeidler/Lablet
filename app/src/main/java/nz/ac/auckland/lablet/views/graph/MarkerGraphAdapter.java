@@ -12,11 +12,11 @@ import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.views.plotview.Range;
 
 
-public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDataModel.IListener {
+public class MarkerGraphAdapter extends AbstractGraphAdapter implements PointDataModel.IListener {
     protected String title;
-    protected MarkerDataModel data;
+    protected PointDataModel data;
 
-    public MarkerGraphAdapter(MarkerDataModel data, String title, MarkerGraphAxis xAxis, MarkerGraphAxis yAxis) {
+    public MarkerGraphAdapter(PointDataModel data, String title, MarkerGraphAxis xAxis, MarkerGraphAxis yAxis) {
         this.title = title;
 
         setTo(data);
@@ -39,7 +39,7 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
         release();
     }
 
-    public void setTo(MarkerDataModel data) {
+    public void setTo(PointDataModel data) {
         if (this.data != null)
             this.data.removeListener(this);
 
@@ -58,11 +58,11 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
         return title;
     }
 
-    public MarkerDataModel getData() {
+    public PointDataModel getData() {
         return data;
     }
 
-    public static MarkerGraphAdapter createPositionAdapter(MarkerDataModel data, String title, Unit xUnit,
+    public static MarkerGraphAdapter createPositionAdapter(PointDataModel data, String title, Unit xUnit,
                                                            Unit yUnit, IMinRangeGetter xMinRangeGetter,
                                                            IMinRangeGetter yMinRangeGetter) {
         return new MarkerGraphAdapter(data, title, new XPositionMarkerGraphAxis(xUnit, xMinRangeGetter),
@@ -70,19 +70,19 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
     }
 
     @Override
-    public void onDataAdded(MarkerDataModel model, int index) {
+    public void onDataAdded(PointDataModel model, int index) {
         // see onDataChanged
         //notifyDataAdded(index, 1);
         notifyAllDataChanged();
     }
 
     @Override
-    public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
+    public void onDataRemoved(PointDataModel model, int index, MarkerData data) {
         notifyDataRemoved(index, 1);
     }
 
     @Override
-    public void onDataChanged(MarkerDataModel model, int index, int number) {
+    public void onDataChanged(PointDataModel model, int index, int number) {
         // when displaying the velocity the marker point index is not equal to the velocity point index
         // for that reason we invalidate all data
         // TODO: this could be optimized
@@ -91,12 +91,12 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDa
     }
 
     @Override
-    public void onAllDataChanged(MarkerDataModel model) {
+    public void onAllDataChanged(PointDataModel model) {
         notifyAllDataChanged();
     }
 
     @Override
-    public void onDataSelected(MarkerDataModel model, int index) {
+    public void onDataSelected(PointDataModel model, int index) {
 
     }
 

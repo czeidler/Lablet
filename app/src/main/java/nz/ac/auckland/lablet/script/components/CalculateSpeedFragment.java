@@ -18,7 +18,7 @@ import android.widget.*;
 import nz.ac.auckland.lablet.*;
 import nz.ac.auckland.lablet.camera.ITimeData;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.PointDataModel;
 import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptComponent;
 import nz.ac.auckland.lablet.script.ScriptTreeNodeFragmentHolder;
@@ -214,7 +214,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
     private CharSequence correctSpeedUnit = "[m/s]";
     private CharSequence correctAccelerationUnit = Html.fromHtml("[m/s<sup><small>2</small></sup>]");
 
-    protected MarkerDataModel tagMarker;
+    protected PointDataModel tagMarker;
     protected ITimeData timeData;
 
     @Override
@@ -383,13 +383,13 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
             return;
 
         String text = "";
-        text += timeData.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex()).getId());
+        text += timeData.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex()).getFrameId());
         time1EditText.setText(text);
         text = "";
-        text += timeData.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 1).getId());
+        text += timeData.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 1).getFrameId());
         time2EditText.setText(text);
         text = "";
-        text += timeData.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 2).getId());
+        text += timeData.getTimeAt(tagMarker.getMarkerDataAt(getFirstDataPointIndex() + 2).getFrameId());
         time3EditText.setText(text);
 
         text = "";

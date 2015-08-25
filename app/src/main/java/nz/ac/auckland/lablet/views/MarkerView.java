@@ -14,7 +14,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewParent;
 import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.PointDataModel;
+import nz.ac.auckland.lablet.experiment.RotatedRectData;
 import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
 import nz.ac.auckland.lablet.views.plotview.*;
 
@@ -32,7 +33,7 @@ import java.util.List;
  */
 abstract class DraggableMarker implements IMarker {
     protected AbstractMarkerPainter parent = null;
-    protected MarkerData markerData;
+    MarkerData markerData;
     protected PointF currentPosition;
     protected PointF dragOffset = new PointF(0, 0);
     protected boolean isSelectedForDragging = false;
@@ -174,6 +175,40 @@ abstract class DraggableMarker implements IMarker {
 
 }
 
+class RectMarker extends DraggableMarker {
+
+    @Override
+    public boolean isPointOnSelectArea(PointF screenPoint) {
+        return false;
+    }
+
+    @Override
+    public void onDraw(Canvas canvas, float priority) {
+
+        // Line settings
+        Paint paint = new Paint();
+        paint.setStrokeCap(Paint.Cap.BUTT);
+        paint.setStrokeWidth(LINE_WIDTH);
+        paint.setAntiAlias(true);
+        paint.setColor(Color.GREEN);
+        paint.setStyle(Paint.Style.STROKE);
+
+        int alpha = (int)(priority * 255.);
+        paint.setAlpha(alpha);
+
+        RotatedRectData data = (RotatedRectData)markerData;
+
+        canvas.save();
+        canvas.rotate(data.getAngle());
+        float left = data.getCentre().x - data.getWidth() / 2;
+        float right = data.getCentre().x + data.getWidth() / 2;
+        float top = data.getCentre().y + data.getHeight() / 2;
+        float bottom = data.getCentre().y - data.getHeight() / 2;
+        canvas.drawRect(left, top, right, bottom, paint);
+        canvas.restore();
+    }
+}
+
 
 /**
  * Default implementation of a draggable marker.
@@ -278,7 +313,7 @@ class SimpleMarker extends DraggableMarker {
 
 
 /**
- * Abstract base class to draw a {@link nz.ac.auckland.lablet.experiment.MarkerDataModel} in a
+ * Abstract base class to draw a {@link PointDataModel} in a
  * {@link nz.ac.auckland.lablet.views.MarkerView}.
  */
 abstract class AbstractMarkerPainter extends AbstractPlotPainter {
@@ -355,34 +390,34 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
         }
     }
 
-    private MarkerDataModel.IListener dataListener = new MarkerDataModel.IListener() {
+    private PointDataModel.IListener dataListener = new PointDataModel.IListener() {
 
         @Override
-        public void onDataAdded(MarkerDataModel model, int index) {
+        public void onDataAdded(PointDataModel model, int index) {
             addMarker(index);
             containerView.invalidate();
         }
 
         @Override
-        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
+        public void onDataRemoved(PointDataModel model, int index, MarkerData data) {
             removeMarker(index);
             containerView.invalidate();
         }
 
         @Override
-        public void onDataChanged(MarkerDataModel model, int index, int number) {
+        public void onDataChanged(PointDataModel model, int index, int number) {
             rebuildMarkerList(); //TODO: bug, if I don't call this then view doesn't update when setMarkerPosition called.
             containerView.invalidate();
         }
 
         @Override
-        public void onAllDataChanged(MarkerDataModel model) {
+        public void onAllDataChanged(PointDataModel model) {
             rebuildMarkerList();
             containerView.invalidate();
         }
 
         @Override
-        public void onDataSelected(MarkerDataModel model, int index) {
+        public void onDataSelected(PointDataModel model, int index) {
             if (getMarkerPainterGroup().selectOnDrag && index >= 0)
                 markerList.get(index).setSelectedForDrag(true);
 
@@ -392,11 +427,11 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
 
     private MarkerPainterGroup markerPainterGroup = new MarkerPainterGroup();
 
-    protected MarkerDataModel markerData = null;
+    protected PointDataModel markerData = null;
     final protected Rect frame = new Rect();
     final protected List<IMarker> markerList = new ArrayList<>();
 
-    public AbstractMarkerPainter(MarkerDataModel model) {
+    public AbstractMarkerPainter(PointDataModel model) {
         markerData = model;
         markerData.addListener(dataListener);
     }
@@ -408,7 +443,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
         rebuildMarkerList();
     }
 
-    public MarkerDataModel getMarkerModel() {
+    public PointDataModel getMarkerModel() {
         return markerData;
     }
 
@@ -628,6 +663,7 @@ public class MarkerView extends PlotPainterContainerView {
         }
     }
 
+    //TODO: Add rotated rect marker painter here.
     public void setCurrentFrame(int frame, @Nullable PointF insertHint) {
         for (IPlotPainter painter : allPainters) {
             if (!(painter instanceof TagMarkerDataModelPainter))

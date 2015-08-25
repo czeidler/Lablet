@@ -13,13 +13,11 @@ import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.IDataAnalysis;
 import nz.ac.auckland.lablet.experiment.ISensorData;
 import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.PointDataModel;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class AccelerometerAnalysis implements IDataAnalysis {
@@ -32,7 +30,7 @@ public class AccelerometerAnalysis implements IDataAnalysis {
     final private Calibration totalCalibration = new Calibration();
 
     class Calibration {
-        final private MarkerDataModel baseLineMarker = new MarkerDataModel();
+        final private PointDataModel baseLineMarker = new PointDataModel();
 
         public Calibration() {
             MarkerData markerData = new MarkerData(0);
@@ -53,7 +51,7 @@ public class AccelerometerAnalysis implements IDataAnalysis {
                 baseLineMarker.fromBundle(baseLineMarkerBundle);
         }
 
-        public MarkerDataModel getBaseLineMarker() {
+        public PointDataModel getBaseLineMarker() {
             return baseLineMarker;
         }
 

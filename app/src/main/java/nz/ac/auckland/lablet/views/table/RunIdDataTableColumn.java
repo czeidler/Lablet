@@ -22,7 +22,7 @@ public class RunIdDataTableColumn extends DataTableColumn {
     }
 
     public Number getValue(int index) {
-        return dataModel.getMarkerDataAt(index).getId();
+        return dataModel.getMarkerDataAt(index).getFrameId();
     }
 
     public String getStringValue(int index) {

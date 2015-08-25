@@ -15,8 +15,6 @@ import org.opencv.core.TermCriteria;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.Video;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -38,9 +36,11 @@ public class CamShiftTracker {
     }
 
     private Mat roiHist;
-    private Rect roiWindow;
+    //private Rect roiWindow;
     private TermCriteria termCriteria;
-    private HashMap<Integer, RotatedRect> rotatedRectangles = new HashMap<Integer, RotatedRect>();
+    private HashMap<Integer, RotatedRect> output = new HashMap<Integer, RotatedRect>();
+    private HashMap<Integer, Rect> rois = new HashMap<Integer, Rect>();
+    Integer currentRoiFrame = null;
 
     public CamShiftTracker() {
         roiHist = new Mat();
@@ -49,30 +49,26 @@ public class CamShiftTracker {
 
     public boolean isROISet()
     {
-        return roiWindow != null;
+        return this.currentRoiFrame != null;
     }
 
-    public void reset()
-    {
-        roiWindow = null;
-    }
 
    /**
     * Sets the region of interest for the CamShiftTracker.
     *
     */
 
-    public void setROI(Bitmap bmp, int x, int y, int width, int height)
+    public void setROI(int frame, Bitmap bmp, int x, int y, int width, int height)
     {
+        this.currentRoiFrame = frame;
+
         Mat inputFrame = new Mat();
         Utils.bitmapToMat(bmp, inputFrame);
 
         //Get region of interest and convert to HSV color space
         Rect rect = new Rect(x, y, width, height);
         Mat roi = new Mat(inputFrame, rect);// inputFrame.submat(x, x+width, y, y+height);
-        //this.saveROI(roi);
 
-        //Mat roi =
         Imgproc.cvtColor(roi, roi, Imgproc.COLOR_BGR2HSV);
 
         //Calculate HSV histogram for region of interest
@@ -80,30 +76,9 @@ public class CamShiftTracker {
         images.add(roi);
         Imgproc.calcHist(images, new MatOfInt(0), new Mat(), roiHist, new MatOfInt(16), new MatOfFloat(0, 180));
         Core.normalize(roiHist, roiHist, 0, 255, Core.NORM_MINMAX);
-        roiWindow = new Rect(x, y, width, height);
-    }
 
-    public void saveROI(Mat roi)
-    {
-        Bitmap bmp = Bitmap.createBitmap(roi.width(), roi.height(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(roi, bmp);
-
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream("/sdcard/roi.png");
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
-            // PNG is a lossless format, the compression factor (100) is ignored
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        Rect roiRect = new Rect(x, y, width, height);
+        rois.put(frame, roiRect);
     }
 
     /**
@@ -116,29 +91,44 @@ public class CamShiftTracker {
      * will be thrown.
      */
 
-    public boolean findObject(int frameNum, Bitmap bmp)
+    public void findObject(int frame, Bitmap bmp)
     {
-        if(roiWindow != null) {
-            //Get current Mat frame and convert to HSV colour space
-            Mat inputFrame = new Mat();
-            Utils.bitmapToMat(bmp, inputFrame);
-            Imgproc.cvtColor(inputFrame, inputFrame, Imgproc.COLOR_BGR2HSV);
+        //Get initial seed window
+        int previousFrame = frame-1;
+        RotatedRect previousResult = this.output.get(previousFrame);
+        Rect seedWindow = new Rect();
 
-            //Meanshift
-            ArrayList<Mat> images = new ArrayList<Mat>();
-            images.add(inputFrame);
-            Mat output = new Mat();
-            Imgproc.calcBackProject(images, new MatOfInt(0), roiHist, output, new MatOfFloat(0, 180), 1);
-
-            RotatedRect result = Video.CamShift(output, roiWindow, termCriteria); //Camshift todo:  check if back project was successful
-            this.rotatedRectangles.put(frameNum, result);
-
-            return true;
+        if(previousResult != null)
+        {
+            seedWindow = previousResult.boundingRect();
         }
-        else
+        else if(previousFrame == this.currentRoiFrame)
+        {
+            seedWindow = this.rois.get(this.currentRoiFrame);
+        }
+
+        if(this.currentRoiFrame == null)
         {
             throw new IllegalStateException("CamShiftTracker: Please set a region of interest with the setROI method");
         }
+        else if(previousResult == null)
+        {
+            throw new IllegalStateException("CamShiftTracker: Please set a region of interest or search for the object in the previous frame");
+        }
+
+        //Get current Mat frame and convert to HSV colour space
+        Mat inputFrame = new Mat();
+        Utils.bitmapToMat(bmp, inputFrame);
+        Imgproc.cvtColor(inputFrame, inputFrame, Imgproc.COLOR_BGR2HSV);
+
+        //Meanshift
+        ArrayList<Mat> images = new ArrayList<Mat>();
+        images.add(inputFrame);
+        Mat output = new Mat();
+        Imgproc.calcBackProject(images, new MatOfInt(0), roiHist, output, new MatOfFloat(0, 180), 1);
+
+        RotatedRect result = Video.CamShift(output, seedWindow, termCriteria); //Camshift todo:  check if back project was successful
+        this.output.put(frame, result);
     }
 
     /**
@@ -146,9 +136,9 @@ public class CamShiftTracker {
      * @return RotatedRect. Returns null if no object found.
      */
 
-    public RotatedRect getRotatedRect(int frameNum)
+    public RotatedRect getOutput(int frame)
     {
-        return this.rotatedRectangles.get(frameNum);
+        return this.output.get(frame);
     }
 
 }

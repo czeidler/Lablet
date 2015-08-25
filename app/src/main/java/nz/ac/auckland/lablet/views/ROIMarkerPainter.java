@@ -5,9 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 
-import nz.ac.auckland.lablet.camera.VideoData;
-import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.PointDataModel;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 /*
@@ -20,7 +18,7 @@ import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 /**
  * Marker for region of interest.
  */
-class RectMarker extends SimpleMarker {
+class ROIMarker extends SimpleMarker {
     @Override
     public void onDraw(Canvas canvas, float priority) {
         if (isSelectedForDrag())
@@ -38,11 +36,11 @@ class RectMarker extends SimpleMarker {
      */
     @Override
     protected void onDraggedTo(PointF point) {
-        RectMarkerPainter rectMarkerPainter = (RectMarkerPainter)parent;
+        ROIMarkerPainter rectMarkerPainter = (ROIMarkerPainter)parent;
         rectMarkerPainter.onDraggedTo(this, point);
     }
 }
-public class RectMarkerPainter extends AbstractMarkerPainter {
+public class ROIMarkerPainter extends AbstractMarkerPainter {
     // device independent sizes:
     private final int FONT_SIZE_DP = 20;
     private final float LINE_WIDTH_DP = 2f;
@@ -60,7 +58,7 @@ public class RectMarkerPainter extends AbstractMarkerPainter {
     public static final int BTM_RIGHT = 0;
 
 
-    public RectMarkerPainter(MarkerDataModel model) {
+    public ROIMarkerPainter(PointDataModel model) {
         super(model);
     }
 
@@ -78,7 +76,7 @@ public class RectMarkerPainter extends AbstractMarkerPainter {
 
     @Override
     protected DraggableMarker createMarkerForRow(int row) {
-        return new RectMarker();
+        return new ROIMarker();
     }
 
     private PointF getCurrentScreenPos(int markerIndex) {
@@ -88,7 +86,7 @@ public class RectMarkerPainter extends AbstractMarkerPainter {
     protected void onDraggedTo(DraggableMarker marker, PointF newPosition)
     {
         int index = markerList.indexOf(marker);
-        MarkerDataModel model  = this.getMarkerModel();
+        PointDataModel model  = this.getMarkerModel();
 
         PointF newPositionReal = new PointF();
         containerView.fromScreen(newPosition, newPositionReal);

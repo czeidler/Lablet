@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.PointDataModel;
 import nz.ac.auckland.lablet.misc.AnimatedTabHostListener;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
 import nz.ac.auckland.lablet.views.*;
@@ -347,11 +347,11 @@ public class FrequencyAnalysisView extends FrameLayout {
             }
         });
 
-        MarkerDataModel hMarkerModel = frequencyAnalysis.getHCursorMarkerModel();
+        PointDataModel hMarkerModel = frequencyAnalysis.getHCursorMarkerModel();
         HCursorDataModelPainter hCursorDataModelPainter = new HCursorDataModelPainter(hMarkerModel);
         frequencyMapPlotView.addPlotPainter(hCursorDataModelPainter);
 
-        MarkerDataModel vMarkerModel = frequencyAnalysis.getVCursorMarkerModel();
+        PointDataModel vMarkerModel = frequencyAnalysis.getVCursorMarkerModel();
         VCursorDataModelPainter vCursorDataModelPainter = new VCursorDataModelPainter(vMarkerModel);
         vCursorDataModelPainter.setMarkerPainterGroup(hCursorDataModelPainter.getMarkerPainterGroup());
         frequencyMapPlotView.addPlotPainter(vCursorDataModelPainter);

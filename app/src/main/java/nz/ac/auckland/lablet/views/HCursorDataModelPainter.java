@@ -7,12 +7,12 @@
  */
 package nz.ac.auckland.lablet.views;
 
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.PointDataModel;
 
 
 public class HCursorDataModelPainter extends CursorDataModelPainter {
 
-    public HCursorDataModelPainter(MarkerDataModel data) {
+    public HCursorDataModelPainter(PointDataModel data) {
         super(data);
     }
 

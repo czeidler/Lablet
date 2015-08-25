@@ -18,7 +18,7 @@ import android.widget.FrameLayout;
 import android.widget.Spinner;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.experiment.PointDataModel;
 import nz.ac.auckland.lablet.views.HCursorDataModelPainter;
 import nz.ac.auckland.lablet.views.plotview.*;
 
@@ -99,29 +99,29 @@ public class IntegralView extends FrameLayout {
         spinner.setSelection(3);
     }
 
-    private MarkerDataModel.IListener dataListener = new MarkerDataModel.IListener() {
+    private PointDataModel.IListener dataListener = new PointDataModel.IListener() {
         @Override
-        public void onDataAdded(MarkerDataModel model, int index) {
+        public void onDataAdded(PointDataModel model, int index) {
 
         }
 
         @Override
-        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
+        public void onDataRemoved(PointDataModel model, int index, MarkerData data) {
 
         }
 
         @Override
-        public void onDataChanged(MarkerDataModel model, int index, int number) {
+        public void onDataChanged(PointDataModel model, int index, int number) {
             updateIntegral();
         }
 
         @Override
-        public void onAllDataChanged(MarkerDataModel model) {
+        public void onAllDataChanged(PointDataModel model) {
 
         }
 
         @Override
-        public void onDataSelected(MarkerDataModel model, int index) {
+        public void onDataSelected(PointDataModel model, int index) {
 
         }
     };
@@ -152,7 +152,7 @@ public class IntegralView extends FrameLayout {
         updateIntegral();
 
         // marker
-        MarkerDataModel baseLineMarker = calibration.getBaseLineMarker();
+        PointDataModel baseLineMarker = calibration.getBaseLineMarker();
         HCursorDataModelPainter hCursorDataModelPainter = new HCursorDataModelPainter(baseLineMarker);
         hCursorDataModelPainter.setPositionDecimalFormat("#.###");
         accelerometerPlotView.addPlotPainter(hCursorDataModelPainter);

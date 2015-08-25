@@ -10,31 +10,22 @@ package nz.ac.auckland.lablet.experiment;
 import android.graphics.PointF;
 
 /**
- * Two dimensional data that is associated with an integer id.
+ * Two dimensional data that is associated with an integer frameId.
  * <p>
- * The id can be used to identify the data in an experiment. For example, in case of the motion analysis, the id is
- * needed because not every frame may have a marker, e.g., when only every second frame is tagged. In this case the id
- * would be the frame id.
+ * The frameId can be used to identify the data in an experiment. For example, in case of the motion analysis, the frameId is
+ * needed because not every frame may have a marker, e.g., when only every second frame is tagged. In this case the frameId
+ * would be the frame frameId.
  * </p>
  */
-public class MarkerData {
-    final private int id;
-    private PointF positionReal;
+
+public abstract class MarkerData {
+    final private int frameId;
 
     public MarkerData(int id) {
-        this.id = id;
-        positionReal = new PointF();
+        this.frameId = id;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public PointF getPosition() {
-        return positionReal;
-    }
-
-    public void setPosition(PointF positionReal) {
-        this.positionReal.set(positionReal);
+    public int getFrameId() {
+        return frameId;
     }
 }

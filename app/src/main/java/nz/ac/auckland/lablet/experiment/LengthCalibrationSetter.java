@@ -28,38 +28,38 @@ import android.os.Bundle;
  */
 public class LengthCalibrationSetter {
     private CalibrationXY calibrationXY;
-    private MarkerDataModel calibrationMarkers;
+    private PointDataModel calibrationMarkers;
 
     private float calibrationValue;
 
-    private MarkerDataModel.IListener dataListener = new MarkerDataModel.IListener() {
+    private PointDataModel.IListener dataListener = new PointDataModel.IListener() {
         @Override
-        public void onDataAdded(MarkerDataModel model, int index) {
+        public void onDataAdded(PointDataModel model, int index) {
             calibrate();
         }
 
         @Override
-        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
+        public void onDataRemoved(PointDataModel model, int index, MarkerData data) {
             calibrate();
         }
 
         @Override
-        public void onDataChanged(MarkerDataModel model, int index, int number) {
+        public void onDataChanged(PointDataModel model, int index, int number) {
             calibrate();
         }
 
         @Override
-        public void onAllDataChanged(MarkerDataModel model) {
+        public void onAllDataChanged(PointDataModel model) {
             calibrate();
         }
 
         @Override
-        public void onDataSelected(MarkerDataModel model, int index) {
+        public void onDataSelected(PointDataModel model, int index) {
 
         }
     };
 
-    public LengthCalibrationSetter(MarkerDataModel lengthCalibrationMarkers, CalibrationXY calibrationXY) {
+    public LengthCalibrationSetter(PointDataModel lengthCalibrationMarkers, CalibrationXY calibrationXY) {
         this.calibrationMarkers = lengthCalibrationMarkers;
         this.calibrationMarkers.addListener(dataListener);
         this.calibrationXY = calibrationXY;
