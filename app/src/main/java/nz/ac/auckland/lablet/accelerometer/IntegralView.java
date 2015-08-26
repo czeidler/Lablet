@@ -17,9 +17,10 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.PointDataModel;
-import nz.ac.auckland.lablet.views.HCursorDataModelPainter;
+import nz.ac.auckland.lablet.data.Data;
+import nz.ac.auckland.lablet.data.PointData;
+import nz.ac.auckland.lablet.data.PointDataList;
+import nz.ac.auckland.lablet.views.painters.HCursorDataListPainter;
 import nz.ac.auckland.lablet.views.plotview.*;
 
 import java.util.ArrayList;
@@ -99,29 +100,29 @@ public class IntegralView extends FrameLayout {
         spinner.setSelection(3);
     }
 
-    private PointDataModel.IListener dataListener = new PointDataModel.IListener() {
+    private PointDataList.IListener<PointDataList> dataListener = new PointDataList.IListener<PointDataList>() {
         @Override
-        public void onDataAdded(PointDataModel model, int index) {
+        public void onDataAdded(PointDataList model, int index) {
 
         }
 
         @Override
-        public void onDataRemoved(PointDataModel model, int index, MarkerData data) {
+        public void onDataRemoved(PointDataList model, int index, Data data) {
 
         }
 
         @Override
-        public void onDataChanged(PointDataModel model, int index, int number) {
+        public void onDataChanged(PointDataList model, int index, int number) {
             updateIntegral();
         }
 
         @Override
-        public void onAllDataChanged(PointDataModel model) {
+        public void onAllDataChanged(PointDataList model) {
 
         }
 
         @Override
-        public void onDataSelected(PointDataModel model, int index) {
+        public void onDataSelected(PointDataList model, int index) {
 
         }
     };
@@ -152,8 +153,8 @@ public class IntegralView extends FrameLayout {
         updateIntegral();
 
         // marker
-        PointDataModel baseLineMarker = calibration.getBaseLineMarker();
-        HCursorDataModelPainter hCursorDataModelPainter = new HCursorDataModelPainter(baseLineMarker);
+        PointDataList baseLineMarker = calibration.getBaseLineMarker();
+        HCursorDataListPainter hCursorDataModelPainter = new HCursorDataListPainter(baseLineMarker);
         hCursorDataModelPainter.setPositionDecimalFormat("#.###");
         accelerometerPlotView.addPlotPainter(hCursorDataModelPainter);
 

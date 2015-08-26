@@ -5,9 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.experiment;
-
-import android.graphics.PointF;
+package nz.ac.auckland.lablet.data;
 
 /**
  * Two dimensional data that is associated with an integer frameId.
@@ -18,10 +16,19 @@ import android.graphics.PointF;
  * </p>
  */
 
-public abstract class MarkerData {
+public abstract class Data {
     final private int frameId;
+    private boolean visible = true;
 
-    public MarkerData(int id) {
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    public Data(int id) {
         this.frameId = id;
     }
 

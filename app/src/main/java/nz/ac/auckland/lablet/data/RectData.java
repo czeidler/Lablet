@@ -1,4 +1,4 @@
-package nz.ac.auckland.lablet.experiment;
+package nz.ac.auckland.lablet.data;
 
 import android.graphics.PointF;
 
@@ -6,13 +6,13 @@ import android.graphics.PointF;
  * Created by jdip004 on 25/08/2015.
  */
 
-public class RotatedRectData extends MarkerData {
+public class RectData extends Data {
     private PointF centre = new PointF();
-    private int width = 0;
-    private int height = 0;
+    private float width = 0;
+    private float height = 0;
     private float angle = 0;
 
-    public RotatedRectData(int frameId) {
+    public RectData(int frameId) {
         super(frameId);
     }
 
@@ -24,19 +24,19 @@ public class RotatedRectData extends MarkerData {
         this.centre = centre;
     }
 
-    public int getWidth() {
+    public float getWidth() {
         return width;
     }
 
-    public void setWidth(int width) {
+    public void setWidth(float width) {
         this.width = width;
     }
 
-    public int getHeight() {
+    public float getHeight() {
         return height;
     }
 
-    public void setHeight(int height) {
+    public void setHeight(float height) {
         this.height = height;
     }
 

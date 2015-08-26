@@ -8,7 +8,7 @@
 package nz.ac.auckland.lablet.views.graph;
 
 import nz.ac.auckland.lablet.camera.ITimeData;
-import nz.ac.auckland.lablet.experiment.PointDataModel;
+import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.misc.Unit;
 
 
@@ -18,14 +18,14 @@ import nz.ac.auckland.lablet.misc.Unit;
 public class MarkerTimeGraphAdapter extends MarkerGraphAdapter {
     protected ITimeData timeCalibration;
 
-    public MarkerTimeGraphAdapter(PointDataModel data, ITimeData timeCalibration, String title,
+    public MarkerTimeGraphAdapter(PointDataList data, ITimeData timeCalibration, String title,
                                   MarkerGraphAxis xAxis, MarkerGraphAxis yAxis) {
         super(data, title, xAxis, yAxis);
 
         this.timeCalibration = timeCalibration;
     }
 
-    public void setTo(PointDataModel data,  ITimeData timeCalibration) {
+    public void setTo(PointDataList data,  ITimeData timeCalibration) {
         setTo(data);
 
         this.timeCalibration = timeCalibration;
@@ -35,13 +35,13 @@ public class MarkerTimeGraphAdapter extends MarkerGraphAdapter {
         return timeCalibration;
     }
 
-    public static MarkerTimeGraphAdapter createXSpeedAdapter(PointDataModel data, ITimeData timeCalibration,
+    public static MarkerTimeGraphAdapter createXSpeedAdapter(PointDataList data, ITimeData timeCalibration,
                                                              String title, Unit xUnit, Unit tUnit) {
         return new MarkerTimeGraphAdapter(data, timeCalibration, title, new SpeedTimeMarkerGraphAxis(tUnit),
                 new XSpeedMarkerGraphAxis(xUnit, tUnit));
     }
 
-    public static MarkerTimeGraphAdapter createYSpeedAdapter(PointDataModel data, ITimeData timeCalibration,
+    public static MarkerTimeGraphAdapter createYSpeedAdapter(PointDataList data, ITimeData timeCalibration,
                                                              String title, Unit yUnit, Unit tUnit) {
         return new MarkerTimeGraphAdapter(data, timeCalibration, title, new SpeedTimeMarkerGraphAxis(tUnit),
                 new YSpeedMarkerGraphAxis(yUnit, tUnit));

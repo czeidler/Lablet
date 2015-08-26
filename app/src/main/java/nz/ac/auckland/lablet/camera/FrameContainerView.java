@@ -23,11 +23,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
+
+import nz.ac.auckland.lablet.data.RectDataList;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
-import nz.ac.auckland.lablet.experiment.FrameDataModel;
-import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.PointDataModel;
+import nz.ac.auckland.lablet.data.Data;
+import nz.ac.auckland.lablet.data.FrameDataList;
+import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.views.*;
+import nz.ac.auckland.lablet.views.painters.CalibrationDataListPainter;
+import nz.ac.auckland.lablet.views.painters.IDataPainter;
+import nz.ac.auckland.lablet.views.painters.OriginDataListPainter;
+import nz.ac.auckland.lablet.views.painters.RectDataListPainter;
+import nz.ac.auckland.lablet.views.painters.RoiDataListPainter;
+import nz.ac.auckland.lablet.views.painters.TagDataListPainter;
 
 
 /**
@@ -41,16 +49,16 @@ public class FrameContainerView extends RelativeLayout {
     private CameraExperimentFrameView videoAnalysisView = null;
     private FrameDataSeekBar seekBar;
     private MarkerView markerView = null;
-    private TagMarkerDataModelPainter painter = null;
-    private FrameDataModel frameDataModel = null;
+    private TagDataListPainter painter = null;
+    private FrameDataList frameDataList = null;
     private MotionAnalysis motionAnalysis = null;
-    private OriginMarkerPainter originMarkerPainter = null;
-    private ROIMarkerPainter rectMarkerPainter = null;
+    private OriginDataListPainter originDataListPainter = null;
+    private RoiDataListPainter rectMarkerPainter = null;
 
     private GestureDetector gestureDetector;
     final Handler handler = new Handler();
 
-    private FrameDataModel.IListener frameDataModelListener = new FrameDataModel.IListener() {
+    private FrameDataList.IListener frameDataModelListener = new FrameDataList.IListener() {
         @Override
         public void onFrameChanged(int newFrame) {
             videoAnalysisView.setCurrentFrame(newFrame);
@@ -181,23 +189,23 @@ public class FrameContainerView extends RelativeLayout {
             if (markerView.isAnyMarkerSelectedForDrag())
                 return super.onSingleTapUp(e);
 
-            IMarker tappedMarker = painter.getMarkerAtScreenPosition(new PointF(e.getX(), e.getY()));
+            IDataPainter tappedMarker = painter.getDataPainterAtScreenPosition(new PointF(e.getX(), e.getY()));
             if (tappedMarker == null)
                 return super.onSingleTapUp(e);
             int tappedMarkerIndex = painter.markerIndexOf(tappedMarker);
 
-            PointDataModel markerDataModel = painter.getMarkerModel();
-            int frameId = markerDataModel.getMarkerDataAt(tappedMarkerIndex).getFrameId();
-            frameDataModel.setCurrentFrame(frameId);
+            PointDataList markerDataModel = painter.getDataList();
+            int frameId = markerDataModel.getDataAt(tappedMarkerIndex).getFrameId();
+            frameDataList.setCurrentFrame(frameId);
             return true;
         }
 
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            int currentFrame = frameDataModel.getCurrentFrame();
+            int currentFrame = frameDataList.getCurrentFrame();
             int newFrame = currentFrame + 1;
-            if (newFrame < frameDataModel.getNumberOfFrames()) {
-                frameDataModel.setCurrentFrame(newFrame);
+            if (newFrame < frameDataList.getNumberOfFrames()) {
+                frameDataList.setCurrentFrame(newFrame);
                 markerView.setCurrentFrame(newFrame, new PointF(e.getX(), e.getY()));
             }
             return true;
@@ -227,7 +235,7 @@ public class FrameContainerView extends RelativeLayout {
             if (show)
                 addOriginMarkerPainter();
             else
-                markerView.removePlotPainter(originMarkerPainter);
+                markerView.removePlotPainter(originDataListPainter);
         }
     };
 
@@ -259,10 +267,10 @@ public class FrameContainerView extends RelativeLayout {
         motionAnalysis = analysis;
         motionAnalysis.addListener(motionAnalysisListener);
 
-        if (frameDataModel != null)
-            frameDataModel.removeListener(frameDataModelListener);
-        frameDataModel = motionAnalysis.getFrameDataModel();
-        frameDataModel.addListener(frameDataModelListener);
+        if (frameDataList != null)
+            frameDataList.removeListener(frameDataModelListener);
+        frameDataList = motionAnalysis.getFrameDataList();
+        frameDataList.addListener(frameDataModelListener);
 
         videoAnalysisView = runView;
 
@@ -306,50 +314,54 @@ public class FrameContainerView extends RelativeLayout {
         initData();
     }
 
-    private PointDataModel.IListener tagDataListener = new PointDataModel.IListener() {
+    private PointDataList.IListener<PointDataList> tagDataListener = new PointDataList.IListener<PointDataList>() {
         @Override
-        public void onDataAdded(PointDataModel model, int index) {
+        public void onDataAdded(PointDataList model, int index) {
 
         }
 
         @Override
-        public void onDataRemoved(PointDataModel model, int index, MarkerData data) {
+        public void onDataRemoved(PointDataList model, int index, Data data) {
 
         }
 
         @Override
-        public void onDataChanged(PointDataModel model, int index, int number) {
+        public void onDataChanged(PointDataList model, int index, int number) {
             seekBarManager.open();
         }
 
         @Override
-        public void onAllDataChanged(PointDataModel model) {
+        public void onAllDataChanged(PointDataList model) {
 
         }
 
         @Override
-        public void onDataSelected(PointDataModel model, int index) {
+        public void onDataSelected(PointDataList model, int index) {
 
         }
     };
 
     public void initData() {
         // tag markers
-        PointDataModel tagMarkers = motionAnalysis.getTagMarkers();
+        PointDataList tagMarkers = motionAnalysis.getTagMarkers();
         tagMarkers.addListener(tagDataListener);
-        painter = new TagMarkerDataModelPainter(tagMarkers);
+        painter = new TagDataListPainter(tagMarkers);
         markerView.addPlotPainter(painter);
 
-        frameDataModelListener.onFrameChanged(frameDataModel.getCurrentFrame());
+        frameDataModelListener.onFrameChanged(frameDataList.getCurrentFrame());
 
         // calibration markers
-        PointDataModel calibrationMarkers = motionAnalysis.getXYCalibrationMarkers();
-        CalibrationMarkerPainter painter = new CalibrationMarkerPainter(calibrationMarkers);
+        PointDataList calibrationMarkers = motionAnalysis.getXYCalibrationMarkers();
+        CalibrationDataListPainter painter = new CalibrationDataListPainter(calibrationMarkers);
         markerView.addPlotPainter(painter);
 
-        PointDataModel rectMarker = motionAnalysis.getRectMarkers();
-        ROIMarkerPainter rectMarkerPainter = new ROIMarkerPainter(rectMarker);
+        PointDataList rectMarker = motionAnalysis.getRectMarkers();
+        RoiDataListPainter rectMarkerPainter = new RoiDataListPainter(rectMarker);
         markerView.addPlotPainter(rectMarkerPainter);
+
+        RectDataList rectDataList = motionAnalysis.getRectDataList();
+        RectDataListPainter rectDataListPainter = new RectDataListPainter(rectDataList);
+        markerView.addPlotPainter(rectDataListPainter);
 
         // origin markers
         if (motionAnalysis.getShowCoordinateSystem())
@@ -358,10 +370,10 @@ public class FrameContainerView extends RelativeLayout {
     }
 
     private void addOriginMarkerPainter() {
-        PointDataModel originMarkers = motionAnalysis.getOriginMarkers();
+        PointDataList originMarkers = motionAnalysis.getOriginMarkers();
         CalibrationXY calibrationXY = motionAnalysis.getCalibrationXY();
-        originMarkerPainter = new OriginMarkerPainter(originMarkers, calibrationXY);
-        markerView.addPlotPainter(originMarkerPainter);
+        originDataListPainter = new OriginDataListPainter(originMarkers, calibrationXY);
+        markerView.addPlotPainter(originDataListPainter);
     }
 
     public void release() {
@@ -369,8 +381,8 @@ public class FrameContainerView extends RelativeLayout {
             markerView.release();
         if (motionAnalysis != null)
             motionAnalysis.removeListener(motionAnalysisListener);
-        if (frameDataModel != null)
-            frameDataModel.removeListener(frameDataModelListener);
+        if (frameDataList != null)
+            frameDataList.removeListener(frameDataModelListener);
     }
 
     /**

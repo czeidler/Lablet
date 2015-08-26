@@ -5,17 +5,19 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views;
+package nz.ac.auckland.lablet.views.painters;
 
 import android.graphics.*;
-import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.PointDataModel;
+
+import nz.ac.auckland.lablet.data.Data;
+import nz.ac.auckland.lablet.data.PointData;
+import nz.ac.auckland.lablet.data.PointDataList;
 
 import java.text.DecimalFormat;
 import java.util.List;
 
 
-abstract class CursorMarker extends DraggableMarker {
+abstract class CursorDataPainter extends TagDataPainter {
     final private Paint cursorPaint = new Paint();
     final private Paint textPaint = new Paint();
     final private Paint textBackgroundPaint = new Paint();
@@ -28,8 +30,8 @@ abstract class CursorMarker extends DraggableMarker {
     private float SELECT_RADIUS;
 
     @Override
-    public void setTo(AbstractMarkerPainter painter, MarkerData markerData) {
-        super.setTo(painter, markerData);
+    public void setTo(DraggableDataListPainter painter, PointData data) {
+        super.setTo(painter, data);
 
         SELECT_RADIUS = parent.toPixel(Const.SELECT_RADIUS_DP);
     }
@@ -75,9 +77,9 @@ abstract class CursorMarker extends DraggableMarker {
         PointF textPosition = new PointF(start.x, start.y);
         textPosition.offset(2, -2);
 
-        CursorDataModelPainter cursorDataModelPainter = (CursorDataModelPainter)parent;
+        CursorDataListPainter cursorDataListPainter = (CursorDataListPainter)parent;
         final String positionString = "Position: " + new DecimalFormat(
-                cursorDataModelPainter.getPositionDecimalFormat()).format(getDirection(realPosition));
+                cursorDataListPainter.getPositionDecimalFormat()).format(getDirection(realPosition));
         final Rect textBounds = new Rect();
         textPaint.getTextBounds(positionString, 0, positionString.length(), textBounds);
         textBounds.offset((int)textPosition.x, (int)textPosition.y);
@@ -92,53 +94,9 @@ abstract class CursorMarker extends DraggableMarker {
     abstract protected PointF getEndPoint();
 }
 
-class HCursorMarker extends CursorMarker {
-    @Override
-    protected float getDirection(PointF point) {
-        return point.y;
-    }
-
-    @Override
-    protected void offsetPoint(Point point, float offset) {
-        point.y += offset;
-    }
-
-    @Override
-    protected PointF getStartPoint() {
-        return new PointF(0, getCachedScreenPosition().y);
-    }
-
-    @Override
-    protected PointF getEndPoint() {
-        return new PointF(parent.getScreenRect().width(), getCachedScreenPosition().y);
-    }
-}
 
 
-class VCursorMarker extends CursorMarker {
-    @Override
-    protected float getDirection(PointF point) {
-        return point.x;
-    }
-
-    @Override
-    protected void offsetPoint(Point point, float offset) {
-        point.x += offset;
-    }
-
-    @Override
-    protected PointF getStartPoint() {
-        return new PointF((int)getCachedScreenPosition().x, parent.getScreenRect().height());
-    }
-
-    @Override
-    protected PointF getEndPoint() {
-        return new PointF(getCachedScreenPosition().x, 0);
-    }
-}
-
-
-abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
+abstract public class CursorDataListPainter extends DraggableDataListPainter {
     private String positionDecimalFormat = "#";
 
     public void setPositionDecimalFormat(String positionDecimalFormat) {
@@ -149,22 +107,22 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
         return positionDecimalFormat;
     }
 
-    public CursorDataModelPainter(PointDataModel data) {
+    public CursorDataListPainter(PointDataList data) {
         super(data);
 
         getMarkerPainterGroup().setSelectOnDrag(true);
     }
 
     @Override
-    public List<IMarker> getSelectableMarkerList() {
-        return markerList;
+    public List<IDataPainter> getSelectableMarkerList() {
+        return painterList;
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        IMarker selectedMarker = null;
-        for (int i = 0; i < markerList.size(); i++) {
-            IMarker marker = markerList.get(i);
+        IDataPainter selectedMarker = null;
+        for (int i = 0; i < painterList.size(); i++) {
+            IDataPainter marker = painterList.get(i);
             if (marker.isSelectedForDrag()) {
                 selectedMarker = marker;
                 continue;
@@ -178,22 +136,22 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
     }
 
     @Override
-    public void markerMoveRequest(DraggableMarker marker, PointF newPosition, boolean isDragging) {
+    public void markerMoveRequest(DraggableDataPainter marker, PointF newPosition, boolean isDragging) {
         super.markerMoveRequest(marker, newPosition, isDragging);
 
         int selectedMarkerId = -1;
         if (marker.isSelectedForDrag())
-            selectedMarkerId = markerData.getMarkerDataAt(markerList.indexOf(marker)).getFrameId();
+            selectedMarkerId = dataList.getDataAt(painterList.indexOf(marker)).getFrameId();
 
         if (!isDragging)
             sort();
 
         if (selectedMarkerId >= 0) {
-            for (int i = 0; i < markerData.getMarkerCount(); i++) {
-                MarkerData data = markerData.getMarkerDataAt(i);
+            for (int i = 0; i < dataList.getDataCount(); i++) {
+                Data data = dataList.getDataAt(i);
                 if (data.getFrameId() == selectedMarkerId) {
-                    if (!markerList.get(i).isSelectedForDrag())
-                        markerList.get(i).setSelectedForDrag(true);
+                    if (!painterList.get(i).isSelectedForDrag())
+                        painterList.get(i).setSelectedForDrag(true);
                     break;
                 }
             }

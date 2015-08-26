@@ -1,26 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/set_roi"
-        android:icon="@drawable/ic_chart_line"
-        android:title="Add region"/>
+    <item android:id="@+id/enable_tracking"
+        android:title="Enable"
+        android:checkable="true"/>
 
     <item android:id="@+id/set_roi"
-          android:icon="@drawable/ic_chart_line"
-          android:title="Set region"/>
+        android:icon="@drawable/ic_chart_line"
+        android:title="Track object"/>
 
     <item android:id="@+id/delete_roi"
         android:icon="@drawable/ic_chart_line"
-        android:title="Delete region"/>
+        android:title="Delete object"/>
 
-    <item android:id="@+id/goto_next_roi"
+    <item android:id="@+id/next_roi"
         android:icon="@drawable/ic_chart_line"
-        android:title="Next region"/>
+        android:title="Next object"/>
 
-    <item android:id="@+id/showCoordinateSystem"
+    <item android:id="@+id/debug_tracking"
         android:title="Debug"
         android:checkable="true"/>
-
-    <item android:id="@+id/showCoordinateSystem"
-        android:title="Settings" />
 </menu>

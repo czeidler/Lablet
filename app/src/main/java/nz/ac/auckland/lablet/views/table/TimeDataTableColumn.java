@@ -28,12 +28,12 @@ public class TimeDataTableColumn extends UnitDataTableColumn {
 
     @Override
     public int size() {
-        return dataModel.getMarkerCount();
+        return dataModel.getDataCount();
     }
 
     @Override
     public Number getValue(int index) {
-        int runId = dataModel.getMarkerDataAt(index).getFrameId();
+        int runId = dataModel.getDataAt(index).getFrameId();
         return timeData.getTimeAt(runId);
     }
 

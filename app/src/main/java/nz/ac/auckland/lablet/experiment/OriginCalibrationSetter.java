@@ -9,6 +9,9 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.graphics.PointF;
 
+import nz.ac.auckland.lablet.data.Data;
+import nz.ac.auckland.lablet.data.PointDataList;
+
 
 /**
  * Manages the origin position.
@@ -27,36 +30,36 @@ import android.graphics.PointF;
  */
 public class OriginCalibrationSetter {
     private CalibrationXY calibrationXY;
-    private PointDataModel calibrationMarkers;
+    private PointDataList calibrationMarkers;
 
-    private PointDataModel.IListener dataListener = new PointDataModel.IListener() {
+    private PointDataList.IListener dataListener = new PointDataList.IListener<PointDataList>() {
         @Override
-        public void onDataAdded(PointDataModel model, int index) {
+        public void onDataAdded(PointDataList model, int index) {
             calibrate();
         }
 
         @Override
-        public void onDataRemoved(PointDataModel model, int index, MarkerData data) {
+        public void onDataRemoved(PointDataList model, int index, Data data) {
             calibrate();
         }
 
         @Override
-        public void onDataChanged(PointDataModel model, int index, int number) {
+        public void onDataChanged(PointDataList model, int index, int number) {
             calibrate();
         }
 
         @Override
-        public void onAllDataChanged(PointDataModel model) {
+        public void onAllDataChanged(PointDataList model) {
             calibrate();
         }
 
         @Override
-        public void onDataSelected(PointDataModel model, int index) {
+        public void onDataSelected(PointDataList model, int index) {
 
         }
     };
 
-    public OriginCalibrationSetter(CalibrationXY calibrationXY, PointDataModel data) {
+    public OriginCalibrationSetter(CalibrationXY calibrationXY, PointDataList data) {
         this.calibrationXY = calibrationXY;
         this.calibrationMarkers = data;
         this.calibrationMarkers.addListener(dataListener);
@@ -71,10 +74,10 @@ public class OriginCalibrationSetter {
     }
 
     private void calibrate() {
-        if (calibrationMarkers.getMarkerCount() != 3)
+        if (calibrationMarkers.getDataCount() != 3)
             return;
-        PointF origin = calibrationMarkers.getMarkerDataAt(0).getPosition();
-        PointF axis1 = calibrationMarkers.getMarkerDataAt(1).getPosition();
+        PointF origin = calibrationMarkers.getDataAt(0).getPosition();
+        PointF axis1 = calibrationMarkers.getDataAt(1).getPosition();
 
         calibrationXY.setOrigin(origin, axis1);
     }

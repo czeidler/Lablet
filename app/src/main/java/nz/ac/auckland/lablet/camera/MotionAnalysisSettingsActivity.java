@@ -19,9 +19,10 @@ import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.*;
 import nz.ac.auckland.lablet.ExperimentAnalysisBaseActivity;
-import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.PointDataModel;
-import nz.ac.auckland.lablet.views.StartEndSeekBar;
+import nz.ac.auckland.lablet.data.Data;
+import nz.ac.auckland.lablet.data.PointData;
+import nz.ac.auckland.lablet.data.PointDataList;
+import nz.ac.auckland.lablet.views.painters.StartEndSeekBar;
 import nz.ac.auckland.lablet.views.VideoFrameView;
 
 import java.io.File;
@@ -50,7 +51,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     private StartEndSeekBar startEndSeekBar = null;
 
     // The marker data model keeps listeners as weak references. Thus we have to maintain our own hard reference.
-    private PointDataModel.IListener startEndSeekBarListener = null;
+    private PointDataList.IListener startEndSeekBarListener = null;
 
     private NumberPicker frameRatePicker = null;
     private EditText editVideoStart = null;
@@ -188,29 +189,29 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         startEndSeekBar.setPadding(seekBar.getPaddingLeft(), seekBar.getPaddingTop(), seekBar.getPaddingRight(),
                 seekBar.getPaddingBottom());
 
-        startEndSeekBarListener = new PointDataModel.IListener() {
+        startEndSeekBarListener = new PointDataList.IListener<PointDataList>() {
             @Override
-            public void onDataAdded(PointDataModel model, int index) {
+            public void onDataAdded(PointDataList model, int index) {
 
             }
 
             @Override
-            public void onDataRemoved(PointDataModel model, int index, MarkerData data) {
+            public void onDataRemoved(PointDataList model, int index, Data data) {
 
             }
 
             @Override
-            public void onDataChanged(PointDataModel model, int index, int number) {
+            public void onDataChanged(PointDataList model, int index, int number) {
                 float frameRate = getFrameRateFromPicker();
                 float duration = getDurationAtFrameRate(frameRate);
 
                 float progress = 0;
                 for (int i = index; i < index + number; i++) {
                     if (i == 0) {
-                        progress = model.getMarkerDataAt(i).getPosition().x * duration;
+                        progress = model.getDataAt(i).getPosition().x * duration;
                         setVideoStart(progress);
                     } else if (i == 1) {
-                        progress = model.getMarkerDataAt(i).getPosition().x * duration;
+                        progress = model.getDataAt(i).getPosition().x * duration;
                         setVideoEnd(progress);
                     }
                 }
@@ -222,12 +223,12 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
             }
 
             @Override
-            public void onAllDataChanged(PointDataModel model) {
+            public void onAllDataChanged(PointDataList model) {
 
             }
 
             @Override
-            public void onDataSelected(PointDataModel model, int index) {
+            public void onDataSelected(PointDataList model, int index) {
 
             }
         };
@@ -288,11 +289,11 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         if (point.x > 1)
             point.x = 1;
         point.x = videoStartValue / duration;
-        startEndSeekBar.getMarkerDataModel().getMarkerDataAt(0).setPosition(point);
+        startEndSeekBar.getMarkerDataModel().getDataAt(0).setPosition(point);
         point.x = videoEndValue / duration;
         if (point.x > 1)
             point.x = 1;
-        startEndSeekBar.getMarkerDataModel().getMarkerDataAt(1).setPosition(point);
+        startEndSeekBar.getMarkerDataModel().getDataAt(1).setPosition(point);
 
         helpView = (MotionAnalysisSettingsHelpView)findViewById(R.id.cameraSettingsHelp);
         assert helpView != null;
@@ -353,16 +354,16 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
 
     private boolean warningNeeded() {
         MotionAnalysis motionAnalysis = (MotionAnalysis)experimentAnalysis.getCurrentAnalysis();
-        if (motionAnalysis.getTagMarkers().getMarkerCount() <= 1)
+        if (motionAnalysis.getTagMarkers().getDataCount() <= 1)
             return false;
 
         MotionAnalysisFragment.RangeChangedMarkerUpdater updater
                 = new MotionAnalysisFragment.RangeChangedMarkerUpdater(initialVideoStartValue, initialFrameRate,
                 videoStartValue, videoEndValue, getFrameRateFromPicker());
 
-        List<MarkerData> newMarkerData = updater.update(motionAnalysis.getTagMarkers());
+        List<PointData> newData = updater.update(motionAnalysis.getTagMarkers());
 
-        return newMarkerData.size() != motionAnalysis.getTagMarkers().getMarkerCount();
+        return newData.size() != motionAnalysis.getTagMarkers().getDataCount();
     }
 
     private void updateWarning() {

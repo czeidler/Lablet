@@ -1,11 +1,11 @@
-package nz.ac.auckland.lablet.views;
+package nz.ac.auckland.lablet.views.painters;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 
-import nz.ac.auckland.lablet.experiment.PointDataModel;
+import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 /*
@@ -18,7 +18,7 @@ import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 /**
  * Marker for region of interest.
  */
-class ROIMarker extends SimpleMarker {
+class RoiDataPainter extends TagDataPainter {
     @Override
     public void onDraw(Canvas canvas, float priority) {
         if (isSelectedForDrag())
@@ -36,11 +36,12 @@ class ROIMarker extends SimpleMarker {
      */
     @Override
     protected void onDraggedTo(PointF point) {
-        ROIMarkerPainter rectMarkerPainter = (ROIMarkerPainter)parent;
+        RoiDataListPainter rectMarkerPainter = (RoiDataListPainter)parent;
         rectMarkerPainter.onDraggedTo(this, point);
     }
 }
-public class ROIMarkerPainter extends AbstractMarkerPainter {
+
+public class RoiDataListPainter extends DraggableDataListPainter {
     // device independent sizes:
     private final int FONT_SIZE_DP = 20;
     private final float LINE_WIDTH_DP = 2f;
@@ -58,7 +59,7 @@ public class ROIMarkerPainter extends AbstractMarkerPainter {
     public static final int BTM_RIGHT = 0;
 
 
-    public ROIMarkerPainter(PointDataModel model) {
+    public RoiDataListPainter(PointDataList model) {
         super(model);
     }
 
@@ -75,18 +76,18 @@ public class ROIMarkerPainter extends AbstractMarkerPainter {
     }
 
     @Override
-    protected DraggableMarker createMarkerForRow(int row) {
-        return new ROIMarker();
+    protected DraggableDataPainter createPainterForFrame(int frameId) {
+        return new RoiDataPainter();
     }
 
     private PointF getCurrentScreenPos(int markerIndex) {
-        return ((DraggableMarker)markerList.get(markerIndex)).getCachedScreenPosition();
+        return ((DraggableDataPainter) painterList.get(markerIndex)).getCachedScreenPosition();
     }
 
-    protected void onDraggedTo(DraggableMarker marker, PointF newPosition)
+    protected void onDraggedTo(DraggableDataPainter marker, PointF newPosition)
     {
-        int index = markerList.indexOf(marker);
-        PointDataModel model  = this.getMarkerModel();
+        int index = painterList.indexOf(marker);
+        PointDataList model  = this.getDataList();
 
         PointF newPositionReal = new PointF();
         containerView.fromScreen(newPosition, newPositionReal);
@@ -97,8 +98,8 @@ public class ROIMarkerPainter extends AbstractMarkerPainter {
                 PointF btmRightReal = new PointF();
                 containerView.fromScreen(btmRightScreen, btmRightReal);
 
-                model.getMarkerDataAt(TOP_RIGHT).setPosition(new PointF(btmRightReal.x, newPositionReal.y));
-                model.getMarkerDataAt(BTM_LEFT).setPosition(new PointF(newPositionReal.x, btmRightReal.y));
+                model.getDataAt(TOP_RIGHT).setPosition(new PointF(btmRightReal.x, newPositionReal.y));
+                model.getDataAt(BTM_LEFT).setPosition(new PointF(newPositionReal.x, btmRightReal.y));
                 break;
 
             case TOP_RIGHT:
@@ -106,8 +107,8 @@ public class ROIMarkerPainter extends AbstractMarkerPainter {
                 PointF btmLeftReal = new PointF();
                 containerView.fromScreen(btmLeftScreen, btmLeftReal);
 
-                model.getMarkerDataAt(TOP_LEFT).setPosition(new PointF(btmLeftReal.x, newPositionReal.y));
-                model.getMarkerDataAt(BTM_RIGHT).setPosition(new PointF(newPositionReal.x, btmLeftReal.y));
+                model.getDataAt(TOP_LEFT).setPosition(new PointF(btmLeftReal.x, newPositionReal.y));
+                model.getDataAt(BTM_RIGHT).setPosition(new PointF(newPositionReal.x, btmLeftReal.y));
                 break;
 
             case BTM_LEFT:
@@ -115,16 +116,16 @@ public class ROIMarkerPainter extends AbstractMarkerPainter {
                 PointF topRightReal = new PointF();
                 containerView.fromScreen(topRightScreen, topRightReal);
 
-                model.getMarkerDataAt(TOP_LEFT).setPosition(new PointF(newPositionReal.x, topRightReal.y));
-                model.getMarkerDataAt(BTM_RIGHT).setPosition(new PointF(topRightReal.x, newPositionReal.y));
+                model.getDataAt(TOP_LEFT).setPosition(new PointF(newPositionReal.x, topRightReal.y));
+                model.getDataAt(BTM_RIGHT).setPosition(new PointF(topRightReal.x, newPositionReal.y));
                 break;
 
             case BTM_RIGHT:
                 PointF topLeftScreen = getCurrentScreenPos(TOP_LEFT);
                 PointF topLeftReal = new PointF();
                 containerView.fromScreen(topLeftScreen, topLeftReal);
-                model.getMarkerDataAt(TOP_RIGHT).setPosition(new PointF(newPositionReal.x, topLeftReal.y));
-                model.getMarkerDataAt(BTM_LEFT).setPosition(new PointF(topLeftReal.x, newPositionReal.y));
+                model.getDataAt(TOP_RIGHT).setPosition(new PointF(newPositionReal.x, topLeftReal.y));
+                model.getDataAt(BTM_LEFT).setPosition(new PointF(topLeftReal.x, newPositionReal.y));
                 break;
         }
     }
@@ -132,9 +133,9 @@ public class ROIMarkerPainter extends AbstractMarkerPainter {
     @Override
     public void onDraw(Canvas canvas) {
 
-        if(this.getMarkerModel().isVisible())
+        if(this.getDataList().isVisible())
         {
-            for (IMarker marker : markerList)
+            for (IDataPainter marker : painterList)
                 marker.onDraw(canvas, 1);
 
             float left;
@@ -142,7 +143,7 @@ public class ROIMarkerPainter extends AbstractMarkerPainter {
             float right;
             float bottom;
 
-            if(markerList.get(BTM_LEFT).isSelectedForDrag() || markerList.get(TOP_RIGHT).isSelectedForDrag())
+            if(painterList.get(BTM_LEFT).isSelectedForDrag() || painterList.get(TOP_RIGHT).isSelectedForDrag())
             {
                 PointF topRight = getCurrentScreenPos(TOP_RIGHT);
                 PointF btmLeft = getCurrentScreenPos(BTM_LEFT);

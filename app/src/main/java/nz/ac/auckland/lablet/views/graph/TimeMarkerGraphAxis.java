@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.PointDataModel;
+import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.misc.Unit;
 
 
@@ -23,13 +23,13 @@ public class TimeMarkerGraphAxis extends MarkerTimeGraphAxis {
 
     @Override
     public int size() {
-        return getData().getMarkerCount();
+        return getData().getDataCount();
     }
 
     @Override
     public Number getValue(int index) {
-        PointDataModel markerData = getData();
-        int runId = markerData.getMarkerDataAt(index).getFrameId();
+        PointDataList markerData = getData();
+        int runId = markerData.getDataAt(index).getFrameId();
         return getTimeData().getTimeAt(runId);
     }
 

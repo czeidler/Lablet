@@ -14,6 +14,10 @@ import android.view.*;
 import android.widget.PopupMenu;
 import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 import nz.ac.auckland.lablet.R;
+import nz.ac.auckland.lablet.data.Data;
+import nz.ac.auckland.lablet.data.FrameDataList;
+import nz.ac.auckland.lablet.data.PointData;
+import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 
@@ -45,31 +49,31 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 
         final MenuItem deleteItem = menu.findItem(R.id.action_delete);
         assert deleteItem != null;
-        final PointDataModel markerDataModel = getSensorAnalysis().getTagMarkers();
-        final FrameDataModel frameDataModel = getSensorAnalysis().getFrameDataModel();
-        if (markerDataModel.getMarkerCount() <= 1)
+        final PointDataList pointDataModel = getSensorAnalysis().getTagMarkers();
+        final FrameDataList frameDataList = getSensorAnalysis().getFrameDataList();
+        if (pointDataModel.getDataCount() <= 1)
             deleteItem.setVisible(false);
         else
             deleteItem.setVisible(true);
         deleteItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                int selectedIndex = markerDataModel.getSelectedMarkerData();
-                if (selectedIndex < 0 || markerDataModel.getMarkerCount() == 1) {
+                int selectedIndex = pointDataModel.getSelectedData();
+                if (selectedIndex < 0 || pointDataModel.getDataCount() == 1) {
                     getActivity().invalidateOptionsMenu();
                     return true;
                 }
 
-                markerDataModel.removeMarkerData(selectedIndex);
+                pointDataModel.removeData(selectedIndex);
 
                 int newSelectedIndex;
-                if (selectedIndex < markerDataModel.getMarkerCount())
+                if (selectedIndex < pointDataModel.getDataCount())
                     newSelectedIndex = selectedIndex;
                 else
                     newSelectedIndex = selectedIndex - 1;
-                frameDataModel.setCurrentFrame(markerDataModel.getMarkerDataAt(newSelectedIndex).getFrameId());
+                frameDataList.setCurrentFrame(pointDataModel.getDataAt(newSelectedIndex).getFrameId());
 
-                if (markerDataModel.getMarkerCount() <= 1)
+                if (pointDataModel.getDataCount() <= 1)
                     getActivity().invalidateOptionsMenu();
                 return true;
             }
@@ -109,53 +113,50 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 
         final MenuItem trackObjectMenu = menu.findItem(R.id.action_track_object);
         assert trackObjectMenu != null;
-
-        final MenuItem setObjectMenu = menu.findItem(R.id.action_set_object);
-        assert setObjectMenu != null;
-
-        final MenuItem gotoObjectMenu = menu.findItem(R.id.action_goto_object);
-        assert gotoObjectMenu != null;
-
-        boolean rectMarkersVisible = getSensorAnalysis().getRectMarkers().isVisible();
-
-
-
-        Integer roiFrame = getSensorAnalysis().getFrameDataModel().getROIFrame();
-        gotoObjectMenu.setVisible(roiFrame != null);
-        setObjectMenu.setVisible(!(rectMarkersVisible || roiFrame !=null));
-        trackObjectMenu.setVisible(!(rectMarkersVisible || roiFrame !=null));
-        //trackObjectMenu.setVisible(!rectMarkersVisible || roiFrame !=null);
-
         trackObjectMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                MotionAnalysis motionAnalysis = getSensorAnalysis();
-                motionAnalysis.getRectMarkers().setVisibility(true);
-                trackObjectMenu.setVisible(false);
-                setObjectMenu.setVisible(true);
+                showObjectTrackingPopup();
                 return true;
             }
         });
 
-        setObjectMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                MotionAnalysis motionAnalysis = getSensorAnalysis();
-                view.setRegionOfInterest(motionAnalysis);
-                gotoObjectMenu.setVisible(true); //When ROI set, show button to track object. TODO: when load video, if ROI set then show button
-                return true;
-            }
-        });
-
-        gotoObjectMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                MotionAnalysis motionAnalysis = getSensorAnalysis();
-                view.showRegionOfInterest(motionAnalysis);
-                setObjectMenu.setVisible(true);
-                return true;
-            }
-        });
+//        //Integer roiFrame = getSensorAnalysis().getFrameDataList().getROIFrame();
+//        gotoObjectMenu.setVisible(roiFrame != null);
+//        setObjectMenu.setVisible(!(rectMarkersVisible || roiFrame !=null));
+//        trackObjectMenu.setVisible(!(rectMarkersVisible || roiFrame !=null));
+//        //trackObjectMenu.setVisible(!rectMarkersVisible || roiFrame !=null);
+//
+//        trackObjectMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem menuItem) {
+//                MotionAnalysis motionAnalysis = getSensorAnalysis();
+//                motionAnalysis.getRectMarkers().setVisibility(true);
+//                trackObjectMenu.setVisible(false);
+//                setObjectMenu.setVisible(true);
+//                return true;
+//            }
+//        });
+//
+//        setObjectMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem menuItem) {
+//                MotionAnalysis motionAnalysis = getSensorAnalysis();
+//                view.setRegionOfInterest(motionAnalysis);
+//                gotoObjectMenu.setVisible(true); //When ROI set, show button to track object. TODO: when load video, if ROI set then show button
+//                return true;
+//            }
+//        });
+//
+//        gotoObjectMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem menuItem) {
+//                MotionAnalysis motionAnalysis = getSensorAnalysis();
+//                view.showRegionOfInterest(motionAnalysis);
+//                setObjectMenu.setVisible(true);
+//                return true;
+//            }
+//        });
 
         setupStandardMenu(menu, inflater);
     }
@@ -165,6 +166,20 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         ScaleSettingsDialog scaleSettingsDialog = new ScaleSettingsDialog(getActivity(),
                 analysis.getLengthCalibrationSetter(), analysis.getXUnit(), analysis.getYUnit());
         scaleSettingsDialog.show();
+    }
+
+    private void showObjectTrackingPopup() {
+        final View menuView = getActivity().findViewById(R.id.enable_tracking);
+        final PopupMenu popup = new PopupMenu(getActivity(), menuView);
+        popup.inflate(R.menu.object_tracking_popup);
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                //TODO: do stuff here
+                return false;
+            }
+        });
+        popup.show();
     }
 
     private void showCalibrationPopup() {
@@ -256,12 +271,12 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                     RangeChangedMarkerUpdater updater = new RangeChangedMarkerUpdater(oldStart, oldFrameRate,
                             timeData.getAnalysisVideoStart(), timeData.getAnalysisVideoEnd(),
                             timeData.getAnalysisFrameRate());
-                    List<MarkerData> updatedMarkers = updater.update(sensorAnalysis.getTagMarkers());
-                    sensorAnalysis.getTagMarkers().setMarkerDataList(updatedMarkers);
+                    List<PointData> updatedMarkers = updater.update(sensorAnalysis.getTagMarkers());
+                    sensorAnalysis.getTagMarkers().setDataList(updatedMarkers);
                     // update current frame
                     int newCurrentFrame = updater.getNewCurrentFrame(updatedMarkers,
-                            sensorAnalysis.getFrameDataModel().getCurrentFrame());
-                    sensorAnalysis.getFrameDataModel().setCurrentFrame(newCurrentFrame);
+                            sensorAnalysis.getFrameDataList().getCurrentFrame());
+                    sensorAnalysis.getFrameDataList().setCurrentFrame(newCurrentFrame);
                 }
             }
         }
@@ -283,11 +298,11 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             newTimeData.setAnalysisFrameRate(newFrameRate);
         }
 
-        public List<MarkerData> update(PointDataModel dataModel) {
-            List<MarkerData> newMarkerData = new ArrayList<>();
-            for (int i = 0; i < dataModel.getMarkerCount(); i++) {
-                MarkerData markerData = dataModel.getMarkerDataAt(i);
-                float time = oldTimeData.getFrameTime(markerData.getFrameId());
+        public List<PointData> update(PointDataList dataModel) {
+            List<PointData> newMarkerData = new ArrayList<>();
+            for (int i = 0; i < dataModel.getDataCount(); i++) {
+                PointData pointData = dataModel.getDataAt(i);
+                float time = oldTimeData.getFrameTime(pointData.getFrameId());
                 int newFrame = newTimeData.getClosestFrame(time);
                 float frameTime = newTimeData.getFrameTime(newFrame);
 
@@ -296,8 +311,8 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                 if (time < newTimeData.getAnalysisVideoStart() || time > newTimeData.getAnalysisVideoEnd())
                     continue;
 
-                MarkerData clone = new MarkerData(newFrame);
-                clone.setPosition(markerData.getPosition());
+                PointData clone = new PointData(newFrame);
+                clone.setPosition(pointData.getPosition());
                 newMarkerData.add(clone);
             }
             return newMarkerData;
@@ -307,13 +322,13 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             return Math.abs(value1 - value2) < 0.01;
         }
 
-        public int getNewCurrentFrame(List<MarkerData> newMarkerList, int oldCurrentFrame) {
+        public int getNewCurrentFrame(List<PointData> newMarkerList, int oldCurrentFrame) {
             float oldTime = oldTimeData.getFrameTime(oldCurrentFrame);
             int newCurrentFrame = 0;
             float minDiff = Float.MAX_VALUE;
             for (int i = 0; i < newMarkerList.size(); i++) {
-                MarkerData markerData = newMarkerList.get(i);
-                int newFrame = markerData.getFrameId();
+                PointData pointData = newMarkerList.get(i);
+                int newFrame = pointData.getFrameId();
                 float time = newTimeData.getFrameTime(newFrame);
                 float currentDiff = Math.abs(time - oldTime);
                 if (currentDiff < minDiff) {
@@ -327,30 +342,30 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         }
     }
 
-    private PointDataModel.IListener menuDataListener = new PointDataModel.IListener() {
+    private PointDataList.IListener menuDataListener = new PointDataList.IListener<PointDataList>() {
         @Override
-        public void onDataAdded(PointDataModel model, int index) {
-            if (model.getMarkerCount() > 1)
+        public void onDataAdded(PointDataList model, int index) {
+            if (model.getDataCount() > 1)
                 getActivity().invalidateOptionsMenu();
         }
 
         @Override
-        public void onDataRemoved(PointDataModel model, int index, MarkerData data) {
+        public void onDataRemoved(PointDataList model, int index, Data data) {
 
         }
 
         @Override
-        public void onDataChanged(PointDataModel model, int index, int number) {
+        public void onDataChanged(PointDataList model, int index, int number) {
 
         }
 
         @Override
-        public void onAllDataChanged(PointDataModel model) {
+        public void onAllDataChanged(PointDataList model) {
 
         }
 
         @Override
-        public void onDataSelected(PointDataModel model, int index) {
+        public void onDataSelected(PointDataList model, int index) {
 
         }
     };
@@ -362,7 +377,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         final Intent intent = getActivity().getIntent();
         if (intent != null) {
             Bundle extras = intent.getExtras();
-            if (extras != null && getSensorAnalysis().getTagMarkers().getMarkerCount() == 0) {
+            if (extras != null && getSensorAnalysis().getTagMarkers().getDataCount() == 0) {
                 if (extras.getBoolean("first_start_with_run_settings", false)) {
                     resumeWithRunSettings = true;
                 }
@@ -398,7 +413,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         MotionAnalysis sensorAnalysis = getSensorAnalysis();
         if (getSensorAnalysis() == null)
             return;
-        sensorAnalysis.getFrameDataModel().setCurrentFrame(sensorAnalysis.getFrameDataModel().getCurrentFrame());
+        sensorAnalysis.getFrameDataList().setCurrentFrame(sensorAnalysis.getFrameDataList().getCurrentFrame());
 
         if (resumeWithRunSettings) {
             Bundle options = null;

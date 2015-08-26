@@ -10,6 +10,13 @@ package nz.ac.auckland.lablet.camera;
 import android.graphics.PointF;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
+
+import nz.ac.auckland.lablet.data.CalibratedDataList;
+import nz.ac.auckland.lablet.data.Data;
+import nz.ac.auckland.lablet.data.FrameDataList;
+import nz.ac.auckland.lablet.data.PointData;
+import nz.ac.auckland.lablet.data.PointDataList;
+import nz.ac.auckland.lablet.data.RectDataList;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.views.graph.IMinRangeGetter;
@@ -39,7 +46,7 @@ public class MotionAnalysis implements IDataAnalysis {
 
     final private VideoData sensorData;
 
-    final private FrameDataModel frameDataModel;
+    final private FrameDataList frameDataList;
     final private CalibrationXY calibrationXY;
     final private CalibrationVideoTimeData calibrationVideoTimeData;
     final private ITimeData timeData;
@@ -48,10 +55,11 @@ public class MotionAnalysis implements IDataAnalysis {
     final private Unit yUnit = new Unit("m");
     final private Unit tUnit = new Unit("s");
 
-    final private CalibratedMarkerDataModel tagMarkers;
-    final private PointDataModel lengthCalibrationMarkers;
-    final private PointDataModel originMarkers;
-    final private PointDataModel rectMarkers;
+    final private CalibratedDataList tagMarkers;
+    final private PointDataList lengthCalibrationMarkers;
+    final private PointDataList originMarkers;
+    final private PointDataList rectMarkers;
+    final private RectDataList rectDataList;
 
     final private LengthCalibrationSetter lengthCalibrationSetter;
     final private OriginCalibrationSetter originCalibrationSetter;
@@ -84,20 +92,20 @@ public class MotionAnalysis implements IDataAnalysis {
         }
         timeData = calibrationVideoTimeData;
 
-        frameDataModel = new FrameDataModel();
-        frameDataModel.setNumberOfFrames(calibrationVideoTimeData.getNumberOfFrames());
+        frameDataList = new FrameDataList();
+        frameDataList.setNumberOfFrames(calibrationVideoTimeData.getNumberOfFrames());
 
-        tagMarkers = new CalibratedMarkerDataModel(calibrationXY);
+        tagMarkers = new CalibratedDataList(calibrationXY);
         tagMarkers.setCalibrationXY(calibrationXY);
 
         float maxXValue = sensorData.getMaxRawX();
         float maxYValue = sensorData.getMaxRawY();
 
         //Rect marker data todo: move to method, want to create from method call from gui
-        MarkerData topLeft = new MarkerData(-1);
-        MarkerData topRight = new MarkerData(-2);
-        MarkerData btmLeft = new MarkerData(-3);
-        MarkerData btmRight = new MarkerData(-4);
+        PointData topLeft = new PointData(-1);
+        PointData topRight = new PointData(-2);
+        PointData btmLeft = new PointData(-3);
+        PointData btmRight = new PointData(-4);
         float length = 10;
         float half = length / 2;
         topLeft.setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.7f));
@@ -105,40 +113,41 @@ public class MotionAnalysis implements IDataAnalysis {
         btmLeft.setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.3f));
         btmRight.setPosition(new PointF(maxXValue * 0.7f, maxYValue * 0.3f));
 
-        rectMarkers = new PointDataModel();
-        rectMarkers.addMarkerData(topLeft);
-        rectMarkers.addMarkerData(topRight);
-        rectMarkers.addMarkerData(btmLeft);
-        rectMarkers.addMarkerData(btmRight);
+        rectMarkers = new PointDataList();
+        rectMarkers.addData(topLeft);
+        rectMarkers.addData(topRight);
+        rectMarkers.addData(btmLeft);
+        rectMarkers.addData(btmRight);
         rectMarkers.setVisibility(false);
 
-        lengthCalibrationMarkers = new PointDataModel();
-        MarkerData point1 = new MarkerData(-1);
+        lengthCalibrationMarkers = new PointDataList();
+        PointData point1 = new PointData(-1);
         point1.setPosition(new PointF(maxXValue * 0.1f, maxYValue * 0.9f));
-        lengthCalibrationMarkers.addMarkerData(point1);
-        MarkerData point2 = new MarkerData(-2);
+        lengthCalibrationMarkers.addData(point1);
+        PointData point2 = new PointData(-2);
         point2.setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.9f));
-        lengthCalibrationMarkers.addMarkerData(point2);
+        lengthCalibrationMarkers.addData(point2);
         lengthCalibrationSetter = new LengthCalibrationSetter(lengthCalibrationMarkers, calibrationXY);
 
         PointF origin = calibrationXY.getOrigin();
         PointF axis1 = calibrationXY.getAxis1();
-        originMarkers = new PointDataModel();
+        originMarkers = new PointDataList();
         // y-axis
-        point1 = new MarkerData(-1);
+        point1 = new PointData(-1);
         point1.setPosition(new PointF(10, 10));
-        originMarkers.addMarkerData(point1);
+        originMarkers.addData(point1);
         // x-axis
-        point2 = new MarkerData(-2);
+        point2 = new PointData(-2);
         point2.setPosition(new PointF(axis1.x, axis1.y));
-        originMarkers.addMarkerData(point2);
+        originMarkers.addData(point2);
         // origin
-        MarkerData point3 = new MarkerData(-3);
+        PointData point3 = new PointData(-3);
         point3.setPosition(origin);
-        originMarkers.addMarkerData(point3);
+        originMarkers.addData(point3);
         originCalibrationSetter = new OriginCalibrationSetter(calibrationXY, originMarkers);
 
-
+        rectDataList = new RectDataList();
+        rectDataList.setVisibility(false);
 
         updateOriginFromVideoRotation();
     }
@@ -162,8 +171,8 @@ public class MotionAnalysis implements IDataAnalysis {
     }
 
     public VideoData getVideoData() { return sensorData; }
-    public FrameDataModel getFrameDataModel() {
-        return frameDataModel;
+    public FrameDataList getFrameDataList() {
+        return frameDataList;
     }
     public LengthCalibrationSetter getLengthCalibrationSetter() {
         return lengthCalibrationSetter;
@@ -177,14 +186,18 @@ public class MotionAnalysis implements IDataAnalysis {
     public CalibrationVideoTimeData getCalibrationVideoTimeData() {
         return calibrationVideoTimeData;
     }
-    public PointDataModel getTagMarkers() {
+    public PointDataList getTagMarkers() {
         return tagMarkers;
     }
-    public PointDataModel getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
-    public PointDataModel getRectMarkers() {return rectMarkers;}
-    public PointDataModel getOriginMarkers(){
+    public PointDataList getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
+    public PointDataList getRectMarkers() {return rectMarkers;}
+    public PointDataList getOriginMarkers(){
         return originMarkers;
     }
+    public RectDataList getRectDataList(){
+        return rectDataList;
+    }
+
     public Bundle getVideoAnalysisSettings() { return videoAnalysisSettings; }
     public void setShowCoordinateSystem(boolean show) {
         showCoordinateSystem = show;
@@ -251,7 +264,7 @@ public class MotionAnalysis implements IDataAnalysis {
         tagMarkers.clear();
 
         setVideoAnalysisSettings(bundle.getBundle("video_analysis_settings"));
-        frameDataModel.setCurrentFrame(bundle.getInt("currentRun"));
+        frameDataList.setCurrentFrame(bundle.getInt("currentRun"));
 
         Bundle tagMarkerBundle = bundle.getBundle("tagMarkers");
         if (tagMarkerBundle != null)
@@ -278,9 +291,9 @@ public class MotionAnalysis implements IDataAnalysis {
     public Bundle exportAnalysisData(File storageDir) throws IOException {
         Bundle analysisDataBundle = new Bundle();
 
-        analysisDataBundle.putInt("currentRun", frameDataModel.getCurrentFrame());
+        analysisDataBundle.putInt("currentRun", frameDataList.getCurrentFrame());
 
-        if (tagMarkers.getMarkerCount() > 0)
+        if (tagMarkers.getDataCount() > 0)
             analysisDataBundle.putBundle("tagMarkers", tagMarkers.toBundle());
 
         analysisDataBundle.putBundle(LENGTH_CALIBRATION_KEY, lengthCalibrationSetter.toBundle());
@@ -343,8 +356,8 @@ public class MotionAnalysis implements IDataAnalysis {
         calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getFloat(ANALYSIS_FRAME_RATE_KEY));
 
         int numberOfFrames = calibrationVideoTimeData.getNumberOfFrames();
-        getFrameDataModel().setNumberOfFrames(numberOfFrames);
-        if (numberOfFrames <= getFrameDataModel().getCurrentFrame())
-            getFrameDataModel().setCurrentFrame(numberOfFrames - 1);
+        getFrameDataList().setNumberOfFrames(numberOfFrames);
+        if (numberOfFrames <= getFrameDataList().getCurrentFrame())
+            getFrameDataList().setCurrentFrame(numberOfFrames - 1);
     }
 }

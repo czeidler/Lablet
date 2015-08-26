@@ -23,7 +23,7 @@ public class SpeedTimeDataTableColumn extends TimeDataTableColumn {
 
     @Override
     public int size() {
-        return dataModel.getMarkerCount() - 1;
+        return dataModel.getDataCount() - 1;
     }
 
     @Override

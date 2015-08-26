@@ -5,18 +5,20 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.experiment;
+package nz.ac.auckland.lablet.data;
 
 import android.graphics.PointF;
 
+import nz.ac.auckland.lablet.experiment.CalibrationXY;
+
 
 /**
- * Data model for the a list of {@link MarkerData} including a xy calibration.
+ * Data model for the a list of {@link Data} including a xy calibration.
  */
-public class CalibratedMarkerDataModel extends PointDataModel implements CalibrationXY.IListener {
+public class CalibratedDataList extends PointDataList implements CalibrationXY.IListener {
     private CalibrationXY calibrationXY;
 
-    public CalibratedMarkerDataModel(CalibrationXY calibrationXY) {
+    public CalibratedDataList(CalibrationXY calibrationXY) {
         setCalibrationXY(calibrationXY);
     }
 
@@ -34,12 +36,12 @@ public class CalibratedMarkerDataModel extends PointDataModel implements Calibra
 
     @Override
     public void onCalibrationChanged() {
-        notifyDataChanged(0, markerDataList.size());
+        notifyDataChanged(0, dataList.size());
     }
 
     @Override
     public PointF getRealMarkerPositionAt(int index) {
-        MarkerData data = getMarkerDataAt(index);
+        PointData data = getDataAt(index);
         PointF raw = data.getPosition();
         if (calibrationXY == null)
             return raw;

@@ -13,8 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.MarkerData;
-import nz.ac.auckland.lablet.experiment.PointDataModel;
+import nz.ac.auckland.lablet.data.Data;
+import nz.ac.auckland.lablet.data.PointData;
+import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.views.plotview.PlotView;
 import nz.ac.auckland.lablet.views.table.DataTableColumn;
 import nz.ac.auckland.lablet.views.table.MarkerDataTableAdapter;
@@ -24,12 +25,12 @@ import nz.ac.auckland.lablet.views.table.TableView;
 class HCursorColumn extends DataTableColumn {
     @Override
     public int size() {
-        return dataModel.getMarkerCount();
+        return dataModel.getDataCount();
     }
 
     @Override
     public Number getValue(int index) {
-        return dataModel.getMarkerDataAt(index).getPosition().y;
+        return dataModel.getDataAt(index).getPosition().y;
     }
 
     @Override
@@ -41,14 +42,14 @@ class HCursorColumn extends DataTableColumn {
 class HCursorDiffToPrevColumn extends DataTableColumn {
     @Override
     public int size() {
-        return dataModel.getMarkerCount();
+        return dataModel.getDataCount();
     }
 
     @Override
     public Number getValue(int index) {
         if (index == 0)
             return 0;
-        return dataModel.getMarkerDataAt(index).getPosition().y - dataModel.getMarkerDataAt(index - 1).getPosition().y;
+        return dataModel.getDataAt(index).getPosition().y - dataModel.getDataAt(index - 1).getPosition().y;
     }
 
     @Override
@@ -60,12 +61,12 @@ class HCursorDiffToPrevColumn extends DataTableColumn {
 class VCursorColumn extends DataTableColumn {
     @Override
     public int size() {
-        return dataModel.getMarkerCount();
+        return dataModel.getDataCount();
     }
 
     @Override
     public Number getValue(int index) {
-        return dataModel.getMarkerDataAt(index).getPosition().x;
+        return dataModel.getDataAt(index).getPosition().x;
     }
 
     @Override
@@ -77,14 +78,14 @@ class VCursorColumn extends DataTableColumn {
 class VCursorDiffToPrevColumn extends DataTableColumn {
     @Override
     public int size() {
-        return dataModel.getMarkerCount();
+        return dataModel.getDataCount();
     }
 
     @Override
     public Number getValue(int index) {
         if (index == 0)
             return 0;
-        return dataModel.getMarkerDataAt(index).getPosition().x - dataModel.getMarkerDataAt(index - 1).getPosition().x;
+        return dataModel.getDataAt(index).getPosition().x - dataModel.getDataAt(index - 1).getPosition().x;
     }
 
     @Override
@@ -96,10 +97,10 @@ class VCursorDiffToPrevColumn extends DataTableColumn {
 
 public class CursorView extends LinearLayout {
     final private PlotView frequencyView;
-    final private PointDataModel hDataModel;
-    final private PointDataModel vDataModel;
+    final private PointDataList hDataModel;
+    final private PointDataList vDataModel;
 
-    public CursorView(Context context, PlotView frequencyView, PointDataModel hDataModel, PointDataModel vDataModel) {
+    public CursorView(Context context, PlotView frequencyView, PointDataList hDataModel, PointDataList vDataModel) {
         super(context);
 
         this.frequencyView = frequencyView;
@@ -121,7 +122,7 @@ public class CursorView extends LinearLayout {
         addView(setupVCursorView(inflater), params);
     }
 
-    class EnableButtonOnMarkerSelectedListener implements PointDataModel.IListener {
+    class EnableButtonOnMarkerSelectedListener implements PointDataList.IListener<PointDataList> {
         final Button button;
 
         public EnableButtonOnMarkerSelectedListener(Button button) {
@@ -129,27 +130,27 @@ public class CursorView extends LinearLayout {
         }
 
         @Override
-        public void onDataAdded(PointDataModel model, int index) {
+        public void onDataAdded(PointDataList model, int index) {
 
         }
 
         @Override
-        public void onDataRemoved(PointDataModel model, int index, MarkerData data) {
+        public void onDataRemoved(PointDataList model, int index, Data data) {
 
         }
 
         @Override
-        public void onDataChanged(PointDataModel model, int index, int number) {
+        public void onDataChanged(PointDataList model, int index, int number) {
 
         }
 
         @Override
-        public void onAllDataChanged(PointDataModel model) {
+        public void onAllDataChanged(PointDataList model) {
 
         }
 
         @Override
-        public void onDataSelected(PointDataModel model, int index) {
+        public void onDataSelected(PointDataList model, int index) {
             if (index < 0)
                 button.setEnabled(false);
             else
@@ -166,7 +167,7 @@ public class CursorView extends LinearLayout {
         TextView titleTextView = (TextView)hCursorView.findViewById(R.id.titleTextView);
         titleTextView.setText("Horizontal Cursors:");
         final TableView tableView = (TableView)hCursorView.findViewById(R.id.tableView);
-        if (hDataModel.getMarkerCount() == 0)
+        if (hDataModel.getDataCount() == 0)
             tableView.setVisibility(INVISIBLE);
         MarkerDataTableAdapter tableAdapter = new MarkerDataTableAdapter(hDataModel);
         tableAdapter.addColumn(new HCursorColumn());
@@ -177,7 +178,7 @@ public class CursorView extends LinearLayout {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (i == 0)
                     return;
-                hDataModel.selectMarkerData(i - 1);
+                hDataModel.selectData(i - 1);
             }
         });
 
@@ -191,7 +192,7 @@ public class CursorView extends LinearLayout {
         hMarkerListener = new EnableButtonOnMarkerSelectedListener(removeButton);
         hDataModel.addListener(hMarkerListener);
         Button addButton = (Button)hCursorView.findViewById(R.id.addButton);
-        if (hDataModel.getSelectedMarkerData() < 0)
+        if (hDataModel.getSelectedData() < 0)
             removeButton.setEnabled(false);
         addButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -207,7 +208,7 @@ public class CursorView extends LinearLayout {
         TextView titleTextView = (TextView)vCursorView.findViewById(R.id.titleTextView);
         titleTextView.setText("Vertical Cursors:");
         final TableView tableView = (TableView)vCursorView.findViewById(R.id.tableView);
-        if (vDataModel.getMarkerCount() == 0)
+        if (vDataModel.getDataCount() == 0)
             tableView.setVisibility(INVISIBLE);
         MarkerDataTableAdapter tableAdapter = new MarkerDataTableAdapter(vDataModel);
         tableAdapter.addColumn(new VCursorColumn());
@@ -218,7 +219,7 @@ public class CursorView extends LinearLayout {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (i == 0)
                     return;
-                vDataModel.selectMarkerData(i - 1);
+                vDataModel.selectData(i - 1);
             }
         });
 
@@ -231,7 +232,7 @@ public class CursorView extends LinearLayout {
         });
         vMarkerListener = new EnableButtonOnMarkerSelectedListener(removeButton);
         vDataModel.addListener(vMarkerListener);
-        if (vDataModel.getSelectedMarkerData() < 0)
+        if (vDataModel.getSelectedData() < 0)
             removeButton.setEnabled(false);
         Button addButton = (Button)vCursorView.findViewById(R.id.addButton);
         addButton.setOnClickListener(new OnClickListener() {
@@ -243,24 +244,24 @@ public class CursorView extends LinearLayout {
         return vCursorView;
     }
 
-    private void addCursor(PointDataModel markerDataModel, Button removeButton, TableView tableView) {
-        MarkerData markerData = new MarkerData(markerDataModel.getLargestRunId() + 1);
-        markerData.setPosition(frequencyView.getRangeMiddle());
-        markerDataModel.addMarkerData(markerData);
-        markerDataModel.selectMarkerData(markerData);
+    private void addCursor(PointDataList markerDataModel, Button removeButton, TableView tableView) {
+        PointData data = new PointData(markerDataModel.getLargestRunId() + 1);
+        data.setPosition(frequencyView.getRangeMiddle());
+        markerDataModel.addData(data);
+        markerDataModel.selectData(data);
 
-        if (markerDataModel.getMarkerCount() > 0)
+        if (markerDataModel.getDataCount() > 0)
             tableView.setVisibility(VISIBLE);
     }
 
-    private void removeSelectedCursor(PointDataModel markerDataModel, Button removeButton, TableView tableView) {
-        int selected = markerDataModel.getSelectedMarkerData();
-        if (selected < 0 || markerDataModel.getMarkerCount() == 0)
+    private void removeSelectedCursor(PointDataList markerDataModel, Button removeButton, TableView tableView) {
+        int selected = markerDataModel.getSelectedData();
+        if (selected < 0 || markerDataModel.getDataCount() == 0)
             return;
 
-        markerDataModel.removeMarkerData(selected);
+        markerDataModel.removeData(selected);
 
-        if (markerDataModel.getMarkerCount() == 0)
+        if (markerDataModel.getDataCount() == 0)
             tableView.setVisibility(INVISIBLE);
     }
 }

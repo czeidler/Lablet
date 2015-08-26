@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.experiment.PointDataModel;
+import nz.ac.auckland.lablet.data.PointDataList;
 
 
 /**
@@ -20,7 +20,7 @@ public abstract class MarkerGraphAxis implements AbstractGraphAdapter.IGraphData
         markerGraphAdapter = adapter;
     }
 
-    public PointDataModel getData() {
+    public PointDataList getData() {
         return markerGraphAdapter.getData();
     }
 }

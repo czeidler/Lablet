@@ -6,20 +6,9 @@
     <item android:id="@+id/action_track_object"
         android:icon="@drawable/ic_eye"
         android:checkable="true"
-        android:title="Track Object"
+        android:title="Object Tracking"
         yourapp:showAsAction="always|withText"/>
-    <item android:id="@+id/action_set_object"
-        android:icon="@drawable/ic_eye"
-        android:checkable="true"
-        android:title="Set Object"
-        android:visible="false"
-        yourapp:showAsAction="always|withText"/>
-    <item android:id="@+id/action_goto_object"
-        android:icon="@drawable/ic_eye"
-        android:checkable="true"
-        android:title="Goto Object"
-        android:visible="false"
-        yourapp:showAsAction="always|withText"/>
+
     <item android:id="@+id/action_delete"
           android:icon="@drawable/ic_delete_marker"
           android:title="@string/action_delete"
@@ -35,5 +24,5 @@
     <item android:id="@+id/action_view"
           android:icon="@drawable/ic_chart_line"
           android:title="@string/action_view"
-          yourapp:showAsAction="ifRoom|withText"/>
+          yourapp:showAsAction="always|withText"/>
 </menu>

@@ -58,9 +58,9 @@ public class CamShiftTracker {
     *
     */
 
-    public void setROI(int frame, Bitmap bmp, int x, int y, int width, int height)
+    public void setROI(int frameId, Bitmap bmp, int x, int y, int width, int height)
     {
-        this.currentRoiFrame = frame;
+        this.currentRoiFrame = frameId;
 
         Mat inputFrame = new Mat();
         Utils.bitmapToMat(bmp, inputFrame);
@@ -78,11 +78,11 @@ public class CamShiftTracker {
         Core.normalize(roiHist, roiHist, 0, 255, Core.NORM_MINMAX);
 
         Rect roiRect = new Rect(x, y, width, height);
-        rois.put(frame, roiRect);
+        rois.put(frameId, roiRect);
     }
 
     /**
-     * Finds an object in a bitmap frame. The object being searched for is detected based on
+     * Finds an object in a bitmap frameId. The object being searched for is detected based on
      * a pre-specified region of interest (setROI).
      *
      * Returns a RotatedRect that specifies the location of the object.
@@ -91,10 +91,10 @@ public class CamShiftTracker {
      * will be thrown.
      */
 
-    public void findObject(int frame, Bitmap bmp)
+    public void findObject(int frameId, Bitmap bmp)
     {
         //Get initial seed window
-        int previousFrame = frame-1;
+        int previousFrame = frameId-1;
         RotatedRect previousResult = this.output.get(previousFrame);
         Rect seedWindow = new Rect();
 
@@ -113,10 +113,10 @@ public class CamShiftTracker {
         }
         else if(previousResult == null)
         {
-            throw new IllegalStateException("CamShiftTracker: Please set a region of interest or search for the object in the previous frame");
+            throw new IllegalStateException("CamShiftTracker: Please set a region of interest or search for the object in the previous frameId");
         }
 
-        //Get current Mat frame and convert to HSV colour space
+        //Get current Mat frameId and convert to HSV colour space
         Mat inputFrame = new Mat();
         Utils.bitmapToMat(bmp, inputFrame);
         Imgproc.cvtColor(inputFrame, inputFrame, Imgproc.COLOR_BGR2HSV);
@@ -128,7 +128,7 @@ public class CamShiftTracker {
         Imgproc.calcBackProject(images, new MatOfInt(0), roiHist, output, new MatOfFloat(0, 180), 1);
 
         RotatedRect result = Video.CamShift(output, seedWindow, termCriteria); //Camshift todo:  check if back project was successful
-        this.output.put(frame, result);
+        this.output.put(frameId, result);
     }
 
     /**
@@ -136,9 +136,9 @@ public class CamShiftTracker {
      * @return RotatedRect. Returns null if no object found.
      */
 
-    public RotatedRect getOutput(int frame)
+    public RotatedRect getOutput(int frameId)
     {
-        return this.output.get(frame);
+        return this.output.get(frameId);
     }
 
 }

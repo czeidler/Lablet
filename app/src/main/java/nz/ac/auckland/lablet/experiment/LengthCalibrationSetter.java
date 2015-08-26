@@ -10,6 +10,9 @@ package nz.ac.auckland.lablet.experiment;
 import android.graphics.PointF;
 import android.os.Bundle;
 
+import nz.ac.auckland.lablet.data.Data;
+import nz.ac.auckland.lablet.data.PointDataList;
+
 
 /**
  * Class to manage the length calibration scale.
@@ -28,38 +31,38 @@ import android.os.Bundle;
  */
 public class LengthCalibrationSetter {
     private CalibrationXY calibrationXY;
-    private PointDataModel calibrationMarkers;
+    private PointDataList calibrationMarkers;
 
     private float calibrationValue;
 
-    private PointDataModel.IListener dataListener = new PointDataModel.IListener() {
+    private PointDataList.IListener dataListener = new PointDataList.IListener<PointDataList>() {
         @Override
-        public void onDataAdded(PointDataModel model, int index) {
+        public void onDataAdded(PointDataList model, int index) {
             calibrate();
         }
 
         @Override
-        public void onDataRemoved(PointDataModel model, int index, MarkerData data) {
+        public void onDataRemoved(PointDataList model, int index, Data data) {
             calibrate();
         }
 
         @Override
-        public void onDataChanged(PointDataModel model, int index, int number) {
+        public void onDataChanged(PointDataList model, int index, int number) {
             calibrate();
         }
 
         @Override
-        public void onAllDataChanged(PointDataModel model) {
+        public void onAllDataChanged(PointDataList model) {
             calibrate();
         }
 
         @Override
-        public void onDataSelected(PointDataModel model, int index) {
+        public void onDataSelected(PointDataList model, int index) {
 
         }
     };
 
-    public LengthCalibrationSetter(PointDataModel lengthCalibrationMarkers, CalibrationXY calibrationXY) {
+    public LengthCalibrationSetter(PointDataList lengthCalibrationMarkers, CalibrationXY calibrationXY) {
         this.calibrationMarkers = lengthCalibrationMarkers;
         this.calibrationMarkers.addListener(dataListener);
         this.calibrationXY = calibrationXY;
@@ -76,8 +79,8 @@ public class LengthCalibrationSetter {
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
 
-        PointF point1 = calibrationMarkers.getMarkerDataAt(0).getPosition();
-        PointF point2 = calibrationMarkers.getMarkerDataAt(1).getPosition();
+        PointF point1 = calibrationMarkers.getDataAt(0).getPosition();
+        PointF point2 = calibrationMarkers.getDataAt(1).getPosition();
         bundle.putFloat("lengthCalibrationPoint1x", point1.x);
         bundle.putFloat("lengthCalibrationPoint1y", point1.y);
         bundle.putFloat("lengthCalibrationPoint2x", point2.x);
@@ -88,8 +91,8 @@ public class LengthCalibrationSetter {
     }
 
     public void fromBundle(Bundle bundle) {
-        PointF point1 = calibrationMarkers.getMarkerDataAt(0).getPosition();
-        PointF point2 = calibrationMarkers.getMarkerDataAt(1).getPosition();
+        PointF point1 = calibrationMarkers.getDataAt(0).getPosition();
+        PointF point2 = calibrationMarkers.getDataAt(1).getPosition();
         if (bundle.containsKey("lengthCalibrationPoint1x"))
             point1.x = bundle.getFloat("lengthCalibrationPoint1x");
         if (bundle.containsKey("lengthCalibrationPoint1y"))
@@ -113,14 +116,14 @@ public class LengthCalibrationSetter {
     }
 
     public float scaleLength() {
-        PointF point1 = calibrationMarkers.getMarkerDataAt(0).getPosition();
-        PointF point2 = calibrationMarkers.getMarkerDataAt(1).getPosition();
+        PointF point1 = calibrationMarkers.getDataAt(0).getPosition();
+        PointF point2 = calibrationMarkers.getDataAt(1).getPosition();
 
         return  (float)Math.sqrt(Math.pow(point1.x - point2.x, 2) +  Math.pow(point1.y - point2.y, 2));
     }
 
     private void calibrate() {
-        if (calibrationMarkers.getMarkerCount() != 2)
+        if (calibrationMarkers.getDataCount() != 2)
             return;
         float value = calibrationValue / scaleLength();
         calibrationXY.setScale(value, value);

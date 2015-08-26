@@ -18,11 +18,11 @@ public class RunIdDataTableColumn extends DataTableColumn {
     }
 
     public int size() {
-        return dataModel.getMarkerCount();
+        return dataModel.getDataCount();
     }
 
     public Number getValue(int index) {
-        return dataModel.getMarkerDataAt(index).getFrameId();
+        return dataModel.getDataAt(index).getFrameId();
     }
 
     public String getStringValue(int index) {

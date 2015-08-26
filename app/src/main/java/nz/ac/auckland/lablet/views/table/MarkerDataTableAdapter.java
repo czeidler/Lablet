@@ -7,7 +7,8 @@
  */
 package nz.ac.auckland.lablet.views.table;
 
-import nz.ac.auckland.lablet.experiment.*;
+import nz.ac.auckland.lablet.data.Data;
+import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.misc.Unit;
 
 import java.util.ArrayList;
@@ -15,9 +16,9 @@ import java.util.List;
 
 
 public class MarkerDataTableAdapter extends ColumnDataTableAdapter {
-    protected PointDataModel model;
+    protected PointDataList model;
 
-    public MarkerDataTableAdapter(PointDataModel model) {
+    public MarkerDataTableAdapter(PointDataList model) {
         this.model = model;
         model.addListener(markerListener);
     }
@@ -44,37 +45,37 @@ public class MarkerDataTableAdapter extends ColumnDataTableAdapter {
 
     @Override
     public void selectRow(int row) {
-        model.selectMarkerData(row);
+        model.selectData(row);
     }
 
     @Override
     public int getSelectedRow() {
-        return model.getSelectedMarkerData();
+        return model.getSelectedData();
     }
 
-    private PointDataModel.IListener markerListener = new PointDataModel.IListener() {
+    private PointDataList.IListener markerListener = new PointDataList.IListener<PointDataList>() {
         @Override
-        public void onDataAdded (PointDataModel model,int index){
+        public void onDataAdded (PointDataList model,int index){
             notifyRowAdded(index + 1);
         }
 
         @Override
-        public void onDataRemoved (PointDataModel model,int index, MarkerData data){
+        public void onDataRemoved (PointDataList model,int index, Data data){
             notifyRowRemoved(index + 1);
         }
 
         @Override
-        public void onDataChanged (PointDataModel model,int index, int number){
+        public void onDataChanged (PointDataList model,int index, int number){
             notifyRowChanged(index + 1, number);
         }
 
         @Override
-        public void onAllDataChanged (PointDataModel model){
+        public void onAllDataChanged (PointDataList model){
             notifyAllRowsChanged();
         }
 
         @Override
-        public void onDataSelected (PointDataModel model,int index){
+        public void onDataSelected (PointDataList model,int index){
             notifyRowSelected(index);
         }
     };

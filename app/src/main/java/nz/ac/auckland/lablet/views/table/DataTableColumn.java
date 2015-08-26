@@ -7,7 +7,7 @@
  */
 package nz.ac.auckland.lablet.views.table;
 
-import nz.ac.auckland.lablet.experiment.PointDataModel;
+import nz.ac.auckland.lablet.data.PointDataList;
 
 import java.util.Locale;
 
@@ -16,7 +16,7 @@ import java.util.Locale;
  * Abstract base class for table columns.
  */
 public abstract class DataTableColumn {
-    protected PointDataModel dataModel;
+    protected PointDataList dataModel;
 
     abstract public int size();
     abstract public Number getValue(int index);
@@ -26,7 +26,7 @@ public abstract class DataTableColumn {
     }
     abstract public String getHeader();
 
-    public void setDataModel(PointDataModel dataModel) {
+    public void setDataModel(PointDataList dataModel) {
         this.dataModel = dataModel;
     }
 }

@@ -1,4 +1,4 @@
-package nz.ac.auckland.lablet.views;
+package nz.ac.auckland.lablet.views.painters;
 
 import android.graphics.*;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
@@ -9,14 +9,14 @@ import nz.ac.auckland.lablet.experiment.CalibrationXY;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-import nz.ac.auckland.lablet.experiment.PointDataModel;
+import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 
 /**
  * Marker for the calibration length scale.
  */
-class CalibrationMarker extends SimpleMarker {
+class CalibrationDataPainter extends TagDataPainter {
     @Override
     public void onDraw(Canvas canvas, float priority) {
         if (isSelectedForDrag())
@@ -27,11 +27,11 @@ class CalibrationMarker extends SimpleMarker {
 /**
  * Responsible to draw a calibration scale.
  * <p>
- * The painter expect a {@link PointDataModel} with two data points; one
+ * The painter expect a {@link PointDataList} with two data points; one
  * for the start and one for the end of the scale.
  * </p>
  */
-public class CalibrationMarkerPainter extends AbstractMarkerPainter {
+public class CalibrationDataListPainter extends DraggableDataListPainter {
     // device independent sizes:
     private final int FONT_SIZE_DP = 20;
     private final float LINE_WIDTH_DP = 2f;
@@ -42,7 +42,7 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
     private float LINE_WIDTH;
     private float WING_LENGTH;
 
-    public CalibrationMarkerPainter(PointDataModel model) {
+    public CalibrationDataListPainter(PointDataList model) {
         super(model);
     }
 
@@ -59,8 +59,8 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
     }
 
     @Override
-    protected DraggableMarker createMarkerForRow(int row) {
-        return new CalibrationMarker();
+    protected DraggableDataPainter createPainterForFrame(int frameId) {
+        return new CalibrationDataPainter();
     }
 
     private void rotate(PointF point, PointF origin, float angleScreen) {
@@ -73,15 +73,15 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
     }
 
     private PointF getCurrentScreenPos(int markerIndex) {
-        return ((DraggableMarker)markerList.get(markerIndex)).getCachedScreenPosition();
+        return ((DraggableDataPainter) painterList.get(markerIndex)).getCachedScreenPosition();
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        for (IMarker marker : markerList)
+        for (IDataPainter marker : painterList)
             marker.onDraw(canvas, 1);
 
-        if (markerData.getMarkerCount() != 2)
+        if (dataList.getDataCount() != 2)
             return;
 
         // draw scale
@@ -115,7 +115,7 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
         canvas.drawLine(wing2Top.x, wing2Top.y, wing2Bottom.x, wing2Bottom.y, paint);
 
         // draw pixel display when one marker is selected for dragging
-        if (!markerList.get(0).isSelectedForDrag() && !markerList.get(1).isSelectedForDrag())
+        if (!painterList.get(0).isSelectedForDrag() && !painterList.get(1).isSelectedForDrag())
             return;
 
         paint.setStyle(Paint.Style.FILL);

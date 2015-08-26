@@ -22,7 +22,7 @@ public class AccelerationTimeDataTableColumn extends TimeDataTableColumn {
 
     @Override
     public int size() {
-        return dataModel.getMarkerCount() - 2;
+        return dataModel.getDataCount() - 2;
     }
 
     @Override
