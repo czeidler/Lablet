@@ -153,20 +153,23 @@ public class SeekToFrameExtractor {
             // coarse seek
             extractor.seekTo(seekTarget, MediaExtractor.SEEK_TO_PREVIOUS_SYNC);
 
+            boolean endOfStream = false;
             // fine manual seek
             boolean positionReached = false;
             while (!positionReached) {
-                int inIndex = decoder.dequeueInputBuffer(DEQUE_TIMEOUT);
-                if (inIndex >= 0) {
-                    ByteBuffer buffer = inputBuffers[inIndex];
+                if (!endOfStream) {
+                    int inIndex = decoder.dequeueInputBuffer(DEQUE_TIMEOUT);
+                    if (inIndex >= 0) {
+                        ByteBuffer buffer = inputBuffers[inIndex];
 
-                    int sampleSize = extractor.readSampleData(buffer, 0);
-                    if (sampleSize < 0) {
-                        decoder.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
-                        positionReached = true;
-                    } else {
-                        decoder.queueInputBuffer(inIndex, 0, sampleSize, extractor.getSampleTime(), 0);
-                        extractor.advance();
+                        int sampleSize = extractor.readSampleData(buffer, 0);
+                        if (sampleSize < 0) {
+                            decoder.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                            endOfStream = true;
+                        } else {
+                            decoder.queueInputBuffer(inIndex, 0, sampleSize, extractor.getSampleTime(), 0);
+                            extractor.advance();
+                        }
                     }
                 }
 
@@ -178,7 +181,8 @@ public class SeekToFrameExtractor {
                         break;
                     default:
                         boolean render = false;
-                        if (bufferInfo.presentationTimeUs - seekTarget >= 0) {
+                        if (bufferInfo.presentationTimeUs - seekTarget >= 0
+                                || (bufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                             positionReached = true;
                             render = true;
                         }
