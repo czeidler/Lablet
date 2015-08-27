@@ -234,7 +234,7 @@ public class TagDataListPainter extends DraggableDataListPainter {
 
         // check if we have the run in the data list
         PointData data = null;
-        int index = dataList.findDataByRun(frame);
+        int index = dataList.getDataByRun(frame);
         if (index >= 0) {
             data = dataList.getDataAt(index);
             dataList.selectData(index);

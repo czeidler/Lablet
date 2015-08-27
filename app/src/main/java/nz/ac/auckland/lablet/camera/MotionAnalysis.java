@@ -12,11 +12,12 @@ import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 
 import nz.ac.auckland.lablet.data.CalibratedDataList;
-import nz.ac.auckland.lablet.data.Data;
 import nz.ac.auckland.lablet.data.FrameDataList;
 import nz.ac.auckland.lablet.data.PointData;
 import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.data.RectDataList;
+import nz.ac.auckland.lablet.data.RoiData;
+import nz.ac.auckland.lablet.data.RoiDataList;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.views.graph.IMinRangeGetter;
@@ -58,7 +59,7 @@ public class MotionAnalysis implements IDataAnalysis {
     final private CalibratedDataList tagMarkers;
     final private PointDataList lengthCalibrationMarkers;
     final private PointDataList originMarkers;
-    final private PointDataList rectMarkers;
+    final private RoiDataList roiDataList;
     final private RectDataList rectDataList;
 
     final private LengthCalibrationSetter lengthCalibrationSetter;
@@ -68,6 +69,9 @@ public class MotionAnalysis implements IDataAnalysis {
     private Bundle videoAnalysisSettings = null;
 
     private int videoRotation = 0;
+    private boolean trackingEnabled = false;
+    private  boolean debuggingEnabled = false;
+    private Integer currentRoi = null;
 
 
     final private List<IListener> listenerList = new ArrayList<>();
@@ -101,25 +105,6 @@ public class MotionAnalysis implements IDataAnalysis {
         float maxXValue = sensorData.getMaxRawX();
         float maxYValue = sensorData.getMaxRawY();
 
-        //Rect marker data todo: move to method, want to create from method call from gui
-        PointData topLeft = new PointData(-1);
-        PointData topRight = new PointData(-2);
-        PointData btmLeft = new PointData(-3);
-        PointData btmRight = new PointData(-4);
-        float length = 10;
-        float half = length / 2;
-        topLeft.setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.7f));
-        topRight.setPosition(new PointF(maxXValue * 0.7f, maxYValue * 0.7f));
-        btmLeft.setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.3f));
-        btmRight.setPosition(new PointF(maxXValue * 0.7f, maxYValue * 0.3f));
-
-        rectMarkers = new PointDataList();
-        rectMarkers.addData(topLeft);
-        rectMarkers.addData(topRight);
-        rectMarkers.addData(btmLeft);
-        rectMarkers.addData(btmRight);
-        rectMarkers.setVisibility(false);
-
         lengthCalibrationMarkers = new PointDataList();
         PointData point1 = new PointData(-1);
         point1.setPosition(new PointF(maxXValue * 0.1f, maxYValue * 0.9f));
@@ -149,7 +134,58 @@ public class MotionAnalysis implements IDataAnalysis {
         rectDataList = new RectDataList();
         rectDataList.setVisibility(false);
 
+        roiDataList = new RoiDataList();
+        roiDataList.setVisibility(false);
+
         updateOriginFromVideoRotation();
+    }
+
+    public boolean isFrameRegionOfInterest(int frameId)
+    {
+        for(int i = 0; i < roiDataList.getDataCount(); i++){
+            RoiData data = roiDataList.getDataAt(i);
+
+            if(data.getFrameId() == frameId)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void setRegionOfInterest()
+    {
+        float maxXValue = sensorData.getMaxRawX();
+        float maxYValue = sensorData.getMaxRawY();
+        currentRoi = this.getFrameDataList().getCurrentFrame();
+
+        RoiData data = new RoiData(currentRoi);
+        data.getTopLeft().setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.7f));
+        data.getTopRight().setPosition(new PointF(maxXValue * 0.7f, maxYValue * 0.7f));
+        data.getBtmLeft().setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.3f));
+        data.getBtmRight().setPosition(new PointF(maxXValue * 0.7f, maxYValue * 0.3f));
+        data.setVisible(true);
+
+        this.getRoiDataList().addData(data);
+    }
+
+    public boolean isDebuggingEnabled() {
+        return debuggingEnabled;
+    }
+
+    public void setDebuggingEnabled(boolean debuggingEnabled) {
+        this.debuggingEnabled = debuggingEnabled;
+        rectDataList.setVisibility(debuggingEnabled);
+    }
+
+    public boolean isTrackingEnabled() {
+        return trackingEnabled;
+    }
+
+    public void setTrackingEnabled(boolean trackingEnabled) {
+        this.trackingEnabled = trackingEnabled;
+        roiDataList.setVisibility(trackingEnabled);
     }
 
     protected void setOrigin(PointF origin, PointF axis1) {
@@ -190,7 +226,7 @@ public class MotionAnalysis implements IDataAnalysis {
         return tagMarkers;
     }
     public PointDataList getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
-    public PointDataList getRectMarkers() {return rectMarkers;}
+    public RoiDataList getRoiDataList() {return roiDataList;}
     public PointDataList getOriginMarkers(){
         return originMarkers;
     }

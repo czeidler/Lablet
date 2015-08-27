@@ -3,6 +3,7 @@ package nz.ac.auckland.lablet.views.painters;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.view.MotionEvent;
 
 import nz.ac.auckland.lablet.data.RectData;
@@ -25,13 +26,14 @@ class RectDataPainter implements IDataPainter<RectData, RectDataListPainter> {
 
     @Override
     public void setTo(RectDataListPainter painter, RectData data) {
-        parent = painter;
+        this.parent = painter;
+        this.data = data;
         LINE_WIDTH = parent.toPixel(LINE_WIDTH_DP);
     }
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
-        RectData data = (RectData) this.data;
+        //RectData data = (RectData) this.data;
 
         if(data.isVisible())
         {
@@ -48,10 +50,19 @@ class RectDataPainter implements IDataPainter<RectData, RectDataListPainter> {
             //Draw rotated rectangle
             canvas.save();
             canvas.rotate(data.getAngle());
-            float left = data.getCentre().x - data.getWidth() / 2;
-            float right = data.getCentre().x + data.getWidth() / 2;
-            float top = data.getCentre().y + data.getHeight() / 2;
-            float bottom = data.getCentre().y - data.getHeight() / 2;
+
+            //Convert centre to screen position
+            PointF centreScreen = new PointF();
+            parent.getContainerView().toScreen(data.getCentre(), centreScreen);
+
+            //Convert width and height to screen size, kinda hacky
+            PointF size = new PointF();
+            parent.getContainerView().toScreen(new PointF(data.getWidth(), data.getHeight()), size);
+
+            float left = centreScreen.x -  size.x / 2;
+            float right = centreScreen.x + size.x / 2;
+            float top = centreScreen.y + size.y / 2;
+            float bottom = centreScreen.y - size.y / 2;
             canvas.drawRect(left, top, right, bottom, paint);
             canvas.restore();
         }

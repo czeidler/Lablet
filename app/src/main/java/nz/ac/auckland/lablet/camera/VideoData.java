@@ -104,7 +104,7 @@ public class VideoData extends AbstractSensorData {
      * @return Coordinates in marker space
      */
 
-    public PointF toMarkerPoint(Point videoPoint)
+    public PointF toMarkerPoint(PointF videoPoint)
     {
         PointF markerPos = new PointF();
         float markerX = ((float)videoPoint.x / (float)this.getVideoWidth()) * this.getMaxRawX();

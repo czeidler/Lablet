@@ -7,15 +7,7 @@
 
     <item android:id="@+id/set_roi"
         android:icon="@drawable/ic_chart_line"
-        android:title="Track object"/>
-
-    <item android:id="@+id/delete_roi"
-        android:icon="@drawable/ic_chart_line"
-        android:title="Delete object"/>
-
-    <item android:id="@+id/next_roi"
-        android:icon="@drawable/ic_chart_line"
-        android:title="Next object"/>
+        android:title="Set Region of Interest"/>
 
     <item android:id="@+id/debug_tracking"
         android:title="Debug"

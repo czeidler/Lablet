@@ -108,13 +108,22 @@ public abstract class DataList<D extends Data> extends WeakListenable<DataList.I
 
     public abstract void fromBundle(Bundle bundle);
 
-    public int findDataByRun(int run) {
+    public int getDataByRun(int run) {
         for (int i = 0; i < getDataCount(); i++) {
             D data = getDataAt(i);
             if (data.getFrameId() == run)
                 return i;
         }
         return -1;
+    }
+
+    public D getDataByFrameId(int frameId) {
+        for (int i = 0; i < getDataCount(); i++) {
+            D data = getDataAt(i);
+            if (data.getFrameId() == frameId)
+                return data;
+        }
+        return null;
     }
 
     public D removeData(int index) {

@@ -36,11 +36,12 @@ public class CamShiftTracker {
     }
 
     private Mat roiHist;
-    //private Rect roiWindow;
+    private Rect seedWindow;
     private TermCriteria termCriteria;
     private HashMap<Integer, RotatedRect> output = new HashMap<Integer, RotatedRect>();
     private HashMap<Integer, Rect> rois = new HashMap<Integer, Rect>();
     Integer currentRoiFrame = null;
+    //Rect seedWindow = null;
 
     public CamShiftTracker() {
         roiHist = new Mat();
@@ -78,7 +79,8 @@ public class CamShiftTracker {
         Core.normalize(roiHist, roiHist, 0, 255, Core.NORM_MINMAX);
 
         Rect roiRect = new Rect(x, y, width, height);
-        rois.put(frameId, roiRect);
+        seedWindow = roiRect;
+        //rois.put(frameId, roiRect);
     }
 
     /**
@@ -91,30 +93,30 @@ public class CamShiftTracker {
      * will be thrown.
      */
 
-    public void findObject(int frameId, Bitmap bmp)
+    public RotatedRect findObject(Bitmap bmp)
     {
         //Get initial seed window
-        int previousFrame = frameId-1;
-        RotatedRect previousResult = this.output.get(previousFrame);
-        Rect seedWindow = new Rect();
+        //int previousFrame = frameId-1;
+        //RotatedRect previousResult = this.output.get(previousFrame);
+//        Rect seedWindow = new Rect();
+//
+//        if(previousResult != null)
+//        {
+//            seedWindow = previousResult.boundingRect();
+//        }
+//        else if(previousFrame == this.currentRoiFrame)
+//        {
+//            seedWindow = this.rois.get(this.currentRoiFrame);
+//        }
 
-        if(previousResult != null)
-        {
-            seedWindow = previousResult.boundingRect();
-        }
-        else if(previousFrame == this.currentRoiFrame)
-        {
-            seedWindow = this.rois.get(this.currentRoiFrame);
-        }
-
-        if(this.currentRoiFrame == null)
-        {
-            throw new IllegalStateException("CamShiftTracker: Please set a region of interest with the setROI method");
-        }
-        else if(previousResult == null)
-        {
-            throw new IllegalStateException("CamShiftTracker: Please set a region of interest or search for the object in the previous frameId");
-        }
+//        if(this.currentRoiFrame == null)
+//        {
+//            throw new IllegalStateException("CamShiftTracker: Please set a region of interest with the setROI method");
+//        }
+//        else if(this.currentRoiFrame == null && previousResult == null)
+//        {
+//            throw new IllegalStateException("CamShiftTracker: Please set a region of interest or search for the object in the previous frameId");
+//        }
 
         //Get current Mat frameId and convert to HSV colour space
         Mat inputFrame = new Mat();
@@ -128,7 +130,8 @@ public class CamShiftTracker {
         Imgproc.calcBackProject(images, new MatOfInt(0), roiHist, output, new MatOfFloat(0, 180), 1);
 
         RotatedRect result = Video.CamShift(output, seedWindow, termCriteria); //Camshift todo:  check if back project was successful
-        this.output.put(frameId, result);
+        seedWindow = result.boundingRect();
+        return result;
     }
 
     /**

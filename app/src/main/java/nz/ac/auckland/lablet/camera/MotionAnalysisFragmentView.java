@@ -23,11 +23,11 @@ import org.opencv.core.RotatedRect;
 
 import nz.ac.auckland.lablet.R;
 //import nz.ac.auckland.lablet.accelerometer.AccelerometerSensorData;
-import nz.ac.auckland.lablet.data.Data;
 import nz.ac.auckland.lablet.data.FrameDataList;
 import nz.ac.auckland.lablet.data.PointData;
 import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.data.RectData;
+import nz.ac.auckland.lablet.data.RoiData;
 import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 import nz.ac.auckland.lablet.views.FrameDataSeekBar;
@@ -327,75 +327,46 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
             @Override
             public void onFrameChanged(int newFrame) {
-
-                if(tracker.isROISet() && sensorAnalysis.getFrameDataList().getROIFrame() == newFrame) {
-                    sensorAnalysis.getRectMarkers().setVisibility(true);
-                }
-                else if(tracker.isROISet() && sensorAnalysis.getFrameDataList().getROIFrame() != newFrame)
+                if(sensorAnalysis.isTrackingEnabled())
                 {
-                    sensorAnalysis.getRectMarkers().setVisibility(false);
-                }
+                    int previousFrame = newFrame -1;
 
-                if(tracker.isROISet() && !sensorAnalysis.getFrameDataList().isObjectPicked(newFrame))
-                {
-                    long startFrameTime = (long)sensorAnalysis.getTimeData().getTimeAt(newFrame-1) * 1000;
-                    long endFrameTime = (long)sensorAnalysis.getTimeData().getTimeAt(newFrame) * 1000;
+                    if(sensorAnalysis.getTagMarkers().getDataByFrameId(newFrame) != null) {
+                        if (sensorAnalysis.getRoiDataList().getDataByFrameId(previousFrame) != null) {
+                            setRegionOfInterest(previousFrame, sensorAnalysis);
+                        }
 
+                        long startFrameTime = (long) sensorAnalysis.getTimeData().getTimeAt(previousFrame) * 1000;
+                        long endFrameTime = (long) sensorAnalysis.getTimeData().getTimeAt(newFrame) * 1000;
 
-                    RotatedRect result = new RotatedRect();
-                    int frameRate = sensorAnalysis.getVideoData().getVideoFrameRate();
-                    long increment = 1000*1000/frameRate;
+                        RotatedRect result = new RotatedRect();
+                        int frameRate = sensorAnalysis.getVideoData().getVideoFrameRate();
+                        long increment = 1000 * 1000 / frameRate;
 
-                    for(long i = startFrameTime; i <= endFrameTime; i+=increment) {
-                        Bitmap bmp = sensorAnalysis.getVideoData().getFrame(i);
-                        tracker.findObject(newFrame, bmp);
-                        result = tracker.getOutput(newFrame);
+                        for (long i = startFrameTime + increment; i <= endFrameTime; i += increment) {
+                            Bitmap bmp = sensorAnalysis.getVideoData().getFrame(i);
+                            result = tracker.findObject(bmp);
+                        }
+
+                        //Add marker
+                        PointF nextPos = sensorAnalysis.getVideoData().toMarkerPoint(new PointF((float) result.center.x, (float) result.center.y));
+                        PointData nextTag = new PointData(newFrame);
+                        nextTag.setPosition(nextPos);
+                        sensorAnalysis.getTagMarkers().addData(nextTag); //Have to add marker here rather than edit its position as TagDataListPainter.setCurrentFrame (which adds markers) is called after this method
+
+                        //Add debugging data
+                        RectData data = new RectData(newFrame);
+
+                        data.setCentre(sensorAnalysis.getVideoData().toMarkerPoint(new PointF((float) result.center.x, (float) result.center.y)));
+                        data.setAngle((float) result.angle);
+
+                        PointF size = sensorAnalysis.getVideoData().toMarkerPoint(new PointF((float) result.size.width, (float) result.size.height));
+                        data.setWidth(size.x);
+                        data.setHeight(size.y);
+                        data.setVisible(true);
+
+                        sensorAnalysis.getRectDataList().addData(data);
                     }
-                    //sensorAnalysis.getFrameDataList().g
-                    sensorAnalysis.getFrameDataList().setObjectPicked(newFrame, true);
-
-                    //Visualise detected rectangle (debug mode)
-
-
-//                    int currentMarker = sensorAnalysis.getTagMarkers().getSelectedData();
-//
-//                    if(curPos != null) {
-//                        sensorAnalysis.getTagMarkers().setMarkerPosition(curPos, currentMarker);
-//                    }
-                    PointF nextPos = sensorAnalysis.getVideoData().toMarkerPoint(new Point((int) result.center.x, (int) result.center.y));
-                    PointData nextTag = new PointData(newFrame);
-                    nextTag.setPosition(nextPos);
-                    sensorAnalysis.getTagMarkers().addData(nextTag); //Have to add marker here rather than edit its position as TagDataListPainter.setCurrentFrame (which adds markers) is called after this method
-
-                    //Add debugging data
-                    RectData data = new RectData(newFrame);
-                    data.setCentre(sensorAnalysis.getVideoData().toMarkerPoint(new Point((int)result.center.x, (int)result.center.y)));
-                    data.setAngle((float)result.angle);
-                    data.setHeight((float)result.size.height); //TODO: scale
-                    data.setHeight((float)result.size.width);
-                    sensorAnalysis.getRectDataList().addData(data);
-                    //
-
-                            //.setMarkerPosition(nextPos, -1);
-                    //changingFrames = true;
-
-                    //changingFrames = true;
-                    //sensorAnalysis.getTagMarkers().setMarkerPosition(newPos, currentMarker);
-                    //PointDataList model = sensorAnalysis.getTagMarkers().addListener();
-
-                    //sensorAnalysis.addListener();
-                    int i = 0;
-                    //Set marker position in new window. TODO: hacky for now as doesn't take rotation into account
-                    //Data topLeft = sensorAnalysis.getRectMarkers() .getRectMarkers().getDataAt(1);
-                    //Data btmRight = sensorAnalysis.getRectMarkers().getDataAt(0);
-
-                    //int width = (int)result.size.width;
-                    //int height = (int)result.size.height;
-                    //int x = (int)result.center.x - width/2;
-                    //int y = (int)result.center.y - height/2;
-
-                    //topLeft.setPosition();
-                    //btmRight.setPosition(sensorAnalysis.getVideoData().toMarkerPoint(new Point(result.width, result.height)));
                 }
             }
 
@@ -406,46 +377,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
         };
 
         sensorAnalysis.getFrameDataList().addListener(dataListenerStrongRef);
-
-
-//        markerListenerStrongRef = new PointDataList.IListener() {
-//
-//            @Override
-//            public void onDataAdded(PointDataList model, int index) {
-//
-//                if(changingFrames && nextPos != null)
-//                {
-//                    //sensorAnalysis.getTagMarkers().setMarkerPosition(nextPos, -1);
-//                    //changingFrames = false;
-//                }
-//            }
-//
-//            @Override
-//            public void onDataRemoved(PointDataList model, int index, Data data) {
-//                int i = 0;
-//                int j = 1;
-//            }
-//
-//            @Override
-//            public void onDataChanged(PointDataList model, int index, int number) {
-//                int i = 0;
-//                int j = 1;
-//            }
-//
-//            @Override
-//            public void onAllDataChanged(PointDataList model) {
-//                int i = 0;
-//                int j = 1;
-//            }
-//
-//            @Override
-//            public void onDataSelected(PointDataList model, int index) {
-//                int i = 0;
-//                int j = 1;
-//            }
-//        };
-//
-//        sensorAnalysis.getTagMarkers().addListener(markerListenerStrongRef);
 
         runContainerView.setTo(sensorAnalysisView, frameDataSeekBar, sensorAnalysis);
 
@@ -512,37 +443,33 @@ class MotionAnalysisFragmentView extends FrameLayout {
     {
         int roiFrame = sensorAnalysis.getFrameDataList().getROIFrame();
         sensorAnalysis.getFrameDataList().setCurrentFrame(roiFrame);
-        //sensorAnalysis.getRectMarkers().setVisibility(true);
+        //sensorAnalysis.getRoiDataList().setVisibility(true);
     }
 
-    public void setRegionOfInterest(MotionAnalysis sensorAnalysis)
+    public void setRegionOfInterest(int frameId, MotionAnalysis sensorAnalysis)
     {
         int currentFrame = sensorAnalysis.getFrameDataList().getCurrentFrame();
         float startFrameTime =  sensorAnalysis.getTimeData().getTimeAt(currentFrame);
         Bitmap bmp = sensorAnalysis.getVideoData().getFrame((long) (startFrameTime * 1000.0));
-        //this.saveFrame(bmp);
 
-        PointF tLeftM = sensorAnalysis.getRectMarkers().getDataAt(RoiDataListPainter.TOP_LEFT).getPosition();
-        PointF bRightM = sensorAnalysis.getRectMarkers().getDataAt(RoiDataListPainter.BTM_RIGHT).getPosition();
-
-        Point topLeft = sensorAnalysis.getVideoData().toVideoPoint(tLeftM);
-        Point btmRight = sensorAnalysis.getVideoData().toVideoPoint(bRightM);
+        RoiData roi = sensorAnalysis.getRoiDataList().getDataByFrameId(frameId);
+        Point topLeft = sensorAnalysis.getVideoData().toVideoPoint(roi.getTopLeft().getPosition());
+        Point btmRight = sensorAnalysis.getVideoData().toVideoPoint(roi.getBtmRight().getPosition());
 
         int x = topLeft.x;
         int y = topLeft.y;
         int width = btmRight.x - topLeft.x;
         int height = btmRight.y - topLeft.y;
 
-        tracker.setROI(currentFrame, bmp, x, y, width, height);
+        tracker.setROI(frameId, bmp, x, y, width, height);
 
         //Set frame target marker to middle of rectangle
         int currentMarker = sensorAnalysis.getTagMarkers().getSelectedData();
-        PointF newPos = sensorAnalysis.getVideoData().toMarkerPoint(new Point(x + width / 2, y + height / 2));
+        PointF newPos = sensorAnalysis.getVideoData().toMarkerPoint(new PointF(x + width / 2, y + height / 2));
         sensorAnalysis.getTagMarkers().setMarkerPosition(newPos, currentMarker);
 
-
-        sensorAnalysis.getFrameDataList().setObjectPicked(currentFrame, true);
-        sensorAnalysis.getFrameDataList().setROIFrame(currentFrame);
+        //sensorAnalysis.getFrameDataList().setObjectPicked(currentFrame, true);
+        //sensorAnalysis.getFrameDataList().setROIFrame(currentFrame);
     }
 
     public void saveFrame(Bitmap bmp)

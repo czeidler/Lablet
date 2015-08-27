@@ -131,7 +131,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 //            @Override
 //            public boolean onMenuItemClick(MenuItem menuItem) {
 //                MotionAnalysis motionAnalysis = getSensorAnalysis();
-//                motionAnalysis.getRectMarkers().setVisibility(true);
+//                motionAnalysis.getRoiDataList().setVisibility(true);
 //                trackObjectMenu.setVisible(false);
 //                setObjectMenu.setVisible(true);
 //                return true;
@@ -169,16 +169,29 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
     }
 
     private void showObjectTrackingPopup() {
-        final View menuView = getActivity().findViewById(R.id.enable_tracking);
+        final View menuView = getActivity().findViewById(R.id.action_track_object);
         final PopupMenu popup = new PopupMenu(getActivity(), menuView);
         popup.inflate(R.menu.object_tracking_popup);
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                //TODO: do stuff here
+                int item = menuItem.getItemId();
+
+                if (item == R.id.enable_tracking) {
+                    getSensorAnalysis().setTrackingEnabled(!menuItem.isChecked());
+                } else if (item == R.id.set_roi) {
+                    getSensorAnalysis().setTrackingEnabled(!menuItem.isChecked());
+                    getSensorAnalysis().setRegionOfInterest();
+                } else if (item == R.id.debug_tracking) {
+                    getSensorAnalysis().setDebuggingEnabled(!menuItem.isChecked());
+                }
+
                 return false;
             }
         });
+
+        popup.getMenu().findItem(R.id.enable_tracking).setChecked(getSensorAnalysis().isTrackingEnabled());
+        popup.getMenu().findItem(R.id.debug_tracking).setChecked(getSensorAnalysis().isDebuggingEnabled());
         popup.show();
     }
 

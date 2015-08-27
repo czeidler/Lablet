@@ -25,6 +25,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
 
 import nz.ac.auckland.lablet.data.RectDataList;
+import nz.ac.auckland.lablet.data.RoiDataList;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.data.Data;
 import nz.ac.auckland.lablet.data.FrameDataList;
@@ -355,9 +356,9 @@ public class FrameContainerView extends RelativeLayout {
         CalibrationDataListPainter painter = new CalibrationDataListPainter(calibrationMarkers);
         markerView.addPlotPainter(painter);
 
-        PointDataList rectMarker = motionAnalysis.getRectMarkers();
-        RoiDataListPainter rectMarkerPainter = new RoiDataListPainter(rectMarker);
-        markerView.addPlotPainter(rectMarkerPainter);
+        RoiDataList roiDataList = motionAnalysis.getRoiDataList();
+        RoiDataListPainter roiDataListPainter = new RoiDataListPainter(roiDataList);
+        markerView.addPlotPainter(roiDataListPainter);
 
         RectDataList rectDataList = motionAnalysis.getRectDataList();
         RectDataListPainter rectDataListPainter = new RectDataListPainter(rectDataList);

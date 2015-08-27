@@ -4,9 +4,15 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.view.MotionEvent;
 
 import nz.ac.auckland.lablet.data.PointDataList;
+import nz.ac.auckland.lablet.data.RectData;
+import nz.ac.auckland.lablet.data.RectDataList;
+import nz.ac.auckland.lablet.data.RoiData;
+import nz.ac.auckland.lablet.data.RoiDataList;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
+
 
 /*
  *
@@ -18,30 +24,8 @@ import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 /**
  * Marker for region of interest.
  */
-class RoiDataPainter extends TagDataPainter {
-    @Override
-    public void onDraw(Canvas canvas, float priority) {
-        if (isSelectedForDrag())
-            super.onDraw(canvas, priority);
-    }
+class RoiDataPainter implements IDataPainter<RoiData, RoiDataListPainter>{
 
-    /**
-     * Dragging a origin marker needs special treatment since it also affects the other two markers in the coordinate
-     * system.
-     * <p>
-     * Call the painter class that then updates all the markers.
-     * </p>
-     *
-     * @param point the new position the marker was dragged to
-     */
-    @Override
-    protected void onDraggedTo(PointF point) {
-        RoiDataListPainter rectMarkerPainter = (RoiDataListPainter)parent;
-        rectMarkerPainter.onDraggedTo(this, point);
-    }
-}
-
-public class RoiDataListPainter extends DraggableDataListPainter {
     // device independent sizes:
     private final int FONT_SIZE_DP = 20;
     private final float LINE_WIDTH_DP = 2f;
@@ -53,13 +37,183 @@ public class RoiDataListPainter extends DraggableDataListPainter {
     private float WING_LENGTH;
     private boolean isVisible = true;
 
-    public static final int TOP_LEFT = 3;
-    public static final int TOP_RIGHT = 2;
-    public static final int BTM_LEFT = 1;
-    public static final int BTM_RIGHT = 0;
+    private TagDataPainter topLeftTag = new TagDataPainter();
+    private TagDataPainter topRightTag = new TagDataPainter();
+    private TagDataPainter btmRightTag = new TagDataPainter();
+    private TagDataPainter btmLeftTag = new TagDataPainter();
+    protected RoiDataListPainter parent = null;
+    private RoiData data;
+    DraggableDataListPainter dataListPainter;
+    PointDataList dataList = new PointDataList();
 
 
-    public RoiDataListPainter(PointDataList model) {
+    @Override
+    public void setTo(RoiDataListPainter painter, final RoiData data) {
+        this.parent = painter;
+        this.data = data;
+
+        dataList.addData(data.getTopLeft());
+        dataList.addData(data.getTopRight());
+        dataList.addData(data.getBtmRight());
+        dataList.addData(data.getBtmLeft());
+
+        dataListPainter = new DraggableDataListPainter(dataList) {
+            @Override
+            protected IDataPainter createPainterForFrame(int frameId) {
+                if(frameId == 0)
+                {
+                    return topLeftTag;
+                }
+                else if(frameId == 1)
+                {
+                    return topRightTag;
+                }
+                else if(frameId == 2)
+                {
+                    return btmRightTag;
+                }
+                else if(frameId == 3)
+                {
+                    return btmLeftTag;
+                }
+
+                return null;
+            }
+
+            @Override
+            public void onDraw(Canvas canvas) {
+                for (IDataPainter marker : painterList)
+                    marker.onDraw(canvas, 1);
+            }
+
+            protected void onDraggedTo(DraggableDataPainter marker, PointF newPosition)
+            {
+                //int index = painterList.indexOf(marker);
+                //PointDataList model  = this.getDataList();
+
+                PointF newPositionReal = new PointF();
+                containerView.fromScreen(newPosition, newPositionReal);
+
+                if(marker == topLeftTag) {
+                    PointF btmRightScreen = btmRightTag.getCachedScreenPosition();
+                    PointF btmRightReal = new PointF();
+                    containerView.fromScreen(btmRightScreen, btmRightReal);
+
+                    data.setTopRight(new PointF(btmRightReal.x, newPositionReal.y));
+                    data.setBtmLeft(new PointF(newPositionReal.x, btmRightReal.y));
+
+                } else if(marker == topRightTag) {
+                    PointF btmLeftScreen = btmLeftTag.getCachedScreenPosition();
+                    PointF btmLeftReal = new PointF();
+                    containerView.fromScreen(btmLeftScreen, btmLeftReal);
+
+                    data.setTopLeft(new PointF(btmLeftReal.x, newPositionReal.y));
+                    data.setBtmRight(new PointF(newPositionReal.x, btmLeftReal.y));
+                } else if(marker == btmLeftTag) {
+                    PointF topRightScreen = topRightTag.getCachedScreenPosition();
+                    PointF topRightReal = new PointF();
+                    containerView.fromScreen(topRightScreen, topRightReal);
+
+                    data.setTopLeft( new PointF(newPositionReal.x, topRightReal.y));
+                    data.setBtmRight(new PointF(topRightReal.x, newPositionReal.y));
+                } else if (marker == btmRightTag) {
+                    PointF topLeftScreen = topLeftTag.getCachedScreenPosition();
+                    PointF topLeftReal = new PointF();
+                    containerView.fromScreen(topLeftScreen, topLeftReal);
+
+                    data.setTopRight(new PointF(newPositionReal.x, topLeftReal.y));
+                    data.setBtmLeft(new PointF(topLeftReal.x, newPositionReal.y));
+                }
+            }
+        };
+
+//        topLeftTag.setTo(dataListPainter, data.getTopLeft());
+//        topRightTag.setTo(dataListPainter, data.getTopRight());
+//        btmRightTag.setTo(dataListPainter, data.getBtmRight());
+//        btmLeftTag.setTo(dataListPainter, data.getBtmLeft());
+
+        dataListPainter.setContainer(this.parent.getContainerView());
+
+        FONT_SIZE = parent.toPixel(FONT_SIZE_DP);
+        LINE_WIDTH = parent.toPixel(LINE_WIDTH_DP);
+        WING_LENGTH = parent.toPixel(WING_LENGTH_DP);
+    }
+
+    @Override
+    public void onDraw(Canvas canvas, float priority) {
+        //dataListPainter.onDraw(canvas);
+
+        float left;
+        float top;
+        float right;
+        float bottom;
+
+        if(btmLeftTag.isSelectedForDrag() || topRightTag.isSelectedForDrag())
+        {
+            PointF topRight = topRightTag.getCachedScreenPosition();
+            PointF btmLeft = btmLeftTag.getCachedScreenPosition();
+            left = btmLeft.x;
+            top = topRight.y;
+            right = topRight.x;
+            bottom = btmLeft.y;
+        }
+        else
+        {
+            PointF topLeft = topLeftTag.getCachedScreenPosition();
+            PointF btmRight = btmRightTag.getCachedScreenPosition();
+            left = topLeft.x;
+            top = topLeft.y;
+            right = btmRight.x;
+            bottom = btmRight.y;
+        }
+
+        // Line settings
+        Paint paint = new Paint();
+        paint.setStrokeCap(Paint.Cap.BUTT);
+        paint.setStrokeWidth(LINE_WIDTH);
+        paint.setAntiAlias(true);
+        paint.setColor(Color.GREEN);
+        paint.setStyle(Paint.Style.STROKE);
+
+        canvas.drawRect(left, top, right, bottom, paint); //See android.Graphics.Rect constructor for meaning of params
+    }
+
+    @Override
+    public boolean handleActionDown(MotionEvent ev) {
+        return false;
+    }
+
+    @Override
+    public boolean handleActionUp(MotionEvent ev) {
+        return false;
+    }
+
+    @Override
+    public boolean handleActionMove(MotionEvent ev) {
+        return false;
+    }
+
+    @Override
+    public void setSelectedForDrag(boolean selectedForDrag) {
+
+    }
+
+    @Override
+    public boolean isSelectedForDrag() {
+        return false;
+    }
+
+    @Override
+    public void invalidate() {
+
+    }
+
+
+}
+
+public class RoiDataListPainter extends DataListPainter<RoiDataList> {
+
+    public RoiDataListPainter(RoiDataList model) {
         super(model);
     }
 
@@ -69,65 +223,11 @@ public class RoiDataListPainter extends DraggableDataListPainter {
 
         if (view == null)
             return;
-
-        FONT_SIZE = toPixel(FONT_SIZE_DP);
-        LINE_WIDTH = toPixel(LINE_WIDTH_DP);
-        WING_LENGTH = toPixel(WING_LENGTH_DP);
     }
 
     @Override
-    protected DraggableDataPainter createPainterForFrame(int frameId) {
+    protected RoiDataPainter createPainterForFrame(int frameId) {
         return new RoiDataPainter();
-    }
-
-    private PointF getCurrentScreenPos(int markerIndex) {
-        return ((DraggableDataPainter) painterList.get(markerIndex)).getCachedScreenPosition();
-    }
-
-    protected void onDraggedTo(DraggableDataPainter marker, PointF newPosition)
-    {
-        int index = painterList.indexOf(marker);
-        PointDataList model  = this.getDataList();
-
-        PointF newPositionReal = new PointF();
-        containerView.fromScreen(newPosition, newPositionReal);
-
-        switch (index) {
-            case TOP_LEFT:
-                PointF btmRightScreen = getCurrentScreenPos(BTM_RIGHT);
-                PointF btmRightReal = new PointF();
-                containerView.fromScreen(btmRightScreen, btmRightReal);
-
-                model.getDataAt(TOP_RIGHT).setPosition(new PointF(btmRightReal.x, newPositionReal.y));
-                model.getDataAt(BTM_LEFT).setPosition(new PointF(newPositionReal.x, btmRightReal.y));
-                break;
-
-            case TOP_RIGHT:
-                PointF btmLeftScreen = getCurrentScreenPos(BTM_LEFT);
-                PointF btmLeftReal = new PointF();
-                containerView.fromScreen(btmLeftScreen, btmLeftReal);
-
-                model.getDataAt(TOP_LEFT).setPosition(new PointF(btmLeftReal.x, newPositionReal.y));
-                model.getDataAt(BTM_RIGHT).setPosition(new PointF(newPositionReal.x, btmLeftReal.y));
-                break;
-
-            case BTM_LEFT:
-                PointF topRightScreen = getCurrentScreenPos(TOP_RIGHT);
-                PointF topRightReal = new PointF();
-                containerView.fromScreen(topRightScreen, topRightReal);
-
-                model.getDataAt(TOP_LEFT).setPosition(new PointF(newPositionReal.x, topRightReal.y));
-                model.getDataAt(BTM_RIGHT).setPosition(new PointF(topRightReal.x, newPositionReal.y));
-                break;
-
-            case BTM_RIGHT:
-                PointF topLeftScreen = getCurrentScreenPos(TOP_LEFT);
-                PointF topLeftReal = new PointF();
-                containerView.fromScreen(topLeftScreen, topLeftReal);
-                model.getDataAt(TOP_RIGHT).setPosition(new PointF(newPositionReal.x, topLeftReal.y));
-                model.getDataAt(BTM_LEFT).setPosition(new PointF(topLeftReal.x, newPositionReal.y));
-                break;
-        }
     }
 
     @Override
@@ -137,41 +237,6 @@ public class RoiDataListPainter extends DraggableDataListPainter {
         {
             for (IDataPainter marker : painterList)
                 marker.onDraw(canvas, 1);
-
-            float left;
-            float top;
-            float right;
-            float bottom;
-
-            if(painterList.get(BTM_LEFT).isSelectedForDrag() || painterList.get(TOP_RIGHT).isSelectedForDrag())
-            {
-                PointF topRight = getCurrentScreenPos(TOP_RIGHT);
-                PointF btmLeft = getCurrentScreenPos(BTM_LEFT);
-                left = btmLeft.x;
-                top = topRight.y;
-                right = topRight.x;
-                bottom = btmLeft.y;
-            }
-            else
-            {
-                PointF topLeft = getCurrentScreenPos(TOP_LEFT);
-                PointF btmRight = getCurrentScreenPos(BTM_RIGHT);
-                left = topLeft.x;
-                top = topLeft.y;
-                right = btmRight.x;
-                bottom = btmRight.y;
-            }
-
-            // Line settings
-            Paint paint = new Paint();
-            paint.setStrokeCap(Paint.Cap.BUTT);
-            paint.setStrokeWidth(LINE_WIDTH);
-            paint.setAntiAlias(true);
-            paint.setColor(Color.GREEN);
-            paint.setStyle(Paint.Style.STROKE);
-
-            canvas.drawRect(left, top, right, bottom, paint); //See android.Graphics.Rect constructor for meaning of params
-
         }
     }
 }
