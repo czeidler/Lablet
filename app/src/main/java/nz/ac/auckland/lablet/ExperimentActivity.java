@@ -589,7 +589,7 @@ public class ExperimentActivity extends FragmentActivity {
 
     @Override
     public void onBackPressed() {
-        if (experiment.dataTaken()) {
+        if (!(state instanceof PreviewState)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Experiment is not saved");
             builder.setNeutralButton("Continue", new DialogInterface.OnClickListener() {
@@ -601,6 +601,8 @@ public class ExperimentActivity extends FragmentActivity {
             builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
+                    // finish experiment when we are currently recording
+                    setState(null);
                     finishExperiment(false);
                 }
             });
