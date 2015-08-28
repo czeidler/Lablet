@@ -6,7 +6,7 @@ import android.os.Bundle;
 /**
  * Created by jdip004 on 27/08/2015.
  */
-public class RoiDataList extends DataList<RoiData>{
+public class RoiDataList extends DataList<RoiData> {
     @Override
     public Bundle toBundle() {
         Bundle bundle = new Bundle();

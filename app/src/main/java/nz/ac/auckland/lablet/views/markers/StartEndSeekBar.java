@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views.painters;
+package nz.ac.auckland.lablet.views.markers;
 
 import android.content.Context;
 import android.graphics.*;
@@ -22,7 +22,7 @@ import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 /**
  * Abstract base class that shares code for the start and the end marker.
  */
-abstract class StartEndDataPainter extends DraggableDataPainter {
+abstract class StartEndMarker extends DraggableMarker {
     // dimensions in density-independent  pixels
     private final float WIDTH_DP = 20;
 
@@ -35,7 +35,7 @@ abstract class StartEndDataPainter extends DraggableDataPainter {
     protected Paint darkenColor = new Paint();
     protected Paint selectedGlowPaint = new Paint();
 
-    public StartEndDataPainter() {
+    public StartEndMarker() {
         lightColor.setColor(Color.rgb(97, 204, 238));
         lightColor.setAntiAlias(true);
         lightColor.setStyle(Paint.Style.FILL);
@@ -49,7 +49,7 @@ abstract class StartEndDataPainter extends DraggableDataPainter {
     }
 
     @Override
-    public void setTo(DraggableDataListPainter painter, PointData data) {
+    public void setTo(DraggableMarkerList painter, PointData data) {
         super.setTo(painter, data);
 
         WIDTH = parent.toPixel(WIDTH_DP);
@@ -93,7 +93,7 @@ abstract class StartEndDataPainter extends DraggableDataPainter {
 /**
  * Implementation of a "start" marker. (Copies the google text select markers.)
  */
-class StartDataPainter extends StartEndDataPainter {
+class StartMarker extends StartEndMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
@@ -127,7 +127,7 @@ class StartDataPainter extends StartEndDataPainter {
 /**
  * Implementation of a "end" marker. (Copies the google text select markers.)
  */
-class EndDataPainter extends StartEndDataPainter {
+class EndMarker extends StartEndMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
@@ -164,7 +164,7 @@ class EndDataPainter extends StartEndDataPainter {
  * The used data model should contain exactly two data points.
  * </p>
  */
-class StartEndPainter extends DraggableDataListPainter {
+class StartEndMarkerList extends DraggableMarkerList {
     int numberOfSteps = 10;
 
     /**
@@ -172,26 +172,26 @@ class StartEndPainter extends DraggableDataListPainter {
      *
      * @param data should contain exactly two data points, one for the start and one for the end marker
      */
-    public StartEndPainter(PointDataList data) {
+    public StartEndMarkerList(PointDataList data) {
         super(data);
     }
 
     @Override
-    protected DraggableDataPainter createPainterForFrame(int frameId) {
+    protected DraggableMarker createMarkerForFrame(int frameId) {
         if (frameId == 0)
-            return new StartDataPainter();
+            return new StartMarker();
         else
-            return new EndDataPainter();
+            return new EndMarker();
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        for (IDataPainter marker : painterList)
+        for (IMarker marker : painterList)
             marker.onDraw(canvas, 1);
     }
 
     @Override
-    public void markerMoveRequest(DraggableDataPainter marker, PointF newPosition, boolean isDragging) {
+    public void markerMoveRequest(DraggableMarker marker, PointF newPosition, boolean isDragging) {
         int row = painterList.lastIndexOf(marker);
         if (row < 0)
             return;
@@ -240,7 +240,7 @@ class StartEndPainter extends DraggableDataListPainter {
  */
 public class StartEndSeekBar extends PlotPainterContainerView {
     private PointDataList markerDataModel;
-    private StartEndPainter startEndPainter;
+    private StartEndMarkerList startEndMarkerList;
 
     // dimensions in density-independent  pixels
     public static final float HEIGHT_DP = 35;
@@ -255,8 +255,8 @@ public class StartEndSeekBar extends PlotPainterContainerView {
         setXRange(0, 1);
         setYRange(0, 1);
 
-        startEndPainter = new StartEndPainter(markerDataModel);
-        addPlotPainter(startEndPainter);
+        startEndMarkerList = new StartEndMarkerList(markerDataModel);
+        addPlotPainter(startEndMarkerList);
         invalidate();
     }
 
@@ -348,7 +348,7 @@ public class StartEndSeekBar extends PlotPainterContainerView {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         LayoutParams params = getLayoutParams();
         assert params != null;
-        setMeasuredDimension(params.width, startEndPainter.toPixel(HEIGHT_DP));
+        setMeasuredDimension(params.width, startEndMarkerList.toPixel(HEIGHT_DP));
     }
 
     public PointDataList getMarkerDataModel() {
@@ -377,6 +377,6 @@ public class StartEndSeekBar extends PlotPainterContainerView {
      * @param max the end of the range
      */
     public void setMax(int max) {
-        startEndPainter.setNumberOfSteps(max + 1);
+        startEndMarkerList.setNumberOfSteps(max + 1);
     }
 }

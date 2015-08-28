@@ -12,8 +12,10 @@ import android.graphics.*;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
-import nz.ac.auckland.lablet.views.painters.DraggableDataListPainter;
-import nz.ac.auckland.lablet.views.painters.TagDataListPainter;
+import nz.ac.auckland.lablet.views.markers.DraggableMarkerList;
+import nz.ac.auckland.lablet.views.markers.IMarker;
+import nz.ac.auckland.lablet.views.markers.PointMarkerList;
+import nz.ac.auckland.lablet.views.markers.RectMarkerList;
 import nz.ac.auckland.lablet.views.plotview.*;
 
 
@@ -21,7 +23,7 @@ import nz.ac.auckland.lablet.views.plotview.*;
  * Displays one or more of marker datasets.
  *
  * <p>
- * The MarkerView also takes track of the currently selected {@link nz.ac.auckland.lablet.views.painters.IDataPainter}.
+ * The MarkerView also takes track of the currently selected {@link IMarker}.
  * </p>
  */
 public class MarkerView extends PlotPainterContainerView {
@@ -30,7 +32,7 @@ public class MarkerView extends PlotPainterContainerView {
     private int parentWidth;
     private int parentHeight;
 
-    private DraggableDataListPainter.MarkerPainterGroup markerPainterGroup = null;
+    private DraggableMarkerList.MarkerPainterGroup markerPainterGroup = null;
 
     public MarkerView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -60,8 +62,8 @@ public class MarkerView extends PlotPainterContainerView {
     public void addPlotPainter(IPlotPainter painter) {
         super.addPlotPainter(painter);
 
-        if (painter instanceof DraggableDataListPainter) {
-            DraggableDataListPainter markerPainter = (DraggableDataListPainter)painter;
+        if (painter instanceof DraggableMarkerList) {
+            DraggableMarkerList markerPainter = (DraggableMarkerList)painter;
             if (markerPainterGroup == null)
                 markerPainterGroup = markerPainter.getMarkerPainterGroup();
             else
@@ -70,14 +72,26 @@ public class MarkerView extends PlotPainterContainerView {
     }
 
     //TODO: Add rotated rect marker painter here.
-    public void setCurrentFrame(int frame, @Nullable PointF insertHint) {
+    public void setCurrentFrame(int frameId, @Nullable PointF insertHint) {
         for (IPlotPainter painter : allPainters) {
-            if (!(painter instanceof TagDataListPainter))
-                continue;
-            TagDataListPainter tagDataListPainter = (TagDataListPainter)painter;
-            tagDataListPainter.setCurrentFrame(frame, insertHint);
-            // deselect any marker
-            tagDataListPainter.getMarkerPainterGroup().deselect();
+
+            if (painter instanceof RectMarkerList) {
+                RectMarkerList rectMarkerList = (RectMarkerList) painter;
+                rectMarkerList.setCurrentFrame(frameId, insertHint);
+            }
+
+            if (painter instanceof PointMarkerList) {
+                PointMarkerList tagDataListPainter = (PointMarkerList) painter;
+                tagDataListPainter.setCurrentFrame(frameId, insertHint);
+                tagDataListPainter.getMarkerPainterGroup().deselect(); // deselect any marker
+            }
+
+            //tagDataListPainter.setCurrentFrame(frame, insertHint);
+
+
+
+
+
         }
         invalidate();
     }
@@ -120,9 +134,9 @@ public class MarkerView extends PlotPainterContainerView {
 
     public void release() {
         for (IPlotPainter painter : allPainters) {
-            if (!(painter instanceof TagDataListPainter))
+            if (!(painter instanceof PointMarkerList))
                 continue;
-            TagDataListPainter tagDataListPainter = (TagDataListPainter)painter;
+            PointMarkerList tagDataListPainter = (PointMarkerList)painter;
             tagDataListPainter.release();
         }
     }

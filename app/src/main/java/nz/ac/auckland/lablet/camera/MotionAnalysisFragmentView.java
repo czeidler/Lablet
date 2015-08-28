@@ -31,7 +31,6 @@ import nz.ac.auckland.lablet.data.RoiData;
 import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 import nz.ac.auckland.lablet.views.FrameDataSeekBar;
-import nz.ac.auckland.lablet.views.painters.RoiDataListPainter;
 import nz.ac.auckland.lablet.views.graph.*;
 import nz.ac.auckland.lablet.views.plotview.LinearFitPainter;
 import nz.ac.auckland.lablet.views.table.*;
@@ -352,7 +351,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
                         PointF nextPos = sensorAnalysis.getVideoData().toMarkerPoint(new PointF((float) result.center.x, (float) result.center.y));
                         PointData nextTag = new PointData(newFrame);
                         nextTag.setPosition(nextPos);
-                        sensorAnalysis.getTagMarkers().addData(nextTag); //Have to add marker here rather than edit its position as TagDataListPainter.setCurrentFrame (which adds markers) is called after this method
+                        sensorAnalysis.getTagMarkers().addData(nextTag); //Have to add marker here rather than edit its position as PointMarkerList.setCurrentFrame (which adds markers) is called after this method
 
                         //Add debugging data
                         RectData data = new RectData(newFrame);

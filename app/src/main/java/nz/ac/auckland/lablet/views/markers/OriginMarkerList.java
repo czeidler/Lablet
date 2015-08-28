@@ -1,9 +1,11 @@
-package nz.ac.auckland.lablet.views.painters;
+package nz.ac.auckland.lablet.views.markers;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+
+import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 /*
  * Copyright 2013-2014.
@@ -12,14 +14,13 @@ import nz.ac.auckland.lablet.experiment.CalibrationXY;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 
 /**
  * Marker for the origin coordinate system.
  */
-class OriginDataPainter extends TagDataPainter {
+class OriginMarker extends PointMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
@@ -37,7 +38,7 @@ class OriginDataPainter extends TagDataPainter {
      */
     @Override
     protected void onDraggedTo(PointF point) {
-        OriginDataListPainter originDataListPainter = (OriginDataListPainter)parent;
+        OriginMarkerList originDataListPainter = (OriginMarkerList)parent;
         originDataListPainter.onDraggedTo(this, point);
     }
 
@@ -53,7 +54,7 @@ class OriginDataPainter extends TagDataPainter {
  * Expects a PointDataList with two data points. One for the origin and one for the first axis.
  * </p>
  */
-public class OriginDataListPainter extends DraggableDataListPainter implements CalibrationXY.IListener {
+public class OriginMarkerList extends DraggableMarkerList implements CalibrationXY.IListener {
     private CalibrationXY calibrationXY;
     private float angleScreen;
     private boolean firstDraw = true;
@@ -73,7 +74,7 @@ public class OriginDataListPainter extends DraggableDataListPainter implements C
     private float ARROW_AXIS_OVERLAP;
     private float LABEL_TO_AXIS_END_DISTANCE;
 
-    public OriginDataListPainter(PointDataList model, CalibrationXY calibrationXY) {
+    public OriginMarkerList(PointDataList model, CalibrationXY calibrationXY) {
         super(model);
         this.calibrationXY = calibrationXY;
         this.calibrationXY.addListener(this);
@@ -106,8 +107,8 @@ public class OriginDataListPainter extends DraggableDataListPainter implements C
     }
 
     @Override
-    protected DraggableDataPainter createPainterForFrame(int frameId) {
-        return new OriginDataPainter();
+    protected DraggableMarker createMarkerForFrame(int frameId) {
+        return new OriginMarker();
     }
 
     @Override
@@ -123,7 +124,7 @@ public class OriginDataListPainter extends DraggableDataListPainter implements C
             updateTagMarkerPositions();
         }
 
-        for (IDataPainter marker : painterList)
+        for (IMarker marker : painterList)
             marker.onDraw(canvas, 1);
 
         if (dataList.getDataCount() != 3)
@@ -257,7 +258,7 @@ public class OriginDataListPainter extends DraggableDataListPainter implements C
     }
 
     @Override
-    public void markerMoveRequest(DraggableDataPainter marker, PointF newPosition, boolean isDragging) {
+    public void markerMoveRequest(DraggableMarker marker, PointF newPosition, boolean isDragging) {
         onDraggedTo(marker, newPosition);
 
         // don't update all the time
@@ -275,7 +276,7 @@ public class OriginDataListPainter extends DraggableDataListPainter implements C
      * @param marker the dragged marker
      * @param newPosition the new position of the dragged marker
      */
-    protected void onDraggedTo(DraggableDataPainter marker, PointF newPosition) {
+    protected void onDraggedTo(DraggableMarker marker, PointF newPosition) {
         int row = painterList.indexOf(marker);
         if (row < 0)
             return;
@@ -295,8 +296,8 @@ public class OriginDataListPainter extends DraggableDataListPainter implements C
         }
     }
 
-    private OriginDataPainter getOriginMarker(int index) {
-        return (OriginDataPainter) painterList.get(index);
+    private OriginMarker getOriginMarker(int index) {
+        return (OriginMarker) painterList.get(index);
     }
 
     private void updateMarkerScreenPositions(PointF originScreen) {

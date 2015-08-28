@@ -20,9 +20,8 @@ import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.misc.AnimatedTabHostListener;
 import nz.ac.auckland.lablet.misc.AudioWavInputStream;
-import nz.ac.auckland.lablet.views.*;
-import nz.ac.auckland.lablet.views.painters.HCursorDataListPainter;
-import nz.ac.auckland.lablet.views.painters.VCursorDataListPainter;
+import nz.ac.auckland.lablet.views.markers.HCursorMarkerList;
+import nz.ac.auckland.lablet.views.markers.VCursorMarkerList;
 import nz.ac.auckland.lablet.views.plotview.*;
 
 import java.io.File;
@@ -350,11 +349,11 @@ public class FrequencyAnalysisView extends FrameLayout {
         });
 
         PointDataList hMarkerModel = frequencyAnalysis.getHCursorMarkerModel();
-        HCursorDataListPainter hCursorDataModelPainter = new HCursorDataListPainter(hMarkerModel);
+        HCursorMarkerList hCursorDataModelPainter = new HCursorMarkerList(hMarkerModel);
         frequencyMapPlotView.addPlotPainter(hCursorDataModelPainter);
 
         PointDataList vMarkerModel = frequencyAnalysis.getVCursorMarkerModel();
-        VCursorDataListPainter vCursorDataListPainter = new VCursorDataListPainter(vMarkerModel);
+        VCursorMarkerList vCursorDataListPainter = new VCursorMarkerList(vMarkerModel);
         vCursorDataListPainter.setMarkerPainterGroup(hCursorDataModelPainter.getMarkerPainterGroup());
         frequencyMapPlotView.addPlotPainter(vCursorDataListPainter);
     }

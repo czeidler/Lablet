@@ -18,6 +18,7 @@ public interface IPlotPainter {
     void onSizeChanged(int width, int height, int oldw, int oldh);
     void onDraw(Canvas canvas);
     boolean onTouchEvent(MotionEvent event);
+
     /**
      * Invalidate the state of the painter.
      *

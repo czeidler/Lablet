@@ -1,8 +1,9 @@
-package nz.ac.auckland.lablet.views.painters;
+package nz.ac.auckland.lablet.views.markers;
 
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.ViewParent;
 
@@ -11,15 +12,13 @@ import java.util.List;
 
 import nz.ac.auckland.lablet.data.Data;
 import nz.ac.auckland.lablet.data.DataList;
-import nz.ac.auckland.lablet.data.PointData;
-import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
 import nz.ac.auckland.lablet.views.plotview.AbstractPlotPainter;
 
 /**
  * Created by Jamie on 26/08/2015.
  */
-public abstract class DataListPainter<D extends DataList> extends AbstractPlotPainter
+public abstract class MarkerList<D extends DataList> extends AbstractPlotPainter
 {
     private DataList.IListener<D> dataListener = new DataList.IListener<D>() {
 
@@ -56,9 +55,9 @@ public abstract class DataListPainter<D extends DataList> extends AbstractPlotPa
 
     protected D dataList = null;
     final protected Rect frame = new Rect();
-    final protected List<IDataPainter> painterList = new ArrayList<>();
+    final protected List<IMarker> painterList = new ArrayList<>();
 
-    public DataListPainter(D list) {
+    public MarkerList(D list) {
         dataList = list;
         dataList.addListener(dataListener);
     }
@@ -81,7 +80,7 @@ public abstract class DataListPainter<D extends DataList> extends AbstractPlotPa
         }
     }
 
-    public List<IDataPainter> getSelectableMarkerList() {
+    public List<IMarker> getSelectableMarkerList() {
         return painterList;
     }
 
@@ -106,7 +105,7 @@ public abstract class DataListPainter<D extends DataList> extends AbstractPlotPa
 
     }
 
-    public IDataPainter getPainterForFrame(int frameId) {
+    public IMarker getMarkerForFrame(int frameId) {
         if (frameId < 0 || frameId >= painterList.size())
             return null;
         return painterList.get(frameId);
@@ -127,15 +126,15 @@ public abstract class DataListPainter<D extends DataList> extends AbstractPlotPa
             point.y = frame.bottom - containerView.getPaddingBottom();
     }
 
-    abstract protected IDataPainter createPainterForFrame(int frameId);
+    abstract protected IMarker createMarkerForFrame(int frameId);
 
     public void addMarker(int frameId) {
-        IDataPainter marker = createPainterForFrame(frameId);
+        IMarker marker = createMarkerForFrame(frameId);
         marker.setTo(this, dataList.getDataAt(frameId));
         painterList.add(frameId, marker);
     }
 
-    public int markerIndexOf(IDataPainter marker) {
+    public int markerIndexOf(IMarker marker) {
         return painterList.indexOf(marker);
     }
 
@@ -153,17 +152,17 @@ public abstract class DataListPainter<D extends DataList> extends AbstractPlotPa
     }
 
     private void invalidateMarker() {
-        for (IDataPainter marker : painterList)
+        for (IMarker marker : painterList)
             marker.invalidate();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        List<IDataPainter> selectableMarkers = getSelectableMarkerList();
+        List<IMarker> selectableMarkers = getSelectableMarkerList();
         int action = event.getActionMasked();
         boolean handled = false;
         if (action == MotionEvent.ACTION_DOWN) {
-            for (IDataPainter marker : selectableMarkers) {
+            for (IMarker marker : selectableMarkers) {
                 if (marker.handleActionDown(event)) {
                     handled = true;
                     break;
@@ -176,14 +175,14 @@ public abstract class DataListPainter<D extends DataList> extends AbstractPlotPa
             }
 
         } else if (action == MotionEvent.ACTION_UP) {
-            for (IDataPainter marker : selectableMarkers) {
+            for (IMarker marker : selectableMarkers) {
                 if (marker.handleActionUp(event)) {
                     handled = true;
                     break;
                 }
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
-            for (IDataPainter marker : selectableMarkers) {
+            for (IMarker marker : selectableMarkers) {
                 if (marker.handleActionMove(event)) {
                     handled = true;
                     break;

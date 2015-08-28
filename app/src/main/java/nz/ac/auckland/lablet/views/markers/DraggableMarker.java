@@ -1,4 +1,4 @@
-package nz.ac.auckland.lablet.views.painters;
+package nz.ac.auckland.lablet.views.markers;
 
 import android.graphics.PointF;
 import android.view.MotionEvent;
@@ -13,8 +13,8 @@ import nz.ac.auckland.lablet.data.PointData;
  * been selected and otherwise is disabled.
  * </p>
  */
-abstract class DraggableDataPainter implements IDataPainter<PointData, DraggableDataListPainter> {
-    protected DraggableDataListPainter parent = null;
+abstract class DraggableMarker implements IMarker<PointData, DraggableMarkerList> {
+    protected DraggableMarkerList parent = null;
     PointData data;
     protected PointF currentPosition;
     protected PointF dragOffset = new PointF(0, 0);
@@ -22,7 +22,7 @@ abstract class DraggableDataPainter implements IDataPainter<PointData, Draggable
     protected boolean isDragging = false;
 
     @Override
-    public void setTo(DraggableDataListPainter painter, PointData data) {
+    public void setTo(DraggableMarkerList painter, PointData data) {
         this.parent = painter;
         this.data = data;
     }

@@ -1,6 +1,8 @@
-package nz.ac.auckland.lablet.views.painters;
+package nz.ac.auckland.lablet.views.markers;
 
 import android.graphics.*;
+
+import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 /*
  * Copyright 2013-2014.
@@ -9,14 +11,13 @@ import nz.ac.auckland.lablet.experiment.CalibrationXY;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 
 /**
  * Marker for the calibration length scale.
  */
-class CalibrationDataPainter extends TagDataPainter {
+class CalibrationMarker extends PointMarker {
     @Override
     public void onDraw(Canvas canvas, float priority) {
         if (isSelectedForDrag())
@@ -31,7 +32,7 @@ class CalibrationDataPainter extends TagDataPainter {
  * for the start and one for the end of the scale.
  * </p>
  */
-public class CalibrationDataListPainter extends DraggableDataListPainter {
+public class CalibrationMarkerList extends DraggableMarkerList {
     // device independent sizes:
     private final int FONT_SIZE_DP = 20;
     private final float LINE_WIDTH_DP = 2f;
@@ -42,7 +43,7 @@ public class CalibrationDataListPainter extends DraggableDataListPainter {
     private float LINE_WIDTH;
     private float WING_LENGTH;
 
-    public CalibrationDataListPainter(PointDataList model) {
+    public CalibrationMarkerList(PointDataList model) {
         super(model);
     }
 
@@ -59,8 +60,8 @@ public class CalibrationDataListPainter extends DraggableDataListPainter {
     }
 
     @Override
-    protected DraggableDataPainter createPainterForFrame(int frameId) {
-        return new CalibrationDataPainter();
+    protected DraggableMarker createMarkerForFrame(int frameId) {
+        return new CalibrationMarker();
     }
 
     private void rotate(PointF point, PointF origin, float angleScreen) {
@@ -73,12 +74,12 @@ public class CalibrationDataListPainter extends DraggableDataListPainter {
     }
 
     private PointF getCurrentScreenPos(int markerIndex) {
-        return ((DraggableDataPainter) painterList.get(markerIndex)).getCachedScreenPosition();
+        return ((DraggableMarker) painterList.get(markerIndex)).getCachedScreenPosition();
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        for (IDataPainter marker : painterList)
+        for (IMarker marker : painterList)
             marker.onDraw(canvas, 1);
 
         if (dataList.getDataCount() != 2)

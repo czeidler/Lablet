@@ -1,4 +1,4 @@
-package nz.ac.auckland.lablet.views.painters;
+package nz.ac.auckland.lablet.views.markers;
 
 import android.graphics.PointF;
 
@@ -13,7 +13,7 @@ import nz.ac.auckland.lablet.data.PointDataList;
  */
 
 
-public abstract class DraggableDataListPainter extends DataListPainter<PointDataList> {
+public abstract class DraggableMarkerList extends MarkerList<PointDataList> {
 
     private DataList.IListener<PointDataList> dataListener = new DataList.IListener<PointDataList>() {
 
@@ -52,12 +52,12 @@ public abstract class DraggableDataListPainter extends DataListPainter<PointData
 
 
     public class MarkerPainterGroup {
-        private DraggableDataListPainter selectedDataListPainter = null;
-        private IDataPainter selectedDataPainter = null;
+        private DraggableMarkerList selectedDataListPainter = null;
+        private IMarker selectedDataPainter = null;
         private boolean inSelectForDragMethod = false;
         private boolean selectOnDrag = false;
 
-        public IDataPainter getSelectedDataPainter() {
+        public IMarker getSelectedDataPainter() {
             return selectedDataPainter;
         }
 
@@ -82,7 +82,7 @@ public abstract class DraggableDataListPainter extends DataListPainter<PointData
             this.selectOnDrag = selectOnDrag;
         }
 
-        public void selectForDrag(IDataPainter marker, DraggableDataListPainter painter) {
+        public void selectForDrag(IMarker marker, DraggableMarkerList painter) {
             if (inSelectForDragMethod)
                 return;
             inSelectForDragMethod = true;
@@ -123,9 +123,9 @@ public abstract class DraggableDataListPainter extends DataListPainter<PointData
         }
     }
 
-    private DraggableDataListPainter.MarkerPainterGroup markerPainterGroup = new DraggableDataListPainter.MarkerPainterGroup();
+    private DraggableMarkerList.MarkerPainterGroup markerPainterGroup = new DraggableMarkerList.MarkerPainterGroup();
 
-    public DraggableDataListPainter(PointDataList list) {
+    public DraggableMarkerList(PointDataList list) {
         super(list);
     }
 
@@ -147,7 +147,7 @@ public abstract class DraggableDataListPainter extends DataListPainter<PointData
      * @param marker that has been moved
      * @param newPosition the marker has been moved too
      */
-    public void markerMoveRequest(DraggableDataPainter marker, PointF newPosition, boolean isDragging) {
+    public void markerMoveRequest(DraggableMarker marker, PointF newPosition, boolean isDragging) {
         if (isDragging)
             return;
 

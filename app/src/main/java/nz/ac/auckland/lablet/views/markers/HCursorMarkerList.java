@@ -1,11 +1,11 @@
-package nz.ac.auckland.lablet.views.painters;
+package nz.ac.auckland.lablet.views.markers;
 
 import android.graphics.Point;
 import android.graphics.PointF;
 
 import nz.ac.auckland.lablet.data.PointDataList;
 
-class HCursorDataPainter extends CursorDataPainter {
+class HCursorMarker extends CursorMarker {
     @Override
     protected float getDirection(PointF point) {
         return point.y;
@@ -27,9 +27,9 @@ class HCursorDataPainter extends CursorDataPainter {
     }
 }
 
-public class HCursorDataListPainter extends CursorDataListPainter {
+public class HCursorMarkerList extends CursorMarkerList {
 
-    public HCursorDataListPainter(PointDataList data) {
+    public HCursorMarkerList(PointDataList data) {
         super(data);
     }
 
@@ -39,7 +39,7 @@ public class HCursorDataListPainter extends CursorDataListPainter {
     }
 
     @Override
-    protected DraggableDataPainter createPainterForFrame(int frameId) {
-        return new HCursorDataPainter();
+    protected DraggableMarker createMarkerForFrame(int frameId) {
+        return new HCursorMarker();
     }
 }

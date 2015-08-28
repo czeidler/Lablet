@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views.painters;
+package nz.ac.auckland.lablet.views.markers;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Default implementation of a draggable marker.
  */
-class TagDataPainter extends DraggableDataPainter {
+class PointMarker extends DraggableMarker {
     // device independent pixels
     private class Const {
         static public final float INNER_RING_RADIUS_DP = 30;
@@ -43,13 +43,13 @@ class TagDataPainter extends DraggableDataPainter {
     private Paint paint = null;
     private int mainAlpha = 255;
 
-    public TagDataPainter() {
+    public PointMarker() {
         paint = new Paint();
         paint.setAntiAlias(true);
     }
 
     @Override
-    public void setTo(DraggableDataListPainter painter, PointData data) {
+    public void setTo(DraggableMarkerList painter, PointData data) {
         super.setTo(painter, data);
 
         INNER_RING_RADIUS = parent.toPixel(Const.INNER_RING_RADIUS_DP);
@@ -124,24 +124,24 @@ class TagDataPainter extends DraggableDataPainter {
 /**
  * Painter for tagged data. For example, the tagged data from a camera experiment.
  */
-public class TagDataListPainter extends DraggableDataListPainter {
+public class PointMarkerList extends DraggableMarkerList {
     private int MAX_DISPLAYED_MARKERS = 100;
 
     private LastInsertMarkerManager lastInsertMarkerManager = new LastInsertMarkerManager();
 
-    public TagDataListPainter(PointDataList data) {
+    public PointMarkerList(PointDataList data) {
         super(data);
     }
 
     @Override
-    public List<IDataPainter> getSelectableMarkerList() {
-        List<IDataPainter> selectableMarkers = new ArrayList<>();
-        IDataPainter selectedMarker = painterList.get(dataList.getSelectedData());
+    public List<IMarker> getSelectableMarkerList() {
+        List<IMarker> selectableMarkers = new ArrayList<>();
+        IMarker selectedMarker = painterList.get(dataList.getSelectedData());
         selectableMarkers.add(selectedMarker);
         return selectableMarkers;
     }
 
-    public IDataPainter getDataPainterAtScreenPosition(PointF screenPosition) {
+    public IMarker getDataPainterAtScreenPosition(PointF screenPosition) {
         int currentMarkerRow = dataList.getSelectedData();
 
         int start = currentMarkerRow - MAX_DISPLAYED_MARKERS / 2 + 1;
@@ -152,10 +152,10 @@ public class TagDataListPainter extends DraggableDataListPainter {
             end = painterList.size();
 
         for (int i = start; i < end; i++) {
-        IDataPainter marker = painterList.get(i);
-            if (!(marker instanceof DraggableDataPainter))
+        IMarker marker = painterList.get(i);
+            if (!(marker instanceof DraggableMarker))
                 continue;
-            if (((DraggableDataPainter)marker).isPointOnSelectArea(screenPosition))
+            if (((DraggableMarker)marker).isPointOnSelectArea(screenPosition))
                 return marker;
         }
         return null;
@@ -164,7 +164,7 @@ public class TagDataListPainter extends DraggableDataListPainter {
     @Override
     public void onDraw(Canvas canvas) {
         int currentMarkerRow = dataList.getSelectedData();
-        IDataPainter topMarker = getPainterForFrame(currentMarkerRow);
+        IMarker topMarker = getMarkerForFrame(currentMarkerRow);
 
         int start = currentMarkerRow - MAX_DISPLAYED_MARKERS / 2 + 1;
         if (start < 0)
@@ -174,7 +174,7 @@ public class TagDataListPainter extends DraggableDataListPainter {
             end = painterList.size();
 
         for (int i = start; i < end; i++) {
-            IDataPainter marker = painterList.get(i);
+            IMarker marker = painterList.get(i);
             if (marker == topMarker)
                 continue;
 
@@ -192,8 +192,8 @@ public class TagDataListPainter extends DraggableDataListPainter {
     }
 
     @Override
-    protected DraggableDataPainter createPainterForFrame(int frameId) {
-        return new TagDataPainter();
+    protected DraggableMarker createMarkerForFrame(int frameId) {
+        return new PointMarker();
     }
 
     /**
@@ -234,7 +234,7 @@ public class TagDataListPainter extends DraggableDataListPainter {
 
         // check if we have the run in the data list
         PointData data = null;
-        int index = dataList.getDataByRun(frame);
+        int index = dataList.getIndexByFrameId(frame);
         if (index >= 0) {
             data = dataList.getDataAt(index);
             dataList.selectData(index);

@@ -1,4 +1,4 @@
-package nz.ac.auckland.lablet.views.painters;
+package nz.ac.auckland.lablet.views.markers;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -7,8 +7,6 @@ import android.graphics.PointF;
 import android.view.MotionEvent;
 
 import nz.ac.auckland.lablet.data.PointDataList;
-import nz.ac.auckland.lablet.data.RectData;
-import nz.ac.auckland.lablet.data.RectDataList;
 import nz.ac.auckland.lablet.data.RoiData;
 import nz.ac.auckland.lablet.data.RoiDataList;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
@@ -24,7 +22,7 @@ import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 /**
  * Marker for region of interest.
  */
-class RoiDataPainter implements IDataPainter<RoiData, RoiDataListPainter>{
+class RoiMarker implements IMarker<RoiData, RoiMarkerList> {
 
     // device independent sizes:
     private final int FONT_SIZE_DP = 20;
@@ -37,18 +35,18 @@ class RoiDataPainter implements IDataPainter<RoiData, RoiDataListPainter>{
     private float WING_LENGTH;
     private boolean isVisible = true;
 
-    private TagDataPainter topLeftTag = new TagDataPainter();
-    private TagDataPainter topRightTag = new TagDataPainter();
-    private TagDataPainter btmRightTag = new TagDataPainter();
-    private TagDataPainter btmLeftTag = new TagDataPainter();
-    protected RoiDataListPainter parent = null;
+    private PointMarker topLeftTag = new PointMarker();
+    private PointMarker topRightTag = new PointMarker();
+    private PointMarker btmRightTag = new PointMarker();
+    private PointMarker btmLeftTag = new PointMarker();
+    protected RoiMarkerList parent = null;
     private RoiData data;
-    DraggableDataListPainter dataListPainter;
+    DraggableMarkerList dataListPainter;
     PointDataList dataList = new PointDataList();
 
 
     @Override
-    public void setTo(RoiDataListPainter painter, final RoiData data) {
+    public void setTo(RoiMarkerList painter, final RoiData data) {
         this.parent = painter;
         this.data = data;
 
@@ -57,9 +55,9 @@ class RoiDataPainter implements IDataPainter<RoiData, RoiDataListPainter>{
         dataList.addData(data.getBtmRight());
         dataList.addData(data.getBtmLeft());
 
-        dataListPainter = new DraggableDataListPainter(dataList) {
+        dataListPainter = new DraggableMarkerList(dataList) {
             @Override
-            protected IDataPainter createPainterForFrame(int frameId) {
+            protected IMarker createMarkerForFrame(int frameId) {
                 if(frameId == 0)
                 {
                     return topLeftTag;
@@ -82,11 +80,11 @@ class RoiDataPainter implements IDataPainter<RoiData, RoiDataListPainter>{
 
             @Override
             public void onDraw(Canvas canvas) {
-                for (IDataPainter marker : painterList)
+                for (IMarker marker : painterList)
                     marker.onDraw(canvas, 1);
             }
 
-            protected void onDraggedTo(DraggableDataPainter marker, PointF newPosition)
+            protected void onDraggedTo(DraggableMarker marker, PointF newPosition)
             {
                 //int index = painterList.indexOf(marker);
                 //PointDataList model  = this.getDataList();
@@ -211,9 +209,9 @@ class RoiDataPainter implements IDataPainter<RoiData, RoiDataListPainter>{
 
 }
 
-public class RoiDataListPainter extends DataListPainter<RoiDataList> {
+public class RoiMarkerList extends MarkerList<RoiDataList> {
 
-    public RoiDataListPainter(RoiDataList model) {
+    public RoiMarkerList(RoiDataList model) {
         super(model);
     }
 
@@ -226,8 +224,8 @@ public class RoiDataListPainter extends DataListPainter<RoiDataList> {
     }
 
     @Override
-    protected RoiDataPainter createPainterForFrame(int frameId) {
-        return new RoiDataPainter();
+    protected RoiMarker createMarkerForFrame(int frameId) {
+        return new RoiMarker();
     }
 
     @Override
@@ -235,7 +233,7 @@ public class RoiDataListPainter extends DataListPainter<RoiDataList> {
 
         if(this.getDataList().isVisible())
         {
-            for (IDataPainter marker : painterList)
+            for (IMarker marker : painterList)
                 marker.onDraw(canvas, 1);
         }
     }

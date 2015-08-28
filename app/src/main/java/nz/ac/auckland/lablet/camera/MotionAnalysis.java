@@ -15,6 +15,7 @@ import nz.ac.auckland.lablet.data.CalibratedDataList;
 import nz.ac.auckland.lablet.data.FrameDataList;
 import nz.ac.auckland.lablet.data.PointData;
 import nz.ac.auckland.lablet.data.PointDataList;
+import nz.ac.auckland.lablet.data.RectData;
 import nz.ac.auckland.lablet.data.RectDataList;
 import nz.ac.auckland.lablet.data.RoiData;
 import nz.ac.auckland.lablet.data.RoiDataList;
@@ -132,7 +133,23 @@ public class MotionAnalysis implements IDataAnalysis {
         originCalibrationSetter = new OriginCalibrationSetter(calibrationXY, originMarkers);
 
         rectDataList = new RectDataList();
-        rectDataList.setVisibility(false);
+
+        //TODO: remove, just a test to make sure working
+        float angle_i = 360 / (float)this.getFrameDataList().getNumberOfFrames();
+        float count = 0;
+        for(int i = 0; i < this.getFrameDataList().getNumberOfFrames(); i++)
+        {
+            RectData data = new RectData(i);
+            data.setAngle(count);
+
+            data.setCentre(new PointF(this.getVideoData().getMaxRawX()/2, this.getVideoData().getMaxRawY()/2));
+            data.setHeight(5);
+            data.setWidth(10);
+            rectDataList.addData(data);
+            count += angle_i;
+        }
+
+        rectDataList.setVisibility(true);
 
         roiDataList = new RoiDataList();
         roiDataList.setVisibility(false);

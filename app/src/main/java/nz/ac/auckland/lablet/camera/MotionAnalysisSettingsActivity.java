@@ -22,7 +22,7 @@ import nz.ac.auckland.lablet.ExperimentAnalysisBaseActivity;
 import nz.ac.auckland.lablet.data.Data;
 import nz.ac.auckland.lablet.data.PointData;
 import nz.ac.auckland.lablet.data.PointDataList;
-import nz.ac.auckland.lablet.views.painters.StartEndSeekBar;
+import nz.ac.auckland.lablet.views.markers.StartEndSeekBar;
 import nz.ac.auckland.lablet.views.VideoFrameView;
 
 import java.io.File;
