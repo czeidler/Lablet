@@ -28,9 +28,9 @@ import java.util.List;
  */
 public class Experiment extends WeakListenable<Experiment.IListener> {
     public interface IListener {
-        public void onExperimentRunAdded(ExperimentRun runGroup);
-        public void onExperimentRunRemoved(ExperimentRun runGroup);
-        public void onCurrentRunChanged(ExperimentRun newGroup, ExperimentRun oldGroup);
+        void onExperimentRunAdded(ExperimentRun runGroup);
+        void onExperimentRunRemoved(ExperimentRun runGroup);
+        void onCurrentRunChanged(ExperimentRun newGroup, ExperimentRun oldGroup);
     }
 
     final private List<ExperimentRun> experimentRuns = new ArrayList<>();
