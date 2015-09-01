@@ -14,6 +14,7 @@ import android.util.AttributeSet;
 
 import nz.ac.auckland.lablet.views.markers.DraggableMarkerList;
 import nz.ac.auckland.lablet.views.markers.IMarker;
+import nz.ac.auckland.lablet.views.markers.MarkerList;
 import nz.ac.auckland.lablet.views.markers.PointMarkerList;
 import nz.ac.auckland.lablet.views.markers.RectMarkerList;
 import nz.ac.auckland.lablet.views.plotview.*;
@@ -75,23 +76,12 @@ public class MarkerView extends PlotPainterContainerView {
     public void setCurrentFrame(int frameId, @Nullable PointF insertHint) {
         for (IPlotPainter painter : allPainters) {
 
-            if (painter instanceof RectMarkerList) {
-                RectMarkerList rectMarkerList = (RectMarkerList) painter;
-                rectMarkerList.setCurrentFrame(frameId, insertHint);
+            if(painter instanceof MarkerList)
+            {
+                MarkerList list = (MarkerList)painter;
+                list.setCurrentFrame(frameId, insertHint);
+                //TODO: deselect all existing markers: tagDataListPainter.getMarkerPainterGroup().deselect(); // deselect any marker
             }
-
-            if (painter instanceof PointMarkerList) {
-                PointMarkerList tagDataListPainter = (PointMarkerList) painter;
-                tagDataListPainter.setCurrentFrame(frameId, insertHint);
-                tagDataListPainter.getMarkerPainterGroup().deselect(); // deselect any marker
-            }
-
-            //tagDataListPainter.setCurrentFrame(frame, insertHint);
-
-
-
-
-
         }
         invalidate();
     }

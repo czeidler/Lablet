@@ -132,9 +132,23 @@ public class MotionAnalysis implements IDataAnalysis {
         originMarkers.addData(point3);
         originCalibrationSetter = new OriginCalibrationSetter(calibrationXY, originMarkers);
 
+        roiDataList = new RoiDataList();
+        roiDataList.setVisibility(true);
+        RoiData d = new RoiData(0);
+
+        PointF centre = new PointF(this.getVideoData().getMaxRawX()/2, this.getVideoData().getMaxRawY()/2);
+        int width = 5;
+        int height = 5;
+        d.setTopLeft(new PointF(centre.x-width, centre.y + height));
+        d.setTopRight(new PointF(centre.x + width, centre.y + height));
+        d.setBtmRight(new PointF(centre.x + width, centre.y - height));
+        d.setBtmLeft(new PointF(centre.x - width, centre.y - height));
+        d.setCentre(centre);
+        roiDataList.addData(d);
+
         rectDataList = new RectDataList();
 
-        //TODO: remove, just a test to make sure working
+        /*//TODO: remove, just a test to make sure working
         float angle_i = 360 / (float)this.getFrameDataList().getNumberOfFrames();
         float count = 0;
         for(int i = 0; i < this.getFrameDataList().getNumberOfFrames(); i++)
@@ -151,8 +165,8 @@ public class MotionAnalysis implements IDataAnalysis {
 
         rectDataList.setVisibility(true);
 
-        roiDataList = new RoiDataList();
-        roiDataList.setVisibility(false);
+        roiDataList = new RoiDataList();*/
+
 
         updateOriginFromVideoRotation();
     }
@@ -202,7 +216,7 @@ public class MotionAnalysis implements IDataAnalysis {
 
     public void setTrackingEnabled(boolean trackingEnabled) {
         this.trackingEnabled = trackingEnabled;
-        roiDataList.setVisibility(trackingEnabled);
+        //roiDataList.setVisibility(trackingEnabled);
     }
 
     protected void setOrigin(PointF origin, PointF axis1) {

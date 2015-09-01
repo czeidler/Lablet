@@ -89,12 +89,12 @@ public class OriginMarkerList extends DraggableMarkerList implements Calibration
             return;
         }
 
-        FONT_SIZE = toPixel(FONT_SIZE_DP);
-        LINE_WIDTH = toPixel(LINE_WIDTH_DP);
-        ARROW_WIDTH = toPixel(ARROW_WIDTH_DP);
-        ARROW_LENGTH = toPixel(ARROW_LENGTH_DP);
-        ARROW_AXIS_OVERLAP = toPixel(ARROW_AXIS_OVERLAP_DP);
-        LABEL_TO_AXIS_END_DISTANCE = toPixel(ARROW_AXIS_OVERLAP_DP);
+        FONT_SIZE = containerView.toPixel(FONT_SIZE_DP);
+        LINE_WIDTH = containerView.toPixel(LINE_WIDTH_DP);
+        ARROW_WIDTH = containerView.toPixel(ARROW_WIDTH_DP);
+        ARROW_LENGTH = containerView.toPixel(ARROW_LENGTH_DP);
+        ARROW_AXIS_OVERLAP = containerView.toPixel(ARROW_AXIS_OVERLAP_DP);
+        LABEL_TO_AXIS_END_DISTANCE = containerView.toPixel(ARROW_AXIS_OVERLAP_DP);
     }
 
     protected void finalize() {
@@ -116,8 +116,8 @@ public class OriginMarkerList extends DraggableMarkerList implements Calibration
         if (firstDraw) {
             firstDraw = false;
             // update the angle
-            PointF originScreen = getScreenPosition(dataList.getDataAt(0));
-            PointF axis1Screen = getScreenPosition(dataList.getDataAt(1));
+            PointF originScreen = DraggableMarker.getScreenPosition(containerView, dataList.getDataAt(0));
+            PointF axis1Screen = DraggableMarker.getScreenPosition(containerView, dataList.getDataAt(1));
             angleScreen = CalibrationXY.getAngle(originScreen, axis1Screen);
             
             updateMarkerScreenPositions(originScreen);
@@ -283,7 +283,7 @@ public class OriginMarkerList extends DraggableMarkerList implements Calibration
 
         if (row == 0) {
             // translation
-            sanitizeScreenPoint(newPosition);
+            containerView.sanitizeScreenPoint(newPosition);
             updateMarkerScreenPositions(newPosition);
         } else {
             // x rotation

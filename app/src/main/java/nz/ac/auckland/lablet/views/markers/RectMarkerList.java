@@ -30,7 +30,7 @@ class RectMarker implements IMarker<RectData, RectMarkerList> {
     public void setTo(RectMarkerList painter, RectData data) {
         this.parent = painter;
         this.data = data;
-        LINE_WIDTH = parent.toPixel(LINE_WIDTH_DP);
+        LINE_WIDTH = painter.getContainerView().toPixel(LINE_WIDTH_DP);
     }
 
     @Override

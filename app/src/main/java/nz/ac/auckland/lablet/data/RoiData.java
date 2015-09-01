@@ -6,6 +6,7 @@ import android.graphics.PointF;
  * Created by jdip004 on 27/08/2015.
  */
 public class RoiData extends Data {
+    private PointData centre;// = new PointF();
     private PointData topLeft;// = new PointF();
     private PointData topRight;// = new PointF();
     private PointData btmLeft;// = new PointF();
@@ -13,10 +14,29 @@ public class RoiData extends Data {
 
     public RoiData(int frameId) {
         super(frameId);
-        topLeft = new PointData(0); //Hacky, shouldn't need to specify frame id here
-        topRight = new PointData(1);
-        btmLeft = new PointData(2);
-        btmRight = new PointData(3);
+        centre = new PointData(frameId);
+        topLeft = new PointData(frameId); //Hacky, shouldn't need to specify frame id here
+        topRight = new PointData(frameId);
+        btmLeft = new PointData(frameId);
+        btmRight = new PointData(frameId);
+    }
+
+    public PointData getCentre() {
+        return centre;
+    }
+
+    public float getWidth()
+    {
+        return Math.abs(topRight.getPosition().x - topLeft.getPosition().x);
+    }
+
+    public float getHeight()
+    {
+        return Math.abs(topRight.getPosition().y - btmRight.getPosition().y);
+    }
+
+    public void setCentre(PointF centre) {
+        this.centre.setPosition(centre);
     }
 
     public PointData getTopLeft() {

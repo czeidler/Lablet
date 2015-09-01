@@ -33,7 +33,7 @@ abstract class CursorMarker extends PointMarker {
     public void setTo(DraggableMarkerList painter, PointData data) {
         super.setTo(painter, data);
 
-        SELECT_RADIUS = parent.toPixel(Const.SELECT_RADIUS_DP);
+        SELECT_RADIUS = containerView.toPixel(Const.SELECT_RADIUS_DP);
     }
 
     @Override

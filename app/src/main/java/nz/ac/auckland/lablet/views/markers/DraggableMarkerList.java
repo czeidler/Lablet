@@ -155,17 +155,12 @@ public abstract class DraggableMarkerList extends MarkerList<PointDataList> {
         if (row < 0)
             return;
 
-        sanitizeScreenPoint(newPosition);
+        newPosition = containerView.sanitizeScreenPoint(newPosition);
 
         PointF newReal = new PointF();
         containerView.fromScreen(newPosition, newReal);
         dataList.setMarkerPosition(newReal, row);
     }
 
-    public PointF getScreenPosition(PointData markerData) {
-        PointF realPosition = markerData.getPosition();
-        PointF screenPosition = new PointF();
-        containerView.toScreen(realPosition, screenPosition);
-        return screenPosition;
-    }
+
 }

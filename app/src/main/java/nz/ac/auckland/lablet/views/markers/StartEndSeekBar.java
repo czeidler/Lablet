@@ -52,16 +52,16 @@ abstract class StartEndMarker extends DraggableMarker {
     public void setTo(DraggableMarkerList painter, PointData data) {
         super.setTo(painter, data);
 
-        WIDTH = parent.toPixel(WIDTH_DP);
-        HEIGHT = parent.toPixel(StartEndSeekBar.HEIGHT_DP);
-        TRIANGLE_HEIGHT = parent.toPixel(StartEndSeekBar.HEIGHT_DP * 0.5f);
+        WIDTH = parent.getContainerView().toPixel(WIDTH_DP);
+        HEIGHT = parent.getContainerView().toPixel(StartEndSeekBar.HEIGHT_DP);
+        TRIANGLE_HEIGHT = parent.getContainerView().toPixel(StartEndSeekBar.HEIGHT_DP * 0.5f);
     }
 
     @Override
     public boolean isPointOnSelectArea(PointF screenPoint) {
-        PointF position = parent.getScreenPosition(data);
+        PointF position = DraggableMarker.getScreenPosition(containerView, data);
         // build a marker rect with increased width
-        final float touchWidth = (float)parent.toPixel(60);
+        final float touchWidth = (float)parent.getContainerView().toPixel(60);
         RectF rect = new RectF();
         rect.left = position.x - touchWidth / 2;
         rect.top = 0;
@@ -97,7 +97,7 @@ class StartMarker extends StartEndMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
-        PointF position = parent.getScreenPosition(data);
+        PointF position = DraggableMarker.getScreenPosition(containerView, data);
 
         if (isDragging) {
             PointF dragPosition = getTouchPosition();
@@ -131,7 +131,7 @@ class EndMarker extends StartEndMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
-        PointF position = parent.getScreenPosition(data);
+        PointF position = DraggableMarker.getScreenPosition(containerView, data);
 
         if (isDragging) {
             PointF dragPosition = getTouchPosition();
@@ -197,7 +197,7 @@ class StartEndMarkerList extends DraggableMarkerList {
             return;
 
         PointF newReal = new PointF();
-        sanitizeScreenPoint(newPosition);
+        containerView.sanitizeScreenPoint(newPosition);
         containerView.fromScreen(newPosition, newReal);
         newReal.x = toStepPosition(newReal.x);
 
@@ -348,7 +348,7 @@ public class StartEndSeekBar extends PlotPainterContainerView {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         LayoutParams params = getLayoutParams();
         assert params != null;
-        setMeasuredDimension(params.width, startEndMarkerList.toPixel(HEIGHT_DP));
+        setMeasuredDimension(params.width, startEndMarkerList.getContainerView().toPixel(HEIGHT_DP));
     }
 
     public PointDataList getMarkerDataModel() {

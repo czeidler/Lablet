@@ -54,9 +54,9 @@ public class CalibrationMarkerList extends DraggableMarkerList {
         if (view == null)
             return;
 
-        FONT_SIZE = toPixel(FONT_SIZE_DP);
-        LINE_WIDTH = toPixel(LINE_WIDTH_DP);
-        WING_LENGTH = toPixel(WING_LENGTH_DP);
+        FONT_SIZE = containerView.toPixel(FONT_SIZE_DP);
+        LINE_WIDTH = containerView.toPixel(LINE_WIDTH_DP);
+        WING_LENGTH = containerView.toPixel(WING_LENGTH_DP);
     }
 
     @Override
@@ -121,7 +121,7 @@ public class CalibrationMarkerList extends DraggableMarkerList {
 
         paint.setStyle(Paint.Style.FILL);
         paint.setTextSize(FONT_SIZE);
-        int scaleLength = toPixel((int) Math.sqrt(Math.pow(screenPos1.x - screenPos2.x, 2)
+        int scaleLength = containerView.toPixel((int) Math.sqrt(Math.pow(screenPos1.x - screenPos2.x, 2)
                 + Math.pow(screenPos1.y - screenPos2.y, 2)));
         String text = "Scale length [pixel]: ";
         text += scaleLength;

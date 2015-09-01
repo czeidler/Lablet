@@ -12,6 +12,7 @@ import java.util.List;
 
 import nz.ac.auckland.lablet.data.Data;
 import nz.ac.auckland.lablet.data.DataList;
+import nz.ac.auckland.lablet.data.RoiData;
 import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
 import nz.ac.auckland.lablet.views.plotview.AbstractPlotPainter;
 
@@ -80,6 +81,14 @@ public abstract class MarkerList<D extends DataList> extends AbstractPlotPainter
         }
     }
 
+    public void setCurrentFrame(int frame, @Nullable PointF insertHint) {
+
+        // check if we have the run in the data list
+        Data data = null;
+        int index = dataList.getIndexByFrameId(frame);
+        dataList.selectData(index);
+    }
+
     public List<IMarker> getSelectableMarkerList() {
         return painterList;
     }
@@ -111,20 +120,7 @@ public abstract class MarkerList<D extends DataList> extends AbstractPlotPainter
         return painterList.get(frameId);
     }
 
-    public int toPixel(float densityIndependentPixel) {
-        return DeviceIndependentPixel.toPixel(densityIndependentPixel, containerView);
-    }
 
-    protected void sanitizeScreenPoint(PointF point) {
-        if (frame.left + containerView.getPaddingLeft() > point.x)
-            point.x = frame.left + containerView.getPaddingLeft();
-        if (frame.right - containerView.getPaddingRight()< point.x)
-            point.x = frame.right - containerView.getPaddingRight();
-        if (frame.top + containerView.getPaddingTop() > point.y)
-            point.y = frame.top + containerView.getPaddingTop();
-        if (frame.bottom - containerView.getPaddingBottom() < point.y)
-            point.y = frame.bottom - containerView.getPaddingBottom();
-    }
 
     abstract protected IMarker createMarkerForFrame(int frameId);
 

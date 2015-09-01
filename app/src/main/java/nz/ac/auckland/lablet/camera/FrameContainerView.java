@@ -54,7 +54,7 @@ public class FrameContainerView extends RelativeLayout {
     private FrameDataList frameDataList = null;
     private MotionAnalysis motionAnalysis = null;
     private OriginMarkerList originDataListPainter = null;
-    private RoiMarkerList rectMarkerPainter = null;
+    //private RoiMarkerList roiMarkers = null;
 
     private GestureDetector gestureDetector;
     final Handler handler = new Handler();

@@ -1,9 +1,14 @@
 package nz.ac.auckland.lablet.views.markers;
 
+import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.view.MotionEvent;
 
 import nz.ac.auckland.lablet.data.PointData;
+import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
+import nz.ac.auckland.lablet.misc.WeakListenable;
+import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 /**
  * A selectable and draggable marker.
@@ -13,17 +18,35 @@ import nz.ac.auckland.lablet.data.PointData;
  * been selected and otherwise is disabled.
  * </p>
  */
-abstract class DraggableMarker implements IMarker<PointData, DraggableMarkerList> {
+abstract class DraggableMarker extends WeakListenable<DraggableMarker.IListener> implements IMarker<PointData, DraggableMarkerList> {
     protected DraggableMarkerList parent = null;
     PointData data;
     protected PointF currentPosition;
     protected PointF dragOffset = new PointF(0, 0);
     protected boolean isSelectedForDragging = false;
     protected boolean isDragging = false;
+    protected PlotPainterContainerView containerView;
+
+    public interface IListener {
+        public void onDraggedTo(DraggableMarker marker, PointF newPosition);
+        public void onSelectedForDrag(DraggableMarker marker, boolean isSelected);
+    }
+
+
 
     @Override
     public void setTo(DraggableMarkerList painter, PointData data) {
         this.parent = painter;
+        this.containerView = painter.getContainerView();
+        this.data = data;
+    }
+
+    /*
+    * Used if using a marker without parent list
+     */
+
+    public void setTo(PlotPainterContainerView containerView, PointData data) {
+        this.containerView = containerView;
         this.data = data;
     }
 
@@ -68,8 +91,18 @@ abstract class DraggableMarker implements IMarker<PointData, DraggableMarkerList
 
         isDragging = false;
 
-        if (wasDragging)
-            parent.markerMoveRequest(this, getDragPoint(event), isDragging);
+        if (wasDragging) {
+            PointF point = this.getDragPoint(event);
+
+            if (parent != null) {
+                parent.markerMoveRequest(this, point, isDragging);
+            } else {
+                PointF newPosition = containerView.sanitizeScreenPoint(point);
+                PointF newReal = new PointF();
+                containerView.fromScreen(newPosition, newReal);
+                this.data.setPosition(newReal);
+            }
+        }
 
         invalidate();
 
@@ -101,7 +134,13 @@ abstract class DraggableMarker implements IMarker<PointData, DraggableMarkerList
     @Override
     public void setSelectedForDrag(boolean selectedForDrag) {
         this.isSelectedForDragging = selectedForDrag;
-        parent.getMarkerPainterGroup().selectForDrag(this, parent);
+
+        if(parent != null) {
+            parent.getMarkerPainterGroup().selectForDrag(this, parent);
+        }
+
+        for (IListener listener : getListeners())
+            listener.onSelectedForDrag(this, selectedForDrag);
     }
 
     @Override
@@ -111,9 +150,16 @@ abstract class DraggableMarker implements IMarker<PointData, DraggableMarkerList
 
     public PointF getCachedScreenPosition() {
         if (currentPosition == null)
-            currentPosition = parent.getScreenPosition(data);
+            currentPosition = DraggableMarker.getScreenPosition(containerView, this.data);//parent.getScreenPosition(data);
 
         return currentPosition;
+    }
+
+    public static PointF getScreenPosition(PlotPainterContainerView containerView, PointData data) {
+        PointF realPosition = data.getPosition();
+        PointF screenPosition = new PointF();
+        containerView.toScreen(realPosition, screenPosition);
+        return screenPosition;
     }
 
     @Override
@@ -134,7 +180,12 @@ abstract class DraggableMarker implements IMarker<PointData, DraggableMarkerList
      * @param point the new position the marker was dragged to
      */
     protected void onDraggedTo(PointF point) {
-        parent.markerMoveRequest(this, point, true);
+        if(this.parent != null) {
+            parent.markerMoveRequest(this, point, true);
+        }
+
+        for (IListener listener : getListeners())
+            listener.onDraggedTo(this, point);
     }
 
     /**

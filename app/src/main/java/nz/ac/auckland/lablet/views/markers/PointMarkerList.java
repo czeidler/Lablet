@@ -13,8 +13,10 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
 
+import nz.ac.auckland.lablet.data.Data;
 import nz.ac.auckland.lablet.data.PointData;
 import nz.ac.auckland.lablet.data.PointDataList;
+import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +37,10 @@ class PointMarker extends DraggableMarker {
     final public static int MARKER_COLOR = Color.argb(255, 100, 200, 20);
     final public static int DRAG_HANDLE_COLOR = Color.argb(100, 0, 200, 100);
 
-    private float INNER_RING_RADIUS;
-    private float INNER_RING_WIDTH;
-    private float RING_RADIUS;
-    private float RING_WIDTH;
+    public float INNER_RING_RADIUS;
+    public float INNER_RING_WIDTH;
+    public float RING_RADIUS;
+    public float RING_WIDTH;
 
     private Paint paint = null;
     private int mainAlpha = 255;
@@ -51,11 +53,17 @@ class PointMarker extends DraggableMarker {
     @Override
     public void setTo(DraggableMarkerList painter, PointData data) {
         super.setTo(painter, data);
+        this.setTo(painter.getContainerView(), data);
+    }
 
-        INNER_RING_RADIUS = parent.toPixel(Const.INNER_RING_RADIUS_DP);
-        INNER_RING_WIDTH = parent.toPixel(Const.INNER_RING_WIDTH_DP);
-        RING_RADIUS = parent.toPixel(Const.RING_RADIUS_DP);
-        RING_WIDTH = parent.toPixel(Const.RING_WIDTH_DP);
+    @Override
+    public void setTo(PlotPainterContainerView containerView, PointData data)
+    {
+        super.setTo(containerView, data);
+        INNER_RING_RADIUS = containerView.toPixel(Const.INNER_RING_RADIUS_DP);
+        INNER_RING_WIDTH = containerView.toPixel(Const.INNER_RING_WIDTH_DP);
+        RING_RADIUS = containerView.toPixel(Const.RING_RADIUS_DP);
+        RING_WIDTH = containerView.toPixel(Const.RING_WIDTH_DP);
     }
 
     @Override
@@ -82,7 +90,7 @@ class PointMarker extends DraggableMarker {
         canvas.drawCircle(position.x, position.y, INNER_RING_RADIUS, paint);
 
         if (isSelectedForDrag()) {
-            paint.setColor(DRAG_HANDLE_COLOR);
+            paint.setColor(DRAG_HANDLE_COLOR); //DRAG_HANDLE_COLOR
             paint.setStrokeWidth(RING_WIDTH);
             paint.setStyle(Paint.Style.STROKE);
             canvas.drawCircle(position.x, position.y, RING_RADIUS, paint);
@@ -229,21 +237,22 @@ public class PointMarkerList extends DraggableMarkerList {
         }
     }
 
+    @Override
     public void setCurrentFrame(int frame, @Nullable PointF insertHint) {
         lastInsertMarkerManager.onCurrentFrameChanging(dataList);
 
-        // check if we have the run in the data list
+        super.setCurrentFrame(frame, insertHint);
+
         PointData data = null;
-        int index = dataList.getIndexByFrameId(frame);
+        int index = dataList.getSelectedData();
         if (index >= 0) {
             data = dataList.getDataAt(index);
-            dataList.selectData(index);
         }
 
         if (data == null) {
             data = new PointData(frame);
             if (insertHint != null) {
-                sanitizeScreenPoint(insertHint);
+                containerView.sanitizeScreenPoint(insertHint);
                 PointF insertHintReal = new PointF();
                 containerView.fromScreen(insertHint, insertHintReal);
                 data.setPosition(insertHintReal);
@@ -257,7 +266,7 @@ public class PointMarkerList extends DraggableMarkerList {
                     // sanitize the new marker position
                     PointF screenPos = new PointF();
                     containerView.toScreen(data.getPosition(), screenPos);
-                    sanitizeScreenPoint(screenPos);
+                    containerView.sanitizeScreenPoint(screenPos);
                     containerView.fromScreen(screenPos, data.getPosition());
                 } else {
                     // center the first marker
