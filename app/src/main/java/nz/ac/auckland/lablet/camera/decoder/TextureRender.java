@@ -98,7 +98,41 @@ public class TextureRender {
     public void render(int textureId, SurfaceTexture st, int rotation) {
         checkGlError("onDrawFrame start");
         st.getTransformMatrix(mSTMatrix);
-        Matrix.setIdentityM(mMVPMatrix, 0);
+
+        float[] decoderRotationMatrix = new float[16];
+        Matrix.setIdentityM(decoderRotationMatrix, 0);
+        decoderRotationMatrix[0] = Math.signum(mSTMatrix[0]);
+        decoderRotationMatrix[1] = Math.signum(mSTMatrix[1]);
+        decoderRotationMatrix[4] = Math.signum(mSTMatrix[4]);
+        decoderRotationMatrix[5] = Math.signum(mSTMatrix[5]);
+
+        float[] rotationMatrix = new float[16];
+        Matrix.setIdentityM(rotationMatrix, 0);
+        if (rotation == 90) {
+            rotationMatrix[0] = 0;
+            rotationMatrix[1] = 1;
+            rotationMatrix[4] = -1;
+            rotationMatrix[5] = 0;
+        } else if (rotation == 180) {
+            rotationMatrix[0] = -1;
+            rotationMatrix[1] = 0;
+            rotationMatrix[4] = 0;
+            rotationMatrix[5] = -1;
+        } else if (rotation == 270) {
+            rotationMatrix[0] = 0;
+            rotationMatrix[1] = -1;
+            rotationMatrix[4] = 1;
+            rotationMatrix[5] = 0;
+        }
+
+        // for some reason the picture is mirrored...
+        float[] mirrorYMatrix = new float[16];
+        Matrix.setIdentityM(mirrorYMatrix, 0);
+        mirrorYMatrix[5] = -1;
+
+        float[] tmp = new float[16];
+        Matrix.multiplyMM(tmp, 0, rotationMatrix, 0, decoderRotationMatrix, 0);
+        Matrix.multiplyMM(mMVPMatrix, 0, mirrorYMatrix, 0, tmp, 0);
 
         // (optional) clear to green so we can see if we're failing to set pixels
         GLES20.glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
