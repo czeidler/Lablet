@@ -7,7 +7,7 @@
 
     <item android:id="@+id/set_roi"
         android:icon="@drawable/ic_chart_line"
-        android:title="Set Region of Interest"/>
+        android:title="Track Object"/>
 
     <item android:id="@+id/debug_tracking"
         android:title="Debug"

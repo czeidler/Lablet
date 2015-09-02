@@ -363,7 +363,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
         MotionAnalysis sensorAnalysis = getMotionAnalysis();
         if (sensorAnalysis == null)
             return;
-        tagMarker = sensorAnalysis.getTagMarkers();
+        tagMarker = sensorAnalysis.getPointDataList();
         timeData = sensorAnalysis.getTimeData();
 
         // first update the tables because otherwise update() can cause a crash when accessing data (an update is

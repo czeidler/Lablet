@@ -15,7 +15,6 @@ import nz.ac.auckland.lablet.data.CalibratedDataList;
 import nz.ac.auckland.lablet.data.FrameDataList;
 import nz.ac.auckland.lablet.data.PointData;
 import nz.ac.auckland.lablet.data.PointDataList;
-import nz.ac.auckland.lablet.data.RectData;
 import nz.ac.auckland.lablet.data.RectDataList;
 import nz.ac.auckland.lablet.data.RoiData;
 import nz.ac.auckland.lablet.data.RoiDataList;
@@ -57,9 +56,9 @@ public class MotionAnalysis implements IDataAnalysis {
     final private Unit yUnit = new Unit("m");
     final private Unit tUnit = new Unit("s");
 
-    final private CalibratedDataList tagMarkers;
-    final private PointDataList lengthCalibrationMarkers;
-    final private PointDataList originMarkers;
+    final private CalibratedDataList pointDataList;
+    final private PointDataList lenCalibDataList;
+    final private PointDataList originDataList;
     final private RoiDataList roiDataList;
     final private RectDataList rectDataList;
 
@@ -100,53 +99,54 @@ public class MotionAnalysis implements IDataAnalysis {
         frameDataList = new FrameDataList();
         frameDataList.setNumberOfFrames(calibrationVideoTimeData.getNumberOfFrames());
 
-        tagMarkers = new CalibratedDataList(calibrationXY);
-        tagMarkers.setCalibrationXY(calibrationXY);
+        pointDataList = new CalibratedDataList(calibrationXY);
+        pointDataList.setCalibrationXY(calibrationXY);
 
         float maxXValue = sensorData.getMaxRawX();
         float maxYValue = sensorData.getMaxRawY();
 
-        lengthCalibrationMarkers = new PointDataList();
+        lenCalibDataList = new PointDataList();
         PointData point1 = new PointData(-1);
         point1.setPosition(new PointF(maxXValue * 0.1f, maxYValue * 0.9f));
-        lengthCalibrationMarkers.addData(point1);
+        lenCalibDataList.addData(point1);
         PointData point2 = new PointData(-2);
         point2.setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.9f));
-        lengthCalibrationMarkers.addData(point2);
-        lengthCalibrationSetter = new LengthCalibrationSetter(lengthCalibrationMarkers, calibrationXY);
+        lenCalibDataList.addData(point2);
+        lengthCalibrationSetter = new LengthCalibrationSetter(lenCalibDataList, calibrationXY);
 
         PointF origin = calibrationXY.getOrigin();
         PointF axis1 = calibrationXY.getAxis1();
-        originMarkers = new PointDataList();
+        originDataList = new PointDataList();
         // y-axis
         point1 = new PointData(-1);
         point1.setPosition(new PointF(10, 10));
-        originMarkers.addData(point1);
+        originDataList.addData(point1);
         // x-axis
         point2 = new PointData(-2);
         point2.setPosition(new PointF(axis1.x, axis1.y));
-        originMarkers.addData(point2);
+        originDataList.addData(point2);
         // origin
         PointData point3 = new PointData(-3);
         point3.setPosition(origin);
-        originMarkers.addData(point3);
-        originCalibrationSetter = new OriginCalibrationSetter(calibrationXY, originMarkers);
+        originDataList.addData(point3);
+        originCalibrationSetter = new OriginCalibrationSetter(calibrationXY, originDataList);
 
         roiDataList = new RoiDataList();
-        roiDataList.setVisibility(true);
-        RoiData d = new RoiData(0);
-
-        PointF centre = new PointF(this.getVideoData().getMaxRawX()/2, this.getVideoData().getMaxRawY()/2);
-        int width = 5;
-        int height = 5;
-        d.setTopLeft(new PointF(centre.x-width, centre.y + height));
-        d.setTopRight(new PointF(centre.x + width, centre.y + height));
-        d.setBtmRight(new PointF(centre.x + width, centre.y - height));
-        d.setBtmLeft(new PointF(centre.x - width, centre.y - height));
-        d.setCentre(centre);
-        roiDataList.addData(d);
+        //roiDataList.setVisibility(true);
+//        RoiData d = new RoiData(0);
+//
+//        PointF centre = new PointF(this.getVideoData().getMaxRawX()/2, this.getVideoData().getMaxRawY()/2);
+//        int width = 5;
+//        int height = 5;
+//        d.setTopLeft(new PointF(centre.x-width, centre.y + height));
+//        d.setTopRight(new PointF(centre.x + width, centre.y + height));
+//        d.setBtmRight(new PointF(centre.x + width, centre.y - height));
+//        d.setBtmLeft(new PointF(centre.x - width, centre.y - height));
+//        d.setCentre(centre);
+//        roiDataList.addData(d);
 
         rectDataList = new RectDataList();
+        rectDataList.setVisibility(false);
 
         /*//TODO: remove, just a test to make sure working
         float angle_i = 360 / (float)this.getFrameDataList().getNumberOfFrames();
@@ -171,34 +171,28 @@ public class MotionAnalysis implements IDataAnalysis {
         updateOriginFromVideoRotation();
     }
 
-    public boolean isFrameRegionOfInterest(int frameId)
-    {
-        for(int i = 0; i < roiDataList.getDataCount(); i++){
-            RoiData data = roiDataList.getDataAt(i);
-
-            if(data.getFrameId() == frameId)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public void setRegionOfInterest()
     {
-        float maxXValue = sensorData.getMaxRawX();
-        float maxYValue = sensorData.getMaxRawY();
+//        float maxXValue = sensorData.getMaxRawX();
+//        float maxYValue = sensorData.getMaxRawY();
         currentRoi = this.getFrameDataList().getCurrentFrame();
 
         RoiData data = new RoiData(currentRoi);
-        data.getTopLeft().setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.7f));
-        data.getTopRight().setPosition(new PointF(maxXValue * 0.7f, maxYValue * 0.7f));
-        data.getBtmLeft().setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.3f));
-        data.getBtmRight().setPosition(new PointF(maxXValue * 0.7f, maxYValue * 0.3f));
+//        data.getTopLeft().setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.7f));
+//        data.getTopRight().setPosition(new PointF(maxXValue * 0.7f, maxYValue * 0.7f));
+//        data.getBtmLeft().setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.3f));
+//        data.getBtmRight().setPosition(new PointF(maxXValue * 0.7f, maxYValue * 0.3f));
+        PointF centre = new PointF(this.getVideoData().getMaxRawX()/2, this.getVideoData().getMaxRawY()/2);
+        int width = 5;
+        int height = 5;
+        data.setTopLeft(new PointF(centre.x - width, centre.y + height));
+        data.setTopRight(new PointF(centre.x + width, centre.y + height));
+        data.setBtmRight(new PointF(centre.x + width, centre.y - height));
+        data.setBtmLeft(new PointF(centre.x - width, centre.y - height));
         data.setVisible(true);
-
-        this.getRoiDataList().addData(data);
+        data.setCentre(centre);
+        roiDataList.addData(data);
+        //this.getPointDataList().removeData(currentRoi);
     }
 
     public boolean isDebuggingEnabled() {
@@ -216,7 +210,7 @@ public class MotionAnalysis implements IDataAnalysis {
 
     public void setTrackingEnabled(boolean trackingEnabled) {
         this.trackingEnabled = trackingEnabled;
-        //roiDataList.setVisibility(trackingEnabled);
+        roiDataList.setVisibility(trackingEnabled);
     }
 
     protected void setOrigin(PointF origin, PointF axis1) {
@@ -253,13 +247,13 @@ public class MotionAnalysis implements IDataAnalysis {
     public CalibrationVideoTimeData getCalibrationVideoTimeData() {
         return calibrationVideoTimeData;
     }
-    public PointDataList getTagMarkers() {
-        return tagMarkers;
+    public PointDataList getPointDataList() {
+        return pointDataList;
     }
-    public PointDataList getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
+    public PointDataList getXYCalibrationDataList() { return lenCalibDataList; }
     public RoiDataList getRoiDataList() {return roiDataList;}
-    public PointDataList getOriginMarkers(){
-        return originMarkers;
+    public PointDataList getOriginDataList(){
+        return originDataList;
     }
     public RectDataList getRectDataList(){
         return rectDataList;
@@ -328,14 +322,14 @@ public class MotionAnalysis implements IDataAnalysis {
     }
 
     public boolean loadAnalysisData(Bundle bundle, File storageDir) {
-        tagMarkers.clear();
+        pointDataList.clear();
 
         setVideoAnalysisSettings(bundle.getBundle("video_analysis_settings"));
         frameDataList.setCurrentFrame(bundle.getInt("currentRun"));
 
-        Bundle tagMarkerBundle = bundle.getBundle("tagMarkers");
+        Bundle tagMarkerBundle = bundle.getBundle("pointDataList");
         if (tagMarkerBundle != null)
-            tagMarkers.fromBundle(tagMarkerBundle);
+            pointDataList.fromBundle(tagMarkerBundle);
 
         if (bundle.containsKey(LENGTH_CALIBRATION_KEY))
             lengthCalibrationSetter.fromBundle(bundle.getBundle(LENGTH_CALIBRATION_KEY));
@@ -360,8 +354,8 @@ public class MotionAnalysis implements IDataAnalysis {
 
         analysisDataBundle.putInt("currentRun", frameDataList.getCurrentFrame());
 
-        if (tagMarkers.getDataCount() > 0)
-            analysisDataBundle.putBundle("tagMarkers", tagMarkers.toBundle());
+        if (pointDataList.getDataCount() > 0)
+            analysisDataBundle.putBundle("pointDataList", pointDataList.toBundle());
 
         analysisDataBundle.putBundle(LENGTH_CALIBRATION_KEY, lengthCalibrationSetter.toBundle());
 
@@ -378,7 +372,7 @@ public class MotionAnalysis implements IDataAnalysis {
 
     @Override
     public void exportTagMarkerCSVData(Writer writer) {
-        MarkerDataTableAdapter tableAdapter = new MarkerDataTableAdapter(tagMarkers);
+        MarkerDataTableAdapter tableAdapter = new MarkerDataTableAdapter(pointDataList);
         tableAdapter.addColumn(new RunIdDataTableColumn("frame"));
         tableAdapter.addColumn(new XPositionDataTableColumn(xUnit));
         tableAdapter.addColumn(new YPositionDataTableColumn(yUnit));

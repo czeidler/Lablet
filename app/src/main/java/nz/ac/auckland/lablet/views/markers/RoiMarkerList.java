@@ -314,7 +314,7 @@ public class RoiMarkerList extends MarkerList<RoiDataList> {
             int markerIndex = dataList.getSelectedData();
 
             if(markerIndex != -1) {
-                IMarker marker = getMarkerForFrame(markerIndex);
+                IMarker marker = getMarker(markerIndex);
                 marker.onDraw(canvas, 1);
             }
         }

@@ -1,10 +1,8 @@
 package nz.ac.auckland.lablet.views.markers;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 
 import nz.ac.auckland.lablet.data.RectData;
@@ -125,10 +123,10 @@ public class RectMarkerList extends MarkerList<RectDataList> {
 
     }
 
-    public void setCurrentFrame(int frameId, @Nullable PointF insertHint) {
-        int index = dataList.getIndexByFrameId(frameId);
-        dataList.selectData(index);
-    }
+//    public void setCurrentFrame(int frameId, @Nullable PointF insertHint) {
+//        int index = dataList.getIndexByFrameId(frameId);
+//        dataList.selectData(index);
+//    }
 
     @Override
     public void onDraw(Canvas canvas) {
@@ -139,28 +137,28 @@ public class RectMarkerList extends MarkerList<RectDataList> {
 
             for (int i = 0; i < dataList.getDataCount(); i++) {
                 RectData data = dataList.getDataAt(i);
-                int frameId = data.getFrameId();
-                IMarker marker = this.getMarkerForFrame(frameId);
-                float priority;
 
-                if(selectedFrame == frameId) {
-                    priority = 1;
-                } else {
-                    float distance = Math.abs(selectedFrame - frameId);
+                if(data != null) {
+                    int frameId = data.getFrameId();
+                    IMarker marker = this.getMarker(i);
+                    float priority;
 
-                    if(frameId < selectedFrame)
-                    {
-                        int numFramesReverse = selectedFrame;
-                        priority = (numFramesReverse - distance) / numFramesReverse;
+                    if (selectedFrame == frameId) {
+                        priority = 1;
+                    } else {
+                        float distance = Math.abs(selectedFrame - frameId);
+
+                        if (frameId < selectedFrame) {
+                            int numFramesReverse = selectedFrame;
+                            priority = (numFramesReverse - distance) / numFramesReverse;
+                        } else {
+                            int numFramesForward = dataList.getDataCount() - selectedFrame;
+                            priority = (numFramesForward - distance) / numFramesForward;
+                        }
                     }
-                    else
-                    {
-                        int numFramesForward = dataList.getDataCount() - selectedFrame;
-                        priority = (numFramesForward - distance) / numFramesForward;
-                    }
+
+                    marker.onDraw(canvas, priority);
                 }
-
-                marker.onDraw(canvas, priority);
             }
 
         }

@@ -272,7 +272,7 @@ class MotionAnalysisGraphView extends ScriptComponentViewHolder {
             if (yAxis == null)
                 yAxis = new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getYMinRangeGetter());
 
-            adapter = new MarkerTimeGraphAdapter(sensorAnalysis.getTagMarkers(), sensorAnalysis.getTimeData(),
+            adapter = new MarkerTimeGraphAdapter(sensorAnalysis.getPointDataList(), sensorAnalysis.getTimeData(),
                     title, xAxis, yAxis);
             graphView2D.setAdapter(adapter);
         }
@@ -282,7 +282,7 @@ class MotionAnalysisGraphView extends ScriptComponentViewHolder {
             @Override
             public void onExperimentAnalysisUpdated() {
                 MotionAnalysis motionAnalysis = experiment.getMotionAnalysis(0);
-                adapter.setTo(motionAnalysis.getTagMarkers(), motionAnalysis.getTimeData());
+                adapter.setTo(motionAnalysis.getPointDataList(), motionAnalysis.getTimeData());
             }
         };
         experiment.addListener(experimentListener);

@@ -24,6 +24,8 @@ import java.util.HashMap;
 
 public class CamShiftTracker {
 
+    private static String TAG = "CamShiftTracker";
+
     static {
         if(!OpenCVLoader.initDebug())
         {
@@ -36,12 +38,12 @@ public class CamShiftTracker {
     }
 
     private Mat roiHist;
-    private Rect seedWindow;
+    private Rect roiRect;
     private TermCriteria termCriteria;
     private HashMap<Integer, RotatedRect> output = new HashMap<Integer, RotatedRect>();
     private HashMap<Integer, Rect> rois = new HashMap<Integer, Rect>();
     Integer currentRoiFrame = null;
-    //Rect seedWindow = null;
+    //Rect roiRect = null;
 
     public CamShiftTracker() {
         roiHist = new Mat();
@@ -50,7 +52,7 @@ public class CamShiftTracker {
 
     public boolean isROISet()
     {
-        return this.currentRoiFrame != null;
+        return roiRect != null;
     }
 
 
@@ -59,10 +61,8 @@ public class CamShiftTracker {
     *
     */
 
-    public void setROI(int frameId, Bitmap bmp, int x, int y, int width, int height)
+    public void setROI(Bitmap bmp, int x, int y, int width, int height)
     {
-        this.currentRoiFrame = frameId;
-
         Mat inputFrame = new Mat();
         Utils.bitmapToMat(bmp, inputFrame);
 
@@ -78,9 +78,7 @@ public class CamShiftTracker {
         Imgproc.calcHist(images, new MatOfInt(0), new Mat(), roiHist, new MatOfInt(16), new MatOfFloat(0, 180));
         Core.normalize(roiHist, roiHist, 0, 255, Core.NORM_MINMAX);
 
-        Rect roiRect = new Rect(x, y, width, height);
-        seedWindow = roiRect;
-        //rois.put(frameId, roiRect);
+        this.roiRect = new Rect(x, y, width, height);
     }
 
     /**
@@ -95,43 +93,37 @@ public class CamShiftTracker {
 
     public RotatedRect findObject(Bitmap bmp)
     {
-        //Get initial seed window
-        //int previousFrame = frameId-1;
-        //RotatedRect previousResult = this.output.get(previousFrame);
-//        Rect seedWindow = new Rect();
-//
-//        if(previousResult != null)
-//        {
-//            seedWindow = previousResult.boundingRect();
-//        }
-//        else if(previousFrame == this.currentRoiFrame)
-//        {
-//            seedWindow = this.rois.get(this.currentRoiFrame);
-//        }
+        if(isROISet()) {
+            return findObject(bmp, roiRect);
+        }
 
-//        if(this.currentRoiFrame == null)
-//        {
-//            throw new IllegalStateException("CamShiftTracker: Please set a region of interest with the setROI method");
-//        }
-//        else if(this.currentRoiFrame == null && previousResult == null)
-//        {
-//            throw new IllegalStateException("CamShiftTracker: Please set a region of interest or search for the object in the previous frameId");
-//        }
+        Log.e(TAG, "please set region of interest before calling findObject");
 
-        //Get current Mat frameId and convert to HSV colour space
-        Mat inputFrame = new Mat();
-        Utils.bitmapToMat(bmp, inputFrame);
-        Imgproc.cvtColor(inputFrame, inputFrame, Imgproc.COLOR_BGR2HSV);
+        return null;
+    }
 
-        //Meanshift
-        ArrayList<Mat> images = new ArrayList<Mat>();
-        images.add(inputFrame);
-        Mat output = new Mat();
-        Imgproc.calcBackProject(images, new MatOfInt(0), roiHist, output, new MatOfFloat(0, 180), 1);
+    public RotatedRect findObject(Bitmap bmp, Rect previousResult)
+    {
+        if(isROISet()) {
+            //Get current Mat frameId and convert to HSV colour space
+            Mat inputFrame = new Mat();
+            Utils.bitmapToMat(bmp, inputFrame);
+            Imgproc.cvtColor(inputFrame, inputFrame, Imgproc.COLOR_BGR2HSV);
 
-        RotatedRect result = Video.CamShift(output, seedWindow, termCriteria); //Camshift todo:  check if back project was successful
-        seedWindow = result.boundingRect();
-        return result;
+            //Meanshift
+            ArrayList<Mat> images = new ArrayList<Mat>();
+            images.add(inputFrame);
+            Mat output = new Mat();
+            Imgproc.calcBackProject(images, new MatOfInt(0), roiHist, output, new MatOfFloat(0, 180), 1);
+
+            RotatedRect result = Video.CamShift(output, previousResult, termCriteria); //Camshift todo:  check if back project was successful
+            //roiRect = result.boundingRect();
+            return result;
+        }
+
+        Log.e(TAG, "please set region of interest before calling findObject");
+
+        return null;
     }
 
     /**

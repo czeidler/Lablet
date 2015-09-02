@@ -26,6 +26,14 @@ public abstract class MarkerList<D extends DataList> extends AbstractPlotPainter
         @Override
         public void onDataAdded(D list, int index) {
             addMarker(index);
+
+            Data data = list.getDataAt(index);
+
+            if(data.getFrameId() == selectedFrameId)
+            {
+                list.selectData(index);
+            }
+
             containerView.invalidate();
         }
 
@@ -57,6 +65,7 @@ public abstract class MarkerList<D extends DataList> extends AbstractPlotPainter
     protected D dataList = null;
     final protected Rect frame = new Rect();
     final protected List<IMarker> painterList = new ArrayList<>();
+    private int selectedFrameId = -1;
 
     public MarkerList(D list) {
         dataList = list;
@@ -81,11 +90,11 @@ public abstract class MarkerList<D extends DataList> extends AbstractPlotPainter
         }
     }
 
-    public void setCurrentFrame(int frame, @Nullable PointF insertHint) {
+    public void setCurrentFrame(int frameId, @Nullable PointF insertHint) {
 
         // check if we have the run in the data list
-        Data data = null;
-        int index = dataList.getIndexByFrameId(frame);
+        selectedFrameId = frameId;
+        int index = dataList.getIndexByFrameId(frameId);
         dataList.selectData(index);
     }
 
@@ -114,10 +123,10 @@ public abstract class MarkerList<D extends DataList> extends AbstractPlotPainter
 
     }
 
-    public IMarker getMarkerForFrame(int frameId) {
-        if (frameId < 0 || frameId >= painterList.size())
+    public IMarker getMarker(int index) {
+        if (index < 0 || index >= painterList.size())
             return null;
-        return painterList.get(frameId);
+        return painterList.get(index);
     }
 
 

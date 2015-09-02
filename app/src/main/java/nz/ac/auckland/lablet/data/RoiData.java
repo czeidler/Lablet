@@ -2,6 +2,8 @@ package nz.ac.auckland.lablet.data;
 
 import android.graphics.PointF;
 
+import org.opencv.core.Rect;
+
 /**
  * Created by jdip004 on 27/08/2015.
  */
@@ -20,6 +22,11 @@ public class RoiData extends Data {
         btmLeft = new PointData(frameId);
         btmRight = new PointData(frameId);
     }
+
+//    public Rect getRect()
+//    {
+//        return new Rect((int)topLeft.getPosition().x, (int)topLeft.getPosition().y, (int)getWidth(), (int)getHeight());
+//    }
 
     public PointData getCentre() {
         return centre;

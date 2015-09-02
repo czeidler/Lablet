@@ -165,7 +165,7 @@ public class MotionAnalysisFragment extends ScriptComponentGenericFragment {
         if (sensorAnalysis == null)
             return false;
 
-        if (sensorAnalysis.getTagMarkers().getDataCount() < 3)
+        if (sensorAnalysis.getPointDataList().getDataCount() < 3)
             return false;
 
         return true;
@@ -188,7 +188,7 @@ public class MotionAnalysisFragment extends ScriptComponentGenericFragment {
             MotionAnalysis sensorAnalysis = experiment.getMotionAnalysis(0);
             if (sensorAnalysis == null)
                 return;
-            MarkerTimeGraphAdapter adapter = new MarkerTimeGraphAdapter(sensorAnalysis.getTagMarkers(),
+            MarkerTimeGraphAdapter adapter = new MarkerTimeGraphAdapter(sensorAnalysis.getPointDataList(),
                     sensorAnalysis.getTimeData(), "Position Data:",
                     new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getXMinRangeGetter()),
                     new YPositionMarkerGraphAxis(sensorAnalysis.getYUnit(), sensorAnalysis.getYMinRangeGetter()));

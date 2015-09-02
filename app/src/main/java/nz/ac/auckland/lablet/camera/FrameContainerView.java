@@ -344,7 +344,7 @@ public class FrameContainerView extends RelativeLayout {
 
     public void initData() {
         // tag markers
-        PointDataList tagMarkers = motionAnalysis.getTagMarkers();
+        PointDataList tagMarkers = motionAnalysis.getPointDataList();
         tagMarkers.addListener(tagDataListener);
         painter = new PointMarkerList(tagMarkers);
         markerView.addPlotPainter(painter);
@@ -352,7 +352,7 @@ public class FrameContainerView extends RelativeLayout {
         frameDataModelListener.onFrameChanged(frameDataList.getCurrentFrame());
 
         // calibration markers
-        PointDataList calibrationMarkers = motionAnalysis.getXYCalibrationMarkers();
+        PointDataList calibrationMarkers = motionAnalysis.getXYCalibrationDataList();
         CalibrationMarkerList painter = new CalibrationMarkerList(calibrationMarkers);
         markerView.addPlotPainter(painter);
 
@@ -371,7 +371,7 @@ public class FrameContainerView extends RelativeLayout {
     }
 
     private void addOriginMarkerPainter() {
-        PointDataList originMarkers = motionAnalysis.getOriginMarkers();
+        PointDataList originMarkers = motionAnalysis.getOriginDataList();
         CalibrationXY calibrationXY = motionAnalysis.getCalibrationXY();
         originDataListPainter = new OriginMarkerList(originMarkers, calibrationXY);
         markerView.addPlotPainter(originDataListPainter);

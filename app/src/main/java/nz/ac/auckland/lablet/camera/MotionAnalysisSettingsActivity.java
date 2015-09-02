@@ -354,16 +354,16 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
 
     private boolean warningNeeded() {
         MotionAnalysis motionAnalysis = (MotionAnalysis)experimentAnalysis.getCurrentAnalysis();
-        if (motionAnalysis.getTagMarkers().getDataCount() <= 1)
+        if (motionAnalysis.getPointDataList().getDataCount() <= 1)
             return false;
 
         MotionAnalysisFragment.RangeChangedMarkerUpdater updater
                 = new MotionAnalysisFragment.RangeChangedMarkerUpdater(initialVideoStartValue, initialFrameRate,
                 videoStartValue, videoEndValue, getFrameRateFromPicker());
 
-        List<PointData> newData = updater.update(motionAnalysis.getTagMarkers());
+        List<PointData> newData = updater.update(motionAnalysis.getPointDataList());
 
-        return newData.size() != motionAnalysis.getTagMarkers().getDataCount();
+        return newData.size() != motionAnalysis.getPointDataList().getDataCount();
     }
 
     private void updateWarning() {

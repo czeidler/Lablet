@@ -13,7 +13,6 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
 
-import nz.ac.auckland.lablet.data.Data;
 import nz.ac.auckland.lablet.data.PointData;
 import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
@@ -172,7 +171,7 @@ public class PointMarkerList extends DraggableMarkerList {
     @Override
     public void onDraw(Canvas canvas) {
         int currentMarkerRow = dataList.getSelectedData();
-        IMarker topMarker = getMarkerForFrame(currentMarkerRow);
+        IMarker topMarker = getMarker(currentMarkerRow);
 
         int start = currentMarkerRow - MAX_DISPLAYED_MARKERS / 2 + 1;
         if (start < 0)
@@ -238,10 +237,10 @@ public class PointMarkerList extends DraggableMarkerList {
     }
 
     @Override
-    public void setCurrentFrame(int frame, @Nullable PointF insertHint) {
+    public void setCurrentFrame(int frameId, @Nullable PointF insertHint) {
         lastInsertMarkerManager.onCurrentFrameChanging(dataList);
 
-        super.setCurrentFrame(frame, insertHint);
+        super.setCurrentFrame(frameId, insertHint);
 
         PointData data = null;
         int index = dataList.getSelectedData();
@@ -250,7 +249,7 @@ public class PointMarkerList extends DraggableMarkerList {
         }
 
         if (data == null) {
-            data = new PointData(frame);
+            data = new PointData(frameId);
             if (insertHint != null) {
                 containerView.sanitizeScreenPoint(insertHint);
                 PointF insertHintReal = new PointF();

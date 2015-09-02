@@ -49,7 +49,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 
         final MenuItem deleteItem = menu.findItem(R.id.action_delete);
         assert deleteItem != null;
-        final PointDataList pointDataModel = getSensorAnalysis().getTagMarkers();
+        final PointDataList pointDataModel = getSensorAnalysis().getPointDataList();
         final FrameDataList frameDataList = getSensorAnalysis().getFrameDataList();
         if (pointDataModel.getDataCount() <= 1)
             deleteItem.setVisible(false);
@@ -284,8 +284,8 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                     RangeChangedMarkerUpdater updater = new RangeChangedMarkerUpdater(oldStart, oldFrameRate,
                             timeData.getAnalysisVideoStart(), timeData.getAnalysisVideoEnd(),
                             timeData.getAnalysisFrameRate());
-                    List<PointData> updatedMarkers = updater.update(sensorAnalysis.getTagMarkers());
-                    sensorAnalysis.getTagMarkers().setDataList(updatedMarkers);
+                    List<PointData> updatedMarkers = updater.update(sensorAnalysis.getPointDataList());
+                    sensorAnalysis.getPointDataList().setDataList(updatedMarkers);
                     // update current frame
                     int newCurrentFrame = updater.getNewCurrentFrame(updatedMarkers,
                             sensorAnalysis.getFrameDataList().getCurrentFrame());
@@ -390,7 +390,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         final Intent intent = getActivity().getIntent();
         if (intent != null) {
             Bundle extras = intent.getExtras();
-            if (extras != null && getSensorAnalysis().getTagMarkers().getDataCount() == 0) {
+            if (extras != null && getSensorAnalysis().getPointDataList().getDataCount() == 0) {
                 if (extras.getBoolean("first_start_with_run_settings", false)) {
                     resumeWithRunSettings = true;
                 }
@@ -401,7 +401,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             }
         }
 
-        getSensorAnalysis().getTagMarkers().addListener(menuDataListener);
+        getSensorAnalysis().getPointDataList().addListener(menuDataListener);
     }
 
     private MotionAnalysisFragmentView view;
