@@ -143,8 +143,13 @@ public class PointMarkerList extends DraggableMarkerList {
     @Override
     public List<IMarker> getSelectableMarkerList() {
         List<IMarker> selectableMarkers = new ArrayList<>();
-        IMarker selectedMarker = painterList.get(dataList.getSelectedData());
-        selectableMarkers.add(selectedMarker);
+        int index = dataList.getSelectedData();
+
+        if(index != -1) {
+            IMarker selectedMarker = painterList.get(index);
+            selectableMarkers.add(selectedMarker);
+        }
+
         return selectableMarkers;
     }
 
@@ -212,7 +217,7 @@ public class PointMarkerList extends DraggableMarkerList {
 
         void onCurrentFrameChanging(PointDataList markersDataModel) {
             // Index could be out of bounds, e.g., when the marker data has been cleared.
-            if (markerInsertedInLastRun >= dataList.getDataCount()) {
+            if (markerInsertedInLastRun >= dataList.size()) {
                 markerInsertedInLastRun =-1;
                 return;
             }
@@ -256,7 +261,7 @@ public class PointMarkerList extends DraggableMarkerList {
                 containerView.fromScreen(insertHint, insertHintReal);
                 data.setPosition(insertHintReal);
             } else {
-                if (dataList.getDataCount() > 0 && dataList.getSelectedData() > 0) {
+                if (dataList.size() > 0 && dataList.getSelectedData() > 0) {
                     int selectedIndex = dataList.getSelectedData();
                     PointData prevData = dataList.getDataAt(selectedIndex);
                     data.setPosition(prevData.getPosition());

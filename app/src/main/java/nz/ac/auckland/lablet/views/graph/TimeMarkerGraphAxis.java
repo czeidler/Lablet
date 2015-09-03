@@ -23,7 +23,7 @@ public class TimeMarkerGraphAxis extends MarkerTimeGraphAxis {
 
     @Override
     public int size() {
-        return getData().getDataCount();
+        return getData().size();
     }
 
     @Override

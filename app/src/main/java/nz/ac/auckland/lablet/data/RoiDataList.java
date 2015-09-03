@@ -11,54 +11,30 @@ public class RoiDataList extends DataList<RoiData> {
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
 
-        int[] runIds = new int[getDataCount()];
-        float[] topLeftXs = new float[getDataCount()];
-        float[] topLeftYs = new float[getDataCount()];
+        int[] frameIds = new int[size()];
+        float[] centreXs = new float[size()];
+        float[] centreYs = new float[size()];
+        float[] widths = new float[size()];
+        float[] heights = new float[size()];
 
-        float[] topRightXs = new float[getDataCount()];
-        float[] topRightYs = new float[getDataCount()];
-
-        float[] btmRightXs = new float[getDataCount()];
-        float[] btmRightYs = new float[getDataCount()];
-
-        float[] btmLeftXs = new float[getDataCount()];
-        float[] btmLeftYs = new float[getDataCount()];
-
-        boolean[] visibilities = new boolean[getDataCount()];
-
-        for (int i = 0; i < getDataCount(); i++) {
+        for (int i = 0; i < size(); i++) {
             RoiData data = getDataAt(i);
-            runIds[i] = data.getFrameId();
-            topLeftXs[i] = data.getTopLeft().getPosition().x;
-            topLeftYs[i] = data.getTopLeft().getPosition().y;
-
-            topRightXs[i] = data.getTopRight().getPosition().x;
-            topRightYs[i] = data.getTopRight().getPosition().y;
-
-            btmRightXs[i] = data.getBtmRight().getPosition().x;
-            btmRightYs[i] = data.getBtmRight().getPosition().y;
-
-            btmLeftXs[i] = data.getBtmLeft().getPosition().x;
-            btmLeftYs[i] = data.getBtmLeft().getPosition().y;
-
-            visibilities[i] = data.isVisible();
+            frameIds[i] = data.getFrameId();
+            centreXs[i] = data.getCentre().getPosition().x;
+            centreYs[i] = data.getCentre().getPosition().y;
+            widths[i] = Math.abs(data.getTopLeft().getPosition().x - data.getTopRight().getPosition().x);
+            heights[i] = Math.abs(data.getTopLeft().getPosition().y - data.getBtmLeft().getPosition().y);
         }
 
-        bundle.putIntArray("runIds", runIds);
+        bundle.putIntArray("runIds", frameIds);
 
-        bundle.putFloatArray("topLeftXs", topLeftXs);
-        bundle.putFloatArray("topLeftYs", topLeftYs);
+        bundle.putFloatArray("centreXs", centreXs);
+        bundle.putFloatArray("centreYs", centreYs);
 
-        bundle.putFloatArray("topRightXs", topRightXs);
-        bundle.putFloatArray("topRightYs", topRightYs);
+        bundle.putFloatArray("widths", widths);
+        bundle.putFloatArray("heights", heights);
 
-        bundle.putFloatArray("btmRightXs", btmRightXs);
-        bundle.putFloatArray("btmRightYs", btmRightYs);
-
-        bundle.putFloatArray("btmLeftXs", btmLeftXs);
-        bundle.putFloatArray("btmLeftYs", btmLeftYs);
-
-        bundle.putBooleanArray("visibilities", visibilities);
+        bundle.putBoolean("visibility", this.isVisible());
 
         return bundle;
     }
@@ -66,28 +42,27 @@ public class RoiDataList extends DataList<RoiData> {
     @Override
     public void fromBundle(Bundle bundle) {
         clear();
-        int[] runIds = bundle.getIntArray("runIds");
-        float[] topLeftXs = bundle.getFloatArray("topLeftXs");
-        float[] topLeftYs = bundle.getFloatArray("topLeftYs");
+        int[] frameIds = bundle.getIntArray("runIds");
+        float[] centreXs = bundle.getFloatArray("centreXs");
+        float[] centreYs = bundle.getFloatArray("centreYs");
 
-        float[] topRightXs = bundle.getFloatArray("topRightXs");
-        float[] topRightYs = bundle.getFloatArray("topRightYs");
+        float[] widths = bundle.getFloatArray("widths");
+        float[] heights = bundle.getFloatArray("heights");
 
-        float[] btmRightXs = bundle.getFloatArray("btmRightXs");
-        float[] btmRightYs = bundle.getFloatArray("btmRightYs");
+        boolean visibility = bundle.getBoolean("visibility");
+        this.setVisibility(visibility);
 
-        float[] btmLeftXs = bundle.getFloatArray("btmLeftXs");
-        float[] btmLeftYs = bundle.getFloatArray("btmLeftYs");
+        for (int i = 0; i < frameIds.length; i++) {
+            float centreX = centreXs[i];
+            float centreY = centreYs[i];
+            float width = widths[i] / 2;
+            float height = heights[i] / 2;
 
-        boolean[] visibilities = bundle.getBooleanArray("visibilities");
-
-        for (int i = 0; i < runIds.length; i++) {
-            RoiData data = new RoiData(runIds[i]);
-            data.setTopLeft(new PointF(topLeftXs[i], topLeftYs[i]));
-            data.setTopRight(new PointF(topRightXs[i], topRightYs[i]));
-            data.setBtmRight(new PointF(btmRightXs[i], btmRightYs[i]));
-            data.setBtmLeft(new PointF(btmLeftXs[i], btmLeftYs[i]));
-            data.setVisible(visibilities[i]);
+            RoiData data = new RoiData(frameIds[i]);
+            data.setTopLeft(new PointF(centreX - width, centreY + height));
+            data.setTopRight(new PointF(centreX + width, centreY + height));
+            data.setBtmRight(new PointF(centreX + width, centreY - height));
+            data.setBtmLeft(new PointF(centreX - width, centreY - height));
             addData(data, false);
         }
     }

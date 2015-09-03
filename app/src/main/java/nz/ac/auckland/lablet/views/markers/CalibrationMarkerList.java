@@ -82,7 +82,7 @@ public class CalibrationMarkerList extends DraggableMarkerList {
         for (IMarker marker : painterList)
             marker.onDraw(canvas, 1);
 
-        if (dataList.getDataCount() != 2)
+        if (dataList.size() != 2)
             return;
 
         // draw scale

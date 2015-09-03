@@ -160,9 +160,9 @@ public class FrequencyAnalysis implements IDataAnalysis {
     public Bundle exportAnalysisData(File additionalStorageDir) throws IOException {
         Bundle analysisDataBundle = new Bundle();
 
-        if (hCursorMarkerModel.getDataCount() > 0)
+        if (hCursorMarkerModel.size() > 0)
             analysisDataBundle.putBundle("hCursors", hCursorMarkerModel.toBundle());
-        if (vCursorMarkerModel.getDataCount() > 0)
+        if (vCursorMarkerModel.size() > 0)
             analysisDataBundle.putBundle("vCursors", vCursorMarkerModel.toBundle());
 
         analysisDataBundle.putBundle("freqMapDisplaySettings", getFreqMapDisplaySettings().toBundle());

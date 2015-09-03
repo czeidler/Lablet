@@ -74,7 +74,7 @@ public class OriginCalibrationSetter {
     }
 
     private void calibrate() {
-        if (calibrationMarkers.getDataCount() != 3)
+        if (calibrationMarkers.size() != 3)
             return;
         PointF origin = calibrationMarkers.getDataAt(0).getPosition();
         PointF axis1 = calibrationMarkers.getDataAt(1).getPosition();

@@ -30,7 +30,7 @@ public class YAccelerationDataTableColumn extends UnitDataTableColumn {
 
     @Override
     public int size() {
-        return dataModel.getDataCount() - 2;
+        return dataModel.size() - 2;
     }
 
     @Override

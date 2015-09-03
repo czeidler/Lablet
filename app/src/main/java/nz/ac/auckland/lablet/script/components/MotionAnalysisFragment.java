@@ -165,7 +165,7 @@ public class MotionAnalysisFragment extends ScriptComponentGenericFragment {
         if (sensorAnalysis == null)
             return false;
 
-        if (sensorAnalysis.getPointDataList().getDataCount() < 3)
+        if (sensorAnalysis.getPointDataList().size() < 3)
             return false;
 
         return true;

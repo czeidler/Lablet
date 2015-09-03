@@ -135,7 +135,7 @@ public class RectMarkerList extends MarkerList<RectDataList> {
         {
             int selectedFrame = dataList.getSelectedData();
 
-            for (int i = 0; i < dataList.getDataCount(); i++) {
+            for (int i = 0; i < dataList.size(); i++) {
                 RectData data = dataList.getDataAt(i);
 
                 if(data != null) {
@@ -152,7 +152,7 @@ public class RectMarkerList extends MarkerList<RectDataList> {
                             int numFramesReverse = selectedFrame;
                             priority = (numFramesReverse - distance) / numFramesReverse;
                         } else {
-                            int numFramesForward = dataList.getDataCount() - selectedFrame;
+                            int numFramesForward = dataList.size() - selectedFrame;
                             priority = (numFramesForward - distance) / numFramesForward;
                         }
                     }

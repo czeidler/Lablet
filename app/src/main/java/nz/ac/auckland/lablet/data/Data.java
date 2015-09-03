@@ -18,15 +18,6 @@ package nz.ac.auckland.lablet.data;
 
 public abstract class Data {
     final private int frameId;
-    private boolean visible = true;
-
-    public boolean isVisible() {
-        return visible;
-    }
-
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
 
     public Data(int id) {
         this.frameId = id;

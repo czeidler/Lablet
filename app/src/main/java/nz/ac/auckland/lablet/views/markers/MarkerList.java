@@ -12,8 +12,6 @@ import java.util.List;
 
 import nz.ac.auckland.lablet.data.Data;
 import nz.ac.auckland.lablet.data.DataList;
-import nz.ac.auckland.lablet.data.RoiData;
-import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
 import nz.ac.auckland.lablet.views.plotview.AbstractPlotPainter;
 
 /**
@@ -114,7 +112,7 @@ public abstract class MarkerList<D extends DataList> extends AbstractPlotPainter
 
     protected void rebuildPainterList() {
         painterList.clear();
-        for (int i = 0; i < dataList.getDataCount(); i++)
+        for (int i = 0; i < dataList.size(); i++)
             addMarker(i);
     }
 

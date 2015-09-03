@@ -147,7 +147,7 @@ abstract public class CursorMarkerList extends DraggableMarkerList {
             sort();
 
         if (selectedMarkerId >= 0) {
-            for (int i = 0; i < dataList.getDataCount(); i++) {
+            for (int i = 0; i < dataList.size(); i++) {
                 Data data = dataList.getDataAt(i);
                 if (data.getFrameId() == selectedMarkerId) {
                     if (!painterList.get(i).isSelectedForDrag())

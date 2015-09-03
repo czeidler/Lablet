@@ -342,7 +342,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
      * @return the index of the first data point to use for speed/acceleration calculation
      */
     private int getFirstDataPointIndex() {
-        int numberOfDataPoints = tagMarker.getDataCount();
+        int numberOfDataPoints = tagMarker.size();
         if (numberOfDataPoints >= 5)
             return 2;
         else
@@ -379,7 +379,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
         adapter.addColumn(new YPositionDataTableColumn(sensorAnalysis.getYUnit()));
         rawDataTable.setAdapter(adapter);
 
-        if (tagMarker.getDataCount() < 3)
+        if (tagMarker.size() < 3)
             return;
 
         String text = "";
@@ -597,7 +597,7 @@ abstract class CalculateSpeedFragment extends ScriptComponentGenericFragment {
     }
 
     private void update() {
-        if (tagMarker.getDataCount() < 3 || correctPosAndVeloValues == null)
+        if (tagMarker.size() < 3 || correctPosAndVeloValues == null)
             return;
 
         boolean allDone = true;

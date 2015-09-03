@@ -354,7 +354,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
 
     private boolean warningNeeded() {
         MotionAnalysis motionAnalysis = (MotionAnalysis)experimentAnalysis.getCurrentAnalysis();
-        if (motionAnalysis.getPointDataList().getDataCount() <= 1)
+        if (motionAnalysis.getPointDataList().size() <= 1)
             return false;
 
         MotionAnalysisFragment.RangeChangedMarkerUpdater updater
@@ -363,7 +363,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
 
         List<PointData> newData = updater.update(motionAnalysis.getPointDataList());
 
-        return newData.size() != motionAnalysis.getPointDataList().getDataCount();
+        return newData.size() != motionAnalysis.getPointDataList().size();
     }
 
     private void updateWarning() {

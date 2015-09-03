@@ -45,6 +45,12 @@ public class MotionAnalysis implements IDataAnalysis {
     final private String CALIBRATION_XY_KEY = "calibrationXY";
     final private String SHOW_COORDINATE_SYSTEM_KEY = "showCoordinateSystem";
 
+    final private String POINT_DATA_LIST = "pointDataList";
+    final private String RECT_DATA_LIST = "rectDataList";
+    final private String ROI_DATA_LIST = "roiDataList";
+    final private String TRACKING_ENABLED = "trackingEnabled";
+    final private String DEBUGGING_ENABLED = "debuggingEnabled";
+
     final private VideoData sensorData;
 
     final private FrameDataList frameDataList;
@@ -189,10 +195,9 @@ public class MotionAnalysis implements IDataAnalysis {
         data.setTopRight(new PointF(centre.x + width, centre.y + height));
         data.setBtmRight(new PointF(centre.x + width, centre.y - height));
         data.setBtmLeft(new PointF(centre.x - width, centre.y - height));
-        data.setVisible(true);
         data.setCentre(centre);
         roiDataList.addData(data);
-        //this.getPointDataList().removeData(currentRoi);
+        this.getPointDataList().removeData(currentRoi);
     }
 
     public boolean isDebuggingEnabled() {
@@ -323,13 +328,27 @@ public class MotionAnalysis implements IDataAnalysis {
 
     public boolean loadAnalysisData(Bundle bundle, File storageDir) {
         pointDataList.clear();
+        rectDataList.clear();
+        roiDataList.clear();
 
         setVideoAnalysisSettings(bundle.getBundle("video_analysis_settings"));
+
+        if(bundle.containsKey(TRACKING_ENABLED))
+            this.setTrackingEnabled(bundle.getBoolean(TRACKING_ENABLED));
+
+        if(bundle.containsKey(DEBUGGING_ENABLED))
+            this.setDebuggingEnabled(bundle.getBoolean(DEBUGGING_ENABLED));
+
         frameDataList.setCurrentFrame(bundle.getInt("currentRun"));
 
-        Bundle tagMarkerBundle = bundle.getBundle("pointDataList");
-        if (tagMarkerBundle != null)
-            pointDataList.fromBundle(tagMarkerBundle);
+        if (bundle.containsKey(POINT_DATA_LIST))
+            pointDataList.fromBundle(bundle.getBundle(POINT_DATA_LIST));
+
+        if (bundle.containsKey(RECT_DATA_LIST))
+            rectDataList.fromBundle(bundle.getBundle(RECT_DATA_LIST));
+
+        if (bundle.containsKey(ROI_DATA_LIST))
+            roiDataList.fromBundle(bundle.getBundle(ROI_DATA_LIST));
 
         if (bundle.containsKey(LENGTH_CALIBRATION_KEY))
             lengthCalibrationSetter.fromBundle(bundle.getBundle(LENGTH_CALIBRATION_KEY));
@@ -337,13 +356,17 @@ public class MotionAnalysis implements IDataAnalysis {
         if (bundle.containsKey(CALIBRATION_XY_KEY))
             calibrationXY.fromBundle(bundle.getBundle(CALIBRATION_XY_KEY));
         originCalibrationSetter.setOrigin(calibrationXY.getOrigin(), calibrationXY.getAxis1());
+
         if (bundle.containsKey(SHOW_COORDINATE_SYSTEM_KEY))
             showCoordinateSystem = bundle.getBoolean(SHOW_COORDINATE_SYSTEM_KEY);
 
         if (bundle.containsKey(X_UNIT_BASE_EXPONENT_KEY))
             xUnit.setBaseExponent(bundle.getInt(X_UNIT_BASE_EXPONENT_KEY));
+
         if (bundle.containsKey(Y_UNIT_BASE_EXPONENT_KEY))
             yUnit.setBaseExponent(bundle.getInt(Y_UNIT_BASE_EXPONENT_KEY));
+
+
 
         return true;
     }
@@ -354,8 +377,14 @@ public class MotionAnalysis implements IDataAnalysis {
 
         analysisDataBundle.putInt("currentRun", frameDataList.getCurrentFrame());
 
-        if (pointDataList.getDataCount() > 0)
-            analysisDataBundle.putBundle("pointDataList", pointDataList.toBundle());
+        if (pointDataList.size() > 0)
+            analysisDataBundle.putBundle(POINT_DATA_LIST, pointDataList.toBundle());
+
+        if(rectDataList.size() > 0)
+            analysisDataBundle.putBundle(RECT_DATA_LIST, rectDataList.toBundle());
+
+        if(roiDataList.size() > 0)
+            analysisDataBundle.putBundle(ROI_DATA_LIST, roiDataList.toBundle());
 
         analysisDataBundle.putBundle(LENGTH_CALIBRATION_KEY, lengthCalibrationSetter.toBundle());
 
@@ -364,6 +393,9 @@ public class MotionAnalysis implements IDataAnalysis {
 
         analysisDataBundle.putInt(X_UNIT_BASE_EXPONENT_KEY, getXUnit().getBaseExponent());
         analysisDataBundle.putInt(Y_UNIT_BASE_EXPONENT_KEY, getYUnit().getBaseExponent());
+
+        analysisDataBundle.putBoolean(TRACKING_ENABLED, isTrackingEnabled());
+        analysisDataBundle.putBoolean(DEBUGGING_ENABLED, isDebuggingEnabled());
 
         if (videoAnalysisSettings != null)
             analysisDataBundle.putBundle("video_analysis_settings", videoAnalysisSettings);
@@ -411,6 +443,9 @@ public class MotionAnalysis implements IDataAnalysis {
         Bundle runSettings = getVideoAnalysisSettings();
         if (runSettings == null)
             return;
+
+
+
 
         calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getFloat(ANALYSIS_VIDEO_START_KEY));
         calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getFloat(ANALYSIS_VIDEO_END_KEY));

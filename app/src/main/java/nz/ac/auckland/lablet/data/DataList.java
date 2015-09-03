@@ -96,7 +96,7 @@ public abstract class DataList<D extends Data> extends WeakListenable<DataList.I
         return runId;
     }
 
-    public int getDataCount() {
+    public int size() {
         return dataList.size();
     }
 
@@ -109,7 +109,7 @@ public abstract class DataList<D extends Data> extends WeakListenable<DataList.I
     public abstract void fromBundle(Bundle bundle);
 
     public int getIndexByFrameId(int frameId) {
-        for (int i = 0; i < getDataCount(); i++) {
+        for (int i = 0; i < size(); i++) {
             D data = getDataAt(i);
             if (data.getFrameId() == frameId)
                 return i;
@@ -118,7 +118,7 @@ public abstract class DataList<D extends Data> extends WeakListenable<DataList.I
     }
 
     public D getDataByFrameId(int frameId) {
-        for (int i = 0; i < getDataCount(); i++) {
+        for (int i = 0; i < size(); i++) {
             D data = getDataAt(i);
             if (data.getFrameId() == frameId)
                 return data;

@@ -51,7 +51,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         assert deleteItem != null;
         final PointDataList pointDataModel = getSensorAnalysis().getPointDataList();
         final FrameDataList frameDataList = getSensorAnalysis().getFrameDataList();
-        if (pointDataModel.getDataCount() <= 1)
+        if (pointDataModel.size() <= 1)
             deleteItem.setVisible(false);
         else
             deleteItem.setVisible(true);
@@ -59,7 +59,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 int selectedIndex = pointDataModel.getSelectedData();
-                if (selectedIndex < 0 || pointDataModel.getDataCount() == 1) {
+                if (selectedIndex < 0 || pointDataModel.size() == 1) {
                     getActivity().invalidateOptionsMenu();
                     return true;
                 }
@@ -67,13 +67,13 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                 pointDataModel.removeData(selectedIndex);
 
                 int newSelectedIndex;
-                if (selectedIndex < pointDataModel.getDataCount())
+                if (selectedIndex < pointDataModel.size())
                     newSelectedIndex = selectedIndex;
                 else
                     newSelectedIndex = selectedIndex - 1;
                 frameDataList.setCurrentFrame(pointDataModel.getDataAt(newSelectedIndex).getFrameId());
 
-                if (pointDataModel.getDataCount() <= 1)
+                if (pointDataModel.size() <= 1)
                     getActivity().invalidateOptionsMenu();
                 return true;
             }
@@ -191,6 +191,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         });
 
         popup.getMenu().findItem(R.id.enable_tracking).setChecked(getSensorAnalysis().isTrackingEnabled());
+        popup.getMenu().findItem(R.id.set_roi).setVisible(getSensorAnalysis().isTrackingEnabled());
         popup.getMenu().findItem(R.id.debug_tracking).setChecked(getSensorAnalysis().isDebuggingEnabled());
         popup.show();
     }
@@ -313,7 +314,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 
         public List<PointData> update(PointDataList dataModel) {
             List<PointData> newMarkerData = new ArrayList<>();
-            for (int i = 0; i < dataModel.getDataCount(); i++) {
+            for (int i = 0; i < dataModel.size(); i++) {
                 PointData pointData = dataModel.getDataAt(i);
                 float time = oldTimeData.getFrameTime(pointData.getFrameId());
                 int newFrame = newTimeData.getClosestFrame(time);
@@ -358,7 +359,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
     private PointDataList.IListener menuDataListener = new PointDataList.IListener<PointDataList>() {
         @Override
         public void onDataAdded(PointDataList model, int index) {
-            if (model.getDataCount() > 1)
+            if (model.size() > 1)
                 getActivity().invalidateOptionsMenu();
         }
 
@@ -390,7 +391,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         final Intent intent = getActivity().getIntent();
         if (intent != null) {
             Bundle extras = intent.getExtras();
-            if (extras != null && getSensorAnalysis().getPointDataList().getDataCount() == 0) {
+            if (extras != null && getSensorAnalysis().getPointDataList().size() == 0) {
                 if (extras.getBoolean("first_start_with_run_settings", false)) {
                     resumeWithRunSettings = true;
                 }

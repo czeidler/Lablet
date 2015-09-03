@@ -330,7 +330,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
             @Override
             public void onFrameChanged(int newFrame) {
-                if(sensorAnalysis.isTrackingEnabled())
+                if(sensorAnalysis.isTrackingEnabled() && sensorAnalysis.getRoiDataList().size() > 0)
                 {
                     int previousFrame = newFrame -1;
                     RoiData roi = sensorAnalysis.getRoiDataList().getDataByFrameId(previousFrame);
@@ -382,7 +382,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
                     PointF size = sensorAnalysis.getVideoData().toMarkerPoint(new PointF((float) result.size.width, (float) result.size.height));
                     data.setWidth(size.x);
                     data.setHeight(size.y);
-                    data.setVisible(true);
 
                     sensorAnalysis.getRectDataList().addData(data);
                 }

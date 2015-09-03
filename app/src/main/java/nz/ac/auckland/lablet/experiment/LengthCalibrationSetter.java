@@ -123,7 +123,7 @@ public class LengthCalibrationSetter {
     }
 
     private void calibrate() {
-        if (calibrationMarkers.getDataCount() != 2)
+        if (calibrationMarkers.size() != 2)
             return;
         float value = calibrationValue / scaleLength();
         calibrationXY.setScale(value, value);

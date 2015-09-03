@@ -46,10 +46,10 @@ public class PointDataList extends DataList<PointData> {
 
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
-        int[] runIds = new int[getDataCount()];
-        float[] xPositions = new float[getDataCount()];
-        float[] yPositions = new float[getDataCount()];
-        for (int i = 0; i < getDataCount(); i++) {
+        int[] runIds = new int[size()];
+        float[] xPositions = new float[size()];
+        float[] yPositions = new float[size()];
+        for (int i = 0; i < size(); i++) {
             PointData data = getDataAt(i);
             runIds[i] = data.getFrameId();
             xPositions[i] = data.getPosition().x;

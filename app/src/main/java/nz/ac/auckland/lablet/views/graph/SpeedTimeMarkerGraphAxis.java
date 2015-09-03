@@ -20,7 +20,7 @@ public class SpeedTimeMarkerGraphAxis extends TimeMarkerGraphAxis {
 
     @Override
     public int size() {
-        return getData().getDataCount() - 1;
+        return getData().size() - 1;
     }
 
     @Override

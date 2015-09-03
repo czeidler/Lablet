@@ -18,7 +18,7 @@ public class RunIdDataTableColumn extends DataTableColumn {
     }
 
     public int size() {
-        return dataModel.getDataCount();
+        return dataModel.size();
     }
 
     public Number getValue(int index) {

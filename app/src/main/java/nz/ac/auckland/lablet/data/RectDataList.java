@@ -12,28 +12,27 @@ public class RectDataList extends DataList<RectData> {
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
 
-        int[] runIds = new int[getDataCount()];
-        float[] centreXs = new float[getDataCount()];
-        float[] centreYs = new float[getDataCount()];
-        float[] widths = new float[getDataCount()];
-        float[] heights = new float[getDataCount()];
-        boolean[] visibilities = new boolean[getDataCount()];
+        int[] frameIds = new int[size()];
+        float[] centreXs = new float[size()];
+        float[] centreYs = new float[size()];
+        float[] widths = new float[size()];
+        float[] heights = new float[size()];
+        boolean visibility = this.isVisible();
 
-        for (int i = 0; i < getDataCount(); i++) {
+        for (int i = 0; i < size(); i++) {
             RectData data = getDataAt(i);
-            runIds[i] = data.getFrameId();
+            frameIds[i] = data.getFrameId();
             centreXs[i] = data.getCentre().x;
-            centreXs[i] = data.getCentre().y;
+            centreYs[i] = data.getCentre().y;
             widths[i] = data.getWidth();
             heights[i] = data.getHeight();
-            visibilities[i] = data.isVisible();
         }
-        bundle.putIntArray("runIds", runIds);
+        bundle.putIntArray("runIds", frameIds);
         bundle.putFloatArray("centreXs", centreXs);
         bundle.putFloatArray("centreYs", centreYs);
         bundle.putFloatArray("widths", widths);
         bundle.putFloatArray("heights", heights);
-        bundle.putBooleanArray("visibilities", visibilities);
+        bundle.putBoolean("visibility", visibility);
 
         return bundle;
     }
@@ -41,19 +40,20 @@ public class RectDataList extends DataList<RectData> {
     @Override
     public void fromBundle(Bundle bundle) {
         clear();
-        int[] runIds = bundle.getIntArray("runIds");
+        int[] frameIds = bundle.getIntArray("runIds");
         float[] centreXs = bundle.getFloatArray("centreXs");
         float[] centreYs = bundle.getFloatArray("centreYs");
         float[] widths = bundle.getFloatArray("widths");
         float[] heights = bundle.getFloatArray("heights");
-        boolean[] visibilities = bundle.getBooleanArray("visibilities");
 
-        for (int i = 0; i < runIds.length; i++) {
-            RectData data = new RectData(runIds[i]);
+        boolean visibility = bundle.getBoolean("visibility");
+        this.setVisibility(visibility);
+
+        for (int i = 0; i < frameIds.length; i++) {
+            RectData data = new RectData(frameIds[i]);
             data.setCentre(new PointF(centreXs[i], centreYs[i]));
             data.setWidth(widths[i]);
             data.setHeight(heights[i]);
-            data.setVisible(visibilities[i]);
             addData(data, false);
         }
     }

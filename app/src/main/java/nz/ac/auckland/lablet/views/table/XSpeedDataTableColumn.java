@@ -31,7 +31,7 @@ public class XSpeedDataTableColumn extends UnitDataTableColumn {
 
     @Override
     public int size() {
-        return dataModel.getDataCount() - 1;
+        return dataModel.size() - 1;
     }
 
     @Override

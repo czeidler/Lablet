@@ -24,7 +24,7 @@ public class XPositionMarkerGraphAxis extends MarkerGraphAxis {
 
     @Override
     public int size() {
-        return getData().getDataCount();
+        return getData().size();
     }
 
     @Override

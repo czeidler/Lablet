@@ -25,7 +25,7 @@ import nz.ac.auckland.lablet.views.table.TableView;
 class HCursorColumn extends DataTableColumn {
     @Override
     public int size() {
-        return dataModel.getDataCount();
+        return dataModel.size();
     }
 
     @Override
@@ -42,7 +42,7 @@ class HCursorColumn extends DataTableColumn {
 class HCursorDiffToPrevColumn extends DataTableColumn {
     @Override
     public int size() {
-        return dataModel.getDataCount();
+        return dataModel.size();
     }
 
     @Override
@@ -61,7 +61,7 @@ class HCursorDiffToPrevColumn extends DataTableColumn {
 class VCursorColumn extends DataTableColumn {
     @Override
     public int size() {
-        return dataModel.getDataCount();
+        return dataModel.size();
     }
 
     @Override
@@ -78,7 +78,7 @@ class VCursorColumn extends DataTableColumn {
 class VCursorDiffToPrevColumn extends DataTableColumn {
     @Override
     public int size() {
-        return dataModel.getDataCount();
+        return dataModel.size();
     }
 
     @Override
@@ -167,7 +167,7 @@ public class CursorView extends LinearLayout {
         TextView titleTextView = (TextView)hCursorView.findViewById(R.id.titleTextView);
         titleTextView.setText("Horizontal Cursors:");
         final TableView tableView = (TableView)hCursorView.findViewById(R.id.tableView);
-        if (hDataModel.getDataCount() == 0)
+        if (hDataModel.size() == 0)
             tableView.setVisibility(INVISIBLE);
         MarkerDataTableAdapter tableAdapter = new MarkerDataTableAdapter(hDataModel);
         tableAdapter.addColumn(new HCursorColumn());
@@ -208,7 +208,7 @@ public class CursorView extends LinearLayout {
         TextView titleTextView = (TextView)vCursorView.findViewById(R.id.titleTextView);
         titleTextView.setText("Vertical Cursors:");
         final TableView tableView = (TableView)vCursorView.findViewById(R.id.tableView);
-        if (vDataModel.getDataCount() == 0)
+        if (vDataModel.size() == 0)
             tableView.setVisibility(INVISIBLE);
         MarkerDataTableAdapter tableAdapter = new MarkerDataTableAdapter(vDataModel);
         tableAdapter.addColumn(new VCursorColumn());
@@ -250,18 +250,18 @@ public class CursorView extends LinearLayout {
         markerDataModel.addData(data);
         markerDataModel.selectData(data);
 
-        if (markerDataModel.getDataCount() > 0)
+        if (markerDataModel.size() > 0)
             tableView.setVisibility(VISIBLE);
     }
 
     private void removeSelectedCursor(PointDataList markerDataModel, Button removeButton, TableView tableView) {
         int selected = markerDataModel.getSelectedData();
-        if (selected < 0 || markerDataModel.getDataCount() == 0)
+        if (selected < 0 || markerDataModel.size() == 0)
             return;
 
         markerDataModel.removeData(selected);
 
-        if (markerDataModel.getDataCount() == 0)
+        if (markerDataModel.size() == 0)
             tableView.setVisibility(INVISIBLE);
     }
 }

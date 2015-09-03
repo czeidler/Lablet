@@ -24,7 +24,7 @@ public class XPositionDataTableColumn extends UnitDataTableColumn {
 
     @Override
     public int size() {
-        return dataModel.getDataCount();
+        return dataModel.size();
     }
 
     @Override

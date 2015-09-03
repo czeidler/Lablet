@@ -127,7 +127,7 @@ public class OriginMarkerList extends DraggableMarkerList implements Calibration
         for (IMarker marker : painterList)
             marker.onDraw(canvas, 1);
 
-        if (dataList.getDataCount() != 3)
+        if (dataList.size() != 3)
             return;
 
         PointF origin = getOriginMarker(0).getCachedScreenPosition();
