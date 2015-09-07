@@ -70,7 +70,7 @@ class ExperimentRunViewManager {
                 List<String> experimentNamesList = new ArrayList<>();
                 for (IExperimentSensor experimentRun : oldGroup.getExperimentSensors())
                     experimentNamesList.add(experimentRun.getClass().getSimpleName());
-                ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(experimentNamesList);
+                ExperimentRun experimentRun = ExperimentRun.createExperimentRun(experimentNamesList);
 
                 experiment.addExperimentRun(experimentRun);
                 setCurrentExperimentRunGroup(experimentRun);
@@ -415,7 +415,7 @@ public class ExperimentActivity extends FragmentActivity {
 
         experiment = new Experiment();
 
-        final ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(pluginNames);
+        final ExperimentRun experimentRun = ExperimentRun.createExperimentRun(pluginNames);
         experiment.addExperimentRun(experimentRun);
         experiment.setCurrentExperimentRun(experimentRun);
         activateExperimentRun(experiment.getCurrentExperimentRun(), true);

@@ -14,7 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Main class for the analysis of {@link ExperimentData}.
+ *
+ * The {@link ExperimentData} is usually recorded in an {@link Experiment}.
+ * The experiment analysis can have multiple runs.
+ */
 public class ExperimentAnalysis {
+    /**
+     * Reference of an analysis within an experiment analysis.
+     */
     public static class AnalysisRef {
         final static public String RUN_ID_KEY = "runID";
         final static public String ANALYSIS_UID_KEY = "analysisUID";
@@ -40,6 +49,9 @@ public class ExperimentAnalysis {
         }
     }
 
+    /**
+     * Entry for a single analysis.
+     */
     public static class AnalysisEntry {
         final public IDataAnalysis analysis;
         final public String analysisUid;
@@ -54,6 +66,9 @@ public class ExperimentAnalysis {
         }
     }
 
+    /**
+     * Maintains the list of analyses for a run.
+     */
     public static class AnalysisRunEntry {
         final public List<AnalysisEntry> analysisList = new ArrayList<>();
 

@@ -8,8 +8,16 @@
 package nz.ac.auckland.lablet.experiment;
 
 
+/**
+ * Plugin interface for a data type.
+ */
 public interface IDataTypePlugin {
     String getDataType();
 
+    /**
+     * Instantiates a new instance of the associated {@link ISensorData}.
+     *
+     * @return pointer to the data type sensor data
+     */
     ISensorData instantiateData();
 }

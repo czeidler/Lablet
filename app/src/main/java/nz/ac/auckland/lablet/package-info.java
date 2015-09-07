@@ -8,10 +8,10 @@
  * <h3>Single Experiments:</h3>
  * <p>
  * New experiments can be implemented using the plugin architecture:
- * {@link nz.ac.auckland.lablet.experiment.IExperimentPlugin}. There is currently one common
- * {@link nz.ac.auckland.lablet.ExperimentAnalysisActivity} to analyze the experiments. However, since there
- * is currently only on {@link nz.ac.auckland.lablet.camera.VideoData} this is not well tested to
- * work with different experiments.
+ * {@link nz.ac.auckland.lablet.experiment.ISensorPlugin}, {@link nz.ac.auckland.lablet.experiment.IDataTypePlugin},
+ * {@link nz.ac.auckland.lablet.experiment.IImportPlugin} and {@link nz.ac.auckland.lablet.experiment.IAnalysisPlugin}.
+ * There is currently one common
+ * {@link nz.ac.auckland.lablet.ExperimentAnalysisActivity} to analyze the experiments.
  * </p>
  * <p>
  * Experiments can be managed in the {@link nz.ac.auckland.lablet.ExperimentHomeActivity}. For example,

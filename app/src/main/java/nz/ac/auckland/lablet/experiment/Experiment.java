@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Main class to perform an experiment.
  *
- * An experiment can have multiple runs and each run can have multiple sensors.
+ * An experiment can have multiple {@link ExperimentRun}s and each run can have multiple sensors.
  *
  * A run can be used to perform a similar experiment multiple times.
  * For example, measuring a value multiple times.
@@ -100,10 +100,21 @@ public class Experiment extends WeakListenable<Experiment.IListener> {
             setCurrentExperimentRun(experimentRuns.get(currentRunIndex));
     }
 
+    /**
+     * Get a list of all ExperimentRuns.
+     *
+     * @return list of ExperimentRuns
+     */
     public List<ExperimentRun> getExperimentRuns() {
         return experimentRuns;
     }
 
+    /**
+     * Add another ExperimentRun.
+     *
+     * @param experimentRun
+     * @return false if the ExperimentRun is already attached to an Experiment
+     */
     public boolean addExperimentRun(ExperimentRun experimentRun) {
         if (experimentRun.getExperiment() != null)
             return false;
@@ -116,6 +127,11 @@ public class Experiment extends WeakListenable<Experiment.IListener> {
         return true;
     }
 
+    /**
+     * Remove an ExperimentRun from the Experiment.
+     *
+     * @param experimentRun
+     */
     public void removeExperimentRun(ExperimentRun experimentRun) {
         final int removedGroupIndex = experimentRuns.indexOf(experimentRun);
 
@@ -147,6 +163,11 @@ public class Experiment extends WeakListenable<Experiment.IListener> {
         notifyCurrentExperimentRunChanged(experimentRun, oldRun);
     }
 
+    /**
+     * Get the current ExperimentRun.
+     *
+     * @return
+     */
     public ExperimentRun getCurrentExperimentRun() {
         return currentExperimentRun;
     }

@@ -15,6 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * An ExperimentRun represent a single measurement of an experiment.
+ *
+ * A measurement can be taken with multiple sensors. When recording a run, all sensors are recorded at the same time.
+ * However, one can set a current sensor, for example, to indicate what sensor preview should be displayed.
+ *
+ */
 public class ExperimentRun {
     private ExperimentRunInfo data = new ExperimentRunInfo();
 
@@ -29,19 +36,27 @@ public class ExperimentRun {
     final static private String SENSOR_COUNT_KEY = "sensor_count";
     final static private String CURRENT_SENSOR_KEY = "current_sensor";
 
-    static public ExperimentRun createExperimentRunGroup(List<String> experimentRuns) {
-        String[] experimentRunsArray = new String[experimentRuns.size()];
+    static public ExperimentRun createExperimentRun(List<String> sensorNames) {
+        String[] experimentRunsArray = new String[sensorNames.size()];
         for (int i = 0; i < experimentRunsArray.length; i++)
-            experimentRunsArray[i] = experimentRuns.get(i);
+            experimentRunsArray[i] = sensorNames.get(i);
 
-        return createExperimentRunGroup(experimentRunsArray);
+        return createExperimentRun(experimentRunsArray);
     }
 
-    static public ExperimentRun createExperimentRunGroup(String[] plugins) {
+    /**
+     * Creates an {@link ExperimentRun} from a list of sensor names.
+     *
+     * Tries to find sensors for each entry in the sensor name list and adds them to a new ExperimentRun.
+     *
+     * @param sensorNames list of sensors
+     * @return the experiment run
+     */
+    static public ExperimentRun createExperimentRun(String[] sensorNames) {
         ExperimentRun experimentRunGroup = new ExperimentRun();
 
         ExperimentPluginFactory factory = ExperimentPluginFactory.getFactory();
-        for (String pluginName : plugins) {
+        for (String pluginName : sensorNames) {
             ISensorPlugin plugin = factory.findSensorPlugin(pluginName);
             if (plugin == null)
                 continue;
@@ -186,6 +201,13 @@ public class ExperimentRun {
         return false;
     }
 
+    /**
+     * Finishes the experiment run and saves the sensor data if requested.
+     *
+     * @param saveData indicates if the data should be saved
+     * @param storageDir the storage location
+     * @throws IOException
+     */
     public void finishExperiment(boolean saveData, File storageDir) throws IOException {
         if (!dataTaken())
             return;

@@ -10,32 +10,43 @@ package nz.ac.auckland.lablet.experiment;
 import android.support.v4.app.Fragment;
 
 
+/**
+ * Plugin interface for a data analysis.
+ */
 public interface IAnalysisPlugin {
     /**
      * The name of the plugin. For example, the name of the experiment class.
      *
-     * @return the name of the plugin
+     * @return the identifier of the plugin
      */
-    public String getIdentifier();
-
-    public String[] requiredDataTypes();
+    String getIdentifier();
 
     /**
-     * Creates an {@link IDataAnalysis} object for the given
+     * Returns a list of required data types.
+     *
+     * For example, a combined video and audio analysis must specify that video and audio data is required for the
+     * analysis.
+     *
+     * @return list of required data types.
+     */
+    String[] requiredDataTypes();
+
+    /**
+     * Creates an {@link IDataAnalysis} object for the given list of
      * {@link ISensorData}.
      *
      * @param sensorData usually loaded with the loadSensorData method
      * @return pointer to the created experiment analysis
      */
-    public IDataAnalysis createDataAnalysis(ISensorData... sensorData);
+    IDataAnalysis createDataAnalysis(ISensorData... sensorData);
 
     /**
-     * Creates the view that displays the results in the
-     * {@link nz.ac.auckland.lablet.ExperimentAnalysisActivity}.
+     * Creates a fragment that displays the analysis.
      *
      * @param analysisRef analysis ref
-     * @return a newly created view
+     * @return a new fragment
      */
-    public Fragment createSensorAnalysisFragment(ExperimentAnalysis.AnalysisRef analysisRef);
+    Fragment createSensorAnalysisFragment(ExperimentAnalysis.AnalysisRef analysisRef);
 
 }
+
