@@ -12,7 +12,6 @@ import android.graphics.SurfaceTexture;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.opengl.GLSurfaceView;
-import android.os.Handler;
 import android.util.AttributeSet;
 import nz.ac.auckland.lablet.camera.decoder.FrameRenderer;
 import nz.ac.auckland.lablet.camera.decoder.SeekToFrameExtractor;
