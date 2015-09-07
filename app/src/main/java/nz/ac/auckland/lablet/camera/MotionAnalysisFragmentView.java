@@ -352,19 +352,20 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
                     for (long i = startFrameTime + increment; i <= endFrameTime; i += increment) {
                         Bitmap bmp = sensorAnalysis.getVideoData().getFrame(i);
+                        result = tracker.findObject(bmp);
 
-                        if(roi != null && result == null)
-                        {
-                            result = tracker.findObject(bmp);
-                        }
-                        else if(roi == null && result == null)
-                        {
-                            result = tracker.findObject(bmp, prevResult.getRect(sensorAnalysis.getVideoData()));
-                        }
-                        else
-                        {
-                            result = tracker.findObject(bmp, result.boundingRect());
-                        }
+//                        if(roi != null && result == null)
+//                        {
+//                            result = tracker.findObject(bmp);
+//                        }
+//                        else if(roi == null && result == null)
+//                        {
+//                            result = tracker.findObject(bmp, prevResult.getRect(sensorAnalysis.getVideoData()));
+//                        }
+//                        else
+//                        {
+//                            result = tracker.findObject(bmp, result.boundingRect());
+//                        }
                     }
 
                     //Add point marker

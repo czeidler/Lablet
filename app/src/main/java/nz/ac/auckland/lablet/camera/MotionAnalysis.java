@@ -51,6 +51,10 @@ public class MotionAnalysis implements IDataAnalysis {
     final private String TRACKING_ENABLED = "trackingEnabled";
     final private String DEBUGGING_ENABLED = "debuggingEnabled";
 
+    final private String TRACKER_VMAX = "vmax";
+    final private String TRACKER_VMIN = "vmin";
+    final private String TRACKER_SMIN = "smin";
+
     final private VideoData sensorData;
 
     final private FrameDataList frameDataList;
@@ -78,6 +82,10 @@ public class MotionAnalysis implements IDataAnalysis {
     private boolean trackingEnabled = false;
     private  boolean debuggingEnabled = false;
     private Integer currentRoi = null;
+
+    private int trackerVMax = 0;
+    private int trackerVMin = 0;
+    private int trackerSMin = 0;
 
 
     final private List<IListener> listenerList = new ArrayList<>();
@@ -198,6 +206,30 @@ public class MotionAnalysis implements IDataAnalysis {
         data.setCentre(centre);
         roiDataList.addData(data);
         this.getPointDataList().removeData(currentRoi);
+    }
+
+    public int getTrackerSMin() {
+        return trackerSMin;
+    }
+
+    public void setTrackerSMin(int trackerSMin) {
+        this.trackerSMin = trackerSMin;
+    }
+
+    public int getTrackerVMin() {
+        return trackerVMin;
+    }
+
+    public void setTrackerVMin(int trackerVMin) {
+        this.trackerVMin = trackerVMin;
+    }
+
+    public int getTrackerVMax() {
+        return trackerVMax;
+    }
+
+    public void setTrackerVMax(int trackerVMax) {
+        this.trackerVMax = trackerVMax;
     }
 
     public boolean isDebuggingEnabled() {
@@ -333,6 +365,15 @@ public class MotionAnalysis implements IDataAnalysis {
 
         setVideoAnalysisSettings(bundle.getBundle("video_analysis_settings"));
 
+        if(bundle.containsKey(TRACKER_VMAX))
+            this.setTrackerVMax(bundle.getInt(TRACKER_VMAX));
+
+        if(bundle.containsKey(TRACKER_VMIN))
+            this.setTrackerVMin(bundle.getInt(TRACKER_VMIN));
+
+        if(bundle.containsKey(TRACKER_SMIN))
+            this.setTrackerSMin(bundle.getInt(TRACKER_SMIN));
+
         if(bundle.containsKey(TRACKING_ENABLED))
             this.setTrackingEnabled(bundle.getBoolean(TRACKING_ENABLED));
 
@@ -385,6 +426,10 @@ public class MotionAnalysis implements IDataAnalysis {
 
         if(roiDataList.size() > 0)
             analysisDataBundle.putBundle(ROI_DATA_LIST, roiDataList.toBundle());
+
+        analysisDataBundle.putInt(TRACKER_VMAX, trackerVMax);
+        analysisDataBundle.putInt(TRACKER_VMIN, trackerVMin);
+        analysisDataBundle.putInt(TRACKER_SMIN, trackerSMin);
 
         analysisDataBundle.putBundle(LENGTH_CALIBRATION_KEY, lengthCalibrationSetter.toBundle());
 

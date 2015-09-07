@@ -20,6 +20,7 @@ import nz.ac.auckland.lablet.data.PointData;
 import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
+import nz.ac.auckland.lablet.views.TrackerSettingsDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -184,6 +185,9 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                     getSensorAnalysis().setRegionOfInterest();
                 } else if (item == R.id.debug_tracking) {
                     getSensorAnalysis().setDebuggingEnabled(!menuItem.isChecked());
+                } else if (item == R.id.tracker_settings) {
+                    TrackerSettingsDialog dialog = new TrackerSettingsDialog(getActivity(), getSensorAnalysis());
+                    dialog.show();
                 }
 
                 return false;

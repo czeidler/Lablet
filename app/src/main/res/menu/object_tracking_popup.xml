@@ -13,4 +13,7 @@
     <item android:id="@+id/debug_tracking"
         android:title="Debug"
         android:checkable="true"/>
+
+    <item android:id="@+id/tracker_settings"
+        android:title="Settings" />
 </menu>
