@@ -7,16 +7,14 @@
  */
 package nz.ac.auckland.lablet.experiment;
 
-import android.app.Activity;
-
 import java.io.File;
 import java.io.IOException;
 
 
 public abstract class AbstractFileImportPlugin implements IImportPlugin {
     @Override
-    public void importData(Activity activity, File importFile, File storageDir, IListener listener) {
-        boolean result = importInternal(activity, importFile, storageDir);
+    public void importData(File importFile, File storageDir, IListener listener) {
+        boolean result = importInternal(importFile, storageDir);
 
         if (listener != null)
             listener.onImportFinished(result);
@@ -24,15 +22,15 @@ public abstract class AbstractFileImportPlugin implements IImportPlugin {
 
     abstract protected String createUid(String fileName);
 
-    abstract protected boolean importFile(Activity activity, File importFile, File dataStorageDir);
+    abstract protected boolean importFile(File importFile, File dataStorageDir);
 
-    private boolean importInternal(final Activity activity, final File importFile, File storageBaseDir) {
+    private boolean importInternal(final File importFile, File storageBaseDir) {
         final String fileName = importFile.getName();
         final String uid = createUid(fileName);
         File mainDir = new File(storageBaseDir, uid);
         mainDir.mkdirs();
 
-        Experiment experiment = new Experiment(activity);
+        Experiment experiment = new Experiment();
         ImportExperimentRun experimentRun = new ImportExperimentRun(this);
         experiment.addExperimentRun(experimentRun);
         try {
@@ -43,6 +41,6 @@ public abstract class AbstractFileImportPlugin implements IImportPlugin {
         }
 
         File dataStorageDir = experimentRun.getStorageDir();
-        return importFile(activity, importFile, dataStorageDir);
+        return importFile(importFile, dataStorageDir);
     }
 }

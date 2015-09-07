@@ -236,12 +236,11 @@ public class ExperimentHomeActivity extends Activity {
     private void importData(final IImportPlugin plugin) {
         FileChooserDialog dialog = new FileChooserDialog(this);
         dialog.setFilter(plugin.getFileFilter());
-        final Activity activity = this;
         dialog.addListener(new FileChooserDialog.OnFileSelectedListener() {
             @Override
             public void onFileSelected(final Dialog source, File file) {
                 Context context = source.getContext();
-                plugin.importData(activity, file, ExperimentAnalysisBaseActivity.getDefaultExperimentBaseDir(context),
+                plugin.importData(file, ExperimentAnalysisBaseActivity.getDefaultExperimentBaseDir(context),
                         new IImportPlugin.IListener() {
                     @Override
                     public void onImportFinished(boolean successful) {

@@ -7,17 +7,15 @@
  */
 package nz.ac.auckland.lablet.experiment;
 
-import android.app.Activity;
-
 import java.io.File;
 
 
 public interface IImportPlugin {
-    public interface IListener {
+    interface IListener {
         void onImportFinished(boolean successful);
     }
 
     String getName();
     String getFileFilter();
-    void importData(Activity activity, File importFile, File storageDir, IListener listener);
+    void importData(File importFile, File storageDir, IListener listener);
 }

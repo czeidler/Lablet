@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.experiment;
 
-import android.app.Activity;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 
@@ -35,13 +34,11 @@ public class Experiment extends WeakListenable<Experiment.IListener> {
 
     final private List<ExperimentRun> experimentRuns = new ArrayList<>();
     private ExperimentRun currentExperimentRun;
-    final private Activity activity;
 
     final static private String NUMBER_OF_RUNS_KEY = "number_of_runs";
     final static private String CURRENT_RUN_KEY = "current_run";
 
-    public Experiment(Activity activity) {
-        this.activity = activity;
+    public Experiment() {
     }
 
     /**
@@ -59,10 +56,6 @@ public class Experiment extends WeakListenable<Experiment.IListener> {
                 sensorsString += "_" + sensor.getSensorName();
         }
         return dateString + sensorsString;
-    }
-
-    public Activity getActivity() {
-        return activity;
     }
 
     /**

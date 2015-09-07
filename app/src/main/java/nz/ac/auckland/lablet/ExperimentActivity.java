@@ -413,7 +413,7 @@ public class ExperimentActivity extends FragmentActivity {
         if (pluginNames.length == 0)
             return;
 
-        experiment = new Experiment(this);
+        experiment = new Experiment();
 
         final ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(pluginNames);
         experiment.addExperimentRun(experimentRun);
@@ -548,7 +548,7 @@ public class ExperimentActivity extends FragmentActivity {
 
         experimentBaseDir = new File(path);
 
-        experiment = new Experiment(this);
+        experiment = new Experiment();
         experiment.onRestoreInstanceState(savedInstanceState);
     }
 
