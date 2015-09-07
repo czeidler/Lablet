@@ -6,17 +6,21 @@ import android.util.Log;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.Rect;
 import org.opencv.core.RotatedRect;
+import org.opencv.core.Scalar;
 import org.opencv.core.TermCriteria;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.Video;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Jamie on 27/07/2015.
@@ -37,17 +41,26 @@ public class CamShiftTracker {
         }
     }
 
-    private Mat roiHist;
-    private Rect roiRect;
-    private TermCriteria termCriteria;
-    private HashMap<Integer, RotatedRect> output = new HashMap<Integer, RotatedRect>();
-    private HashMap<Integer, Rect> rois = new HashMap<Integer, Rect>();
-    Integer currentRoiFrame = null;
-    //Rect roiRect = null;
+    private Mat prob;
+    private Mat mask;
+    private Mat hist;
+    private ArrayList<Mat> hues = new ArrayList<>();
+
+
+    private MatOfFloat ranges = new MatOfFloat(0f, 256f);
+    private MatOfInt histSize = new MatOfInt(25);
+    private TermCriteria termCriteria = new TermCriteria(TermCriteria.EPS | TermCriteria.COUNT, 10, 1);
+
+    private int range;
+    private int vMax = 0;
+    private int vMin = 0;
+    private int sMin = 0;
+
+    Rect roiRect;
+    Rect prevRect;
 
     public CamShiftTracker() {
-        roiHist = new Mat();
-        termCriteria = new TermCriteria(TermCriteria.EPS | TermCriteria.COUNT, 10, 1);
+
     }
 
     public boolean isROISet()
@@ -55,8 +68,7 @@ public class CamShiftTracker {
         return roiRect != null;
     }
 
-
-   /**
+    /**
     * Sets the region of interest for the CamShiftTracker.
     *
     */
@@ -66,19 +78,22 @@ public class CamShiftTracker {
         Mat inputFrame = new Mat();
         Utils.bitmapToMat(bmp, inputFrame);
 
-        //Get region of interest and convert to HSV color space
-        Rect rect = new Rect(x, y, width, height);
-        Mat roi = new Mat(inputFrame, rect);// inputFrame.submat(x, x+width, y, y+height);
+        Rect roiRect =  new Rect(x, y, width, height);
 
-        Imgproc.cvtColor(roi, roi, Imgproc.COLOR_BGR2HSV);
+        mask = new Mat(inputFrame.size(), CvType.CV_8UC1);
+        prob = new Mat(inputFrame.size(),CvType.CV_8UC1);
 
-        //Calculate HSV histogram for region of interest
-        ArrayList<Mat> images = new ArrayList<Mat>();
-        images.add(roi);
-        Imgproc.calcHist(images, new MatOfInt(0), new Mat(), roiHist, new MatOfInt(16), new MatOfFloat(0, 180));
-        Core.normalize(roiHist, roiHist, 0, 255, Core.NORM_MINMAX);
+        updateHueImage(inputFrame);
 
-        this.roiRect = new Rect(x, y, width, height);
+        Mat mask = new Mat(inputFrame.size(), CvType.CV_8UC1);// inputFrame.submat(x, x+width, y, y+height);
+        mask.submat(roiRect);
+
+        List<Mat> images = Arrays.asList(hues.get(0).submat(roiRect));
+        Imgproc.calcHist(images, new MatOfInt(0), new Mat(), hist, histSize, ranges);
+        Core.normalize(hist, hist);
+
+        prevRect = roiRect;
+        this.roiRect = roiRect;
     }
 
     /**
@@ -91,33 +106,40 @@ public class CamShiftTracker {
      * will be thrown.
      */
 
-    public RotatedRect findObject(Bitmap bmp)
+    private void updateHueImage(Mat input)
     {
-        if(isROISet()) {
-            return findObject(bmp, roiRect);
-        }
+        Mat bgr = new Mat(input.size(), CvType.CV_8UC3);
+        Mat hsv = new Mat(input.size(), CvType.CV_8UC3);
+        Mat hue = new Mat(input.size(), CvType.CV_8UC1);
+        ArrayList<Mat> hsvs = new ArrayList<>();
 
-        Log.e(TAG, "please set region of interest before calling findObject");
+        Imgproc.cvtColor(input, bgr, Imgproc.COLOR_RGBA2BGR);
+        Imgproc.cvtColor(bgr, hsv, Imgproc.COLOR_BGR2HSV);
 
-        return null;
+        Core.inRange(hsv, new Scalar(0, sMin, Math.min(vMin, vMax)), new Scalar(180, 256, Math.max(vMin, vMax)), mask);
+
+        hues.clear();
+        hsvs.add(hsv);
+        hues.add(hue);
+
+        MatOfInt from_to = new MatOfInt(0,0);
+        Core.mixChannels(hsvs, hues, from_to);
     }
 
-    public RotatedRect findObject(Bitmap bmp, Rect previousResult)
+    public RotatedRect findObject(Bitmap bmp)
     {
         if(isROISet()) {
             //Get current Mat frameId and convert to HSV colour space
             Mat inputFrame = new Mat();
             Utils.bitmapToMat(bmp, inputFrame);
-            Imgproc.cvtColor(inputFrame, inputFrame, Imgproc.COLOR_BGR2HSV);
 
-            //Meanshift
-            ArrayList<Mat> images = new ArrayList<Mat>();
-            images.add(inputFrame);
-            Mat output = new Mat();
-            Imgproc.calcBackProject(images, new MatOfInt(0), roiHist, output, new MatOfFloat(0, 180), 1);
+            updateHueImage(inputFrame);
 
-            RotatedRect result = Video.CamShift(output, previousResult, termCriteria); //Camshift todo:  check if back project was successful
-            //roiRect = result.boundingRect();
+            Imgproc.calcBackProject(hues, new MatOfInt(0), hist, prob, ranges, 255);
+            Core.bitwise_and(prob, mask, prob, new Mat());
+
+            RotatedRect result = Video.CamShift(prob, prevRect, termCriteria);
+            prevRect = result.boundingRect();
             return result;
         }
 
@@ -126,14 +148,27 @@ public class CamShiftTracker {
         return null;
     }
 
-    /**
-     *
-     * @return RotatedRect. Returns null if no object found.
-     */
-
-    public RotatedRect getOutput(int frameId)
-    {
-        return this.output.get(frameId);
+    public int getvMax() {
+        return vMax;
     }
 
+    public void setvMax(int vMax) {
+        this.vMax = vMax;
+    }
+
+    public int getvMin() {
+        return vMin;
+    }
+
+    public void setvMin(int vMin) {
+        this.vMin = vMin;
+    }
+
+    public int getsMin() {
+        return sMin;
+    }
+
+    public void setsMin(int sMin) {
+        this.sMin = sMin;
+    }
 }
