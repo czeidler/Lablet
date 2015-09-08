@@ -83,9 +83,9 @@ public class MotionAnalysis implements IDataAnalysis {
     private  boolean debuggingEnabled = false;
     private Integer currentRoi = null;
 
-    private int trackerVMax = 0;
-    private int trackerVMin = 0;
-    private int trackerSMin = 0;
+    private int trackerVMax = 256;
+    private int trackerVMin = 65;
+    private int trackerSMin = 55;
 
 
     final private List<IListener> listenerList = new ArrayList<>();

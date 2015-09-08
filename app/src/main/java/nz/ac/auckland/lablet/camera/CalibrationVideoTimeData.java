@@ -32,8 +32,8 @@ public class CalibrationVideoTimeData implements ITimeData {
     }
 
     @Override
-    public float getTimeAt(float index) {
-        return getFrameTime(Math.round(index));
+    public float getTimeAt(float frameId) {
+        return getFrameTime(Math.round(frameId));
     }
 
     public int getNumberOfFrames() {

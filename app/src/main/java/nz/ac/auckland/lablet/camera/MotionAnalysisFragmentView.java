@@ -13,14 +13,12 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
 
 import org.opencv.core.Rect;
-import org.opencv.core.RotatedRect;
 
 import nz.ac.auckland.lablet.R;
 //import nz.ac.auckland.lablet.accelerometer.AccelerometerSensorData;
@@ -35,10 +33,8 @@ import nz.ac.auckland.lablet.views.FrameDataSeekBar;
 import nz.ac.auckland.lablet.views.graph.*;
 import nz.ac.auckland.lablet.views.plotview.LinearFitPainter;
 import nz.ac.auckland.lablet.views.table.*;
-import nz.ac.auckland.lablet.vision_algorithms.CamShiftTracker;
+import nz.ac.auckland.lablet.vision.CamShiftTracker;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -348,28 +344,19 @@ class MotionAnalysisFragmentView extends FrameLayout {
                     int frameRate = sensorAnalysis.getVideoData().getVideoFrameRate();
                     long increment = 1000 * 1000 / frameRate;
 
-                    RotatedRect result = null;// = new RotatedRect();
+                    Rect result = null;// = new RotatedRect();
 
                     for (long i = startFrameTime + increment; i <= endFrameTime; i += increment) {
                         Bitmap bmp = sensorAnalysis.getVideoData().getFrame(i);
                         result = tracker.findObject(bmp);
-
-//                        if(roi != null && result == null)
-//                        {
-//                            result = tracker.findObject(bmp);
-//                        }
-//                        else if(roi == null && result == null)
-//                        {
-//                            result = tracker.findObject(bmp, prevResult.getRect(sensorAnalysis.getVideoData()));
-//                        }
-//                        else
-//                        {
-//                            result = tracker.findObject(bmp, result.boundingRect());
-//                        }
                     }
 
+                    float centreX = result.x + result.width / 2;
+                    float centreY = result.y + result.height / 2;
+
+
                     //Add point marker
-                    PointF nextPos = sensorAnalysis.getVideoData().toMarkerPoint(new PointF((float) result.center.x, (float) result.center.y));
+                    PointF nextPos = sensorAnalysis.getVideoData().toMarkerPoint(new PointF(centreX, centreY));
                     PointData nextTag = new PointData(newFrame);
                     nextTag.setPosition(nextPos);
                     sensorAnalysis.getPointDataList().addData(nextTag); //Have to add marker here rather than edit its position as PointMarkerList.setCurrentFrame (which adds markers) is called after this method
@@ -377,10 +364,10 @@ class MotionAnalysisFragmentView extends FrameLayout {
                     //Add debugging data
                     RectData data = new RectData(newFrame);
 
-                    data.setCentre(sensorAnalysis.getVideoData().toMarkerPoint(new PointF((float) result.center.x, (float) result.center.y)));
-                    data.setAngle((float) result.angle);
+                    data.setCentre(sensorAnalysis.getVideoData().toMarkerPoint(new PointF(centreX, centreY)));
+                    data.setAngle(0);
 
-                    PointF size = sensorAnalysis.getVideoData().toMarkerPoint(new PointF((float) result.size.width, (float) result.size.height));
+                    PointF size = sensorAnalysis.getVideoData().toMarkerPoint(new PointF(result.width, result.height));
                     data.setWidth(size.x);
                     data.setHeight(size.y);
 
@@ -457,17 +444,9 @@ class MotionAnalysisFragmentView extends FrameLayout {
         }
     }
 
-    public void showRegionOfInterest(MotionAnalysis sensorAnalysis)
-    {
-        int roiFrame = sensorAnalysis.getFrameDataList().getROIFrame();
-        sensorAnalysis.getFrameDataList().setCurrentFrame(roiFrame);
-        //sensorAnalysis.getRoiDataList().setVisibility(true);
-    }
-
     public void setRegionOfInterest(int frameId, MotionAnalysis sensorAnalysis)
     {
-        int currentFrame = sensorAnalysis.getFrameDataList().getCurrentFrame();
-        float startFrameTime =  sensorAnalysis.getTimeData().getTimeAt(currentFrame);
+        float startFrameTime =  sensorAnalysis.getTimeData().getTimeAt(frameId);
         Bitmap bmp = sensorAnalysis.getVideoData().getFrame((long) (startFrameTime * 1000.0));
 
         RoiData roi = sensorAnalysis.getRoiDataList().getDataByFrameId(frameId);
@@ -480,37 +459,9 @@ class MotionAnalysisFragmentView extends FrameLayout {
         int height = (int)(btmRight.y - topLeft.y);
 
         tracker.setROI(bmp, x, y, width, height);
-
-        //Set frame target marker to middle of rectangle
-//        int currentMarker = sensorAnalysis.getPointDataList().getSelectedData();
-//        PointF newPos = sensorAnalysis.getVideoData().toMarkerPoint(new PointF(x + width / 2, y + height / 2));
-//        sensorAnalysis.getPointDataList().setMarkerPosition(newPos, currentMarker);
-
-        //sensorAnalysis.getFrameDataList().setObjectPicked(currentFrame, true);
-        //sensorAnalysis.getFrameDataList().setROIFrame(currentFrame);
     }
 
-    public void saveFrame(Bitmap bmp)
-    {
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream("/sdcard/screen.png");
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
-            // PNG is a lossless format, the compression factor (100) is ignored
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
+     /**
      *
      * @return an icon id for the new state
      */

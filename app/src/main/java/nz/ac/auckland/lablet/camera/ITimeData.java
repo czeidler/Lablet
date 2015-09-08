@@ -14,8 +14,8 @@ public interface ITimeData {
     /**
      * Get time value.
      *
-     * @param index of the frame number
+     * @param frameId of the frame number
      * @return time in milli seconds
      */
-    public float getTimeAt(float index);
+    public float getTimeAt(float frameId);
 }
