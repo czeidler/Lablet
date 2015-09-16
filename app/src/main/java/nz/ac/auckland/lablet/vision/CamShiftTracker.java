@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -52,6 +53,10 @@ public class CamShiftTracker {
     private MatOfInt histSize = new MatOfInt(16);
     private MatOfFloat ranges = new MatOfFloat(0, 180);
     private Rect trackWindow;
+    private Scalar hsvMin;
+    private Scalar hsvMax;
+    private int colourRange = 30;
+
 
     Mat hsv, hue, mask, hist, backproj, bgr;// = Mat::zeros(200, 320, CV_8UC3), backproj;
     Size size;
@@ -83,13 +88,29 @@ public class CamShiftTracker {
         Utils.bitmapToMat(bmp, image);
         //this.saveFrame(image, "roi_raw_frame");
 
-        toHsv(image);
-
-        //setHues(image);
-
-        //this.saveFrame(hue, "roi_hue");
-
         trackWindow = new Rect(x, y, width, height);
+
+        Mat bgrRoi = image.submat(trackWindow);
+
+        Scalar domColour = getDominantHsv(bgrRoi, 5);
+
+        int minHue = (int)domColour.val[0] - colourRange;
+        if(minHue < 0)
+        {
+            minHue = 180 - minHue;
+        }
+
+        //white:
+        //hsvMin = new Scalar(minHue, Math.max(domColour.val[1] - 50, 0), Math.max(domColour.val[2]- 50, 0));
+        //hsvMax = new Scalar((domColour.val[0] + colourRange) % 180, Math.min(domColour.val[1]+ 50, 255), Math.min(domColour.val[2]+ 50, 255));
+
+        hsvMin = domColour;// new Scalar(minHue, Math.max(domColour.val[1] - 50, 0), Math.max(domColour.val[2]- 50, 0));
+        hsvMax = domColour;// new Scalar((domColour.val[0] + colourRange) % 180, Math.min(domColour.val[1]+ 50, 255), Math.min(domColour.val[2]+ 50, 255));
+
+        toHsv(image, hsvMin, hsvMax);
+
+//        getDominantColour(bgrRoi);
+//        kmeansCluster(bgrRoi);
 
         Mat hsvRoi = hsv.submat(trackWindow);
         //this.saveFrame(hsvRoi, "roi_hue_submat");
@@ -106,20 +127,102 @@ public class CamShiftTracker {
         //this.saveFrame(hist, "roi_hist_norm");
     }
 
-    private void toHsv(Mat image)
+//    private void getDominantColour(Mat bgr)
+//    {
+//        Mat hsv = new Mat();
+//        Imgproc.cvtColor(bgr, hsv, Imgproc.COLOR_BGR2HSV, 3);
+//
+//        ArrayList<Mat> hsvRois = new ArrayList<>();
+//        hsvRois.add(hsv);
+//
+//        Mat hist = new Mat();
+//        int size = 180;
+//        Imgproc.calcHist(hsvRois, new MatOfInt(0), new Mat(), hist, new MatOfInt(size), new MatOfFloat(0, 180));
+//
+//        for (int i = 0; i < size; i++) {
+//            double[] histValues = hist.get(i, 0);
+//            for (int j = 0; j < histValues.length; j++) {
+//                Log.d(TAG, "count=" + histValues[j] + " hue=" + i * (180/size));
+//            }
+//        }
+//
+//    }
+
+    private Scalar getDominantHsv(Mat bgr, int k)
+    {
+        //Convert to HSV
+        Mat hsv = new Mat();
+        Imgproc.cvtColor(bgr, hsv, Imgproc.COLOR_BGR2HSV, 3);
+
+        //Image quantization using k-means: https://github.com/abidrahmank/OpenCV2-Python-Tutorials/blob/master/source/py_tutorials/py_ml/py_kmeans/py_kmeans_opencv/py_kmeans_opencv.rst
+        Mat clusterData = new Mat();
+        hsv.reshape(1, hsv.rows() * hsv.cols()).convertTo(clusterData, CvType.CV_32F, 1.0 / 255.0);
+        Mat labels = new Mat();
+        Mat centres = new Mat();
+        TermCriteria criteria = new TermCriteria(TermCriteria.COUNT, 100, 1);
+        Core.kmeans(clusterData, k, labels, criteria, 1, Core.KMEANS_PP_CENTERS, centres);
+
+        //Get num hits for each category
+        int[] counts = new int[k];
+
+        for (int i = 0; i < labels.rows(); i++) {
+            int label = (int)labels.get(i, 0)[0];
+            counts[label] += 1;
+        }
+
+        //Get cluster index with maximum number of members
+        int max = 0;
+        int index = -1;
+
+        for (int i = 0; i < counts.length; i++)
+        {
+            int value = counts[i];
+
+            if(value > max)
+            {
+                max = value;
+                index = i;
+            }
+        }
+
+        //Get cluster centre point hsv
+        int h = (int)(centres.get(index, 0)[0] * 255.0);
+        int s = (int)(centres.get(index, 1)[0] * 255.0);
+        int v = (int)(centres.get(index, 2)[0] * 255.0);
+
+        Log.d(TAG, "h=" + h + " s=" + s + " v=" + v);
+
+
+
+        for (int i = 0; i < centres.rows(); i++) {
+            for (int j = 0; j < centres.cols(); j++) {
+                double[] centreData = centres.get(i, j);
+                Log.d(TAG, "i=" + i + " j=" + j + " centres=" + centreData[0] * 255);
+            }
+        }
+
+        return new Scalar(h, s, v);
+
+
+
+
+
+    }
+
+    private void toHsv(Mat image, Scalar hsvMin, Scalar hsvMax)
     {
         Imgproc.cvtColor(image, hsv, Imgproc.COLOR_BGR2HSV, 3);
         //this.saveFrame(hsv, "hsv");
 
-        Scalar hsvMin = new Scalar(106, 60, 90);
-        Scalar hsvMax = new Scalar(124,255,255);
+        //Scalar hsvMin = new Scalar(106, 60, 90);
+        //Scalar hsvMax = new Scalar(124,255,255);
         //Core.inRange(hsv, new Scalar(0, sMin, Math.min(vMin, vMax)), new Scalar(180, 255, Math.max(vMin, vMax)), mask);
         Core.inRange(hsv, hsvMin, hsvMax, mask);
 
         Mat output = new Mat();
         Imgproc.cvtColor(mask, output, Imgproc.COLOR_GRAY2BGR, 0);
         Imgproc.cvtColor(output, output, Imgproc.COLOR_BGR2RGBA, 0);
-        //this.saveFrame(output, "mask");
+        this.saveFrame(output, "mask");
 
 //        MatOfInt fromTo = new MatOfInt(0, 0);
 //        hue.create(size, hsv.depth());
@@ -154,7 +257,7 @@ public class CamShiftTracker {
             Mat image = new Mat();
             Utils.bitmapToMat(bmp, image);
 
-            toHsv(image);
+            toHsv(image, hsvMin, hsvMax);
 
             ArrayList<Mat> hsvs = new ArrayList<>();
             hsvs.add(hsv);
