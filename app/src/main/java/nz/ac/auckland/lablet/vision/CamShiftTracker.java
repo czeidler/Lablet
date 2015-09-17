@@ -2,6 +2,7 @@ package nz.ac.auckland.lablet.vision;
 
 import android.graphics.Bitmap;
 import android.util.Log;
+import android.util.Pair;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
@@ -55,7 +56,7 @@ public class CamShiftTracker {
     private Rect trackWindow;
     private Scalar hsvMin;
     private Scalar hsvMax;
-    private int colourRange = 30;
+    private int colourRange = 9;
 
 
     Mat hsv, hue, mask, hist, backproj, bgr;// = Mat::zeros(200, 320, CV_8UC3), backproj;
@@ -92,20 +93,22 @@ public class CamShiftTracker {
 
         Mat bgrRoi = image.submat(trackWindow);
 
-        Scalar domColour = getDominantHsv(bgrRoi, 5);
-
-        int minHue = (int)domColour.val[0] - colourRange;
-        if(minHue < 0)
-        {
-            minHue = 180 - minHue;
-        }
+        Pair<Scalar, Scalar> minMaxHsv = getMinMaxHsv(bgrRoi, 2);
+        hsvMin = minMaxHsv.first;
+        hsvMax = minMaxHsv.second;
+//
+//        int minHue = (int)domColour.val[0] - colourRange;
+//        if(minHue < 0)
+//        {
+//            minHue = 180 - minHue;
+//        }
 
         //white:
         //hsvMin = new Scalar(minHue, Math.max(domColour.val[1] - 50, 0), Math.max(domColour.val[2]- 50, 0));
         //hsvMax = new Scalar((domColour.val[0] + colourRange) % 180, Math.min(domColour.val[1]+ 50, 255), Math.min(domColour.val[2]+ 50, 255));
 
-        hsvMin = domColour;// new Scalar(minHue, Math.max(domColour.val[1] - 50, 0), Math.max(domColour.val[2]- 50, 0));
-        hsvMax = domColour;// new Scalar((domColour.val[0] + colourRange) % 180, Math.min(domColour.val[1]+ 50, 255), Math.min(domColour.val[2]+ 50, 255));
+        //hsvMin = domColour;// new Scalar(minHue, Math.max(domColour.val[1] - 50, 0), Math.max(domColour.val[2]- 50, 0));
+        //hsvMax = domColour;// new Scalar((domColour.val[0] + colourRange) % 180, Math.min(domColour.val[1]+ 50, 255), Math.min(domColour.val[2]+ 50, 255));
 
         toHsv(image, hsvMin, hsvMax);
 
@@ -148,15 +151,20 @@ public class CamShiftTracker {
 //
 //    }
 
-    private Scalar getDominantHsv(Mat bgr, int k)
+    private Pair<Scalar, Scalar> getMinMaxHsv(Mat bgr, int k)
     {
         //Convert to HSV
-        Mat hsv = new Mat();
-        Imgproc.cvtColor(bgr, hsv, Imgproc.COLOR_BGR2HSV, 3);
+        Mat input = new Mat();
+//        Imgproc.cvtColor(bgr, hsv, Imgproc.COLOR_BGR2HSV, 3);
+        Imgproc.cvtColor(bgr, input, Imgproc.COLOR_BGR2BGRA, 3);
+        //Resize
 
         //Image quantization using k-means: https://github.com/abidrahmank/OpenCV2-Python-Tutorials/blob/master/source/py_tutorials/py_ml/py_kmeans/py_kmeans_opencv/py_kmeans_opencv.rst
         Mat clusterData = new Mat();
-        hsv.reshape(1, hsv.rows() * hsv.cols()).convertTo(clusterData, CvType.CV_32F, 1.0 / 255.0);
+
+
+        Mat reshaped = input.reshape(1, bgr.rows() * bgr.cols());
+        reshaped.convertTo(clusterData, CvType.CV_32F, 1.0 / 255.0);
         Mat labels = new Mat();
         Mat centres = new Mat();
         TermCriteria criteria = new TermCriteria(TermCriteria.COUNT, 100, 1);
@@ -171,28 +179,26 @@ public class CamShiftTracker {
         }
 
         //Get cluster index with maximum number of members
-        int max = 0;
+        int maxCluster = 0;
         int index = -1;
 
         for (int i = 0; i < counts.length; i++)
         {
             int value = counts[i];
 
-            if(value > max)
+            if(value > maxCluster)
             {
-                max = value;
+                maxCluster = value;
                 index = i;
             }
         }
 
         //Get cluster centre point hsv
-        int h = (int)(centres.get(index, 0)[0] * 255.0);
-        int s = (int)(centres.get(index, 1)[0] * 255.0);
-        int v = (int)(centres.get(index, 2)[0] * 255.0);
+        int r = (int)(centres.get(index, 2)[0] * 255.0);
+        int g = (int)(centres.get(index, 1)[0] * 255.0);
+        int b = (int)(centres.get(index, 0)[0] * 255.0);
 
-        Log.d(TAG, "h=" + h + " s=" + s + " v=" + v);
-
-
+        Log.d(TAG, "r=" + r + " g=" + g + " b=" + b);
 
         for (int i = 0; i < centres.rows(); i++) {
             for (int j = 0; j < centres.cols(); j++) {
@@ -201,12 +207,60 @@ public class CamShiftTracker {
             }
         }
 
-        return new Scalar(h, s, v);
+        int sum = (r + g + b) / 3;
 
+        Scalar min;
+        Scalar max;
 
+        int rg = Math.abs(r-g);
+        int gb = Math.abs(g-b);
+        int rb = Math.abs(r-b);
+        int maxDiff = Math.max(Math.max(rg, gb), rb);
 
+        if(maxDiff < 35 && sum > 120) //white
+        {
+            min = new Scalar(0, 0, 0);
+            max = new Scalar(180, 40, 255);
+        }
+        else if(sum < 50 && maxDiff < 35) //black
+        {
+            min = new Scalar(0, 0, 0);
+            max = new Scalar(180, 255, 40);
+        }
+        else
+        {
+            Mat bgrColour = new Mat(1,1, CvType.CV_8UC3, new Scalar(r, g, b));
+            Mat hsvColour = new Mat();
 
+            for (int i = 0; i < bgrColour.rows(); i++) {
+                for (int j = 0; j < bgrColour.cols(); j++) {
+                    double[] data = bgrColour.get(i, j);
+                    Log.d(TAG, "MAT: i=" + i + " j=" + j + " bgrColour=" + data[0]);
+                }
+            }
+//            double[] data = new double[3];
+//            data[0] = b;
+//            data[1] = g;
+//            data[2] = r;
+//            bgrColour.put(0, 0, data);
 
+            Imgproc.cvtColor(bgrColour, hsvColour, Imgproc.COLOR_BGR2HSV, 3);
+            double[] hsv = hsvColour.get(0,0);
+
+            int addition = 0;
+            int minHue = (int)hsv[0] - colourRange;
+            if(minHue < 0)
+            {
+                addition = Math.abs(minHue);
+            }
+
+            int maxHue = (int)hsv[0] + colourRange;
+
+            min = new Scalar(Math.max(minHue, 0), 60, Math.max(35, hsv[2]-30));
+            max = new Scalar(Math.min(maxHue+addition, 180), 255, 255);
+        }
+
+        return new Pair<>(min, max);
     }
 
     private void toHsv(Mat image, Scalar hsvMin, Scalar hsvMax)
@@ -222,7 +276,7 @@ public class CamShiftTracker {
         Mat output = new Mat();
         Imgproc.cvtColor(mask, output, Imgproc.COLOR_GRAY2BGR, 0);
         Imgproc.cvtColor(output, output, Imgproc.COLOR_BGR2RGBA, 0);
-        this.saveFrame(output, "mask");
+        //this.saveFrame(output, "mask");
 
 //        MatOfInt fromTo = new MatOfInt(0, 0);
 //        hue.create(size, hsv.depth());
