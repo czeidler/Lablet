@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Entry for a remote Lab Activity.
+ */
 class ActivityRemoteEntry {
     final public String name;
     final public URL url;
@@ -36,6 +39,12 @@ class ActivityRemoteEntry {
         this.url = url;
     }
 
+    /**
+     * Reads remote Lab Activity entries from a directory.
+     *
+     * @param dir location of the remote Lab Activities entries
+     * @return a list of ActivityRemoteEntries
+     */
     static public List<ActivityRemoteEntry> getActivityRemoteEntries(File dir) {
         List<ActivityRemoteEntry> list = new ArrayList<>();
 
@@ -66,6 +75,11 @@ class ActivityRemoteEntry {
 }
 
 
+/**
+ * Dialog to add remote Lab Activities.
+ *
+ * Downloads a Lab Activity from a remote web server.
+ */
 public class AddRemoteScriptDialog extends AlertDialog {
     static final String HISTORY_DIR = "history";
 

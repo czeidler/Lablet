@@ -11,6 +11,9 @@ import nz.ac.auckland.lablet.experiment.IExperimentSensor;
 import nz.ac.auckland.lablet.experiment.ISensorPlugin;
 
 
+/**
+ * Implementation of a camera sensor plugin.
+ */
 public class CameraSensorPlugin implements ISensorPlugin {
     @Override
     public String getSensorName() {
@@ -21,5 +24,4 @@ public class CameraSensorPlugin implements ISensorPlugin {
     public IExperimentSensor createExperimentSensor() {
         return new CameraExperimentSensor();
     }
-
 }

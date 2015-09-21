@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class ExperimentAnalysis {
     /**
-     * Reference of an analysis within an experiment analysis.
+     * Reference to an analysis within an experiment analysis.
      */
     public static class AnalysisRef {
         final static public String RUN_ID_KEY = "runID";
@@ -41,6 +41,11 @@ public class ExperimentAnalysis {
             this.analysisUid = analysisUid;
         }
 
+        /**
+         * Archive the AnalysisRef into a Bundle.
+         *
+         * @return the archived AnalysisRef
+         */
         public Bundle toBundle() {
             Bundle archive = new Bundle();
             archive.putInt(RUN_ID_KEY, runId);

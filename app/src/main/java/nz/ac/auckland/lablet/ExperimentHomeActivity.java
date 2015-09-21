@@ -36,6 +36,9 @@ import java.util.Collections;
 import java.util.List;
 
 
+/**
+ * Helper class for the info alert dialog.
+ */
 class InfoHelper {
     static private String getAuthorList() {
         String authors = "Authors:\n";

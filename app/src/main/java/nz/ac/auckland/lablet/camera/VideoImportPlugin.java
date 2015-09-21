@@ -15,6 +15,9 @@ import java.io.File;
 import java.io.IOException;
 
 
+/**
+ * Import plugin for a single video file.
+ */
 public class VideoImportPlugin extends AbstractFileImportPlugin {
     @Override
     public String getName() {

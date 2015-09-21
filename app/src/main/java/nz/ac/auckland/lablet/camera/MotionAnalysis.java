@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Base class for everything that is related to analysing an experiment.
+ * Contains all data relevant for a motion analysis of {@link VideoData}.
  */
 public class MotionAnalysis implements IDataAnalysis {
     public interface IListener {

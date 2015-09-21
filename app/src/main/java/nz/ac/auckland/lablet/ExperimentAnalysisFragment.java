@@ -23,7 +23,7 @@ import java.util.List;
 
 
 /**
- * Fragment that displays an experiment analysis.
+ * Base class for a Fragment that displays an experiment analysis.
  */
 public class ExperimentAnalysisFragment extends android.support.v4.app.Fragment {
     protected IDataAnalysis sensorAnalysis;

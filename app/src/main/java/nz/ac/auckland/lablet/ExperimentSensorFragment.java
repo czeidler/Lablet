@@ -17,6 +17,14 @@ import nz.ac.auckland.lablet.experiment.IExperimentSensor;
 import java.util.List;
 
 
+/**
+ * Class to visualize a sensor experiment in a Fragment.
+ *
+ * The sensor that should be displayed is specified in the Fragment arguments. From this sensor the view is created
+ * ({@link IExperimentSensor#createExperimentView} that is displayed in the Fragment.
+ *
+ * This class must only be used in an {@link ExperimentActivity}.
+ */
 public class ExperimentSensorFragment extends android.support.v4.app.Fragment {
     private IExperimentSensor sensor;
 
@@ -24,6 +32,14 @@ public class ExperimentSensorFragment extends android.support.v4.app.Fragment {
         super();
     }
 
+    /**
+     * Tries to find the sensor that is specified in the arguments.
+     *
+     * The sensor must exist in the parent {@link ExperimentActivity}.
+     *
+     * @param activity must be an instance of {@link ExperimentActivity}
+     * @return null if no sensor is found
+     */
     private IExperimentSensor findExperimentFromArguments(Activity activity) {
         int sensorId = getArguments().getInt("sensor", 0);
         List<IExperimentSensor> activeSensors = ((ExperimentActivity)activity).getActiveSensors();
