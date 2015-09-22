@@ -95,15 +95,21 @@ The copyright header is directly followed by the package.
 Use java doc to document your code.
 However, avoid useless comments like:
 
-    // counter for the number of blocks
-    private int blockCounter; 
-    
-    /**
-     * Sets the timeout.
-     *
-     * @param timeout
-     */
-    private void setTimeout(long timeout) {
-    }
+        // counter for the number of blocks
+        private int blockCounter; 
+        
+        /**
+         * Sets the timeout.
+         *
+         * @param timeout
+         */
+        private void setTimeout(long timeout) {
+        }
     
 These types of comments just clutter the code and make it unreadable.
+
+## Committing Code
+* Commit your code in small logical units.
+* Add descriptive commit messages, e.g. what you have done, why you have done it...
+* Don't commit dead, commented or debug code.
+* Make sure your the code compiles after your changes.
