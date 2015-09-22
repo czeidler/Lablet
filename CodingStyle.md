@@ -18,10 +18,9 @@ For that reason your code should follow a certain coding style and should not st
 + Class names are capital, e.g. class FooClass {};
 + Methods and variables are camelCase starting with a lowercase letter.
 + Variables do not have any prefixes. (Current IDEs automatic highlight member variables)
-+ Methods and variables should have descriptive names.
-+ For code blocks use the Kernighan and Ritchie bracket style.
++ For code blocks use the Kernighan and Ritchie (K&K) bracket style. (No new line before { and new line before })
 + Interfaces start with an I, e.g. IListener.
-
++ Classes, Methods and variables should have descriptive names.
 
 See the following code example for more detailed style rules:
 
@@ -47,11 +46,12 @@ See the following code example for more detailed style rules:
         // define constant values with uppercase letters and underscores
         final static private String CONSTANT_VALUE = "value";
             
+        // Use the K&K { bracket style. (No new line before { and new line before })
         public FooClass(String fooBar) {
             this.fooBar = fooBar;
         }
         
-        public void doStuff(int parameter, List<String> list) {
+        public void doStuff(int parameter, List<String> list) {        
             // Don't put extra spaces in a () blocks but use exactly one space to
             // separate items in such a block. Use exactly one space after an if
             // statment.
