@@ -8,6 +8,18 @@ import android.os.Bundle;
  */
 public class RectDataList extends DataList<RectData> {
 
+    private FrameDataList frameDataList;
+
+    public void addFrameDataList(FrameDataList frameDataList)
+    {
+        this.frameDataList = frameDataList;
+    }
+
+    public FrameDataList getFrameDataList()
+    {
+        return frameDataList;
+    }
+
     @Override
     public Bundle toBundle() {
         Bundle bundle = new Bundle();

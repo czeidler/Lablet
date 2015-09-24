@@ -12,6 +12,7 @@ import java.util.List;
 
 import nz.ac.auckland.lablet.data.Data;
 import nz.ac.auckland.lablet.data.DataList;
+import nz.ac.auckland.lablet.data.FrameDataList;
 import nz.ac.auckland.lablet.views.plotview.AbstractPlotPainter;
 
 /**
@@ -108,6 +109,28 @@ public abstract class MarkerList<D extends DataList> extends AbstractPlotPainter
     public void onSizeChanged(int width, int height, int oldw, int oldh) {
         frame.set(0, 0, width, height);
         rebuildPainterList();
+    }
+
+    public float getPriority(int selectedFrameId, int markerFrameId, int numFrames)
+    {
+        float priority;
+
+        if (selectedFrameId == markerFrameId) {
+            priority = 1;
+        } else {
+            float distance = Math.abs(selectedFrameId - markerFrameId);
+            priority = (numFrames - distance) / numFrames;
+
+//            if (markerFrameId < selectedFrameId) {
+//                int numFramesReverse = selectedFrameId;
+//                priority = (numFramesReverse - distance) / numFramesReverse;
+//            } else {
+//                int numFramesForward = numFrames - selectedFrameId;
+//                priority = (numFramesForward - distance) / numFramesForward;
+//            }
+        }
+
+        return priority;
     }
 
     protected void rebuildPainterList() {

@@ -35,18 +35,14 @@ class RectMarker implements IMarker<RectData, RectMarkerList> {
     public void onDraw(Canvas canvas, float priority) {
 
         //Set color and alpha
-        int a;
-        int r;
-        int b;
-        int g;
+        int a, r, g, b;
 
         if (priority >= 0. && priority < 1.) {
             a = (int) (priority * 150.);
             r = 200;
             b = 200;
             g = 200;
-        }
-        else {
+        } else {
             a = 255;
             r = 0;
             b = 0;
@@ -73,7 +69,7 @@ class RectMarker implements IMarker<RectData, RectMarkerList> {
         PointF size = new PointF();
         parent.getContainerView().toScreen(new PointF(data.getWidth(), data.getHeight()), size);
 
-        float left = centreScreen.x -  size.x / 2;
+        float left = centreScreen.x - size.x / 2;
         float right = centreScreen.x + size.x / 2;
         float top = centreScreen.y - size.y / 2;
         float bottom = centreScreen.y + size.y / 2;
@@ -116,7 +112,7 @@ class RectMarker implements IMarker<RectData, RectMarkerList> {
 public class RectMarkerList extends MarkerList<RectDataList> {
 
     public final int MAX_DISPLAYED_MARKERS = 100;
-   // boolean drawn = false;
+    // boolean drawn = false;
 
     public RectMarkerList(RectDataList model) {
         super(model);
@@ -131,36 +127,19 @@ public class RectMarkerList extends MarkerList<RectDataList> {
     @Override
     public void onDraw(Canvas canvas) {
 
-        if(this.getDataList().isVisible())
-        {
-            int selectedFrame = dataList.getSelectedData();
+        if (this.getDataList().isVisible()) {
+            int selectedFrame = dataList.getFrameDataList().getCurrentFrame();// .get .get //dataList.getSelectedData();
 
             for (int i = 0; i < dataList.size(); i++) {
                 RectData data = dataList.getDataAt(i);
 
-                if(data != null) {
+                if (data != null) {
                     int frameId = data.getFrameId();
                     IMarker marker = this.getMarker(i);
-                    float priority;
-
-                    if (selectedFrame == frameId) {
-                        priority = 1;
-                    } else {
-                        float distance = Math.abs(selectedFrame - frameId);
-
-                        if (frameId < selectedFrame) {
-                            int numFramesReverse = selectedFrame;
-                            priority = (numFramesReverse - distance) / numFramesReverse;
-                        } else {
-                            int numFramesForward = dataList.size() - selectedFrame;
-                            priority = (numFramesForward - distance) / numFramesForward;
-                        }
-                    }
-
+                    float priority = getPriority(selectedFrame, frameId, dataList.getFrameDataList().getNumberOfFrames());
                     marker.onDraw(canvas, priority);
                 }
             }
-
         }
     }
 

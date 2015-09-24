@@ -9,6 +9,7 @@ import android.view.ViewParent;
 
 import java.util.ArrayList;
 
+import nz.ac.auckland.lablet.data.RectData;
 import nz.ac.auckland.lablet.data.RoiData;
 import nz.ac.auckland.lablet.data.RoiDataList;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
@@ -181,6 +182,21 @@ class RoiMarker implements IMarker<RoiData, RoiMarkerList> {
         float right;
         float bottom;
 
+        //Set color and alpha
+        int a, r, g, b;
+
+        if (priority >= 0. && priority < 1.) {
+            a = (int) (priority * 150.);
+            r = 200;
+            b = 200;
+            g = 200;
+        } else {
+            a = 255;
+            r = 0;
+            b = 0;
+            g = 255;
+        }
+
         if(btmLeftMarker.isSelectedForDrag() || topRightMarker.isSelectedForDrag())
         {
             PointF topRight = topRightMarker.getCachedScreenPosition();
@@ -205,7 +221,7 @@ class RoiMarker implements IMarker<RoiData, RoiMarkerList> {
         paint.setStrokeCap(Paint.Cap.BUTT);
         paint.setStrokeWidth(LINE_WIDTH);
         paint.setAntiAlias(true);
-        paint.setColor(Color.GREEN);
+        paint.setARGB(a, r, g, b);
         paint.setStyle(Paint.Style.STROKE);
 
         canvas.drawRect(left, top, right, bottom, paint); //See android.Graphics.Rect constructor for meaning of params
@@ -218,7 +234,7 @@ class RoiMarker implements IMarker<RoiData, RoiMarkerList> {
 
         for (IMarker marker : markers) {
             if(marker.isSelectedForDrag() || marker == centreMarker) {
-                marker.onDraw(canvas, 1);
+                marker.onDraw(canvas, priority);
             }
         }
     }
@@ -309,13 +325,16 @@ public class RoiMarkerList extends MarkerList<RoiDataList> {
     @Override
     public void onDraw(Canvas canvas) {
 
-        if(this.getDataList().isVisible())
-        {
-            int markerIndex = dataList.getSelectedData();
+        int selectedFrame = dataList.getFrameDataList().getCurrentFrame();// .get .get //dataList.getSelectedData();
 
-            if(markerIndex != -1) {
-                IMarker marker = getMarker(markerIndex);
-                marker.onDraw(canvas, 1);
+        for (int i = 0; i < dataList.size(); i++) {
+            RoiData data = dataList.getDataAt(i);
+
+            if(data != null) {
+                int frameId = data.getFrameId();
+                IMarker marker = this.getMarker(i);
+                float priority = getPriority(selectedFrame, frameId, dataList.getFrameDataList().getNumberOfFrames());
+                marker.onDraw(canvas, priority);
             }
         }
     }

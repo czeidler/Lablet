@@ -71,9 +71,9 @@ public class TrackerSettingsDialog extends AlertDialog {
         seekBarVMin.setOnSeekBarChangeListener(seekBarChangeListener);
         seekBarSMin.setOnSeekBarChangeListener(seekBarChangeListener);
 
-        seekBarVMax.setProgress(motionAnalysis.getTrackerVMax());
-        seekBarVMin.setProgress(motionAnalysis.getTrackerVMin());
-        seekBarSMin.setProgress(motionAnalysis.getTrackerSMin());
+//        seekBarVMax.setProgress(motionAnalysis.getTrackerVMax());
+//        seekBarVMin.setProgress(motionAnalysis.getTrackerVMin());
+//        seekBarSMin.setProgress(motionAnalysis.getTrackerSMin());
 
         Button btnDone = (Button)contentView.findViewById(R.id.trackerSettingsDone);
         btnDone.setOnClickListener(new View.OnClickListener() {
@@ -89,17 +89,17 @@ public class TrackerSettingsDialog extends AlertDialog {
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
             int seekId = seekBar.getId();
 
-            if(seekId == R.id.seekBarVMax)
-            {
-                textViewVMax.setText("" + i);
-                motionAnalysis.setTrackerVMax(i);
-            } else if (seekId == R.id.seekBarVMin) {
-                textViewVMin.setText("" + i);
-                motionAnalysis.setTrackerVMin(i);
-            } else {
-                textViewSMin.setText("" + i);
-                motionAnalysis.setTrackerSMin(i);
-            }
+//            if(seekId == R.id.seekBarVMax)
+//            {
+//                textViewVMax.setText("" + i);
+//                motionAnalysis.setTrackerVMax(i);
+//            } else if (seekId == R.id.seekBarVMin) {
+//                textViewVMin.setText("" + i);
+//                motionAnalysis.setTrackerVMin(i);
+//            } else {
+//                textViewSMin.setText("" + i);
+//                motionAnalysis.setTrackerSMin(i);
+//            }
         }
 
         @Override

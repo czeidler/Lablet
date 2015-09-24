@@ -18,9 +18,11 @@ import nz.ac.auckland.lablet.data.Data;
 import nz.ac.auckland.lablet.data.FrameDataList;
 import nz.ac.auckland.lablet.data.PointData;
 import nz.ac.auckland.lablet.data.PointDataList;
+import nz.ac.auckland.lablet.data.RoiDataList;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 import nz.ac.auckland.lablet.views.TrackerSettingsDialog;
+import nz.ac.auckland.lablet.vision.CamShiftTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,7 +145,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 //            @Override
 //            public boolean onMenuItemClick(MenuItem menuItem) {
 //                MotionAnalysis motionAnalysis = getSensorAnalysis();
-//                view.setRegionOfInterest(motionAnalysis);
+//                view.addRegionOfInterest(motionAnalysis);
 //                gotoObjectMenu.setVisible(true); //When ROI set, show button to track object. TODO: when load video, if ROI set then show button
 //                return true;
 //            }
@@ -177,16 +179,20 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 int item = menuItem.getItemId();
+                RoiDataList dataList = getSensorAnalysis().getRoiDataList();
+                int roiDataSize = dataList.size();
+                int currentFrame = getSensorAnalysis().getFrameDataList().getCurrentFrame();
+                boolean roiExists = dataList.getIndexByFrameId(currentFrame) != -1;
+                CamShiftTracker tracker = getSensorAnalysis().getObjectTracker();
 
-                if (item == R.id.enable_tracking) {
-                    getSensorAnalysis().setTrackingEnabled(!menuItem.isChecked());
-                } else if (item == R.id.set_roi) {
-                    getSensorAnalysis().setTrackingEnabled(!menuItem.isChecked());
-                    getSensorAnalysis().setRegionOfInterest();
+                if (item == R.id.track_objects && roiDataSize > 0) {
+                    tracker.trackObjects(0, getSensorAnalysis().getFrameDataList().getNumberOfFrames()); //TODO: notify user if region of interest not set
+                } else if (item == R.id.set_roi && !roiExists) {
+                    tracker.addRegionOfInterest(currentFrame); //TODO: notify user they can only add one ROI per frame
                 } else if (item == R.id.debug_tracking) {
-                    getSensorAnalysis().setDebuggingEnabled(!menuItem.isChecked());
+                    tracker.setDebuggingEnabled(!menuItem.isChecked());
                 } else if (item == R.id.tracker_settings) {
-                    TrackerSettingsDialog dialog = new TrackerSettingsDialog(getActivity(), getSensorAnalysis());
+                    TrackerSettingsDialog dialog = new TrackerSettingsDialog(getActivity(), getSensorAnalysis()); //TODO: change settings to allow user to tune masking
                     dialog.show();
                 }
 
@@ -194,9 +200,8 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             }
         });
 
-        popup.getMenu().findItem(R.id.enable_tracking).setChecked(getSensorAnalysis().isTrackingEnabled());
-        popup.getMenu().findItem(R.id.set_roi).setVisible(getSensorAnalysis().isTrackingEnabled());
-        popup.getMenu().findItem(R.id.debug_tracking).setChecked(getSensorAnalysis().isDebuggingEnabled());
+        //getSensorAnalysis()
+        popup.getMenu().findItem(R.id.debug_tracking).setChecked(getSensorAnalysis().getObjectTracker().isDebuggingEnabled());
         popup.show();
     }
 

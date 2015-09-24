@@ -10,11 +10,15 @@ package nz.ac.auckland.lablet.camera;
 import android.graphics.PointF;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
+import android.util.SparseArray;
+
+import org.opencv.core.Rect;
 
 import nz.ac.auckland.lablet.data.CalibratedDataList;
 import nz.ac.auckland.lablet.data.FrameDataList;
 import nz.ac.auckland.lablet.data.PointData;
 import nz.ac.auckland.lablet.data.PointDataList;
+import nz.ac.auckland.lablet.data.RectData;
 import nz.ac.auckland.lablet.data.RectDataList;
 import nz.ac.auckland.lablet.data.RoiData;
 import nz.ac.auckland.lablet.data.RoiDataList;
@@ -22,6 +26,7 @@ import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.views.graph.IMinRangeGetter;
 import nz.ac.auckland.lablet.views.table.*;
+import nz.ac.auckland.lablet.vision.CamShiftTracker;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -48,12 +53,7 @@ public class MotionAnalysis implements IDataAnalysis {
     final private String POINT_DATA_LIST = "pointDataList";
     final private String RECT_DATA_LIST = "rectDataList";
     final private String ROI_DATA_LIST = "roiDataList";
-    final private String TRACKING_ENABLED = "trackingEnabled";
     final private String DEBUGGING_ENABLED = "debuggingEnabled";
-
-    final private String TRACKER_VMAX = "vmax";
-    final private String TRACKER_VMIN = "vmin";
-    final private String TRACKER_SMIN = "smin";
 
     final private VideoData sensorData;
 
@@ -79,18 +79,15 @@ public class MotionAnalysis implements IDataAnalysis {
     private Bundle videoAnalysisSettings = null;
 
     private int videoRotation = 0;
-    private boolean trackingEnabled = false;
     private  boolean debuggingEnabled = false;
-    private Integer currentRoi = null;
 
-    private int trackerVMax = 256;
-    private int trackerVMin = 65;
-    private int trackerSMin = 55;
+    private CamShiftTracker tracker;
 
 
     final private List<IListener> listenerList = new ArrayList<>();
 
-    public MotionAnalysis(VideoData sensorData) {
+    public MotionAnalysis(VideoData sensorData)
+    {
         this.sensorData = sensorData;
 
         xUnit.setName("x");
@@ -146,108 +143,18 @@ public class MotionAnalysis implements IDataAnalysis {
         originCalibrationSetter = new OriginCalibrationSetter(calibrationXY, originDataList);
 
         roiDataList = new RoiDataList();
-        //roiDataList.setVisibility(true);
-//        RoiData d = new RoiData(0);
-//
-//        PointF centre = new PointF(this.getVideoData().getMaxRawX()/2, this.getVideoData().getMaxRawY()/2);
-//        int width = 5;
-//        int height = 5;
-//        d.setTopLeft(new PointF(centre.x-width, centre.y + height));
-//        d.setTopRight(new PointF(centre.x + width, centre.y + height));
-//        d.setBtmRight(new PointF(centre.x + width, centre.y - height));
-//        d.setBtmLeft(new PointF(centre.x - width, centre.y - height));
-//        d.setCentre(centre);
-//        roiDataList.addData(d);
-
+        roiDataList.addFrameDataList(frameDataList);
         rectDataList = new RectDataList();
+        rectDataList.addFrameDataList(frameDataList);
         rectDataList.setVisibility(false);
-
-        /*//TODO: remove, just a test to make sure working
-        float angle_i = 360 / (float)this.getFrameDataList().getNumberOfFrames();
-        float count = 0;
-        for(int i = 0; i < this.getFrameDataList().getNumberOfFrames(); i++)
-        {
-            RectData data = new RectData(i);
-            data.setAngle(count);
-
-            data.setCentre(new PointF(this.getVideoData().getMaxRawX()/2, this.getVideoData().getMaxRawY()/2));
-            data.setHeight(5);
-            data.setWidth(10);
-            rectDataList.addData(data);
-            count += angle_i;
-        }
-
-        rectDataList.setVisibility(true);
-
-        roiDataList = new RoiDataList();*/
-
+        tracker = new CamShiftTracker(this);
 
         updateOriginFromVideoRotation();
     }
 
-    public void setRegionOfInterest()
+    public CamShiftTracker getObjectTracker()
     {
-//        float maxXValue = sensorData.getMaxRawX();
-//        float maxYValue = sensorData.getMaxRawY();
-        currentRoi = this.getFrameDataList().getCurrentFrame();
-
-        RoiData data = new RoiData(currentRoi);
-//        data.getTopLeft().setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.7f));
-//        data.getTopRight().setPosition(new PointF(maxXValue * 0.7f, maxYValue * 0.7f));
-//        data.getBtmLeft().setPosition(new PointF(maxXValue * 0.3f, maxYValue * 0.3f));
-//        data.getBtmRight().setPosition(new PointF(maxXValue * 0.7f, maxYValue * 0.3f));
-        PointF centre = new PointF(this.getVideoData().getMaxRawX()/2, this.getVideoData().getMaxRawY()/2);
-        int width = 5;
-        int height = 5;
-        data.setTopLeft(new PointF(centre.x - width, centre.y + height));
-        data.setTopRight(new PointF(centre.x + width, centre.y + height));
-        data.setBtmRight(new PointF(centre.x + width, centre.y - height));
-        data.setBtmLeft(new PointF(centre.x - width, centre.y - height));
-        data.setCentre(centre);
-        roiDataList.addData(data);
-        this.getPointDataList().removeData(currentRoi);
-    }
-
-    public int getTrackerSMin() {
-        return trackerSMin;
-    }
-
-    public void setTrackerSMin(int trackerSMin) {
-        this.trackerSMin = trackerSMin;
-    }
-
-    public int getTrackerVMin() {
-        return trackerVMin;
-    }
-
-    public void setTrackerVMin(int trackerVMin) {
-        this.trackerVMin = trackerVMin;
-    }
-
-    public int getTrackerVMax() {
-        return trackerVMax;
-    }
-
-    public void setTrackerVMax(int trackerVMax) {
-        this.trackerVMax = trackerVMax;
-    }
-
-    public boolean isDebuggingEnabled() {
-        return debuggingEnabled;
-    }
-
-    public void setDebuggingEnabled(boolean debuggingEnabled) {
-        this.debuggingEnabled = debuggingEnabled;
-        rectDataList.setVisibility(debuggingEnabled);
-    }
-
-    public boolean isTrackingEnabled() {
-        return trackingEnabled;
-    }
-
-    public void setTrackingEnabled(boolean trackingEnabled) {
-        this.trackingEnabled = trackingEnabled;
-        roiDataList.setVisibility(trackingEnabled);
+        return tracker;
     }
 
     protected void setOrigin(PointF origin, PointF axis1) {
@@ -365,20 +272,8 @@ public class MotionAnalysis implements IDataAnalysis {
 
         setVideoAnalysisSettings(bundle.getBundle("video_analysis_settings"));
 
-        if(bundle.containsKey(TRACKER_VMAX))
-            this.setTrackerVMax(bundle.getInt(TRACKER_VMAX));
-
-        if(bundle.containsKey(TRACKER_VMIN))
-            this.setTrackerVMin(bundle.getInt(TRACKER_VMIN));
-
-        if(bundle.containsKey(TRACKER_SMIN))
-            this.setTrackerSMin(bundle.getInt(TRACKER_SMIN));
-
-        if(bundle.containsKey(TRACKING_ENABLED))
-            this.setTrackingEnabled(bundle.getBoolean(TRACKING_ENABLED));
-
         if(bundle.containsKey(DEBUGGING_ENABLED))
-            this.setDebuggingEnabled(bundle.getBoolean(DEBUGGING_ENABLED));
+            tracker.setDebuggingEnabled(bundle.getBoolean(DEBUGGING_ENABLED));
 
         frameDataList.setCurrentFrame(bundle.getInt("currentRun"));
 
@@ -407,8 +302,6 @@ public class MotionAnalysis implements IDataAnalysis {
         if (bundle.containsKey(Y_UNIT_BASE_EXPONENT_KEY))
             yUnit.setBaseExponent(bundle.getInt(Y_UNIT_BASE_EXPONENT_KEY));
 
-
-
         return true;
     }
 
@@ -427,10 +320,6 @@ public class MotionAnalysis implements IDataAnalysis {
         if(roiDataList.size() > 0)
             analysisDataBundle.putBundle(ROI_DATA_LIST, roiDataList.toBundle());
 
-        analysisDataBundle.putInt(TRACKER_VMAX, trackerVMax);
-        analysisDataBundle.putInt(TRACKER_VMIN, trackerVMin);
-        analysisDataBundle.putInt(TRACKER_SMIN, trackerSMin);
-
         analysisDataBundle.putBundle(LENGTH_CALIBRATION_KEY, lengthCalibrationSetter.toBundle());
 
         analysisDataBundle.putBundle(CALIBRATION_XY_KEY, calibrationXY.toBundle());
@@ -439,8 +328,7 @@ public class MotionAnalysis implements IDataAnalysis {
         analysisDataBundle.putInt(X_UNIT_BASE_EXPONENT_KEY, getXUnit().getBaseExponent());
         analysisDataBundle.putInt(Y_UNIT_BASE_EXPONENT_KEY, getYUnit().getBaseExponent());
 
-        analysisDataBundle.putBoolean(TRACKING_ENABLED, isTrackingEnabled());
-        analysisDataBundle.putBoolean(DEBUGGING_ENABLED, isDebuggingEnabled());
+        analysisDataBundle.putBoolean(DEBUGGING_ENABLED, tracker.isDebuggingEnabled());
 
         if (videoAnalysisSettings != null)
             analysisDataBundle.putBundle("video_analysis_settings", videoAnalysisSettings);
@@ -488,9 +376,6 @@ public class MotionAnalysis implements IDataAnalysis {
         Bundle runSettings = getVideoAnalysisSettings();
         if (runSettings == null)
             return;
-
-
-
 
         calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getFloat(ANALYSIS_VIDEO_START_KEY));
         calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getFloat(ANALYSIS_VIDEO_END_KEY));

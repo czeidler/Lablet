@@ -12,28 +12,17 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.PointF;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
-
-import org.opencv.core.Rect;
-
 import nz.ac.auckland.lablet.R;
-//import nz.ac.auckland.lablet.accelerometer.AccelerometerSensorData;
-import nz.ac.auckland.lablet.data.FrameDataList;
-import nz.ac.auckland.lablet.data.PointData;
 import nz.ac.auckland.lablet.data.PointDataList;
-import nz.ac.auckland.lablet.data.RectData;
-import nz.ac.auckland.lablet.data.RoiData;
 import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 import nz.ac.auckland.lablet.views.FrameDataSeekBar;
 import nz.ac.auckland.lablet.views.graph.*;
 import nz.ac.auckland.lablet.views.plotview.LinearFitPainter;
 import nz.ac.auckland.lablet.views.table.*;
-import nz.ac.auckland.lablet.vision.CamShiftTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -140,13 +129,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
     final private FrameDataSeekBar frameDataSeekBar;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
     private boolean releaseAdaptersWhenDrawerClosed = false;
-    final private FrameDataList.IListener dataListenerStrongRef;
-    //final private PointDataList.IListener markerListenerStrongRef;
-    private boolean changingFrames = false;
-    int curMarker;
-    private PointF nextPos;
-    private CamShiftTracker tracker;// = new CamShiftTracker();
-    private int previousFrame = -1;
 
     private class GraphSpinnerEntry {
         private String name;
@@ -297,8 +279,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
         graphSpinner = (Spinner)sideBarView.findViewById(R.id.graphSpinner);
 
-        int currentRoiFrame = -1;
-
         // marker graph view
         graphView = (GraphView2D)sideBarView.findViewById(R.id.tagMarkerGraphView);
         assert graphView != null;
@@ -319,69 +299,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
         final CameraExperimentFrameView sensorAnalysisView = new CameraExperimentFrameView(context, sensorAnalysis);
         frameDataSeekBar.setTo(sensorAnalysis.getFrameDataList(), sensorAnalysis.getTimeData());
-        tracker = new CamShiftTracker();
-
-
-        dataListenerStrongRef = new FrameDataList.IListener() {
-
-            @Override
-            public void onFrameChanged(int newFrame) {
-                if(sensorAnalysis.isTrackingEnabled() && sensorAnalysis.getRoiDataList().size() > 0)
-                {
-                    int previousFrame = newFrame -1;
-                    RoiData roi = sensorAnalysis.getRoiDataList().getDataByFrameId(previousFrame);
-                    RectData prevResult = sensorAnalysis.getRectDataList().getDataByFrameId(previousFrame);
-
-                    if(roi != null)
-                    {
-                        setRegionOfInterest(previousFrame, sensorAnalysis);
-                    }
-
-                    long startFrameTime = (long) sensorAnalysis.getTimeData().getTimeAt(previousFrame) * 1000;
-                    long endFrameTime = (long) sensorAnalysis.getTimeData().getTimeAt(newFrame) * 1000;
-
-                    //RotatedRect result = new RotatedRect();
-                    int frameRate = sensorAnalysis.getVideoData().getVideoFrameRate();
-                    long increment = 1000 * 1000 / frameRate;
-
-                    Rect result = null;// = new RotatedRect();
-
-                    for (long i = startFrameTime + increment; i <= endFrameTime; i += increment) {
-                        Bitmap bmp = sensorAnalysis.getVideoData().getFrame(i);
-                        result = tracker.findObject(bmp);
-                    }
-
-                    float centreX = result.x + result.width / 2;
-                    float centreY = result.y + result.height / 2;
-
-
-                    //Add point marker
-                    PointF nextPos = sensorAnalysis.getVideoData().toMarkerPoint(new PointF(centreX, centreY));
-                    PointData nextTag = new PointData(newFrame);
-                    nextTag.setPosition(nextPos);
-                    sensorAnalysis.getPointDataList().addData(nextTag); //Have to add marker here rather than edit its position as PointMarkerList.setCurrentFrame (which adds markers) is called after this method
-
-                    //Add debugging data
-                    RectData data = new RectData(newFrame);
-
-                    data.setCentre(sensorAnalysis.getVideoData().toMarkerPoint(new PointF(centreX, centreY)));
-                    data.setAngle(0);
-
-                    PointF size = sensorAnalysis.getVideoData().toMarkerPoint(new PointF(result.width, result.height));
-                    data.setWidth(size.x);
-                    data.setHeight(size.y);
-
-                    sensorAnalysis.getRectDataList().addData(data);
-                }
-            }
-
-            @Override
-            public void onNumberOfFramesChanged() {
-
-            }
-        };
-
-        sensorAnalysis.getFrameDataList().addListener(dataListenerStrongRef);
 
         runContainerView.setTo(sensorAnalysisView, frameDataSeekBar, sensorAnalysis);
 
@@ -444,24 +361,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
         }
     }
 
-    public void setRegionOfInterest(int frameId, MotionAnalysis sensorAnalysis)
-    {
-        float startFrameTime =  sensorAnalysis.getTimeData().getTimeAt(frameId);
-        Bitmap bmp = sensorAnalysis.getVideoData().getFrame((long) (startFrameTime * 1000.0));
-
-        RoiData roi = sensorAnalysis.getRoiDataList().getDataByFrameId(frameId);
-        PointF topLeft = sensorAnalysis.getVideoData().toVideoPoint(roi.getTopLeft().getPosition());
-        PointF btmRight = sensorAnalysis.getVideoData().toVideoPoint(roi.getBtmRight().getPosition());
-
-        int x = (int)topLeft.x;
-        int y = (int)topLeft.y;
-        int width = (int)(btmRight.x - topLeft.x);
-        int height = (int)(btmRight.y - topLeft.y);
-
-        tracker.setROI(bmp, x, y, width, height);
-    }
-
-     /**
+    /**
      *
      * @return an icon id for the new state
      */
@@ -516,7 +416,4 @@ class MotionAnalysisFragmentView extends FrameLayout {
     public void onResume() {
         runContainerView.onResume();
     }
-
-
-
 }

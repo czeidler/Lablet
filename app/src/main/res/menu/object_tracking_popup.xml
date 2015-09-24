@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/enable_tracking"
-        android:title="Enable"
-        android:checkable="true"/>
-
     <item android:id="@+id/set_roi"
         android:icon="@drawable/ic_chart_line"
-        android:title="Track Object"
-        android:visible="false"/>
+        android:title="Choose Object"
+        android:visible="true"/>
+
+    <item android:id="@+id/track_objects"
+        android:icon="@drawable/ic_chart_line"
+        android:title="Track Objects"
+        android:visible="true"/>
 
     <item android:id="@+id/debug_tracking"
         android:title="Debug"
