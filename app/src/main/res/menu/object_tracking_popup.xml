@@ -8,13 +8,10 @@
 
     <item android:id="@+id/track_objects"
         android:icon="@drawable/ic_chart_line"
-        android:title="Track Objects"
+        android:title="Track Objects..."
         android:visible="true"/>
 
     <item android:id="@+id/debug_tracking"
         android:title="Debug"
         android:checkable="true"/>
-
-    <item android:id="@+id/tracker_settings"
-        android:title="Settings" />
 </menu>

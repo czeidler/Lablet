@@ -50,7 +50,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         void onTrackingUpdate(Double percentDone);
     }
 
-    private static String TAG =  CamShiftTracker.class.getName();
+    private static String TAG = CamShiftTracker.class.getName();
 
     static {
         if (!OpenCVLoader.initDebug()) {
@@ -70,6 +70,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
     private WeakListenable<CamShiftTracker.IListener> weakListenable;
     private MotionAnalysis motionAnalysis;
     private boolean debuggingEnabled = false;
+    private boolean isTracking = false;
 
     Mat hsv, hue, mask, hist, backproj, bgr;// = Mat::zeros(200, 320, CV_8UC3), backproj;
     Size size;
@@ -79,8 +80,13 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         this.motionAnalysis = motionAnalysis;
     }
 
+    public void stopTracking() {
+        isTracking = false;
+    }
+
     @Override
     protected SparseArray<Rect> doInBackground(Object[] objects) {
+        isTracking = true;
         int startFrame = (int) objects[0];
         int endFrame = (int) objects[1];
         RoiDataList roiDataList = (RoiDataList) objects[2];
@@ -89,7 +95,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         RoiData currentRoi = null;
         SparseArray<Rect> results = new SparseArray<>();
 
-        for (int i = startFrame; i <= endFrame; i++) {
+        for (int i = startFrame; i <= endFrame && isTracking; i++) {
             RoiData last = getLastRoi(roiDataList, i);
 
             if (last != null) {
@@ -97,7 +103,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
                     currentRoi = last;
                     Bitmap roiBmp = videodata.getFrame(i);
 
-                    if(roiBmp !=null) {
+                    if (roiBmp != null) {
                         PointF topLeft = videodata.toVideoPoint(currentRoi.getTopLeft().getPosition());
                         PointF btmRight = videodata.toVideoPoint(currentRoi.getBtmRight().getPosition());
 
@@ -106,9 +112,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
                         int width = (int) (btmRight.x - topLeft.x);
                         int height = (int) (btmRight.y - topLeft.y);
                         setRegionOfInterest(roiBmp, x, y, width, height);
-                    }
-                    else
-                    {
+                    } else {
                         Log.d(TAG, "Region of interest BMP is null");
                         return null;
                     }
@@ -118,15 +122,13 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
                     long frameTimeMicroseconds = (long) motionAnalysis.getTimeData().getTimeAt(i) * 1000;
                     Bitmap curFrameBmp = videodata.getFrame(frameTimeMicroseconds);
 
-                    if(curFrameBmp != null) {
+                    if (curFrameBmp != null) {
                         Rect result = getObjectLocation(curFrameBmp);
 
                         if (result != null) {
                             results.put(i, result);
                         }
-                    }
-                    else
-                    {
+                    } else {
                         Log.d(TAG, "Current frame BMP is null: " + i);
                     }
                 }
@@ -134,6 +136,8 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
                 Log.d(TAG, "No region of interests are set");
                 return null;
             }
+
+            publishProgress(((double) i + 1) / endFrame);
         }
 
         return results;
@@ -164,16 +168,14 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
 
     public void trackObjects(int startFrame, int endFrame) {
 
-        if(motionAnalysis.getRoiDataList().size() > 0) {
+        if (motionAnalysis.getRoiDataList().size() > 0) {
             Object[] objects = new Object[4];
             objects[0] = startFrame; //TODO, add second method and set default start and end. Check that start < end
             objects[1] = endFrame;
             objects[2] = motionAnalysis.getRoiDataList();
             objects[3] = motionAnalysis.getVideoData();
             this.execute(objects);
-        }
-        else
-        {
+        } else {
             Log.e(TAG, "Please add a region of interest before calling trackObjects");
         }
     }
@@ -181,16 +183,22 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
     /**
      * Finds an object in a bitmap frameId. The object being searched for is detected based on
      * a pre-specified region of interest (setRegionOfInterest).
-     * <p>
+     * <p/>
      * Returns a RotatedRect that specifies the location of the object.
-     * <p>
+     * <p/>
      * Important: setRegionOfInterest must be called before this method is used, otherwise an IllegalStateException
      * will be thrown.
      */
 
     private Rect getObjectLocation(Bitmap bmp) {
         Mat image = new Mat();
-        Utils.bitmapToMat(bmp, image);
+
+        try {
+            Utils.bitmapToMat(bmp, image);
+        } catch (Exception e) {
+            Log.e(TAG, "getObjectLocation bitmapToMat failed: ", e);
+            return null;
+        }
 
         toHsv(image, hsvMin, hsvMax);
 
@@ -208,9 +216,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
             if (result.size.equals(new Size(0, 0)) && result.angle == 0 && result.center.equals(new Point(0, 0))) {
                 return null;
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             Log.e(TAG, "Shit went down: ", e);
             return null;
         }
@@ -228,7 +234,12 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         backproj = new Mat();
 
         Mat image = new Mat();
-        Utils.bitmapToMat(bmp, image);
+
+        try {
+            Utils.bitmapToMat(bmp, image);
+        } catch (Exception e) {
+            Log.e(TAG, "getObjectLocation bitmapToMat failed: ", e);
+        }
         //this.saveFrame(image, "roi_raw_frame");
 
         trackWindow = new Rect(x, y, width, height);
