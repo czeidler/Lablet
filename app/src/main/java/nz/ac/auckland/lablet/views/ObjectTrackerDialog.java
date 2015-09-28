@@ -21,6 +21,7 @@ import android.widget.TextView;
 import org.opencv.core.Rect;
 
 import nz.ac.auckland.lablet.R;
+import nz.ac.auckland.lablet.camera.CalibrationVideoTimeData;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.vision.CamShiftTracker;
 
@@ -59,7 +60,10 @@ public class ObjectTrackerDialog extends AlertDialog {
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                motionAnalysis.getObjectTracker().trackObjects(0, motionAnalysis.getFrameDataList().getNumberOfFrames());
+                CalibrationVideoTimeData timeData = motionAnalysis.getCalibrationVideoTimeData();
+                int start = timeData.getClosestFrame(timeData.getAnalysisVideoStart());
+                int end = timeData.getClosestFrame(timeData.getAnalysisVideoEnd());
+                motionAnalysis.getObjectTracker().trackObjects(start, end);
             }
         });
 
