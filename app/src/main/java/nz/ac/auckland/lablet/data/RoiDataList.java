@@ -72,6 +72,7 @@ public class RoiDataList extends DataList<RoiData> {
             float height = heights[i] / 2;
 
             RoiData data = new RoiData(frameIds[i]);
+            data.setCentre(new PointF(centreX, centreY));
             data.setTopLeft(new PointF(centreX - width, centreY + height));
             data.setTopRight(new PointF(centreX + width, centreY + height));
             data.setBtmRight(new PointF(centreX + width, centreY - height));
