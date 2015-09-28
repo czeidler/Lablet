@@ -123,7 +123,10 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
                     long frameTimeMicroseconds = (long) motionAnalysis.getTimeData().getTimeAt(i) * 1000;
                     Bitmap curFrameBmp = videodata.getFrame(frameTimeMicroseconds);
 
-                    if (curFrameBmp != null) {
+                    /*TODO: there is a bug in the frame
+                     reader that returns either a null bitmap
+                     or a bitmap with a null config causing OpenCV to crash.*/
+                    if (curFrameBmp != null && curFrameBmp.getConfig() != null) {
                         Rect result = getObjectLocation(curFrameBmp);
 
                         if (result != null) {
@@ -193,13 +196,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
 
     private Rect getObjectLocation(Bitmap bmp) {
         Mat image = new Mat();
-
-        try {
-            Utils.bitmapToMat(bmp, image);
-        } catch (Exception e) {
-            Log.e(TAG, "getObjectLocation bitmapToMat failed: ", e);
-            return null;
-        }
+        Utils.bitmapToMat(bmp, image);
 
         toHsv(image, hsvMin, hsvMax);
 
@@ -236,11 +233,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
 
         Mat image = new Mat();
 
-        try {
-            Utils.bitmapToMat(bmp, image);
-        } catch (Exception e) {
-            Log.e(TAG, "getObjectLocation bitmapToMat failed: ", e);
-        }
+        Utils.bitmapToMat(bmp, image);
         //this.saveFrame(image, "roi_raw_frame");
 
         trackWindow = new Rect(x, y, width, height);
