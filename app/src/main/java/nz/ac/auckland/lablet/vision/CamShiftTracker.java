@@ -71,6 +71,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
     private MotionAnalysis motionAnalysis;
     private boolean debuggingEnabled = false;
     private boolean isTracking = false;
+    public static final int KMEANS_IMG_SIZE = 100;
 
     Mat hsv, hue, mask, hist, backproj, bgr;// = Mat::zeros(200, 320, CV_8UC3), backproj;
     Size size;
@@ -183,9 +184,9 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
     /**
      * Finds an object in a bitmap frameId. The object being searched for is detected based on
      * a pre-specified region of interest (setRegionOfInterest).
-     * <p/>
+     * <p>
      * Returns a RotatedRect that specifies the location of the object.
-     * <p/>
+     * <p>
      * Important: setRegionOfInterest must be called before this method is used, otherwise an IllegalStateException
      * will be thrown.
      */
@@ -270,18 +271,33 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
     private Pair<Scalar, Scalar> getMinMaxHsv(Mat bgr, int k) {
         //Convert to HSV
         Mat input = new Mat();
-//        Imgproc.cvtColor(bgr, hsv, Imgproc.COLOR_BGR2HSV, 3);
         Imgproc.cvtColor(bgr, input, Imgproc.COLOR_BGR2BGRA, 3);
-        //Resize
+
+        //Scale image
+        Size bgrSize = bgr.size();
+        Size newSize = new Size();
+
+        if (bgrSize.width > CamShiftTracker.KMEANS_IMG_SIZE || bgrSize.height > CamShiftTracker.KMEANS_IMG_SIZE) {
+
+            if (bgrSize.width > bgrSize.height) {
+                newSize.width = CamShiftTracker.KMEANS_IMG_SIZE;
+                newSize.height = CamShiftTracker.KMEANS_IMG_SIZE / bgrSize.width * bgrSize.height;
+            } else {
+                newSize.width = CamShiftTracker.KMEANS_IMG_SIZE / bgrSize.height * bgrSize.width;
+                newSize.height = CamShiftTracker.KMEANS_IMG_SIZE;
+            }
+
+            Imgproc.resize(input, input, newSize);
+        }
 
         //Image quantization using k-means: https://github.com/abidrahmank/OpenCV2-Python-Tutorials/blob/master/source/py_tutorials/py_ml/py_kmeans/py_kmeans_opencv/py_kmeans_opencv.rst
         Mat clusterData = new Mat();
 
-        Mat reshaped = input.reshape(1, bgr.rows() * bgr.cols());
+        Mat reshaped = input.reshape(1, input.rows() * input.cols());
         reshaped.convertTo(clusterData, CvType.CV_32F, 1.0 / 255.0);
         Mat labels = new Mat();
         Mat centres = new Mat();
-        TermCriteria criteria = new TermCriteria(TermCriteria.COUNT, 100, 1);
+        TermCriteria criteria = new TermCriteria(TermCriteria.COUNT, 50, 1);
         Core.kmeans(clusterData, k, labels, criteria, 1, Core.KMEANS_PP_CENTERS, centres);
 
         //Get num hits for each category
@@ -309,18 +325,9 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         int r = (int) (centres.get(index, 2)[0] * 255.0);
         int g = (int) (centres.get(index, 1)[0] * 255.0);
         int b = (int) (centres.get(index, 0)[0] * 255.0);
-
-        Log.d(TAG, "r=" + r + " g=" + g + " b=" + b);
-
-        for (int i = 0; i < centres.rows(); i++) {
-            for (int j = 0; j < centres.cols(); j++) {
-                double[] centreData = centres.get(i, j);
-                Log.d(TAG, "i=" + i + " j=" + j + " centres=" + centreData[0] * 255);
-            }
-        }
-
         int sum = (r + g + b) / 3;
 
+        //Get colour range
         Scalar min;
         Scalar max;
 
@@ -340,13 +347,6 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         } else {
             Mat bgrColour = new Mat(1, 1, CvType.CV_8UC3, new Scalar(r, g, b));
             Mat hsvColour = new Mat();
-
-            for (int i = 0; i < bgrColour.rows(); i++) {
-                for (int j = 0; j < bgrColour.cols(); j++) {
-                    double[] data = bgrColour.get(i, j);
-                    Log.d(TAG, "MAT: i=" + i + " j=" + j + " bgrColour=" + data[0]);
-                }
-            }
 
             Imgproc.cvtColor(bgrColour, hsvColour, Imgproc.COLOR_BGR2HSV, 3);
             double[] hsv = hsvColour.get(0, 0);
