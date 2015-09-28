@@ -124,43 +124,6 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             }
         });
 
-//        //Integer roiFrame = getSensorAnalysis().getFrameDataList().getROIFrame();
-//        gotoObjectMenu.setVisible(roiFrame != null);
-//        setObjectMenu.setVisible(!(rectMarkersVisible || roiFrame !=null));
-//        trackObjectMenu.setVisible(!(rectMarkersVisible || roiFrame !=null));
-//        //trackObjectMenu.setVisible(!rectMarkersVisible || roiFrame !=null);
-//
-//        trackObjectMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem menuItem) {
-//                MotionAnalysis motionAnalysis = getSensorAnalysis();
-//                motionAnalysis.getRoiDataList().setVisibility(true);
-//                trackObjectMenu.setVisible(false);
-//                setObjectMenu.setVisible(true);
-//                return true;
-//            }
-//        });
-//
-//        setObjectMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem menuItem) {
-//                MotionAnalysis motionAnalysis = getSensorAnalysis();
-//                view.addRegionOfInterest(motionAnalysis);
-//                gotoObjectMenu.setVisible(true); //When ROI set, show button to track object. TODO: when load video, if ROI set then show button
-//                return true;
-//            }
-//        });
-//
-//        gotoObjectMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem menuItem) {
-//                MotionAnalysis motionAnalysis = getSensorAnalysis();
-//                view.showRegionOfInterest(motionAnalysis);
-//                setObjectMenu.setVisible(true);
-//                return true;
-//            }
-//        });
-
         setupStandardMenu(menu, inflater);
     }
 
@@ -198,7 +161,6 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             }
         });
 
-        //getSensorAnalysis()
         popup.getMenu().findItem(R.id.debug_tracking).setChecked(getSensorAnalysis().getObjectTracker().isDebuggingEnabled());
         popup.show();
     }

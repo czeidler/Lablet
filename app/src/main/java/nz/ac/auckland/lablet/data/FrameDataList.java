@@ -23,37 +23,6 @@ public class FrameDataList extends WeakListenable<FrameDataList.IListener>{
 
     private int currentFrame;
     private int numberOfFrames;
-    private Integer roiFrame = null;
-    private HashMap<Integer, Boolean> frames = new HashMap<Integer, Boolean>();
-
-    public Integer getROIFrame()
-    {
-        return this.roiFrame;
-    }
-
-    public void setROIFrame(int roiFrame)
-    {
-        this.roiFrame = roiFrame;
-    }
-
-    public void setObjectPicked(int frame, boolean isObjectPicked)
-    {
-        this.frames.put(frame, isObjectPicked);
-    }
-
-    public Boolean isObjectPicked(int frame)
-    {
-        Boolean isPicked = this.frames.get(frame);
-
-        if(isPicked == null)
-        {
-            return false;
-        }
-        else
-        {
-            return isPicked;
-        }
-    }
 
     public int getCurrentFrame() {
         return currentFrame;
