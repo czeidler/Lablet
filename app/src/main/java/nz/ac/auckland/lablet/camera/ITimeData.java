@@ -8,8 +8,18 @@
 package nz.ac.auckland.lablet.camera;
 
 
+/**
+ * Interface to map a time stamp to a certain frame number.
+ *
+ * Since a video can be analysed at different frame rates, a frame number does not has a fix time stamp.
+ */
 public interface ITimeData {
-    public int getSize();
+    /**
+     * Get the number of frames.
+     *
+     * @return number of frames
+     */
+    int getSize();
 
     /**
      * Get time value.
@@ -17,5 +27,5 @@ public interface ITimeData {
      * @param index of the frame number
      * @return time in milli seconds
      */
-    public float getTimeAt(float index);
+    float getTimeAt(float index);
 }

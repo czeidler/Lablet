@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -26,6 +27,9 @@ import java.io.IOException;
 import java.util.*;
 
 
+/**
+ * Manages the views of multiple experiment runs.
+ */
 class ExperimentRunViewManager {
     final private Experiment experiment;
 
@@ -70,7 +74,7 @@ class ExperimentRunViewManager {
                 List<String> experimentNamesList = new ArrayList<>();
                 for (IExperimentSensor experimentRun : oldGroup.getExperimentSensors())
                     experimentNamesList.add(experimentRun.getClass().getSimpleName());
-                ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(experimentNamesList);
+                ExperimentRun experimentRun = ExperimentRun.createExperimentRun(experimentNamesList);
 
                 experiment.addExperimentRun(experimentRun);
                 setCurrentExperimentRunGroup(experimentRun);
@@ -183,6 +187,12 @@ class MenuItemProxy {
 }
 
 
+/**
+ * Displays one or more sensor experiments.
+ *
+ * Each sensor experiment is displayed in a Fragment. There can be multiple runs with each run containing a set of
+ * sensor experiments.
+ */
 public class ExperimentActivity extends FragmentActivity {
     private Experiment experiment;
 
@@ -306,6 +316,11 @@ public class ExperimentActivity extends FragmentActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
+    /**
+     * Get the experiment sensors of the current run.
+     *
+     * @return a list of experiment sensors
+     */
     public List<IExperimentSensor> getActiveSensors() {
         ExperimentRun currentRun = experiment.getCurrentExperimentRun();
         if (currentRun.isActive())
@@ -351,6 +366,9 @@ public class ExperimentActivity extends FragmentActivity {
         return null;
     }
 
+    /**
+     * Show a menu to enable or disable sensors.
+     */
     private void showSensorMenu() {
         View menuView = findViewById(R.id.action_view);
         PopupMenu popup = new PopupMenu(menuView.getContext(), menuView);
@@ -382,6 +400,10 @@ public class ExperimentActivity extends FragmentActivity {
         popup.show();
     }
 
+    /**
+     * Add a sensor experiment to the current run.
+     * @param plugin for the sensor experiment
+     */
     private void addExperiment(ISensorPlugin plugin) {
         IExperimentSensor experimentRun = plugin.createExperimentSensor();
         experiment.getCurrentExperimentRun().addExperimentSensor(experimentRun);
@@ -391,6 +413,11 @@ public class ExperimentActivity extends FragmentActivity {
         updateAdapter();
     }
 
+    /**
+     * Remove an experiment run.
+     *
+     * @param experimentRun the run to be removed
+     */
     private void removeExperimentRun(IExperimentSensor experimentRun) {
         experiment.getCurrentExperimentRun().removeExperimentSensor(experimentRun);
         experimentRun.stopPreview();
@@ -410,12 +437,12 @@ public class ExperimentActivity extends FragmentActivity {
         if (experimentBaseDir == null)
             experimentBaseDir = new File(getExternalFilesDir(null), "experiments");
 
-        if (pluginNames.length == 0)
+        if (pluginNames != null && pluginNames.length == 0)
             return;
 
-        experiment = new Experiment(this);
+        experiment = new Experiment();
 
-        final ExperimentRun experimentRun = ExperimentRun.createExperimentRunGroup(pluginNames);
+        final ExperimentRun experimentRun = ExperimentRun.createExperimentRun(pluginNames);
         experiment.addExperimentRun(experimentRun);
         experiment.setCurrentExperimentRun(experimentRun);
         activateExperimentRun(experiment.getCurrentExperimentRun(), true);
@@ -536,7 +563,7 @@ public class ExperimentActivity extends FragmentActivity {
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
         if (experiment != null)
@@ -548,7 +575,7 @@ public class ExperimentActivity extends FragmentActivity {
 
         experimentBaseDir = new File(path);
 
-        experiment = new Experiment(this);
+        experiment = new Experiment();
         experiment.onRestoreInstanceState(savedInstanceState);
     }
 
@@ -589,7 +616,7 @@ public class ExperimentActivity extends FragmentActivity {
 
     @Override
     public void onBackPressed() {
-        if (experiment.dataTaken()) {
+        if (!(state instanceof PreviewState)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Experiment is not saved");
             builder.setNeutralButton("Continue", new DialogInterface.OnClickListener() {
@@ -601,6 +628,8 @@ public class ExperimentActivity extends FragmentActivity {
             builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
+                    // finish experiment when we are currently recording
+                    setState(null);
                     finishExperiment(false);
                 }
             });
@@ -833,6 +862,9 @@ public class ExperimentActivity extends FragmentActivity {
     }
 }
 
+/**
+ * Fragment pager for the sensor experiment fragments.
+ */
 class ExperimentRunFragmentPagerAdapter extends FragmentStatePagerAdapter {
     private int sensorCount;
 

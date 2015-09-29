@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.experiment;
 
-import android.app.Activity;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 
@@ -20,7 +19,7 @@ import java.util.List;
 /**
  * Main class to perform an experiment.
  *
- * An experiment can have multiple runs and each run can have multiple sensors.
+ * An experiment can have multiple {@link ExperimentRun}s and each run can have multiple sensors.
  *
  * A run can be used to perform a similar experiment multiple times.
  * For example, measuring a value multiple times.
@@ -28,20 +27,18 @@ import java.util.List;
  */
 public class Experiment extends WeakListenable<Experiment.IListener> {
     public interface IListener {
-        public void onExperimentRunAdded(ExperimentRun runGroup);
-        public void onExperimentRunRemoved(ExperimentRun runGroup);
-        public void onCurrentRunChanged(ExperimentRun newGroup, ExperimentRun oldGroup);
+        void onExperimentRunAdded(ExperimentRun runGroup);
+        void onExperimentRunRemoved(ExperimentRun runGroup);
+        void onCurrentRunChanged(ExperimentRun newGroup, ExperimentRun oldGroup);
     }
 
     final private List<ExperimentRun> experimentRuns = new ArrayList<>();
     private ExperimentRun currentExperimentRun;
-    final private Activity activity;
 
     final static private String NUMBER_OF_RUNS_KEY = "number_of_runs";
     final static private String CURRENT_RUN_KEY = "current_run";
 
-    public Experiment(Activity activity) {
-        this.activity = activity;
+    public Experiment() {
     }
 
     /**
@@ -59,10 +56,6 @@ public class Experiment extends WeakListenable<Experiment.IListener> {
                 sensorsString += "_" + sensor.getSensorName();
         }
         return dateString + sensorsString;
-    }
-
-    public Activity getActivity() {
-        return activity;
     }
 
     /**
@@ -107,10 +100,21 @@ public class Experiment extends WeakListenable<Experiment.IListener> {
             setCurrentExperimentRun(experimentRuns.get(currentRunIndex));
     }
 
+    /**
+     * Get a list of all ExperimentRuns.
+     *
+     * @return list of ExperimentRuns
+     */
     public List<ExperimentRun> getExperimentRuns() {
         return experimentRuns;
     }
 
+    /**
+     * Add another ExperimentRun.
+     *
+     * @param experimentRun
+     * @return false if the ExperimentRun is already attached to an Experiment
+     */
     public boolean addExperimentRun(ExperimentRun experimentRun) {
         if (experimentRun.getExperiment() != null)
             return false;
@@ -123,6 +127,11 @@ public class Experiment extends WeakListenable<Experiment.IListener> {
         return true;
     }
 
+    /**
+     * Remove an ExperimentRun from the Experiment.
+     *
+     * @param experimentRun
+     */
     public void removeExperimentRun(ExperimentRun experimentRun) {
         final int removedGroupIndex = experimentRuns.indexOf(experimentRun);
 
@@ -154,6 +163,11 @@ public class Experiment extends WeakListenable<Experiment.IListener> {
         notifyCurrentExperimentRunChanged(experimentRun, oldRun);
     }
 
+    /**
+     * Get the current ExperimentRun.
+     *
+     * @return
+     */
     public ExperimentRun getCurrentExperimentRun() {
         return currentExperimentRun;
     }

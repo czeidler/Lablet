@@ -28,6 +28,11 @@ import java.util.Comparator;
 import java.util.List;
 
 
+/**
+ * Activity to manage Lab Activities.
+ *
+ * Lab Activities can be added, deleted or updated.
+ */
 public class ScriptManagerActivity extends Activity {
     final private List<ScriptMetaData> scriptList = new ArrayList<>();
     final private List<ScriptMetaData> remoteScriptList = new ArrayList<>();

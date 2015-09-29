@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Helper class for various common frame rate related methods.
+ */
 class FrameRateHelper {
     static public List<Float> getPossibleAnalysisFrameRates(int maxFrameRate) {
         // sanitize the frame rate a bit

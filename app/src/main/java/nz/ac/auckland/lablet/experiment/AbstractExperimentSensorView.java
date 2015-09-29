@@ -12,6 +12,12 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 
+/**
+ * Base class for a sensor view.
+ *
+ * The view contains a preview, a recording and a playback state. Subclasses must implement these states. States are
+ * automatically changed when the view is listening to a {@ling AbstractExperimentSensor}.
+ */
 abstract public class AbstractExperimentSensorView extends FrameLayout implements IExperimentSensor.IListener {
     protected AbstractExperimentSensor.State previewState = null;
     protected AbstractExperimentSensor.State recordingState = null;

@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet;
 
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;

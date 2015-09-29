@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.camera;
 
-import android.content.res.Configuration;
 import android.graphics.PointF;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
@@ -21,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Base class for everything that is related to analysing an experiment.
+ * Contains all data relevant for a motion analysis of {@link VideoData}.
  */
 public class MotionAnalysis implements IDataAnalysis {
     public interface IListener {

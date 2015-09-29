@@ -7,17 +7,32 @@
  */
 package nz.ac.auckland.lablet.experiment;
 
-import android.app.Activity;
-
 import java.io.File;
 
 
+/**
+ * Data import plugin interface. Imports data from a data file.
+ */
 public interface IImportPlugin {
-    public interface IListener {
+    interface IListener {
         void onImportFinished(boolean successful);
     }
 
     String getName();
+
+    /**
+     * Returns a filter of what files can be imported.
+     *
+     * @return a filter string
+     */
     String getFileFilter();
-    void importData(Activity activity, File importFile, File storageDir, IListener listener);
+
+    /**
+     * Imports file from a source file.
+     *
+     * @param importFile the file that should be imported.
+     * @param storageDir the base storage dir where the data should be imported
+     * @param listener for the import
+     */
+    void importData(File importFile, File storageDir, IListener listener);
 }

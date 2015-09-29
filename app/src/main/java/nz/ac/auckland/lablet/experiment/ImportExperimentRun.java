@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.IOException;
 
 
+/**
+ * A "fake" experiment run to create the directory structure for imported data.
+ */
 public class ImportExperimentRun extends ExperimentRun {
     final IImportPlugin importPlugin;
     File storageDir;

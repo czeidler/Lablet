@@ -7,7 +7,6 @@
  */
 package nz.ac.auckland.lablet.camera;
 
-import android.app.Activity;
 import nz.ac.auckland.lablet.experiment.AbstractFileImportPlugin;
 import nz.ac.auckland.lablet.misc.StorageLib;
 import nz.ac.auckland.lablet.misc.StreamHelper;
@@ -16,6 +15,9 @@ import java.io.File;
 import java.io.IOException;
 
 
+/**
+ * Import plugin for a single video file.
+ */
 public class VideoImportPlugin extends AbstractFileImportPlugin {
     @Override
     public String getName() {
@@ -35,7 +37,7 @@ public class VideoImportPlugin extends AbstractFileImportPlugin {
     }
 
     @Override
-    protected boolean importFile(Activity activity, File importFile, File dataStorageDir) {
+    protected boolean importFile(File importFile, File dataStorageDir) {
         String fileName = importFile.getName();
         try {
             StorageLib.copyFile(importFile, new File(dataStorageDir, fileName), new StreamHelper.IProgressListener() {

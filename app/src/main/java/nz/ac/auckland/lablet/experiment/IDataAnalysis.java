@@ -14,14 +14,17 @@ import java.io.IOException;
 import java.io.Writer;
 
 
+/**
+ * Interface for a data analysis.
+ */
 public interface IDataAnalysis {
-    final public static String EXPERIMENT_ANALYSIS_FILE_NAME = "experiment_analysis.xml";
+    String EXPERIMENT_ANALYSIS_FILE_NAME = "experiment_analysis.xml";
 
-    public String getDisplayName();
-    public String getIdentifier();
-    public boolean loadAnalysisData(Bundle bundle, File storageDir);
-    public ISensorData[] getData();
+    String getDisplayName();
+    String getIdentifier();
+    boolean loadAnalysisData(Bundle bundle, File storageDir);
+    ISensorData[] getData();
 
-    public Bundle exportAnalysisData(File additionalStorageDir) throws IOException;
-    public void exportTagMarkerCSVData(Writer writer) throws IOException;
+    Bundle exportAnalysisData(File additionalStorageDir) throws IOException;
+    void exportTagMarkerCSVData(Writer writer) throws IOException;
 }

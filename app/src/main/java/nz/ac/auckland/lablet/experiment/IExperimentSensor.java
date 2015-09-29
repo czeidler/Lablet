@@ -17,6 +17,9 @@ import java.io.File;
 import java.io.IOException;
 
 
+/**
+ * Experiment sensor interface to record sensor data.
+ */
 public interface IExperimentSensor {
     interface IListener {
         void onStartPreview();
@@ -75,5 +78,10 @@ public interface IExperimentSensor {
     void startPlayback();
     void stopPlayback();
 
+    /**
+     * Returns the recorded sensor data.
+     *
+     * @return the recorded data
+     */
     ISensorData getExperimentData();
 }
