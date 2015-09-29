@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * View that displays velocity and displacement based on accelerometer data.
+ */
 public class IntegralView extends FrameLayout {
     final private AccelerometerAnalysis analysis;
     final private List<SpinnerEntry> spinnerEntryList = new ArrayList<>();

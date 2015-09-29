@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Fragment to display the motion analysis.
+ */
 public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
     static final int PERFORM_RUN_SETTINGS = 0;
 

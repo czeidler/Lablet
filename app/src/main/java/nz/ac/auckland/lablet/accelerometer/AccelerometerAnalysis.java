@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Contains all data relevant for the accelerometer analysis.
+ */
 public class AccelerometerAnalysis implements IDataAnalysis {
     final private AccelerometerSensorData sensorData;
     final private DisplaySettings displaySettings = new DisplaySettings();

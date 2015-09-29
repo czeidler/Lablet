@@ -1,4 +1,4 @@
 /**
- * Contains accelerometer sensor and analyses.
+ * Contains accelerometer sensor and a analysis.
  */
 package nz.ac.auckland.lablet.accelerometer;

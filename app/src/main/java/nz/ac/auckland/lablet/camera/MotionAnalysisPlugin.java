@@ -12,6 +12,9 @@ import nz.ac.auckland.lablet.experiment.ExperimentAnalysis;
 import nz.ac.auckland.lablet.experiment.*;
 
 
+/**
+ * A motion analysis plugin.
+ */
 public class MotionAnalysisPlugin implements IAnalysisPlugin {
     @Override
     public String getIdentifier() {

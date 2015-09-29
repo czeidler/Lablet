@@ -14,6 +14,9 @@ import java.io.File;
  * Data import plugin interface. Imports data from a data file.
  */
 public interface IImportPlugin {
+    /**
+     * Listener interface for the import plugin.
+     */
     interface IListener {
         void onImportFinished(boolean successful);
     }

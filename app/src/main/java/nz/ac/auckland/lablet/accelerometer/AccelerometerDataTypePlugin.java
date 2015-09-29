@@ -11,6 +11,9 @@ import nz.ac.auckland.lablet.experiment.IDataTypePlugin;
 import nz.ac.auckland.lablet.experiment.ISensorData;
 
 
+/**
+ * Data type plugin for accelerometer data.
+ */
 public class AccelerometerDataTypePlugin implements IDataTypePlugin {
     @Override
     public String getDataType() {

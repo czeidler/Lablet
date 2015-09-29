@@ -21,6 +21,9 @@ import java.io.IOException;
  * Experiment sensor interface to record sensor data.
  */
 public interface IExperimentSensor {
+    /**
+     * Listener interface for the experiment sensor.
+     */
     interface IListener {
         void onStartPreview();
         void onStopPreview();

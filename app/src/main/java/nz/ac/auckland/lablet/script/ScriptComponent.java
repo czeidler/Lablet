@@ -25,6 +25,9 @@ abstract public class ScriptComponent {
     final static public int SCRIPT_STATE_ONGOING = -1;
     final static public int SCRIPT_STATE_DONE = 0;
 
+    /**
+     * Listener interface for the component state.
+     */
     public interface IScriptComponentListener {
         void onStateChanged(ScriptComponent item, int state);
     }

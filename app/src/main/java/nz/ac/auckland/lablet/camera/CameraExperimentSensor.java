@@ -266,6 +266,9 @@ class MediaRecorderStrategy implements IRecorderStrategy {
 }
 
 
+/**
+ * Camera sensor.
+ */
 public class CameraExperimentSensor extends AbstractExperimentSensor {
     private Activity activity;
 

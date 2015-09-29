@@ -17,13 +17,19 @@ import java.util.Comparator;
 import java.util.List;
 
 
+/**
+ * Data model for a list of marker.
+ */
 public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
+    /**
+     * Listener interface for the marker data model.
+     */
     public interface IListener {
-        public void onDataAdded(MarkerDataModel model, int index);
-        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data);
-        public void onDataChanged(MarkerDataModel model, int index, int number);
-        public void onAllDataChanged(MarkerDataModel model);
-        public void onDataSelected(MarkerDataModel model, int index);
+        void onDataAdded(MarkerDataModel model, int index);
+        void onDataRemoved(MarkerDataModel model, int index, MarkerData data);
+        void onDataChanged(MarkerDataModel model, int index, int number);
+        void onAllDataChanged(MarkerDataModel model);
+        void onDataSelected(MarkerDataModel model, int index);
     }
 
     final protected List<MarkerData> markerDataList = new ArrayList<>();

@@ -12,7 +12,15 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 
+/**
+ * Abstract base class for experiment sensors.
+ *
+ * Manages preview, recording and playback states. Subclasses have to define these states.
+ */
 abstract public class AbstractExperimentSensor implements IExperimentSensor {
+    /**
+     * Interface for the recording state of an sensor.
+     */
     public interface State {
         void start();
         boolean stop();

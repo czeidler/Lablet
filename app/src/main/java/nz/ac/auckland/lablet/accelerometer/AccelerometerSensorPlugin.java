@@ -10,6 +10,9 @@ package nz.ac.auckland.lablet.accelerometer;
 import nz.ac.auckland.lablet.experiment.*;
 
 
+/**
+ * Plugin for the accelerometer sensor.
+ */
 public class AccelerometerSensorPlugin implements ISensorPlugin {
 
     @Override

@@ -22,6 +22,9 @@ import nz.ac.auckland.lablet.experiment.ISensorData;
 import java.io.*;
 
 
+/**
+ * Accelerometer sensor.
+ */
 public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     private AccelerometerSensorData data;
 
