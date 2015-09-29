@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'com.android.tools.build:gradle:1.1.1'
     }
 }
 
@@ -17,8 +17,8 @@ android {
         applicationId "nz.ac.auckland.lablet"
         minSdkVersion 18
         targetSdkVersion 18
-        versionCode 303
-        versionName "3.0.1"
+        versionCode 307
+        versionName "3.0.3"
         renderscriptTargetApi 18
         renderscriptSupportModeEnabled true
     }
@@ -55,12 +55,13 @@ configurations {
 }
 
 dependencies {
+    compile "org.jboss.apiviz:apiviz:1.3.2.GA"
     doclet group: 'org.jboss.apiviz', name: 'apiviz', version: '1.3.2.GA'
     compile project(':openCVLibrary2411')
 }
 
 android.applicationVariants.all { variant ->
-    task("generate${variant.name}Javadoc", type: Javadoc) {
+    task("generate${variant.name.capitalize()}Javadoc", type: Javadoc) {
         source = variant.javaCompile.source
         def androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
 
@@ -86,7 +87,7 @@ dependencies {
     compile "edu.emory.mathcs:JTransforms:2.4"
     compile "org.luaj:luaj-jse:3.0-beta2"
     compile "com.android.support:support-annotations:20.0.0"
-    compile "com.android.support:support-v4:21.0.2"
+    compile "com.android.support:support-v4:22.2.0"
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "com.github.wseemann:FFmpegMediaMetadataRetriever:1.0.1"
 }

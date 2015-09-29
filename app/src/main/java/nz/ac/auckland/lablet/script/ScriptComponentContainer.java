@@ -23,13 +23,13 @@ import java.util.List;
  */
 public class ScriptComponentContainer<ItemType extends ScriptComponent>
         implements ScriptComponent.IScriptComponentListener {
-    private List<ItemType> items = new ArrayList<ItemType>();
+    private List<ItemType> items = new ArrayList<>();
     private IItemContainerListener listener = null;
     private boolean allItemsDone = false;
     private String lastErrorMessage = "";
 
     public interface IItemContainerListener {
-        public void onAllItemStatusChanged(boolean allDone);
+        void onAllItemStatusChanged(boolean allDone);
     }
 
     public boolean initCheck() {

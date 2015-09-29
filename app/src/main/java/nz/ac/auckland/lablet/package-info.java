@@ -7,25 +7,27 @@
  *
  * <h3>Single Experiments:</h3>
  * <p>
- * New experiments can be implemented using the plugin architecture:
- * {@link nz.ac.auckland.lablet.experiment.IExperimentPlugin}. There is currently one common
- * {@link nz.ac.auckland.lablet.ExperimentAnalysisActivity} to analyze the experiments. However, since there
- * is currently only on {@link nz.ac.auckland.lablet.camera.VideoData} this is not well tested to
- * work with different experiments.
+ * New sensors, data types and analyses can be implemented using the plugin architecture:
+ * {@link nz.ac.auckland.lablet.experiment.ISensorPlugin}, {@link nz.ac.auckland.lablet.experiment.IDataTypePlugin}
+ * and {@link nz.ac.auckland.lablet.experiment.IAnalysisPlugin}. Data files can be imported by implementing
+ * {@link nz.ac.auckland.lablet.experiment.IImportPlugin}.
+ * There is currently one common
+ * {@link nz.ac.auckland.lablet.ExperimentAnalysisActivity} to analyze experiments. This Activity displays each
+ * experiment analysis in an {@link nz.ac.auckland.lablet.ExperimentAnalysisFragment}.
  * </p>
  * <p>
- * Experiments can be managed in the {@link nz.ac.auckland.lablet.ExperimentHomeActivity}. For example,
+ * Experiments can be managed in the {@link nz.ac.auckland.lablet.ExperimentHomeActivity}. For example, to
  * start a new or resume and delete an old experiment.
  * </p>
  *
- * <h3>Scripts (Lab Activities):</h3>
+ * <h3>Lab Activities (Scripts):</h3>
  * <p>
  * It is possible to script a whole lab activity using a lua script. The script can have multiple pages including
- * questions, text, experiments, analysis... The script sensors in the
+ * questions, text boxes, experiments, analyses... The script sensors in the
  * {@link nz.ac.auckland.lablet.script.ScriptRunnerActivity}.
  * </p>
  * <p>
- * Scripts can be managed in the {@link nz.ac.auckland.lablet.ScriptHomeActivity}. For example,
+ * Scripts can be managed in the {@link nz.ac.auckland.lablet.ScriptHomeActivity}. For example, to
  * start a new or resume and delete an old script.
  * </p>
  */

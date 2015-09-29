@@ -27,12 +27,14 @@ import java.util.concurrent.Semaphore;
  */
 public class SeekToFrameExtractor {
     public interface IListener {
+        /**
+         * Is called from the extractor thread.
+         */
         void onFrameExtracted();
     }
 
     private SeekToThread seekToThread;
     private final Semaphore threadReadySemaphore = new Semaphore(0);
-    private Handler listenerHandler;
     private IListener listener = null;
 
     public SeekToFrameExtractor(File mediaFile, Surface surface) throws IOException {
@@ -48,7 +50,6 @@ public class SeekToFrameExtractor {
 
     public void setListener(IListener listener) {
         this.listener = listener;
-        listenerHandler = new Handler();
     }
 
     public void release() {
@@ -64,6 +65,26 @@ public class SeekToFrameExtractor {
         bundle.putLong("position", positionMicroSeconds);
         message.setData(bundle);
         return seekHandler.sendMessage(message);
+    }
+
+    static class SeekHandler extends Handler {
+        final SeekToThread thread;
+
+        public SeekHandler(SeekToThread thread) {
+            this.thread = thread;
+        }
+
+        @Override
+        public void handleMessage(Message message)
+        {
+            if (message.what != SeekToThread.SEEK_MESSAGE)
+                return;
+            Bundle data = message.peekData();
+            assert data != null;
+
+            long positionMicroSeconds = data.getLong("position");
+            thread.performSeekTo(positionMicroSeconds);
+        }
     }
 
     class SeekToThread extends Thread {
@@ -119,20 +140,7 @@ public class SeekToFrameExtractor {
 
         public void run() {
             Looper.prepare();
-            seekHandler = new Handler() {
-                @Override
-                public void handleMessage(Message message)
-                {
-                    if (message.what != SEEK_MESSAGE)
-                        return;
-                    Bundle data = message.peekData();
-                    assert data != null;
-
-                    long positionMicroSeconds = data.getLong("position");
-                    performSeekTo(positionMicroSeconds);
-                }
-
-            };
+            seekHandler = new SeekHandler(this);
             threadReadySemaphore.release();
             Looper.loop();
         }
@@ -140,26 +148,28 @@ public class SeekToFrameExtractor {
         private void performSeekTo(long seekTarget) {
             final int DEQUE_TIMEOUT = 1000;
 
-            decoder.flush();
             inputBuffers = decoder.getInputBuffers();
 
             // coarse seek
             extractor.seekTo(seekTarget, MediaExtractor.SEEK_TO_PREVIOUS_SYNC);
 
+            boolean endOfStream = false;
             // fine manual seek
             boolean positionReached = false;
             while (!positionReached) {
-                int inIndex = decoder.dequeueInputBuffer(DEQUE_TIMEOUT);
-                if (inIndex >= 0) {
-                    ByteBuffer buffer = inputBuffers[inIndex];
+                if (!endOfStream) {
+                    int inIndex = decoder.dequeueInputBuffer(DEQUE_TIMEOUT);
+                    if (inIndex >= 0) {
+                        ByteBuffer buffer = inputBuffers[inIndex];
 
-                    int sampleSize = extractor.readSampleData(buffer, 0);
-                    if (sampleSize < 0) {
-                        decoder.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
-                        positionReached = true;
-                    } else {
-                        decoder.queueInputBuffer(inIndex, 0, sampleSize, extractor.getSampleTime(), 0);
-                        extractor.advance();
+                        int sampleSize = extractor.readSampleData(buffer, 0);
+                        if (sampleSize < 0) {
+                            decoder.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                            endOfStream = true;
+                        } else {
+                            decoder.queueInputBuffer(inIndex, 0, sampleSize, extractor.getSampleTime(), 0);
+                            extractor.advance();
+                        }
                     }
                 }
 
@@ -171,7 +181,8 @@ public class SeekToFrameExtractor {
                         break;
                     default:
                         boolean render = false;
-                        if (bufferInfo.presentationTimeUs - seekTarget >= 0) {
+                        if (bufferInfo.presentationTimeUs - seekTarget >= 0
+                                || (bufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                             positionReached = true;
                             render = true;
                         }
@@ -179,14 +190,8 @@ public class SeekToFrameExtractor {
                         decoder.releaseOutputBuffer(outIndex, render);
                         if (render) {
                             decoder.flush();
-                            if (listener != null) {
-                                listenerHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        listener.onFrameExtracted();
-                                    }
-                                });
-                            }
+                            if (listener != null)
+                                listener.onFrameExtracted();
                         }
                         break;
                 }

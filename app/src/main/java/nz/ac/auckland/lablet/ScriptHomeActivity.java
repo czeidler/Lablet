@@ -35,22 +35,12 @@ import java.util.Comparator;
 import java.util.List;
 
 
+/**
+ * Helper class to manage Lab Activities (scripts).
+ */
 class ScriptDirs {
     final static private String SCRIPTS_COPIED_KEY = "scripts_copied_v1";
     final static private String PREFERENCES_NAME = "lablet_preferences";
-
-    static public void readScriptsFromDir(File scriptDir, List<ScriptMetaData> scripts) {
-        File[] children = scriptDir.listFiles();
-        for (File child : children != null ? children : new File[0]) {
-            String name = child.getName();
-            if (!isLuaFile(name))
-                continue;
-            ScriptMetaData metaData = LuaScriptLoader.getScriptMetaData(child);
-            if (metaData == null)
-                continue;
-            scripts.add(metaData);
-        }
-    }
 
     /**
      * The script directory is the directory the stores the script files, i.e., the lua files.
@@ -73,6 +63,12 @@ class ScriptDirs {
         return new File(getScriptDirectory(context), "remotes");
     }
 
+    /**
+     * Copies the default Lab Activities from the app resources.
+     *
+     * @param activity the current activity
+     * @param forceCopy overwrite existing Lab Activities
+     */
     static public void copyResourceScripts(Activity activity, boolean forceCopy) {
         SharedPreferences settings = activity.getSharedPreferences(PREFERENCES_NAME, 0);
         if (!forceCopy && settings.getBoolean(SCRIPTS_COPIED_KEY, false))
@@ -120,6 +116,12 @@ class ScriptDirs {
     }
 
 
+    /**
+     * Read available Lab Activities.
+     *
+     * @param scriptList found Lab Activities are places here
+     * @param context current context
+     */
     static public void readScriptList(List<ScriptMetaData> scriptList, Context context) {
         File[] scriptDirs = {
                 getScriptDirectory(context),
@@ -130,6 +132,25 @@ class ScriptDirs {
         for (File scriptDir : scriptDirs) {
             if (scriptDir.isDirectory())
                 readScriptsFromDir(scriptDir, scriptList);
+        }
+    }
+
+    /**
+     * Read available script from a certain directory.
+     *
+     * @param scriptDir the directory that should be searched
+     * @param scripts found Lab Activities are places here
+     */
+    static public void readScriptsFromDir(File scriptDir, List<ScriptMetaData> scripts) {
+        File[] children = scriptDir.listFiles();
+        for (File child : children != null ? children : new File[0]) {
+            String name = child.getName();
+            if (!isLuaFile(name))
+                continue;
+            ScriptMetaData metaData = LuaScriptLoader.getScriptMetaData(child);
+            if (metaData == null)
+                continue;
+            scripts.add(metaData);
         }
     }
 }

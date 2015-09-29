@@ -24,7 +24,7 @@ public interface ISensorData {
      * {@link nz.ac.auckland.lablet.misc.PersistentBundle}.
      * </p>
      */
-    final static String EXPERIMENT_DATA_FILE_NAME = "experiment_data.xml";
+    String EXPERIMENT_DATA_FILE_NAME = "experiment_data.xml";
 
     /**
      * Only returns a valid file if {load, save}ExperimentData has been called.

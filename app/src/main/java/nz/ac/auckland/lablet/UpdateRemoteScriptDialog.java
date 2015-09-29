@@ -23,6 +23,9 @@ import java.net.URLConnection;
 import java.util.List;
 
 
+/**
+ * Dialog to update remote Lab Activities.
+ */
 public class UpdateRemoteScriptDialog extends AlertDialog {
     private TextView statusView;
     final private List<ScriptMetaData> listToUpdate;
