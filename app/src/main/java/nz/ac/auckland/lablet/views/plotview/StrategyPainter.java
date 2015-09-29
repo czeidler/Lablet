@@ -46,6 +46,9 @@ abstract class ConcurrentPainter {
 }
 
 
+/**
+ * Abstract base class for different data rendering strategies.
+ */
 abstract public class StrategyPainter extends AbstractPlotPainter {
     public static class RenderPayload {
         final private ConcurrentPainter painter;
@@ -73,8 +76,21 @@ abstract public class StrategyPainter extends AbstractPlotPainter {
 
     final protected List<ConcurrentPainter> childPainters = new ArrayList<>();
 
+    /**
+     * Indicates if the StrategyPainter uses threads.
+     *
+     * This can be used to determine if {@link nz.ac.auckland.lablet.views.plotview.StrategyPainter.RenderPayload}s have
+     * to be thread safe.
+     *
+     * @return true if threads are used
+     */
     abstract public boolean hasThreads();
 
+    /**
+     * Indicates if the StrategyPainter is ready to draw.
+     *
+     * @return true if the StrategyPainter is ready to draw
+     */
     abstract public boolean hasFreeRenderingPipe();
 
     /**

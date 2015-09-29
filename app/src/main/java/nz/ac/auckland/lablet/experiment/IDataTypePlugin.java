@@ -12,6 +12,11 @@ package nz.ac.auckland.lablet.experiment;
  * Plugin interface for a data type.
  */
 public interface IDataTypePlugin {
+    /**
+     * Returns the data type associated with the plugin.
+     *
+     * @return data type
+     */
     String getDataType();
 
     /**

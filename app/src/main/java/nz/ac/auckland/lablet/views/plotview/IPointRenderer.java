@@ -11,6 +11,9 @@ import android.graphics.Canvas;
 import android.graphics.PointF;
 
 
+/**
+ * Interface to render a shape at a certain position.
+ */
 public interface IPointRenderer {
-    public void drawPoint(Canvas canvas, PointF position, DrawConfig config);
+    void drawPoint(Canvas canvas, PointF position, DrawConfig config);
 }

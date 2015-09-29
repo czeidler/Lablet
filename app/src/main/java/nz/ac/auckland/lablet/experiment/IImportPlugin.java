@@ -18,6 +18,11 @@ public interface IImportPlugin {
         void onImportFinished(boolean successful);
     }
 
+    /**
+     * Gets a human readable name of the plugin.
+     *
+     * @return name of the plugin
+     */
     String getName();
 
     /**
