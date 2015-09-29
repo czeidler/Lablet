@@ -8,6 +8,11 @@
 package nz.ac.auckland.lablet.camera;
 
 
+/**
+ * Provides frame times depending on the analysis range and analysis frame rate.
+ *
+ * The time at frame zero is always 0.
+ */
 public class CalibrationVideoTimeData implements ITimeData {
     protected int numberOfFrames;
     final protected long videoDuration;

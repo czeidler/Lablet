@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Draw the legend for one or more {@link XYConcurrentPainter}
+ */
 public class LegendPainter implements IPlotPainter {
     private Paint labelPaint = new Paint();
     private Paint backgroundPaint = new Paint();

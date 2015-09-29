@@ -12,12 +12,30 @@ import android.graphics.RectF;
 import android.view.MotionEvent;
 
 
+/**
+ * A plot painter is used to draw within a {@link PlotPainterContainerView}.
+ *
+ * The plot painter receives touch events.
+ */
 public interface IPlotPainter {
+    /**
+     * Sets the parent container view.
+     *
+     * @param view parent container
+     */
     void setContainer(PlotPainterContainerView view);
 
     void onSizeChanged(int width, int height, int oldw, int oldh);
     void onDraw(Canvas canvas);
+
+    /**
+     * Handle touch events from the parent view.
+     *
+     * @param event that has been received in the parent view
+     * @return true if the event has been handled
+     */
     boolean onTouchEvent(MotionEvent event);
+
     /**
      * Invalidate the state of the painter.
      *

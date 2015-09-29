@@ -13,6 +13,12 @@ import android.util.AttributeSet;
 import android.view.ViewGroup;
 
 
+/**
+ * Base class to draw a range of real data in the view.
+ *
+ * For example, when the view should display a range of 100 x 100 meters and a data point should be drawn at the point
+ * 30,40 meters this view provides methods to transform between real and screen coordinates.
+ */
 public class RangeDrawingView extends ViewGroup {
     public interface IRangeListener {
         void onRangeChanged(RectF range);
