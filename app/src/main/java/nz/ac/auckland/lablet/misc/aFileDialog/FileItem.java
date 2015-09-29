@@ -17,7 +17,7 @@
  *  along with aFileDialog. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nz.ac.auckland.lablet.misc.aFileDialog.view;
+package nz.ac.auckland.lablet.misc.aFileDialog;
 
 import java.io.File;
 import java.util.LinkedList;
