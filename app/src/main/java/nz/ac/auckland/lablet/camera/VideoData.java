@@ -7,16 +7,13 @@
  */
 package nz.ac.auckland.lablet.camera;
 
-import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
-import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
+
 import nz.ac.auckland.lablet.experiment.AbstractSensorData;
 import nz.ac.auckland.lablet.experiment.IExperimentSensor;
-import wseemann.media.FFmpegMediaMetadataRetriever;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,8 +32,6 @@ public class VideoData extends AbstractSensorData {
     private int videoFrameRate;
 
     private float recordingFrameRate;
-    //private MediaMetadataRetriever retriever;
-    FFmpegMediaMetadataRetriever retriever;// = new FFmpegMediaMetadataRetriever();
 
     static final public String DATA_TYPE = "Video";
 
@@ -63,21 +58,6 @@ public class VideoData extends AbstractSensorData {
         return xMax / xToYRatio;
     }
 
-    /*
-    *   Gets Bitmap of video frame
-     */
-
-    /**
-     *
-     * @param time: time in microseconds
-     * @return
-     */
-
-    public Bitmap getFrame(long time)
-    {
-        assert retriever != null;
-        return retriever.getFrameAtTime(time, FFmpegMediaMetadataRetriever.OPTION_CLOSEST);
-    }
 
     /**
      * Converts coordinates in marker space into coordinates in video space.
@@ -119,11 +99,6 @@ public class VideoData extends AbstractSensorData {
             return false;
 
         setVideoFileName(storageDir, bundle.getString("videoName"));
-
-        //Initialises objects for getFrame
-        retriever = new FFmpegMediaMetadataRetriever();
-        retriever.setDataSource(this.getVideoFile().getAbsolutePath());
-
         recordingFrameRate = bundle.getFloat("recordingFrameRate", -1);
         return true;
     }

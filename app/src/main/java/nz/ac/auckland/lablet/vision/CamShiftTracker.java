@@ -30,6 +30,8 @@ import java.util.List;
 
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.camera.VideoData;
+import nz.ac.auckland.lablet.camera.decoder.CodecOutputSurface;
+import nz.ac.auckland.lablet.camera.decoder.SeekToFrameExtractor;
 import nz.ac.auckland.lablet.data.PointData;
 import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.data.RectData;
@@ -72,6 +74,8 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
     private boolean debuggingEnabled = false;
     private boolean isTracking = false;
     public static final int KMEANS_IMG_SIZE = 100;
+    SeekToFrameExtractor extractor;
+    CodecOutputSurface outputSurface;
 
     Mat hsv, hue, mask, hist, backproj, bgr;// = Mat::zeros(200, 320, CV_8UC3), backproj;
     Size size;
@@ -93,16 +97,27 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         RoiDataList roiDataList = (RoiDataList) objects[2];
         VideoData videodata = (VideoData) objects[3];
 
+        outputSurface = new CodecOutputSurface(videodata.getVideoWidth(), videodata.getVideoHeight());
+
+        try {
+            extractor = new SeekToFrameExtractor(videodata.getVideoFile(), outputSurface.getSurface());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         RoiData currentRoi = null;
         SparseArray<Rect> results = new SparseArray<>();
 
-        for (int i = startFrame; i <= endFrame && isTracking; i++) {
+        for (int i = startFrame; i < endFrame && isTracking; i++) {
             RoiData last = getLastRoi(roiDataList, i);
 
             if (last != null) {
                 if (last != currentRoi) {
                     currentRoi = last;
-                    Bitmap roiBmp = videodata.getFrame(i);
+                    long frameTimeMicroseconds = (long) motionAnalysis.getTimeData().getTimeAt(i) * 1000;
+                    Bitmap roiBmp = getFrame(frameTimeMicroseconds);
+                    //saveFrame(roiBmp, "roi");
 
                     if (roiBmp != null) {
                         PointF topLeft = videodata.toVideoPoint(currentRoi.getTopLeft().getPosition());
@@ -121,11 +136,9 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
 
                 if (currentRoi.getFrameId() != i) {
                     long frameTimeMicroseconds = (long) motionAnalysis.getTimeData().getTimeAt(i) * 1000;
-                    Bitmap curFrameBmp = videodata.getFrame(frameTimeMicroseconds);
+                    Bitmap curFrameBmp = getFrame(frameTimeMicroseconds);
+                    //saveFrame(curFrameBmp, "frame" + i);
 
-                    /*TODO: there is a bug in the frame
-                     reader that returns either a null bitmap
-                     or a bitmap with a null config causing OpenCV to crash.*/
                     if (curFrameBmp != null && curFrameBmp.getConfig() != null) {
                         Rect result = getObjectLocation(curFrameBmp);
 
@@ -145,6 +158,25 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         }
 
         return results;
+    }
+
+
+    /*
+    *   Gets Bitmap of video frame
+     */
+
+    /**
+     *
+     * @param time: time in microseconds
+     * @return
+     */
+
+    public Bitmap getFrame(long time)
+    {
+        extractor.seekToFrameSync(time);
+        outputSurface.awaitNewImage();
+        outputSurface.drawImage(true);
+        return outputSurface.getBitmap();
     }
 
     /**
@@ -462,9 +494,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         motionAnalysis.getRectDataList().setVisibility(debuggingEnabled);
     }
 
-    public void saveFrame(Mat mat, String name) {
-        Bitmap bmp = Bitmap.createBitmap(mat.width(), mat.height(), Bitmap.Config.ARGB_8888);// .createBitmap();
-        Utils.matToBitmap(mat, bmp);
+    public void saveFrame(Bitmap bmp, String name) {
 
         FileOutputStream out = null;
         try {

@@ -67,6 +67,14 @@ public class SeekToFrameExtractor {
         return seekHandler.sendMessage(message);
     }
 
+    /*
+    * Synchronous seek to frame
+     */
+
+    public void seekToFrameSync(long positionMicroSeconds) {
+        this.seekToThread.performSeekTo(positionMicroSeconds);
+    }
+
     static class SeekHandler extends Handler {
         final SeekToThread thread;
 
@@ -93,11 +101,13 @@ public class SeekToFrameExtractor {
         private MediaExtractor extractor;
         private MediaCodec decoder;
         private MediaCodec.BufferInfo bufferInfo;
+        private Surface surface;
         ByteBuffer[] inputBuffers;
 
         Handler seekHandler;
 
         public SeekToThread(File mediaFile, Surface surface) throws IOException {
+            this.surface = surface;
             extractor = new MediaExtractor();
             extractor.setDataSource(mediaFile.getPath());
 
