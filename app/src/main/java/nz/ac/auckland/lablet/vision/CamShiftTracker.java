@@ -149,11 +149,8 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
                         Log.d(TAG, "Current frame BMP is null: " + i);
                     }
                 }
-            } else {
-                Log.d(TAG, "No region of interests are set");
-                return null;
             }
-
+            
             publishProgress(((double) i + 1) / endFrame);
         }
 
@@ -241,9 +238,11 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         //this.saveFrame(backproj, "backproj_bitwise_and");
 
         try {
+            Rect tempTrackWindow = trackWindow.clone();
             RotatedRect result = Video.CamShift(backproj, trackWindow, termCriteria);
 
             if (result.size.equals(new Size(0, 0)) && result.angle == 0 && result.center.equals(new Point(0, 0))) {
+                trackWindow = tempTrackWindow;
                 return null;
             }
         } catch (Exception e) {
