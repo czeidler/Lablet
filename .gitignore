@@ -3,6 +3,8 @@ out/*
 build/*
 gen/*
 LabletTests/gen/*
+app/src/main/jniLibs/*
+openCVLibrary2411/*
 
 # IDEA project files
 workspace.xml
