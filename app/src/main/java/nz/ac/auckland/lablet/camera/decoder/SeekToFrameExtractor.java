@@ -101,13 +101,11 @@ public class SeekToFrameExtractor {
         private MediaExtractor extractor;
         private MediaCodec decoder;
         private MediaCodec.BufferInfo bufferInfo;
-        private Surface surface;
         ByteBuffer[] inputBuffers;
 
         Handler seekHandler;
 
         public SeekToThread(File mediaFile, Surface surface) throws IOException {
-            this.surface = surface;
             extractor = new MediaExtractor();
             extractor.setDataSource(mediaFile.getPath());
 

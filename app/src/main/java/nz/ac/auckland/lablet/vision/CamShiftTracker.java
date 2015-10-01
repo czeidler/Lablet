@@ -7,6 +7,7 @@ import android.util.Log;
 import android.util.Pair;
 import android.util.SparseArray;
 
+import org.luaj.vm2.ast.Str;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -74,8 +75,8 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
     private boolean debuggingEnabled = false;
     private boolean isTracking = false;
     public static final int KMEANS_IMG_SIZE = 100;
-    SeekToFrameExtractor extractor;
-    CodecOutputSurface outputSurface;
+    private SeekToFrameExtractor extractor;
+    private CodecOutputSurface outputSurface;
 
     Mat hsv, hue, mask, hist, backproj, bgr;// = Mat::zeros(200, 320, CV_8UC3), backproj;
     Size size;
@@ -168,7 +169,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
      * @return
      */
 
-    public Bitmap getFrame(long time)
+    private Bitmap getFrame(long time)
     {
         extractor.seekToFrameSync(time);
         outputSurface.awaitNewImage();
@@ -227,13 +228,20 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         Mat image = new Mat();
         Utils.bitmapToMat(bmp, image);
 
+//        this.saveFrame(image, "normal");
+//        Mat out = new Mat(image.rows(), image.cols(), image.type());
+//        image.convertTo(out, -1, 2.0, 2.0);
+//        image = out;
+//
+//        this.saveFrame(image, "bright");
+
         toHsv(image, hsvMin, hsvMax);
 
         ArrayList<Mat> hsvs = new ArrayList<>();
         hsvs.add(hsv);
 
         Imgproc.calcBackProject(hsvs, new MatOfInt(0), hist, backproj, ranges, 1);
-        //this.saveFrame(backproj, "backproj");
+        //
         Core.bitwise_and(backproj, mask, backproj);
         //this.saveFrame(backproj, "backproj_bitwise_and");
 
@@ -265,6 +273,15 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         Mat image = new Mat();
 
         Utils.bitmapToMat(bmp, image);
+
+//        this.saveFrame(image, "normal-roi");
+//        Mat out = new Mat(image.rows(), image.cols(), image.type());
+//        image.convertTo(out, -1, 2.0, 2.0);
+//        image = out;
+//
+//        this.saveFrame(image, "bright-roi");
+
+
         //this.saveFrame(image, "roi_raw_frame");
 
         trackWindow = new Rect(x, y, width, height);
@@ -294,6 +311,8 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
 
     private Pair<Scalar, Scalar> getMinMaxHsv(Mat bgr, int k) {
         //Convert to HSV
+
+
         Mat input = new Mat();
         Imgproc.cvtColor(bgr, input, Imgproc.COLOR_BGR2BGRA, 3);
 
@@ -491,6 +510,13 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
     public void setDebuggingEnabled(boolean debuggingEnabled) {
         this.debuggingEnabled = debuggingEnabled;
         motionAnalysis.getRectDataList().setVisibility(debuggingEnabled);
+    }
+
+    public void saveFrame(Mat mat, String name)
+    {
+        Bitmap bmp = Bitmap.createBitmap(mat.width(), mat.height(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(mat, bmp);
+        this.saveFrame(bmp, name);
     }
 
     public void saveFrame(Bitmap bmp, String name) {
