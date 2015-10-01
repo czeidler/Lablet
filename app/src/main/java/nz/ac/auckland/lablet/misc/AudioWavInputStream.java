@@ -146,7 +146,7 @@ public class AudioWavInputStream extends InputStream implements Closeable {
      * @param inputStream the input stream to read the data from
      * @param convertByteBuffer must have at least size 2
      * @param convertFloatBuffer must have at least size 1
-     * @return
+     * @return float amplitude value
      * @throws IOException
      */
     static public float readFloatAmplitude(InputStream inputStream, byte[] convertByteBuffer,

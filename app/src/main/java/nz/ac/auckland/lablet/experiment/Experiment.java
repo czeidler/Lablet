@@ -166,7 +166,7 @@ public class Experiment extends WeakListenable<Experiment.IListener> {
     /**
      * Get the current ExperimentRun.
      *
-     * @return
+     * @return the current experiment run of the experiment
      */
     public ExperimentRun getCurrentExperimentRun() {
         return currentExperimentRun;

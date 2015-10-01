@@ -32,7 +32,7 @@ abstract class ConcurrentPainter {
      *
      * @param geometryInfoNeeded if true the realDataRect and the screenRect of the RenderPayload as to be set.
      * @param requestedRealRect can be null
-     * @return
+     * @return a list of render payloads that needs to be rendered
      */
     abstract public List<StrategyPainter.RenderPayload> collectRenderPayloads(boolean geometryInfoNeeded,
                                                                               RectF requestedRealRect,

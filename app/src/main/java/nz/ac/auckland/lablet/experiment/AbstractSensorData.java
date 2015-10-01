@@ -79,7 +79,7 @@ abstract public class AbstractSensorData implements ISensorData {
     /**
      * Sub classes can override this method to store data that does not fit into a Bundle.
      *
-     * This method is called from {@see saveExperimentData}.
+     * This method is called from {@link #saveExperimentData}.
      *
      * * @param dir directory where data can be stored
      */
@@ -88,7 +88,7 @@ abstract public class AbstractSensorData implements ISensorData {
     /**
      * Here, derived classes can make their data persistent.
      *
-     * If an experiment has data that does not fit into an Bundle use {@see onSaveAdditionalData} instead.
+     * If an experiment has data that does not fit into an Bundle use {@link #onSaveAdditionalData} instead.
      *
      * @return a bundle containing the experiment data
      */

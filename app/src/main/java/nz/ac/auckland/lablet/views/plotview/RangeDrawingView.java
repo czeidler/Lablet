@@ -67,7 +67,7 @@ public class RangeDrawingView extends ViewGroup {
      *
      * @param left
      * @param right
-     * @return
+     * @return true if the range has changed
      */
     public boolean setMaxXRange(float left, float right) {
         maxRange.left = left;
@@ -82,7 +82,7 @@ public class RangeDrawingView extends ViewGroup {
      *
      * @param bottom
      * @param top
-     * @return
+     * @return true if the range has changed
      */
     public boolean setMaxYRange(float bottom, float top) {
         maxRange.bottom = bottom;

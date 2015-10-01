@@ -659,7 +659,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
      * This is a workaround for GT-P5210, when recording at 1280 x 720 but with a smaller preview size the recorded
      * video is messed up.
      *
-     * @return
+     * @return true if preview == video size is supported even it is not advertised
      */
     private boolean forcePreviewEqualVideo() {
         if (Build.MODEL.equals("GT-P5210"))

@@ -47,7 +47,7 @@ public interface ISensorData {
      * </p>
      * @param bundle the where all experiment information is stored
      * @param storageDir the storage directory of the experiment
-     * @return
+     * @return true if the data has been loaded
      */
     boolean loadExperimentData(Bundle bundle, File storageDir) throws IOException;
 
