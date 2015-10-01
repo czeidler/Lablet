@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views.markers;
+package nz.ac.auckland.lablet.vision.markers;
 
 import android.graphics.Canvas;
 import android.view.MotionEvent;

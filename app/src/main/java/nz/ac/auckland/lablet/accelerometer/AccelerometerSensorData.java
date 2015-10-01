@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Accelerometer sensor data.
+ */
 public class AccelerometerSensorData extends AbstractSensorData {
     private List<Number> timeValues = new ArrayList<>();
     private List<Number> xValues = new ArrayList<>();
@@ -29,6 +32,9 @@ public class AccelerometerSensorData extends AbstractSensorData {
     private List<Number> zValues = new ArrayList<>();
     private WeakListenable<IListener> weakListenable = new WeakListenable<>();
 
+    /**
+     * Listener interface for the accelerometer data.
+     */
     public interface IListener {
         void onDataAdded(long time, float[] data);
         void onDataCleared();

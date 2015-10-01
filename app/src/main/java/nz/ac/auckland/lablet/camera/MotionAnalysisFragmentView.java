@@ -16,7 +16,7 @@ import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.data.PointDataList;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 import nz.ac.auckland.lablet.views.FrameDataSeekBar;
@@ -292,13 +292,13 @@ class MotionAnalysisFragmentView extends FrameLayout {
                 if (i == 0)
                     return;
                 // ignore header row
-                int frameId = sensorAnalysis.getPointDataList().getDataAt(i - 1).getFrameId();
-                sensorAnalysis.getFrameDataList().setCurrentFrame(frameId);
+                int frameId = sensorAnalysis.getTagMarkers().getMarkerDataAt(i - 1).getId();
+                sensorAnalysis.getFrameDataModel().setCurrentFrame(frameId);
             }
         });
 
         final CameraExperimentFrameView sensorAnalysisView = new CameraExperimentFrameView(context, sensorAnalysis);
-        frameDataSeekBar.setTo(sensorAnalysis.getFrameDataList(), sensorAnalysis.getTimeData());
+        frameDataSeekBar.setTo(sensorAnalysis.getFrameDataModel(), sensorAnalysis.getTimeData());
 
         runContainerView.setTo(sensorAnalysisView, frameDataSeekBar, sensorAnalysis);
 
@@ -308,13 +308,13 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
         // marker table view
         final ITimeData timeData = sensorAnalysis.getTimeData();
-        markerDataTableAdapter = new MarkerDataTableAdapter(sensorAnalysis.getPointDataList());
+        markerDataTableAdapter = new MarkerDataTableAdapter(sensorAnalysis.getTagMarkers());
         markerDataTableAdapter.addColumn(new RunIdDataTableColumn("frame"));
         markerDataTableAdapter.addColumn(new TimeDataTableColumn(tUnit, timeData));
         markerDataTableAdapter.addColumn(new XPositionDataTableColumn(xUnit));
         markerDataTableAdapter.addColumn(new YPositionDataTableColumn(yUnit));
 
-        PointDataList markerDataModel = sensorAnalysis.getPointDataList();
+        MarkerDataModel markerDataModel = sensorAnalysis.getTagMarkers();
         ITimeData timeCalibration = sensorAnalysis.getTimeData();
         if (timeCalibration.getSize() > 400)
             releaseAdaptersWhenDrawerClosed = true;

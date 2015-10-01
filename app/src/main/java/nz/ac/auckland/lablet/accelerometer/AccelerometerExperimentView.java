@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Sensor view for an accelerometer experiment.
+ */
 class AccelerometerExperimentView extends AbstractExperimentSensorView {
     final private AccelerometerExperimentSensor sensor;
     final private AccelerometerSensorData.IListener dataListenerStrongRef;

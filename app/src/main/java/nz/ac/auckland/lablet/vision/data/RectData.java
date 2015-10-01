@@ -1,4 +1,4 @@
-package nz.ac.auckland.lablet.data;
+package nz.ac.auckland.lablet.vision.data;
 
 import android.graphics.PointF;
 
@@ -8,7 +8,6 @@ import org.opencv.core.RotatedRect;
 import org.opencv.core.Size;
 
 import nz.ac.auckland.lablet.camera.VideoData;
-import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 /**
  * Created by jdip004 on 25/08/2015.

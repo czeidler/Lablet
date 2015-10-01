@@ -1,11 +1,9 @@
-package nz.ac.auckland.lablet.views.markers;
+package nz.ac.auckland.lablet.views;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
-
-import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 /*
  * Copyright 2013-2014.
@@ -14,13 +12,14 @@ import nz.ac.auckland.lablet.experiment.CalibrationXY;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 
 /**
  * Marker for the origin coordinate system.
  */
-class OriginMarker extends PointMarker {
+class OriginMarker extends SimpleMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
@@ -38,8 +37,8 @@ class OriginMarker extends PointMarker {
      */
     @Override
     protected void onDraggedTo(PointF point) {
-        OriginMarkerList originDataListPainter = (OriginMarkerList)parent;
-        originDataListPainter.onDraggedTo(this, point);
+        OriginMarkerPainter originMarkerPainter = (OriginMarkerPainter)parent;
+        originMarkerPainter.onDraggedTo(this, point);
     }
 
     public void setScreenPosition(PointF screenPosition) {
@@ -51,10 +50,10 @@ class OriginMarker extends PointMarker {
 /**
  * Draws the origin coordinate system.
  * <p>
- * Expects a PointDataList with two data points. One for the origin and one for the first axis.
+ * Expects a MarkerDataModel with two data points. One for the origin and one for the first axis.
  * </p>
  */
-public class OriginMarkerList extends DraggableMarkerList implements CalibrationXY.IListener {
+public class OriginMarkerPainter extends AbstractMarkerPainter implements CalibrationXY.IListener {
     private CalibrationXY calibrationXY;
     private float angleScreen;
     private boolean firstDraw = true;
@@ -74,7 +73,7 @@ public class OriginMarkerList extends DraggableMarkerList implements Calibration
     private float ARROW_AXIS_OVERLAP;
     private float LABEL_TO_AXIS_END_DISTANCE;
 
-    public OriginMarkerList(PointDataList model, CalibrationXY calibrationXY) {
+    public OriginMarkerPainter(MarkerDataModel model, CalibrationXY calibrationXY) {
         super(model);
         this.calibrationXY = calibrationXY;
         this.calibrationXY.addListener(this);
@@ -89,12 +88,12 @@ public class OriginMarkerList extends DraggableMarkerList implements Calibration
             return;
         }
 
-        FONT_SIZE = containerView.toPixel(FONT_SIZE_DP);
-        LINE_WIDTH = containerView.toPixel(LINE_WIDTH_DP);
-        ARROW_WIDTH = containerView.toPixel(ARROW_WIDTH_DP);
-        ARROW_LENGTH = containerView.toPixel(ARROW_LENGTH_DP);
-        ARROW_AXIS_OVERLAP = containerView.toPixel(ARROW_AXIS_OVERLAP_DP);
-        LABEL_TO_AXIS_END_DISTANCE = containerView.toPixel(ARROW_AXIS_OVERLAP_DP);
+        FONT_SIZE = toPixel(FONT_SIZE_DP);
+        LINE_WIDTH = toPixel(LINE_WIDTH_DP);
+        ARROW_WIDTH = toPixel(ARROW_WIDTH_DP);
+        ARROW_LENGTH = toPixel(ARROW_LENGTH_DP);
+        ARROW_AXIS_OVERLAP = toPixel(ARROW_AXIS_OVERLAP_DP);
+        LABEL_TO_AXIS_END_DISTANCE = toPixel(ARROW_AXIS_OVERLAP_DP);
     }
 
     protected void finalize() {
@@ -107,7 +106,7 @@ public class OriginMarkerList extends DraggableMarkerList implements Calibration
     }
 
     @Override
-    protected DraggableMarker createMarkerForFrame(int frameId) {
+    protected DraggableMarker createMarkerForRow(int row) {
         return new OriginMarker();
     }
 
@@ -116,18 +115,18 @@ public class OriginMarkerList extends DraggableMarkerList implements Calibration
         if (firstDraw) {
             firstDraw = false;
             // update the angle
-            PointF originScreen = DraggableMarker.getScreenPosition(containerView, dataList.getDataAt(0));
-            PointF axis1Screen = DraggableMarker.getScreenPosition(containerView, dataList.getDataAt(1));
+            PointF originScreen = getMarkerScreenPosition(markerData.getMarkerDataAt(0));
+            PointF axis1Screen = getMarkerScreenPosition(markerData.getMarkerDataAt(1));
             angleScreen = CalibrationXY.getAngle(originScreen, axis1Screen);
             
             updateMarkerScreenPositions(originScreen);
             updateTagMarkerPositions();
         }
 
-        for (IMarker marker : painterList)
+        for (IMarker marker : markerList)
             marker.onDraw(canvas, 1);
 
-        if (dataList.size() != 3)
+        if (markerData.getMarkerCount() != 3)
             return;
 
         PointF origin = getOriginMarker(0).getCachedScreenPosition();
@@ -277,13 +276,13 @@ public class OriginMarkerList extends DraggableMarkerList implements Calibration
      * @param newPosition the new position of the dragged marker
      */
     protected void onDraggedTo(DraggableMarker marker, PointF newPosition) {
-        int row = painterList.indexOf(marker);
+        int row = markerList.indexOf(marker);
         if (row < 0)
             return;
 
         if (row == 0) {
             // translation
-            containerView.sanitizeScreenPoint(newPosition);
+            sanitizeScreenPoint(newPosition);
             updateMarkerScreenPositions(newPosition);
         } else {
             // x rotation
@@ -297,7 +296,7 @@ public class OriginMarkerList extends DraggableMarkerList implements Calibration
     }
 
     private OriginMarker getOriginMarker(int index) {
-        return (OriginMarker) painterList.get(index);
+        return (OriginMarker)markerList.get(index);
     }
 
     private void updateMarkerScreenPositions(PointF originScreen) {
@@ -323,9 +322,9 @@ public class OriginMarkerList extends DraggableMarkerList implements Calibration
         containerView.fromScreen(xAxisScreen, xAxis);
         containerView.fromScreen(yAxisScreen, yAxis);
 
-        dataList.setMarkerPosition(origin, 0);
-        dataList.setMarkerPosition(xAxis, 1);
-        dataList.setMarkerPosition(yAxis, 2);
+        markerData.setMarkerPosition(origin, 0);
+        markerData.setMarkerPosition(xAxis, 1);
+        markerData.setMarkerPosition(yAxis, 2);
     }
 
     private float getScreenAxisLength() {

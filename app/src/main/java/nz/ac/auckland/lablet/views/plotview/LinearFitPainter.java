@@ -10,6 +10,9 @@ package nz.ac.auckland.lablet.views.plotview;
 import android.graphics.*;
 
 
+/**
+ * Draws a linear fit of {@link AbstractXYDataAdapter} data.
+ */
 public class LinearFitPainter extends AbstractPlotDataPainter {
     class Fit {
         private double b = 0;
@@ -96,6 +99,11 @@ public class LinearFitPainter extends AbstractPlotDataPainter {
         invalidate();
     }
 
+    /**
+     * The adapter must be an instance of {@link AbstractXYDataAdapter}.
+     *
+     * @param adapter the data adapter
+     */
     @Override
     public void setDataAdapter(AbstractPlotDataAdapter adapter) {
         super.setDataAdapter(adapter);

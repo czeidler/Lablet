@@ -1,3 +1,13 @@
+/*
+ * Copyright 2015.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      James Diprose <jamie.diprose@gmail.com>
+ */
+
+
+
 package nz.ac.auckland.lablet.vision;
 
 import android.graphics.Bitmap;
@@ -7,7 +17,6 @@ import android.util.Log;
 import android.util.Pair;
 import android.util.SparseArray;
 
-import org.luaj.vm2.ast.Str;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -33,17 +42,14 @@ import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.camera.VideoData;
 import nz.ac.auckland.lablet.camera.decoder.CodecOutputSurface;
 import nz.ac.auckland.lablet.camera.decoder.SeekToFrameExtractor;
-import nz.ac.auckland.lablet.data.PointData;
-import nz.ac.auckland.lablet.data.PointDataList;
-import nz.ac.auckland.lablet.data.RectData;
-import nz.ac.auckland.lablet.data.RectDataList;
-import nz.ac.auckland.lablet.data.RoiData;
-import nz.ac.auckland.lablet.data.RoiDataList;
+import nz.ac.auckland.lablet.vision.data.RectData;
+import nz.ac.auckland.lablet.vision.data.RectDataList;
+import nz.ac.auckland.lablet.vision.data.RoiData;
+import nz.ac.auckland.lablet.vision.data.RoiDataList;
+import nz.ac.auckland.lablet.experiment.MarkerData;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 
-/**
- * Created by Jamie on 27/07/2015.
- */
 
 public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>> {
 
@@ -421,7 +427,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
 
     public void updateMarkers(SparseArray<Rect> results) {
         //Delete all items from arrays
-        PointDataList pointDataList = motionAnalysis.getPointDataList();
+        MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
         RectDataList rectDataList = motionAnalysis.getRectDataList();
         pointDataList.clear();
         rectDataList.clear();
@@ -437,9 +443,9 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
 
             //Add point marker
             PointF centre = videoData.toMarkerPoint(new PointF(centreX, centreY));
-            PointData centreTag = new PointData(frameId);
+            MarkerData centreTag = new MarkerData(frameId);
             centreTag.setPosition(centre);
-            pointDataList.addData(centreTag);
+            pointDataList.addMarkerData(centreTag);
 
             //Add debugging rectangle
             RectData data = new RectData(frameId);
@@ -453,7 +459,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
     }
 
     public void addRegionOfInterest(int frameId) {
-        PointDataList pointDataList = motionAnalysis.getPointDataList();
+        MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
         RoiDataList roiDataList = motionAnalysis.getRoiDataList();
 
         RoiData data = new RoiData(frameId);
@@ -466,7 +472,11 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         data.setBtmLeft(new PointF(centre.x - width, centre.y - height));
         data.setCentre(centre);
         roiDataList.addData(data);
-        pointDataList.removeData(frameId);
+        MarkerData pointData = pointDataList.getMarkerDataByDataId(frameId);
+        if(pointData !=null){
+            pointData.setVisibility(false); //TODO: if delete ROI then set to visible again.
+            pointData.setPosition(centre); //TODO: update this position when ROI moves (so view is updated, easier than changing whole app logic)
+        }
     }
 
     public List<CamShiftTracker.IListener> getListeners() {

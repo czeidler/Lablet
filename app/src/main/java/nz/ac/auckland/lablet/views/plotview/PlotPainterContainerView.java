@@ -16,7 +16,6 @@ import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import nz.ac.auckland.lablet.data.Data;
 import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
 import nz.ac.auckland.lablet.misc.JoinedList;
 
@@ -24,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Delegates drawing and touch event handling to a set of {@link IPlotPainter}s.
+ */
 public class PlotPainterContainerView extends RangeDrawingView {
     final private List<IPlotPainter> backgroundPainters = new ArrayList<>();
     final private List<IPlotPainter> plotPainters = new ArrayList<>();

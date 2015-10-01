@@ -61,7 +61,7 @@ class ScriptComponentMicExperimentView extends ScriptComponentSingleExperimentBa
 
         Button takeExperiment = (Button)view.findViewById(R.id.takeExperimentButton);
         assert takeExperiment != null;
-        takeExperiment.setOnClickListener(new View.OnClickListener() {
+        takeExperiment.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 startExperimentActivity(new MicrophoneSensorPlugin());

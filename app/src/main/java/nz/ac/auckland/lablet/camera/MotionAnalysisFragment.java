@@ -14,11 +14,7 @@ import android.view.*;
 import android.widget.PopupMenu;
 import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.data.Data;
-import nz.ac.auckland.lablet.data.FrameDataList;
-import nz.ac.auckland.lablet.data.PointData;
-import nz.ac.auckland.lablet.data.PointDataList;
-import nz.ac.auckland.lablet.data.RoiDataList;
+import nz.ac.auckland.lablet.vision.data.RoiDataList;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 import nz.ac.auckland.lablet.views.ObjectTrackerDialog;
@@ -28,6 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Fragment to display the motion analysis.
+ */
 public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
     static final int PERFORM_RUN_SETTINGS = 0;
 
@@ -52,31 +51,31 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 
         final MenuItem deleteItem = menu.findItem(R.id.action_delete);
         assert deleteItem != null;
-        final PointDataList pointDataModel = getSensorAnalysis().getPointDataList();
-        final FrameDataList frameDataList = getSensorAnalysis().getFrameDataList();
-        if (pointDataModel.size() <= 1)
+        final MarkerDataModel markerDataModel = getSensorAnalysis().getTagMarkers();
+        final FrameDataModel frameDataModel = getSensorAnalysis().getFrameDataModel();
+        if (markerDataModel.getMarkerCount() <= 1)
             deleteItem.setVisible(false);
         else
             deleteItem.setVisible(true);
         deleteItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                int selectedIndex = pointDataModel.getSelectedData();
-                if (selectedIndex < 0 || pointDataModel.size() == 1) {
+                int selectedIndex = markerDataModel.getSelectedMarkerData();
+                if (selectedIndex < 0 || markerDataModel.getMarkerCount() == 1) {
                     getActivity().invalidateOptionsMenu();
                     return true;
                 }
 
-                pointDataModel.removeData(selectedIndex);
+                markerDataModel.removeMarkerData(selectedIndex);
 
                 int newSelectedIndex;
-                if (selectedIndex < pointDataModel.size())
+                if (selectedIndex < markerDataModel.getMarkerCount())
                     newSelectedIndex = selectedIndex;
                 else
                     newSelectedIndex = selectedIndex - 1;
-                frameDataList.setCurrentFrame(pointDataModel.getDataAt(newSelectedIndex).getFrameId());
+                frameDataModel.setCurrentFrame(markerDataModel.getMarkerDataAt(newSelectedIndex).getId());
 
-                if (pointDataModel.size() <= 1)
+                if (markerDataModel.getMarkerCount() <= 1)
                     getActivity().invalidateOptionsMenu();
                 return true;
             }
@@ -144,7 +143,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                 int item = menuItem.getItemId();
                 RoiDataList dataList = getSensorAnalysis().getRoiDataList();
                 int roiDataSize = dataList.size();
-                int currentFrame = getSensorAnalysis().getFrameDataList().getCurrentFrame();
+                int currentFrame = getSensorAnalysis().getFrameDataModel().getCurrentFrame();
                 boolean roiExists = dataList.getIndexByFrameId(currentFrame) != -1;
                 CamShiftTracker tracker = getSensorAnalysis().getObjectTracker();
 
@@ -254,12 +253,12 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                     RangeChangedMarkerUpdater updater = new RangeChangedMarkerUpdater(oldStart, oldFrameRate,
                             timeData.getAnalysisVideoStart(), timeData.getAnalysisVideoEnd(),
                             timeData.getAnalysisFrameRate());
-                    List<PointData> updatedMarkers = updater.update(sensorAnalysis.getPointDataList());
-                    sensorAnalysis.getPointDataList().setDataList(updatedMarkers);
+                    List<MarkerData> updatedMarkers = updater.update(sensorAnalysis.getTagMarkers());
+                    sensorAnalysis.getTagMarkers().setMarkerDataList(updatedMarkers);
                     // update current frame
                     int newCurrentFrame = updater.getNewCurrentFrame(updatedMarkers,
-                            sensorAnalysis.getFrameDataList().getCurrentFrame());
-                    sensorAnalysis.getFrameDataList().setCurrentFrame(newCurrentFrame);
+                            sensorAnalysis.getFrameDataModel().getCurrentFrame());
+                    sensorAnalysis.getFrameDataModel().setCurrentFrame(newCurrentFrame);
                 }
             }
         }
@@ -281,11 +280,11 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             newTimeData.setAnalysisFrameRate(newFrameRate);
         }
 
-        public List<PointData> update(PointDataList dataModel) {
-            List<PointData> newMarkerData = new ArrayList<>();
-            for (int i = 0; i < dataModel.size(); i++) {
-                PointData pointData = dataModel.getDataAt(i);
-                float time = oldTimeData.getFrameTime(pointData.getFrameId());
+        public List<MarkerData> update(MarkerDataModel dataModel) {
+            List<MarkerData> newMarkerData = new ArrayList<>();
+            for (int i = 0; i < dataModel.getMarkerCount(); i++) {
+                MarkerData markerData = dataModel.getMarkerDataAt(i);
+                float time = oldTimeData.getFrameTime(markerData.getId());
                 int newFrame = newTimeData.getClosestFrame(time);
                 float frameTime = newTimeData.getFrameTime(newFrame);
 
@@ -294,8 +293,8 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                 if (time < newTimeData.getAnalysisVideoStart() || time > newTimeData.getAnalysisVideoEnd())
                     continue;
 
-                PointData clone = new PointData(newFrame);
-                clone.setPosition(pointData.getPosition());
+                MarkerData clone = new MarkerData(newFrame);
+                clone.setPosition(markerData.getPosition());
                 newMarkerData.add(clone);
             }
             return newMarkerData;
@@ -305,13 +304,13 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             return Math.abs(value1 - value2) < 0.01;
         }
 
-        public int getNewCurrentFrame(List<PointData> newMarkerList, int oldCurrentFrame) {
+        public int getNewCurrentFrame(List<MarkerData> newMarkerList, int oldCurrentFrame) {
             float oldTime = oldTimeData.getFrameTime(oldCurrentFrame);
             int newCurrentFrame = 0;
             float minDiff = Float.MAX_VALUE;
             for (int i = 0; i < newMarkerList.size(); i++) {
-                PointData pointData = newMarkerList.get(i);
-                int newFrame = pointData.getFrameId();
+                MarkerData markerData = newMarkerList.get(i);
+                int newFrame = markerData.getId();
                 float time = newTimeData.getFrameTime(newFrame);
                 float currentDiff = Math.abs(time - oldTime);
                 if (currentDiff < minDiff) {
@@ -325,30 +324,30 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         }
     }
 
-    private PointDataList.IListener menuDataListener = new PointDataList.IListener<PointDataList>() {
+    private MarkerDataModel.IListener menuDataListener = new MarkerDataModel.IListener() {
         @Override
-        public void onDataAdded(PointDataList model, int index) {
-            if (model.size() > 1)
+        public void onDataAdded(MarkerDataModel model, int index) {
+            if (model.getMarkerCount() > 1)
                 getActivity().invalidateOptionsMenu();
         }
 
         @Override
-        public void onDataRemoved(PointDataList model, int index, Data data) {
+        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
 
         }
 
         @Override
-        public void onDataChanged(PointDataList model, int index, int number) {
+        public void onDataChanged(MarkerDataModel model, int index, int number) {
 
         }
 
         @Override
-        public void onAllDataChanged(PointDataList model) {
+        public void onAllDataChanged(MarkerDataModel model) {
 
         }
 
         @Override
-        public void onDataSelected(PointDataList model, int index) {
+        public void onDataSelected(MarkerDataModel model, int index) {
 
         }
     };
@@ -360,7 +359,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         final Intent intent = getActivity().getIntent();
         if (intent != null) {
             Bundle extras = intent.getExtras();
-            if (extras != null && getSensorAnalysis().getPointDataList().size() == 0) {
+            if (extras != null && getSensorAnalysis().getTagMarkers().getMarkerCount() == 0) {
                 if (extras.getBoolean("first_start_with_run_settings", false)) {
                     resumeWithRunSettings = true;
                 }
@@ -371,7 +370,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             }
         }
 
-        getSensorAnalysis().getPointDataList().addListener(menuDataListener);
+        getSensorAnalysis().getTagMarkers().addListener(menuDataListener);
     }
 
     private MotionAnalysisFragmentView view;
@@ -396,7 +395,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         MotionAnalysis sensorAnalysis = getSensorAnalysis();
         if (getSensorAnalysis() == null)
             return;
-        sensorAnalysis.getFrameDataList().setCurrentFrame(sensorAnalysis.getFrameDataList().getCurrentFrame());
+        sensorAnalysis.getFrameDataModel().setCurrentFrame(sensorAnalysis.getFrameDataModel().getCurrentFrame());
 
         if (resumeWithRunSettings) {
             Bundle options = null;

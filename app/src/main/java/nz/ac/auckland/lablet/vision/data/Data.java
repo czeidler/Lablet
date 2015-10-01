@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.data;
+package nz.ac.auckland.lablet.vision.data;
 
 /**
  * Two dimensional data that is associated with an integer frameId.

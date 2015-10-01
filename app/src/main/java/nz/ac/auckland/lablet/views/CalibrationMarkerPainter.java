@@ -1,8 +1,6 @@
-package nz.ac.auckland.lablet.views.markers;
+package nz.ac.auckland.lablet.views;
 
 import android.graphics.*;
-
-import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 /*
  * Copyright 2013-2014.
@@ -11,13 +9,14 @@ import nz.ac.auckland.lablet.experiment.CalibrationXY;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 
 /**
  * Marker for the calibration length scale.
  */
-class CalibrationMarker extends PointMarker {
+class CalibrationMarker extends SimpleMarker {
     @Override
     public void onDraw(Canvas canvas, float priority) {
         if (isSelectedForDrag())
@@ -28,11 +27,11 @@ class CalibrationMarker extends PointMarker {
 /**
  * Responsible to draw a calibration scale.
  * <p>
- * The painter expect a {@link PointDataList} with two data points; one
+ * The painter expect a {@link nz.ac.auckland.lablet.experiment.MarkerDataModel} with two data points; one
  * for the start and one for the end of the scale.
  * </p>
  */
-public class CalibrationMarkerList extends DraggableMarkerList {
+public class CalibrationMarkerPainter extends AbstractMarkerPainter {
     // device independent sizes:
     private final int FONT_SIZE_DP = 20;
     private final float LINE_WIDTH_DP = 2f;
@@ -43,7 +42,7 @@ public class CalibrationMarkerList extends DraggableMarkerList {
     private float LINE_WIDTH;
     private float WING_LENGTH;
 
-    public CalibrationMarkerList(PointDataList model) {
+    public CalibrationMarkerPainter(MarkerDataModel model) {
         super(model);
     }
 
@@ -54,13 +53,13 @@ public class CalibrationMarkerList extends DraggableMarkerList {
         if (view == null)
             return;
 
-        FONT_SIZE = containerView.toPixel(FONT_SIZE_DP);
-        LINE_WIDTH = containerView.toPixel(LINE_WIDTH_DP);
-        WING_LENGTH = containerView.toPixel(WING_LENGTH_DP);
+        FONT_SIZE = toPixel(FONT_SIZE_DP);
+        LINE_WIDTH = toPixel(LINE_WIDTH_DP);
+        WING_LENGTH = toPixel(WING_LENGTH_DP);
     }
 
     @Override
-    protected DraggableMarker createMarkerForFrame(int frameId) {
+    protected DraggableMarker createMarkerForRow(int row) {
         return new CalibrationMarker();
     }
 
@@ -74,15 +73,15 @@ public class CalibrationMarkerList extends DraggableMarkerList {
     }
 
     private PointF getCurrentScreenPos(int markerIndex) {
-        return ((DraggableMarker) painterList.get(markerIndex)).getCachedScreenPosition();
+        return ((DraggableMarker)markerList.get(markerIndex)).getCachedScreenPosition();
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        for (IMarker marker : painterList)
+        for (IMarker marker : markerList)
             marker.onDraw(canvas, 1);
 
-        if (dataList.size() != 2)
+        if (markerData.getMarkerCount() != 2)
             return;
 
         // draw scale
@@ -116,12 +115,12 @@ public class CalibrationMarkerList extends DraggableMarkerList {
         canvas.drawLine(wing2Top.x, wing2Top.y, wing2Bottom.x, wing2Bottom.y, paint);
 
         // draw pixel display when one marker is selected for dragging
-        if (!painterList.get(0).isSelectedForDrag() && !painterList.get(1).isSelectedForDrag())
+        if (!markerList.get(0).isSelectedForDrag() && !markerList.get(1).isSelectedForDrag())
             return;
 
         paint.setStyle(Paint.Style.FILL);
         paint.setTextSize(FONT_SIZE);
-        int scaleLength = containerView.toPixel((int) Math.sqrt(Math.pow(screenPos1.x - screenPos2.x, 2)
+        int scaleLength = toPixel((int) Math.sqrt(Math.pow(screenPos1.x - screenPos2.x, 2)
                 + Math.pow(screenPos1.y - screenPos2.y, 2)));
         String text = "Scale length [pixel]: ";
         text += scaleLength;

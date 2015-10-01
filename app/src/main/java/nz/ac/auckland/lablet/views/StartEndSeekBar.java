@@ -5,16 +5,16 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views.markers;
+package nz.ac.auckland.lablet.views;
 
 import android.content.Context;
 import android.graphics.*;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-
-import nz.ac.auckland.lablet.data.PointData;
-import nz.ac.auckland.lablet.data.PointDataList;
+import android.util.SparseArray;
+import nz.ac.auckland.lablet.experiment.MarkerData;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.plotview.IPlotPainter;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
@@ -49,19 +49,19 @@ abstract class StartEndMarker extends DraggableMarker {
     }
 
     @Override
-    public void setTo(DraggableMarkerList painter, PointData data) {
-        super.setTo(painter, data);
+    public void setTo(AbstractMarkerPainter painter, MarkerData markerData) {
+        super.setTo(painter, markerData);
 
-        WIDTH = parent.getContainerView().toPixel(WIDTH_DP);
-        HEIGHT = parent.getContainerView().toPixel(StartEndSeekBar.HEIGHT_DP);
-        TRIANGLE_HEIGHT = parent.getContainerView().toPixel(StartEndSeekBar.HEIGHT_DP * 0.5f);
+        WIDTH = parent.toPixel(WIDTH_DP);
+        HEIGHT = parent.toPixel(StartEndSeekBar.HEIGHT_DP);
+        TRIANGLE_HEIGHT = parent.toPixel(StartEndSeekBar.HEIGHT_DP * 0.5f);
     }
 
     @Override
     public boolean isPointOnSelectArea(PointF screenPoint) {
-        PointF position = DraggableMarker.getScreenPosition(containerView, data);
+        PointF position = parent.getMarkerScreenPosition(markerData);
         // build a marker rect with increased width
-        final float touchWidth = (float)parent.getContainerView().toPixel(60);
+        final float touchWidth = (float)parent.toPixel(60);
         RectF rect = new RectF();
         rect.left = position.x - touchWidth / 2;
         rect.top = 0;
@@ -97,7 +97,7 @@ class StartMarker extends StartEndMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
-        PointF position = DraggableMarker.getScreenPosition(containerView, data);
+        PointF position = parent.getMarkerScreenPosition(markerData);
 
         if (isDragging) {
             PointF dragPosition = getTouchPosition();
@@ -131,7 +131,7 @@ class EndMarker extends StartEndMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
-        PointF position = DraggableMarker.getScreenPosition(containerView, data);
+        PointF position = parent.getMarkerScreenPosition(markerData);
 
         if (isDragging) {
             PointF dragPosition = getTouchPosition();
@@ -164,7 +164,7 @@ class EndMarker extends StartEndMarker {
  * The used data model should contain exactly two data points.
  * </p>
  */
-class StartEndMarkerList extends DraggableMarkerList {
+class StartEndPainter extends AbstractMarkerPainter {
     int numberOfSteps = 10;
 
     /**
@@ -172,13 +172,13 @@ class StartEndMarkerList extends DraggableMarkerList {
      *
      * @param data should contain exactly two data points, one for the start and one for the end marker
      */
-    public StartEndMarkerList(PointDataList data) {
+    public StartEndPainter(MarkerDataModel data) {
         super(data);
     }
 
     @Override
-    protected DraggableMarker createMarkerForFrame(int frameId) {
-        if (frameId == 0)
+    protected DraggableMarker createMarkerForRow(int row) {
+        if (row == 0)
             return new StartMarker();
         else
             return new EndMarker();
@@ -186,43 +186,43 @@ class StartEndMarkerList extends DraggableMarkerList {
 
     @Override
     public void onDraw(Canvas canvas) {
-        for (IMarker marker : painterList)
+        for (IMarker marker : markerList)
             marker.onDraw(canvas, 1);
     }
 
     @Override
     public void markerMoveRequest(DraggableMarker marker, PointF newPosition, boolean isDragging) {
-        int row = painterList.lastIndexOf(marker);
+        int row = markerList.lastIndexOf(marker);
         if (row < 0)
             return;
 
         PointF newReal = new PointF();
-        containerView.sanitizeScreenPoint(newPosition);
+        sanitizeScreenPoint(newPosition);
         containerView.fromScreen(newPosition, newReal);
         newReal.x = toStepPosition(newReal.x);
 
         if (row == 0) {
-            PointData marker2 = dataList.getDataAt(1);
+            MarkerData marker2 = markerData.getMarkerDataAt(1);
             if (newReal.x > marker2.getPosition().x)
-                dataList.setMarkerPosition(newReal, 1);
+                markerData.setMarkerPosition(newReal, 1);
         } else {
-            PointData marker1 = dataList.getDataAt(0);
+            MarkerData marker1 = markerData.getMarkerDataAt(0);
             if (newReal.x < marker1.getPosition().x)
-                dataList.setMarkerPosition(newReal, 0);
+                markerData.setMarkerPosition(newReal, 0);
         }
-        dataList.setMarkerPosition(newReal, row);
+        markerData.setMarkerPosition(newReal, row);
     }
 
     public void setNumberOfSteps(int steps) {
         numberOfSteps = steps;
 
-        PointData marker1 = dataList.getDataAt(0);
+        MarkerData marker1 = markerData.getMarkerDataAt(0);
         marker1.getPosition().x = toStepPosition(marker1.getPosition().x);
-        dataList.setMarkerPosition(marker1.getPosition(), 0);
+        markerData.setMarkerPosition(marker1.getPosition(), 0);
 
-        PointData marker2 = dataList.getDataAt(1);
+        MarkerData marker2 = markerData.getMarkerDataAt(1);
         marker2.getPosition().x = toStepPosition(marker2.getPosition().x);
-        dataList.setMarkerPosition(marker2.getPosition(), 1);
+        markerData.setMarkerPosition(marker2.getPosition(), 1);
     }
 
     private float toStepPosition(float floatPosition) {
@@ -239,8 +239,8 @@ class StartEndMarkerList extends DraggableMarkerList {
  * A seek bar with a start and an end marker. For example, used to select video start and end point.
  */
 public class StartEndSeekBar extends PlotPainterContainerView {
-    private PointDataList markerDataModel;
-    private StartEndMarkerList startEndMarkerList;
+    private MarkerDataModel markerDataModel;
+    private StartEndPainter startEndPainter;
 
     // dimensions in density-independent  pixels
     public static final float HEIGHT_DP = 35;
@@ -248,34 +248,34 @@ public class StartEndSeekBar extends PlotPainterContainerView {
     public StartEndSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        markerDataModel = new PointDataList();
-        markerDataModel.addData(new PointData(0));
-        markerDataModel.addData(new PointData(1));
+        markerDataModel = new MarkerDataModel();
+        markerDataModel.addMarkerData(new MarkerData(0));
+        markerDataModel.addMarkerData(new MarkerData(1));
 
         setXRange(0, 1);
         setYRange(0, 1);
 
-        startEndMarkerList = new StartEndMarkerList(markerDataModel);
-        addPlotPainter(startEndMarkerList);
+        startEndPainter = new StartEndPainter(markerDataModel);
+        addPlotPainter(startEndPainter);
         invalidate();
     }
 
     public float getStart() {
-        return markerDataModel.getDataAt(0).getPosition().x;
+        return markerDataModel.getMarkerDataAt(0).getPosition().x;
     }
 
     public float getEnd() {
-        return markerDataModel.getDataAt(1).getPosition().x;
+        return markerDataModel.getMarkerDataAt(1).getPosition().x;
     }
 
     private void setStart(float start) {
-        PointF point = markerDataModel.getDataAt(0).getPosition();
+        PointF point = markerDataModel.getMarkerDataAt(0).getPosition();
         point.x = start;
         markerDataModel.setMarkerPosition(point, 0);
     }
 
     private void setEnd(float end) {
-        PointF point = markerDataModel.getDataAt(1).getPosition();
+        PointF point = markerDataModel.getMarkerDataAt(1).getPosition();
         point.x = end;
         markerDataModel.setMarkerPosition(point, 1);
     }
@@ -348,10 +348,10 @@ public class StartEndSeekBar extends PlotPainterContainerView {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         LayoutParams params = getLayoutParams();
         assert params != null;
-        setMeasuredDimension(params.width, startEndMarkerList.getContainerView().toPixel(HEIGHT_DP));
+        setMeasuredDimension(params.width, startEndPainter.toPixel(HEIGHT_DP));
     }
 
-    public PointDataList getMarkerDataModel() {
+    public MarkerDataModel getMarkerDataModel() {
         return markerDataModel;
     }
 
@@ -377,6 +377,6 @@ public class StartEndSeekBar extends PlotPainterContainerView {
      * @param max the end of the range
      */
     public void setMax(int max) {
-        startEndMarkerList.setNumberOfSteps(max + 1);
+        startEndPainter.setNumberOfSteps(max + 1);
     }
 }

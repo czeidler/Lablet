@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.IOException;
 
 
+/**
+ * Abstract base class for file based imports.
+ */
 public abstract class AbstractFileImportPlugin implements IImportPlugin {
     @Override
     public void importData(File importFile, File storageDir, IListener listener) {

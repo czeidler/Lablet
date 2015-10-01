@@ -1,4 +1,4 @@
-package nz.ac.auckland.lablet.views.markers;
+package nz.ac.auckland.lablet.vision.markers;
 
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -10,9 +10,8 @@ import android.view.ViewParent;
 import java.util.ArrayList;
 import java.util.List;
 
-import nz.ac.auckland.lablet.data.Data;
-import nz.ac.auckland.lablet.data.DataList;
-import nz.ac.auckland.lablet.data.FrameDataList;
+import nz.ac.auckland.lablet.vision.data.Data;
+import nz.ac.auckland.lablet.vision.data.DataList;
 import nz.ac.auckland.lablet.views.plotview.AbstractPlotPainter;
 
 /**

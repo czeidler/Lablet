@@ -1,4 +1,4 @@
-package nz.ac.auckland.lablet.data;
+package nz.ac.auckland.lablet.vision.data;
 
 import android.graphics.PointF;
 

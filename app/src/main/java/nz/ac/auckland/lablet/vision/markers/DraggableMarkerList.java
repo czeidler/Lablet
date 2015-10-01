@@ -1,11 +1,11 @@
-package nz.ac.auckland.lablet.views.markers;
+package nz.ac.auckland.lablet.vision.markers;
 
 import android.graphics.PointF;
 
-import nz.ac.auckland.lablet.data.Data;
-import nz.ac.auckland.lablet.data.DataList;
-import nz.ac.auckland.lablet.data.PointData;
-import nz.ac.auckland.lablet.data.PointDataList;
+import nz.ac.auckland.lablet.vision.data.Data;
+import nz.ac.auckland.lablet.vision.data.DataList;
+import nz.ac.auckland.lablet.vision.data.PointData;
+import nz.ac.auckland.lablet.vision.data.PointDataList;
 
 /**
  * Abstract base class to draw a in a
@@ -123,7 +123,7 @@ public abstract class DraggableMarkerList extends MarkerList<PointDataList> {
         }
     }
 
-    private DraggableMarkerList.MarkerPainterGroup markerPainterGroup = new DraggableMarkerList.MarkerPainterGroup();
+    private MarkerPainterGroup markerPainterGroup = new MarkerPainterGroup();
 
     public DraggableMarkerList(PointDataList list) {
         super(list);

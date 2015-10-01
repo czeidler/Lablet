@@ -11,6 +11,9 @@ import nz.ac.auckland.lablet.experiment.IDataTypePlugin;
 import nz.ac.auckland.lablet.experiment.ISensorData;
 
 
+/**
+ * Plugin for the video data type.
+ */
 public class VideoDataTypePlugin implements IDataTypePlugin {
     @Override
     public String getDataType() {

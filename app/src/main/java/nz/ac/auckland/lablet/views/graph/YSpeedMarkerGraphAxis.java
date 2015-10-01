@@ -24,7 +24,7 @@ public class YSpeedMarkerGraphAxis extends MarkerTimeGraphAxis {
 
     @Override
     public int size() {
-        return getData().size() - 1;
+        return getData().getMarkerCount() - 1;
     }
 
     @Override

@@ -10,17 +10,21 @@ package nz.ac.auckland.lablet.accelerometer;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Bundle;
-
-import nz.ac.auckland.lablet.data.PointData;
-import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.experiment.IDataAnalysis;
 import nz.ac.auckland.lablet.experiment.ISensorData;
+import nz.ac.auckland.lablet.experiment.MarkerData;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 
+/**
+ * Contains all data relevant for the accelerometer analysis.
+ */
 public class AccelerometerAnalysis implements IDataAnalysis {
     final private AccelerometerSensorData sensorData;
     final private DisplaySettings displaySettings = new DisplaySettings();
@@ -31,12 +35,12 @@ public class AccelerometerAnalysis implements IDataAnalysis {
     final private Calibration totalCalibration = new Calibration();
 
     class Calibration {
-        final private PointDataList baseLineMarker = new PointDataList();
+        final private MarkerDataModel baseLineMarker = new MarkerDataModel();
 
         public Calibration() {
-            PointData data = new PointData(0);
-            data.setPosition(new PointF(0f, 9.81f));
-            baseLineMarker.addData(data);
+            MarkerData markerData = new MarkerData(0);
+            markerData.setPosition(new PointF(0f, 9.81f));
+            baseLineMarker.addMarkerData(markerData);
         }
 
         public Bundle toBundle() {
@@ -52,7 +56,7 @@ public class AccelerometerAnalysis implements IDataAnalysis {
                 baseLineMarker.fromBundle(baseLineMarkerBundle);
         }
 
-        public PointDataList getBaseLineMarker() {
+        public MarkerDataModel getBaseLineMarker() {
             return baseLineMarker;
         }
 

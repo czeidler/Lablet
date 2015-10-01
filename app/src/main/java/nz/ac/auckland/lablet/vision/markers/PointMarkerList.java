@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views.markers;
+package nz.ac.auckland.lablet.vision.markers;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -13,8 +13,8 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
 
-import nz.ac.auckland.lablet.data.PointData;
-import nz.ac.auckland.lablet.data.PointDataList;
+import nz.ac.auckland.lablet.vision.data.PointData;
+import nz.ac.auckland.lablet.vision.data.PointDataList;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 import java.util.ArrayList;

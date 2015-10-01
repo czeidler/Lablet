@@ -16,16 +16,16 @@ import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.camera.ITimeData;
-import nz.ac.auckland.lablet.data.FrameDataList;
+import nz.ac.auckland.lablet.experiment.FrameDataModel;
 
 import java.text.DecimalFormat;
 
 
 /**
- * Seek bar to work with the {@link FrameDataList}.
+ * Seek bar to work with the {@link nz.ac.auckland.lablet.experiment.FrameDataModel}.
  */
-public class FrameDataSeekBar extends LinearLayout implements FrameDataList.IListener {
-    private FrameDataList frameDataList = null;
+public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.IListener {
+    private FrameDataModel frameDataModel = null;
     private ITimeData timeData = null;
 
     private TextView progressLabel = null;
@@ -82,7 +82,7 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataList.ILis
                 if (progress < 1)
                     progress = 1;
 
-                frameDataList.setCurrentFrame(frameDataList.getCurrentFrame() + direction * (int)progress);
+                frameDataModel.setCurrentFrame(frameDataModel.getCurrentFrame() + direction * (int)progress);
 
                 handler.postDelayed(this, updateInterval);
             }
@@ -112,7 +112,7 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataList.ILis
         prevButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                frameDataList.setCurrentFrame(frameDataList.getCurrentFrame() - 1);
+                frameDataModel.setCurrentFrame(frameDataModel.getCurrentFrame() - 1);
             }
         });
         prevButton.setOnLongClickListener(new OnLongClickListener() {
@@ -126,7 +126,7 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataList.ILis
         nextButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                frameDataList.setCurrentFrame(frameDataList.getCurrentFrame() + 1);
+                frameDataModel.setCurrentFrame(frameDataModel.getCurrentFrame() + 1);
             }
         });
         nextButton.setOnLongClickListener(new OnLongClickListener() {
@@ -143,7 +143,7 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataList.ILis
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (!fromUser)
                     return;
-                frameDataList.setCurrentFrame(progress);
+                frameDataModel.setCurrentFrame(progress);
             }
 
             @Override
@@ -160,23 +160,23 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataList.ILis
         progressLabel.setText("--/--");
     }
 
-    public void setTo(FrameDataList model, ITimeData timeData) {
+    public void setTo(FrameDataModel model, ITimeData timeData) {
         this.timeData = timeData;
 
-        if (frameDataList != null)
-            frameDataList.removeListener(this);
+        if (frameDataModel != null)
+            frameDataModel.removeListener(this);
 
-        frameDataList = model;
-        frameDataList.addListener(this);
+        frameDataModel = model;
+        frameDataModel.addListener(this);
 
         updateViews();
     }
 
     private void updateViews() {
-        int run = frameDataList.getCurrentFrame();
+        int run = frameDataModel.getCurrentFrame();
         String labelText = String.valueOf(run);
         labelText += "/";
-        labelText += String.valueOf(frameDataList.getNumberOfFrames() - 1);
+        labelText += String.valueOf(frameDataModel.getNumberOfFrames() - 1);
         progressLabel.setText(labelText);
 
         int frameTime = (int)timeData.getTimeAt(run);
@@ -185,7 +185,7 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataList.ILis
         else
             timeLabel.setText(new DecimalFormat("#.###").format((float)frameTime / 1000) + " [s]");
 
-        seekBar.setMax(frameDataList.getNumberOfFrames() - 1);
+        seekBar.setMax(frameDataModel.getNumberOfFrames() - 1);
         seekBar.setProgress(run);
     }
 

@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.data;
+package nz.ac.auckland.lablet.vision.data;
 
 import android.os.Bundle;
 import nz.ac.auckland.lablet.misc.WeakListenable;

@@ -1,12 +1,12 @@
-package nz.ac.auckland.lablet.views.markers;
+package nz.ac.auckland.lablet.vision.markers;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.view.MotionEvent;
 
-import nz.ac.auckland.lablet.data.RectData;
-import nz.ac.auckland.lablet.data.RectDataList;
+import nz.ac.auckland.lablet.vision.data.RectData;
+import nz.ac.auckland.lablet.vision.data.RectDataList;
 
 
 /*

@@ -24,7 +24,7 @@ public class YPositionDataTableColumn extends UnitDataTableColumn {
 
     @Override
     public int size() {
-        return dataModel.size();
+        return dataModel.getMarkerCount();
     }
 
     @Override

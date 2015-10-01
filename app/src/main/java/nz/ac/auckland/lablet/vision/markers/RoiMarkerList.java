@@ -1,17 +1,13 @@
-package nz.ac.auckland.lablet.views.markers;
+package nz.ac.auckland.lablet.vision.markers;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.view.MotionEvent;
 import android.view.ViewParent;
-
 import java.util.ArrayList;
-
-import nz.ac.auckland.lablet.data.RectData;
-import nz.ac.auckland.lablet.data.RoiData;
-import nz.ac.auckland.lablet.data.RoiDataList;
+import nz.ac.auckland.lablet.vision.data.RoiData;
+import nz.ac.auckland.lablet.vision.data.RoiDataList;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 

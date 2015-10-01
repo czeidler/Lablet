@@ -370,7 +370,7 @@ public class ExperimentActivity extends FragmentActivity {
      * Show a menu to enable or disable sensors.
      */
     private void showSensorMenu() {
-        View menuView = findViewById(R.id.action_view);
+        View menuView = findViewById(R.id.action_sensors);
         PopupMenu popup = new PopupMenu(menuView.getContext(), menuView);
 
         final List<ISensorPlugin> plugins = ExperimentPluginFactory.getFactory().getSensorPlugins();

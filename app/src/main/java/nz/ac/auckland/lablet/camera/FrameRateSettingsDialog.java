@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Dialog to select the recording frame rate.
+ */
 public class FrameRateSettingsDialog extends AlertDialog {
     final private List<Float> frameRateList;
     final private CameraExperimentSensor cameraExperimentSensor;

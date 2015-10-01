@@ -7,17 +7,16 @@
  */
 package nz.ac.auckland.lablet.views.graph;
 
-import nz.ac.auckland.lablet.data.Data;
-import nz.ac.auckland.lablet.data.PointDataList;
+import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.views.plotview.Range;
 
 
-public class MarkerGraphAdapter extends AbstractGraphAdapter implements PointDataList.IListener<PointDataList> {
+public class MarkerGraphAdapter extends AbstractGraphAdapter implements MarkerDataModel.IListener {
     protected String title;
-    protected PointDataList data;
+    protected MarkerDataModel data;
 
-    public MarkerGraphAdapter(PointDataList data, String title, MarkerGraphAxis xAxis, MarkerGraphAxis yAxis) {
+    public MarkerGraphAdapter(MarkerDataModel data, String title, MarkerGraphAxis xAxis, MarkerGraphAxis yAxis) {
         this.title = title;
 
         setTo(data);
@@ -40,7 +39,7 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements PointDat
         release();
     }
 
-    public void setTo(PointDataList data) {
+    public void setTo(MarkerDataModel data) {
         if (this.data != null)
             this.data.removeListener(this);
 
@@ -59,11 +58,11 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements PointDat
         return title;
     }
 
-    public PointDataList getData() {
+    public MarkerDataModel getData() {
         return data;
     }
 
-    public static MarkerGraphAdapter createPositionAdapter(PointDataList data, String title, Unit xUnit,
+    public static MarkerGraphAdapter createPositionAdapter(MarkerDataModel data, String title, Unit xUnit,
                                                            Unit yUnit, IMinRangeGetter xMinRangeGetter,
                                                            IMinRangeGetter yMinRangeGetter) {
         return new MarkerGraphAdapter(data, title, new XPositionMarkerGraphAxis(xUnit, xMinRangeGetter),
@@ -71,19 +70,19 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements PointDat
     }
 
     @Override
-    public void onDataAdded(PointDataList model, int index) {
+    public void onDataAdded(MarkerDataModel model, int index) {
         // see onDataChanged
         //notifyDataAdded(index, 1);
         notifyAllDataChanged();
     }
 
     @Override
-    public void onDataRemoved(PointDataList model, int index, Data data) {
+    public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
         notifyDataRemoved(index, 1);
     }
 
     @Override
-    public void onDataChanged(PointDataList model, int index, int number) {
+    public void onDataChanged(MarkerDataModel model, int index, int number) {
         // when displaying the velocity the marker point index is not equal to the velocity point index
         // for that reason we invalidate all data
         // TODO: this could be optimized
@@ -92,12 +91,12 @@ public class MarkerGraphAdapter extends AbstractGraphAdapter implements PointDat
     }
 
     @Override
-    public void onAllDataChanged(PointDataList model) {
+    public void onAllDataChanged(MarkerDataModel model) {
         notifyAllDataChanged();
     }
 
     @Override
-    public void onDataSelected(PointDataList model, int index) {
+    public void onDataSelected(MarkerDataModel model, int index) {
 
     }
 

@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * View that displays the accelerometer analysis.
+ */
 public class AccelerometerAnalysisView extends FrameLayout {
     final private AccelerometerAnalysis analysis;
     final private ViewGroup mainView;

@@ -19,10 +19,9 @@ import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.*;
 import nz.ac.auckland.lablet.ExperimentAnalysisBaseActivity;
-import nz.ac.auckland.lablet.data.Data;
-import nz.ac.auckland.lablet.data.PointData;
-import nz.ac.auckland.lablet.data.PointDataList;
-import nz.ac.auckland.lablet.views.markers.StartEndSeekBar;
+import nz.ac.auckland.lablet.experiment.MarkerData;
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.StartEndSeekBar;
 import nz.ac.auckland.lablet.views.VideoFrameView;
 
 import java.io.File;
@@ -44,14 +43,11 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     private VideoData videoData;
     private VideoFrameView videoFrameView;
 
-    private boolean isAutoTrackingEnabled = false;
-
-
     private SeekBar seekBar = null;
     private StartEndSeekBar startEndSeekBar = null;
 
     // The marker data model keeps listeners as weak references. Thus we have to maintain our own hard reference.
-    private PointDataList.IListener startEndSeekBarListener = null;
+    private MarkerDataModel.IListener startEndSeekBarListener = null;
 
     private NumberPicker frameRatePicker = null;
     private EditText editVideoStart = null;
@@ -148,7 +144,6 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
 
         MotionAnalysis motionAnalysis = (MotionAnalysis)experimentAnalysis.getCurrentAnalysis();
         videoData = motionAnalysis.getVideoData();
-        //videoData.getVideoFile()
 
         setContentView(R.layout.motion_analysis_settings);
 
@@ -189,29 +184,29 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         startEndSeekBar.setPadding(seekBar.getPaddingLeft(), seekBar.getPaddingTop(), seekBar.getPaddingRight(),
                 seekBar.getPaddingBottom());
 
-        startEndSeekBarListener = new PointDataList.IListener<PointDataList>() {
+        startEndSeekBarListener = new MarkerDataModel.IListener() {
             @Override
-            public void onDataAdded(PointDataList model, int index) {
+            public void onDataAdded(MarkerDataModel model, int index) {
 
             }
 
             @Override
-            public void onDataRemoved(PointDataList model, int index, Data data) {
+            public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
 
             }
 
             @Override
-            public void onDataChanged(PointDataList model, int index, int number) {
+            public void onDataChanged(MarkerDataModel model, int index, int number) {
                 float frameRate = getFrameRateFromPicker();
                 float duration = getDurationAtFrameRate(frameRate);
 
                 float progress = 0;
                 for (int i = index; i < index + number; i++) {
                     if (i == 0) {
-                        progress = model.getDataAt(i).getPosition().x * duration;
+                        progress = model.getMarkerDataAt(i).getPosition().x * duration;
                         setVideoStart(progress);
                     } else if (i == 1) {
-                        progress = model.getDataAt(i).getPosition().x * duration;
+                        progress = model.getMarkerDataAt(i).getPosition().x * duration;
                         setVideoEnd(progress);
                     }
                 }
@@ -223,12 +218,12 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
             }
 
             @Override
-            public void onAllDataChanged(PointDataList model) {
+            public void onAllDataChanged(MarkerDataModel model) {
 
             }
 
             @Override
-            public void onDataSelected(PointDataList model, int index) {
+            public void onDataSelected(MarkerDataModel model, int index) {
 
             }
         };
@@ -289,11 +284,11 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         if (point.x > 1)
             point.x = 1;
         point.x = videoStartValue / duration;
-        startEndSeekBar.getMarkerDataModel().getDataAt(0).setPosition(point);
+        startEndSeekBar.getMarkerDataModel().getMarkerDataAt(0).setPosition(point);
         point.x = videoEndValue / duration;
         if (point.x > 1)
             point.x = 1;
-        startEndSeekBar.getMarkerDataModel().getDataAt(1).setPosition(point);
+        startEndSeekBar.getMarkerDataModel().getMarkerDataAt(1).setPosition(point);
 
         helpView = (MotionAnalysisSettingsHelpView)findViewById(R.id.cameraSettingsHelp);
         assert helpView != null;
@@ -354,16 +349,16 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
 
     private boolean warningNeeded() {
         MotionAnalysis motionAnalysis = (MotionAnalysis)experimentAnalysis.getCurrentAnalysis();
-        if (motionAnalysis.getPointDataList().size() <= 1)
+        if (motionAnalysis.getTagMarkers().getMarkerCount() <= 1)
             return false;
 
         MotionAnalysisFragment.RangeChangedMarkerUpdater updater
                 = new MotionAnalysisFragment.RangeChangedMarkerUpdater(initialVideoStartValue, initialFrameRate,
                 videoStartValue, videoEndValue, getFrameRateFromPicker());
 
-        List<PointData> newData = updater.update(motionAnalysis.getPointDataList());
+        List<MarkerData> newMarkerData = updater.update(motionAnalysis.getTagMarkers());
 
-        return newData.size() != motionAnalysis.getPointDataList().size();
+        return newMarkerData.size() != motionAnalysis.getTagMarkers().getMarkerCount();
     }
 
     private void updateWarning() {
@@ -500,12 +495,6 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
     }
 
     public void seekTo(int time) {
-        if(isAutoTrackingEnabled)
-        {
-
-        }
-
-
         videoFrameView.seekToFrame(time * 1000);
     }
 }

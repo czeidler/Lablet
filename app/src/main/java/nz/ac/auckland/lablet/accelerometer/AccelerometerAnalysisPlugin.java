@@ -14,6 +14,9 @@ import nz.ac.auckland.lablet.experiment.IDataAnalysis;
 import nz.ac.auckland.lablet.experiment.ISensorData;
 
 
+/**
+ * Plugin for the accelerometer analysis.
+ */
 public class AccelerometerAnalysisPlugin implements IAnalysisPlugin {
 
     @Override

@@ -1,21 +1,23 @@
-package nz.ac.auckland.lablet.data;
+package nz.ac.auckland.lablet.vision.data;
 
 import android.graphics.PointF;
 import android.os.Bundle;
+
+import nz.ac.auckland.lablet.experiment.FrameDataModel;
 
 /**
  * Created by Jamie on 26/08/2015.
  */
 public class RectDataList extends DataList<RectData> {
 
-    private FrameDataList frameDataList;
+    private FrameDataModel frameDataList;
 
-    public void addFrameDataList(FrameDataList frameDataList)
+    public void addFrameDataList(FrameDataModel frameDataList)
     {
         this.frameDataList = frameDataList;
     }
 
-    public FrameDataList getFrameDataList()
+    public FrameDataModel getFrameDataList()
     {
         return frameDataList;
     }

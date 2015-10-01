@@ -9,8 +9,6 @@ package nz.ac.auckland.lablet.microphone;
 
 import android.graphics.RectF;
 import android.os.Bundle;
-
-import nz.ac.auckland.lablet.data.PointDataList;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.views.table.CSVWriter;
@@ -22,8 +20,8 @@ import java.io.*;
 public class FrequencyAnalysis implements IDataAnalysis {
     final private AudioData sensorData;
 
-    final private PointDataList hCursorMarkerModel;
-    final private PointDataList vCursorMarkerModel;
+    final private MarkerDataModel hCursorMarkerModel;
+    final private MarkerDataModel vCursorMarkerModel;
     final private Unit xUnit = new Unit("s", Unit.MILLI);
     final private Unit yUnit = new Unit("Hz");
     final private FreqMapDisplaySettings freqMapDisplaySettings = new FreqMapDisplaySettings();
@@ -105,8 +103,8 @@ public class FrequencyAnalysis implements IDataAnalysis {
 
         xUnit.setName("time");
         yUnit.setName("frequency");
-        hCursorMarkerModel = new PointDataList();
-        vCursorMarkerModel = new PointDataList();
+        hCursorMarkerModel = new MarkerDataModel();
+        vCursorMarkerModel = new MarkerDataModel();
     }
 
     public Unit getXUnit() {
@@ -160,9 +158,9 @@ public class FrequencyAnalysis implements IDataAnalysis {
     public Bundle exportAnalysisData(File additionalStorageDir) throws IOException {
         Bundle analysisDataBundle = new Bundle();
 
-        if (hCursorMarkerModel.size() > 0)
+        if (hCursorMarkerModel.getMarkerCount() > 0)
             analysisDataBundle.putBundle("hCursors", hCursorMarkerModel.toBundle());
-        if (vCursorMarkerModel.size() > 0)
+        if (vCursorMarkerModel.getMarkerCount() > 0)
             analysisDataBundle.putBundle("vCursors", vCursorMarkerModel.toBundle());
 
         analysisDataBundle.putBundle("freqMapDisplaySettings", getFreqMapDisplaySettings().toBundle());
@@ -184,11 +182,11 @@ public class FrequencyAnalysis implements IDataAnalysis {
         CSVWriter.writeTable(vTableAdapter, writer, ',');
     }
 
-    public PointDataList getHCursorMarkerModel() {
+    public MarkerDataModel getHCursorMarkerModel() {
         return hCursorMarkerModel;
     }
 
-    public PointDataList getVCursorMarkerModel() {
+    public MarkerDataModel getVCursorMarkerModel() {
         return vCursorMarkerModel;
     }
 }

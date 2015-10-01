@@ -11,7 +11,6 @@ import android.graphics.PointF;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.os.Bundle;
-
 import nz.ac.auckland.lablet.experiment.AbstractSensorData;
 import nz.ac.auckland.lablet.experiment.IExperimentSensor;
 
@@ -99,6 +98,7 @@ public class VideoData extends AbstractSensorData {
             return false;
 
         setVideoFileName(storageDir, bundle.getString("videoName"));
+
         recordingFrameRate = bundle.getFloat("recordingFrameRate", -1);
         return true;
     }

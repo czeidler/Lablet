@@ -1,8 +1,6 @@
-package nz.ac.auckland.lablet.data;
+package nz.ac.auckland.lablet.vision.data;
 
 import android.graphics.PointF;
-
-import org.opencv.core.Rect;
 
 /**
  * Created by jdip004 on 27/08/2015.

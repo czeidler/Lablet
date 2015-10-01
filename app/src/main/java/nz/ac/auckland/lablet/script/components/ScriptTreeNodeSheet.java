@@ -272,7 +272,7 @@ class MotionAnalysisGraphView extends ScriptComponentViewHolder {
             if (yAxis == null)
                 yAxis = new XPositionMarkerGraphAxis(sensorAnalysis.getXUnit(), sensorAnalysis.getYMinRangeGetter());
 
-            adapter = new MarkerTimeGraphAdapter(sensorAnalysis.getPointDataList(), sensorAnalysis.getTimeData(),
+            adapter = new MarkerTimeGraphAdapter(sensorAnalysis.getTagMarkers(), sensorAnalysis.getTimeData(),
                     title, xAxis, yAxis);
             graphView2D.setAdapter(adapter);
         }
@@ -282,7 +282,7 @@ class MotionAnalysisGraphView extends ScriptComponentViewHolder {
             @Override
             public void onExperimentAnalysisUpdated() {
                 MotionAnalysis motionAnalysis = experiment.getMotionAnalysis(0);
-                adapter.setTo(motionAnalysis.getPointDataList(), motionAnalysis.getTimeData());
+                adapter.setTo(motionAnalysis.getTagMarkers(), motionAnalysis.getTimeData());
             }
         };
         experiment.addListener(experimentListener);
@@ -621,14 +621,14 @@ abstract class ActivityStarterView extends FrameLayout {
      * @param intent the intent to start the activity
      * @param requestCode the request code for that activity
      */
-    public void startActivityForResult(android.content.Intent intent, int requestCode) {
+    public void startActivityForResult(Intent intent, int requestCode) {
         parent.startActivityForResultFromView(this, intent, requestCode);
     }
 
     /**
      * Called when the started activity returns.
      *
-     * @param requestCode the code specified in {@link #startActivityForResult(android.content.Intent, int)}.
+     * @param requestCode the code specified in {@link #startActivityForResult(Intent, int)}.
      * @param resultCode the result code
      * @param data the Intent returned by the activity
      */

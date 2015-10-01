@@ -5,17 +5,18 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.data;
+package nz.ac.auckland.lablet.experiment;
 
 import nz.ac.auckland.lablet.misc.WeakListenable;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * Data model for the set of frames of an experiment.
  */
-public class FrameDataList extends WeakListenable<FrameDataList.IListener>{
+public class FrameDataModel extends WeakListenable<FrameDataModel.IListener>{
     public interface IListener {
         public void onFrameChanged(int newFrame);
         public void onNumberOfFramesChanged();

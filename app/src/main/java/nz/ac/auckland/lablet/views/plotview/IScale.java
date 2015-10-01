@@ -8,7 +8,18 @@
 package nz.ac.auckland.lablet.views.plotview;
 
 
+/**
+ * Interface to describe a length scale.
+ */
 public interface IScale {
-    public float scale(float realValue);
+    /**
+     * Scales a real value to a value on the scale.
+     *
+     * For example, a log scale would returns log(realValue).
+     *
+     * @param realValue the value that should be scaled
+     * @return the scaled value
+     */
+    float scale(float realValue);
 }
 

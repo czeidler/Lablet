@@ -1,21 +1,23 @@
-package nz.ac.auckland.lablet.data;
+package nz.ac.auckland.lablet.vision.data;
 
 import android.graphics.PointF;
 import android.os.Bundle;
+
+import nz.ac.auckland.lablet.experiment.FrameDataModel;
 
 /**
  * Created by jdip004 on 27/08/2015.
  */
 public class RoiDataList extends DataList<RoiData> {
 
-    private FrameDataList frameDataList;
+    private FrameDataModel frameDataList;
 
-    public void addFrameDataList(FrameDataList frameDataList)
+    public void addFrameDataList(FrameDataModel frameDataList)
     {
         this.frameDataList = frameDataList;
     }
 
-    public FrameDataList getFrameDataList()
+    public FrameDataModel getFrameDataList()
     {
         return frameDataList;
     }

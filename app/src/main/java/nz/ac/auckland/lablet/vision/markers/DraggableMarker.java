@@ -1,11 +1,11 @@
-package nz.ac.auckland.lablet.views.markers;
+package nz.ac.auckland.lablet.vision.markers;
 
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.view.MotionEvent;
 
-import nz.ac.auckland.lablet.data.PointData;
+import nz.ac.auckland.lablet.vision.data.PointData;
 import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;

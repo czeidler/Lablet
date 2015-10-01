@@ -13,6 +13,9 @@ import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 import nz.ac.auckland.lablet.R;
 
 
+/**
+ * Fragment to display a accelerometer analysis.
+ */
 public class AccelerometerAnalysisFragment extends ExperimentAnalysisFragment {
     private AccelerometerAnalysisView analysisView = null;
 
