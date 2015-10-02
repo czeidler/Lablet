@@ -9,7 +9,6 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.graphics.PointF;
 import android.os.Bundle;
-
 import nz.ac.auckland.lablet.misc.WeakListenable;
 
 import java.util.ArrayList;
@@ -30,10 +29,6 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
         void onDataRemoved(MarkerDataModel model, int index, MarkerData data);
         void onDataChanged(MarkerDataModel model, int index, int number);
         void onAllDataChanged(MarkerDataModel model);
-        void onDataSelected(MarkerDataModel model, int index);
-
-        void onAllDataChanged(MarkerDataModel model);
-
         void onDataSelected(MarkerDataModel model, int index);
     }
 
@@ -58,15 +53,6 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
         if (index < 0)
             return;
         selectMarkerData(index);
-    }
-
-    public MarkerData getMarkerDataByDataId(int dataId) {
-        for (int i = 0; i < getMarkerCount(); i++) {
-            MarkerData data = getMarkerDataAt(i);
-            if (data.getId() == dataId)
-                return data;
-        }
-        return null;
     }
 
     public int getSelectedMarkerData() {
@@ -188,7 +174,7 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
         sort(new Comparator<MarkerData>() {
             @Override
             public int compare(MarkerData markerData, MarkerData markerData2) {
-                return (int) (markerData.getPosition().x - markerData2.getPosition().x);
+                return (int)(markerData.getPosition().x - markerData2.getPosition().x);
             }
         });
     }
@@ -197,7 +183,7 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
         sort(new Comparator<MarkerData>() {
             @Override
             public int compare(MarkerData markerData, MarkerData markerData2) {
-                return (int) (markerData.getPosition().y - markerData2.getPosition().y);
+                return (int)(markerData.getPosition().y - markerData2.getPosition().y);
             }
         });
     }

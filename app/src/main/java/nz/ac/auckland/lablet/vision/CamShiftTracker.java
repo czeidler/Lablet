@@ -164,17 +164,12 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         return results;
     }
 
-
-    /*
-    *   Gets Bitmap of video frame
-     */
-
     /**
+     * Gets Bitmap of video frame
      *
      * @param time: time in microseconds
      * @return
      */
-
     private Bitmap getFrame(long time)
     {
         extractor.seekToFrameSync(time);
@@ -472,11 +467,6 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         data.setBtmLeft(new PointF(centre.x - width, centre.y - height));
         data.setCentre(centre);
         roiDataList.addData(data);
-        MarkerData pointData = pointDataList.getMarkerDataByDataId(frameId);
-        if(pointData !=null){
-            pointData.setVisibility(false); //TODO: if delete ROI then set to visible again.
-            pointData.setPosition(centre); //TODO: update this position when ROI moves (so view is updated, easier than changing whole app logic)
-        }
     }
 
     public List<CamShiftTracker.IListener> getListeners() {

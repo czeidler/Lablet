@@ -10,7 +10,6 @@ package nz.ac.auckland.lablet.views;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
-
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
@@ -48,10 +47,10 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
             end = markerList.size();
 
         for (int i = start; i < end; i++) {
-            IMarker marker = markerList.get(i);
+        IMarker marker = markerList.get(i);
             if (!(marker instanceof DraggableMarker))
                 continue;
-            if (((DraggableMarker) marker).isPointOnSelectArea(screenPosition))
+            if (((DraggableMarker)marker).isPointOnSelectArea(screenPosition))
                 return marker;
         }
         return null;
@@ -75,24 +74,16 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
                 continue;
 
             float runDistance = Math.abs(currentMarkerRow - i);
-            float currentPriority = (float) (0.35 - 0.1 * runDistance);
+            float currentPriority = (float)(0.35 - 0.1 * runDistance);
             if (currentPriority > 1.0)
-                currentPriority = (float) 1.0;
+                currentPriority = (float)1.0;
             if (currentPriority < 0.1)
-                currentPriority = (float) 0.1;
+                currentPriority = (float)0.1;
 
-            MarkerData data = markerData.getMarkerDataAt(i);
-
-            if (data.isVisibile()) {
-                marker.onDraw(canvas, currentPriority);
-            }
+            marker.onDraw(canvas, currentPriority);
         }
-        if (topMarker != null) {
-            MarkerData data = markerData.getMarkerDataAt(currentMarkerRow);
-            if(data.isVisibile()) {
-                topMarker.onDraw(canvas, (float) 1.0);
-            }
-        }
+        if (topMarker != null)
+            topMarker.onDraw(canvas, (float)1.0);
     }
 
     @Override
@@ -110,7 +101,7 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
         void onCurrentFrameChanging(MarkerDataModel markersDataModel) {
             // Index could be out of bounds, e.g., when the marker data has been cleared.
             if (markerInsertedInLastRun >= markerData.getMarkerCount()) {
-                markerInsertedInLastRun = -1;
+                markerInsertedInLastRun =-1;
                 return;
             }
 
