@@ -353,12 +353,12 @@ public class FrameContainerView extends RelativeLayout {
         markerView.addPlotPainter(painter);
 
         //Region of interest markers
-        RoiDataList roiDataList = motionAnalysis.getRoiDataList();
+        RoiDataList roiDataList = motionAnalysis.getObjectTrackerAnalysis().getRoiDataList();
         RoiMarkerList roiMarkerList = new RoiMarkerList(roiDataList);
         markerView.addPlotPainter(roiMarkerList);
 
         //Rectangle markers
-        RectDataList rectDataList = motionAnalysis.getRectDataList();
+        RectDataList rectDataList = motionAnalysis.getObjectTrackerAnalysis().getRectDataList();
         RectMarkerList rectMarkerList = new RectMarkerList(rectDataList);
         markerView.addPlotPainter(rectMarkerList);
 

@@ -28,6 +28,9 @@ public class ScriptComponentContainer<ItemType extends ScriptComponent>
     private boolean allItemsDone = false;
     private String lastErrorMessage = "";
 
+    /**
+     * Listener interface for the script component container.
+     */
     public interface IItemContainerListener {
         void onAllItemStatusChanged(boolean allDone);
     }

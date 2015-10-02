@@ -35,7 +35,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.misc.aFileDialog.view.FileItem;
 
 /**
  * This class implements the common features of a file chooser.

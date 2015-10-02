@@ -14,11 +14,11 @@ import android.view.*;
 import android.widget.PopupMenu;
 import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 import nz.ac.auckland.lablet.R;
+import nz.ac.auckland.lablet.vision.ObjectTrackerAnalysis;
 import nz.ac.auckland.lablet.vision.data.RoiDataList;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 import nz.ac.auckland.lablet.views.ObjectTrackerDialog;
-import nz.ac.auckland.lablet.vision.CamShiftTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -140,27 +140,29 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
+                ObjectTrackerAnalysis objectTrackerAnalysis = getSensorAnalysis().getObjectTrackerAnalysis();
                 int item = menuItem.getItemId();
-                RoiDataList dataList = getSensorAnalysis().getRoiDataList();
+                RoiDataList dataList = objectTrackerAnalysis.getRoiDataList();
                 int roiDataSize = dataList.size();
                 int currentFrame = getSensorAnalysis().getFrameDataModel().getCurrentFrame();
                 boolean roiExists = dataList.getIndexByFrameId(currentFrame) != -1;
-                CamShiftTracker tracker = getSensorAnalysis().getObjectTracker();
 
                 if (item == R.id.track_objects && roiDataSize > 0) {
-                    ObjectTrackerDialog dialog = new ObjectTrackerDialog(getActivity(), getSensorAnalysis()); //TODO: change settings to allow user to tune masking
+                    ObjectTrackerDialog dialog = new ObjectTrackerDialog(getActivity(), getSensorAnalysis());
+                        //TODO: change settings to allow user to tune masking
                     dialog.show();
                 } else if (item == R.id.set_roi && !roiExists) {
-                    tracker.addRegionOfInterestMarker(currentFrame); //TODO: notify user they can only add one ROI per frame
+                    objectTrackerAnalysis.addRegionOfInterest(currentFrame); //TODO: notify user they can only add one ROI per frame
                 } else if (item == R.id.debug_tracking) {
-                    tracker.setDebuggingEnabled(!menuItem.isChecked());
+                    objectTrackerAnalysis.setDebuggingEnabled(!menuItem.isChecked());
                 }
 
                 return false;
             }
         });
 
-        popup.getMenu().findItem(R.id.debug_tracking).setChecked(getSensorAnalysis().getObjectTracker().isDebuggingEnabled());
+        popup.getMenu().findItem(R.id.debug_tracking).setChecked(
+                getSensorAnalysis().getObjectTrackerAnalysis().isDebuggingEnabled());
         popup.show();
     }
 

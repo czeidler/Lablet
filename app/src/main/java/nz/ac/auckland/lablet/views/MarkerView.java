@@ -371,6 +371,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
 
         @Override
         public void onDataChanged(MarkerDataModel model, int index, int number) {
+            invalidateMarker();
             containerView.invalidate();
         }
 

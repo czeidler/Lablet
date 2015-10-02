@@ -50,16 +50,7 @@ android {
     }
 }
 
-configurations {
-    doclet
-}
-
-dependencies {
-    compile "org.jboss.apiviz:apiviz:1.3.2.GA"
-    doclet group: 'org.jboss.apiviz', name: 'apiviz', version: '1.3.2.GA'
     compile project(':openCVLibrary2411')
-}
-
 android.applicationVariants.all { variant ->
     task("generate${variant.name.capitalize()}Javadoc", type: Javadoc) {
         source = variant.javaCompile.source
@@ -69,11 +60,10 @@ android.applicationVariants.all { variant ->
         options {
             links "http://docs.oracle.com/javase/7/docs/api/"
             linksOffline "http://d.android.com/reference","${android.sdkDirectory}/docs/reference"
-            doclet 'org.jboss.apiviz.APIviz'
-            docletpath file(configurations.doclet.asPath)
         }
         exclude '**/BuildConfig.java'
         exclude '**/R.java'
+        exclude '**/ScriptC_fft.java'
     }
 }
 

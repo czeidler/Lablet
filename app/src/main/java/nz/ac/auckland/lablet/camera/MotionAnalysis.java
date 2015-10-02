@@ -11,13 +11,11 @@ import android.graphics.PointF;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 
-import nz.ac.auckland.lablet.vision.data.RectDataList;
-import nz.ac.auckland.lablet.vision.data.RoiDataList;
+import nz.ac.auckland.lablet.vision.ObjectTrackerAnalysis;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.views.graph.IMinRangeGetter;
 import nz.ac.auckland.lablet.views.table.*;
-import nz.ac.auckland.lablet.vision.CamShiftTracker;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -40,10 +38,7 @@ public class MotionAnalysis implements IDataAnalysis {
     final private String LENGTH_CALIBRATION_KEY = "lengthCalibration";
     final private String CALIBRATION_XY_KEY = "calibrationXY";
     final private String SHOW_COORDINATE_SYSTEM_KEY = "showCoordinateSystem";
-
-    final private String RECT_DATA_LIST = "rectDataList";
-    final private String ROI_DATA_LIST = "roiDataList";
-    final private String DEBUGGING_ENABLED = "debuggingEnabled";
+    final private String OBJECT_TRACKER_ANALYSIS_KEY = "objectTracking";
 
     final private VideoData sensorData;
 
@@ -59,8 +54,6 @@ public class MotionAnalysis implements IDataAnalysis {
     final private CalibratedMarkerDataModel tagMarkers;
     final private MarkerDataModel lengthCalibrationMarkers;
     final private MarkerDataModel originMarkers;
-    final private RoiDataList roiDataList;
-    final private RectDataList rectDataList;
 
     final private LengthCalibrationSetter lengthCalibrationSetter;
     final private OriginCalibrationSetter originCalibrationSetter;
@@ -71,7 +64,7 @@ public class MotionAnalysis implements IDataAnalysis {
     private int videoRotation = 0;
     private  boolean debuggingEnabled = false;
 
-    private CamShiftTracker tracker;
+    private ObjectTrackerAnalysis objectTrackerAnalysis;
 
     final private List<IListener> listenerList = new ArrayList<>();
 
@@ -129,19 +122,9 @@ public class MotionAnalysis implements IDataAnalysis {
         originMarkers.addMarkerData(point3);
         originCalibrationSetter = new OriginCalibrationSetter(calibrationXY, originMarkers);
 
-        roiDataList = new RoiDataList();
-        roiDataList.addFrameDataList(frameDataModel);
-        rectDataList = new RectDataList();
-        rectDataList.addFrameDataList(frameDataModel);
-        rectDataList.setVisibility(false);
-        tracker = new CamShiftTracker(this);
+        objectTrackerAnalysis = new ObjectTrackerAnalysis(this, frameDataModel);
 
         updateOriginFromVideoRotation();
-    }
-
-    public CamShiftTracker getObjectTracker()
-    {
-        return tracker;
     }
 
     protected void setOrigin(PointF origin, PointF axis1) {
@@ -182,12 +165,11 @@ public class MotionAnalysis implements IDataAnalysis {
         return tagMarkers;
     }
     public MarkerDataModel getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
-    public RoiDataList getRoiDataList() {return roiDataList;}
     public MarkerDataModel getOriginMarkers(){
         return originMarkers;
     }
-    public RectDataList getRectDataList(){
-        return rectDataList;
+    public ObjectTrackerAnalysis getObjectTrackerAnalysis() {
+        return objectTrackerAnalysis;
     }
 
     public Bundle getVideoAnalysisSettings() { return videoAnalysisSettings; }
@@ -254,8 +236,6 @@ public class MotionAnalysis implements IDataAnalysis {
 
     public boolean loadAnalysisData(Bundle bundle, File storageDir) {
         tagMarkers.clear();
-        rectDataList.clear();
-        roiDataList.clear();
 
         setVideoAnalysisSettings(bundle.getBundle("video_analysis_settings"));
         frameDataModel.setCurrentFrame(bundle.getInt("currentRun"));
@@ -264,12 +244,8 @@ public class MotionAnalysis implements IDataAnalysis {
         if (tagMarkerBundle != null)
             tagMarkers.fromBundle(tagMarkerBundle);
 
-        if (bundle.containsKey(RECT_DATA_LIST))
-            rectDataList.fromBundle(bundle.getBundle(RECT_DATA_LIST));
-
-        if (bundle.containsKey(ROI_DATA_LIST))
-            roiDataList.fromBundle(bundle.getBundle(ROI_DATA_LIST));
-
+        if (bundle.containsKey(OBJECT_TRACKER_ANALYSIS_KEY))
+            objectTrackerAnalysis.fromBundle(bundle.getBundle(OBJECT_TRACKER_ANALYSIS_KEY));
 
         if (bundle.containsKey(LENGTH_CALIBRATION_KEY))
             lengthCalibrationSetter.fromBundle(bundle.getBundle(LENGTH_CALIBRATION_KEY));
@@ -297,11 +273,7 @@ public class MotionAnalysis implements IDataAnalysis {
         if (tagMarkers.getMarkerCount() > 0)
             analysisDataBundle.putBundle("tagMarkers", tagMarkers.toBundle());
 
-        if(rectDataList.size() > 0)
-            analysisDataBundle.putBundle(RECT_DATA_LIST, rectDataList.toBundle());
-
-        if(roiDataList.size() > 0)
-            analysisDataBundle.putBundle(ROI_DATA_LIST, roiDataList.toBundle());
+        analysisDataBundle.putBundle(OBJECT_TRACKER_ANALYSIS_KEY, objectTrackerAnalysis.toBundle());
 
         analysisDataBundle.putBundle(LENGTH_CALIBRATION_KEY, lengthCalibrationSetter.toBundle());
 
@@ -311,7 +283,6 @@ public class MotionAnalysis implements IDataAnalysis {
         analysisDataBundle.putInt(X_UNIT_BASE_EXPONENT_KEY, getXUnit().getBaseExponent());
         analysisDataBundle.putInt(Y_UNIT_BASE_EXPONENT_KEY, getYUnit().getBaseExponent());
 
-        analysisDataBundle.putBoolean(DEBUGGING_ENABLED, tracker.isDebuggingEnabled());
 
         if (videoAnalysisSettings != null)
             analysisDataBundle.putBundle("video_analysis_settings", videoAnalysisSettings);

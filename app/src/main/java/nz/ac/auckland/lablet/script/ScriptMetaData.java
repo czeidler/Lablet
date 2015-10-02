@@ -15,6 +15,11 @@ import java.io.File;
 import java.io.FileReader;
 
 
+/**
+ * Class to access meta data of a script.
+ *
+ * For example, the title or the interface version.
+ */
 public class ScriptMetaData {
     final public File file;
     private float interfaceVersion;

@@ -59,7 +59,6 @@ public class StorageLib {
      * Copies a file (not a directory) from source to destination
      * @param source
      * @param destination
-     * @return false on failure
      */
     static public void copyFile(File source, File destination) throws IOException {
         FileInputStream inStream = new FileInputStream(source);
@@ -70,8 +69,8 @@ public class StorageLib {
         outStream.close();
     }
 
-    static public void copyFile(File source, File destination, StreamHelper.IProgressListener listener, int reportingStep)
-            throws IOException {
+    static public void copyFile(File source, File destination, StreamHelper.IProgressListener listener,
+                                int reportingStep) throws IOException {
         FileInputStream inStream = new FileInputStream(source);
         FileOutputStream outStream = new FileOutputStream(destination);
         StreamHelper.copy(inStream, outStream, listener, reportingStep);

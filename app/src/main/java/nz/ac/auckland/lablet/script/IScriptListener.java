@@ -8,6 +8,9 @@
 package nz.ac.auckland.lablet.script;
 
 
+/**
+ * Listener interface for a script.
+ */
 public interface IScriptListener {
-    public void onComponentStateChanged(ScriptTreeNode current, int state);
+    void onComponentStateChanged(ScriptTreeNode current, int state);
 }

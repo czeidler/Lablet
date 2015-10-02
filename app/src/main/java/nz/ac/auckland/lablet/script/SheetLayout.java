@@ -15,15 +15,15 @@ import android.view.View;
  * Interface for sheet layout parameters.
  */
 interface ISheetLayoutItemParameters {
-    public void setWeight(float weight);
-    public float getWeight();
+    void setWeight(float weight);
+    float getWeight();
 }
 
 /**
  * Abstract base class for the layout of an script component.
  * <p>
  * The idea is to specify the layout in the script file and load it into a SheetLayout. By calling
- * {@link SheetLayout.buildLayout} a real view with the layout can be created when needed.
+ * {@link SheetLayout#buildLayout} a real view with the layout can be created when needed.
  * </p>
  * <p>
  * Also see {@link nz.ac.auckland.lablet.script.SheetGroupLayout}.
