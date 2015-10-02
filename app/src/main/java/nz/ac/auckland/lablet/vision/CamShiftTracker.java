@@ -6,17 +6,11 @@
  *      James Diprose <jamie.diprose@gmail.com>
  */
 
-
-
 package nz.ac.auckland.lablet.vision;
 
 import android.graphics.Bitmap;
-import android.graphics.PointF;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.util.Pair;
-import android.util.SparseArray;
-
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -36,9 +30,6 @@ import org.opencv.video.Video;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import nz.ac.auckland.lablet.camera.decoder.CodecOutputSurface;
-import nz.ac.auckland.lablet.camera.decoder.SeekToFrameExtractor;
 
 
 public class CamShiftTracker {
@@ -76,12 +67,9 @@ public class CamShiftTracker {
         Mat image = new Mat();
         Utils.bitmapToMat(frame, image);
 
-//        this.saveFrame(image, "normal");
 //        Mat out = new Mat(image.rows(), image.cols(), image.type());
 //        image.convertTo(out, -1, 2.0, 2.0);
 //        image = out;
-//
-//        this.saveFrame(image, "bright");
 
         toHsv(image, hsvMin, hsvMax);
 
@@ -89,9 +77,7 @@ public class CamShiftTracker {
         hsvs.add(hsv);
 
         Imgproc.calcBackProject(hsvs, new MatOfInt(0), hist, backproj, ranges, 1);
-        //
         Core.bitwise_and(backproj, mask, backproj);
-        //this.saveFrame(backproj, "backproj_bitwise_and");
 
         try {
             Rect tempTrackWindow = trackWindow.clone();
@@ -130,18 +116,11 @@ public class CamShiftTracker {
         backproj = new Mat();
 
         Mat image = new Mat();
-
         Utils.bitmapToMat(frame, image);
 
-//        this.saveFrame(image, "normal-roi");
 //        Mat out = new Mat(image.rows(), image.cols(), image.type());
 //        image.convertTo(out, -1, 2.0, 2.0);
 //        image = out;
-//
-//        this.saveFrame(image, "bright-roi");
-
-
-        //this.saveFrame(image, "roi_raw_frame");
 
         trackWindow = new Rect(x, y, width, height);
 
@@ -154,18 +133,12 @@ public class CamShiftTracker {
         toHsv(image, hsvMin, hsvMax);
 
         Mat hsvRoi = hsv.submat(trackWindow);
-        //this.saveFrame(hsvRoi, "roi_hue_submat");
-
         Mat maskRoi = mask.submat(trackWindow);
-        //this.saveFrame(maskRoi, "roi_mask_submat");
 
         ArrayList<Mat> hsvRois = new ArrayList<>();
-        hsvRois.add(hsvRoi); //List<Mat> images, MatOfInt channels, Mat mask, Mat hist, MatOfInt histSize, MatOfFloat ranges, boolean accumulate
+        hsvRois.add(hsvRoi);
         Imgproc.calcHist(hsvRois, new MatOfInt(0), maskRoi, hist, histSize, ranges);
-        //this.saveFrame(hist, "roi_hist");
         Core.normalize(hist, hist, 0, 255, Core.NORM_MINMAX);
-        //hist.reshape(-1);
-        //this.saveFrame(hist, "roi_hist_norm");
     }
 
     /**
@@ -280,6 +253,7 @@ public class CamShiftTracker {
         return new Pair<>(min, max);
     }
 
+    //TODO: convert to local variables
     private void toHsv(Mat image, Scalar hsvMin, Scalar hsvMax) {
         Imgproc.cvtColor(image, hsv, Imgproc.COLOR_BGR2HSV, 3);
 
@@ -289,7 +263,7 @@ public class CamShiftTracker {
         Imgproc.cvtColor(mask, output, Imgproc.COLOR_GRAY2BGR, 0);
         Imgproc.cvtColor(output, output, Imgproc.COLOR_BGR2RGBA, 0);
     }
-    
+
     /**
      * Saves a Mat based image to /sdcard/ for debugging.
      *

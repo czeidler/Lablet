@@ -152,7 +152,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                         //TODO: change settings to allow user to tune masking
                     dialog.show();
                 } else if (item == R.id.set_roi && !roiExists) {
-                    objectTrackerAnalysis.addRegionOfInterest(currentFrame); //TODO: notify user they can only add one ROI per frame
+                    objectTrackerAnalysis.addRegionOfInterestMarker(currentFrame); //TODO: notify user they can only add one ROI per frame
                 } else if (item == R.id.debug_tracking) {
                     objectTrackerAnalysis.setDebuggingEnabled(!menuItem.isChecked());
                 }

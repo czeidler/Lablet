@@ -50,6 +50,7 @@ public class ObjectTrackerAnalysis {
     private MotionAnalysis motionAnalysis;
     final private CamShiftTracker tracker;
     private boolean isTracking = false;
+    private BackgroundTask task;
 
     public ObjectTrackerAnalysis(MotionAnalysis motionAnalysis, FrameDataModel frameDataModel) {
         this.motionAnalysis = motionAnalysis;
@@ -65,29 +66,8 @@ public class ObjectTrackerAnalysis {
     }
     public RoiDataList getRoiDataList() {return roiDataList;}
 
-    public void fromBundle(Bundle bundle) {
-        rectDataList.clear();
-        roiDataList.clear();
-        if (bundle.containsKey(RECT_DATA_LIST))
-            rectDataList.fromBundle(bundle.getBundle(RECT_DATA_LIST));
-
-        if (bundle.containsKey(ROI_DATA_LIST))
-            roiDataList.fromBundle(bundle.getBundle(ROI_DATA_LIST));
-
-        if (bundle.containsKey(DEBUGGING_ENABLED))
-            debuggingEnabled = bundle.getBoolean(DEBUGGING_ENABLED);
-    }
-
-    public Bundle toBundle() {
-        Bundle bundle = new Bundle();
-        if(rectDataList.size() > 0)
-            bundle.putBundle(RECT_DATA_LIST, rectDataList.toBundle());
-
-        if(roiDataList.size() > 0)
-            bundle.putBundle(ROI_DATA_LIST, roiDataList.toBundle());
-
-        bundle.putBoolean(DEBUGGING_ENABLED, isDebuggingEnabled());
-        return bundle;
+    public void stopTracking() {
+        isTracking = false;
     }
 
     public boolean isDebuggingEnabled() {
@@ -98,6 +78,65 @@ public class ObjectTrackerAnalysis {
         this.debuggingEnabled = debuggingEnabled;
         getRectDataList().setVisibility(debuggingEnabled);
     }
+
+    /**
+     * Adds a region of interest marker.
+     *
+     * @param frameId The id of the frame to add the ROI marker to.
+     */
+
+    public void addRegionOfInterestMarker(int frameId) {
+        MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
+        RoiDataList roiDataList = motionAnalysis.getObjectTrackerAnalysis().getRoiDataList();
+
+        RoiData data = new RoiData(frameId);
+        PointF centre = new PointF(motionAnalysis.getVideoData().getMaxRawX() / 2,
+                motionAnalysis.getVideoData().getMaxRawY() / 2);
+        int width = 5;
+        int height = 5;
+        data.setTopLeft(new PointF(centre.x - width, centre.y + height));
+        data.setTopRight(new PointF(centre.x + width, centre.y + height));
+        data.setBtmRight(new PointF(centre.x + width, centre.y - height));
+        data.setBtmLeft(new PointF(centre.x - width, centre.y - height));
+        data.setCentre(centre);
+        roiDataList.addData(data);
+
+        MarkerData pointData = pointDataList.getMarkerDataByDataId(frameId);
+        if(pointData !=null){
+            pointData.setVisibility(false); //TODO: if delete ROI then set to visible again.
+            pointData.setPosition(centre); //TODO: update this position when ROI moves (so view is updated, easier than changing whole app logic)
+        }
+    }
+
+    /**
+     * Tracks objects between a start and end frame. Region of interest markers need to be added
+     * before this method is called so that the algorithm knows what objects to track. Use
+     * addRegionOfInterestMarker to add a region of interest marker.
+     *
+     * @param startFrame Frame to begin tracking objects from.
+     * @param endFrame Frame to stop tracking objects at.
+     * @param listener
+     */
+
+    public void trackObjects(int startFrame, int endFrame, IListener listener) {
+        if (motionAnalysis.getObjectTrackerAnalysis().getRoiDataList().size() > 0) {
+            // TODO: don't allow to start to background threads!!
+            isTracking = true;
+            task = new BackgroundTask(startFrame, endFrame, motionAnalysis.getVideoData(), getRoiDataList(),
+                    listener);
+            task.execute();
+        }
+        else
+        {
+            Log.e(TAG, "Please add a region of interest before calling trackObjects");
+        }
+    }
+
+    /**
+     * Updates the object tracking markers.
+     *
+     * @param results The object tracking results.
+     */
 
     public void updateMarkers(SparseArray<Rect> results) {
         //Delete all items from arrays
@@ -137,20 +176,29 @@ public class ObjectTrackerAnalysis {
         }
     }
 
-    public void addRegionOfInterest(int frameId) {
-        RoiDataList roiDataList = motionAnalysis.getObjectTrackerAnalysis().getRoiDataList();
+    public void fromBundle(Bundle bundle) {
+        rectDataList.clear();
+        roiDataList.clear();
+        if (bundle.containsKey(RECT_DATA_LIST))
+            rectDataList.fromBundle(bundle.getBundle(RECT_DATA_LIST));
 
-        RoiData data = new RoiData(frameId);
-        PointF centre = new PointF(motionAnalysis.getVideoData().getMaxRawX() / 2,
-                motionAnalysis.getVideoData().getMaxRawY() / 2);
-        int width = 5;
-        int height = 5;
-        data.setTopLeft(new PointF(centre.x - width, centre.y + height));
-        data.setTopRight(new PointF(centre.x + width, centre.y + height));
-        data.setBtmRight(new PointF(centre.x + width, centre.y - height));
-        data.setBtmLeft(new PointF(centre.x - width, centre.y - height));
-        data.setCentre(centre);
-        roiDataList.addData(data);
+        if (bundle.containsKey(ROI_DATA_LIST))
+            roiDataList.fromBundle(bundle.getBundle(ROI_DATA_LIST));
+
+        if (bundle.containsKey(DEBUGGING_ENABLED))
+            debuggingEnabled = bundle.getBoolean(DEBUGGING_ENABLED);
+    }
+
+    public Bundle toBundle() {
+        Bundle bundle = new Bundle();
+        if(rectDataList.size() > 0)
+            bundle.putBundle(RECT_DATA_LIST, rectDataList.toBundle());
+
+        if(roiDataList.size() > 0)
+            bundle.putBundle(ROI_DATA_LIST, roiDataList.toBundle());
+
+        bundle.putBoolean(DEBUGGING_ENABLED, isDebuggingEnabled());
+        return bundle;
     }
 
     private class BackgroundTask extends AsyncTask<Void, Double, SparseArray<Rect>> {
@@ -172,6 +220,14 @@ public class ObjectTrackerAnalysis {
             this.roiDataList = roiDataList;
         }
 
+
+        /**
+         * Called by AsyncTask when the AsyncTask execute method is called.
+         *
+         * @param objects
+         * @return
+         */
+
         @Override
         protected SparseArray<Rect> doInBackground(Void[] objects) {
             isTracking = true;
@@ -187,7 +243,7 @@ public class ObjectTrackerAnalysis {
             }
 
             for (int i = startFrame; i < endFrame && isTracking; i++) {
-                RoiData last = getLastRoi(roiDataList, i);
+                RoiData last = getClosestRoi(roiDataList, i);
 
                 if (last != null) {
                     if (last != currentRoi) {
@@ -234,12 +290,14 @@ public class ObjectTrackerAnalysis {
             return results;
         }
 
+
         /**
          * Gets Bitmap of video frame
          *
-         * @param time: time in microseconds
-         * @return
+         * @param time: time in microseconds.
+         * @return The Bitmap of the video frame.
          */
+
         private Bitmap getFrame(long time) {
             extractor.seekToFrameSync(time);
             outputSurface.awaitNewImage();
@@ -247,14 +305,16 @@ public class ObjectTrackerAnalysis {
             return outputSurface.getBitmap();
         }
 
+
         /**
-         * Sets the region of interest for the CamShiftTracker.
+         * Gets the closest region of interest.
          *
          * @param roiDataList
          * @param currentFrame
          * @return
          */
-        private RoiData getLastRoi(RoiDataList roiDataList, int currentFrame) {
+
+        private RoiData getClosestRoi(RoiDataList roiDataList, int currentFrame) {
             RoiData data = null;
 
             for (int i = currentFrame; i >= 0; i--) {
@@ -269,6 +329,13 @@ public class ObjectTrackerAnalysis {
             return data;
         }
 
+
+        /**
+         * Called after the object tracking thread has finished.
+         *
+         * @param results The object tracking results.
+         */
+
         @Override
         protected void onPostExecute(SparseArray<Rect> results) {
             super.onPostExecute(results);
@@ -278,28 +345,18 @@ public class ObjectTrackerAnalysis {
             listener.onTrackingFinished(results);
         }
 
+
+        /**
+         * Called when each frame is processed by the object tracker.
+         *
+         * @param values The progress of the object tracker values[0] (from 0.0-1.0)
+         */
+
         @Override
         protected void onProgressUpdate(Double... values) {
             super.onProgressUpdate(values);
 
             listener.onTrackingUpdate(values[0]);
         }
-    }
-
-    private BackgroundTask task;
-
-    public void trackObjects(int startFrame, int endFrame, IListener listener) {
-        if (motionAnalysis.getObjectTrackerAnalysis().getRoiDataList().size() > 0) {
-            // TODO: don't allow to start to background threads!!
-            isTracking = true;
-            task = new BackgroundTask(startFrame, endFrame, motionAnalysis.getVideoData(), getRoiDataList(),
-                    listener);
-            task.execute();
-            Log.e(TAG, "Please add a region of interest before calling trackObjects");
-        }
-    }
-
-    public void stopTracking() {
-        isTracking = false;
     }
 }

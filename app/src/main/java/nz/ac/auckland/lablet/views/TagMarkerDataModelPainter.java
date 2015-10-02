@@ -47,10 +47,10 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
             end = markerList.size();
 
         for (int i = start; i < end; i++) {
-        IMarker marker = markerList.get(i);
+            IMarker marker = markerList.get(i);
             if (!(marker instanceof DraggableMarker))
                 continue;
-            if (((DraggableMarker)marker).isPointOnSelectArea(screenPosition))
+            if (((DraggableMarker) marker).isPointOnSelectArea(screenPosition))
                 return marker;
         }
         return null;
@@ -80,10 +80,18 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
             if (currentPriority < 0.1)
                 currentPriority = (float)0.1;
 
-            marker.onDraw(canvas, currentPriority);
+            MarkerData data = markerData.getMarkerDataAt(i);
+
+            if (data.isVisibile()) {
+                marker.onDraw(canvas, currentPriority);
+            }
         }
-        if (topMarker != null)
-            topMarker.onDraw(canvas, (float)1.0);
+        if (topMarker != null) {
+            MarkerData data = markerData.getMarkerDataAt(currentMarkerRow);
+            if(data.isVisibile()) {
+                topMarker.onDraw(canvas, (float) 1.0);
+            }
+        }
     }
 
     @Override

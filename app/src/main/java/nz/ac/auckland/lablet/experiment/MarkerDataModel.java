@@ -55,6 +55,15 @@ public class MarkerDataModel extends WeakListenable<MarkerDataModel.IListener> {
         selectMarkerData(index);
     }
 
+    public MarkerData getMarkerDataByDataId(int dataId) {
+        for (int i = 0; i < getMarkerCount(); i++) {
+            MarkerData data = getMarkerDataAt(i);
+            if (data.getId() == dataId)
+                return data;
+        }
+        return null;
+    }
+
     public int getSelectedMarkerData() {
         return selectedDataIndex;
     }
