@@ -9,10 +9,14 @@ package nz.ac.auckland.lablet.views.plotview;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+
+import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
 import nz.ac.auckland.lablet.misc.JoinedList;
 
 import java.util.ArrayList;
@@ -62,6 +66,29 @@ public class PlotPainterContainerView extends RangeDrawingView {
     public void removeAllPlotPainters() {
         while (plotPainters.size() > 0)
             removePlotPainter(plotPainters.get(0));
+    }
+
+    public int toPixel(float densityIndependentPixel) {
+        return DeviceIndependentPixel.toPixel(densityIndependentPixel, this);
+    }
+
+    public PointF sanitizeScreenPoint(PointF point) {
+        PointF newPoint = new PointF();
+        newPoint.set(point.x, point.y);
+
+        Rect frame = new Rect();
+        frame.set(0, 0, this.getWidth(), this.getHeight());
+
+        if (frame.left + this.getPaddingLeft() > point.x)
+            newPoint.x = frame.left + this.getPaddingLeft();
+        if (frame.right - this.getPaddingRight()< point.x)
+            newPoint.x = frame.right - this.getPaddingRight();
+        if (frame.top + this.getPaddingTop() > point.y)
+            newPoint.y = frame.top + this.getPaddingTop();
+        if (frame.bottom - this.getPaddingBottom() < point.y)
+            newPoint.y = frame.bottom - this.getPaddingBottom();
+
+        return newPoint;
     }
 
     @Override

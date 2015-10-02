@@ -67,6 +67,14 @@ public class SeekToFrameExtractor {
         return seekHandler.sendMessage(message);
     }
 
+    /*
+    * Synchronous seek to frame
+     */
+
+    public void seekToFrameSync(long positionMicroSeconds) {
+        this.seekToThread.performSeekTo(positionMicroSeconds);
+    }
+
     static class SeekHandler extends Handler {
         final SeekToThread thread;
 

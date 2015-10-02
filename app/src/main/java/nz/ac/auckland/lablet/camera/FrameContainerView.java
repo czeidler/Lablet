@@ -23,11 +23,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
+
+import nz.ac.auckland.lablet.vision.data.PointDataList;
+import nz.ac.auckland.lablet.vision.data.RectDataList;
+import nz.ac.auckland.lablet.vision.data.RoiDataList;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.*;
+import nz.ac.auckland.lablet.vision.markers.RectMarkerList;
+import nz.ac.auckland.lablet.vision.markers.RoiMarkerList;
 
 
 /**
@@ -345,6 +351,16 @@ public class FrameContainerView extends RelativeLayout {
         MarkerDataModel calibrationMarkers = motionAnalysis.getXYCalibrationMarkers();
         CalibrationMarkerPainter painter = new CalibrationMarkerPainter(calibrationMarkers);
         markerView.addPlotPainter(painter);
+
+        //Region of interest markers
+        RoiDataList roiDataList = motionAnalysis.getRoiDataList();
+        RoiMarkerList roiMarkerList = new RoiMarkerList(roiDataList);
+        markerView.addPlotPainter(roiMarkerList);
+
+        //Rectangle markers
+        RectDataList rectDataList = motionAnalysis.getRectDataList();
+        RectMarkerList rectMarkerList = new RectMarkerList(rectDataList);
+        markerView.addPlotPainter(rectMarkerList);
 
         // origin markers
         if (motionAnalysis.getShowCoordinateSystem())

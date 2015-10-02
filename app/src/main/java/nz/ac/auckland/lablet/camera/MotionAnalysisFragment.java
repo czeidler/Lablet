@@ -14,8 +14,11 @@ import android.view.*;
 import android.widget.PopupMenu;
 import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 import nz.ac.auckland.lablet.R;
+import nz.ac.auckland.lablet.vision.data.RoiDataList;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
+import nz.ac.auckland.lablet.views.ObjectTrackerDialog;
+import nz.ac.auckland.lablet.vision.CamShiftTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,6 +113,16 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             }
         });
 
+        final MenuItem trackObjectMenu = menu.findItem(R.id.action_track_object);
+        assert trackObjectMenu != null;
+        trackObjectMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                showObjectTrackingPopup();
+                return true;
+            }
+        });
+
         setupStandardMenu(menu, inflater);
     }
 
@@ -118,6 +131,37 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         ScaleSettingsDialog scaleSettingsDialog = new ScaleSettingsDialog(getActivity(),
                 analysis.getLengthCalibrationSetter(), analysis.getXUnit(), analysis.getYUnit());
         scaleSettingsDialog.show();
+    }
+
+    private void showObjectTrackingPopup() {
+        final View menuView = getActivity().findViewById(R.id.action_track_object);
+        final PopupMenu popup = new PopupMenu(getActivity(), menuView);
+        popup.inflate(R.menu.object_tracking_popup);
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                int item = menuItem.getItemId();
+                RoiDataList dataList = getSensorAnalysis().getRoiDataList();
+                int roiDataSize = dataList.size();
+                int currentFrame = getSensorAnalysis().getFrameDataModel().getCurrentFrame();
+                boolean roiExists = dataList.getIndexByFrameId(currentFrame) != -1;
+                CamShiftTracker tracker = getSensorAnalysis().getObjectTracker();
+
+                if (item == R.id.track_objects && roiDataSize > 0) {
+                    ObjectTrackerDialog dialog = new ObjectTrackerDialog(getActivity(), getSensorAnalysis()); //TODO: change settings to allow user to tune masking
+                    dialog.show();
+                } else if (item == R.id.set_roi && !roiExists) {
+                    tracker.addRegionOfInterest(currentFrame); //TODO: notify user they can only add one ROI per frame
+                } else if (item == R.id.debug_tracking) {
+                    tracker.setDebuggingEnabled(!menuItem.isChecked());
+                }
+
+                return false;
+            }
+        });
+
+        popup.getMenu().findItem(R.id.debug_tracking).setChecked(getSensorAnalysis().getObjectTracker().isDebuggingEnabled());
+        popup.show();
     }
 
     private void showCalibrationPopup() {

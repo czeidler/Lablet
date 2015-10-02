@@ -50,6 +50,7 @@ android {
     }
 }
 
+    compile project(':openCVLibrary2411')
 android.applicationVariants.all { variant ->
     task("generate${variant.name.capitalize()}Javadoc", type: Javadoc) {
         source = variant.javaCompile.source

@@ -13,7 +13,7 @@ import nz.ac.auckland.lablet.script.*;
 /**
  * Factory to create script components by name.
  * <p>
- * This class is used when building a {@link nz.ac.auckland.lablet.script.Script} from a lua file. The user
+ * This class is used when building a {@link Script} from a lua file. The user
  * can specify the pages by name and the script builder creates the script components using this factory.
  * </p>
  */

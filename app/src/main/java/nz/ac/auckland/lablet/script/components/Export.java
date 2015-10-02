@@ -63,7 +63,7 @@ public class Export extends ScriptComponentViewHolder {
             View view = inflater.inflate(R.layout.script_component_export, null, true);
             assert view != null;
 
-            View.OnClickListener onClickListener = new View.OnClickListener() {
+            OnClickListener onClickListener = new OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     exportScriptUserData(parent);
