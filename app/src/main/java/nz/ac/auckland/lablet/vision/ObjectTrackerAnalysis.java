@@ -60,10 +60,6 @@ public class ObjectTrackerAnalysis {
         rectDataList.setVisibility(false);
     }
 
-    public CamShiftTracker getObjectTracker() {
-        return tracker;
-    }
-
     public RectDataList getRectDataList(){
         return rectDataList;
     }
