@@ -5,9 +5,6 @@
  * Authors:
  *      James Diprose <jamie.diprose@gmail.com>
  */
-
-
-
 package nz.ac.auckland.lablet.vision;
 
 import android.graphics.Bitmap;
@@ -202,12 +199,11 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
      */
 
     public void trackObjects(int startFrame, int endFrame) {
-
-        if (motionAnalysis.getRoiDataList().size() > 0) {
+        if (motionAnalysis.getObjectTrackerAnalysis().getRoiDataList().size() > 0) {
             Object[] objects = new Object[4];
             objects[0] = startFrame; //TODO, add second method and set default start and end. Check that start < end
             objects[1] = endFrame;
-            objects[2] = motionAnalysis.getRoiDataList();
+            objects[2] = motionAnalysis.getObjectTrackerAnalysis().getRoiDataList();
             objects[3] = motionAnalysis.getVideoData();
             this.execute(objects);
         } else {
@@ -380,12 +376,10 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         int rb = Math.abs(r - b);
         int maxDiff = Math.max(Math.max(rg, gb), rb);
 
-        if (maxDiff < 35 && sum > 120) //white
-        {
+        if (maxDiff < 35 && sum > 120) { //white
             min = new Scalar(0, 0, 0);
             max = new Scalar(180, 40, 255);
-        } else if (sum < 50 && maxDiff < 35) //black
-        {
+        } else if (sum < 50 && maxDiff < 35) { //black
             min = new Scalar(0, 0, 0);
             max = new Scalar(180, 255, 40);
         } else {
@@ -423,7 +417,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
     public void updateMarkers(SparseArray<Rect> results) {
         //Delete all items from arrays
         MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
-        RectDataList rectDataList = motionAnalysis.getRectDataList();
+        RectDataList rectDataList = motionAnalysis.getObjectTrackerAnalysis().getRectDataList();
         pointDataList.clear();
         rectDataList.clear();
 
@@ -454,8 +448,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
     }
 
     public void addRegionOfInterest(int frameId) {
-        MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
-        RoiDataList roiDataList = motionAnalysis.getRoiDataList();
+        RoiDataList roiDataList = motionAnalysis.getObjectTrackerAnalysis().getRoiDataList();
 
         RoiData data = new RoiData(frameId);
         PointF centre = new PointF(motionAnalysis.getVideoData().getMaxRawX() / 2, motionAnalysis.getVideoData().getMaxRawY() / 2);
@@ -509,18 +502,16 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
 
     public void setDebuggingEnabled(boolean debuggingEnabled) {
         this.debuggingEnabled = debuggingEnabled;
-        motionAnalysis.getRectDataList().setVisibility(debuggingEnabled);
+        motionAnalysis.getObjectTrackerAnalysis().getRectDataList().setVisibility(debuggingEnabled);
     }
 
-    public void saveFrame(Mat mat, String name)
-    {
+    public void saveFrame(Mat mat, String name) {
         Bitmap bmp = Bitmap.createBitmap(mat.width(), mat.height(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(mat, bmp);
         this.saveFrame(bmp, name);
     }
 
     public void saveFrame(Bitmap bmp, String name) {
-
         FileOutputStream out = null;
         try {
             out = new FileOutputStream("/sdcard/" + name + ".png");

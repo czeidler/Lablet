@@ -38,7 +38,7 @@ public class ObjectTrackerDialog extends AlertDialog {
     public ObjectTrackerDialog(Context context, MotionAnalysis motionAnalysis) {
         super(context);
         this.motionAnalysis = motionAnalysis;
-        this.motionAnalysis.getObjectTracker().addListener(trackingListener);
+        this.motionAnalysis.getObjectTrackerAnalysis().getObjectTracker().addListener(trackingListener);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class ObjectTrackerDialog extends AlertDialog {
                 CalibrationVideoTimeData timeData = motionAnalysis.getCalibrationVideoTimeData();
                 int start = timeData.getClosestFrame(timeData.getAnalysisVideoStart());
                 int end = timeData.getClosestFrame(timeData.getAnalysisVideoEnd());
-                motionAnalysis.getObjectTracker().trackObjects(start, end);
+                motionAnalysis.getObjectTrackerAnalysis().getObjectTracker().trackObjects(start, end);
             }
         });
 
@@ -71,7 +71,7 @@ public class ObjectTrackerDialog extends AlertDialog {
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                motionAnalysis.getObjectTracker().stopTracking();
+                motionAnalysis.getObjectTrackerAnalysis().getObjectTracker().stopTracking();
                 dismiss();
             }
         });
