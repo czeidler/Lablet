@@ -75,7 +75,6 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
     private int colourRange = 9;
     private WeakListenable<CamShiftTracker.IListener> weakListenable;
     private MotionAnalysis motionAnalysis;
-    private boolean debuggingEnabled = false;
     private boolean isTracking = false;
     public static final int KMEANS_IMG_SIZE = 100;
     private SeekToFrameExtractor extractor;
@@ -498,15 +497,6 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
 
         for (IListener listener : weakListenable.getListeners())
             listener.onTrackingUpdate(values[0]);
-    }
-
-    public boolean isDebuggingEnabled() {
-        return debuggingEnabled;
-    }
-
-    public void setDebuggingEnabled(boolean debuggingEnabled) {
-        this.debuggingEnabled = debuggingEnabled;
-        motionAnalysis.getObjectTrackerAnalysis().getRectDataList().setVisibility(debuggingEnabled);
     }
 
     public void saveFrame(Mat mat, String name) {

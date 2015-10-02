@@ -23,6 +23,8 @@ public class ObjectTrackerAnalysis {
     final private RoiDataList roiDataList = new RoiDataList();
     final private RectDataList rectDataList = new RectDataList();
 
+    private boolean debuggingEnabled = false;
+
     final private CamShiftTracker tracker;
 
     public ObjectTrackerAnalysis(MotionAnalysis motionAnalysis, FrameDataModel frameDataModel) {
@@ -50,6 +52,9 @@ public class ObjectTrackerAnalysis {
 
         if (bundle.containsKey(ROI_DATA_LIST))
             roiDataList.fromBundle(bundle.getBundle(ROI_DATA_LIST));
+
+        if (bundle.containsKey(DEBUGGING_ENABLED))
+            debuggingEnabled = bundle.getBoolean(DEBUGGING_ENABLED);
     }
 
     public Bundle toBundle() {
@@ -60,7 +65,16 @@ public class ObjectTrackerAnalysis {
         if(roiDataList.size() > 0)
             bundle.putBundle(ROI_DATA_LIST, roiDataList.toBundle());
 
-        bundle.putBoolean(DEBUGGING_ENABLED, tracker.isDebuggingEnabled());
+        bundle.putBoolean(DEBUGGING_ENABLED, isDebuggingEnabled());
         return bundle;
+    }
+
+    public boolean isDebuggingEnabled() {
+        return debuggingEnabled;
+    }
+
+    public void setDebuggingEnabled(boolean debuggingEnabled) {
+        this.debuggingEnabled = debuggingEnabled;
+        getRectDataList().setVisibility(debuggingEnabled);
     }
 }

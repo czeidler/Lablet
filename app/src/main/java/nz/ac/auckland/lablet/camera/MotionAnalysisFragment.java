@@ -156,7 +156,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                 } else if (item == R.id.set_roi && !roiExists) {
                     tracker.addRegionOfInterest(currentFrame); //TODO: notify user they can only add one ROI per frame
                 } else if (item == R.id.debug_tracking) {
-                    tracker.setDebuggingEnabled(!menuItem.isChecked());
+                    objectTrackerAnalysis.setDebuggingEnabled(!menuItem.isChecked());
                 }
 
                 return false;
@@ -164,7 +164,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         });
 
         popup.getMenu().findItem(R.id.debug_tracking).setChecked(
-                getSensorAnalysis().getObjectTrackerAnalysis().getObjectTracker().isDebuggingEnabled());
+                getSensorAnalysis().getObjectTrackerAnalysis().isDebuggingEnabled());
         popup.show();
     }
 
