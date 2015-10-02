@@ -418,7 +418,6 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         //Delete all items from arrays
         MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
         RectDataList rectDataList = motionAnalysis.getObjectTrackerAnalysis().getRectDataList();
-        pointDataList.clear();
         rectDataList.clear();
 
         VideoData videoData = motionAnalysis.getVideoData();
@@ -432,9 +431,15 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
 
             //Add point marker
             PointF centre = videoData.toMarkerPoint(new PointF(centreX, centreY));
-            MarkerData centreTag = new MarkerData(frameId);
-            centreTag.setPosition(centre);
-            pointDataList.addMarkerData(centreTag);
+
+            int index = pointDataList.findMarkerDataByRun(frameId);
+            if (index >= 0)
+                pointDataList.setMarkerPosition(centre, index);
+            else {
+                MarkerData markerData = new MarkerData(frameId);
+                markerData.setPosition(centre);
+                pointDataList.addMarkerData(markerData);
+            }
 
             //Add debugging rectangle
             RectData data = new RectData(frameId);
