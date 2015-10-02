@@ -64,7 +64,6 @@ public class VideoData extends AbstractSensorData {
      * @param markerPoint: Point in marker space
      * @return Coordinates in video space
      */
-
     public PointF toVideoPoint(PointF markerPoint)
     {
         PointF videoPos = new PointF();
@@ -82,7 +81,6 @@ public class VideoData extends AbstractSensorData {
      * @param videoPoint: Point in video space
      * @return Coordinates in marker space
      */
-
     public PointF toMarkerPoint(PointF videoPoint)
     {
         PointF markerPos = new PointF();

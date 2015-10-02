@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import nz.ac.auckland.lablet.vision.ObjectTrackerAnalysis;
 import org.opencv.core.Rect;
 
 import nz.ac.auckland.lablet.R;
@@ -38,7 +39,6 @@ public class ObjectTrackerDialog extends AlertDialog {
     public ObjectTrackerDialog(Context context, MotionAnalysis motionAnalysis) {
         super(context);
         this.motionAnalysis = motionAnalysis;
-        this.motionAnalysis.getObjectTrackerAnalysis().getObjectTracker().addListener(trackingListener);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class ObjectTrackerDialog extends AlertDialog {
                 CalibrationVideoTimeData timeData = motionAnalysis.getCalibrationVideoTimeData();
                 int start = timeData.getClosestFrame(timeData.getAnalysisVideoStart());
                 int end = timeData.getClosestFrame(timeData.getAnalysisVideoEnd());
-                motionAnalysis.getObjectTrackerAnalysis().getObjectTracker().trackObjects(start, end);
+                motionAnalysis.getObjectTrackerAnalysis().trackObjects(start, end, trackingListener);
             }
         });
 
@@ -71,13 +71,13 @@ public class ObjectTrackerDialog extends AlertDialog {
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                motionAnalysis.getObjectTrackerAnalysis().getObjectTracker().stopTracking();
+                motionAnalysis.getObjectTrackerAnalysis().stopTracking();
                 dismiss();
             }
         });
     }
 
-    private final CamShiftTracker.IListener trackingListener = new CamShiftTracker.IListener()
+    private final ObjectTrackerAnalysis.IListener trackingListener = new ObjectTrackerAnalysis.IListener()
     {
         @Override
         public void onTrackingFinished(SparseArray<Rect> results) {

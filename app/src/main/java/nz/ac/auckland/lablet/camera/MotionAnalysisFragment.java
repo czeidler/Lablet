@@ -19,7 +19,6 @@ import nz.ac.auckland.lablet.vision.data.RoiDataList;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
 import nz.ac.auckland.lablet.views.ObjectTrackerDialog;
-import nz.ac.auckland.lablet.vision.CamShiftTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,14 +146,13 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                 int roiDataSize = dataList.size();
                 int currentFrame = getSensorAnalysis().getFrameDataModel().getCurrentFrame();
                 boolean roiExists = dataList.getIndexByFrameId(currentFrame) != -1;
-                CamShiftTracker tracker = objectTrackerAnalysis.getObjectTracker();
 
                 if (item == R.id.track_objects && roiDataSize > 0) {
                     ObjectTrackerDialog dialog = new ObjectTrackerDialog(getActivity(), getSensorAnalysis());
                         //TODO: change settings to allow user to tune masking
                     dialog.show();
                 } else if (item == R.id.set_roi && !roiExists) {
-                    tracker.addRegionOfInterest(currentFrame); //TODO: notify user they can only add one ROI per frame
+                    objectTrackerAnalysis.addRegionOfInterest(currentFrame); //TODO: notify user they can only add one ROI per frame
                 } else if (item == R.id.debug_tracking) {
                     objectTrackerAnalysis.setDebuggingEnabled(!menuItem.isChecked());
                 }
