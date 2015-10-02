@@ -177,8 +177,11 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
 
     /**
      * Sets the region of interest for the CamShiftTracker.
+     *
+     * @param roiDataList
+     * @param currentFrame
+     * @return
      */
-
     private RoiData getLastRoi(RoiDataList roiDataList, int currentFrame) {
         RoiData data = null;
 
@@ -193,10 +196,6 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
 
         return data;
     }
-
-    /*
-    *
-     */
 
     public void trackObjects(int startFrame, int endFrame) {
         if (motionAnalysis.getObjectTrackerAnalysis().getRoiDataList().size() > 0) {
@@ -214,13 +213,13 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
     /**
      * Finds an object in a bitmap frameId. The object being searched for is detected based on
      * a pre-specified region of interest (setRegionOfInterest).
-     * <p>
-     * Returns a RotatedRect that specifies the location of the object.
-     * <p>
+     *
      * Important: setRegionOfInterest must be called before this method is used, otherwise an IllegalStateException
      * will be thrown.
+     *
+     * @param bmp
+     * @return a RotatedRect that specifies the location of the object.
      */
-
     private Rect getObjectLocation(Bitmap bmp) {
         Mat image = new Mat();
         Utils.bitmapToMat(bmp, image);
