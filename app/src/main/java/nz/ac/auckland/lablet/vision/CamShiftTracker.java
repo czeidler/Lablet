@@ -55,7 +55,6 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
 
     public interface IListener {
         void onTrackingFinished(SparseArray<Rect> results);
-
         void onTrackingUpdate(Double percentDone);
     }
 
@@ -84,126 +83,34 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
     private SeekToFrameExtractor extractor;
     private CodecOutputSurface outputSurface;
 
-    Mat hsv, hue, mask, hist, backproj, bgr;// = Mat::zeros(200, 320, CV_8UC3), backproj;
+    Mat hsv, hue, mask, hist, backproj, bgr;
     Size size;
+
+    /**
+     *
+     * @param motionAnalysis
+     */
 
     public CamShiftTracker(MotionAnalysis motionAnalysis) {
         weakListenable = new WeakListenable<>();
         this.motionAnalysis = motionAnalysis;
     }
 
+    /**
+     * Stops the object tracking thread from running.
+     */
+
     public void stopTracking() {
         isTracking = false;
     }
 
-    @Override
-    protected SparseArray<Rect> doInBackground(Object[] objects) {
-        isTracking = true;
-        int startFrame = (int) objects[0];
-        int endFrame = (int) objects[1];
-        RoiDataList roiDataList = (RoiDataList) objects[2];
-        VideoData videodata = (VideoData) objects[3];
-
-        outputSurface = new CodecOutputSurface(videodata.getVideoWidth(), videodata.getVideoHeight());
-
-        try {
-            extractor = new SeekToFrameExtractor(videodata.getVideoFile(), outputSurface.getSurface());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        RoiData currentRoi = null;
-        SparseArray<Rect> results = new SparseArray<>();
-
-        for (int i = startFrame; i < endFrame && isTracking; i++) {
-            RoiData last = getLastRoi(roiDataList, i);
-
-            if (last != null) {
-                if (last != currentRoi) {
-                    currentRoi = last;
-                    long frameTimeMicroseconds = (long) motionAnalysis.getTimeData().getTimeAt(i) * 1000;
-                    Bitmap roiBmp = getFrame(frameTimeMicroseconds);
-                    //saveFrame(roiBmp, "roi");
-
-                    if (roiBmp != null) {
-                        PointF topLeft = videodata.toVideoPoint(currentRoi.getTopLeft().getPosition());
-                        PointF btmRight = videodata.toVideoPoint(currentRoi.getBtmRight().getPosition());
-
-                        int x = (int) topLeft.x;
-                        int y = (int) topLeft.y;
-                        int width = (int) (btmRight.x - topLeft.x);
-                        int height = (int) (btmRight.y - topLeft.y);
-                        setRegionOfInterest(roiBmp, x, y, width, height);
-                    } else {
-                        Log.d(TAG, "Region of interest BMP is null");
-                        return null;
-                    }
-                }
-
-                if (currentRoi.getFrameId() != i) {
-                    long frameTimeMicroseconds = (long) motionAnalysis.getTimeData().getTimeAt(i) * 1000;
-                    Bitmap curFrameBmp = getFrame(frameTimeMicroseconds);
-                    //saveFrame(curFrameBmp, "frame" + i);
-
-                    if (curFrameBmp != null && curFrameBmp.getConfig() != null) {
-                        Rect result = getObjectLocation(curFrameBmp);
-
-                        if (result != null) {
-                            results.put(i, result);
-                        }
-                    } else {
-                        Log.d(TAG, "Current frame BMP is null: " + i);
-                    }
-                }
-            }
-            
-            publishProgress(((double) i + 1) / endFrame);
-        }
-
-        return results;
-    }
-
-
-    /*
-    *   Gets Bitmap of video frame
-     */
-
     /**
+     * Tracks objects between a start and end frame. Region of interest markers need to be added
+     * before this method is called so that the algorithm knows what objects to track. Use
+     * addRegionOfInterestMarker to add a region of interest marker.
      *
-     * @param time: time in microseconds
-     * @return
-     */
-
-    private Bitmap getFrame(long time)
-    {
-        extractor.seekToFrameSync(time);
-        outputSurface.awaitNewImage();
-        outputSurface.drawImage(true);
-        return outputSurface.getBitmap();
-    }
-
-    /**
-     * Sets the region of interest for the CamShiftTracker.
-     */
-
-    private RoiData getLastRoi(RoiDataList roiDataList, int currentFrame) {
-        RoiData data = null;
-
-        for (int i = currentFrame; i >= 0; i--) {
-            int roiIndex = roiDataList.getIndexByFrameId(i);
-
-            if (roiIndex != -1) {
-                data = roiDataList.getDataAt(roiIndex);
-                break;
-            }
-        }
-
-        return data;
-    }
-
-    /*
-    *
+     * @param startFrame Frame to begin tracking objects from.
+     * @param endFrame Frame to stop tracking objects at.
      */
 
     public void trackObjects(int startFrame, int endFrame) {
@@ -221,18 +128,98 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
     }
 
     /**
-     * Finds an object in a bitmap frameId. The object being searched for is detected based on
-     * a pre-specified region of interest (setRegionOfInterest).
-     * <p>
-     * Returns a RotatedRect that specifies the location of the object.
-     * <p>
-     * Important: setRegionOfInterest must be called before this method is used, otherwise an IllegalStateException
-     * will be thrown.
+     * Adds a region of interest marker.
+     *
+     * @param frameId The id of the frame to add the ROI marker to.
      */
 
-    private Rect getObjectLocation(Bitmap bmp) {
+    public void addRegionOfInterestMarker(int frameId) {
+        MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
+        RoiDataList roiDataList = motionAnalysis.getRoiDataList();
+
+        RoiData data = new RoiData(frameId);
+        PointF centre = new PointF(motionAnalysis.getVideoData().getMaxRawX() / 2, motionAnalysis.getVideoData().getMaxRawY() / 2);
+        int width = 5;
+        int height = 5;
+        data.setTopLeft(new PointF(centre.x - width, centre.y + height));
+        data.setTopRight(new PointF(centre.x + width, centre.y + height));
+        data.setBtmRight(new PointF(centre.x + width, centre.y - height));
+        data.setBtmLeft(new PointF(centre.x - width, centre.y - height));
+        data.setCentre(centre);
+        roiDataList.addData(data);
+        MarkerData pointData = pointDataList.getMarkerDataByDataId(frameId);
+        if(pointData !=null){
+            pointData.setVisibility(false); //TODO: if delete ROI then set to visible again.
+            pointData.setPosition(centre); //TODO: update this position when ROI moves (so view is updated, easier than changing whole app logic)
+        }
+    }
+
+    /**
+     * Updates the object tracking markers.
+     *
+     * @param results The object tracking results.
+     */
+
+    public void updateMarkers(SparseArray<Rect> results) {
+        //Delete all items from arrays
+        MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
+        RectDataList rectDataList = motionAnalysis.getRectDataList();
+        pointDataList.clear();
+        rectDataList.clear();
+
+        VideoData videoData = motionAnalysis.getVideoData();
+
+        for (int i = 0; i < results.size(); i++) {
+            int frameId = results.keyAt(i);
+            Rect result = results.get(frameId);
+
+            float centreX = result.x + result.width / 2;
+            float centreY = result.y + result.height / 2;
+
+            //Add point marker
+            PointF centre = videoData.toMarkerPoint(new PointF(centreX, centreY));
+            MarkerData centreTag = new MarkerData(frameId);
+            centreTag.setPosition(centre);
+            pointDataList.addMarkerData(centreTag);
+
+            //Add debugging rectangle
+            RectData data = new RectData(frameId);
+            data.setCentre(centre);
+            data.setAngle(0);
+            PointF size = videoData.toMarkerPoint(new PointF(result.width, result.height));
+            data.setWidth(size.x);
+            data.setHeight(size.y);
+            rectDataList.addData(data);
+        }
+    }
+
+    public List<CamShiftTracker.IListener> getListeners() {
+        return weakListenable.getListeners();
+    }
+
+    public void addListener(CamShiftTracker.IListener listener) {
+        weakListenable.addListener(listener);
+    }
+
+    public boolean removeListener(CamShiftTracker.IListener listener) {
+        return weakListenable.removeListener(listener);
+    }
+
+    public boolean hasListener(CamShiftTracker.IListener listener) {
+        return weakListenable.hasListener(listener);
+    }
+
+    /**
+     * Gets the location of an object in a frame. Assumes you have called setRegionOfInterest,
+     * which informs CamShiftTracker which object to track.
+     *
+     * @param frame The frame to search for the object in.
+     * @return The location and bounds of the object, represented by a Rect.
+     */
+
+    private Rect getObjectLocation(Bitmap frame) {
         Mat image = new Mat();
-        Utils.bitmapToMat(bmp, image);
+        Utils.bitmapToMat(frame, image);
 
 //        this.saveFrame(image, "normal");
 //        Mat out = new Mat(image.rows(), image.cols(), image.type());
@@ -267,8 +254,19 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         return trackWindow.clone();
     }
 
-    private void setRegionOfInterest(Bitmap bmp, int x, int y, int width, int height) {
-        size = new Size(bmp.getWidth(), bmp.getHeight());
+    /**
+     * Internally sets the region of interest (ROI) to track.
+     * Only needs to be set once, unless the region of interest changes.
+     *
+     * @param frame The frame to extract the ROI from.
+     * @param x The x coordinate of the ROI (top left).
+     * @param y The y coordinate of the ROI (top left).
+     * @param width The width of the ROI.
+     * @param height The height of the ROI.
+     */
+
+    private void setRegionOfInterest(Bitmap frame, int x, int y, int width, int height) {
+        size = new Size(frame.getWidth(), frame.getHeight());
         hsv = new Mat(size, CvType.CV_8UC3);
         hue = new Mat(size, CvType.CV_8UC3);
         mask = new Mat(size, CvType.CV_8UC3);
@@ -278,7 +276,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
 
         Mat image = new Mat();
 
-        Utils.bitmapToMat(bmp, image);
+        Utils.bitmapToMat(frame, image);
 
 //        this.saveFrame(image, "normal-roi");
 //        Mat out = new Mat(image.rows(), image.cols(), image.type());
@@ -315,10 +313,24 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         //this.saveFrame(hist, "roi_hist_norm");
     }
 
+    /**
+     * Finds the dominant colour in an image, and returns two values in HSV colour space to represent similar colours,
+     * e.g. so you can keep all colours similar to the dominant colour.
+     *
+     * How the algorithm works:
+     *
+     * 1. Scale the frame down so that algorithm doesn't take too long.
+     * 2. Segment the frame into different colours (number of colours determined by k)
+     * 3. Find dominant cluster (largest area) and get its central colour point.
+     * 4. Get range (min max) to represent similar colours.
+     *
+     * @param bgr The input frame, in BGR colour space.
+     * @param k The number of segments to use (2 works well).
+     * @return The min and max HSV colour values, which represent the colours similar to the dominant colour.
+     */
+
     private Pair<Scalar, Scalar> getMinMaxHsv(Mat bgr, int k) {
         //Convert to HSV
-
-
         Mat input = new Mat();
         Imgproc.cvtColor(bgr, input, Imgproc.COLOR_BGR2BGRA, 3);
 
@@ -339,7 +351,7 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
             Imgproc.resize(input, input, newSize);
         }
 
-        //Image quantization using k-means: https://github.com/abidrahmank/OpenCV2-Python-Tutorials/blob/master/source/py_tutorials/py_ml/py_kmeans/py_kmeans_opencv/py_kmeans_opencv.rst
+        //Image quantization using k-means, see here for details of k-means algorithm: http://bit.ly/1JIvrlB
         Mat clusterData = new Mat();
 
         Mat reshaped = input.reshape(1, input.rows() * input.cols());
@@ -415,85 +427,86 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
         return new Pair<>(min, max);
     }
 
-    private void toHsv(Mat image, Scalar hsvMin, Scalar hsvMax) {
-        Imgproc.cvtColor(image, hsv, Imgproc.COLOR_BGR2HSV, 3);
+    /**
+     * Called by AsyncTask when the AsyncTask execute method is called.
+     *
+     * @param objects
+     * @return
+     */
 
-        Core.inRange(hsv, hsvMin, hsvMax, mask);
+    @Override
+    protected SparseArray<Rect> doInBackground(Object[] objects) {
+        isTracking = true;
+        int startFrame = (int) objects[0];
+        int endFrame = (int) objects[1];
+        RoiDataList roiDataList = (RoiDataList) objects[2];
+        VideoData videodata = (VideoData) objects[3];
 
-        Mat output = new Mat();
-        Imgproc.cvtColor(mask, output, Imgproc.COLOR_GRAY2BGR, 0);
-        Imgproc.cvtColor(output, output, Imgproc.COLOR_BGR2RGBA, 0);
-    }
+        outputSurface = new CodecOutputSurface(videodata.getVideoWidth(), videodata.getVideoHeight());
 
-    public void updateMarkers(SparseArray<Rect> results) {
-        //Delete all items from arrays
-        MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
-        RectDataList rectDataList = motionAnalysis.getRectDataList();
-        pointDataList.clear();
-        rectDataList.clear();
+        try {
+            extractor = new SeekToFrameExtractor(videodata.getVideoFile(), outputSurface.getSurface());
 
-        VideoData videoData = motionAnalysis.getVideoData();
-
-        for (int i = 0; i < results.size(); i++) {
-            int frameId = results.keyAt(i);
-            Rect result = results.get(frameId);
-
-            float centreX = result.x + result.width / 2;
-            float centreY = result.y + result.height / 2;
-
-            //Add point marker
-            PointF centre = videoData.toMarkerPoint(new PointF(centreX, centreY));
-            MarkerData centreTag = new MarkerData(frameId);
-            centreTag.setPosition(centre);
-            pointDataList.addMarkerData(centreTag);
-
-            //Add debugging rectangle
-            RectData data = new RectData(frameId);
-            data.setCentre(centre);
-            data.setAngle(0);
-            PointF size = videoData.toMarkerPoint(new PointF(result.width, result.height));
-            data.setWidth(size.x);
-            data.setHeight(size.y);
-            rectDataList.addData(data);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    }
 
-    public void addRegionOfInterest(int frameId) {
-        MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
-        RoiDataList roiDataList = motionAnalysis.getRoiDataList();
+        RoiData currentRoi = null;
+        SparseArray<Rect> results = new SparseArray<>();
 
-        RoiData data = new RoiData(frameId);
-        PointF centre = new PointF(motionAnalysis.getVideoData().getMaxRawX() / 2, motionAnalysis.getVideoData().getMaxRawY() / 2);
-        int width = 5;
-        int height = 5;
-        data.setTopLeft(new PointF(centre.x - width, centre.y + height));
-        data.setTopRight(new PointF(centre.x + width, centre.y + height));
-        data.setBtmRight(new PointF(centre.x + width, centre.y - height));
-        data.setBtmLeft(new PointF(centre.x - width, centre.y - height));
-        data.setCentre(centre);
-        roiDataList.addData(data);
-        MarkerData pointData = pointDataList.getMarkerDataByDataId(frameId);
-        if(pointData !=null){
-            pointData.setVisibility(false); //TODO: if delete ROI then set to visible again.
-            pointData.setPosition(centre); //TODO: update this position when ROI moves (so view is updated, easier than changing whole app logic)
+        for (int i = startFrame; i < endFrame && isTracking; i++) {
+            RoiData last = getClosestRoi(roiDataList, i);
+
+            if (last != null) {
+                if (last != currentRoi) {
+                    currentRoi = last;
+                    long frameTimeMicroseconds = (long) motionAnalysis.getTimeData().getTimeAt(i) * 1000;
+                    Bitmap roiBmp = getFrame(frameTimeMicroseconds);
+                    //saveFrame(roiBmp, "roi");
+
+                    if (roiBmp != null) {
+                        PointF topLeft = videodata.toVideoPoint(currentRoi.getTopLeft().getPosition());
+                        PointF btmRight = videodata.toVideoPoint(currentRoi.getBtmRight().getPosition());
+
+                        int x = (int) topLeft.x;
+                        int y = (int) topLeft.y;
+                        int width = (int) (btmRight.x - topLeft.x);
+                        int height = (int) (btmRight.y - topLeft.y);
+                        setRegionOfInterest(roiBmp, x, y, width, height);
+                    } else {
+                        Log.d(TAG, "Region of interest BMP is null");
+                        return null;
+                    }
+                }
+
+                if (currentRoi.getFrameId() != i) {
+                    long frameTimeMicroseconds = (long) motionAnalysis.getTimeData().getTimeAt(i) * 1000;
+                    Bitmap curFrameBmp = getFrame(frameTimeMicroseconds);
+                    //saveFrame(curFrameBmp, "frame" + i);
+
+                    if (curFrameBmp != null && curFrameBmp.getConfig() != null) {
+                        Rect result = getObjectLocation(curFrameBmp);
+
+                        if (result != null) {
+                            results.put(i, result);
+                        }
+                    } else {
+                        Log.d(TAG, "Current frame BMP is null: " + i);
+                    }
+                }
+            }
+
+            publishProgress(((double) i + 1) / endFrame);
         }
+
+        return results;
     }
 
-    public List<CamShiftTracker.IListener> getListeners() {
-        return weakListenable.getListeners();
-    }
-
-    public void addListener(CamShiftTracker.IListener listener) {
-        weakListenable.addListener(listener);
-    }
-
-    public boolean removeListener(CamShiftTracker.IListener listener) {
-        return weakListenable.removeListener(listener);
-    }
-
-    public boolean hasListener(CamShiftTracker.IListener listener) {
-        return weakListenable.hasListener(listener);
-    }
+    /**
+     * Called after the object tracking thread has finished.
+     *
+     * @param results The object tracking results.
+     */
 
     @Override
     protected void onPostExecute(SparseArray<Rect> results) {
@@ -505,6 +518,12 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
             listener.onTrackingFinished(results);
     }
 
+    /**
+     * Called when each frame is processed by the object tracker.
+     *
+     * @param values The progress of the object tracker values[0] (from 0.0-1.0)
+     */
+
     @Override
     protected void onProgressUpdate(Double... values) {
         super.onProgressUpdate(values);
@@ -513,28 +532,103 @@ public class CamShiftTracker extends AsyncTask<Object, Double, SparseArray<Rect>
             listener.onTrackingUpdate(values[0]);
     }
 
+    /**
+     * Gets Bitmap of video frame
+     *
+     * @param time: time in microseconds.
+     * @return The Bitmap of the video frame.
+     */
+
+    private Bitmap getFrame(long time)
+    {
+        extractor.seekToFrameSync(time);
+        outputSurface.awaitNewImage();
+        outputSurface.drawImage(true);
+        return outputSurface.getBitmap();
+    }
+
+    /**
+     * Gets the closest region of interest.
+     *
+     * @param roiDataList
+     * @param currentFrame
+     * @return
+     */
+
+    private RoiData getClosestRoi(RoiDataList roiDataList, int currentFrame) {
+        RoiData data = null;
+
+        for (int i = currentFrame; i >= 0; i--) {
+            int roiIndex = roiDataList.getIndexByFrameId(i);
+
+            if (roiIndex != -1) {
+                data = roiDataList.getDataAt(roiIndex);
+                break;
+            }
+        }
+
+        return data;
+    }
+
+    //TODO: change to local variables?
+
+    private void toHsv(Mat image, Scalar hsvMin, Scalar hsvMax) {
+        Imgproc.cvtColor(image, hsv, Imgproc.COLOR_BGR2HSV, 3);
+
+        Core.inRange(hsv, hsvMin, hsvMax, mask);
+
+        Mat output = new Mat();
+        Imgproc.cvtColor(mask, output, Imgproc.COLOR_GRAY2BGR, 0);
+        Imgproc.cvtColor(output, output, Imgproc.COLOR_BGR2RGBA, 0);
+    }
+
+    /**
+     *
+     * @return Whether object tracking debugging visualisations are enabled.
+     */
+
     public boolean isDebuggingEnabled() {
         return debuggingEnabled;
     }
+
+    /**
+     * Sets whether to visualise extra debugging information for the object tracking.
+     *
+     * @param debuggingEnabled
+     */
 
     public void setDebuggingEnabled(boolean debuggingEnabled) {
         this.debuggingEnabled = debuggingEnabled;
         motionAnalysis.getRectDataList().setVisibility(debuggingEnabled);
     }
 
-    public void saveFrame(Mat mat, String name)
+    /**
+     * Saves a Mat based image to /sdcard/ for debugging.
+     *
+     * @param frame The frame to save.
+     * @param name The name of the file (without a file type).
+     */
+
+    public void saveFrame(Mat frame, String name)
     {
-        Bitmap bmp = Bitmap.createBitmap(mat.width(), mat.height(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(mat, bmp);
+        Bitmap bmp = Bitmap.createBitmap(frame.width(), frame.height(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(frame, bmp);
         this.saveFrame(bmp, name);
     }
 
-    public void saveFrame(Bitmap bmp, String name) {
+    /**
+     * Saves a Bitmap based image to /sdcard/ for debugging.
+     *
+     * @param frame The frame to save.
+     * @param name The name of the file (without a file type).
+     */
+
+    public void saveFrame(Bitmap frame, String name) {
 
         FileOutputStream out = null;
         try {
             out = new FileOutputStream("/sdcard/" + name + ".png");
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+            frame.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
             // PNG is a lossless format, the compression factor (100) is ignored
         } catch (Exception e) {
             e.printStackTrace();
