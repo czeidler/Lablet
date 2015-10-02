@@ -151,7 +151,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                     ObjectTrackerDialog dialog = new ObjectTrackerDialog(getActivity(), getSensorAnalysis()); //TODO: change settings to allow user to tune masking
                     dialog.show();
                 } else if (item == R.id.set_roi && !roiExists) {
-                    tracker.addRegionOfInterest(currentFrame); //TODO: notify user they can only add one ROI per frame
+                    tracker.addRegionOfInterestMarker(currentFrame); //TODO: notify user they can only add one ROI per frame
                 } else if (item == R.id.debug_tracking) {
                     tracker.setDebuggingEnabled(!menuItem.isChecked());
                 }
