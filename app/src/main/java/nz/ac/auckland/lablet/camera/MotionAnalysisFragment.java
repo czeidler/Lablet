@@ -18,7 +18,7 @@ import nz.ac.auckland.lablet.vision.ObjectTrackerAnalysis;
 import nz.ac.auckland.lablet.vision.data.RoiDataList;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
-import nz.ac.auckland.lablet.views.ObjectTrackerDialog;
+import nz.ac.auckland.lablet.vision.ObjectTrackerDialog;
 
 import java.util.ArrayList;
 import java.util.List;
