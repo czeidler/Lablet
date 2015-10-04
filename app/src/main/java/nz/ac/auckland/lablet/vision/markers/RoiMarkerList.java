@@ -1,3 +1,10 @@
+/*
+ * Copyright 2015.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      James Diprose <jamie.diprose@gmail.com>
+ */
 package nz.ac.auckland.lablet.vision.markers;
 
 import android.graphics.Canvas;
@@ -9,13 +16,6 @@ import java.util.ArrayList;
 import nz.ac.auckland.lablet.vision.data.RoiData;
 import nz.ac.auckland.lablet.vision.data.RoiDataList;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
-
-
-/*
- *
- * Authors:
- *      Jamie Diprose <jdip004@aucklanduni.ac.nz>
- */
 
 
 /**

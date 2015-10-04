@@ -1,3 +1,10 @@
+/*
+ * Copyright 2015.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      James Diprose <jamie.diprose@gmail.com>
+ */
 package nz.ac.auckland.lablet.vision.markers;
 
 import android.graphics.Canvas;
@@ -7,13 +14,6 @@ import android.view.MotionEvent;
 
 import nz.ac.auckland.lablet.vision.data.RectData;
 import nz.ac.auckland.lablet.vision.data.RectDataList;
-
-
-/*
- *
- * Authors:
- *      Jamie Diprose <jdip004@aucklanduni.ac.nz>
- */
 
 
 class RectMarker implements IMarker<RectData, RectMarkerList> {

@@ -1,9 +1,9 @@
 /*
- * Copyright 2013-2014.
+ * Copyright 2015.
  * Distributed under the terms of the GPLv3 License.
  *
  * Authors:
- *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ *      James Diprose <jamie.diprose@gmail.com>
  */
 package nz.ac.auckland.lablet.vision;
 
