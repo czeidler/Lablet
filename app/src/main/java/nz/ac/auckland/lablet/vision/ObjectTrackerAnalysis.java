@@ -128,12 +128,6 @@ public class ObjectTrackerAnalysis {
         data.setBtmLeft(new PointF(centre.x - width, centre.y - height));
         data.setCentre(centre);
         roiDataList.addData(data);
-
-        MarkerData pointData = pointDataList.getMarkerDataByDataId(frameId);
-        if(pointData !=null){
-            pointData.setVisibility(false); //TODO: if delete ROI then set to visible again.
-            pointData.setPosition(centre); //TODO: update this position when ROI moves (so view is updated, easier than changing whole app logic)
-        }
     }
 
     /**
