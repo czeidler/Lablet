@@ -103,8 +103,6 @@ public class FrequencyAnalysisFragment extends ScriptComponentGenericFragment {
                 Intent intent = new Intent(getActivity(), ExperimentAnalysisActivity.class);
                 intent.putExtra(ExperimentActivity.PATH,
                         ((ScriptTreeNodeFrequencyAnalysis)component).getExperiment().getExperimentPath());
-                intent.putExtra("first_start_with_run_settings", true);
-                intent.putExtra("first_start_with_run_settings_help", true);
                 startActivityForResult(intent, ANALYSE_EXPERIMENT);
             }
         });

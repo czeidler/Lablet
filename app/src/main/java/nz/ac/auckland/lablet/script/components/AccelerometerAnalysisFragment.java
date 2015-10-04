@@ -105,8 +105,6 @@ public class AccelerometerAnalysisFragment extends ScriptComponentGenericFragmen
                 Intent intent = new Intent(getActivity(), ExperimentAnalysisActivity.class);
                 intent.putExtra(ExperimentActivity.PATH,
                         ((ScriptTreeNodeAccelerometerAnalysis)component).getExperiment().getExperimentPath());
-                intent.putExtra("first_start_with_run_settings", true);
-                intent.putExtra("first_start_with_run_settings_help", true);
                 startActivityForResult(intent, ANALYSE_EXPERIMENT);
             }
         });
