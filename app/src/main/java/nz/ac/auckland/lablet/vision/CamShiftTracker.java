@@ -5,7 +5,6 @@
  * Authors:
  *      James Diprose <jamie.diprose@gmail.com>
  */
-
 package nz.ac.auckland.lablet.vision;
 
 import android.graphics.Bitmap;
@@ -32,6 +31,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
+/**
+ * Object tracker using the cam shift algorithm.
+ */
 public class CamShiftTracker {
     private static String TAG = CamShiftTracker.class.getName();
 
@@ -62,7 +64,6 @@ public class CamShiftTracker {
      * @param frame The frame to search for the object in.
      * @return The location and bounds of the object, represented by a Rect.
      */
-
     public Rect getObjectLocation(Bitmap frame) {
         Mat image = new Mat();
         Utils.bitmapToMat(frame, image);
@@ -105,7 +106,6 @@ public class CamShiftTracker {
      * @param width The width of the ROI.
      * @param height The height of the ROI.
      */
-
     public void setRegionOfInterest(Bitmap frame, int x, int y, int width, int height) {
         size = new Size(frame.getWidth(), frame.getHeight());
         hsv = new Mat(size, CvType.CV_8UC3);
@@ -156,7 +156,6 @@ public class CamShiftTracker {
      * @param k The number of segments to use (2 works well).
      * @return The min and max HSV colour values, which represent the colours similar to the dominant colour.
      */
-
     private Pair<Scalar, Scalar> getMinMaxHsv(Mat bgr, int k) {
         //Convert to HSV
         Mat input = new Mat();
@@ -270,7 +269,6 @@ public class CamShiftTracker {
      * @param frame The frame to save.
      * @param name The name of the file (without a file type).
      */
-
     public void saveFrame(Mat frame, String name)
     {
         Bitmap bmp = Bitmap.createBitmap(frame.width(), frame.height(), Bitmap.Config.ARGB_8888);
@@ -284,7 +282,6 @@ public class CamShiftTracker {
      * @param frame The frame to save.
      * @param name The name of the file (without a file type).
      */
-
     public void saveFrame(Bitmap frame, String name) {
         FileOutputStream out = null;
         try {
