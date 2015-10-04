@@ -134,7 +134,10 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
     }
 
     private void showObjectTrackingPopup() {
-        final View menuView = getActivity().findViewById(R.id.action_track_object);
+        View menuView = getActivity().findViewById(R.id.action_track_object);
+        if (menuView == null) // anchor to the done item from the standard menu
+            menuView = getActivity().findViewById(R.id.action_done);
+
         final PopupMenu popup = new PopupMenu(getActivity(), menuView);
         popup.inflate(R.menu.object_tracking_popup);
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
