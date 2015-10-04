@@ -61,16 +61,15 @@ public class VideoData extends AbstractSensorData {
     /**
      * Converts coordinates in marker space into coordinates in video space.
      *
-     * @param markerPoint: Point in marker space
+     * @param markerPoint Point in marker space
      * @return Coordinates in video space
      */
-    public PointF toVideoPoint(PointF markerPoint)
-    {
+    public PointF toVideoPoint(PointF markerPoint) {
         PointF videoPos = new PointF();
         int videoX = (int)(markerPoint.x / this.getMaxRawX() * this.getVideoWidth());
-        float ySwapedDir = this.getMaxRawY() - markerPoint.y;
+        float ySwappedDir = this.getMaxRawY() - markerPoint.y;
         int height = this.getVideoHeight();
-        int videoY = (int)( ySwapedDir / this.getMaxRawY() * this.getVideoHeight());
+        int videoY = (int)(ySwappedDir / this.getMaxRawY() * this.getVideoHeight());
         videoPos.set(videoX, videoY);
         return videoPos;
     }
@@ -78,14 +77,13 @@ public class VideoData extends AbstractSensorData {
     /**
      * Converts coordinates in video space into coordinates in marker space.
      *
-     * @param videoPoint: Point in video space
+     * @param videoPoint Point in video space
      * @return Coordinates in marker space
      */
-    public PointF toMarkerPoint(PointF videoPoint)
-    {
+    public PointF toMarkerPoint(PointF videoPoint) {
         PointF markerPos = new PointF();
-        float markerX = ((float)videoPoint.x / (float)this.getVideoWidth()) * this.getMaxRawX();
-        float markerY = this.getMaxRawY() - (((float)videoPoint.y / (float)this.getVideoHeight()) * this.getMaxRawY());
+        float markerX = (videoPoint.x / (float)this.getVideoWidth()) * this.getMaxRawX();
+        float markerY = this.getMaxRawY() - ((videoPoint.y / (float)this.getVideoHeight()) * this.getMaxRawY());
         markerPos.set(markerX, markerY);
         return markerPos;
     }
