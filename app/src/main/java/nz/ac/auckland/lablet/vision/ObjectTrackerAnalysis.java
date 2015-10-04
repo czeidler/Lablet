@@ -21,10 +21,7 @@ import nz.ac.auckland.lablet.camera.decoder.SeekToFrameExtractor;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
-import nz.ac.auckland.lablet.vision.data.RectData;
-import nz.ac.auckland.lablet.vision.data.RectDataList;
-import nz.ac.auckland.lablet.vision.data.RoiData;
-import nz.ac.auckland.lablet.vision.data.RoiDataList;
+import nz.ac.auckland.lablet.vision.data.*;
 import org.opencv.core.Rect;
 
 import java.io.IOException;
@@ -52,6 +49,35 @@ public class ObjectTrackerAnalysis {
     private boolean isTracking = false;
     private BackgroundTask task;
 
+    RoiDataList.IListener roiDataListener = new DataList.IListener() {
+        @Override
+        public void onDataAdded(DataList dataList, int index) {
+
+        }
+
+        @Override
+        public void onDataRemoved(DataList dataList, int index, Data data) {
+
+        }
+
+        @Override
+        public void onDataChanged(DataList dataList, int index, int number) {
+
+        }
+
+        @Override
+        public void onAllDataChanged(DataList dataList) {
+
+        }
+
+        @Override
+        public void onDataSelected(DataList dataList, int index) {
+            if (index < 0)
+                return;
+            motionAnalysis.getFrameDataModel().setCurrentFrame(dataList.getDataAt(index).getFrameId());
+        }
+    };
+
     public ObjectTrackerAnalysis(MotionAnalysis motionAnalysis, FrameDataModel frameDataModel) {
         this.motionAnalysis = motionAnalysis;
         tracker = new CamShiftTracker();
@@ -59,6 +85,8 @@ public class ObjectTrackerAnalysis {
         roiDataList.addFrameDataList(frameDataModel);
         rectDataList.addFrameDataList(frameDataModel);
         rectDataList.setVisibility(false);
+
+        roiDataList.addListener(roiDataListener);
     }
 
     public RectDataList getRectDataList(){

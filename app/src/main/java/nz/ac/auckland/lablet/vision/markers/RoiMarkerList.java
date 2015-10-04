@@ -248,10 +248,13 @@ class RoiMarker implements IMarker<RoiData, RoiMarkerList> {
         }
 
         if (handled) {
+            parent.dataList.selectData(data);
+
             ViewParent parent = this.parent.getContainerView().getParent();
             if (parent != null)
                 parent.requestDisallowInterceptTouchEvent(true);
-        }
+        } else
+            parent.dataList.selectData(-1);
 
         return handled;
     }
