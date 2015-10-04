@@ -1,12 +1,9 @@
 package nz.ac.auckland.lablet.vision.markers;
 
-import android.graphics.Point;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.view.MotionEvent;
 
 import nz.ac.auckland.lablet.vision.data.PointData;
-import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
@@ -18,8 +15,8 @@ import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
  * been selected and otherwise is disabled.
  * </p>
  */
-abstract class DraggableMarker extends WeakListenable<DraggableMarker.IListener> implements IMarker<PointData, DraggableMarkerList> {
-    protected DraggableMarkerList parent = null;
+abstract class DraggableMarker extends WeakListenable<DraggableMarker.IListener> implements IMarker<PointData, DraggableMarkerListPainter> {
+    protected DraggableMarkerListPainter parent = null;
     PointData data;
     protected PointF currentPosition;
     protected PointF dragOffset = new PointF(0, 0);
@@ -35,7 +32,7 @@ abstract class DraggableMarker extends WeakListenable<DraggableMarker.IListener>
 
 
     @Override
-    public void setTo(DraggableMarkerList painter, PointData data) {
+    public void setTo(DraggableMarkerListPainter painter, PointData data) {
         this.parent = painter;
         this.containerView = painter.getContainerView();
         this.data = data;

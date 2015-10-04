@@ -50,7 +50,7 @@ class PointMarker extends DraggableMarker {
     }
 
     @Override
-    public void setTo(DraggableMarkerList painter, PointData data) {
+    public void setTo(DraggableMarkerListPainter painter, PointData data) {
         super.setTo(painter, data);
         this.setTo(painter.getContainerView(), data);
     }
@@ -131,12 +131,12 @@ class PointMarker extends DraggableMarker {
 /**
  * Painter for tagged data. For example, the tagged data from a camera experiment.
  */
-public class PointMarkerList extends DraggableMarkerList {
+public class PointMarkerListPainter extends DraggableMarkerListPainter {
     private int MAX_DISPLAYED_MARKERS = 100;
 
     private LastInsertMarkerManager lastInsertMarkerManager = new LastInsertMarkerManager();
 
-    public PointMarkerList(PointDataList data) {
+    public PointMarkerListPainter(PointDataList data) {
         super(data);
     }
 

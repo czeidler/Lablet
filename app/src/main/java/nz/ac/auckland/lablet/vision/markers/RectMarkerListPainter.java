@@ -16,16 +16,16 @@ import nz.ac.auckland.lablet.vision.data.RectData;
 import nz.ac.auckland.lablet.vision.data.RectDataList;
 
 
-class RectMarker implements IMarker<RectData, RectMarkerList> {
+class RectMarker implements IMarker<RectData, RectMarkerListPainter> {
 
     private final float LINE_WIDTH_DP = 2f;
     private float LINE_WIDTH;
-    protected RectMarkerList parent = null;
+    protected RectMarkerListPainter parent = null;
     private RectData data;
 
 
     @Override
-    public void setTo(RectMarkerList painter, RectData data) {
+    public void setTo(RectMarkerListPainter painter, RectData data) {
         this.parent = painter;
         this.data = data;
         LINE_WIDTH = painter.getContainerView().toPixel(LINE_WIDTH_DP);
@@ -109,12 +109,12 @@ class RectMarker implements IMarker<RectData, RectMarkerList> {
     }
 }
 
-public class RectMarkerList extends MarkerList<RectDataList> {
+public class RectMarkerListPainter extends MarkerListPainter<RectDataList> {
 
     public final int MAX_DISPLAYED_MARKERS = 100;
     // boolean drawn = false;
 
-    public RectMarkerList(RectDataList model) {
+    public RectMarkerListPainter(RectDataList model) {
         super(model);
 
     }

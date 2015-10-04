@@ -1,3 +1,10 @@
+/*
+ * Copyright 2015.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      James Diprose <jamie.diprose@gmail.com>
+ */
 package nz.ac.auckland.lablet.vision.markers;
 
 import android.graphics.PointF;
@@ -14,11 +21,8 @@ import nz.ac.auckland.lablet.vision.data.Data;
 import nz.ac.auckland.lablet.vision.data.DataList;
 import nz.ac.auckland.lablet.views.plotview.AbstractPlotPainter;
 
-/**
- * Created by Jamie on 26/08/2015.
- */
-public abstract class MarkerList<D extends DataList> extends AbstractPlotPainter
-{
+
+public abstract class MarkerListPainter<D extends DataList> extends AbstractPlotPainter {
     private DataList.IListener<D> dataListener = new DataList.IListener<D>() {
 
         @Override
@@ -27,8 +31,7 @@ public abstract class MarkerList<D extends DataList> extends AbstractPlotPainter
 
             Data data = list.getDataAt(index);
 
-            if(data.getFrameId() == selectedFrameId)
-            {
+            if(data.getFrameId() == selectedFrameId) {
                 list.selectData(index);
             }
 
@@ -65,7 +68,7 @@ public abstract class MarkerList<D extends DataList> extends AbstractPlotPainter
     final protected List<IMarker> painterList = new ArrayList<>();
     private int selectedFrameId = -1;
 
-    public MarkerList(D list) {
+    public MarkerListPainter(D list) {
         dataList = list;
         dataList.addListener(dataListener);
     }

@@ -21,7 +21,7 @@ import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 /**
  * Marker for region of interest.
  */
-class RoiMarker implements IMarker<RoiData, RoiMarkerList> {
+class RoiMarker implements IMarker<RoiData, RoiMarkerListPainter> {
 
     // device independent sizes:
     private final float LINE_WIDTH_DP = 2f;
@@ -37,7 +37,7 @@ class RoiMarker implements IMarker<RoiData, RoiMarkerList> {
     private PointMarker btmRightMarker = new PointMarker();
     private PointMarker btmLeftMarker = new PointMarker();
     ArrayList<PointMarker> markers;
-    protected RoiMarkerList parent = null;
+    protected RoiMarkerListPainter parent = null;
     private RoiData data;
 
     private DraggableMarker.IListener dragListener = new DraggableMarker.IListener() {
@@ -143,7 +143,7 @@ class RoiMarker implements IMarker<RoiData, RoiMarkerList> {
     };
 
     @Override
-    public void setTo(RoiMarkerList painter, final RoiData data) {
+    public void setTo(RoiMarkerListPainter painter, final RoiData data) {
         this.parent = painter;
         this.data = data;
 
@@ -305,9 +305,9 @@ class RoiMarker implements IMarker<RoiData, RoiMarkerList> {
     }
 }
 
-public class RoiMarkerList extends MarkerList<RoiDataList> {
+public class RoiMarkerListPainter extends MarkerListPainter<RoiDataList> {
 
-    public RoiMarkerList(RoiDataList model) {
+    public RoiMarkerListPainter(RoiDataList model) {
         super(model);
     }
 

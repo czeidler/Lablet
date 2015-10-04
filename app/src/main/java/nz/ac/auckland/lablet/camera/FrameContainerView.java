@@ -24,7 +24,6 @@ import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
 
-import nz.ac.auckland.lablet.vision.data.PointDataList;
 import nz.ac.auckland.lablet.vision.data.RectDataList;
 import nz.ac.auckland.lablet.vision.data.RoiDataList;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
@@ -32,8 +31,8 @@ import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.*;
-import nz.ac.auckland.lablet.vision.markers.RectMarkerList;
-import nz.ac.auckland.lablet.vision.markers.RoiMarkerList;
+import nz.ac.auckland.lablet.vision.markers.RectMarkerListPainter;
+import nz.ac.auckland.lablet.vision.markers.RoiMarkerListPainter;
 
 
 /**
@@ -354,12 +353,12 @@ public class FrameContainerView extends RelativeLayout {
 
         //Region of interest markers
         RoiDataList roiDataList = motionAnalysis.getObjectTrackerAnalysis().getRoiDataList();
-        RoiMarkerList roiMarkerList = new RoiMarkerList(roiDataList);
+        RoiMarkerListPainter roiMarkerList = new RoiMarkerListPainter(roiDataList);
         markerView.addPlotPainter(roiMarkerList);
 
         //Rectangle markers
         RectDataList rectDataList = motionAnalysis.getObjectTrackerAnalysis().getRectDataList();
-        RectMarkerList rectMarkerList = new RectMarkerList(rectDataList);
+        RectMarkerListPainter rectMarkerList = new RectMarkerListPainter(rectDataList);
         markerView.addPlotPainter(rectMarkerList);
 
         // origin markers

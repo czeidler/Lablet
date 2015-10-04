@@ -4,7 +4,6 @@ import android.graphics.PointF;
 
 import nz.ac.auckland.lablet.vision.data.Data;
 import nz.ac.auckland.lablet.vision.data.DataList;
-import nz.ac.auckland.lablet.vision.data.PointData;
 import nz.ac.auckland.lablet.vision.data.PointDataList;
 
 /**
@@ -13,7 +12,7 @@ import nz.ac.auckland.lablet.vision.data.PointDataList;
  */
 
 
-public abstract class DraggableMarkerList extends MarkerList<PointDataList> {
+public abstract class DraggableMarkerListPainter extends MarkerListPainter<PointDataList> {
 
     private DataList.IListener<PointDataList> dataListener = new DataList.IListener<PointDataList>() {
 
@@ -52,7 +51,7 @@ public abstract class DraggableMarkerList extends MarkerList<PointDataList> {
 
 
     public class MarkerPainterGroup {
-        private DraggableMarkerList selectedDataListPainter = null;
+        private DraggableMarkerListPainter selectedDataListPainter = null;
         private IMarker selectedDataPainter = null;
         private boolean inSelectForDragMethod = false;
         private boolean selectOnDrag = false;
@@ -82,7 +81,7 @@ public abstract class DraggableMarkerList extends MarkerList<PointDataList> {
             this.selectOnDrag = selectOnDrag;
         }
 
-        public void selectForDrag(IMarker marker, DraggableMarkerList painter) {
+        public void selectForDrag(IMarker marker, DraggableMarkerListPainter painter) {
             if (inSelectForDragMethod)
                 return;
             inSelectForDragMethod = true;
@@ -125,7 +124,7 @@ public abstract class DraggableMarkerList extends MarkerList<PointDataList> {
 
     private MarkerPainterGroup markerPainterGroup = new MarkerPainterGroup();
 
-    public DraggableMarkerList(PointDataList list) {
+    public DraggableMarkerListPainter(PointDataList list) {
         super(list);
     }
 
