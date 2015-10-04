@@ -107,14 +107,21 @@ public class ObjectTrackerAnalysis {
         getRectDataList().setVisibility(debuggingEnabled);
     }
 
+    public RoiData getRoiForFrame(int frameId) {
+        for (int i = 0; i < roiDataList.size(); i++) {
+            RoiData roiData = roiDataList.getDataAt(i);
+            if (roiData.getFrameId() == frameId)
+                return roiData;
+        }
+        return null;
+    }
+
     /**
      * Adds a region of interest marker.
      *
      * @param frameId The id of the frame to add the ROI marker to.
      */
-
     public void addRegionOfInterestMarker(int frameId) {
-        MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
         RoiDataList roiDataList = motionAnalysis.getObjectTrackerAnalysis().getRoiDataList();
 
         RoiData data = new RoiData(frameId);
@@ -130,6 +137,10 @@ public class ObjectTrackerAnalysis {
         roiDataList.addData(data);
     }
 
+    public void removeRegionOfInterest(RoiData roiData) {
+        roiDataList.removeData(roiData);
+    }
+
     /**
      * Tracks objects between a start and end frame. Region of interest markers need to be added
      * before this method is called so that the algorithm knows what objects to track. Use
@@ -139,7 +150,6 @@ public class ObjectTrackerAnalysis {
      * @param endFrame Frame to stop tracking objects at.
      * @param listener
      */
-
     public void trackObjects(int startFrame, int endFrame, IListener listener) {
         if (motionAnalysis.getObjectTrackerAnalysis().getRoiDataList().size() > 0) {
             // TODO: don't allow to start to background threads!!
@@ -159,7 +169,6 @@ public class ObjectTrackerAnalysis {
      *
      * @param results The object tracking results.
      */
-
     public void updateMarkers(SparseArray<Rect> results) {
         //Delete all items from arrays
         MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
@@ -249,7 +258,6 @@ public class ObjectTrackerAnalysis {
          * @param objects
          * @return
          */
-
         @Override
         protected SparseArray<Rect> doInBackground(Void[] objects) {
             isTracking = true;
@@ -319,7 +327,6 @@ public class ObjectTrackerAnalysis {
          * @param time: time in microseconds.
          * @return The Bitmap of the video frame.
          */
-
         private Bitmap getFrame(long time) {
             extractor.seekToFrameSync(time);
             outputSurface.awaitNewImage();
@@ -335,7 +342,6 @@ public class ObjectTrackerAnalysis {
          * @param currentFrame
          * @return
          */
-
         private RoiData getClosestRoi(RoiDataList roiDataList, int currentFrame) {
             RoiData data = null;
 
@@ -357,7 +363,6 @@ public class ObjectTrackerAnalysis {
          *
          * @param results The object tracking results.
          */
-
         @Override
         protected void onPostExecute(SparseArray<Rect> results) {
             super.onPostExecute(results);
@@ -373,7 +378,6 @@ public class ObjectTrackerAnalysis {
          *
          * @param values The progress of the object tracker values[0] (from 0.0-1.0)
          */
-
         @Override
         protected void onProgressUpdate(Double... values) {
             super.onProgressUpdate(values);

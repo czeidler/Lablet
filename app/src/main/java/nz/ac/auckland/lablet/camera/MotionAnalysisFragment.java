@@ -15,6 +15,7 @@ import android.widget.PopupMenu;
 import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.vision.ObjectTrackerAnalysis;
+import nz.ac.auckland.lablet.vision.data.RoiData;
 import nz.ac.auckland.lablet.vision.data.RoiDataList;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.views.ScaleSettingsDialog;
@@ -148,10 +149,20 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 
         final PopupMenu popup = new PopupMenu(getActivity(), menuView);
         popup.inflate(R.menu.object_tracking_popup);
+
+        final ObjectTrackerAnalysis objectTrackerAnalysis = getSensorAnalysis().getObjectTrackerAnalysis();
+        int currentFrame = getSensorAnalysis().getFrameDataModel().getCurrentFrame();
+        final RoiData roiData = objectTrackerAnalysis.getRoiForFrame(currentFrame);
+        if (roiData != null)
+            popup.getMenu().findItem(R.id.set_roi).setTitle("Deselect Object");
+        if (objectTrackerAnalysis.getRoiDataList().size() == 0)
+            popup.getMenu().findItem(R.id.track_objects).setEnabled(false);
+
+        popup.getMenu().findItem(R.id.debug_tracking).setChecked(
+                getSensorAnalysis().getObjectTrackerAnalysis().isDebuggingEnabled());
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                ObjectTrackerAnalysis objectTrackerAnalysis = getSensorAnalysis().getObjectTrackerAnalysis();
                 int item = menuItem.getItemId();
                 RoiDataList dataList = objectTrackerAnalysis.getRoiDataList();
                 int roiDataSize = dataList.size();
@@ -162,8 +173,11 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                     ObjectTrackerDialog dialog = new ObjectTrackerDialog(getActivity(), getSensorAnalysis());
                         //TODO: change settings to allow user to tune masking
                     dialog.show();
-                } else if (item == R.id.set_roi && !roiExists) {
-                    objectTrackerAnalysis.addRegionOfInterestMarker(currentFrame); //TODO: notify user they can only add one ROI per frame
+                } else if (item == R.id.set_roi) {
+                    if (!roiExists)
+                        objectTrackerAnalysis.addRegionOfInterestMarker(currentFrame);
+                    else
+                        objectTrackerAnalysis.removeRegionOfInterest(roiData);
                 } else if (item == R.id.debug_tracking) {
                     objectTrackerAnalysis.setDebuggingEnabled(!menuItem.isChecked());
                 }
@@ -172,8 +186,6 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             }
         });
 
-        popup.getMenu().findItem(R.id.debug_tracking).setChecked(
-                getSensorAnalysis().getObjectTrackerAnalysis().isDebuggingEnabled());
         popup.show();
     }
 
