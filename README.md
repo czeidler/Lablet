@@ -18,7 +18,7 @@ Lablet supports “electronic” lab handouts with information and instructions 
 
 Build
 ----
-Lablet is developed using Intellij IDEA / Android Studio. If you want to build Lablet on your own best use one of these IDEs since no other IDEs or build systems has been tested so far.
+Lablet is developed using Intellij IDEA / Android Studio. If you want to build Lablet on your own best use one of these IDEs. Lablet uses Gradle as a build system. Please make sure that you installed the Android SDK and configured it correctly.
 
 Dependencies
 ---
