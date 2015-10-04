@@ -15,7 +15,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 
-abstract class CursorMarker extends DraggableMarker {
+abstract class CursorMarker extends DraggableMarker<MarkerData> {
     final private Paint cursorPaint = new Paint();
     final private Paint textPaint = new Paint();
     final private Paint textBackgroundPaint = new Paint();
@@ -138,7 +138,7 @@ class VCursorMarker extends CursorMarker {
 }
 
 
-abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
+abstract public class CursorDataModelPainter extends AbstractMarkerPainter<MarkerData> {
     private String positionDecimalFormat = "#";
 
     public void setPositionDecimalFormat(String positionDecimalFormat) {
@@ -156,7 +156,7 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
     }
 
     @Override
-    public List<IMarker> getSelectableMarkerList() {
+    public List<IMarker<MarkerData>> getSelectableMarkerList() {
         return markerList;
     }
 
@@ -183,14 +183,14 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter {
 
         int selectedMarkerId = -1;
         if (marker.isSelectedForDrag())
-            selectedMarkerId = markerData.getMarkerDataAt(markerList.indexOf(marker)).getId();
+            selectedMarkerId = markerData.getAt(markerList.indexOf(marker)).getId();
 
         if (!isDragging)
             sort();
 
         if (selectedMarkerId >= 0) {
-            for (int i = 0; i < markerData.getMarkerCount(); i++) {
-                MarkerData data = markerData.getMarkerDataAt(i);
+            for (int i = 0; i < markerData.size(); i++) {
+                MarkerData data = markerData.getAt(i);
                 if (data.getId() == selectedMarkerId) {
                     if (!markerList.get(i).isSelectedForDrag())
                         markerList.get(i).setSelectedForDrag(true);

@@ -18,7 +18,7 @@ public class VCursorDataModelPainter extends CursorDataModelPainter {
 
     @Override
     public void sort() {
-        markerData.sortXAscending();
+        ((MarkerDataModel)markerData).sortXAscending();
     }
 
     @Override

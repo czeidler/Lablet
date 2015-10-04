@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewParent;
+import nz.ac.auckland.lablet.experiment.AbstractPointDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
@@ -30,16 +31,16 @@ import java.util.List;
  * been selected and otherwise is disabled.
  * </p>
  */
-abstract class DraggableMarker implements IMarker {
+abstract class DraggableMarker<T> implements IMarker<T> {
     protected AbstractMarkerPainter parent = null;
-    protected MarkerData markerData;
+    protected T markerData;
     protected PointF currentPosition;
     protected PointF dragOffset = new PointF(0, 0);
     protected boolean isSelectedForDragging = false;
     protected boolean isDragging = false;
 
     @Override
-    public void setTo(AbstractMarkerPainter painter, MarkerData markerData) {
+    public void setTo(AbstractMarkerPainter painter, T markerData) {
         this.parent = painter;
         this.markerData = markerData;
     }
@@ -178,7 +179,7 @@ abstract class DraggableMarker implements IMarker {
 /**
  * Default implementation of a draggable marker.
  */
-class SimpleMarker extends DraggableMarker {
+class SimpleMarker<T> extends DraggableMarker<T> {
     // device independent pixels
     private class Const {
         static public final float INNER_RING_RADIUS_DP = 30;
@@ -204,7 +205,7 @@ class SimpleMarker extends DraggableMarker {
     }
 
     @Override
-    public void setTo(AbstractMarkerPainter painter, MarkerData markerData) {
+    public void setTo(AbstractMarkerPainter painter, T markerData) {
         super.setTo(painter, markerData);
 
         INNER_RING_RADIUS = parent.toPixel(Const.INNER_RING_RADIUS_DP);
@@ -281,7 +282,7 @@ class SimpleMarker extends DraggableMarker {
  * Abstract base class to draw a {@link nz.ac.auckland.lablet.experiment.MarkerDataModel} in a
  * {@link nz.ac.auckland.lablet.views.MarkerView}.
  */
-abstract class AbstractMarkerPainter extends AbstractPlotPainter {
+abstract class AbstractMarkerPainter<T> extends AbstractPlotPainter {
 
     public class MarkerPainterGroup {
         private AbstractMarkerPainter selectedForDragPainter = null;
@@ -391,11 +392,11 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
 
     private MarkerPainterGroup markerPainterGroup = new MarkerPainterGroup();
 
-    protected MarkerDataModel markerData = null;
+    protected AbstractPointDataModel<T> markerData = null;
     final protected Rect frame = new Rect();
-    final protected List<IMarker> markerList = new ArrayList<>();
+    final protected List<IMarker<T>> markerList = new ArrayList<>();
 
-    public AbstractMarkerPainter(MarkerDataModel model) {
+    public AbstractMarkerPainter(AbstractPointDataModel<T> model) {
         markerData = model;
         markerData.addListener(dataListener);
     }
@@ -407,7 +408,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
         rebuildMarkerList();
     }
 
-    public MarkerDataModel getMarkerModel() {
+    public AbstractPointDataModel<T> getMarkerModel() {
         return markerData;
     }
 
@@ -426,12 +427,12 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
         }
     }
 
-    public List<IMarker> getSelectableMarkerList() {
+    public List<IMarker<T>> getSelectableMarkerList() {
         return markerList;
     }
 
-    public PointF getMarkerScreenPosition(MarkerData markerData) {
-        PointF realPosition = markerData.getPosition();
+    public PointF getMarkerScreenPosition(T markerData) {
+        PointF realPosition = this.markerData.getPosition(markerData);
         PointF screenPosition = new PointF();
         containerView.toScreen(realPosition, screenPosition);
         return screenPosition;
@@ -449,7 +450,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
 
     private void rebuildMarkerList() {
         markerList.clear();
-        for (int i = 0; i < markerData.getMarkerCount(); i++)
+        for (int i = 0; i < markerData.size(); i++)
             addMarker(i);
     }
 
@@ -460,7 +461,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        List<IMarker> selectableMarkers = getSelectableMarkerList();
+        List<IMarker<T>> selectableMarkers = getSelectableMarkerList();
         int action = event.getActionMasked();
         boolean handled = false;
         if (action == MotionEvent.ACTION_DOWN) {
@@ -507,7 +508,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
      * @param marker that has been moved
      * @param newPosition the marker has been moved too
      */
-    public void markerMoveRequest(DraggableMarker marker, PointF newPosition, boolean isDragging) {
+    public void markerMoveRequest(DraggableMarker<T> marker, PointF newPosition, boolean isDragging) {
         if (isDragging)
             return;
 
@@ -519,7 +520,7 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
 
         PointF newReal = new PointF();
         containerView.fromScreen(newPosition, newReal);
-        markerData.setMarkerPosition(newReal, row);
+        markerData.setPosition(newReal, row);
     }
 
     public IMarker getMarkerForRow(int row) {
@@ -546,8 +547,8 @@ abstract class AbstractMarkerPainter extends AbstractPlotPainter {
     abstract protected DraggableMarker createMarkerForRow(int row);
 
     public void addMarker(int row) {
-        IMarker marker = createMarkerForRow(row);
-        marker.setTo(this, markerData.getMarkerDataAt(row));
+        IMarker<T> marker = createMarkerForRow(row);
+        marker.setTo(this, markerData.getAt(row));
         markerList.add(row, marker);
     }
 

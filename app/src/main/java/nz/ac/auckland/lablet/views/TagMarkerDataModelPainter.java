@@ -10,33 +10,36 @@ package nz.ac.auckland.lablet.views;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
+import nz.ac.auckland.lablet.experiment.AbstractPointDataModel;
 import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Painter for tagged data. For example, the tagged data from a camera experiment.
- */
-public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
+
+class MarkerDataModelPainter<T> extends AbstractMarkerPainter<T> {
     private int MAX_DISPLAYED_MARKERS = 100;
 
-    private LastInsertMarkerManager lastInsertMarkerManager = new LastInsertMarkerManager();
+    protected LastInsertMarkerManager lastInsertMarkerManager = new LastInsertMarkerManager();
 
-    public TagMarkerDataModelPainter(MarkerDataModel data) {
+    public MarkerDataModelPainter(AbstractPointDataModel<T> data) {
         super(data);
     }
 
     @Override
-    public List<IMarker> getSelectableMarkerList() {
-        List<IMarker> selectableMarkers = new ArrayList<>();
-        IMarker selectedMarker = markerList.get(markerData.getSelectedMarkerData());
-        selectableMarkers.add(selectedMarker);
+    public List<IMarker<T>> getSelectableMarkerList() {
+        List<IMarker<T>> selectableMarkers = new ArrayList<>();
+        int index = markerData.getSelectedMarkerData();
+        if (index < 0)
+            return selectableMarkers;
+        IMarker<T> selectedMarker = markerList.get(index);
+        if (selectedMarker != null)
+            selectableMarkers.add(selectedMarker);
         return selectableMarkers;
     }
 
-    public IMarker getMarkerAtScreenPosition(PointF screenPosition) {
+    public IMarker<T> getMarkerAtScreenPosition(PointF screenPosition) {
         int currentMarkerRow = markerData.getSelectedMarkerData();
 
         int start = currentMarkerRow - MAX_DISPLAYED_MARKERS / 2 + 1;
@@ -47,7 +50,7 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
             end = markerList.size();
 
         for (int i = start; i < end; i++) {
-        IMarker marker = markerList.get(i);
+            IMarker<T> marker = markerList.get(i);
             if (!(marker instanceof DraggableMarker))
                 continue;
             if (((DraggableMarker)marker).isPointOnSelectArea(screenPosition))
@@ -69,7 +72,7 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
             end = markerList.size();
 
         for (int i = start; i < end; i++) {
-            IMarker marker = markerList.get(i);
+            IMarker<T> marker = markerList.get(i);
             if (marker == topMarker)
                 continue;
 
@@ -94,21 +97,21 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
     /**
      * If the last inserted marker hasn't moved remove it again.
      */
-    private class LastInsertMarkerManager {
+    protected class LastInsertMarkerManager {
         private int markerInsertedInLastRun = -1;
         private PointF lastMarkerPosition = new PointF();
 
-        void onCurrentFrameChanging(MarkerDataModel markersDataModel) {
+        public void onCurrentFrameChanging(AbstractPointDataModel<T> markersDataModel) {
             // Index could be out of bounds, e.g., when the marker data has been cleared.
-            if (markerInsertedInLastRun >= markerData.getMarkerCount()) {
+            if (markerInsertedInLastRun >= markerData.size()) {
                 markerInsertedInLastRun =-1;
                 return;
             }
 
             if (markerInsertedInLastRun >= 0) {
-                MarkerData lastMarkerData = markerData.getMarkerDataAt(markerInsertedInLastRun);
-                if (lastMarkerData.getPosition().equals(lastMarkerPosition)) {
-                    markerData.removeMarkerData(markerInsertedInLastRun);
+                T lastMarkerData = markerData.getAt(markerInsertedInLastRun);
+                if (markerData.getPosition(lastMarkerData).equals(lastMarkerPosition)) {
+                    markerData.removeData(markerInsertedInLastRun);
                     int selectedIndex = markerInsertedInLastRun - 1;
                     if (selectedIndex < 0)
                         selectedIndex = 0;
@@ -118,10 +121,20 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
             }
         }
 
-        void onNewMarkerInserted(int index, MarkerData data) {
+        public void onNewMarkerInserted(int index, MarkerData data) {
             markerInsertedInLastRun = index;
             lastMarkerPosition.set(data.getPosition());
         }
+    }
+}
+
+/**
+ * Painter for tagged data. For example, the tagged data from a camera experiment.
+ */
+public class TagMarkerDataModelPainter extends MarkerDataModelPainter<MarkerData> {
+
+    public TagMarkerDataModelPainter(MarkerDataModel data) {
+        super(data);
     }
 
     public void setCurrentFrame(int frame, @Nullable PointF insertHint) {
@@ -129,9 +142,9 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
 
         // check if we have the run in the data list
         MarkerData data = null;
-        int index = markerData.findMarkerDataByRun(frame);
+        int index = ((MarkerDataModel)markerData).findMarkerDataByRun(frame);
         if (index >= 0) {
-            data = markerData.getMarkerDataAt(index);
+            data = markerData.getAt(index);
             markerData.selectMarkerData(index);
         }
 
@@ -143,9 +156,9 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
                 containerView.fromScreen(insertHint, insertHintReal);
                 data.setPosition(insertHintReal);
             } else {
-                if (markerData.getMarkerCount() > 0 && markerData.getSelectedMarkerData() > 0) {
+                if (markerData.size() > 0 && markerData.getSelectedMarkerData() > 0) {
                     int selectedIndex = markerData.getSelectedMarkerData();
-                    MarkerData prevData = markerData.getMarkerDataAt(selectedIndex);
+                    MarkerData prevData = markerData.getAt(selectedIndex);
                     data.setPosition(prevData.getPosition());
                     data.getPosition().x += 5;
 
@@ -163,7 +176,7 @@ public class TagMarkerDataModelPainter extends AbstractMarkerPainter {
                 }
             }
 
-            int newIndex = markerData.addMarkerData(data);
+            int newIndex = markerData.addData(data);
             markerData.selectMarkerData(newIndex);
 
             lastInsertMarkerManager.onNewMarkerInserted(newIndex, data);

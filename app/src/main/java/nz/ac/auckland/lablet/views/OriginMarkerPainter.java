@@ -12,6 +12,7 @@ import nz.ac.auckland.lablet.experiment.CalibrationXY;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
+import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
@@ -53,7 +54,7 @@ class OriginMarker extends SimpleMarker {
  * Expects a MarkerDataModel with two data points. One for the origin and one for the first axis.
  * </p>
  */
-public class OriginMarkerPainter extends AbstractMarkerPainter implements CalibrationXY.IListener {
+public class OriginMarkerPainter extends AbstractMarkerPainter<MarkerData> implements CalibrationXY.IListener {
     private CalibrationXY calibrationXY;
     private float angleScreen;
     private boolean firstDraw = true;
@@ -115,8 +116,8 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         if (firstDraw) {
             firstDraw = false;
             // update the angle
-            PointF originScreen = getMarkerScreenPosition(markerData.getMarkerDataAt(0));
-            PointF axis1Screen = getMarkerScreenPosition(markerData.getMarkerDataAt(1));
+            PointF originScreen = getMarkerScreenPosition(markerData.getAt(0));
+            PointF axis1Screen = getMarkerScreenPosition(markerData.getAt(1));
             angleScreen = CalibrationXY.getAngle(originScreen, axis1Screen);
             
             updateMarkerScreenPositions(originScreen);
@@ -126,7 +127,7 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         for (IMarker marker : markerList)
             marker.onDraw(canvas, 1);
 
-        if (markerData.getMarkerCount() != 3)
+        if (markerData.size() != 3)
             return;
 
         PointF origin = getOriginMarker(0).getCachedScreenPosition();
@@ -322,9 +323,9 @@ public class OriginMarkerPainter extends AbstractMarkerPainter implements Calibr
         containerView.fromScreen(xAxisScreen, xAxis);
         containerView.fromScreen(yAxisScreen, yAxis);
 
-        markerData.setMarkerPosition(origin, 0);
-        markerData.setMarkerPosition(xAxis, 1);
-        markerData.setMarkerPosition(yAxis, 2);
+        markerData.setPosition(origin, 0);
+        markerData.setPosition(xAxis, 1);
+        markerData.setPosition(yAxis, 2);
     }
 
     private float getScreenAxisLength() {

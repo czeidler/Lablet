@@ -9,6 +9,7 @@ import nz.ac.auckland.lablet.experiment.CalibrationXY;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
+import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
@@ -31,7 +32,7 @@ class CalibrationMarker extends SimpleMarker {
  * for the start and one for the end of the scale.
  * </p>
  */
-public class CalibrationMarkerPainter extends AbstractMarkerPainter {
+public class CalibrationMarkerPainter extends AbstractMarkerPainter<MarkerData> {
     // device independent sizes:
     private final int FONT_SIZE_DP = 20;
     private final float LINE_WIDTH_DP = 2f;
@@ -81,7 +82,7 @@ public class CalibrationMarkerPainter extends AbstractMarkerPainter {
         for (IMarker marker : markerList)
             marker.onDraw(canvas, 1);
 
-        if (markerData.getMarkerCount() != 2)
+        if (markerData.size() != 2)
             return;
 
         // draw scale

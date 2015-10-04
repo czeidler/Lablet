@@ -185,7 +185,7 @@ public class FrameContainerView extends RelativeLayout {
                 return super.onSingleTapUp(e);
             int tappedMarkerIndex = painter.markerIndexOf(tappedMarker);
 
-            MarkerDataModel markerDataModel = painter.getMarkerModel();
+            MarkerDataModel markerDataModel = (MarkerDataModel)painter.getMarkerModel();
             int frameId = markerDataModel.getMarkerDataAt(tappedMarkerIndex).getId();
             frameDataModel.setCurrentFrame(frameId);
             return true;

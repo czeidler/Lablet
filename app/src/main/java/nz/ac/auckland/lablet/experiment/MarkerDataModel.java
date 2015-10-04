@@ -17,87 +17,6 @@ import java.util.Comparator;
 import java.util.List;
 
 
-abstract class AbstractPointDataModel<T> extends WeakListenable<AbstractPointDataModel.IListener> {
-    /**
-     * Listener interface for the marker data model.
-     */
-    public interface IListener<List extends AbstractPointDataModel, T> {
-        void onDataAdded(List model, int index);
-        void onDataRemoved(List model, int index, T data);
-        void onDataChanged(List model, int index, int number);
-        void onAllDataChanged(List model);
-        void onDataSelected(List model, int index);
-    }
-
-    private int selectedDataIndex = -1;
-
-    abstract public int size();
-
-    public void selectMarkerData(int index) {
-        if (selectedDataIndex == index)
-            return;
-        selectedDataIndex = index;
-        notifyDataSelected(index);
-    }
-
-    public int getSelectedMarkerData() {
-        return selectedDataIndex;
-    }
-
-    abstract public T getAt(int index);
-
-    abstract public PointF getPosition(int index);
-
-    abstract protected int addDataNoNotify(T data);
-    abstract protected T removeDataNoNotify(int index);
-    abstract protected void clearNoNotify();
-
-    public int addData(T data) {
-        int i = addDataNoNotify(data);
-        notifyDataAdded(i);
-        return i;
-    }
-
-    public T removeData(int index) {
-        T data = removeDataNoNotify(index);
-        notifyDataRemoved(index, data);
-        if (index == selectedDataIndex)
-            selectMarkerData(-1);
-        return data;
-    }
-
-    public void clear() {
-        clearNoNotify();
-        selectedDataIndex = -1;
-        notifyAllDataChanged();
-    }
-
-    public void notifyDataAdded(int index) {
-        for (IListener listener : getListeners())
-            listener.onDataAdded(this, index);
-    }
-
-    public void notifyDataRemoved(int index, T data) {
-        for (IListener listener : getListeners())
-            listener.onDataRemoved(this, index, data);
-    }
-
-    public void notifyDataChanged(int index, int number) {
-        for (IListener listener : getListeners())
-            listener.onDataChanged(this, index, number);
-    }
-
-    public void notifyAllDataChanged() {
-        for (IListener listener : getListeners())
-            listener.onAllDataChanged(this);
-    }
-
-    public void notifyDataSelected(int index) {
-        for (IListener listener : getListeners())
-            listener.onDataSelected(this, index);
-    }
-}
-
 abstract class AbstractPointDataList<T> extends AbstractPointDataModel<T> {
     protected List<T> list = new ArrayList<>();
 
@@ -115,6 +34,11 @@ abstract class AbstractPointDataList<T> extends AbstractPointDataModel<T> {
     @Override
     public T getAt(int index) {
         return list.get(index);
+    }
+
+    @Override
+    public int indexOf(T data) {
+        return list.indexOf(data);
     }
 
     @Override
@@ -160,8 +84,17 @@ public class MarkerDataModel extends AbstractPointDataList<MarkerData> {
 
     public void setMarkerPosition(PointF position, int index) {
         MarkerData data = getMarkerDataAt(index);
-        data.setPosition(position);
-        notifyDataChanged(index, 1);
+        setPosition(data, position);
+    }
+
+    @Override
+    public PointF getPosition(MarkerData data) {
+        return data.getPosition();
+    }
+
+    @Override
+    public void setPositionNoNotify(MarkerData data, PointF point) {
+        data.setPosition(point);
     }
 
     public int addMarkerData(MarkerData data) {
@@ -243,11 +176,6 @@ public class MarkerDataModel extends AbstractPointDataList<MarkerData> {
                 return i;
         }
         return -1;
-    }
-
-    @Override
-    public PointF getPosition(int index) {
-        return getRealMarkerPositionAt(index);
     }
 
     public PointF getRealMarkerPositionAt(int index) {
