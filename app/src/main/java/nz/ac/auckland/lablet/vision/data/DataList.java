@@ -134,6 +134,12 @@ public abstract class DataList<D extends Data> extends WeakListenable<DataList.I
         return data;
     }
 
+    public void removeData(D data) {
+        int index = dataList.indexOf(data);
+        if (index >= 0)
+            removeData(index);
+    }
+
     public void clear() {
         dataList.clear();
         selectedDataIndex = -1;
