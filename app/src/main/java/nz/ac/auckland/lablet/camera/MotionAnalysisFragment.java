@@ -372,19 +372,22 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         final Intent intent = getActivity().getIntent();
         if (intent != null) {
             Bundle extras = intent.getExtras();
-            if (extras != null && getSensorAnalysis().getTagMarkers().getMarkerCount() == 0) {
-                if (extras.getBoolean(FIRST_START_WITH_VIDEO_SETTINGS, false)) {
-                    resumeWithRunSettings = true;
+            if (extras != null) {
+                Bundle motionAnalysisSettings = extras.getBundle(MOTION_ANLYSIS_SETTINGS);
+                if (motionAnalysisSettings != null) {
+                    if (getSensorAnalysis().getTagMarkers().getMarkerCount() == 0) {
+                        if (motionAnalysisSettings.getBoolean(FIRST_START_WITH_VIDEO_SETTINGS, false)) {
+                            resumeWithRunSettings = true;
+                        }
+                        if (motionAnalysisSettings.getBoolean(FIRST_START_WITH_VIDEO_SETTINGS_HELP, false)) {
+                            resumeWithRunSettings = true;
+                            resumeWithRunSettingsHelp = true;
+                        }
+                    }
+
+                    if (motionAnalysisSettings.containsKey(OBJECT_TRACKING_ENABLED))
+                        objectTrackingEnabled = motionAnalysisSettings.getBoolean(OBJECT_TRACKING_ENABLED);
                 }
-                if (extras.getBoolean(FIRST_START_WITH_VIDEO_SETTINGS_HELP, false)) {
-                    resumeWithRunSettings = true;
-                    resumeWithRunSettingsHelp = true;
-                }
-            }
-            Bundle motionAnalysisSettings = extras.getBundle(MOTION_ANLYSIS_SETTINGS);
-            if (motionAnalysisSettings != null) {
-                if (motionAnalysisSettings.containsKey(OBJECT_TRACKING_ENABLED))
-                    objectTrackingEnabled = motionAnalysisSettings.getBoolean(OBJECT_TRACKING_ENABLED);
             }
         }
 

@@ -110,14 +110,16 @@ public class MotionAnalysisFragment extends ScriptComponentGenericFragment {
                 Intent intent = new Intent(getActivity(), ExperimentAnalysisActivity.class);
                 intent.putExtra(ExperimentActivity.PATH,
                         ((ScriptTreeNodeMotionAnalysis) component).getExperiment().getExperimentPath());
-                intent.putExtra(
-                        nz.ac.auckland.lablet.camera.MotionAnalysisFragment.FIRST_START_WITH_VIDEO_SETTINGS, true);
-                intent.putExtra(
-                        nz.ac.auckland.lablet.camera.MotionAnalysisFragment.FIRST_START_WITH_VIDEO_SETTINGS_HELP, true);
+
+                // motion analysis settings
                 Bundle motionAnalysisSettings = new Bundle();
                 motionAnalysisSettings.putBoolean(
+                        nz.ac.auckland.lablet.camera.MotionAnalysisFragment.FIRST_START_WITH_VIDEO_SETTINGS, true);
+                motionAnalysisSettings.putBoolean(
+                        nz.ac.auckland.lablet.camera.MotionAnalysisFragment.FIRST_START_WITH_VIDEO_SETTINGS_HELP, true);
+                motionAnalysisSettings.putBoolean(
                         nz.ac.auckland.lablet.camera.MotionAnalysisFragment.OBJECT_TRACKING_ENABLED, false);
-                //TODO: put video settings in the bundle as well
+
                 intent.putExtra(nz.ac.auckland.lablet.camera.MotionAnalysisFragment.MOTION_ANLYSIS_SETTINGS,
                         motionAnalysisSettings);
                 startActivityForResult(intent, ANALYSE_EXPERIMENT);
