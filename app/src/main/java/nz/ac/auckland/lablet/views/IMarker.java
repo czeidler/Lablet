@@ -15,8 +15,8 @@ import nz.ac.auckland.lablet.experiment.MarkerData;
 /**
  * Interface for a drawable, selectable marker that can handle motion events.
  */
-public interface IMarker {
-    void setTo(AbstractMarkerPainter painter, MarkerData markerData);
+public interface IMarker<T> {
+    void setTo(AbstractMarkerPainter painter, T markerData);
 
     void onDraw(Canvas canvas, float priority);
 

@@ -34,7 +34,7 @@ public class CalibratedMarkerDataModel extends MarkerDataModel implements Calibr
 
     @Override
     public void onCalibrationChanged() {
-        notifyDataChanged(0, markerDataList.size());
+        notifyDataChanged(0, list.size());
     }
 
     @Override

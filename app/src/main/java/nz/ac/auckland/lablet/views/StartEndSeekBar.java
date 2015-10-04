@@ -22,7 +22,7 @@ import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 /**
  * Abstract base class that shares code for the start and the end marker.
  */
-abstract class StartEndMarker extends DraggableMarker {
+abstract class StartEndMarker extends DraggableMarker<MarkerData> {
     // dimensions in density-independent  pixels
     private final float WIDTH_DP = 20;
 
@@ -164,7 +164,7 @@ class EndMarker extends StartEndMarker {
  * The used data model should contain exactly two data points.
  * </p>
  */
-class StartEndPainter extends AbstractMarkerPainter {
+class StartEndPainter extends AbstractMarkerPainter<MarkerData> {
     int numberOfSteps = 10;
 
     /**
@@ -202,27 +202,27 @@ class StartEndPainter extends AbstractMarkerPainter {
         newReal.x = toStepPosition(newReal.x);
 
         if (row == 0) {
-            MarkerData marker2 = markerData.getMarkerDataAt(1);
+            MarkerData marker2 = markerData.getAt(1);
             if (newReal.x > marker2.getPosition().x)
-                markerData.setMarkerPosition(newReal, 1);
+                markerData.setPosition(newReal, 1);
         } else {
-            MarkerData marker1 = markerData.getMarkerDataAt(0);
+            MarkerData marker1 = markerData.getAt(0);
             if (newReal.x < marker1.getPosition().x)
-                markerData.setMarkerPosition(newReal, 0);
+                markerData.setPosition(newReal, 0);
         }
-        markerData.setMarkerPosition(newReal, row);
+        markerData.setPosition(newReal, row);
     }
 
     public void setNumberOfSteps(int steps) {
         numberOfSteps = steps;
 
-        MarkerData marker1 = markerData.getMarkerDataAt(0);
+        MarkerData marker1 = markerData.getAt(0);
         marker1.getPosition().x = toStepPosition(marker1.getPosition().x);
-        markerData.setMarkerPosition(marker1.getPosition(), 0);
+        markerData.setPosition(marker1.getPosition(), 0);
 
-        MarkerData marker2 = markerData.getMarkerDataAt(1);
+        MarkerData marker2 = markerData.getAt(1);
         marker2.getPosition().x = toStepPosition(marker2.getPosition().x);
-        markerData.setMarkerPosition(marker2.getPosition(), 1);
+        markerData.setPosition(marker2.getPosition(), 1);
     }
 
     private float toStepPosition(float floatPosition) {
