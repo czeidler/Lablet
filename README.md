@@ -27,8 +27,6 @@ Lablet depends on OpenCV for Android to provide object tracking functionality. A
 1. Download and unzip [OpenCV for Android 2.4.11](http://sourceforge.net/projects/opencvlibrary/files/opencv-android/2.4.11/OpenCV-2.4.11-android-sdk.zip/download).
 2. Copy the directory OpenCV-android-sdk-2.4.11/sdk/native/libs into Lablet/app/src/main
 3. Rename the libs folder (that you just copied) to jniLibs
-4. From Android Studio or Intellij IDEA, click: File -> New -> Import Module -> set the source directory to C:/path to OpenCV for android/sdk/java -> Next -> Finish
-6. Right click on Lablet in the Project panel -> Open Module Settings -> Dependencies -> Add (plus) -> 3 Module Dependency -> select :openCVLibrary2411 -> OK -> OK
 
 Links
 ----
