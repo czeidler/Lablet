@@ -30,8 +30,14 @@ import java.util.List;
 public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
     static final int PERFORM_RUN_SETTINGS = 0;
 
+    static final public String MOTION_ANLYSIS_SETTINGS = "motion_analysis_settings";
+    static final public String FIRST_START_WITH_VIDEO_SETTINGS = "first_start_with_run_settings";
+    static final public String FIRST_START_WITH_VIDEO_SETTINGS_HELP = "first_start_with_run_settings_help";
+    static final public String OBJECT_TRACKING_ENABLED = "first_start_with_run_settings_help";
+
     private boolean resumeWithRunSettings = false;
     private boolean resumeWithRunSettingsHelp = false;
+    private boolean objectTrackingEnabled = true;
 
     public MotionAnalysisFragment() {
         super();
@@ -122,6 +128,8 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                 return true;
             }
         });
+        if (!objectTrackingEnabled)
+            trackObjectMenu.setVisible(false);
 
         setupStandardMenu(menu, inflater);
     }
@@ -365,13 +373,18 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         if (intent != null) {
             Bundle extras = intent.getExtras();
             if (extras != null && getSensorAnalysis().getTagMarkers().getMarkerCount() == 0) {
-                if (extras.getBoolean("first_start_with_run_settings", false)) {
+                if (extras.getBoolean(FIRST_START_WITH_VIDEO_SETTINGS, false)) {
                     resumeWithRunSettings = true;
                 }
-                if (extras.getBoolean("first_start_with_run_settings_help", false)) {
+                if (extras.getBoolean(FIRST_START_WITH_VIDEO_SETTINGS_HELP, false)) {
                     resumeWithRunSettings = true;
                     resumeWithRunSettingsHelp = true;
                 }
+            }
+            Bundle motionAnalysisSettings = extras.getBundle(MOTION_ANLYSIS_SETTINGS);
+            if (motionAnalysisSettings != null) {
+                if (motionAnalysisSettings.containsKey(OBJECT_TRACKING_ENABLED))
+                    objectTrackingEnabled = motionAnalysisSettings.getBoolean(OBJECT_TRACKING_ENABLED);
             }
         }
 
