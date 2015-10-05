@@ -106,6 +106,8 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
 
     @Override
     public void startPreview() {
+        resetData();
+
         sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_NORMAL);
 
@@ -142,14 +144,7 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     public void startPlayback() {
         super.startPlayback();
     }
-
-    @Override
-    public void stopPlayback() {
-        resetData();
-
-        super.stopPlayback();
-    }
-
+    
     @Override
     public ISensorData getExperimentData() {
         return data;
