@@ -34,7 +34,8 @@ public class ObjectTrackerDialog extends AlertDialog {
 
     private ProgressBar progressBar;
     private TextView textViewProgress;
-    MotionAnalysis motionAnalysis;
+    private MotionAnalysis motionAnalysis;
+    private long startTimeMs;
 
     public ObjectTrackerDialog(Context context, MotionAnalysis motionAnalysis) {
         super(context);
@@ -56,6 +57,8 @@ public class ObjectTrackerDialog extends AlertDialog {
         progressBar.setProgress(0);
         textViewProgress.setText("0%");
 
+        startTimeMs = System.currentTimeMillis();
+
         CalibrationVideoTimeData timeData = motionAnalysis.getCalibrationVideoTimeData();
         int start = timeData.getClosestFrame(timeData.getAnalysisVideoStart());
         int end = timeData.getClosestFrame(timeData.getAnalysisVideoEnd());
@@ -71,6 +74,22 @@ public class ObjectTrackerDialog extends AlertDialog {
         });
     }
 
+    private String timeString(long timeMs) {
+        int seconds = (int)(timeMs / 1000);
+        int hours = seconds / 60 / 60;
+        seconds -= hours * 60 * 60;
+        int minutes = seconds / 60;
+        seconds -= minutes * 60;
+
+        String string = "";
+        if (hours > 0)
+            string += hours + "h";
+        if (minutes > 0)
+            string += minutes + "m";
+        string += seconds + "s";
+        return string;
+    }
+
     private final ObjectTrackerAnalysis.IListener trackingListener = new ObjectTrackerAnalysis.IListener() {
         @Override
         public void onTrackingFinished(SparseArray<Rect> results) {
@@ -83,8 +102,16 @@ public class ObjectTrackerDialog extends AlertDialog {
             int percent = 0;
             if (totalNumberOfFrames > 0)
                 percent = frame * 100 / totalNumberOfFrames;
+
+            long elapsedTime = System.currentTimeMillis() - startTimeMs;
+            String timeString;
+            if ((elapsedTime / 5000) % 2 == 0)
+                timeString = "Time Elapsed: " + timeString(elapsedTime);
+            else
+                timeString = "Time Remaining: " + timeString(elapsedTime * (totalNumberOfFrames - frame) / frame);
+
             progressBar.setProgress(percent);
-            textViewProgress.setText("Frame:\t" + frame + "/" + totalNumberOfFrames + "\t(" +percent + "%)");
+            textViewProgress.setText("Frame:\t" + frame + "/" + totalNumberOfFrames + "\t\t" + timeString);
         }
     };
 }

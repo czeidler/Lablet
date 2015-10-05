@@ -315,7 +315,7 @@ public class ObjectTrackerAnalysis {
                     }
                 }
 
-                publishProgress(i);
+                publishProgress(i - startFrame);
             }
 
             extractor.release();
