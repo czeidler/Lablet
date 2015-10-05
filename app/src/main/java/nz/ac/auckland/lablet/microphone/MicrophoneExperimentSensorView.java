@@ -258,6 +258,10 @@ class PlaybackViewState implements AbstractExperimentSensor.State {
         frequencyMapAdapter = new AudioFrequencyMapAdapter(DEFAULT_STEP_FACTOR);
         strategyPainter.addChild(new AudioFrequencyMapConcurrentPainter(frequencyMapAdapter));
         frequencyMapPlotView.addPlotPainter(strategyPainter);
+        frequencyMapPlotView.getYAxisView().setUnit(experimentSensor.getFrequencyUnit());
+        frequencyMapPlotView.getYAxisView().setTitle("Frequency");
+        frequencyMapPlotView.getXAxisView().setUnit(experimentSensor.getTimeUnit());
+        frequencyMapPlotView.getXAxisView().setTitle("Time");
 
         startPauseButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
