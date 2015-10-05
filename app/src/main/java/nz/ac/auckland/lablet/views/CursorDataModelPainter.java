@@ -156,7 +156,7 @@ abstract public class CursorDataModelPainter extends AbstractMarkerPainter<Marke
     }
 
     @Override
-    public List<IMarker<MarkerData>> getSelectableMarkerList() {
+    public List<IMarker> getSelectableMarkerList() {
         return markerList;
     }
 

@@ -31,8 +31,8 @@ import java.util.List;
  * been selected and otherwise is disabled.
  * </p>
  */
-abstract class DraggableMarker<T> implements IMarker<T> {
-    protected AbstractMarkerPainter parent = null;
+abstract class DraggableMarker<T> implements IMarker<AbstractMarkerPainter<T>, T> {
+    protected AbstractMarkerPainter<T> parent = null;
     protected T markerData;
     protected PointF currentPosition;
     protected PointF dragOffset = new PointF(0, 0);
@@ -40,7 +40,7 @@ abstract class DraggableMarker<T> implements IMarker<T> {
     protected boolean isDragging = false;
 
     @Override
-    public void setTo(AbstractMarkerPainter painter, T markerData) {
+    public void setTo(AbstractMarkerPainter<T> painter, T markerData) {
         this.parent = painter;
         this.markerData = markerData;
     }
@@ -205,7 +205,7 @@ class SimpleMarker<T> extends DraggableMarker<T> {
     }
 
     @Override
-    public void setTo(AbstractMarkerPainter painter, T markerData) {
+    public void setTo(AbstractMarkerPainter<T> painter, T markerData) {
         super.setTo(painter, markerData);
 
         INNER_RING_RADIUS = parent.toPixel(Const.INNER_RING_RADIUS_DP);
@@ -395,7 +395,7 @@ abstract class AbstractMarkerPainter<T> extends AbstractPlotPainter {
 
     protected AbstractPointDataModel<T> markerData = null;
     final protected Rect frame = new Rect();
-    final protected List<IMarker<T>> markerList = new ArrayList<>();
+    final protected List<IMarker> markerList = new ArrayList<>();
 
     public AbstractMarkerPainter(AbstractPointDataModel<T> model) {
         markerData = model;
@@ -428,7 +428,7 @@ abstract class AbstractMarkerPainter<T> extends AbstractPlotPainter {
         }
     }
 
-    public List<IMarker<T>> getSelectableMarkerList() {
+    public List<IMarker> getSelectableMarkerList() {
         return markerList;
     }
 
@@ -462,7 +462,7 @@ abstract class AbstractMarkerPainter<T> extends AbstractPlotPainter {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        List<IMarker<T>> selectableMarkers = getSelectableMarkerList();
+        List<IMarker> selectableMarkers = getSelectableMarkerList();
         int action = event.getActionMasked();
         boolean handled = false;
         if (action == MotionEvent.ACTION_DOWN) {
@@ -548,7 +548,7 @@ abstract class AbstractMarkerPainter<T> extends AbstractPlotPainter {
     abstract protected DraggableMarker createMarkerForRow(int row);
 
     public void addMarker(int row) {
-        IMarker<T> marker = createMarkerForRow(row);
+        IMarker marker = createMarkerForRow(row);
         marker.setTo(this, markerData.getAt(row));
         markerList.add(row, marker);
     }

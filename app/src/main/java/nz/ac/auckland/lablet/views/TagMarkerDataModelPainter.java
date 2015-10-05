@@ -28,18 +28,18 @@ class MarkerDataModelPainter<T> extends AbstractMarkerPainter<T> {
     }
 
     @Override
-    public List<IMarker<T>> getSelectableMarkerList() {
-        List<IMarker<T>> selectableMarkers = new ArrayList<>();
+    public List<IMarker> getSelectableMarkerList() {
+        List<IMarker> selectableMarkers = new ArrayList<>();
         int index = markerData.getSelectedMarkerData();
         if (index < 0)
             return selectableMarkers;
-        IMarker<T> selectedMarker = markerList.get(index);
+        IMarker selectedMarker = markerList.get(index);
         if (selectedMarker != null)
             selectableMarkers.add(selectedMarker);
         return selectableMarkers;
     }
 
-    public IMarker<T> getMarkerAtScreenPosition(PointF screenPosition) {
+    public IMarker getMarkerAtScreenPosition(PointF screenPosition) {
         int currentMarkerRow = markerData.getSelectedMarkerData();
 
         int start = currentMarkerRow - MAX_DISPLAYED_MARKERS / 2 + 1;
@@ -50,7 +50,7 @@ class MarkerDataModelPainter<T> extends AbstractMarkerPainter<T> {
             end = markerList.size();
 
         for (int i = start; i < end; i++) {
-            IMarker<T> marker = markerList.get(i);
+            IMarker marker = markerList.get(i);
             if (!(marker instanceof DraggableMarker))
                 continue;
             if (((DraggableMarker)marker).isPointOnSelectArea(screenPosition))
@@ -72,7 +72,7 @@ class MarkerDataModelPainter<T> extends AbstractMarkerPainter<T> {
             end = markerList.size();
 
         for (int i = start; i < end; i++) {
-            IMarker<T> marker = markerList.get(i);
+            IMarker marker = markerList.get(i);
             if (marker == topMarker)
                 continue;
 
