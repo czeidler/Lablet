@@ -15,7 +15,7 @@
                  android:layout_height="match_parent"
                  android:visibility="invisible"/>
 
-    <view class="nz.ac.auckland.lablet.views.FrameDataSeekBar" android:id="@+id/frameDataSeekBar"
+    <view class="nz.ac.auckland.lablet.camera.FrameDataSeekBar" android:id="@+id/frameDataSeekBar"
           android:layout_width="fill_parent"
           android:layout_height="wrap_content"
           android:layout_alignParentBottom="true"

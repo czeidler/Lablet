@@ -37,7 +37,7 @@
             android:layout_alignRight="@+id/relativeLayout" android:paddingLeft="25dp" android:paddingRight="25dp"/>
     <view android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          class="nz.ac.auckland.lablet.views.StartEndSeekBar" android:id="@+id/startEndSeekBar"
+          class="nz.ac.auckland.lablet.camera.StartEndSeekBar" android:id="@+id/startEndSeekBar"
           android:layout_alignParentLeft="true"
           android:layout_above="@+id/statusBar" android:layout_alignRight="@+id/seekBar"/>
     <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"

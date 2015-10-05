@@ -21,7 +21,6 @@ import nz.ac.auckland.lablet.*;
 import nz.ac.auckland.lablet.ExperimentAnalysisBaseActivity;
 import nz.ac.auckland.lablet.views.marker.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
-import nz.ac.auckland.lablet.views.StartEndSeekBar;
 import nz.ac.auckland.lablet.views.VideoFrameView;
 
 import java.io.File;

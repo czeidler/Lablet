@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views;
+package nz.ac.auckland.lablet.camera;
 
 import android.content.Context;
 import android.os.Handler;
@@ -15,7 +15,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.camera.ITimeData;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 
 import java.text.DecimalFormat;
