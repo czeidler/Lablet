@@ -293,7 +293,7 @@ public class ObjectTrackerAnalysis {
                             tracker.setRegionOfInterest(roiBmp, x, y, width, height);
                         } else {
                             Log.d(TAG, "Region of interest BMP is null");
-                            return null;
+                            break;
                         }
                     }
 
@@ -317,6 +317,7 @@ public class ObjectTrackerAnalysis {
                 publishProgress(((double) i + 1) / endFrame);
             }
 
+            extractor.release();
             return results;
         }
 
@@ -328,7 +329,7 @@ public class ObjectTrackerAnalysis {
          * @return The Bitmap of the video frame.
          */
         private Bitmap getFrame(long time) {
-            extractor.seekToFrameSync(time);
+            extractor.seekToFrame(time);
             outputSurface.awaitNewImage();
             outputSurface.drawImage(true);
             return outputSurface.getBitmap();
