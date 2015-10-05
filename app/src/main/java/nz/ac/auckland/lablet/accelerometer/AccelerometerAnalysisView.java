@@ -55,6 +55,8 @@ public class AccelerometerAnalysisView extends FrameLayout {
 
         PlotView plotView = (PlotView)mainView.findViewById(R.id.plotView);
         plotView.getTitleView().setTitle("Accelerometer");
+        plotView.getXAxisView().setTitle("time [ms]");
+        plotView.getYAxisView().setTitle("acceleration [m/s^2]");
         plotView.getBackgroundPainter().setShowXGrid(true);
         plotView.getBackgroundPainter().setShowYGrid(true);
         StrategyPainter strategyPainter = new ThreadStrategyPainter();

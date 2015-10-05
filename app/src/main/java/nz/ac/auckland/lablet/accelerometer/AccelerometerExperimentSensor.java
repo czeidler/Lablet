@@ -144,7 +144,7 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     public void startPlayback() {
         super.startPlayback();
     }
-    
+
     @Override
     public ISensorData getExperimentData() {
         return data;
