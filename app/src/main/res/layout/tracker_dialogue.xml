@@ -46,13 +46,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
-                android:text="Start"
-                android:id="@+id/btnStartTracking" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:text="Stop"
                 android:id="@+id/btnStopTracking" />
 

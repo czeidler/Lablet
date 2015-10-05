@@ -56,16 +56,10 @@ public class ObjectTrackerDialog extends AlertDialog {
         progressBar.setProgress(0);
         textViewProgress.setText("0%");
 
-        Button btnStart = (Button)contentView.findViewById(R.id.btnStartTracking);
-        btnStart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CalibrationVideoTimeData timeData = motionAnalysis.getCalibrationVideoTimeData();
-                int start = timeData.getClosestFrame(timeData.getAnalysisVideoStart());
-                int end = timeData.getClosestFrame(timeData.getAnalysisVideoEnd());
-                motionAnalysis.getObjectTrackerAnalysis().trackObjects(start, end, trackingListener);
-            }
-        });
+        CalibrationVideoTimeData timeData = motionAnalysis.getCalibrationVideoTimeData();
+        int start = timeData.getClosestFrame(timeData.getAnalysisVideoStart());
+        int end = timeData.getClosestFrame(timeData.getAnalysisVideoEnd());
+        motionAnalysis.getObjectTrackerAnalysis().trackObjects(start, end, trackingListener);
 
         Button btnStop = (Button)contentView.findViewById(R.id.btnStopTracking);
         btnStop.setOnClickListener(new View.OnClickListener() {
@@ -77,8 +71,7 @@ public class ObjectTrackerDialog extends AlertDialog {
         });
     }
 
-    private final ObjectTrackerAnalysis.IListener trackingListener = new ObjectTrackerAnalysis.IListener()
-    {
+    private final ObjectTrackerAnalysis.IListener trackingListener = new ObjectTrackerAnalysis.IListener() {
         @Override
         public void onTrackingFinished(SparseArray<Rect> results) {
             dismiss();
