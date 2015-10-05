@@ -49,8 +49,8 @@ public class MicrophoneExperimentSensor extends AbstractExperimentSensor {
     final private float liveStepFactor = 0.5f;
 
     public interface ISensorDataListener {
-        public void onNewAmplitudeData(float[] amplitudes);
-        public void onNewFrequencyData(float[] frequencies);
+        void onNewAmplitudeData(float[] amplitudes);
+        void onNewFrequencyData(float[] frequencies);
     }
 
     public Unit getTimeUnit() {

@@ -15,7 +15,7 @@ import java.util.List;
 
 public class Unit extends WeakListenable<Unit.IListener> {
     public interface IListener {
-        public void onBaseExponentChanged();
+        void onBaseExponentChanged();
     }
 
     private void notifyBaseExponentChanged() {
