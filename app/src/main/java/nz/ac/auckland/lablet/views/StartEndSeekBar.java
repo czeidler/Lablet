@@ -12,9 +12,11 @@ import android.graphics.*;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.SparseArray;
-import nz.ac.auckland.lablet.experiment.MarkerData;
+import nz.ac.auckland.lablet.views.marker.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.marker.AbstractMarkerPainter;
+import nz.ac.auckland.lablet.views.marker.DraggableMarker;
+import nz.ac.auckland.lablet.views.marker.IMarker;
 import nz.ac.auckland.lablet.views.plotview.IPlotPainter;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 

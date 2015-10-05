@@ -2,13 +2,14 @@ package nz.ac.auckland.lablet.vision.markers;
 
 import android.graphics.PointF;
 
+import nz.ac.auckland.lablet.views.marker.MarkerView;
 import nz.ac.auckland.lablet.vision.data.Data;
 import nz.ac.auckland.lablet.vision.data.DataList;
 import nz.ac.auckland.lablet.vision.data.PointDataList;
 
 /**
  * Abstract base class to draw a in a
- * {@link nz.ac.auckland.lablet.views.MarkerView}.
+ * {@link MarkerView}.
  */
 
 

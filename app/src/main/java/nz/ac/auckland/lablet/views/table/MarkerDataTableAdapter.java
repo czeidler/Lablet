@@ -9,6 +9,7 @@ package nz.ac.auckland.lablet.views.table;
 
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.Unit;
+import nz.ac.auckland.lablet.views.marker.MarkerData;
 
 import java.util.ArrayList;
 import java.util.List;

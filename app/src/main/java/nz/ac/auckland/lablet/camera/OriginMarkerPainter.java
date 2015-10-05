@@ -1,4 +1,4 @@
-package nz.ac.auckland.lablet.views;
+package nz.ac.auckland.lablet.camera;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,8 +12,12 @@ import nz.ac.auckland.lablet.experiment.CalibrationXY;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-import nz.ac.auckland.lablet.experiment.MarkerData;
+import nz.ac.auckland.lablet.views.marker.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.marker.AbstractMarkerPainter;
+import nz.ac.auckland.lablet.views.marker.DraggableMarker;
+import nz.ac.auckland.lablet.views.marker.IMarker;
+import nz.ac.auckland.lablet.views.marker.SimpleMarker;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 

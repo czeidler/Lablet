@@ -1,4 +1,11 @@
-package nz.ac.auckland.lablet.views;
+/*
+ * Copyright 2013-2014.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
+package nz.ac.auckland.lablet.camera;
 
 import android.graphics.*;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
@@ -9,8 +16,8 @@ import nz.ac.auckland.lablet.experiment.CalibrationXY;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-import nz.ac.auckland.lablet.experiment.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.marker.*;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
 

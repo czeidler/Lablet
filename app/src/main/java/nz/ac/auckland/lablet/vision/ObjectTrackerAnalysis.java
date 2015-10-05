@@ -19,7 +19,7 @@ import nz.ac.auckland.lablet.camera.VideoData;
 import nz.ac.auckland.lablet.camera.decoder.CodecOutputSurface;
 import nz.ac.auckland.lablet.camera.decoder.SeekToFrameExtractor;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
-import nz.ac.auckland.lablet.experiment.MarkerData;
+import nz.ac.auckland.lablet.views.marker.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.vision.data.*;
 import org.opencv.core.Rect;

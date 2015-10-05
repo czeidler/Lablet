@@ -24,11 +24,14 @@ import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
 
+import nz.ac.auckland.lablet.views.marker.IMarker;
+import nz.ac.auckland.lablet.views.marker.MarkerView;
+import nz.ac.auckland.lablet.views.marker.TagMarkerDataModelPainter;
 import nz.ac.auckland.lablet.vision.data.RectDataList;
 import nz.ac.auckland.lablet.vision.data.RoiDataList;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
-import nz.ac.auckland.lablet.experiment.MarkerData;
+import nz.ac.auckland.lablet.views.marker.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.views.*;
 import nz.ac.auckland.lablet.vision.markers.RectMarkerListPainter;

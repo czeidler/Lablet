@@ -5,11 +5,11 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.views;
+package nz.ac.auckland.lablet.views.marker;
 
 import android.graphics.Canvas;
 import android.view.MotionEvent;
-import nz.ac.auckland.lablet.experiment.MarkerData;
+import nz.ac.auckland.lablet.views.marker.AbstractMarkerPainter;
 
 
 /**

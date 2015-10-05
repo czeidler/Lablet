@@ -8,8 +8,11 @@
 package nz.ac.auckland.lablet.views;
 
 import android.graphics.*;
-import nz.ac.auckland.lablet.experiment.MarkerData;
+import nz.ac.auckland.lablet.views.marker.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.marker.AbstractMarkerPainter;
+import nz.ac.auckland.lablet.views.marker.DraggableMarker;
+import nz.ac.auckland.lablet.views.marker.IMarker;
 
 import java.text.DecimalFormat;
 import java.util.List;

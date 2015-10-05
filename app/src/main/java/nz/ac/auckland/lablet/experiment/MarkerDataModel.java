@@ -9,7 +9,8 @@ package nz.ac.auckland.lablet.experiment;
 
 import android.graphics.PointF;
 import android.os.Bundle;
-import nz.ac.auckland.lablet.misc.WeakListenable;
+import nz.ac.auckland.lablet.views.marker.AbstractPointDataModel;
+import nz.ac.auckland.lablet.views.marker.MarkerData;
 
 import java.util.ArrayList;
 import java.util.Collections;

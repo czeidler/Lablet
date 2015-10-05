@@ -8,6 +8,7 @@
 package nz.ac.auckland.lablet.experiment;
 
 import android.graphics.PointF;
+import nz.ac.auckland.lablet.views.marker.MarkerData;
 
 
 /**

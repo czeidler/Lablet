@@ -12,14 +12,12 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.IDataAnalysis;
 import nz.ac.auckland.lablet.experiment.ISensorData;
-import nz.ac.auckland.lablet.experiment.MarkerData;
+import nz.ac.auckland.lablet.views.marker.MarkerData;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**

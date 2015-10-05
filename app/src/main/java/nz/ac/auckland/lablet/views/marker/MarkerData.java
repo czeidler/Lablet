@@ -5,7 +5,7 @@
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-package nz.ac.auckland.lablet.experiment;
+package nz.ac.auckland.lablet.views.marker;
 
 import android.graphics.PointF;
 
