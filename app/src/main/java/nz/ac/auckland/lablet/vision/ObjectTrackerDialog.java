@@ -78,10 +78,13 @@ public class ObjectTrackerDialog extends AlertDialog {
         }
 
         @Override
-        public void onTrackingUpdate(Double percentDone) {
-            int percent = (int)(percentDone * 100);
+        public void onTrackingUpdate(int frameNumber, int totalNumberOfFrames) {
+            int frame = frameNumber + 1;
+            int percent = 0;
+            if (totalNumberOfFrames > 0)
+                percent = frame * 100 / totalNumberOfFrames;
             progressBar.setProgress(percent);
-            textViewProgress.setText(percent + "%");
+            textViewProgress.setText("Frame:\t" + frame + "/" + totalNumberOfFrames + "\t(" +percent + "%)");
         }
     };
 }

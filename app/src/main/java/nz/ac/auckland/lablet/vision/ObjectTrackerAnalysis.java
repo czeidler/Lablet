@@ -30,7 +30,7 @@ import java.io.IOException;
 public class ObjectTrackerAnalysis {
     public interface IListener {
         void onTrackingFinished(SparseArray<Rect> results);
-        void onTrackingUpdate(Double percentDone);
+        void onTrackingUpdate(int frameNumber, int totalNumberOfFrames);
     }
 
     final private static String TAG = ObjectTrackerAnalysis.class.getName();
@@ -232,7 +232,7 @@ public class ObjectTrackerAnalysis {
         return bundle;
     }
 
-    private class BackgroundTask extends AsyncTask<Void, Double, SparseArray<Rect>> {
+    private class BackgroundTask extends AsyncTask<Void, Integer, SparseArray<Rect>> {
         final int startFrame;
         final int endFrame;
         final private IListener listener;
@@ -272,6 +272,7 @@ public class ObjectTrackerAnalysis {
                 return results;
             }
 
+            //TODO: check if endFrame exclusive is what you want or i < endFrame + 1?
             for (int i = startFrame; i < endFrame && isTracking; i++) {
                 RoiData last = getClosestRoi(roiDataList, i);
 
@@ -314,7 +315,7 @@ public class ObjectTrackerAnalysis {
                     }
                 }
 
-                publishProgress(((double) i + 1) / endFrame);
+                publishProgress(i);
             }
 
             extractor.release();
@@ -380,10 +381,10 @@ public class ObjectTrackerAnalysis {
          * @param values The progress of the object tracker values[0] (from 0.0-1.0)
          */
         @Override
-        protected void onProgressUpdate(Double... values) {
+        protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
 
-            listener.onTrackingUpdate(values[0]);
+            listener.onTrackingUpdate(values[0], endFrame - startFrame);
         }
     }
 }
