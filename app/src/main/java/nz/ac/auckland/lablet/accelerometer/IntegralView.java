@@ -143,7 +143,10 @@ public class IntegralView extends FrameLayout {
 
         start = 0;
         end = data.getTimeValues().size() - 1;
-        timeValues = data.getTimeValues().subList(start, end);
+        if (end > 0)
+            timeValues = data.getTimeValues().subList(start, end);
+        else
+            timeValues = new ArrayList<>();
         setupPlot(accelerometerPlotView, timeValues, currentEntry.data, prefix + "-Acceleration",
                 "acceleration [m/s^2]");
 
