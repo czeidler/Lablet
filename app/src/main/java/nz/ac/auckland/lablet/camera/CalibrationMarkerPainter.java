@@ -16,7 +16,7 @@ import nz.ac.auckland.lablet.experiment.CalibrationXY;
  * Authors:
  *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
  */
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.views.marker.*;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 
@@ -35,7 +35,7 @@ class CalibrationMarker extends SimpleMarker {
 /**
  * Responsible to draw a calibration scale.
  * <p>
- * The painter expect a {@link nz.ac.auckland.lablet.experiment.MarkerDataModel} with two data points; one
+ * The painter expect a {@link MarkerDataModel} with two data points; one
  * for the start and one for the end of the scale.
  * </p>
  */

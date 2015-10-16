@@ -11,6 +11,7 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.Unit;
+import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.views.table.CSVWriter;
 import nz.ac.auckland.lablet.views.table.MarkerDataTableAdapter;
 

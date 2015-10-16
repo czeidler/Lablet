@@ -9,7 +9,6 @@ package nz.ac.auckland.lablet.views.marker;
 
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 
 
 /**

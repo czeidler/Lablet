@@ -8,7 +8,7 @@
 package nz.ac.auckland.lablet.views.table;
 
 import nz.ac.auckland.lablet.camera.ITimeData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.Unit;
 
 
