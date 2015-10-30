@@ -164,6 +164,23 @@ public class ObjectTrackerAnalysis {
         }
     }
 
+    public void addPointMarker(int frameId, PointF point) {
+        MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
+        VideoData videoData = motionAnalysis.getVideoData();
+
+        //Add point marker
+        PointF centre = videoData.toMarkerPoint(point);
+
+        int index = pointDataList.findMarkerDataByRun(frameId);
+        if (index >= 0)
+            pointDataList.setMarkerPosition(centre, index);
+        else {
+            MarkerData markerData = new MarkerData(frameId);
+            markerData.setPosition(centre);
+            pointDataList.addMarkerData(markerData);
+        }
+    }
+
     /**
      * Updates the object tracking markers.
      *
@@ -232,7 +249,7 @@ public class ObjectTrackerAnalysis {
         return bundle;
     }
 
-    private class BackgroundTask extends AsyncTask<Void, Integer, SparseArray<Rect>> {
+    private class BackgroundTask extends AsyncTask<Void, Float, SparseArray<Rect>> {
         final int startFrame;
         final int endFrame;
         final private IListener listener;
@@ -315,7 +332,17 @@ public class ObjectTrackerAnalysis {
                     }
                 }
 
-                publishProgress(i - startFrame);
+                Rect result = results.get(i);
+                if(result != null)
+                {
+                    float centreX = result.x + result.width / 2;
+                    float centreY = result.y + result.height / 2;
+                    publishProgress((float)i - startFrame, centreX, centreY);
+                }
+                else
+                {
+                    publishProgress((float)i - startFrame, null, null);
+                }
             }
 
             extractor.release();
@@ -381,10 +408,20 @@ public class ObjectTrackerAnalysis {
          * @param values The progress of the object tracker values[0] (from 0.0-1.0)
          */
         @Override
-        protected void onProgressUpdate(Integer... values) {
+        protected void onProgressUpdate(Float... values) {
             super.onProgressUpdate(values);
 
-            listener.onTrackingUpdate(values[0], endFrame - startFrame);
+            int currentFrame = values[0].intValue();
+            Float x = values[1];
+            Float y = values[2];
+
+            if(x != null && y != null)
+            {
+                addPointMarker(currentFrame, new PointF(x, y));
+                motionAnalysis.getFrameDataModel().setCurrentFrame(currentFrame);
+            }
+
+            listener.onTrackingUpdate(currentFrame, endFrame - startFrame);
         }
     }
 }
