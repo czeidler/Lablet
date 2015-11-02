@@ -62,7 +62,7 @@ public class FrameContainerView extends RelativeLayout {
             videoAnalysisView.setCurrentFrame(newFrame);
             markerView.setCurrentFrame(newFrame, null);
             markerView.invalidate();
-            seekBarManager.open();
+            //seekBarManager.open();
         }
 
         @Override
@@ -83,6 +83,7 @@ public class FrameContainerView extends RelativeLayout {
         boolean open = false;
         long lastOpenRequest = 0;
         final int openTime = 4000;
+        boolean keepOpen = true;
 
         final int animationDuration = 300;
         AnimatorSet animator = null;
@@ -111,17 +112,19 @@ public class FrameContainerView extends RelativeLayout {
             ViewGroup parent = (ViewGroup)FrameContainerView.this.getParent();
             animate(parent.getBottom(), parent.getBottom() - seekBar.getHeight(),
                     new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    animator = null;
-                    scheduleClose(openTime);
-                }
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            animator = null;
+                            if (!keepOpen) {
+                                scheduleClose(openTime);
+                            }
+                        }
 
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    seekBar.setVisibility(View.VISIBLE);
-                }
-            });
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            seekBar.setVisibility(View.VISIBLE);
+                        }
+                    });
         }
 
         private void close() {
@@ -175,7 +178,17 @@ public class FrameContainerView extends RelativeLayout {
                 }
             }, delay);
         }
+
+
+        public boolean isKeepOpen() {
+            return keepOpen;
+        }
+
+        public void setKeepOpen(boolean keepOpen) {
+            this.keepOpen = keepOpen;
+        }
     }
+
     private SeekBarManager seekBarManager;
 
     class GestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -218,8 +231,8 @@ public class FrameContainerView extends RelativeLayout {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (!markerView.isAnyMarkerSelectedForDrag())
-                        seekBarManager.open();
+//                   if (!markerView.isAnyMarkerSelectedForDrag())
+//                        seekBarManager.open();
                 }
             });
 
@@ -259,6 +272,8 @@ public class FrameContainerView extends RelativeLayout {
     public void setTo(CameraExperimentFrameView runView, FrameDataSeekBar seekBar, MotionAnalysis analysis) {
         this.seekBar = seekBar;
         seekBarManager = new SeekBarManager();
+        seekBarManager.setKeepOpen(true);
+        seekBarManager.open();
 
         if (motionAnalysis != null)
             motionAnalysis.removeListener(motionAnalysisListener);
@@ -325,7 +340,7 @@ public class FrameContainerView extends RelativeLayout {
 
         @Override
         public void onDataChanged(MarkerDataModel model, int index, int number) {
-            seekBarManager.open();
+            //seekBarManager.open();
         }
 
         @Override
