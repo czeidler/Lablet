@@ -13,6 +13,8 @@ import android.graphics.PointF;
 import java.util.ArrayList;
 import java.util.List;
 
+import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+
 
 public class MarkerDataModelPainter<T> extends AbstractMarkerPainter<T> {
     private int MAX_DISPLAYED_MARKERS = 100;
@@ -68,18 +70,23 @@ public class MarkerDataModelPainter<T> extends AbstractMarkerPainter<T> {
             end = markerList.size();
 
         for (int i = start; i < end; i++) {
-            IMarker marker = markerList.get(i);
-            if (marker == topMarker)
-                continue;
+            MarkerData data = ((MarkerDataModel)markerData).getMarkerDataAt(i);// .findMarkerDataByRun(frame);
+            if (data != null) {
+                if(data.isVisible()) {
+                    IMarker marker = markerList.get(i);
+                    if (marker == topMarker)
+                        continue;
 
-            float runDistance = Math.abs(currentMarkerRow - i);
-            float currentPriority = (float)(0.35 - 0.1 * runDistance);
-            if (currentPriority > 1.0)
-                currentPriority = (float)1.0;
-            if (currentPriority < 0.1)
-                currentPriority = (float)0.1;
+                    float runDistance = Math.abs(currentMarkerRow - i);
+                    float currentPriority = (float) (0.35 - 0.1 * runDistance);
+                    if (currentPriority > 1.0)
+                        currentPriority = (float) 1.0;
+                    if (currentPriority < 0.1)
+                        currentPriority = (float) 0.1;
 
-            marker.onDraw(canvas, currentPriority);
+                    marker.onDraw(canvas, currentPriority);
+                }
+            }
         }
         if (topMarker != null)
             topMarker.onDraw(canvas, (float)1.0);

@@ -363,9 +363,15 @@ public class ObjectTrackerAnalysis {
          */
         private Bitmap getFrame(long time) {
             extractor.seekToFrame(time);
-            outputSurface.awaitNewImage();
-            outputSurface.drawImage(true);
-            return outputSurface.getBitmap();
+
+            try
+            {
+                outputSurface.awaitNewImage();
+                outputSurface.drawImage(true);
+                return outputSurface.getBitmap();
+            } catch (RuntimeException e) {
+                return null;
+            }
         }
 
 

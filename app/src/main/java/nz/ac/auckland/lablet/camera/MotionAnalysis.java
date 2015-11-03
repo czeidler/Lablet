@@ -10,6 +10,9 @@ package nz.ac.auckland.lablet.camera;
 import android.graphics.PointF;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
+import android.util.SparseArray;
+
+import org.opencv.core.Rect;
 
 import nz.ac.auckland.lablet.views.marker.MarkerData;
 import nz.ac.auckland.lablet.vision.ObjectTrackerAnalysis;
