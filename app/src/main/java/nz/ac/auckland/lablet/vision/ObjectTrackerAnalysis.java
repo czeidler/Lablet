@@ -46,6 +46,7 @@ public class ObjectTrackerAnalysis {
 
     private MotionAnalysis motionAnalysis;
     final private CamShiftTracker tracker;
+
     private boolean isTracking = false;
     private BackgroundTask task;
 
@@ -105,6 +106,10 @@ public class ObjectTrackerAnalysis {
     public void setDebuggingEnabled(boolean debuggingEnabled) {
         this.debuggingEnabled = debuggingEnabled;
         getRectDataList().setVisibility(debuggingEnabled);
+    }
+
+    public boolean isTracking() {
+        return isTracking;
     }
 
     public RoiData getRoiForFrame(int frameId) {
@@ -290,7 +295,7 @@ public class ObjectTrackerAnalysis {
             }
 
             //TODO: check if endFrame exclusive is what you want or i < endFrame + 1?
-            for (int i = startFrame; i < endFrame && isTracking; i++) {
+            for (int i = startFrame; i <= endFrame && isTracking; i++) {
                 RoiData last = getClosestRoi(roiDataList, i);
 
                 if (last != null) {
@@ -298,7 +303,7 @@ public class ObjectTrackerAnalysis {
                         currentRoi = last;
                         long frameTimeMicroseconds = (long) motionAnalysis.getTimeData().getTimeAt(i) * 1000;
                         Bitmap roiBmp = getFrame(frameTimeMicroseconds);
-                        //saveFrame(roiBmp, "roi");
+
 
                         if (roiBmp != null) {
                             PointF topLeft = videodata.toVideoPoint(currentRoi.getTopLeft().getPosition());
@@ -318,9 +323,9 @@ public class ObjectTrackerAnalysis {
                     if (currentRoi.getFrameId() != i) {
                         long frameTimeMicroseconds = (long) motionAnalysis.getTimeData().getTimeAt(i) * 1000;
                         Bitmap curFrameBmp = getFrame(frameTimeMicroseconds);
-                        //saveFrame(curFrameBmp, "frame" + i);
+                        //tracker.saveFrame(curFrameBmp, "frame" + i);
 
-                        if (curFrameBmp != null && curFrameBmp.getConfig() != null) {
+                        if (curFrameBmp != null) {
                             Rect result = tracker.getObjectLocation(curFrameBmp);
 
                             if (result != null) {
@@ -398,7 +403,9 @@ public class ObjectTrackerAnalysis {
 
             updateMarkers(results);
 
-            listener.onTrackingFinished(results);
+            if(listener != null) {
+                listener.onTrackingFinished(results);
+            }
         }
 
 
@@ -421,7 +428,10 @@ public class ObjectTrackerAnalysis {
                 motionAnalysis.getFrameDataModel().setCurrentFrame(currentFrame);
             }
 
-            listener.onTrackingUpdate(currentFrame, endFrame - startFrame);
+            if(listener != null)
+            {
+                listener.onTrackingUpdate(currentFrame, endFrame - startFrame);
+            }
         }
     }
 }
