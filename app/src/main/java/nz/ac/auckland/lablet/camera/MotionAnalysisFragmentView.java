@@ -12,9 +12,13 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.util.SparseArray;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
+
+import org.opencv.core.Rect;
+
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.Unit;
@@ -22,6 +26,7 @@ import nz.ac.auckland.lablet.misc.WeakListenable;
 import nz.ac.auckland.lablet.views.graph.*;
 import nz.ac.auckland.lablet.views.plotview.LinearFitPainter;
 import nz.ac.auckland.lablet.views.table.*;
+import nz.ac.auckland.lablet.vision.ObjectTrackerAnalysis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -262,6 +267,8 @@ class MotionAnalysisFragmentView extends FrameLayout {
         }
     };
 
+
+
     public MotionAnalysisFragmentView(Context context, final MotionAnalysis sensorAnalysis) {
         super(context);
 
@@ -270,6 +277,20 @@ class MotionAnalysisFragmentView extends FrameLayout {
         assert mainView != null;
 
         frameDataSeekBar = (FrameDataSeekBar)mainView.findViewById(R.id.frameDataSeekBar);
+
+        final FrameDataSeekBar.IListener frameDataListener = new FrameDataSeekBar.IListener() {
+
+            @Override
+            public void onActionBtnClicked() {
+                if(sensorAnalysis.getObjectTrackerAnalysis().isTracking())
+                {
+                    sensorAnalysis.getObjectTrackerAnalysis().stopTracking();
+                    frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
+                }
+            }
+        };
+
+        frameDataSeekBar.setListener(frameDataListener);
 
         sideBarView = (ViewGroup)inflater.inflate(R.layout.motion_analysis_data_side_bar, null, false);
         sideBar = new MotionAnalysisSideBar(mainView, sideBarView);

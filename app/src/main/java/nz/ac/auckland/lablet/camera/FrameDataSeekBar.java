@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
+
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 
@@ -24,14 +25,29 @@ import java.text.DecimalFormat;
  * Seek bar to work with the {@link nz.ac.auckland.lablet.experiment.FrameDataModel}.
  */
 public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.IListener {
+
+    public interface IListener {
+        void onActionBtnClicked();
+    }
+
+    public enum Action {
+        PLAY, STOP, PAUSE
+    }
+
     private FrameDataModel frameDataModel = null;
     private ITimeData timeData = null;
+    private IListener listener;
 
     private TextView progressLabel = null;
     private TextView timeLabel = null;
     private SeekBar seekBar = null;
 
     private long lastTouchEvent = 0;
+
+    public void setListener(FrameDataSeekBar.IListener listener)
+    {
+        this.listener = listener;
+    }
 
     @Override
     public void onFrameChanged(int newFrame) {
@@ -53,6 +69,24 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.ILi
         super(context, attrs);
 
         init(context);
+    }
+
+    public void setAction(Action action)
+    {
+        final ImageButton actionButton = (ImageButton)findViewById(R.id.frameActionBtn);
+
+        if(action == Action.STOP)
+        {
+            actionButton.setImageResource(R.drawable.ic_media_stop_big);
+        }
+        else if(action == Action.PLAY)
+        {
+            actionButton.setImageResource(R.drawable.ic_media_play_big);
+        }
+        else if(action == Action.PAUSE)
+        {
+            actionButton.setImageResource(R.drawable.ic_media_pause);
+        }
     }
 
     class FastSeeker {
@@ -103,6 +137,7 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.ILi
         layoutInflater.inflate(R.layout.frame_data_seek_bar, this, true);
 
         final ImageButton prevButton = (ImageButton)findViewById(R.id.frameBackButton);
+        final ImageButton actionButton = (ImageButton)findViewById(R.id.frameActionBtn);
         final ImageButton nextButton = (ImageButton)findViewById(R.id.nextFrameButton);
         progressLabel = (TextView)findViewById(R.id.progressLabel);
         timeLabel = (TextView)findViewById(R.id.timeLabel);
@@ -134,6 +169,13 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.ILi
                 FastSeeker seeker = new FastSeeker(nextButton, 1);
                 seeker.start();
                 return true;
+            }
+        });
+
+        actionButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onActionBtnClicked();
             }
         });
 

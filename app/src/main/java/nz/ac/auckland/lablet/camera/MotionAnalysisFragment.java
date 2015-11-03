@@ -10,8 +10,13 @@ package nz.ac.auckland.lablet.camera;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.SparseArray;
 import android.view.*;
+import android.widget.Button;
 import android.widget.PopupMenu;
+
+import org.opencv.core.Rect;
+
 import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.views.marker.MarkerData;
@@ -170,9 +175,34 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                 boolean roiExists = dataList.getIndexByFrameId(currentFrame) != -1;
 
                 if (item == R.id.track_objects && roiDataSize > 0) {
-                    ObjectTrackerDialog dialog = new ObjectTrackerDialog(getActivity(), getSensorAnalysis());
-                        //TODO: change settings to allow user to tune masking
-                    dialog.show();
+                    CalibrationVideoTimeData timeData = getSensorAnalysis().getCalibrationVideoTimeData();
+                    int start = timeData.getClosestFrame(timeData.getAnalysisVideoStart());
+                    int end = timeData.getClosestFrame(timeData.getAnalysisVideoEnd());
+                    final FrameDataSeekBar frameDataSeekBar = (FrameDataSeekBar)getView().findViewById(R.id.frameDataSeekBar);
+                    frameDataSeekBar.setAction(FrameDataSeekBar.Action.STOP);
+
+                    final ObjectTrackerAnalysis.IListener trackingListener = new ObjectTrackerAnalysis.IListener() {
+                        @Override
+                        public void onTrackingFinished(SparseArray<Rect> results) {
+                            frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
+                        }
+
+                        @Override
+                        public void onTrackingUpdate(int frameNumber, int totalNumberOfFrames) {
+                            //TODO update estimate time finished etc if needed
+                        }
+                    };
+
+                    //Reset point markers and rectangles
+                    getSensorAnalysis().getTagMarkers().clear();
+                    getSensorAnalysis().getObjectTrackerAnalysis().getRectDataList().clear();
+                    getSensorAnalysis().getObjectTrackerAnalysis().trackObjects(start, end, trackingListener);
+
+//                    //frameDataSeekBar
+//
+//                    ObjectTrackerDialog dialog = new ObjectTrackerDialog(getActivity(), getSensorAnalysis());
+//                        //TODO: change settings to allow user to tune masking
+//                    dialog.show();
                 } else if (item == R.id.set_roi) {
                     if (!roiExists)
                         objectTrackerAnalysis.addRegionOfInterestMarker(currentFrame);
