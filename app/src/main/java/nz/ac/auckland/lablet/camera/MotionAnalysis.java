@@ -20,6 +20,7 @@ import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.views.graph.IMinRangeGetter;
 import nz.ac.auckland.lablet.views.table.*;
+import nz.ac.auckland.lablet.vision.VideoPlayer;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -69,6 +70,7 @@ public class MotionAnalysis implements IDataAnalysis {
     private  boolean debuggingEnabled = false;
 
     private ObjectTrackerAnalysis objectTrackerAnalysis;
+    private VideoPlayer videoPlayer;
 
     final private List<IListener> listenerList = new ArrayList<>();
 
@@ -127,6 +129,7 @@ public class MotionAnalysis implements IDataAnalysis {
         originCalibrationSetter = new OriginCalibrationSetter(calibrationXY, originMarkers);
 
         objectTrackerAnalysis = new ObjectTrackerAnalysis(this, frameDataModel);
+        videoPlayer = new VideoPlayer(frameDataModel, calibrationVideoTimeData);
 
         updateOriginFromVideoRotation();
     }
@@ -147,6 +150,10 @@ public class MotionAnalysis implements IDataAnalysis {
     @Override
     public String getIdentifier() {
         return "MotionAnalysis";
+    }
+
+    public VideoPlayer getVideoPlayer() {
+        return videoPlayer;
     }
 
     public VideoData getVideoData() { return sensorData; }

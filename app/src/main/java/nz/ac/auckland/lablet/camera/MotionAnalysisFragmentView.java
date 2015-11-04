@@ -29,6 +29,7 @@ import nz.ac.auckland.lablet.views.marker.MarkerData;
 import nz.ac.auckland.lablet.views.plotview.LinearFitPainter;
 import nz.ac.auckland.lablet.views.table.*;
 import nz.ac.auckland.lablet.vision.ObjectTrackerAnalysis;
+import nz.ac.auckland.lablet.vision.VideoPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -280,6 +281,15 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
         frameDataSeekBar = (FrameDataSeekBar)mainView.findViewById(R.id.frameDataSeekBar);
 
+        final VideoPlayer.IListener videoListener = new VideoPlayer.IListener() {
+            @Override
+            public void onFinished() {
+                frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
+            }
+        };
+
+        sensorAnalysis.getVideoPlayer().setListener(videoListener);
+
         final FrameDataSeekBar.IListener frameDataListener = new FrameDataSeekBar.IListener() {
 
             @Override
@@ -288,6 +298,16 @@ class MotionAnalysisFragmentView extends FrameLayout {
                 {
                     sensorAnalysis.getObjectTrackerAnalysis().stopTracking();
                     frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
+                }
+                else if(frameDataSeekBar.getCurrentAction() == FrameDataSeekBar.Action.PLAY)
+                {
+                    frameDataSeekBar.setAction(FrameDataSeekBar.Action.PAUSE);
+                    sensorAnalysis.getVideoPlayer().play();
+                }
+                else
+                {
+                    frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
+                    sensorAnalysis.getVideoPlayer().stop();
                 }
             }
         };

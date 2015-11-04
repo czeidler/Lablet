@@ -43,6 +43,7 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.ILi
     private SeekBar seekBar = null;
 
     private long lastTouchEvent = 0;
+    private Action currentAction = Action.PLAY;
 
     public void setListener(FrameDataSeekBar.IListener listener)
     {
@@ -74,6 +75,7 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.ILi
     public void setAction(Action action)
     {
         final ImageButton actionButton = (ImageButton)findViewById(R.id.frameActionBtn);
+        currentAction = action;
 
         if(action == Action.STOP)
         {
@@ -87,6 +89,11 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.ILi
         {
             actionButton.setImageResource(R.drawable.ic_media_pause);
         }
+    }
+
+    public Action getCurrentAction()
+    {
+        return currentAction;
     }
 
     class FastSeeker {

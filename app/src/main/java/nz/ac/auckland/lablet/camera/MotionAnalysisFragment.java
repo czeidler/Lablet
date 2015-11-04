@@ -196,13 +196,10 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                     //Reset point markers and rectangles
                     getSensorAnalysis().getTagMarkers().clear();
                     getSensorAnalysis().getObjectTrackerAnalysis().getRectDataList().clear();
+
+                    //Start object tracking
                     getSensorAnalysis().getObjectTrackerAnalysis().trackObjects(start, end, trackingListener);
 
-//                    //frameDataSeekBar
-//
-//                    ObjectTrackerDialog dialog = new ObjectTrackerDialog(getActivity(), getSensorAnalysis());
-//                        //TODO: change settings to allow user to tune masking
-//                    dialog.show();
                 } else if (item == R.id.set_roi) {
                     if (!roiExists)
                         objectTrackerAnalysis.addRegionOfInterestMarker(currentFrame);
