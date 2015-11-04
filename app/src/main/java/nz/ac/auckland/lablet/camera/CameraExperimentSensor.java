@@ -426,12 +426,15 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
 
                 if (info.facing == CAMERA_FACE) {
                     cameraId = i;
-                    camera = Camera.open(i);
+                    camera = Camera.open(cameraId);
                 }
             }
         }
-        if (camera == null)
-            camera = Camera.open();
+
+        if (camera == null) {
+            cameraId = 0;
+            camera = Camera.open(cameraId);
+        }
 
         producer = new CameraGLTextureProducer(camera);
 
@@ -741,7 +744,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
         if (CamcorderProfile.hasProfile(cameraId, profile)) {
             CamcorderSettings camcorderSettings = new CamcorderSettings();
             camcorderSettings.cameraProfile = profile;
-            CamcorderProfile camcorderProfile = CamcorderProfile.get(profile);
+            CamcorderProfile camcorderProfile = CamcorderProfile.get(cameraId, profile);
             camcorderSettings.bitRate = camcorderProfile.videoBitRate;
             camcorderSettings.width = camcorderProfile.videoFrameWidth;
             camcorderSettings.height = camcorderProfile.videoFrameHeight;
