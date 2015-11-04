@@ -134,7 +134,9 @@ class MotionAnalysisFragmentView extends FrameLayout {
     final private TableView tableView;
     final private MotionAnalysisSideBar sideBar;
     final private FrameDataSeekBar frameDataSeekBar;
+    final private FrameDataModel.IListener frameListener;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
+    final private Object updateMarkersLock = new Object();
     private boolean releaseAdaptersWhenDrawerClosed = false;
 
     private class GraphSpinnerEntry {
@@ -280,6 +282,37 @@ class MotionAnalysisFragmentView extends FrameLayout {
         assert mainView != null;
 
         frameDataSeekBar = (FrameDataSeekBar)mainView.findViewById(R.id.frameDataSeekBar);
+
+        frameListener = new FrameDataModel.IListener() {
+
+            @Override
+            public void onFrameChanged(int newFrame) {
+                synchronized(updateMarkersLock) {
+                    if (!sensorAnalysis.getObjectTrackerAnalysis().isTracking()) {
+                        MarkerDataModel visiblePoints = sensorAnalysis.getTagMarkers();
+                        MarkerDataModel invisiblePoints = sensorAnalysis.getInvisibleTagMarkers();
+                        visiblePoints.clear();
+
+                        for(int i = 0; i < invisiblePoints.getMarkerCount(); i++)
+                        {
+                            MarkerData data = invisiblePoints.getMarkerDataAt(i);
+
+                            if (data.getId() <= newFrame) {
+                                visiblePoints.addMarkerData(data);
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            @Override
+            public void onNumberOfFramesChanged() {
+
+            }
+        };
+
+        sensorAnalysis.getFrameDataModel().addListener(frameListener);
 
         final VideoPlayer.IListener videoListener = new VideoPlayer.IListener() {
             @Override

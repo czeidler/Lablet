@@ -193,9 +193,11 @@ public class ObjectTrackerAnalysis {
      */
     public void updateMarkers(SparseArray<Rect> results) {
         //Delete all items from arrays
-        MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
+        MarkerDataModel pointDataList = motionAnalysis.getInvisibleTagMarkers();
         RectDataList rectDataList = motionAnalysis.getObjectTrackerAnalysis().getRectDataList();
         rectDataList.clear();
+        pointDataList.clear();
+        //motionAnalysis.getInvisibleTagMarkers().clear();
 
         VideoData videoData = motionAnalysis.getVideoData();
 
@@ -370,7 +372,7 @@ public class ObjectTrackerAnalysis {
                 outputSurface.drawImage(true);
                 return outputSurface.getBitmap();
             } catch (RuntimeException e) {
-                return null;
+                return getFrame(time);
             }
         }
 
@@ -409,9 +411,13 @@ public class ObjectTrackerAnalysis {
 
             updateMarkers(results);
 
+            isTracking = false;
+
             if(listener != null) {
                 listener.onTrackingFinished(results);
             }
+
+
         }
 
 
