@@ -132,7 +132,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
     final private ViewGroup sideBarView;
     final private TableView tableView;
     final private MotionAnalysisSideBar sideBar;
-    final private FrameDataModel.IListener frameListener;
     final private FrameDataSeekBar frameDataSeekBar;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
     private boolean releaseAdaptersWhenDrawerClosed = false;
@@ -322,36 +321,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
         final CameraExperimentFrameView sensorAnalysisView = new CameraExperimentFrameView(context, sensorAnalysis);
         frameDataSeekBar.setTo(sensorAnalysis.getFrameDataModel(), sensorAnalysis.getTimeData());
-
-        frameListener = new FrameDataModel.IListener() {
-
-            @Override
-            public void onFrameChanged(int newFrame) {
-                for(int i = 0; i < sensorAnalysis.getTagMarkers().getMarkerCount(); i++) {
-                    MarkerData data = sensorAnalysis.getTagMarkers().getMarkerDataAt(i);
-
-                    if (data != null)
-                    {
-                        if (data.getId() <= newFrame) {
-                            data.setVisible(true);
-                        }
-                        else
-                        {
-                            data.setVisible(false);
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onNumberOfFramesChanged() {
-
-            }
-        };
-
-        sensorAnalysis.getFrameDataModel().addListener(frameListener);
-
-
         runContainerView.setTo(sensorAnalysisView, frameDataSeekBar, sensorAnalysis);
 
         final Unit xUnit = sensorAnalysis.getXUnit();

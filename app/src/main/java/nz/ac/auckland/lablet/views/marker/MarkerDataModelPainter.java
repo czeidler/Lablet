@@ -60,6 +60,7 @@ public class MarkerDataModelPainter<T> extends AbstractMarkerPainter<T> {
     @Override
     public void onDraw(Canvas canvas) {
         int currentMarkerRow = markerData.getSelectedMarkerData();
+        MarkerData topData = ((MarkerDataModel)markerData).getMarkerDataAt(currentMarkerRow);
         IMarker topMarker = getMarkerForRow(currentMarkerRow);
 
         int start = currentMarkerRow - MAX_DISPLAYED_MARKERS / 2 + 1;
@@ -71,8 +72,7 @@ public class MarkerDataModelPainter<T> extends AbstractMarkerPainter<T> {
 
         for (int i = start; i < end; i++) {
             MarkerData data = ((MarkerDataModel)markerData).getMarkerDataAt(i);// .findMarkerDataByRun(frame);
-            if (data != null) {
-                if(data.isVisible()) {
+            if (data != null && data.getId() <= topData.getId()) {
                     IMarker marker = markerList.get(i);
                     if (marker == topMarker)
                         continue;
@@ -85,7 +85,6 @@ public class MarkerDataModelPainter<T> extends AbstractMarkerPainter<T> {
                         currentPriority = (float) 0.1;
 
                     marker.onDraw(canvas, currentPriority);
-                }
             }
         }
         if (topMarker != null)
