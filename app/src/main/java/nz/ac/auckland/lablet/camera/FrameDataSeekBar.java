@@ -87,7 +87,7 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.ILi
         }
         else if(action == Action.PAUSE)
         {
-            actionButton.setImageResource(R.drawable.ic_media_pause);
+            actionButton.setImageResource(R.drawable.ic_media_pause_big);
         }
     }
 
