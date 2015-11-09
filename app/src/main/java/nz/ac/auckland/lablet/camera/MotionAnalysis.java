@@ -54,7 +54,6 @@ public class MotionAnalysis implements IDataAnalysis {
     final private Unit tUnit = new Unit("s");
 
     final private CalibratedMarkerDataModel tagMarkers;
-    final private CalibratedMarkerDataModel invisibleTagMarkers;
     final private MarkerDataModel lengthCalibrationMarkers;
     final private MarkerDataModel originMarkers;
 
@@ -97,9 +96,6 @@ public class MotionAnalysis implements IDataAnalysis {
 
         tagMarkers = new CalibratedMarkerDataModel(calibrationXY);
         tagMarkers.setCalibrationXY(calibrationXY);
-
-        invisibleTagMarkers = new CalibratedMarkerDataModel(calibrationXY);
-        invisibleTagMarkers.setCalibrationXY(calibrationXY);
 
         float maxXValue = sensorData.getMaxRawX();
         float maxYValue = sensorData.getMaxRawY();
@@ -175,10 +171,6 @@ public class MotionAnalysis implements IDataAnalysis {
     }
     public MarkerDataModel getTagMarkers() {
         return tagMarkers;
-    }
-
-    public MarkerDataModel getInvisibleTagMarkers() {
-        return invisibleTagMarkers;
     }
 
     public MarkerDataModel getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
@@ -261,10 +253,6 @@ public class MotionAnalysis implements IDataAnalysis {
         if (tagMarkerBundle != null)
             tagMarkers.fromBundle(tagMarkerBundle);
 
-        Bundle invisibleTagMarkersBundle = bundle.getBundle("invisibleTagMarkers");
-        if (invisibleTagMarkersBundle != null)
-            invisibleTagMarkers.fromBundle(invisibleTagMarkersBundle);
-
         if (bundle.containsKey(OBJECT_TRACKER_ANALYSIS_KEY))
             objectTrackerAnalysis.fromBundle(bundle.getBundle(OBJECT_TRACKER_ANALYSIS_KEY));
 
@@ -293,9 +281,6 @@ public class MotionAnalysis implements IDataAnalysis {
 
         if (tagMarkers.getMarkerCount() > 0)
             analysisDataBundle.putBundle("tagMarkers", tagMarkers.toBundle());
-
-        if (invisibleTagMarkers.getMarkerCount() > 0)
-            analysisDataBundle.putBundle("invisibleTagMarkers", invisibleTagMarkers.toBundle());
 
         analysisDataBundle.putBundle(OBJECT_TRACKER_ANALYSIS_KEY, objectTrackerAnalysis.toBundle());
 

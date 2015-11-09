@@ -195,7 +195,6 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
 
                     //Reset point markers and rectangles
                     getSensorAnalysis().getTagMarkers().clear();
-                    getSensorAnalysis().getInvisibleTagMarkers().clear();
                     getSensorAnalysis().getObjectTrackerAnalysis().getRectDataList().clear();
 
                     //Start object tracking

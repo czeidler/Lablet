@@ -193,11 +193,8 @@ public class ObjectTrackerAnalysis {
      */
     public void updateMarkers(SparseArray<Rect> results) {
         //Delete all items from arrays
-        MarkerDataModel pointDataList = motionAnalysis.getInvisibleTagMarkers();
         RectDataList rectDataList = motionAnalysis.getObjectTrackerAnalysis().getRectDataList();
         rectDataList.clear();
-        pointDataList.clear();
-        //motionAnalysis.getInvisibleTagMarkers().clear();
 
         VideoData videoData = motionAnalysis.getVideoData();
 
@@ -208,17 +205,7 @@ public class ObjectTrackerAnalysis {
             float centreX = result.x + result.width / 2;
             float centreY = result.y + result.height / 2;
 
-            //Add point marker
             PointF centre = videoData.toMarkerPoint(new PointF(centreX, centreY));
-
-            int index = pointDataList.findMarkerDataByRun(frameId);
-            if (index >= 0)
-                pointDataList.setMarkerPosition(centre, index);
-            else {
-                MarkerData markerData = new MarkerData(frameId);
-                markerData.setPosition(centre);
-                pointDataList.addMarkerData(markerData);
-            }
 
             //Add debugging rectangle
             RectData data = new RectData(frameId);
