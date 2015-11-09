@@ -12,6 +12,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
@@ -20,6 +22,7 @@ import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 import nz.ac.auckland.lablet.views.graph.*;
+import nz.ac.auckland.lablet.views.plotview.DrawConfig;
 import nz.ac.auckland.lablet.views.plotview.LinearFitPainter;
 import nz.ac.auckland.lablet.views.table.*;
 
@@ -121,6 +124,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
     private MarkerDataTableAdapter markerDataTableAdapter;
     final private FrameContainerView runContainerView;
     final private GraphView2D graphView;
+    private SelectedMarkerPainter selectedMarkerPainter;
     final private Spinner graphSpinner;
     final private ViewGroup sideBarView;
     final private TableView tableView;
@@ -376,6 +380,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
         if (i < 0) {
             graphView.setFitPainter(null);
             graphView.setAdapter(null);
+            graphView.removePlotPainter(selectedMarkerPainter);
             return;
         }
         if (releaseAdaptersWhenDrawerClosed && !sideBar.isOpen())
@@ -389,6 +394,11 @@ class MotionAnalysisFragmentView extends FrameLayout {
         }
         graphView.setAdapter(adapter);
         graphView.setFitPainter(fitPainter);
+        DrawConfig selectedMarkerConfig = new DrawConfig(getContext());
+        selectedMarkerConfig.getMarkerPaint().setColor(Color.RED);
+        selectedMarkerPainter = new SelectedMarkerPainter(adapter.getData(), adapter.getXAxis(),
+                adapter.getYAxis(), selectedMarkerConfig);
+        graphView.addForegroundPainter(selectedMarkerPainter);
     }
 
     @Override
