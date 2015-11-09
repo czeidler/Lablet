@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.*;
-import android.widget.Button;
 import android.widget.PopupMenu;
 
 import org.opencv.core.Rect;
@@ -24,7 +23,6 @@ import nz.ac.auckland.lablet.vision.ObjectTrackerAnalysis;
 import nz.ac.auckland.lablet.vision.data.RoiData;
 import nz.ac.auckland.lablet.vision.data.RoiDataList;
 import nz.ac.auckland.lablet.experiment.*;
-import nz.ac.auckland.lablet.vision.ObjectTrackerDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +48,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
     }
 
     private MotionAnalysis getSensorAnalysis() {
-        return (MotionAnalysis)sensorAnalysis;
+        return (MotionAnalysis) sensorAnalysis;
     }
 
     @Override
@@ -158,13 +156,25 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         final ObjectTrackerAnalysis objectTrackerAnalysis = getSensorAnalysis().getObjectTrackerAnalysis();
         int currentFrame = getSensorAnalysis().getFrameDataModel().getCurrentFrame();
         final RoiData roiData = objectTrackerAnalysis.getRoiForFrame(currentFrame);
+
         if (roiData != null)
             popup.getMenu().findItem(R.id.set_roi).setTitle("Deselect Object");
-        if (objectTrackerAnalysis.getRoiDataList().size() == 0)
-            popup.getMenu().findItem(R.id.track_objects).setEnabled(false);
+
+        if (getSensorAnalysis().getObjectTrackerAnalysis().isTracking()) {
+            popup.getMenu().findItem(R.id.start_tracking).setEnabled(false);
+            popup.getMenu().findItem(R.id.stop_tracking).setEnabled(true);
+        } else {
+            if (objectTrackerAnalysis.getRoiDataList().size() == 0)
+                popup.getMenu().findItem(R.id.start_tracking).setEnabled(false);
+            else
+                popup.getMenu().findItem(R.id.start_tracking).setEnabled(true);
+
+            popup.getMenu().findItem(R.id.stop_tracking).setEnabled(false);
+        }
 
         popup.getMenu().findItem(R.id.debug_tracking).setChecked(
                 getSensorAnalysis().getObjectTrackerAnalysis().isDebuggingEnabled());
+
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -174,11 +184,11 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                 int currentFrame = getSensorAnalysis().getFrameDataModel().getCurrentFrame();
                 boolean roiExists = dataList.getIndexByFrameId(currentFrame) != -1;
 
-                if (item == R.id.track_objects && roiDataSize > 0) {
+                if (item == R.id.start_tracking && roiDataSize > 0) {
                     CalibrationVideoTimeData timeData = getSensorAnalysis().getCalibrationVideoTimeData();
                     int start = timeData.getClosestFrame(timeData.getAnalysisVideoStart());
                     int end = timeData.getClosestFrame(timeData.getAnalysisVideoEnd());
-                    final FrameDataSeekBar frameDataSeekBar = (FrameDataSeekBar)getView().findViewById(R.id.frameDataSeekBar);
+                    final FrameDataSeekBar frameDataSeekBar = (FrameDataSeekBar) getView().findViewById(R.id.frameDataSeekBar);
                     frameDataSeekBar.setAction(FrameDataSeekBar.Action.STOP);
 
                     final ObjectTrackerAnalysis.IListener trackingListener = new ObjectTrackerAnalysis.IListener() {
@@ -207,6 +217,8 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                         objectTrackerAnalysis.removeRegionOfInterest(roiData);
                 } else if (item == R.id.debug_tracking) {
                     objectTrackerAnalysis.setDebuggingEnabled(!menuItem.isChecked());
+                } else if (item == R.id.stop_tracking) {
+                    objectTrackerAnalysis.stopTracking();
                 }
 
                 return false;
@@ -293,7 +305,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
             Bundle extras = data.getExtras();
             if (extras != null) {
                 Bundle settings = extras.getBundle(MotionAnalysisSettingsActivity.MOTION_ANALYSIS_SETTINGS_KEY);
-                CalibrationVideoTimeData timeData = (CalibrationVideoTimeData)sensorAnalysis.getTimeData();
+                CalibrationVideoTimeData timeData = (CalibrationVideoTimeData) sensorAnalysis.getTimeData();
                 float oldStart = timeData.getAnalysisVideoStart();
                 float oldFrameRate = timeData.getAnalysisFrameRate();
 

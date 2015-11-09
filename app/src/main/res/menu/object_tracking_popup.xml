@@ -6,9 +6,14 @@
         android:title="Choose Object"
         android:visible="true"/>
 
-    <item android:id="@+id/track_objects"
+    <item android:id="@+id/start_tracking"
         android:icon="@drawable/ic_chart_line"
-        android:title="Track Objects..."
+        android:title="Start"
+        android:visible="true"/>
+
+    <item android:id="@+id/stop_tracking"
+        android:icon="@drawable/ic_chart_line"
+        android:title="Stop"
         android:visible="true"/>
 
     <item android:id="@+id/debug_tracking"
