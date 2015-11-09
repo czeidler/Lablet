@@ -1,3 +1,10 @@
+/*
+ * Copyright 2015.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
 package nz.ac.auckland.lablet.views.graph;
 
 import android.graphics.Canvas;
@@ -64,7 +71,6 @@ public class SelectedMarkerPainter extends AbstractPlotPainter {
     public void onDraw(Canvas canvas) {
         int selected = dataModel.getSelectedMarkerData();
         if (selected >= 0 && selected < xAxis.size() && selected < yAxis.size()) {
-
             Number x = xAxis.getValue(selected);
             Number y = yAxis.getValue(selected);
 
