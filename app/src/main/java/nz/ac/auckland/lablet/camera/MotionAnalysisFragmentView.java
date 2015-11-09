@@ -13,7 +13,6 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
@@ -396,8 +395,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
         graphView.setFitPainter(fitPainter);
         DrawConfig selectedMarkerConfig = new DrawConfig(getContext());
         selectedMarkerConfig.getMarkerPaint().setColor(Color.RED);
-        selectedMarkerPainter = new SelectedMarkerPainter(adapter.getData(), adapter.getXAxis(),
-                adapter.getYAxis(), selectedMarkerConfig);
+        selectedMarkerPainter = new SelectedMarkerPainter(adapter, selectedMarkerConfig);
         graphView.addForegroundPainter(selectedMarkerPainter);
     }
 

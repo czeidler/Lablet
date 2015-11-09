@@ -52,11 +52,10 @@ public class SelectedMarkerPainter extends AbstractPlotPainter {
         }
     };
 
-    public SelectedMarkerPainter(MarkerDataModel data, AbstractGraphAdapter.IGraphDataAxis xAxis,
-                                 AbstractGraphAdapter.IGraphDataAxis yAxis, DrawConfig config) {
-        this.dataModel = data;
-        this.xAxis = xAxis;
-        this.yAxis = yAxis;
+    public SelectedMarkerPainter(MarkerGraphAdapter adapter, DrawConfig config) {
+        this.dataModel = adapter.getData();
+        this.xAxis = adapter.getXAxis();
+        this.yAxis = adapter.getYAxis();
         this.config = config;
 
         dataModel.addListener(listener);
