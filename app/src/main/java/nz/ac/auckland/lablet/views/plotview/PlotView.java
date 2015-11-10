@@ -727,10 +727,13 @@ public class PlotView extends ViewGroup {
 
     ScrollAnimator scrollAnimator = new ScrollAnimator();
     class ScrollAnimator {
-        final private int DURATION = 500;
+        final private int DURATION = 300;
         private AnimatorSet animator = null;
 
         public void animateXScroll(float offset) {
+            // don't start a new animation; too frequent animations can stall the scrolling completely
+            if (animator != null)
+                return;
             ValueAnimator valueAnimator = ObjectAnimator.ofFloat(mainView.getRangeLeft(), mainView.getRangeLeft()
                     + offset);
             valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -743,6 +746,8 @@ public class PlotView extends ViewGroup {
         }
 
         public void animateYScroll(float offset) {
+            if (animator != null)
+                return;
             ValueAnimator valueAnimator = ObjectAnimator.ofFloat(mainView.getRangeBottom(), mainView.getRangeBottom()
                     + offset);
             valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
