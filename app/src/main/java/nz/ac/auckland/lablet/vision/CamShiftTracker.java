@@ -10,6 +10,7 @@ package nz.ac.auckland.lablet.vision;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.Pair;
+
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -64,13 +65,10 @@ public class CamShiftTracker {
      * @param frame The frame to search for the object in.
      * @return The location and bounds of the object, represented by a Rect.
      */
+
     public Rect getObjectLocation(Bitmap frame) {
         Mat image = new Mat();
         Utils.bitmapToMat(frame, image);
-
-//        Mat out = new Mat(image.rows(), image.cols(), image.type());
-//        image.convertTo(out, -1, 2.0, 2.0);
-//        image = out;
 
         toHsv(image, hsvMin, hsvMax);
 
@@ -100,12 +98,13 @@ public class CamShiftTracker {
      * Internally sets the region of interest (ROI) to track.
      * Only needs to be set once, unless the region of interest changes.
      *
-     * @param frame The frame to extract the ROI from.
-     * @param x The x coordinate of the ROI (top left).
-     * @param y The y coordinate of the ROI (top left).
-     * @param width The width of the ROI.
+     * @param frame  The frame to extract the ROI from.
+     * @param x      The x coordinate of the ROI (top left).
+     * @param y      The y coordinate of the ROI (top left).
+     * @param width  The width of the ROI.
      * @param height The height of the ROI.
      */
+
     public void setRegionOfInterest(Bitmap frame, int x, int y, int width, int height) {
         size = new Size(frame.getWidth(), frame.getHeight());
         hsv = new Mat(size, CvType.CV_8UC3);
@@ -117,10 +116,6 @@ public class CamShiftTracker {
 
         Mat image = new Mat();
         Utils.bitmapToMat(frame, image);
-
-//        Mat out = new Mat(image.rows(), image.cols(), image.type());
-//        image.convertTo(out, -1, 2.0, 2.0);
-//        image = out;
 
         trackWindow = new Rect(x, y, width, height);
 
@@ -144,18 +139,19 @@ public class CamShiftTracker {
     /**
      * Finds the dominant colour in an image, and returns two values in HSV colour space to represent similar colours,
      * e.g. so you can keep all colours similar to the dominant colour.
-     *
+     * <p/>
      * How the algorithm works:
-     *
+     * <p/>
      * 1. Scale the frame down so that algorithm doesn't take too long.
      * 2. Segment the frame into different colours (number of colours determined by k)
      * 3. Find dominant cluster (largest area) and get its central colour point.
      * 4. Get range (min max) to represent similar colours.
      *
      * @param bgr The input frame, in BGR colour space.
-     * @param k The number of segments to use (2 works well).
+     * @param k   The number of segments to use (2 works well).
      * @return The min and max HSV colour values, which represent the colours similar to the dominant colour.
      */
+
     private Pair<Scalar, Scalar> getMinMaxHsv(Mat bgr, int k) {
         //Convert to HSV
         Mat input = new Mat();
@@ -188,31 +184,21 @@ public class CamShiftTracker {
         TermCriteria criteria = new TermCriteria(TermCriteria.COUNT, 50, 1);
         Core.kmeans(clusterData, k, labels, criteria, 1, Core.KMEANS_PP_CENTERS, centres);
 
-        //Get num hits for each category
-        int[] counts = new int[k];
+        double[] averageDists = getAverageDistToCentre(input.cols(), input.rows(), k, labels);
+        int centreLabelIndex = -1;
+        double maxDist = 10000000;
 
-        for (int i = 0; i < labels.rows(); i++) {
-            int label = (int) labels.get(i, 0)[0];
-            counts[label] += 1;
-        }
-
-        //Get cluster index with maximum number of members
-        int maxCluster = 0;
-        int index = -1;
-
-        for (int i = 0; i < counts.length; i++) {
-            int value = counts[i];
-
-            if (value > maxCluster) {
-                maxCluster = value;
-                index = i;
+        for (int i = 0; i < averageDists.length; i++) {
+            if (averageDists[i] < maxDist) {
+                maxDist = averageDists[i];
+                centreLabelIndex = i;
             }
         }
 
         //Get cluster centre point hsv
-        int r = (int) (centres.get(index, 2)[0] * 255.0);
-        int g = (int) (centres.get(index, 1)[0] * 255.0);
-        int b = (int) (centres.get(index, 0)[0] * 255.0);
+        int r = (int) (centres.get(centreLabelIndex, 2)[0] * 255.0);
+        int g = (int) (centres.get(centreLabelIndex, 1)[0] * 255.0);
+        int b = (int) (centres.get(centreLabelIndex, 0)[0] * 255.0);
         int sum = (r + g + b) / 3;
 
         //Get colour range
@@ -252,6 +238,38 @@ public class CamShiftTracker {
         return new Pair<>(min, max);
     }
 
+    /**
+     * Calculates the average distances between the points in each k-means cluster
+     * and the centre of the region of interest.
+     *
+     * @param roiWidth
+     * @param roiHeight
+     * @param labels:   kmeans labels
+     */
+
+    private double[] getAverageDistToCentre(int roiWidth, int roiHeight, int k, Mat labels) {
+
+        double[] dists = new double[k];
+        int[] counts = new int[k];
+        Point roiCentre = new Point(roiWidth / 2, roiHeight / 2);
+
+        for (int y = 0; y < roiHeight; y++) {
+            for (int x = 0; x < roiWidth; x++) {
+                int index = x + roiWidth * y;
+
+                int label = (int) labels.get(index, 0)[0];
+                dists[label] += Math.sqrt(Math.pow(roiCentre.x - x, 2) + Math.pow(roiCentre.y - y, 2));
+                counts[label] += 1;
+            }
+        }
+
+        for (int i = 0; i < dists.length; i++) {
+            dists[i] = dists[i] / counts[i];
+        }
+
+        return dists;
+    }
+
     //TODO: convert to local variables
     private void toHsv(Mat image, Scalar hsvMin, Scalar hsvMax) {
         Imgproc.cvtColor(image, hsv, Imgproc.COLOR_BGR2HSV, 3);
@@ -267,10 +285,10 @@ public class CamShiftTracker {
      * Saves a Mat based image to /sdcard/ for debugging.
      *
      * @param frame The frame to save.
-     * @param name The name of the file (without a file type).
+     * @param name  The name of the file (without a file type).
      */
-    public void saveFrame(Mat frame, String name)
-    {
+
+    public void saveFrame(Mat frame, String name) {
         Bitmap bmp = Bitmap.createBitmap(frame.width(), frame.height(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(frame, bmp);
         this.saveFrame(bmp, name);
@@ -280,8 +298,9 @@ public class CamShiftTracker {
      * Saves a Bitmap based image to /sdcard/ for debugging.
      *
      * @param frame The frame to save.
-     * @param name The name of the file (without a file type).
+     * @param name  The name of the file (without a file type).
      */
+
     public void saveFrame(Bitmap frame, String name) {
         FileOutputStream out = null;
         try {
