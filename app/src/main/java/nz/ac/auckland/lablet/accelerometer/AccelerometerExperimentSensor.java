@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import nz.ac.auckland.lablet.experiment.AbstractExperimentSensor;
 import nz.ac.auckland.lablet.experiment.ISensorData;
+import nz.ac.auckland.lablet.misc.Unit;
 
 import java.io.*;
 
@@ -32,6 +33,17 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
     private long startTime = 0;
 
     final public static String SENSOR_NAME = "Accelerometer";
+
+    final private Unit timeUnit = new Unit("s", Unit.MILLI);
+    final private Unit accelerationUnit = new Unit("Acceleration");
+
+    public Unit getXUnit() {
+        return timeUnit;
+    }
+
+    public Unit getYUnit() {
+        return accelerationUnit;
+    }
 
     @Override
     public String getSensorName() {
@@ -109,7 +121,7 @@ public class AccelerometerExperimentSensor extends AbstractExperimentSensor {
         resetData();
 
         sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_FASTEST);
 
         super.startPreview();
     }

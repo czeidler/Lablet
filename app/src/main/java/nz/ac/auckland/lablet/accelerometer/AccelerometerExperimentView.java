@@ -42,11 +42,15 @@ class AccelerometerExperimentView extends AbstractExperimentSensorView {
 
             plotView.setMaxXRange(Float.MAX_VALUE, Float.MAX_VALUE);
             plotView.setMaxYRange(Float.MAX_VALUE, Float.MAX_VALUE);
-            plotView.setXRange(0, 20000);
+            plotView.setXRange(0, 8000);
             plotView.setYRange(-0.5f, 0.5f);
             plotView.setDraggable(false);
             plotView.setZoomable(false);
             plotView.setAutoRange(PlotView.AUTO_RANGE_SCROLL, PlotView.AUTO_RANGE_ZOOM_EXTENDING);
+            plotView.getXAxisView().setUnit(sensor.getXUnit());
+            plotView.getXAxisView().setTitle("Time");
+            plotView.getYAxisView().setUnit(sensor.getYUnit());
+            plotView.getYAxisView().setTitle("Acceleration");
         }
 
         @Override
