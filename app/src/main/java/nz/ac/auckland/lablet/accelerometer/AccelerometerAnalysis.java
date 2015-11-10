@@ -13,7 +13,7 @@ import android.os.Bundle;
 import nz.ac.auckland.lablet.experiment.IDataAnalysis;
 import nz.ac.auckland.lablet.experiment.ISensorData;
 import nz.ac.auckland.lablet.views.marker.MarkerData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 
 import java.io.File;
 import java.io.IOException;

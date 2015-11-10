@@ -32,7 +32,7 @@ import nz.ac.auckland.lablet.vision.data.RoiDataList;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.views.marker.MarkerData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.vision.markers.RectMarkerListPainter;
 import nz.ac.auckland.lablet.vision.markers.RoiMarkerListPainter;
 

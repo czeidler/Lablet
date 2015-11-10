@@ -136,7 +136,7 @@ public class XYDataStatistics extends DataStatistics implements AbstractPlotData
 
     @Override
     public void onDataChanged(AbstractPlotDataAdapter plot, int index, int number) {
-        for (int i = 0; i < number; i++) {
+        for (int i = 0; i < number && index + i < plot.getSize(); i++) {
             float x = adapter.getX(index + i).floatValue();
             float y = adapter.getY(index + i).floatValue();
             if (!isInLimit(x, y)) {

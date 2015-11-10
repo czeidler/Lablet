@@ -12,23 +12,18 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.util.SparseArray;
+import android.graphics.Color;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
-
-import org.opencv.core.Rect;
-
 import nz.ac.auckland.lablet.R;
-import nz.ac.auckland.lablet.experiment.FrameDataModel;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.Unit;
 import nz.ac.auckland.lablet.misc.WeakListenable;
 import nz.ac.auckland.lablet.views.graph.*;
-import nz.ac.auckland.lablet.views.marker.MarkerData;
+import nz.ac.auckland.lablet.views.plotview.DrawConfig;
 import nz.ac.auckland.lablet.views.plotview.LinearFitPainter;
 import nz.ac.auckland.lablet.views.table.*;
-import nz.ac.auckland.lablet.vision.ObjectTrackerAnalysis;
 import nz.ac.auckland.lablet.vision.VideoPlayer;
 
 import java.util.ArrayList;
@@ -129,13 +124,13 @@ class MotionAnalysisFragmentView extends FrameLayout {
     private MarkerDataTableAdapter markerDataTableAdapter;
     final private FrameContainerView runContainerView;
     final private GraphView2D graphView;
+    private SelectedMarkerPainter selectedMarkerPainter;
     final private Spinner graphSpinner;
     final private ViewGroup sideBarView;
     final private TableView tableView;
     final private MotionAnalysisSideBar sideBar;
     final private FrameDataSeekBar frameDataSeekBar;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
-    final private Object updateMarkersLock = new Object();
     private boolean releaseAdaptersWhenDrawerClosed = false;
 
     private class GraphSpinnerEntry {
@@ -270,8 +265,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
             }
         }
     };
-
-
 
     public MotionAnalysisFragmentView(Context context, final MotionAnalysis sensorAnalysis) {
         super(context);
@@ -419,6 +412,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
         if (i < 0) {
             graphView.setFitPainter(null);
             graphView.setAdapter(null);
+            graphView.removePlotPainter(selectedMarkerPainter);
             return;
         }
         if (releaseAdaptersWhenDrawerClosed && !sideBar.isOpen())
@@ -432,6 +426,10 @@ class MotionAnalysisFragmentView extends FrameLayout {
         }
         graphView.setAdapter(adapter);
         graphView.setFitPainter(fitPainter);
+        DrawConfig selectedMarkerConfig = new DrawConfig(getContext());
+        selectedMarkerConfig.getMarkerPaint().setColor(Color.RED);
+        selectedMarkerPainter = new SelectedMarkerPainter(adapter, selectedMarkerConfig);
+        graphView.addForegroundPainter(selectedMarkerPainter);
     }
 
     @Override

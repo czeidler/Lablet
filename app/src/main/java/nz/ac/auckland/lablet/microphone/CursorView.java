@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.views.marker.MarkerData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.views.plotview.PlotView;
 import nz.ac.auckland.lablet.views.table.DataTableColumn;
 import nz.ac.auckland.lablet.views.table.MarkerDataTableAdapter;

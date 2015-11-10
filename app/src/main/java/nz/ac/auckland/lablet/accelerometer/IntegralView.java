@@ -18,7 +18,7 @@ import android.widget.FrameLayout;
 import android.widget.Spinner;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.views.marker.MarkerData;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.views.HCursorDataModelPainter;
 import nz.ac.auckland.lablet.views.plotview.*;
 

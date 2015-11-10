@@ -19,6 +19,7 @@ import org.opencv.core.Rect;
 import nz.ac.auckland.lablet.ExperimentAnalysisFragment;
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.views.marker.MarkerData;
+import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.vision.ObjectTrackerAnalysis;
 import nz.ac.auckland.lablet.vision.data.RoiData;
 import nz.ac.auckland.lablet.vision.data.RoiDataList;

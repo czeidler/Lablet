@@ -13,10 +13,10 @@ import nz.ac.auckland.lablet.misc.WeakListenable;
 public abstract class AbstractPlotDataAdapter extends WeakListenable<AbstractPlotDataAdapter.IListener> {
 
     public interface IListener {
-        public void onDataAdded(AbstractPlotDataAdapter plot, int index, int number);
-        public void onDataRemoved(AbstractPlotDataAdapter plot, int index, int number);
-        public void onDataChanged(AbstractPlotDataAdapter plot, int index, int number);
-        public void onAllDataChanged(AbstractPlotDataAdapter plot);
+        void onDataAdded(AbstractPlotDataAdapter plot, int index, int number);
+        void onDataRemoved(AbstractPlotDataAdapter plot, int index, int number);
+        void onDataChanged(AbstractPlotDataAdapter plot, int index, int number);
+        void onAllDataChanged(AbstractPlotDataAdapter plot);
     }
 
     abstract public int getSize();

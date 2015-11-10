@@ -531,7 +531,7 @@ public class PlotView extends ViewGroup {
         painter.invalidate();
     }
 
-    protected void removePlotPainter(IPlotPainter painter) {
+    public void removePlotPainter(IPlotPainter painter) {
         if (!mainView.removePlotPainter(painter))
             return;
 

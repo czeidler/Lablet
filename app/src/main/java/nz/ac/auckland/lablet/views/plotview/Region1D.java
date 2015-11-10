@@ -16,7 +16,7 @@ import java.util.List;
  *
  * If possible a new range is merged with the existing ranges in the region. Thus there are never two overlapping or
  * directly adjacent ranges in a region. The ranges in a region are ordered. For example, a region could look like this:
- * 2-5, 6-20, 22-23
+ * 2-5, 9-20, 22-23
  */
 public class Region1D {
     private List<Range> ranges = new ArrayList<>();

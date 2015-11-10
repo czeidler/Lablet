@@ -11,14 +11,7 @@ import android.content.Context;
 import android.graphics.*;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.ViewParent;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
-import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
 import nz.ac.auckland.lablet.views.plotview.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**

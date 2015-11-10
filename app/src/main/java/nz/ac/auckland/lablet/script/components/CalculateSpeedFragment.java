@@ -18,7 +18,7 @@ import android.widget.*;
 import nz.ac.auckland.lablet.*;
 import nz.ac.auckland.lablet.camera.ITimeData;
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
+import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.script.Script;
 import nz.ac.auckland.lablet.script.ScriptComponent;
 import nz.ac.auckland.lablet.script.ScriptTreeNodeFragmentHolder;

@@ -12,6 +12,7 @@ import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 
 import nz.ac.auckland.lablet.views.marker.MarkerData;
+import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.vision.ObjectTrackerAnalysis;
 import nz.ac.auckland.lablet.experiment.*;
 import nz.ac.auckland.lablet.misc.Unit;

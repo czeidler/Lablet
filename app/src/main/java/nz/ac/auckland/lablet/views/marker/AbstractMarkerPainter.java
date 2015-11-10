@@ -12,7 +12,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 import android.view.ViewParent;
-import nz.ac.auckland.lablet.experiment.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.DeviceIndependentPixel;
 import nz.ac.auckland.lablet.views.plotview.AbstractPlotPainter;
 
@@ -21,12 +20,12 @@ import java.util.List;
 
 
 /**
- * Abstract base class to draw a {@link nz.ac.auckland.lablet.experiment.MarkerDataModel} in a
+ * Abstract base class to draw a {@link MarkerDataModel} in a
  * {@link MarkerView}.
  */
 public abstract class AbstractMarkerPainter<T> extends AbstractPlotPainter {
 
-    public class MarkerPainterGroup {
+    static public class MarkerPainterGroup {
         private AbstractMarkerPainter selectedForDragPainter = null;
         private IMarker selectedForDragMarker = null;
         private boolean inSelectForDragMethod = false;
