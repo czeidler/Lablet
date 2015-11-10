@@ -187,35 +187,25 @@ public class ObjectTrackerAnalysis {
     }
 
     /**
-     * Updates the object tracking markers.
      *
-     * @param results The object tracking results.
+     * @param rect The object tracking results Rect.
      */
-    public void updateMarkers(SparseArray<Rect> results) {
-        //Delete all items from arrays
-        RectDataList rectDataList = motionAnalysis.getObjectTrackerAnalysis().getRectDataList();
-        rectDataList.clear();
-
+    public void addRectMarker(int frameId, Rect rect) {
         VideoData videoData = motionAnalysis.getVideoData();
+        float centreX = rect.x + rect.width / 2;
+        float centreY = rect.y + rect.height / 2;
 
-        for (int i = 0; i < results.size(); i++) {
-            int frameId = results.keyAt(i);
-            Rect result = results.get(frameId);
+        PointF centre = videoData.toMarkerPoint(new PointF(centreX, centreY));
 
-            float centreX = result.x + result.width / 2;
-            float centreY = result.y + result.height / 2;
+        //Add debugging rectangle
+        RectData data = new RectData(frameId);
+        data.setCentre(centre);
+        data.setAngle(0);
+        PointF size = videoData.toMarkerPoint(new PointF(rect.width, rect.height));
+        data.setWidth(size.x);
+        data.setHeight(size.y);
+        rectDataList.addData(data);
 
-            PointF centre = videoData.toMarkerPoint(new PointF(centreX, centreY));
-
-            //Add debugging rectangle
-            RectData data = new RectData(frameId);
-            data.setCentre(centre);
-            data.setAngle(0);
-            PointF size = videoData.toMarkerPoint(new PointF(result.width, result.height));
-            data.setWidth(size.x);
-            data.setHeight(size.y);
-            rectDataList.addData(data);
-        }
     }
 
     public void fromBundle(Bundle bundle) {
@@ -329,13 +319,11 @@ public class ObjectTrackerAnalysis {
                 Rect result = results.get(i);
                 if(result != null)
                 {
-                    float centreX = result.x + result.width / 2;
-                    float centreY = result.y + result.height / 2;
-                    publishProgress((float)i - startFrame, centreX, centreY);
+                    publishProgress((float)i - startFrame, (float)result.x, (float)result.y, (float)result.width, (float)result.height);
                 }
                 else
                 {
-                    publishProgress((float)i - startFrame, null, null);
+                    publishProgress((float)i - startFrame, null, null, null, null);
                 }
             }
 
@@ -396,15 +384,11 @@ public class ObjectTrackerAnalysis {
         protected void onPostExecute(SparseArray<Rect> results) {
             super.onPostExecute(results);
 
-            updateMarkers(results);
-
             isTracking = false;
 
             if(listener != null) {
                 listener.onTrackingFinished(results);
             }
-
-
         }
 
 
@@ -420,10 +404,17 @@ public class ObjectTrackerAnalysis {
             int currentFrame = values[0].intValue();
             Float x = values[1];
             Float y = values[2];
+            Float width = values[3];
+            Float height = values[4];
 
             if(x != null && y != null)
             {
-                addPointMarker(currentFrame, new PointF(x, y));
+                float centreX = x + width / 2;
+                float centreY = y + height / 2;
+
+                addPointMarker(currentFrame, new PointF(centreX, centreY));
+                addRectMarker(currentFrame, new Rect(x.intValue(), y.intValue(), width.intValue(), height.intValue()));
+
                 motionAnalysis.getFrameDataModel().setCurrentFrame(currentFrame);
             }
 
