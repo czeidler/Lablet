@@ -129,7 +129,7 @@ class AccelerometerExperimentView extends AbstractExperimentSensorView {
 
         data.addListener(dataListenerStrongRef);
 
-        StrategyPainter strategyPainter = new BufferedDirectStrategyPainter();
+        StrategyPainter strategyPainter = new ThreadStrategyPainter();
 
         xData = new XYDataAdapter();
         XYConcurrentPainter xPainter = new XYConcurrentPainter(xData, getContext());
