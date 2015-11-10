@@ -31,7 +31,6 @@
         android:visibility="gone"
         android:orientation="vertical"
         android:id="@+id/trackingState"
-        android:background="#000000C0"
         >
 
         <TextView

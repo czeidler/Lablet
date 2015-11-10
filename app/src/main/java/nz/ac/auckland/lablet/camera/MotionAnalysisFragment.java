@@ -162,6 +162,11 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
         if (roiData != null)
             popup.getMenu().findItem(R.id.set_roi).setTitle("Deselect Object");
 
+        if (objectTrackerAnalysis.getRoiDataList().size() > 0)
+            popup.getMenu().findItem(R.id.next_roi).setEnabled(true);
+        else
+            popup.getMenu().findItem(R.id.next_roi).setEnabled(false);
+
         if (getSensorAnalysis().getObjectTrackerAnalysis().isTracking()) {
             popup.getMenu().findItem(R.id.start_tracking).setEnabled(false);
             popup.getMenu().findItem(R.id.stop_tracking).setEnabled(true);
@@ -203,6 +208,26 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                         objectTrackerAnalysis.addRegionOfInterestMarker(currentFrame);
                     else
                         objectTrackerAnalysis.removeRegionOfInterest(roiData);
+                } else if (item == R.id.next_roi) {
+                    //Goto next region of interest (assumes they are sorted)
+                    RoiDataList rois = objectTrackerAnalysis.getRoiDataList();
+                    boolean found = false;
+
+                    for(int i = 0; i < rois.size(); i++)
+                    {
+                        int roiFrameId = rois.getDataAt(i).getFrameId();
+
+                        if(roiFrameId > currentFrame)
+                        {
+                            getSensorAnalysis().getFrameDataModel().setCurrentFrame(roiFrameId);
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if(!found)
+                        getSensorAnalysis().getFrameDataModel().setCurrentFrame(rois.getDataAt(0).getFrameId());
+
                 } else if (item == R.id.debug_tracking) {
                     objectTrackerAnalysis.setDebuggingEnabled(!menuItem.isChecked());
                 } else if (item == R.id.stop_tracking) {
