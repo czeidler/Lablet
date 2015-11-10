@@ -307,6 +307,8 @@ class RoiMarker implements IMarker<RoiData, RoiMarkerListPainter> {
 
 public class RoiMarkerListPainter extends MarkerListPainter<RoiDataList> {
 
+    public final int MAX_DISPLAYED_MARKERS = 10;
+
     public RoiMarkerListPainter(RoiDataList model) {
         super(model);
     }
@@ -324,7 +326,7 @@ public class RoiMarkerListPainter extends MarkerListPainter<RoiDataList> {
     @Override
     public void onDraw(Canvas canvas) {
 
-        int selectedFrame = dataList.getFrameDataList().getCurrentFrame();// .get .get //dataList.getSelectedData();
+        int selectedFrame = dataList.getFrameDataList().getCurrentFrame();
 
         for (int i = 0; i < dataList.size(); i++) {
             RoiData data = dataList.getDataAt(i);
@@ -332,7 +334,7 @@ public class RoiMarkerListPainter extends MarkerListPainter<RoiDataList> {
             if(data != null) {
                 int frameId = data.getFrameId();
                 IMarker marker = this.getMarker(i);
-                float priority = getPriority(selectedFrame, frameId, dataList.getFrameDataList().getNumberOfFrames());
+                float priority = getPriority(selectedFrame, frameId, MAX_DISPLAYED_MARKERS);
                 marker.onDraw(canvas, priority);
             }
         }

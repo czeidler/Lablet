@@ -111,32 +111,26 @@ class RectMarker implements IMarker<RectData, RectMarkerListPainter> {
 
 public class RectMarkerListPainter extends MarkerListPainter<RectDataList> {
 
-    public final int MAX_DISPLAYED_MARKERS = 100;
-    // boolean drawn = false;
+    public final int MAX_DISPLAYED_MARKERS = 10;
 
     public RectMarkerListPainter(RectDataList model) {
         super(model);
 
     }
 
-//    public void setCurrentFrame(int frameId, @Nullable PointF insertHint) {
-//        int index = dataList.getIndexByFrameId(frameId);
-//        dataList.selectData(index);
-//    }
-
     @Override
     public void onDraw(Canvas canvas) {
 
         if (this.getDataList().isVisible()) {
-            int selectedFrame = dataList.getFrameDataList().getCurrentFrame();// .get .get //dataList.getSelectedData();
+            int selectedFrame = dataList.getFrameDataList().getCurrentFrame();
 
             for (int i = 0; i < dataList.size(); i++) {
                 RectData data = dataList.getDataAt(i);
 
-                if (data != null) {
+                if (data != null && data.getFrameId() <= selectedFrame) {
                     int frameId = data.getFrameId();
                     IMarker marker = this.getMarker(i);
-                    float priority = getPriority(selectedFrame, frameId, dataList.getFrameDataList().getNumberOfFrames());
+                    float priority = getPriority(selectedFrame, frameId, MAX_DISPLAYED_MARKERS);
                     marker.onDraw(canvas, priority);
                 }
             }
