@@ -42,6 +42,11 @@ public class XYConcurrentPainter extends ArrayConcurrentPainter {
     protected RectF getRealDataRect(int startIndex, int lastIndex) {
         if (startIndex > 0)
             startIndex--;
+        if (startIndex < 0)
+            startIndex = 0;
+        if (lastIndex >= dataAdapter.getSize())
+            lastIndex = dataAdapter.getSize() - 1;
+
         AbstractXYDataAdapter adapter = (AbstractXYDataAdapter)dataAdapter;
         RectF realDataRect = getContainerView().getRange();
         realDataRect.left = adapter.getX(startIndex).floatValue();
