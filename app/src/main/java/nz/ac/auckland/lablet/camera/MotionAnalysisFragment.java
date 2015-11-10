@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.*;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import org.opencv.core.Rect;
 
@@ -189,27 +190,13 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                     CalibrationVideoTimeData timeData = getSensorAnalysis().getCalibrationVideoTimeData();
                     int start = timeData.getClosestFrame(timeData.getAnalysisVideoStart());
                     int end = timeData.getClosestFrame(timeData.getAnalysisVideoEnd());
-                    final FrameDataSeekBar frameDataSeekBar = (FrameDataSeekBar) getView().findViewById(R.id.frameDataSeekBar);
-                    frameDataSeekBar.setAction(FrameDataSeekBar.Action.STOP);
-
-                    final ObjectTrackerAnalysis.IListener trackingListener = new ObjectTrackerAnalysis.IListener() {
-                        @Override
-                        public void onTrackingFinished(SparseArray<Rect> results) {
-                            frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
-                        }
-
-                        @Override
-                        public void onTrackingUpdate(int frameNumber, int totalNumberOfFrames) {
-                            //TODO update estimate time finished etc if needed
-                        }
-                    };
 
                     //Reset point markers and rectangles
                     getSensorAnalysis().getTagMarkers().clear();
                     getSensorAnalysis().getObjectTrackerAnalysis().getRectDataList().clear();
 
                     //Start object tracking
-                    getSensorAnalysis().getObjectTrackerAnalysis().trackObjects(start, end, trackingListener);
+                    getSensorAnalysis().getObjectTrackerAnalysis().trackObjects(start, end);
 
                 } else if (item == R.id.set_roi) {
                     if (!roiExists)

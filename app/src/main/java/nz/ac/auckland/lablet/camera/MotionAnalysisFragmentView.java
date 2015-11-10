@@ -13,9 +13,14 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Color;
+import android.util.SparseArray;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
+
+import org.opencv.core.Rect;
+import org.w3c.dom.Text;
+
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.Unit;
@@ -24,6 +29,7 @@ import nz.ac.auckland.lablet.views.graph.*;
 import nz.ac.auckland.lablet.views.plotview.DrawConfig;
 import nz.ac.auckland.lablet.views.plotview.LinearFitPainter;
 import nz.ac.auckland.lablet.views.table.*;
+import nz.ac.auckland.lablet.vision.ObjectTrackerAnalysis;
 import nz.ac.auckland.lablet.vision.VideoPlayer;
 
 import java.util.ArrayList;
@@ -131,6 +137,9 @@ class MotionAnalysisFragmentView extends FrameLayout {
     final private MotionAnalysisSideBar sideBar;
     final private FrameDataSeekBar frameDataSeekBar;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
+    final private TextView timeLeft;
+    final private TextView timeElapsed;
+    final ObjectTrackerAnalysis.IListener trackingListener;
     private boolean releaseAdaptersWhenDrawerClosed = false;
 
     private class GraphSpinnerEntry {
@@ -394,6 +403,53 @@ class MotionAnalysisFragmentView extends FrameLayout {
             tableView.setAdapter(markerDataTableAdapter);
             selectGraphAdapter(graphSpinner.getSelectedItemPosition());
         }
+
+        timeElapsed = (TextView)mainView.findViewById(R.id.timeElapsed);
+        timeLeft = (TextView)mainView.findViewById(R.id.timeLeft);
+
+        trackingListener = new ObjectTrackerAnalysis.IListener() {
+            @Override
+            public void onTrackingStart()
+            {
+                frameDataSeekBar.setAction(FrameDataSeekBar.Action.STOP);
+                View trackingState = mainView.findViewById(R.id.trackingState);
+                trackingState.setVisibility(VISIBLE);
+                timeElapsed.setText("Time elapsed: 0");
+                timeLeft.setText("Time left: ");
+            }
+
+            @Override
+            public void onTrackingFinished(SparseArray<Rect> results) {
+                View trackingState = mainView.findViewById(R.id.trackingState);
+                trackingState.setVisibility(GONE);
+                frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
+            }
+
+            @Override
+            public void onTrackingUpdate(int frameNumber, int totalNumberOfFrames) {
+                long elapsedTime = sensorAnalysis.getObjectTrackerAnalysis().getElapsedTime();
+                timeElapsed.setText("Time elapsed: " + timeString(elapsedTime));
+                timeLeft.setText("Time left: " + timeString(elapsedTime * (totalNumberOfFrames + 1 - frameNumber) / (frameNumber + 1)));
+            }
+        };
+
+        sensorAnalysis.getObjectTrackerAnalysis().addListener(trackingListener);
+    }
+
+    private String timeString(long timeMs) {
+        int seconds = (int)(timeMs / 1000);
+        int hours = seconds / 60 / 60;
+        seconds -= hours * 60 * 60;
+        int minutes = seconds / 60;
+        seconds -= minutes * 60;
+
+        String string = "";
+        if (hours > 0)
+            string += hours + "h ";
+        if (minutes > 0)
+            string += minutes + "m ";
+        string += seconds + "s";
+        return string;
     }
 
     /**

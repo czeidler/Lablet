@@ -19,6 +19,7 @@ import nz.ac.auckland.lablet.camera.VideoData;
 import nz.ac.auckland.lablet.camera.decoder.CodecOutputSurface;
 import nz.ac.auckland.lablet.camera.decoder.SeekToFrameExtractor;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
+import nz.ac.auckland.lablet.misc.WeakListenable;
 import nz.ac.auckland.lablet.views.marker.MarkerData;
 import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.vision.data.*;
@@ -27,8 +28,9 @@ import org.opencv.core.Rect;
 import java.io.IOException;
 
 
-public class ObjectTrackerAnalysis {
+public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.IListener> {
     public interface IListener {
+        void onTrackingStart();
         void onTrackingFinished(SparseArray<Rect> results);
         void onTrackingUpdate(int frameNumber, int totalNumberOfFrames);
     }
@@ -49,6 +51,7 @@ public class ObjectTrackerAnalysis {
 
     private boolean isTracking = false;
     private BackgroundTask task;
+    private long startTimeMs;
 
     RoiDataList.IListener roiDataListener = new DataList.IListener() {
         @Override
@@ -153,20 +156,28 @@ public class ObjectTrackerAnalysis {
      *
      * @param startFrame Frame to begin tracking objects from.
      * @param endFrame Frame to stop tracking objects at.
-     * @param listener
      */
-    public void trackObjects(int startFrame, int endFrame, IListener listener) {
+    public void trackObjects(int startFrame, int endFrame) {
         if (motionAnalysis.getObjectTrackerAnalysis().getRoiDataList().size() > 0) {
             // TODO: don't allow to start to background threads!!
+            startTimeMs = System.currentTimeMillis();
+
+            for (IListener listener : getListeners())
+                listener.onTrackingStart();
+
             isTracking = true;
-            task = new BackgroundTask(startFrame, endFrame, motionAnalysis.getVideoData(), getRoiDataList(),
-                    listener);
+            task = new BackgroundTask(startFrame, endFrame, motionAnalysis.getVideoData(), getRoiDataList());
             task.execute();
         }
         else
         {
             Log.e(TAG, "Please add a region of interest before calling trackObjects");
         }
+    }
+
+    public long getElapsedTime()
+    {
+        return System.currentTimeMillis() - startTimeMs;
     }
 
     public void addPointMarker(int frameId, PointF point) {
@@ -236,18 +247,15 @@ public class ObjectTrackerAnalysis {
     private class BackgroundTask extends AsyncTask<Void, Float, SparseArray<Rect>> {
         final int startFrame;
         final int endFrame;
-        final private IListener listener;
         final private VideoData videodata;
         final private RoiDataList roiDataList;
 
         private CodecOutputSurface outputSurface;
         private SeekToFrameExtractor extractor;
 
-        public BackgroundTask(int startFrame, int endFrame, VideoData videodata, RoiDataList roiDataList,
-                              IListener listener) {
+        public BackgroundTask(int startFrame, int endFrame, VideoData videodata, RoiDataList roiDataList) {
             this.startFrame = startFrame;
             this.endFrame = endFrame;
-            this.listener = listener;
             this.videodata = videodata;
             this.roiDataList = roiDataList;
         }
@@ -386,9 +394,8 @@ public class ObjectTrackerAnalysis {
 
             isTracking = false;
 
-            if(listener != null) {
+            for (IListener listener : getListeners())
                 listener.onTrackingFinished(results);
-            }
         }
 
 
@@ -418,10 +425,8 @@ public class ObjectTrackerAnalysis {
                 motionAnalysis.getFrameDataModel().setCurrentFrame(currentFrame);
             }
 
-            if(listener != null)
-            {
+            for (IListener listener : getListeners())
                 listener.onTrackingUpdate(currentFrame, endFrame - startFrame);
-            }
         }
     }
 }

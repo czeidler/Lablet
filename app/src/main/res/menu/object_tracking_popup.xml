@@ -6,6 +6,11 @@
         android:title="Choose Object"
         android:visible="true"/>
 
+    <item android:id="@+id/next_roi"
+        android:icon="@drawable/ic_chart_line"
+        android:title="Next Object"
+        android:visible="true"/>
+
     <item android:id="@+id/start_tracking"
         android:icon="@drawable/ic_chart_line"
         android:title="Start"
