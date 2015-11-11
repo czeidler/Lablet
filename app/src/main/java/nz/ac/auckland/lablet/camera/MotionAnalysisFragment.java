@@ -9,6 +9,7 @@ package nz.ac.auckland.lablet.camera;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.*;
@@ -213,19 +214,17 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                     RoiDataList rois = objectTrackerAnalysis.getRoiDataList();
                     boolean found = false;
 
-                    for(int i = 0; i < rois.size(); i++)
-                    {
+                    for (int i = 0; i < rois.size(); i++) {
                         int roiFrameId = rois.getDataAt(i).getFrameId();
 
-                        if(roiFrameId > currentFrame)
-                        {
+                        if (roiFrameId > currentFrame) {
                             getSensorAnalysis().getFrameDataModel().setCurrentFrame(roiFrameId);
                             found = true;
                             break;
                         }
                     }
 
-                    if(!found)
+                    if (!found)
                         getSensorAnalysis().getFrameDataModel().setCurrentFrame(rois.getDataAt(0).getFrameId());
 
                 } else if (item == R.id.debug_tracking) {
@@ -432,6 +431,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         final Intent intent = getActivity().getIntent();
         if (intent != null) {
