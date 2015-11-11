@@ -462,6 +462,7 @@ public class MotionAnalysisSettingsActivity extends ExperimentAnalysisBaseActivi
         runSettings.putFloat(MotionAnalysis.ANALYSIS_VIDEO_END_KEY, videoEndValue);
         intent.putExtra(MOTION_ANALYSIS_SETTINGS_KEY, runSettings);
 
+
         setResult(RESULT_OK, intent);
 
         finish();

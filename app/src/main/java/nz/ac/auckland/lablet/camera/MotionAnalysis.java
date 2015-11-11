@@ -345,6 +345,9 @@ public class MotionAnalysis implements IDataAnalysis {
         calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getFloat(ANALYSIS_VIDEO_END_KEY));
         calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getFloat(ANALYSIS_FRAME_RATE_KEY));
 
+        getObjectTrackerAnalysis().getRoiDataList().clear();
+        getObjectTrackerAnalysis().getRectDataList().clear();
+
         int numberOfFrames = calibrationVideoTimeData.getNumberOfFrames();
         getFrameDataModel().setNumberOfFrames(numberOfFrames);
         if (numberOfFrames <= getFrameDataModel().getCurrentFrame())
