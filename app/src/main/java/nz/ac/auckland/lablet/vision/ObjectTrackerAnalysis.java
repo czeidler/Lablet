@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
+
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.camera.VideoData;
 import nz.ac.auckland.lablet.camera.decoder.CodecOutputSurface;
@@ -23,6 +24,7 @@ import nz.ac.auckland.lablet.misc.WeakListenable;
 import nz.ac.auckland.lablet.views.marker.MarkerData;
 import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.vision.data.*;
+
 import org.opencv.core.Rect;
 
 import java.io.IOException;
@@ -31,7 +33,9 @@ import java.io.IOException;
 public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.IListener> {
     public interface IListener {
         void onTrackingStart();
+
         void onTrackingFinished(SparseArray<Rect> results);
+
         void onTrackingUpdate(int frameNumber, int totalNumberOfFrames);
     }
 
@@ -93,10 +97,13 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
         roiDataList.addListener(roiDataListener);
     }
 
-    public RectDataList getRectDataList(){
+    public RectDataList getRectDataList() {
         return rectDataList;
     }
-    public RoiDataList getRoiDataList() {return roiDataList;}
+
+    public RoiDataList getRoiDataList() {
+        return roiDataList;
+    }
 
     public void stopTracking() {
         isTracking = false;
@@ -155,7 +162,7 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
      * addRegionOfInterestMarker to add a region of interest marker.
      *
      * @param startFrame Frame to begin tracking objects from.
-     * @param endFrame Frame to stop tracking objects at.
+     * @param endFrame   Frame to stop tracking objects at.
      */
     public void trackObjects(int startFrame, int endFrame) {
         if (motionAnalysis.getObjectTrackerAnalysis().getRoiDataList().size() > 0) {
@@ -168,15 +175,12 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
             isTracking = true;
             task = new BackgroundTask(startFrame, endFrame, motionAnalysis.getVideoData(), getRoiDataList());
             task.execute();
-        }
-        else
-        {
+        } else {
             Log.e(TAG, "Please add a region of interest before calling trackObjects");
         }
     }
 
-    public long getElapsedTime()
-    {
+    public long getElapsedTime() {
         return System.currentTimeMillis() - startTimeMs;
     }
 
@@ -198,7 +202,6 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
     }
 
     /**
-     *
      * @param rect The object tracking results Rect.
      */
     public void addRectMarker(int frameId, Rect rect) {
@@ -234,10 +237,10 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
 
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
-        if(rectDataList.size() > 0)
+        if (rectDataList.size() > 0)
             bundle.putBundle(RECT_DATA_LIST, rectDataList.toBundle());
 
-        if(roiDataList.size() > 0)
+        if (roiDataList.size() > 0)
             bundle.putBundle(ROI_DATA_LIST, roiDataList.toBundle());
 
         bundle.putBoolean(DEBUGGING_ENABLED, isDebuggingEnabled());
@@ -272,6 +275,7 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
             isTracking = true;
 
             RoiData currentRoi = null;
+            int nextRoiIndex = 0;
             SparseArray<Rect> results = new SparseArray<>();
 
             outputSurface = new CodecOutputSurface(videodata.getVideoWidth(), videodata.getVideoHeight());
@@ -281,16 +285,24 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
                 return results;
             }
 
-            //TODO: check if endFrame exclusive is what you want or i < endFrame + 1?
-            for (int i = startFrame; i <= endFrame && isTracking; i++) {
-                RoiData last = getClosestRoi(roiDataList, i);
+            if (roiDataList.size() > 0) {
+                currentRoi = roiDataList.getDataAt(nextRoiIndex);
 
-                if (last != null) {
-                    if (last != currentRoi) {
-                        currentRoi = last;
+                for (int i = currentRoi.getFrameId(); i <= endFrame && isTracking; i++) {
+
+                    if (roiDataList.size() > nextRoiIndex) {
+                        RoiData nextRoi = roiDataList.getDataAt(nextRoiIndex);
+
+                        if (nextRoi.getFrameId() == i) {
+                            currentRoi = nextRoi;
+                            nextRoiIndex += 1;
+                        }
+                    }
+
+                    if (currentRoi.getFrameId() == i) {
+
                         long frameTimeMicroseconds = (long) motionAnalysis.getTimeData().getTimeAt(i) * 1000;
                         Bitmap roiBmp = getFrame(frameTimeMicroseconds);
-
 
                         if (roiBmp != null) {
                             PointF topLeft = videodata.toVideoPoint(currentRoi.getTopLeft().getPosition());
@@ -310,7 +322,6 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
                     if (currentRoi.getFrameId() != i) {
                         long frameTimeMicroseconds = (long) motionAnalysis.getTimeData().getTimeAt(i) * 1000;
                         Bitmap curFrameBmp = getFrame(frameTimeMicroseconds);
-                        //tracker.saveFrame(curFrameBmp, "frame" + i);
 
                         if (curFrameBmp != null) {
                             Rect result = tracker.getObjectLocation(curFrameBmp);
@@ -322,17 +333,16 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
                             Log.d(TAG, "Current frame BMP is null: " + i);
                         }
                     }
-                }
 
-                Rect result = results.get(i);
-                if(result != null)
-                {
-                    publishProgress((float)i - startFrame, (float)result.x, (float)result.y, (float)result.width, (float)result.height);
+                    Rect result = results.get(i);
+                    if (result != null) {
+                        publishProgress((float) i - startFrame, (float) result.x, (float) result.y, (float) result.width, (float) result.height);
+                    } else {
+                        publishProgress((float) i - startFrame, null, null, null, null);
+                    }
                 }
-                else
-                {
-                    publishProgress((float)i - startFrame, null, null, null, null);
-                }
+            } else {
+                Log.d(TAG, "No region of interests set");
             }
 
             extractor.release();
@@ -349,13 +359,12 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
         private Bitmap getFrame(long time) {
             extractor.seekToFrame(time);
 
-            try
-            {
+            try {
                 outputSurface.awaitNewImage();
                 outputSurface.drawImage(true);
                 return outputSurface.getBitmap();
             } catch (RuntimeException e) {
-                return getFrame(time);
+                return null;
             }
         }
 
@@ -414,8 +423,7 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
             Float width = values[3];
             Float height = values[4];
 
-            if(x != null && y != null)
-            {
+            if (x != null && y != null) {
                 float centreX = x + width / 2;
                 float centreY = y + height / 2;
 
