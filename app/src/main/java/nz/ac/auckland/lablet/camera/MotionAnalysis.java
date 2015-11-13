@@ -127,7 +127,7 @@ public class MotionAnalysis implements IDataAnalysis {
         originCalibrationSetter = new OriginCalibrationSetter(calibrationXY, originMarkers);
 
         objectTrackerAnalysis = new ObjectTrackerAnalysis(this, frameDataModel);
-        videoPlayer = new VideoPlayer(frameDataModel, calibrationVideoTimeData);
+        videoPlayer = new VideoPlayer(frameDataModel);
 
         updateOriginFromVideoRotation();
     }

@@ -1,14 +1,19 @@
+/*
+ * Copyright 2015.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      James Diprose <jamie.diprose@gmail.com>
+ *      Clemens Zeidler <czei002@aucklanduni.ac.nz>
+ */
 package nz.ac.auckland.lablet.vision;
-import android.os.AsyncTask;
+
 import android.os.Handler;
 import android.os.Looper;
-import android.os.SystemClock;
-import nz.ac.auckland.lablet.camera.CalibrationVideoTimeData;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 
 
 public class VideoPlayer {
-
     public interface IListener {
         void onFinished();
     }
@@ -16,17 +21,14 @@ public class VideoPlayer {
     private IListener listener;
     private boolean isPlaying = false;
     private FrameDataModel frameDataModel;
-    private CalibrationVideoTimeData timeData;
 
-    public VideoPlayer(FrameDataModel frameDataModel, CalibrationVideoTimeData timeData) {
+    public VideoPlayer(FrameDataModel frameDataModel) {
         this.frameDataModel = frameDataModel;
-        this.timeData = timeData;
     }
 
-    public void play()
-    {
+    public void play() {
         isPlaying = true;
-        new BackgroundTask().execute();
+        postGoToNextFrame();
     }
 
     public void stop()
@@ -39,38 +41,28 @@ public class VideoPlayer {
         this.listener = listener;
     }
 
-    class BackgroundTask extends AsyncTask<Void, Integer, Void>
-    {
-        protected Void doInBackground(Void[] objects) {
-            int startFrame = frameDataModel.getCurrentFrame();
-            int endFrame = timeData.getClosestFrame(timeData.getAnalysisVideoEnd());
-
-            for(int i = startFrame + 1; i <= endFrame && isPlaying; i++)
-            {
-                final int frameX = i;
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        frameDataModel.setCurrentFrame(frameX);
-                    }
-                });
-
-                SystemClock.sleep(300); //TODO: allow playback speed to be changed
+    private void postGoToNextFrame() {
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                goToNextFrame();
             }
-
-            return null;
-        }
-
-        protected void onProgressUpdate(Integer... frame) {
-
-        }
-
-        protected void onPostExecute(Void result) {
-            if(listener != null)
-            {
-                listener.onFinished();
-            }
-        }
+        }, 300);
     }
 
+    private void goToNextFrame() {
+        int targetFrame = frameDataModel.getCurrentFrame() + 1;
+        int endFrame = frameDataModel.getNumberOfFrames() - 1;
+        if (targetFrame >= endFrame) {
+            targetFrame = endFrame;
+            isPlaying = false;
+        }
+        frameDataModel.setCurrentFrame(targetFrame);
+        if (isPlaying)
+            postGoToNextFrame();
+        else {
+            if(listener != null)
+                listener.onFinished();
+        }
+    }
 }
