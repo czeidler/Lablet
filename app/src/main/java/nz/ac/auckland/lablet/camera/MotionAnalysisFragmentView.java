@@ -19,7 +19,6 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
 
 import org.opencv.core.Rect;
-import org.w3c.dom.Text;
 
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
@@ -136,6 +135,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
     final private TableView tableView;
     final private MotionAnalysisSideBar sideBar;
     final private FrameDataSeekBar frameDataSeekBar;
+    final private VideoPlayer videoPlayer;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
     final private TextView timeLeft;
     final private TextView timeElapsed;
@@ -291,7 +291,8 @@ class MotionAnalysisFragmentView extends FrameLayout {
             }
         };
 
-        sensorAnalysis.getVideoPlayer().setListener(videoListener);
+        videoPlayer = new VideoPlayer(sensorAnalysis.getFrameDataModel());
+        videoPlayer.setListener(videoListener);
 
         final FrameDataSeekBar.IListener frameDataListener = new FrameDataSeekBar.IListener() {
             @Override
@@ -301,10 +302,10 @@ class MotionAnalysisFragmentView extends FrameLayout {
                     frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
                 } else if(frameDataSeekBar.getCurrentAction() == FrameDataSeekBar.Action.PLAY) {
                     frameDataSeekBar.setAction(FrameDataSeekBar.Action.PAUSE);
-                    sensorAnalysis.getVideoPlayer().play();
+                    videoPlayer.play();
                 } else {
                     frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
-                    sensorAnalysis.getVideoPlayer().stop();
+                    videoPlayer.stop();
                 }
             }
         };
