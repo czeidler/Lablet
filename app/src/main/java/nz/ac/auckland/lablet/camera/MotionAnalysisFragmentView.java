@@ -294,21 +294,15 @@ class MotionAnalysisFragmentView extends FrameLayout {
         sensorAnalysis.getVideoPlayer().setListener(videoListener);
 
         final FrameDataSeekBar.IListener frameDataListener = new FrameDataSeekBar.IListener() {
-
             @Override
             public void onActionBtnClicked() {
-                if(sensorAnalysis.getObjectTrackerAnalysis().isTracking())
-                {
+                if(sensorAnalysis.getObjectTrackerAnalysis().isTracking()) {
                     sensorAnalysis.getObjectTrackerAnalysis().stopTracking();
                     frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
-                }
-                else if(frameDataSeekBar.getCurrentAction() == FrameDataSeekBar.Action.PLAY)
-                {
+                } else if(frameDataSeekBar.getCurrentAction() == FrameDataSeekBar.Action.PLAY) {
                     frameDataSeekBar.setAction(FrameDataSeekBar.Action.PAUSE);
                     sensorAnalysis.getVideoPlayer().play();
-                }
-                else
-                {
+                } else {
                     frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
                     sensorAnalysis.getVideoPlayer().stop();
                 }

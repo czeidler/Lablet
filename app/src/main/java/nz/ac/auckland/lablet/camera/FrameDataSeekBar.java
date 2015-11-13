@@ -72,23 +72,16 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.ILi
         init(context);
     }
 
-    public void setAction(Action action)
-    {
+    public void setAction(Action action) {
         final ImageButton actionButton = (ImageButton)findViewById(R.id.frameActionBtn);
         currentAction = action;
 
         if(action == Action.STOP)
-        {
             actionButton.setImageResource(R.drawable.ic_media_stop_big);
-        }
         else if(action == Action.PLAY)
-        {
             actionButton.setImageResource(R.drawable.ic_media_play_big);
-        }
         else if(action == Action.PAUSE)
-        {
             actionButton.setImageResource(R.drawable.ic_media_pause_big);
-        }
     }
 
     public Action getCurrentAction()
@@ -182,7 +175,8 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.ILi
         actionButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onActionBtnClicked();
+                if (listener != null)
+                    listener.onActionBtnClicked();
             }
         });
 
