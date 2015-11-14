@@ -326,9 +326,8 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
                         if (curFrameBmp != null) {
                             Rect result = tracker.getObjectLocation(curFrameBmp);
 
-                            if (result != null) {
+                            if (result != null)
                                 results.put(i, result);
-                            }
                         } else {
                             Log.d(TAG, "Current frame BMP is null: " + i);
                         }
@@ -361,11 +360,12 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
 
             try {
                 outputSurface.awaitNewImage();
-                outputSurface.drawImage(true);
-                return outputSurface.getBitmap();
             } catch (RuntimeException e) {
                 return null;
             }
+
+            outputSurface.drawImage(true);
+            return outputSurface.getBitmap();
         }
 
 
