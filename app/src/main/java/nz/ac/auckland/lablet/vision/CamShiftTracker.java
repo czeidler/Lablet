@@ -70,7 +70,7 @@ public class CamShiftTracker {
         Mat image = new Mat();
         Utils.bitmapToMat(frame, image);
 
-        toHsv(image, hsvMin, hsvMax);
+        mask = getMask(image, hsvMin, hsvMax);
 
         ArrayList<Mat> hsvs = new ArrayList<>();
         hsvs.add(hsv);
@@ -87,7 +87,7 @@ public class CamShiftTracker {
                 return null;
             }
         } catch (Exception e) {
-            Log.e(TAG, "Shit went down: ", e);
+            Log.e(TAG, "Something bad happened with OpenCV: ", e);
             return null;
         }
 
@@ -125,7 +125,7 @@ public class CamShiftTracker {
         hsvMin = minMaxHsv.first;
         hsvMax = minMaxHsv.second;
 
-        toHsv(image, hsvMin, hsvMax);
+        mask = getMask(image, hsvMin, hsvMax);
 
         Mat hsvRoi = hsv.submat(trackWindow);
         Mat maskRoi = mask.submat(trackWindow);
@@ -231,7 +231,7 @@ public class CamShiftTracker {
 
             int maxHue = (int) hsv[0] + colourRange;
 
-            min = new Scalar(Math.max(minHue, 0), 60, Math.max(35, hsv[2] - 30));
+            min = new Scalar(Math.max(minHue, 0), 60, 35);//Math.max(35, hsv[2] - 50));
             max = new Scalar(Math.min(maxHue + addition, 180), 255, 255);
         }
 
@@ -270,15 +270,18 @@ public class CamShiftTracker {
         return dists;
     }
 
-    //TODO: convert to local variables
-    private void toHsv(Mat image, Scalar hsvMin, Scalar hsvMax) {
-        Imgproc.cvtColor(image, hsv, Imgproc.COLOR_BGR2HSV, 3);
-
+    private Mat getMask(Mat bgr, Scalar hsvMin, Scalar hsvMax) {
+        Mat mask = new Mat(size, CvType.CV_8UC3);
+        Imgproc.cvtColor(bgr, hsv, Imgproc.COLOR_BGR2HSV, 3);
         Core.inRange(hsv, hsvMin, hsvMax, mask);
+        return mask;
 
-        Mat output = new Mat();
-        Imgproc.cvtColor(mask, output, Imgproc.COLOR_GRAY2BGR, 0);
-        Imgproc.cvtColor(output, output, Imgproc.COLOR_BGR2RGBA, 0);
+        //Enable to save masked image
+//        Mat output = new Mat();
+//        Imgproc.cvtColor(mask, output, Imgproc.COLOR_GRAY2BGR, 0);
+//        Imgproc.cvtColor(output, output, Imgproc.COLOR_BGR2RGBA, 0);
+//        this.saveFrame(output, "frame " + frameNum);
+//        frameNum++;
     }
 
     /**
