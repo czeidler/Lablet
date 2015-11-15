@@ -164,6 +164,7 @@ class VideoSettings {
 }
 
 class CamcorderSettings {
+    public int cameraId;
     public Integer cameraProfile;
     public int width;
     public int height;
@@ -237,7 +238,8 @@ class MediaRecorderStrategy implements IRecorderStrategy {
         recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 
         // data source config state
-        CamcorderProfile profile = CamcorderProfile.get(settings.camcorderSettings.cameraProfile);
+        CamcorderProfile profile = CamcorderProfile.get(settings.camcorderSettings.cameraId,
+                settings.camcorderSettings.cameraProfile);
         recorder.setVideoEncoder(profile.videoCodec);
         recorder.setVideoFrameRate(profile.videoFrameRate);
         recorder.setVideoEncodingBitRate(profile.videoBitRate);
@@ -743,6 +745,7 @@ public class CameraExperimentSensor extends AbstractExperimentSensor {
     private void addProfileIfSupported(int cameraId, List<CamcorderSettings> list, int profile) {
         if (CamcorderProfile.hasProfile(cameraId, profile)) {
             CamcorderSettings camcorderSettings = new CamcorderSettings();
+            camcorderSettings.cameraId = cameraId;
             camcorderSettings.cameraProfile = profile;
             CamcorderProfile camcorderProfile = CamcorderProfile.get(cameraId, profile);
             camcorderSettings.bitRate = camcorderProfile.videoBitRate;
