@@ -56,7 +56,6 @@ class RoiMarker implements IMarker<RoiData, RoiMarkerListPainter> {
                 data.getTopRight().setPosition(new PointF(newPositionReal.x+width, newPositionReal.y + height));
                 data.getBtmRight().setPosition(new PointF(newPositionReal.x+width, newPositionReal.y - height));
                 data.getBtmLeft().setPosition(new PointF(newPositionReal.x-width, newPositionReal.y - height));
-                data.setCentre(newPositionReal);
 
                 for (IMarker m : markers) {
                     if(m != centreMarker) {
@@ -77,7 +76,6 @@ class RoiMarker implements IMarker<RoiData, RoiMarkerListPainter> {
                 topRightMarker.invalidate();
                 btmLeftMarker.invalidate();
 
-                data.setCentre(new PointF(newPositionReal.x + data.getWidth() / 2, newPositionReal.y - data.getHeight() / 2));
                 centreMarker.invalidate();
 
             } else if(marker == topRightMarker) {
@@ -92,7 +90,6 @@ class RoiMarker implements IMarker<RoiData, RoiMarkerListPainter> {
                 topLeftMarker.invalidate();
                 btmRightMarker.invalidate();
 
-                data.setCentre(new PointF(data.getTopLeft().getPosition().x + data.getWidth() / 2, data.getTopLeft().getPosition().y - data.getHeight() / 2));
                 centreMarker.invalidate();
 
             } else if(marker == btmLeftMarker) {
@@ -106,7 +103,6 @@ class RoiMarker implements IMarker<RoiData, RoiMarkerListPainter> {
                 topLeftMarker.invalidate();
                 btmRightMarker.invalidate();
 
-                data.setCentre(new PointF(data.getTopLeft().getPosition().x + data.getWidth() / 2, data.getTopLeft().getPosition().y - data.getHeight() / 2));
                 centreMarker.invalidate();
 
             } else if (marker == btmRightMarker) {
@@ -120,7 +116,6 @@ class RoiMarker implements IMarker<RoiData, RoiMarkerListPainter> {
                 topRightMarker.invalidate();
                 btmLeftMarker.invalidate();
 
-                data.setCentre(new PointF(data.getTopLeft().getPosition().x + data.getWidth() / 2, data.getTopLeft().getPosition().y - data.getHeight() / 2));
                 centreMarker.invalidate();
             }
         }
@@ -151,7 +146,6 @@ class RoiMarker implements IMarker<RoiData, RoiMarkerListPainter> {
         topRightMarker.setTo(painter.getContainerView(), data.getTopRight());
         btmRightMarker.setTo(painter.getContainerView(), data.getBtmRight());
         btmLeftMarker.setTo(painter.getContainerView(), data.getBtmLeft());
-        centreMarker.setTo(painter.getContainerView(), data.getCentre());
 
         //btmRightMarker.data
 
@@ -326,7 +320,7 @@ public class RoiMarkerListPainter extends MarkerListPainter<RoiDataList> {
     @Override
     public void onDraw(Canvas canvas) {
 
-        int selectedFrame = dataList.getFrameDataList().getCurrentFrame();
+        int selectedFrame = dataList.getCurrentFrame();
 
         for (int i = 0; i < dataList.size(); i++) {
             RoiData data = dataList.getDataAt(i);

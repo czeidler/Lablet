@@ -27,6 +27,7 @@ import android.widget.RelativeLayout;
 import nz.ac.auckland.lablet.views.marker.IMarker;
 import nz.ac.auckland.lablet.views.marker.MarkerView;
 import nz.ac.auckland.lablet.views.marker.TagMarkerDataModelPainter;
+import nz.ac.auckland.lablet.vision.RoiListPainter;
 import nz.ac.auckland.lablet.vision.data.RectDataList;
 import nz.ac.auckland.lablet.vision.data.RoiDataList;
 import nz.ac.auckland.lablet.experiment.CalibrationXY;
@@ -357,8 +358,9 @@ public class FrameContainerView extends RelativeLayout {
 
         //Region of interest markers
         RoiDataList roiDataList = motionAnalysis.getObjectTrackerAnalysis().getRoiDataList();
-        RoiMarkerListPainter roiMarkerList = new RoiMarkerListPainter(roiDataList);
-        markerView.addPlotPainter(roiMarkerList);
+        RoiListPainter roiListPainter = new RoiListPainter(roiDataList);
+        roiListPainter.setMarkerGroup(painter.getMarkerPainterGroup());
+        markerView.addPlotPainter(roiListPainter);
 
         //Rectangle markers
         RectDataList rectDataList = motionAnalysis.getObjectTrackerAnalysis().getRectDataList();
@@ -396,6 +398,7 @@ public class FrameContainerView extends RelativeLayout {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             return;
         }
+
 
         int specWidthMode = MeasureSpec.getMode(widthMeasureSpec);
         int specHeightMode = MeasureSpec.getMode(heightMeasureSpec);

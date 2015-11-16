@@ -45,7 +45,7 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
     final private String ROI_DATA_LIST = "roiDataList";
     final private String DEBUGGING_ENABLED = "debuggingEnabled";
 
-    final private RoiDataList roiDataList = new RoiDataList();
+    final private RoiDataList roiDataList;
     final private RectDataList rectDataList = new RectDataList();
 
     private boolean debuggingEnabled = false;
@@ -56,6 +56,36 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
     private boolean isTracking = false;
     private BackgroundTask task;
     private long startTimeMs;
+
+    MarkerDataModel.IListener markerDataListener = new MarkerDataModel.IListener() {
+        @Override
+        public void onDataAdded(MarkerDataModel model, int index) {
+
+        }
+
+        @Override
+        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
+            RoiData roiData = roiDataList.getDataByFrameId(data.getId());
+            if (roiData == null)
+                return;
+            roiDataList.removeData(roiData);
+        }
+
+        @Override
+        public void onDataChanged(MarkerDataModel model, int index, int number) {
+
+        }
+
+        @Override
+        public void onAllDataChanged(MarkerDataModel model) {
+
+        }
+
+        @Override
+        public void onDataSelected(MarkerDataModel model, int index) {
+
+        }
+    };
 
     RoiDataList.IListener roiDataListener = new DataList.IListener() {
         @Override
@@ -90,11 +120,13 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
         this.motionAnalysis = motionAnalysis;
         tracker = new CamShiftTracker();
 
-        roiDataList.addFrameDataList(frameDataModel);
+        roiDataList = new RoiDataList(motionAnalysis.getTagMarkers());
         rectDataList.addFrameDataList(frameDataModel);
         rectDataList.setVisibility(false);
 
         roiDataList.addListener(roiDataListener);
+
+        motionAnalysis.getTagMarkers().addListener(markerDataListener);
     }
 
     public RectDataList getRectDataList() {
@@ -139,16 +171,15 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
     public void addRegionOfInterestMarker(int frameId) {
         RoiDataList roiDataList = motionAnalysis.getObjectTrackerAnalysis().getRoiDataList();
 
-        RoiData data = new RoiData(frameId);
-        PointF centre = new PointF(motionAnalysis.getVideoData().getMaxRawX() / 2,
-                motionAnalysis.getVideoData().getMaxRawY() / 2);
+        MarkerData markerData = motionAnalysis.getTagMarkers().getMarkerDataById(frameId);
+        RoiData data = new RoiData(markerData);
+        PointF centre = markerData.getPosition();
         int width = 5;
         int height = 5;
         data.setTopLeft(new PointF(centre.x - width, centre.y + height));
         data.setTopRight(new PointF(centre.x + width, centre.y + height));
         data.setBtmRight(new PointF(centre.x + width, centre.y - height));
         data.setBtmLeft(new PointF(centre.x - width, centre.y - height));
-        data.setCentre(centre);
         roiDataList.addData(data);
     }
 
@@ -274,7 +305,7 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
         protected SparseArray<Rect> doInBackground(Void[] objects) {
             isTracking = true;
 
-            RoiData currentRoi = null;
+            RoiData currentRoi;
             int nextRoiIndex = 0;
             SparseArray<Rect> results = new SparseArray<>();
 

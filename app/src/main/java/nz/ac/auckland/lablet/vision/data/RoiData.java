@@ -1,78 +1,89 @@
 package nz.ac.auckland.lablet.vision.data;
 
 import android.graphics.PointF;
+import nz.ac.auckland.lablet.views.marker.MarkerData;
 
-/**
- * Created by jdip004 on 27/08/2015.
- */
+
+//TODO: remove Data
 public class RoiData extends Data {
-    private PointData centre;// = new PointF();
-    private PointData topLeft;// = new PointF();
-    private PointData topRight;// = new PointF();
-    private PointData btmLeft;// = new PointF();
-    private PointData btmRight;// = new PointF();
+    private float left;
+    private float top;
+    private float right;
+    private float bottom;
+    private MarkerData markerData;
 
-    public RoiData(int frameId) {
-        super(frameId);
-        centre = new PointData(frameId);
-        topLeft = new PointData(frameId); //Hacky, shouldn't need to specify frame id here
-        topRight = new PointData(frameId);
-        btmLeft = new PointData(frameId);
-        btmRight = new PointData(frameId);
+    public RoiData(MarkerData markerData) {
+        super(-1);
+        this.markerData = markerData;
     }
 
-//    public Rect getRect()
-//    {
-//        return new Rect((int)topLeft.getPosition().x, (int)topLeft.getPosition().y, (int)getWidth(), (int)getHeight());
-//    }
-
-    public PointData getCentre() {
-        return centre;
+    public float getWidth() {
+        return right - left;
     }
 
-    public float getWidth()
-    {
-        return Math.abs(topRight.getPosition().x - topLeft.getPosition().x);
+    public float getHeight() {
+        return top - bottom;
     }
 
-    public float getHeight()
-    {
-        return Math.abs(topRight.getPosition().y - btmRight.getPosition().y);
-    }
-
-    public void setCentre(PointF centre) {
-        this.centre.setPosition(centre);
+    private PointData getPointData(float x, float y) {
+        PointData pointData = new PointData(-1);
+        pointData.setPosition(new PointF(x, y));
+        return pointData;
     }
 
     public PointData getTopLeft() {
-        return topLeft;
+        return getPointData(left, top);
     }
 
     public void setTopLeft(PointF topLeft) {
-        this.topLeft.setPosition(topLeft);
+        this.left = topLeft.x;
+        this.top = topLeft.y;
     }
 
     public PointData getTopRight() {
-        return topRight;
+        return getPointData(right, top);
     }
 
     public void setTopRight(PointF topRight) {
-        this.topRight.setPosition(topRight);
+        this.right = topRight.x;
+        this.top = topRight.y;
     }
 
     public PointData getBtmLeft() {
-        return btmLeft;
+        return getPointData(left, bottom);
     }
 
     public void setBtmLeft(PointF btmLeft) {
-        this.btmLeft.setPosition(btmLeft);
+        this.left = btmLeft.x;
+        this.bottom = btmLeft.y;
     }
 
     public PointData getBtmRight() {
-        return btmRight;
+        return getPointData(right, bottom);
     }
 
     public void setBtmRight(PointF btmRight) {
-        this.btmRight.setPosition(btmRight);
+        this.right = btmRight.x;
+        this.bottom = btmRight.y;
+    }
+
+    public float getLeft() {
+        return left;
+    }
+
+    public float getTop() {
+        return top;
+    }
+
+    public float getRight() {
+        return right;
+    }
+
+    public float getBottom() {
+        return bottom;
+    }
+
+    public int getFrameId() {
+        return markerData.getId();
     }
 }

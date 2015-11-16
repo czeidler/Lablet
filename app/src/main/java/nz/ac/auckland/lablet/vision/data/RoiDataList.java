@@ -3,23 +3,15 @@ package nz.ac.auckland.lablet.vision.data;
 import android.graphics.PointF;
 import android.os.Bundle;
 
-import nz.ac.auckland.lablet.experiment.FrameDataModel;
+import nz.ac.auckland.lablet.views.marker.MarkerData;
+import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 
-/**
- * Created by jdip004 on 27/08/2015.
- */
+
 public class RoiDataList extends DataList<RoiData> {
+    private MarkerDataModel markerDataModel;
 
-    private FrameDataModel frameDataList;
-
-    public void addFrameDataList(FrameDataModel frameDataList)
-    {
-        this.frameDataList = frameDataList;
-    }
-
-    public FrameDataModel getFrameDataList()
-    {
-        return frameDataList;
+    public RoiDataList(MarkerDataModel model) {
+        this.markerDataModel = model;
     }
 
     @Override
@@ -27,29 +19,27 @@ public class RoiDataList extends DataList<RoiData> {
         Bundle bundle = new Bundle();
 
         int[] frameIds = new int[size()];
-        float[] centreXs = new float[size()];
-        float[] centreYs = new float[size()];
+        float[] lefts = new float[size()];
+        float[] tops = new float[size()];
         float[] widths = new float[size()];
         float[] heights = new float[size()];
 
         for (int i = 0; i < size(); i++) {
             RoiData data = getDataAt(i);
             frameIds[i] = data.getFrameId();
-            centreXs[i] = data.getCentre().getPosition().x;
-            centreYs[i] = data.getCentre().getPosition().y;
-            widths[i] = Math.abs(data.getTopLeft().getPosition().x - data.getTopRight().getPosition().x);
-            heights[i] = Math.abs(data.getTopLeft().getPosition().y - data.getBtmLeft().getPosition().y);
+            lefts[i] = data.getLeft();
+            tops[i] = data.getTop();
+            widths[i] = data.getWidth();
+            heights[i] = data.getHeight();
         }
 
         bundle.putIntArray("runIds", frameIds);
 
-        bundle.putFloatArray("centreXs", centreXs);
-        bundle.putFloatArray("centreYs", centreYs);
+        bundle.putFloatArray("lefts", lefts);
+        bundle.putFloatArray("tops", tops);
 
         bundle.putFloatArray("widths", widths);
         bundle.putFloatArray("heights", heights);
-
-        bundle.putBoolean("visibility", this.isVisible());
 
         return bundle;
     }
@@ -58,27 +48,28 @@ public class RoiDataList extends DataList<RoiData> {
     public void fromBundle(Bundle bundle) {
         clear();
         int[] frameIds = bundle.getIntArray("runIds");
-        float[] centreXs = bundle.getFloatArray("centreXs");
-        float[] centreYs = bundle.getFloatArray("centreYs");
+        float[] lefts = bundle.getFloatArray("lefts");
+        float[] tops = bundle.getFloatArray("tops");
 
         float[] widths = bundle.getFloatArray("widths");
         float[] heights = bundle.getFloatArray("heights");
 
-        boolean visibility = bundle.getBoolean("visibility");
-        this.setVisibility(visibility);
+        if (frameIds.length != lefts.length || frameIds.length != tops.length || frameIds.length != widths.length
+                || frameIds.length != heights.length)
+            return;
 
         for (int i = 0; i < frameIds.length; i++) {
-            float centreX = centreXs[i];
-            float centreY = centreYs[i];
-            float width = widths[i] / 2;
-            float height = heights[i] / 2;
+            float left = lefts[i];
+            float top = tops[i];
+            float width = widths[i];
+            float height = heights[i];
 
-            RoiData data = new RoiData(frameIds[i]);
-            data.setCentre(new PointF(centreX, centreY));
-            data.setTopLeft(new PointF(centreX - width, centreY + height));
-            data.setTopRight(new PointF(centreX + width, centreY + height));
-            data.setBtmRight(new PointF(centreX + width, centreY - height));
-            data.setBtmLeft(new PointF(centreX - width, centreY - height));
+            MarkerData markerData = markerDataModel.getMarkerDataById(frameIds[i]);
+            RoiData data = new RoiData(markerData);
+            data.setTopLeft(new PointF(left, top));
+            data.setTopRight(new PointF(left + width, top));
+            data.setBtmRight(new PointF(left + width, top + height));
+            data.setBtmLeft(new PointF(left, top + height));
             addData(data, false);
         }
     }
@@ -91,5 +82,9 @@ public class RoiDataList extends DataList<RoiData> {
     @Override
     public void sortYAscending() {
 
+    }
+
+    public int getCurrentFrame() {
+        return markerDataModel.getSelectedMarkerData();
     }
 }
