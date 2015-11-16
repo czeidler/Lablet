@@ -14,22 +14,28 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
+
 import nz.ac.auckland.lablet.camera.MotionAnalysis;
 import nz.ac.auckland.lablet.camera.VideoData;
 import nz.ac.auckland.lablet.camera.decoder.CodecOutputSurface;
 import nz.ac.auckland.lablet.camera.decoder.SeekToFrameExtractor;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
+import nz.ac.auckland.lablet.misc.WeakListenable;
 import nz.ac.auckland.lablet.views.marker.MarkerData;
 import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.vision.data.*;
+
 import org.opencv.core.Rect;
 
 import java.io.IOException;
 
 
-public class ObjectTrackerAnalysis {
+public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.IListener> {
     public interface IListener {
+        void onTrackingStart();
+
         void onTrackingFinished(SparseArray<Rect> results);
+
         void onTrackingUpdate(int frameNumber, int totalNumberOfFrames);
     }
 
@@ -46,8 +52,10 @@ public class ObjectTrackerAnalysis {
 
     private MotionAnalysis motionAnalysis;
     final private CamShiftTracker tracker;
+
     private boolean isTracking = false;
     private BackgroundTask task;
+    private long startTimeMs;
 
     RoiDataList.IListener roiDataListener = new DataList.IListener() {
         @Override
@@ -89,10 +97,13 @@ public class ObjectTrackerAnalysis {
         roiDataList.addListener(roiDataListener);
     }
 
-    public RectDataList getRectDataList(){
+    public RectDataList getRectDataList() {
         return rectDataList;
     }
-    public RoiDataList getRoiDataList() {return roiDataList;}
+
+    public RoiDataList getRoiDataList() {
+        return roiDataList;
+    }
 
     public void stopTracking() {
         isTracking = false;
@@ -105,6 +116,10 @@ public class ObjectTrackerAnalysis {
     public void setDebuggingEnabled(boolean debuggingEnabled) {
         this.debuggingEnabled = debuggingEnabled;
         getRectDataList().setVisibility(debuggingEnabled);
+    }
+
+    public boolean isTracking() {
+        return isTracking;
     }
 
     public RoiData getRoiForFrame(int frameId) {
@@ -147,64 +162,64 @@ public class ObjectTrackerAnalysis {
      * addRegionOfInterestMarker to add a region of interest marker.
      *
      * @param startFrame Frame to begin tracking objects from.
-     * @param endFrame Frame to stop tracking objects at.
-     * @param listener
+     * @param endFrame   Frame to stop tracking objects at.
      */
-    public void trackObjects(int startFrame, int endFrame, IListener listener) {
+    public void trackObjects(int startFrame, int endFrame) {
         if (motionAnalysis.getObjectTrackerAnalysis().getRoiDataList().size() > 0) {
             // TODO: don't allow to start to background threads!!
+            startTimeMs = System.currentTimeMillis();
+
+            for (IListener listener : getListeners())
+                listener.onTrackingStart();
+
             isTracking = true;
-            task = new BackgroundTask(startFrame, endFrame, motionAnalysis.getVideoData(), getRoiDataList(),
-                    listener);
+            task = new BackgroundTask(startFrame, endFrame, motionAnalysis.getVideoData(), getRoiDataList());
             task.execute();
-        }
-        else
-        {
+        } else {
             Log.e(TAG, "Please add a region of interest before calling trackObjects");
         }
     }
 
-    /**
-     * Updates the object tracking markers.
-     *
-     * @param results The object tracking results.
-     */
-    public void updateMarkers(SparseArray<Rect> results) {
-        //Delete all items from arrays
-        MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
-        RectDataList rectDataList = motionAnalysis.getObjectTrackerAnalysis().getRectDataList();
-        rectDataList.clear();
+    public long getElapsedTime() {
+        return System.currentTimeMillis() - startTimeMs;
+    }
 
+    public void addPointMarker(int frameId, PointF point) {
+        MarkerDataModel pointDataList = motionAnalysis.getTagMarkers();
         VideoData videoData = motionAnalysis.getVideoData();
 
-        for (int i = 0; i < results.size(); i++) {
-            int frameId = results.keyAt(i);
-            Rect result = results.get(frameId);
+        //Add point marker
+        PointF centre = videoData.toMarkerPoint(point);
 
-            float centreX = result.x + result.width / 2;
-            float centreY = result.y + result.height / 2;
-
-            //Add point marker
-            PointF centre = videoData.toMarkerPoint(new PointF(centreX, centreY));
-
-            int index = pointDataList.findMarkerDataByRun(frameId);
-            if (index >= 0)
-                pointDataList.setMarkerPosition(centre, index);
-            else {
-                MarkerData markerData = new MarkerData(frameId);
-                markerData.setPosition(centre);
-                pointDataList.addMarkerData(markerData);
-            }
-
-            //Add debugging rectangle
-            RectData data = new RectData(frameId);
-            data.setCentre(centre);
-            data.setAngle(0);
-            PointF size = videoData.toMarkerPoint(new PointF(result.width, result.height));
-            data.setWidth(size.x);
-            data.setHeight(size.y);
-            rectDataList.addData(data);
+        int index = pointDataList.findMarkerDataByRun(frameId);
+        if (index >= 0)
+            pointDataList.setMarkerPosition(centre, index);
+        else {
+            MarkerData markerData = new MarkerData(frameId);
+            markerData.setPosition(centre);
+            pointDataList.addMarkerData(markerData);
         }
+    }
+
+    /**
+     * @param rect The object tracking results Rect.
+     */
+    public void addRectMarker(int frameId, Rect rect) {
+        VideoData videoData = motionAnalysis.getVideoData();
+        float centreX = rect.x + rect.width / 2;
+        float centreY = rect.y + rect.height / 2;
+
+        PointF centre = videoData.toMarkerPoint(new PointF(centreX, centreY));
+
+        //Add debugging rectangle
+        RectData data = new RectData(frameId);
+        data.setCentre(centre);
+        data.setAngle(0);
+        PointF size = videoData.toMarkerPoint(new PointF(rect.width, rect.height));
+        data.setWidth(size.x);
+        data.setHeight(size.y);
+        rectDataList.addData(data);
+
     }
 
     public void fromBundle(Bundle bundle) {
@@ -222,31 +237,28 @@ public class ObjectTrackerAnalysis {
 
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
-        if(rectDataList.size() > 0)
+        if (rectDataList.size() > 0)
             bundle.putBundle(RECT_DATA_LIST, rectDataList.toBundle());
 
-        if(roiDataList.size() > 0)
+        if (roiDataList.size() > 0)
             bundle.putBundle(ROI_DATA_LIST, roiDataList.toBundle());
 
         bundle.putBoolean(DEBUGGING_ENABLED, isDebuggingEnabled());
         return bundle;
     }
 
-    private class BackgroundTask extends AsyncTask<Void, Integer, SparseArray<Rect>> {
+    private class BackgroundTask extends AsyncTask<Void, Float, SparseArray<Rect>> {
         final int startFrame;
         final int endFrame;
-        final private IListener listener;
         final private VideoData videodata;
         final private RoiDataList roiDataList;
 
         private CodecOutputSurface outputSurface;
         private SeekToFrameExtractor extractor;
 
-        public BackgroundTask(int startFrame, int endFrame, VideoData videodata, RoiDataList roiDataList,
-                              IListener listener) {
+        public BackgroundTask(int startFrame, int endFrame, VideoData videodata, RoiDataList roiDataList) {
             this.startFrame = startFrame;
             this.endFrame = endFrame;
-            this.listener = listener;
             this.videodata = videodata;
             this.roiDataList = roiDataList;
         }
@@ -263,6 +275,7 @@ public class ObjectTrackerAnalysis {
             isTracking = true;
 
             RoiData currentRoi = null;
+            int nextRoiIndex = 0;
             SparseArray<Rect> results = new SparseArray<>();
 
             outputSurface = new CodecOutputSurface(videodata.getVideoWidth(), videodata.getVideoHeight());
@@ -272,16 +285,24 @@ public class ObjectTrackerAnalysis {
                 return results;
             }
 
-            //TODO: check if endFrame exclusive is what you want or i < endFrame + 1?
-            for (int i = startFrame; i < endFrame && isTracking; i++) {
-                RoiData last = getClosestRoi(roiDataList, i);
+            if (roiDataList.size() > 0) {
+                currentRoi = roiDataList.getDataAt(nextRoiIndex);
 
-                if (last != null) {
-                    if (last != currentRoi) {
-                        currentRoi = last;
+                for (int i = currentRoi.getFrameId(); i <= endFrame && isTracking; i++) {
+
+                    if (roiDataList.size() > nextRoiIndex) {
+                        RoiData nextRoi = roiDataList.getDataAt(nextRoiIndex);
+
+                        if (nextRoi.getFrameId() == i) {
+                            currentRoi = nextRoi;
+                            nextRoiIndex += 1;
+                        }
+                    }
+
+                    if (currentRoi.getFrameId() == i) {
+
                         long frameTimeMicroseconds = (long) motionAnalysis.getTimeData().getTimeAt(i) * 1000;
                         Bitmap roiBmp = getFrame(frameTimeMicroseconds);
-                        //saveFrame(roiBmp, "roi");
 
                         if (roiBmp != null) {
                             PointF topLeft = videodata.toVideoPoint(currentRoi.getTopLeft().getPosition());
@@ -301,21 +322,26 @@ public class ObjectTrackerAnalysis {
                     if (currentRoi.getFrameId() != i) {
                         long frameTimeMicroseconds = (long) motionAnalysis.getTimeData().getTimeAt(i) * 1000;
                         Bitmap curFrameBmp = getFrame(frameTimeMicroseconds);
-                        //saveFrame(curFrameBmp, "frame" + i);
 
-                        if (curFrameBmp != null && curFrameBmp.getConfig() != null) {
+                        if (curFrameBmp != null) {
                             Rect result = tracker.getObjectLocation(curFrameBmp);
 
-                            if (result != null) {
+                            if (result != null)
                                 results.put(i, result);
-                            }
                         } else {
                             Log.d(TAG, "Current frame BMP is null: " + i);
                         }
                     }
-                }
 
-                publishProgress(i - startFrame);
+                    Rect result = results.get(i);
+                    if (result != null) {
+                        publishProgress((float) i - startFrame, (float) result.x, (float) result.y, (float) result.width, (float) result.height);
+                    } else {
+                        publishProgress((float) i - startFrame, null, null, null, null);
+                    }
+                }
+            } else {
+                Log.d(TAG, "No region of interests set");
             }
 
             extractor.release();
@@ -331,7 +357,13 @@ public class ObjectTrackerAnalysis {
          */
         private Bitmap getFrame(long time) {
             extractor.seekToFrame(time);
-            outputSurface.awaitNewImage();
+
+            try {
+                outputSurface.awaitNewImage();
+            } catch (RuntimeException e) {
+                return null;
+            }
+
             outputSurface.drawImage(true);
             return outputSurface.getBitmap();
         }
@@ -369,9 +401,10 @@ public class ObjectTrackerAnalysis {
         protected void onPostExecute(SparseArray<Rect> results) {
             super.onPostExecute(results);
 
-            updateMarkers(results);
+            isTracking = false;
 
-            listener.onTrackingFinished(results);
+            for (IListener listener : getListeners())
+                listener.onTrackingFinished(results);
         }
 
 
@@ -381,10 +414,27 @@ public class ObjectTrackerAnalysis {
          * @param values The progress of the object tracker values[0] (from 0.0-1.0)
          */
         @Override
-        protected void onProgressUpdate(Integer... values) {
+        protected void onProgressUpdate(Float... values) {
             super.onProgressUpdate(values);
 
-            listener.onTrackingUpdate(values[0], endFrame - startFrame);
+            int currentFrame = values[0].intValue();
+            Float x = values[1];
+            Float y = values[2];
+            Float width = values[3];
+            Float height = values[4];
+
+            if (x != null && y != null) {
+                float centreX = x + width / 2;
+                float centreY = y + height / 2;
+
+                addPointMarker(currentFrame, new PointF(centreX, centreY));
+                addRectMarker(currentFrame, new Rect(x.intValue(), y.intValue(), width.intValue(), height.intValue()));
+
+                motionAnalysis.getFrameDataModel().setCurrentFrame(currentFrame);
+            }
+
+            for (IListener listener : getListeners())
+                listener.onTrackingUpdate(currentFrame, endFrame - startFrame);
         }
     }
 }

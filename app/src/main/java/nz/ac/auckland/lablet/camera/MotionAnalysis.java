@@ -64,7 +64,6 @@ public class MotionAnalysis implements IDataAnalysis {
     private Bundle videoAnalysisSettings = null;
 
     private int videoRotation = 0;
-    private  boolean debuggingEnabled = false;
 
     private ObjectTrackerAnalysis objectTrackerAnalysis;
 
@@ -166,6 +165,7 @@ public class MotionAnalysis implements IDataAnalysis {
     public MarkerDataModel getTagMarkers() {
         return tagMarkers;
     }
+
     public MarkerDataModel getXYCalibrationMarkers() { return lengthCalibrationMarkers; }
     public MarkerDataModel getOriginMarkers(){
         return originMarkers;
@@ -336,6 +336,9 @@ public class MotionAnalysis implements IDataAnalysis {
         calibrationVideoTimeData.setAnalysisVideoStart(runSettings.getFloat(ANALYSIS_VIDEO_START_KEY));
         calibrationVideoTimeData.setAnalysisVideoEnd(runSettings.getFloat(ANALYSIS_VIDEO_END_KEY));
         calibrationVideoTimeData.setAnalysisFrameRate(runSettings.getFloat(ANALYSIS_FRAME_RATE_KEY));
+
+        getObjectTrackerAnalysis().getRoiDataList().clear();
+        getObjectTrackerAnalysis().getRectDataList().clear();
 
         int numberOfFrames = calibrationVideoTimeData.getNumberOfFrames();
         getFrameDataModel().setNumberOfFrames(numberOfFrames);

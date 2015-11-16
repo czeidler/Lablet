@@ -21,6 +21,6 @@
           yourapp:showAsAction="always|withText"/>
     <item android:id="@+id/action_track_object"
           android:icon="@drawable/ic_eye"
-          android:title="Tracking"
-          yourapp:showAsAction="ifRoom|withText"/>
+          android:title="Track"
+          yourapp:showAsAction="always|withText"/>
 </menu>

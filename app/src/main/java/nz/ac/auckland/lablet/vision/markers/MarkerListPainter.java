@@ -31,7 +31,7 @@ public abstract class MarkerListPainter<D extends DataList> extends AbstractPlot
 
             Data data = list.getDataAt(index);
 
-            if(data.getFrameId() == selectedFrameId) {
+            if (data.getFrameId() == selectedFrameId) {
                 list.selectData(index);
             }
 
@@ -113,23 +113,16 @@ public abstract class MarkerListPainter<D extends DataList> extends AbstractPlot
         rebuildPainterList();
     }
 
-    public float getPriority(int selectedFrameId, int markerFrameId, int numFrames)
-    {
+    public float getPriority(int selectedFrameId, int markerFrameId, int maxDisplayedMarkers) {
         float priority;
+        int distance = markerFrameId - selectedFrameId;
 
         if (selectedFrameId == markerFrameId) {
             priority = 1;
+        } else if (distance < 0 && distance >= -maxDisplayedMarkers) {
+            priority = (float)(maxDisplayedMarkers - Math.abs(distance)) / maxDisplayedMarkers;
         } else {
-            float distance = Math.abs(selectedFrameId - markerFrameId);
-            priority = (numFrames - distance) / numFrames;
-
-//            if (markerFrameId < selectedFrameId) {
-//                int numFramesReverse = selectedFrameId;
-//                priority = (numFramesReverse - distance) / numFramesReverse;
-//            } else {
-//                int numFramesForward = numFrames - selectedFrameId;
-//                priority = (numFramesForward - distance) / numFramesForward;
-//            }
+            priority = 0;
         }
 
         return priority;
@@ -151,7 +144,6 @@ public abstract class MarkerListPainter<D extends DataList> extends AbstractPlot
             return null;
         return painterList.get(index);
     }
-
 
 
     abstract protected IMarker createMarkerForFrame(int frameId);

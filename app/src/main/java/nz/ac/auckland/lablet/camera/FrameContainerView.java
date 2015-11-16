@@ -111,17 +111,17 @@ public class FrameContainerView extends RelativeLayout {
             ViewGroup parent = (ViewGroup)FrameContainerView.this.getParent();
             animate(parent.getBottom(), parent.getBottom() - seekBar.getHeight(),
                     new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    animator = null;
-                    scheduleClose(openTime);
-                }
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            animator = null;
+                            scheduleClose(openTime);
+                        }
 
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    seekBar.setVisibility(View.VISIBLE);
-                }
-            });
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            seekBar.setVisibility(View.VISIBLE);
+                        }
+                    });
         }
 
         private void close() {
@@ -176,6 +176,7 @@ public class FrameContainerView extends RelativeLayout {
             }, delay);
         }
     }
+
     private SeekBarManager seekBarManager;
 
     class GestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -218,7 +219,7 @@ public class FrameContainerView extends RelativeLayout {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (!markerView.isAnyMarkerSelectedForDrag())
+                   if (!markerView.isAnyMarkerSelectedForDrag())
                         seekBarManager.open();
                 }
             });
@@ -259,6 +260,7 @@ public class FrameContainerView extends RelativeLayout {
     public void setTo(CameraExperimentFrameView runView, FrameDataSeekBar seekBar, MotionAnalysis analysis) {
         this.seekBar = seekBar;
         seekBarManager = new SeekBarManager();
+        seekBarManager.open();
 
         if (motionAnalysis != null)
             motionAnalysis.removeListener(motionAnalysisListener);

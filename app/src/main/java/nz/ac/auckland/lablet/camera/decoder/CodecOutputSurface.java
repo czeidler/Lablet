@@ -207,7 +207,7 @@ public class CodecOutputSurface implements SurfaceTexture.OnFrameAvailableListen
      * with the EGLContext that contains the GL texture object used by SurfaceTexture.)
      */
     public void awaitNewImage() {
-        final int TIMEOUT_MS = 2500;
+        final int TIMEOUT_MS = 3500;
 
         synchronized (mFrameSyncObject) {
             while (!mFrameAvailable) {

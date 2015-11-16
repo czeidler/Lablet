@@ -13,9 +13,14 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Color;
+import android.util.SparseArray;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
+
+import nz.ac.auckland.lablet.vision.MotionTrackingStatusView;
+import org.opencv.core.Rect;
+
 import nz.ac.auckland.lablet.R;
 import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.misc.Unit;
@@ -24,6 +29,8 @@ import nz.ac.auckland.lablet.views.graph.*;
 import nz.ac.auckland.lablet.views.plotview.DrawConfig;
 import nz.ac.auckland.lablet.views.plotview.LinearFitPainter;
 import nz.ac.auckland.lablet.views.table.*;
+import nz.ac.auckland.lablet.vision.ObjectTrackerAnalysis;
+import nz.ac.auckland.lablet.vision.VideoPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,6 +127,7 @@ class MotionAnalysisSideBar extends WeakListenable<MotionAnalysisSideBar.IListen
 }
 
 class MotionAnalysisFragmentView extends FrameLayout {
+    final MotionAnalysis sensorAnalysis;
     private MarkerDataTableAdapter markerDataTableAdapter;
     final private FrameContainerView runContainerView;
     final private GraphView2D graphView;
@@ -129,7 +137,10 @@ class MotionAnalysisFragmentView extends FrameLayout {
     final private TableView tableView;
     final private MotionAnalysisSideBar sideBar;
     final private FrameDataSeekBar frameDataSeekBar;
+    final private VideoPlayer videoPlayer;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
+    final private MotionTrackingStatusView motionTrackingStatusView;
+    final ObjectTrackerAnalysis.IListener trackingListener;
     private boolean releaseAdaptersWhenDrawerClosed = false;
 
     private class GraphSpinnerEntry {
@@ -265,14 +276,81 @@ class MotionAnalysisFragmentView extends FrameLayout {
         }
     };
 
+    private class PlayVideoSeekBarAction implements FrameDataSeekBar.Action {
+        @Override
+        public int getIconResource() {
+            return R.drawable.ic_media_play_big;
+        }
+
+        @Override
+        public FrameDataSeekBar.Action perform() {
+            videoPlayer.play();
+            return new PauseVideoSeekBarAction();
+        }
+
+        @Override
+        public void onActionUncalledRemoved() {
+
+        }
+    }
+
+    private class PauseVideoSeekBarAction implements FrameDataSeekBar.Action {
+        @Override
+        public int getIconResource() {
+            return R.drawable.ic_media_pause_big;
+        }
+
+        @Override
+        public FrameDataSeekBar.Action perform() {
+            onActionUncalledRemoved();
+            return new PlayVideoSeekBarAction();
+        }
+
+        @Override
+        public void onActionUncalledRemoved() {
+            videoPlayer.stop();
+        }
+    }
+
+    private class StopTrackingSeekBarAction implements FrameDataSeekBar.Action {
+        @Override
+        public int getIconResource() {
+            return R.drawable.ic_media_stop_big;
+        }
+
+        @Override
+        public FrameDataSeekBar.Action perform() {
+            onActionUncalledRemoved();
+            return new PlayVideoSeekBarAction();
+        }
+
+        @Override
+        public void onActionUncalledRemoved() {
+            if (sensorAnalysis.getObjectTrackerAnalysis().isTracking())
+                sensorAnalysis.getObjectTrackerAnalysis().stopTracking();
+        }
+    }
+
     public MotionAnalysisFragmentView(Context context, final MotionAnalysis sensorAnalysis) {
         super(context);
 
+        this.sensorAnalysis = sensorAnalysis;
         final LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View mainView = inflater.inflate(R.layout.motion_analysis, this, true);
         assert mainView != null;
 
         frameDataSeekBar = (FrameDataSeekBar)mainView.findViewById(R.id.frameDataSeekBar);
+        frameDataSeekBar.setAction(new PlayVideoSeekBarAction());
+
+        final VideoPlayer.IListener videoListener = new VideoPlayer.IListener() {
+            @Override
+            public void onFinished() {
+                frameDataSeekBar.setAction(new PlayVideoSeekBarAction());
+            }
+        };
+
+        videoPlayer = new VideoPlayer(sensorAnalysis.getFrameDataModel());
+        videoPlayer.setListener(videoListener);
 
         sideBarView = (ViewGroup)inflater.inflate(R.layout.motion_analysis_data_side_bar, null, false);
         sideBar = new MotionAnalysisSideBar(mainView, sideBarView);
@@ -301,7 +379,6 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
         final CameraExperimentFrameView sensorAnalysisView = new CameraExperimentFrameView(context, sensorAnalysis);
         frameDataSeekBar.setTo(sensorAnalysis.getFrameDataModel(), sensorAnalysis.getTimeData());
-
         runContainerView.setTo(sensorAnalysisView, frameDataSeekBar, sensorAnalysis);
 
         final Unit xUnit = sensorAnalysis.getXUnit();
@@ -361,6 +438,27 @@ class MotionAnalysisFragmentView extends FrameLayout {
             tableView.setAdapter(markerDataTableAdapter);
             selectGraphAdapter(graphSpinner.getSelectedItemPosition());
         }
+
+        motionTrackingStatusView = (MotionTrackingStatusView)mainView.findViewById(R.id.trackingStatusView);
+        motionTrackingStatusView.setObjectTrackerAnalysis(sensorAnalysis.getObjectTrackerAnalysis());
+
+        trackingListener = new ObjectTrackerAnalysis.IListener() {
+            @Override
+            public void onTrackingStart() {
+                frameDataSeekBar.setAction(new StopTrackingSeekBarAction());
+            }
+
+            @Override
+            public void onTrackingFinished(SparseArray<Rect> results) {
+                frameDataSeekBar.setAction(new PlayVideoSeekBarAction());
+            }
+
+            @Override
+            public void onTrackingUpdate(int frameNumber, int totalNumberOfFrames) {
+            }
+        };
+
+        sensorAnalysis.getObjectTrackerAnalysis().addListener(trackingListener);
     }
 
     /**

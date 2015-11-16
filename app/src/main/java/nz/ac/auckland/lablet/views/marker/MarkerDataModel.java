@@ -92,6 +92,15 @@ public class MarkerDataModel extends AbstractPointDataList<MarkerData> {
         return getAt(index);
     }
 
+    public MarkerData getMarkerDataById(int id) {
+        for (int i = 0; i < size(); i++) {
+            MarkerData data = getMarkerDataAt(i);
+            if (data.getId() == id)
+                return data;
+        }
+        return null;
+    }
+
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
         int[] runIds = new int[getMarkerCount()];
