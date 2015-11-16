@@ -59,7 +59,7 @@ public class TagMarkerDataModelPainter extends MarkerDataModelPainter<MarkerData
                 }
             }
 
-            int newIndex = markerData.addData(data);
+            int newIndex = ((MarkerDataModel)markerData).addMarkerData(data, true);
             markerData.selectMarkerData(newIndex);
 
             lastInsertMarkerManager.onNewMarkerInserted(newIndex, data);

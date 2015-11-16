@@ -50,7 +50,7 @@ public abstract class AbstractMarkerPainter<T> extends AbstractPlotPainter {
         /**
          * Set if the MarkerData should be marked as selected if the IMarker is selected for drag.
          *
-         * @param selectOnDrag
+         * @param selectOnDrag true if marker should be selected when dragged
          */
         public void setSelectOnDrag(boolean selectOnDrag) {
             this.selectOnDrag = selectOnDrag;
@@ -97,34 +97,35 @@ public abstract class AbstractMarkerPainter<T> extends AbstractPlotPainter {
         }
     }
 
-    private MarkerDataModel.IListener dataListener = new MarkerDataModel.IListener() {
+    private AbstractPointDataModel.IListener<AbstractPointDataModel<T>, T> dataListener
+            = new AbstractPointDataModel.IListener<AbstractPointDataModel<T>, T>() {
 
         @Override
-        public void onDataAdded(MarkerDataModel model, int index) {
+        public void onDataAdded(AbstractPointDataModel<T> model, int index) {
             addMarker(index);
             containerView.invalidate();
         }
 
         @Override
-        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
+        public void onDataRemoved(AbstractPointDataModel<T> model, int index, T data) {
             removeMarker(index);
             containerView.invalidate();
         }
 
         @Override
-        public void onDataChanged(MarkerDataModel model, int index, int number) {
+        public void onDataChanged(AbstractPointDataModel<T> model, int index, int number) {
             invalidateMarker();
             containerView.invalidate();
         }
 
         @Override
-        public void onAllDataChanged(MarkerDataModel model) {
+        public void onAllDataChanged(AbstractPointDataModel<T> model) {
             rebuildMarkerList();
             containerView.invalidate();
         }
 
         @Override
-        public void onDataSelected(MarkerDataModel model, int index) {
+        public void onDataSelected(AbstractPointDataModel<T> model, int index) {
             if (getMarkerPainterGroup().selectOnDrag && index >= 0)
                 markerList.get(index).setSelectedForDrag(true);
 
@@ -173,8 +174,8 @@ public abstract class AbstractMarkerPainter<T> extends AbstractPlotPainter {
         return markerList;
     }
 
-    public PointF getMarkerScreenPosition(T markerData) {
-        PointF realPosition = this.markerData.getPosition(markerData);
+    public PointF getMarkerScreenPosition(int index) {
+        PointF realPosition = this.markerData.getPosition(index);
         PointF screenPosition = new PointF();
         containerView.toScreen(realPosition, screenPosition);
         return screenPosition;
@@ -286,22 +287,29 @@ public abstract class AbstractMarkerPainter<T> extends AbstractPlotPainter {
             point.y = frame.bottom - containerView.getPaddingBottom();
     }
 
-    abstract protected DraggableMarker createMarkerForRow(int row);
-
-    public void addMarker(int row) {
-        IMarker marker = createMarkerForRow(row);
-        marker.setTo(this, markerData.getAt(row));
-        markerList.add(row, marker);
-    }
+    abstract protected IMarker<AbstractMarkerPainter<T>> createMarkerForRow(int row);
 
     public int markerIndexOf(IMarker marker) {
         return markerList.indexOf(marker);
+    }
+
+    public void addMarker(int row) {
+        IMarker<AbstractMarkerPainter<T>> marker = createMarkerForRow(row);
+        marker.setTo(this, row);
+        markerList.add(row, marker);
+        reassignMarkers(row + 1);
     }
 
     public void removeMarker(int row) {
         markerList.remove(row);
         if (row == markerData.getSelectedMarkerData())
             markerData.selectMarkerData(-1);
+        reassignMarkers(row);
+    }
+
+    public void reassignMarkers(int startIndex) {
+        for (int i = startIndex; i < markerList.size(); i++)
+            markerList.get(i).setTo(this, i);
     }
 
     @Override

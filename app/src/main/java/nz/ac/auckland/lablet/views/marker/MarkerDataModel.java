@@ -39,18 +39,17 @@ public class MarkerDataModel extends AbstractPointDataList<MarkerData> {
     }
 
     public void setMarkerPosition(PointF position, int index) {
-        MarkerData data = getMarkerDataAt(index);
-        setPosition(data, position);
+        setPosition(position, index);
     }
 
     @Override
-    public PointF getPosition(MarkerData data) {
-        return data.getPosition();
+    public PointF getPosition(int index) {
+        return getAt(index).getPosition();
     }
 
     @Override
-    public void setPositionNoNotify(MarkerData data, PointF point) {
-        data.setPosition(point);
+    public void setPositionNoNotify(PointF point, int index) {
+        getAt(index).setPosition(point);
     }
 
     public int addMarkerData(MarkerData data) {

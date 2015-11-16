@@ -42,8 +42,8 @@ public class SimpleMarker<T> extends DraggableMarker<T> {
     }
 
     @Override
-    public void setTo(AbstractMarkerPainter<T> painter, T markerData) {
-        super.setTo(painter, markerData);
+    public void setTo(AbstractMarkerPainter<T> painter, int index) {
+        super.setTo(painter, index);
 
         INNER_RING_RADIUS = parent.toPixel(Const.INNER_RING_RADIUS_DP);
         INNER_RING_WIDTH = parent.toPixel(Const.INNER_RING_WIDTH_DP);

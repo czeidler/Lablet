@@ -39,20 +39,15 @@ public abstract class AbstractPointDataModel<T> extends WeakListenable<AbstractP
     }
 
     abstract public T getAt(int index);
-    abstract public int indexOf(T data);
 
+    abstract public PointF getPosition(int index);
     abstract public PointF getPosition(T data);
-    public void setPosition(T data, PointF point) {
-        setPositionNoNotify(data, point);
-        notifyDataChanged(indexOf(data), 1);
-    }
-
     public void setPosition(PointF point, int index) {
-        T data = getAt(index);
-        setPosition(data, point);
+        setPositionNoNotify(point, index);
+        notifyDataChanged(index, 1);
     }
 
-    abstract public void setPositionNoNotify(T data, PointF point);
+    abstract public void setPositionNoNotify(PointF point, int index);
     abstract protected int addDataNoNotify(T data);
     abstract protected T removeDataNoNotify(int index);
     abstract protected void clearNoNotify();

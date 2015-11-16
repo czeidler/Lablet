@@ -31,8 +31,8 @@ abstract class CursorMarker extends DraggableMarker<MarkerData> {
     private float SELECT_RADIUS;
 
     @Override
-    public void setTo(AbstractMarkerPainter painter, MarkerData markerData) {
-        super.setTo(painter, markerData);
+    public void setTo(AbstractMarkerPainter painter, int index) {
+        super.setTo(painter, index);
 
         SELECT_RADIUS = parent.toPixel(Const.SELECT_RADIUS_DP);
     }

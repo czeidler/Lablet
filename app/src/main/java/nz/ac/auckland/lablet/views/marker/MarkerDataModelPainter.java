@@ -105,8 +105,7 @@ public class MarkerDataModelPainter<T> extends AbstractMarkerPainter<T> {
             }
 
             if (markerInsertedInLastRun >= 0) {
-                T lastMarkerData = markerData.getAt(markerInsertedInLastRun);
-                if (markerData.getPosition(lastMarkerData).equals(lastMarkerPosition)) {
+                if (markerData.getPosition(markerInsertedInLastRun).equals(lastMarkerPosition)) {
                     markerData.removeData(markerInsertedInLastRun);
                     int selectedIndex = markerInsertedInLastRun - 1;
                     if (selectedIndex < 0)

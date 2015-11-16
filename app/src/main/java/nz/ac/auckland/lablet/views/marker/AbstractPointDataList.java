@@ -7,6 +7,8 @@
  */
 package nz.ac.auckland.lablet.views.marker;
 
+import android.graphics.PointF;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,9 +32,12 @@ public abstract class AbstractPointDataList<T> extends AbstractPointDataModel<T>
         return list.get(index);
     }
 
-    @Override
     public int indexOf(T data) {
         return list.indexOf(data);
+    }
+
+    public PointF getPosition(T data) {
+        return getPosition(indexOf(data));
     }
 
     @Override

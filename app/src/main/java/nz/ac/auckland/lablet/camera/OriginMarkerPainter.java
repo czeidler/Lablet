@@ -120,8 +120,8 @@ public class OriginMarkerPainter extends AbstractMarkerPainter<MarkerData> imple
         if (firstDraw) {
             firstDraw = false;
             // update the angle
-            PointF originScreen = getMarkerScreenPosition(markerData.getAt(0));
-            PointF axis1Screen = getMarkerScreenPosition(markerData.getAt(1));
+            PointF originScreen = getMarkerScreenPosition(0);
+            PointF axis1Screen = getMarkerScreenPosition(1);
             angleScreen = CalibrationXY.getAngle(originScreen, axis1Screen);
             
             updateMarkerScreenPositions(originScreen);

@@ -15,8 +15,8 @@ import nz.ac.auckland.lablet.views.marker.AbstractMarkerPainter;
 /**
  * Interface for a drawable, selectable marker that can handle motion events.
  */
-public interface IMarker<P extends AbstractMarkerPainter<T>, T> {
-    void setTo(P painter, T markerData);
+public interface IMarker<P extends AbstractMarkerPainter> {
+    void setTo(P painter, int index);
 
     void onDraw(Canvas canvas, float priority);
 

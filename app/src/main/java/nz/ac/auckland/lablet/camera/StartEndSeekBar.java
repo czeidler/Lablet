@@ -51,8 +51,8 @@ abstract class StartEndMarker extends DraggableMarker<MarkerData> {
     }
 
     @Override
-    public void setTo(AbstractMarkerPainter painter, MarkerData markerData) {
-        super.setTo(painter, markerData);
+    public void setTo(AbstractMarkerPainter painter, int index) {
+        super.setTo(painter, index);
 
         WIDTH = parent.toPixel(WIDTH_DP);
         HEIGHT = parent.toPixel(StartEndSeekBar.HEIGHT_DP);
@@ -61,7 +61,7 @@ abstract class StartEndMarker extends DraggableMarker<MarkerData> {
 
     @Override
     public boolean isPointOnSelectArea(PointF screenPoint) {
-        PointF position = parent.getMarkerScreenPosition(markerData);
+        PointF position = parent.getMarkerScreenPosition(markerIndex);
         // build a marker rect with increased width
         final float touchWidth = (float)parent.toPixel(60);
         RectF rect = new RectF();
@@ -99,7 +99,7 @@ class StartMarker extends StartEndMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
-        PointF position = parent.getMarkerScreenPosition(markerData);
+        PointF position = parent.getMarkerScreenPosition(markerIndex);
 
         if (isDragging) {
             PointF dragPosition = getTouchPosition();
@@ -133,7 +133,7 @@ class EndMarker extends StartEndMarker {
 
     @Override
     public void onDraw(Canvas canvas, float priority) {
-        PointF position = parent.getMarkerScreenPosition(markerData);
+        PointF position = parent.getMarkerScreenPosition(markerIndex);
 
         if (isDragging) {
             PointF dragPosition = getTouchPosition();

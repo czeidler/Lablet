@@ -19,18 +19,19 @@ import android.view.MotionEvent;
  * been selected and otherwise is disabled.
  * </p>
  */
-public abstract class DraggableMarker<T> implements IMarker<AbstractMarkerPainter<T>, T> {
+public abstract class DraggableMarker<T> implements IMarker<AbstractMarkerPainter<T>> {
     protected AbstractMarkerPainter<T> parent = null;
-    protected T markerData;
+    protected int markerIndex;
     protected PointF currentPosition;
     protected PointF dragOffset = new PointF(0, 0);
     protected boolean isSelectedForDragging = false;
     protected boolean isDragging = false;
 
     @Override
-    public void setTo(AbstractMarkerPainter<T> painter, T markerData) {
+    public void setTo(AbstractMarkerPainter<T> painter, int index) {
         this.parent = painter;
-        this.markerData = markerData;
+        this.markerIndex = index;
+        invalidate();
     }
 
     /**
@@ -117,7 +118,7 @@ public abstract class DraggableMarker<T> implements IMarker<AbstractMarkerPainte
 
     public PointF getCachedScreenPosition() {
         if (currentPosition == null)
-            currentPosition = parent.getMarkerScreenPosition(markerData);
+            currentPosition = parent.getMarkerScreenPosition(markerIndex);
 
         return currentPosition;
     }
