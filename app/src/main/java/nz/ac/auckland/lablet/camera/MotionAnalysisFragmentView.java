@@ -18,6 +18,7 @@ import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
 
+import nz.ac.auckland.lablet.vision.MotionTrackingStatusView;
 import org.opencv.core.Rect;
 
 import nz.ac.auckland.lablet.R;
@@ -137,8 +138,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
     final private FrameDataSeekBar frameDataSeekBar;
     final private VideoPlayer videoPlayer;
     final private List<GraphSpinnerEntry> graphSpinnerEntryList = new ArrayList<>();
-    final private TextView timeLeft;
-    final private TextView timeElapsed;
+    final private MotionTrackingStatusView motionTrackingStatusView;
     final ObjectTrackerAnalysis.IListener trackingListener;
     private boolean releaseAdaptersWhenDrawerClosed = false;
 
@@ -399,52 +399,26 @@ class MotionAnalysisFragmentView extends FrameLayout {
             selectGraphAdapter(graphSpinner.getSelectedItemPosition());
         }
 
-        timeElapsed = (TextView)mainView.findViewById(R.id.timeElapsed);
-        timeLeft = (TextView)mainView.findViewById(R.id.timeLeft);
+        motionTrackingStatusView = (MotionTrackingStatusView)mainView.findViewById(R.id.trackingStatusView);
+        motionTrackingStatusView.setObjectTrackerAnalysis(sensorAnalysis.getObjectTrackerAnalysis());
 
         trackingListener = new ObjectTrackerAnalysis.IListener() {
             @Override
-            public void onTrackingStart()
-            {
+            public void onTrackingStart() {
                 frameDataSeekBar.setAction(FrameDataSeekBar.Action.STOP);
-                View trackingState = mainView.findViewById(R.id.trackingState);
-                trackingState.setVisibility(VISIBLE);
-                timeElapsed.setText("Time elapsed: 0");
-                timeLeft.setText("Time left: ");
             }
 
             @Override
             public void onTrackingFinished(SparseArray<Rect> results) {
-                View trackingState = mainView.findViewById(R.id.trackingState);
-                trackingState.setVisibility(GONE);
                 frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
             }
 
             @Override
             public void onTrackingUpdate(int frameNumber, int totalNumberOfFrames) {
-                long elapsedTime = sensorAnalysis.getObjectTrackerAnalysis().getElapsedTime();
-                timeElapsed.setText("Time elapsed: " + timeString(elapsedTime));
-                timeLeft.setText("Time left: " + timeString(elapsedTime * (totalNumberOfFrames + 1 - frameNumber) / (frameNumber + 1)));
             }
         };
 
         sensorAnalysis.getObjectTrackerAnalysis().addListener(trackingListener);
-    }
-
-    private String timeString(long timeMs) {
-        int seconds = (int)(timeMs / 1000);
-        int hours = seconds / 60 / 60;
-        seconds -= hours * 60 * 60;
-        int minutes = seconds / 60;
-        seconds -= minutes * 60;
-
-        String string = "";
-        if (hours > 0)
-            string += hours + "h ";
-        if (minutes > 0)
-            string += minutes + "m ";
-        string += seconds + "s";
-        return string;
     }
 
     /**
