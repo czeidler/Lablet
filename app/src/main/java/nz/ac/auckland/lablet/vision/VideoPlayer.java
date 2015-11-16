@@ -31,8 +31,7 @@ public class VideoPlayer {
         postGoToNextFrame();
     }
 
-    public void stop()
-    {
+    public void stop() {
         isPlaying = false;
     }
 
@@ -51,6 +50,9 @@ public class VideoPlayer {
     }
 
     private void goToNextFrame() {
+        if (!isPlaying)
+            return;
+
         int targetFrame = frameDataModel.getCurrentFrame() + 1;
         int endFrame = frameDataModel.getNumberOfFrames() - 1;
         if (targetFrame >= endFrame) {
@@ -60,9 +62,7 @@ public class VideoPlayer {
         frameDataModel.setCurrentFrame(targetFrame);
         if (isPlaying)
             postGoToNextFrame();
-        else {
-            if(listener != null)
-                listener.onFinished();
-        }
+        else if (listener != null)
+            listener.onFinished();
     }
 }
