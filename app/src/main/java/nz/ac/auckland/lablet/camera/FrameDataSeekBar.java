@@ -26,29 +26,26 @@ import java.text.DecimalFormat;
  */
 public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.IListener {
 
-    public interface IListener {
-        void onActionBtnClicked();
-    }
-
-    public enum Action {
-        PLAY, STOP, PAUSE
+    public interface Action {
+        int getIconResource();
+        Action perform();
+        /**
+         * Called when the action has been replaced without being performed.
+         *
+         * Can be used to do clean up.
+         */
+        void onActionUncalledRemoved();
     }
 
     private FrameDataModel frameDataModel = null;
     private ITimeData timeData = null;
-    private IListener listener;
 
     private TextView progressLabel = null;
     private TextView timeLabel = null;
     private SeekBar seekBar = null;
 
     private long lastTouchEvent = 0;
-    private Action currentAction = Action.PLAY;
-
-    public void setListener(FrameDataSeekBar.IListener listener)
-    {
-        this.listener = listener;
-    }
+    private Action currentAction = null;
 
     @Override
     public void onFrameChanged(int newFrame) {
@@ -73,20 +70,16 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.ILi
     }
 
     public void setAction(Action action) {
-        final ImageButton actionButton = (ImageButton)findViewById(R.id.frameActionBtn);
+        if (currentAction != null)
+            currentAction.onActionUncalledRemoved();
         currentAction = action;
 
-        if(action == Action.STOP)
-            actionButton.setImageResource(R.drawable.ic_media_stop_big);
-        else if(action == Action.PLAY)
-            actionButton.setImageResource(R.drawable.ic_media_play_big);
-        else if(action == Action.PAUSE)
-            actionButton.setImageResource(R.drawable.ic_media_pause_big);
+        updateActionImage(currentAction);
     }
 
-    public Action getCurrentAction()
-    {
-        return currentAction;
+    private void updateActionImage(Action action) {
+        final ImageButton actionButton = (ImageButton)findViewById(R.id.frameActionBtn);
+        actionButton.setImageResource(action.getIconResource());
     }
 
     class FastSeeker {
@@ -175,8 +168,10 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.ILi
         actionButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (listener != null)
-                    listener.onActionBtnClicked();
+                if (currentAction == null)
+                    return;
+                currentAction = currentAction.perform();
+                updateActionImage(currentAction);
             }
         });
 

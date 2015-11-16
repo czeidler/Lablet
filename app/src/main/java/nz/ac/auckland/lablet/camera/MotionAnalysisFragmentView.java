@@ -127,6 +127,7 @@ class MotionAnalysisSideBar extends WeakListenable<MotionAnalysisSideBar.IListen
 }
 
 class MotionAnalysisFragmentView extends FrameLayout {
+    final MotionAnalysis sensorAnalysis;
     private MarkerDataTableAdapter markerDataTableAdapter;
     final private FrameContainerView runContainerView;
     final private GraphView2D graphView;
@@ -275,42 +276,81 @@ class MotionAnalysisFragmentView extends FrameLayout {
         }
     };
 
+    private class PlayVideoSeekBarAction implements FrameDataSeekBar.Action {
+        @Override
+        public int getIconResource() {
+            return R.drawable.ic_media_play_big;
+        }
+
+        @Override
+        public FrameDataSeekBar.Action perform() {
+            videoPlayer.play();
+            return new PauseVideoSeekBarAction();
+        }
+
+        @Override
+        public void onActionUncalledRemoved() {
+
+        }
+    }
+
+    private class PauseVideoSeekBarAction implements FrameDataSeekBar.Action {
+        @Override
+        public int getIconResource() {
+            return R.drawable.ic_media_pause_big;
+        }
+
+        @Override
+        public FrameDataSeekBar.Action perform() {
+            onActionUncalledRemoved();
+            return new PlayVideoSeekBarAction();
+        }
+
+        @Override
+        public void onActionUncalledRemoved() {
+            videoPlayer.stop();
+        }
+    }
+
+    private class StopTrackingSeekBarAction implements FrameDataSeekBar.Action {
+        @Override
+        public int getIconResource() {
+            return R.drawable.ic_media_stop_big;
+        }
+
+        @Override
+        public FrameDataSeekBar.Action perform() {
+            onActionUncalledRemoved();
+            return new PlayVideoSeekBarAction();
+        }
+
+        @Override
+        public void onActionUncalledRemoved() {
+            if (sensorAnalysis.getObjectTrackerAnalysis().isTracking())
+                sensorAnalysis.getObjectTrackerAnalysis().stopTracking();
+        }
+    }
+
     public MotionAnalysisFragmentView(Context context, final MotionAnalysis sensorAnalysis) {
         super(context);
 
+        this.sensorAnalysis = sensorAnalysis;
         final LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View mainView = inflater.inflate(R.layout.motion_analysis, this, true);
         assert mainView != null;
 
         frameDataSeekBar = (FrameDataSeekBar)mainView.findViewById(R.id.frameDataSeekBar);
+        frameDataSeekBar.setAction(new PlayVideoSeekBarAction());
 
         final VideoPlayer.IListener videoListener = new VideoPlayer.IListener() {
             @Override
             public void onFinished() {
-                frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
+                frameDataSeekBar.setAction(new PlayVideoSeekBarAction());
             }
         };
 
         videoPlayer = new VideoPlayer(sensorAnalysis.getFrameDataModel());
         videoPlayer.setListener(videoListener);
-
-        final FrameDataSeekBar.IListener frameDataListener = new FrameDataSeekBar.IListener() {
-            @Override
-            public void onActionBtnClicked() {
-                if(sensorAnalysis.getObjectTrackerAnalysis().isTracking()) {
-                    sensorAnalysis.getObjectTrackerAnalysis().stopTracking();
-                    frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
-                } else if(frameDataSeekBar.getCurrentAction() == FrameDataSeekBar.Action.PLAY) {
-                    frameDataSeekBar.setAction(FrameDataSeekBar.Action.PAUSE);
-                    videoPlayer.play();
-                } else {
-                    frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
-                    videoPlayer.stop();
-                }
-            }
-        };
-
-        frameDataSeekBar.setListener(frameDataListener);
 
         sideBarView = (ViewGroup)inflater.inflate(R.layout.motion_analysis_data_side_bar, null, false);
         sideBar = new MotionAnalysisSideBar(mainView, sideBarView);
@@ -405,12 +445,12 @@ class MotionAnalysisFragmentView extends FrameLayout {
         trackingListener = new ObjectTrackerAnalysis.IListener() {
             @Override
             public void onTrackingStart() {
-                frameDataSeekBar.setAction(FrameDataSeekBar.Action.STOP);
+                frameDataSeekBar.setAction(new StopTrackingSeekBarAction());
             }
 
             @Override
             public void onTrackingFinished(SparseArray<Rect> results) {
-                frameDataSeekBar.setAction(FrameDataSeekBar.Action.PLAY);
+                frameDataSeekBar.setAction(new PlayVideoSeekBarAction());
             }
 
             @Override
