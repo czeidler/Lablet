@@ -326,8 +326,7 @@ class MotionAnalysisFragmentView extends FrameLayout {
 
         @Override
         public void onActionUncalledRemoved() {
-            if (sensorAnalysis.getObjectTrackerAnalysis().isTracking())
-                sensorAnalysis.getObjectTrackerAnalysis().stopTracking();
+            sensorAnalysis.getObjectTrackerAnalysis().stopTracking();
         }
     }
 

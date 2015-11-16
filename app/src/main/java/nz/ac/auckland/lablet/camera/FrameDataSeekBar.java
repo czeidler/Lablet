@@ -78,6 +78,8 @@ public class FrameDataSeekBar extends LinearLayout implements FrameDataModel.ILi
     }
 
     private void updateActionImage(Action action) {
+        if (action == null)
+            return;
         final ImageButton actionButton = (ImageButton)findViewById(R.id.frameActionBtn);
         actionButton.setImageResource(action.getIconResource());
     }

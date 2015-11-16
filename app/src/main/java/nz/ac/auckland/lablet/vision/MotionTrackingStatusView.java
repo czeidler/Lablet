@@ -8,7 +8,6 @@
  */
 package nz.ac.auckland.lablet.vision;
 
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.SparseArray;
@@ -84,9 +83,8 @@ public class MotionTrackingStatusView extends LinearLayout {
     }
 
     public void setObjectTrackerAnalysis(ObjectTrackerAnalysis objectTrackerAnalysis) {
-        if (this.objectTrackerAnalysis != null) {
+        if (this.objectTrackerAnalysis != null)
             this.objectTrackerAnalysis.removeListener(trackerListener);
-        }
         this.objectTrackerAnalysis = objectTrackerAnalysis;
         this.objectTrackerAnalysis.addListener(trackerListener);
     }
