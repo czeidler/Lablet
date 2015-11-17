@@ -139,17 +139,16 @@ public class RectMarkerListPainter extends AbstractMarkerPainter<RectData> {
         }
     }
 
-    private float getPriority(int selectedFrameId, int markerFrameId, int maxDisplayedMarkers) {
+    static public float getPriority(int selectedFrameId, int markerFrameId, int maxDisplayedMarkers) {
         float priority;
         int distance = markerFrameId - selectedFrameId;
 
-        if (selectedFrameId == markerFrameId) {
+        if (selectedFrameId == markerFrameId)
             priority = 1;
-        } else if (distance < 0 && distance >= -maxDisplayedMarkers) {
+        else if (distance < 0 && distance >= -maxDisplayedMarkers)
             priority = (float)(maxDisplayedMarkers - Math.abs(distance)) / maxDisplayedMarkers;
-        } else {
+        else
             priority = 0;
-        }
 
         return priority;
     }
