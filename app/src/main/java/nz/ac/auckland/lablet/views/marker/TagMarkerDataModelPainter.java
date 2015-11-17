@@ -25,7 +25,7 @@ public class TagMarkerDataModelPainter extends MarkerDataModelPainter<MarkerData
 
         // check if we have the run in the data list
         MarkerData data = null;
-        int index = ((MarkerDataModel)markerData).findMarkerDataByRun(frame);
+        int index = ((MarkerDataModel)markerData).findMarkerDataById(frame);
         if (index >= 0) {
             data = markerData.getAt(index);
             markerData.selectMarkerData(index);

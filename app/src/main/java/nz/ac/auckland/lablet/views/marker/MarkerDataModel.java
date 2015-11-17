@@ -92,12 +92,16 @@ public class MarkerDataModel extends AbstractPointDataList<MarkerData> {
     }
 
     public MarkerData getMarkerDataById(int id) {
-        for (int i = 0; i < size(); i++) {
+        return getAt(findMarkerDataById(id));
+    }
+
+    public int findMarkerDataById(int run) {
+        for (int i = 0; i < getMarkerCount(); i++) {
             MarkerData data = getMarkerDataAt(i);
-            if (data.getId() == id)
-                return data;
+            if (data.getId() == run)
+                return i;
         }
-        return null;
+        return -1;
     }
 
     public Bundle toBundle() {
@@ -131,15 +135,6 @@ public class MarkerDataModel extends AbstractPointDataList<MarkerData> {
                 addMarkerData(data, false);
             }
         }
-    }
-
-    public int findMarkerDataByRun(int run) {
-        for (int i = 0; i < getMarkerCount(); i++) {
-            MarkerData data = getMarkerDataAt(i);
-            if (data.getId() == run)
-                return i;
-        }
-        return -1;
     }
 
     public PointF getRealMarkerPositionAt(int index) {
