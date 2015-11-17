@@ -7,10 +7,7 @@
  */
 package nz.ac.auckland.lablet.vision;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PointF;
-import android.graphics.RectF;
+import android.graphics.*;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.views.marker.*;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
@@ -117,6 +114,26 @@ class RoiModel extends AbstractPointDataModel<PointF> {
     }
 }
 
+class RoiMarker extends SimpleMarker<PointF> {
+    final private Paint paint = new Paint();
+
+    public RoiMarker() {
+        paint.setAntiAlias(true);
+        paint.setStyle(Paint.Style.FILL);
+    }
+
+    @Override
+    public void onDraw(Canvas canvas, float priority) {
+        if (isSelectedForDrag()) {
+            super.onDraw(canvas, priority);
+            return;
+        }
+        PointF point = parent.getMarkerScreenPosition(markerIndex);
+        RoiPainter.setColor(paint, priority);
+        canvas.drawCircle(point.x, point.y, 5, paint);
+    }
+}
+
 public class RoiPainter extends AbstractMarkerPainter<PointF> {
     final public int MAX_DISPLAYED_MARKERS = 10;
 
@@ -150,7 +167,14 @@ public class RoiPainter extends AbstractMarkerPainter<PointF> {
 
     @Override
     protected IMarker<AbstractMarkerPainter<PointF>> createMarkerForRow(int row) {
-        return new SimpleMarker<>();
+        return new RoiMarker();
+    }
+
+    static public void setColor(Paint paint, float priority) {
+        if (priority >= 0. && priority < 1.)
+            paint.setARGB((int) (priority * 150.), 200, 200, 200);
+        else
+            paint.setARGB(255, 0, 255, 0);
     }
 
     @Override
@@ -158,26 +182,11 @@ public class RoiPainter extends AbstractMarkerPainter<PointF> {
         float priority = RectMarkerListPainter.getPriority(frameDataModel.getCurrentFrame(), getRoiData().getFrameId(),
                 MAX_DISPLAYED_MARKERS);
 
-        //Set color and alpha
-        int a, r, g, b;
-
-        if (priority >= 0. && priority < 1.) {
-            a = (int) (priority * 150.);
-            r = 200;
-            b = 200;
-            g = 200;
-        } else {
-            a = 255;
-            r = 0;
-            b = 0;
-            g = 255;
-        }
-
         Paint paint = new Paint();
         paint.setStrokeCap(Paint.Cap.BUTT);
         paint.setStrokeWidth(LINE_WIDTH);
         paint.setAntiAlias(true);
-        paint.setARGB(a, r, g, b);
+        setColor(paint, priority);
         paint.setStyle(Paint.Style.STROKE);
 
         RoiData data = getRoiData();
@@ -185,10 +194,8 @@ public class RoiPainter extends AbstractMarkerPainter<PointF> {
                 data.getBottom()));
         canvas.drawRect(rect, paint);
 
-        for (IMarker marker : markerList) {
-            if (marker.isSelectedForDrag())
-                marker.onDraw(canvas, 1);
-        }
+        for (IMarker marker : markerList)
+            marker.onDraw(canvas, priority);
     }
 
     @Override
