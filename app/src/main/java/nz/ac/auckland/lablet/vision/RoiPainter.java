@@ -68,17 +68,34 @@ class RoiModel extends AbstractPointDataModel<PointF> {
 
     @Override
     public void setPositionNoNotify(PointF point, int index) {
+        final float MIN = 1.5f;
         switch (index) {
             case LEFT_TOP:
+                if (point.x > data.getRight() - MIN)
+                    point.x = data.getRight() - MIN;
+                if (point.y < data.getBottom() + MIN)
+                    point.y = data.getBottom() + MIN;
                 data.setTopLeft(point);
                 break;
             case RIGHT_TOP:
+                if (point.x < data.getLeft() + MIN)
+                    point.x = data.getLeft() + MIN;
+                if (point.y < data.getBottom() + MIN)
+                    point.y = data.getBottom() + MIN;
                 data.setTopRight(point);
                 break;
             case LEFT_BOTTOM:
+                if (point.x > data.getRight() - MIN)
+                    point.x = data.getRight() - MIN;
+                if (point.y > data.getTop() - MIN)
+                    point.y = data.getTop() - MIN;
                 data.setBtmLeft(point);
                 break;
             case RIGHT_BOTTOM:
+                if (point.x < data.getLeft() + MIN)
+                    point.x = data.getLeft() + MIN;
+                if (point.y > data.getTop() - MIN)
+                    point.y = data.getTop() - MIN;
                 data.setBtmRight(point);
                 break;
         }
