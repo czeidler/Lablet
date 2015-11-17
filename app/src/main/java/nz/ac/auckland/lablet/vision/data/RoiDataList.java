@@ -121,8 +121,10 @@ public class RoiDataList extends AbstractPointDataList<RoiData> {
                 return new Integer(roiData.getFrameId()).compareTo(t1.getFrameId());
             }
         });
+        int index = indexOf(data);
+        notifyDataAdded(index);
         notifyAllDataChanged();
-        return indexOf(data);
+        return index;
     }
 
     @Override
