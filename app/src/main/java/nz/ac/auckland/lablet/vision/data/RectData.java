@@ -1,3 +1,10 @@
+/*
+ * Copyright 2015.
+ * Distributed under the terms of the GPLv3 License.
+ *
+ * Authors:
+ *      James Diprose <jamie.diprose@gmail.com>
+ */
 package nz.ac.auckland.lablet.vision.data;
 
 import android.graphics.PointF;
