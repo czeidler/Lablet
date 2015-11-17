@@ -16,6 +16,9 @@ import nz.ac.auckland.lablet.views.marker.*;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 import nz.ac.auckland.lablet.vision.data.RoiData;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 class RoiModel extends AbstractPointDataModel<PointF> {
     final private RoiData data;
@@ -98,6 +101,8 @@ class RoiModel extends AbstractPointDataModel<PointF> {
 }
 
 public class RoiPainter extends AbstractMarkerPainter<PointF> {
+    final public int MAX_DISPLAYED_MARKERS = 10;
+
     // device independent sizes:
     private final float LINE_WIDTH_DP = 2f;
 
@@ -131,11 +136,8 @@ public class RoiPainter extends AbstractMarkerPainter<PointF> {
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (getRoiData().getFrameId() != frameDataModel.getCurrentFrame())
-            return;
-
-        int priority = 1;
-
+        float priority = RectMarkerListPainter.getPriority(frameDataModel.getCurrentFrame(), getRoiData().getFrameId(),
+                MAX_DISPLAYED_MARKERS);
 
         //Set color and alpha
         int a, r, g, b;
@@ -181,5 +183,12 @@ public class RoiPainter extends AbstractMarkerPainter<PointF> {
         PointF newReal = new PointF();
         containerView.fromScreen(newPosition, newReal);
         markerData.setPosition(newReal, row);
+    }
+
+    @Override
+    public List<IMarker> getSelectableMarkerList() {
+        if (getRoiData().getFrameId() != frameDataModel.getCurrentFrame())
+            return new ArrayList<>();
+        return super.getSelectableMarkerList();
     }
 }
