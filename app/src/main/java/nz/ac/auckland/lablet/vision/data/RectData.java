@@ -2,13 +2,6 @@ package nz.ac.auckland.lablet.vision.data;
 
 import android.graphics.PointF;
 
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.RotatedRect;
-import org.opencv.core.Size;
-
-import nz.ac.auckland.lablet.camera.VideoData;
-
 
 public class RectData {
     final private int frameId;
@@ -16,15 +9,6 @@ public class RectData {
     private float width = 0;
     private float height = 0;
     private float angle = 0;
-
-    public Rect getRect(VideoData videoData)
-    {
-        PointF sizeScreen = videoData.toVideoPoint(new PointF(width, height));
-        PointF centreScreen = videoData.toVideoPoint(centre);
-
-        RotatedRect rect = new RotatedRect(new Point(centreScreen.x, centreScreen.y), new Size(sizeScreen.x, sizeScreen.y), angle);
-        return rect.boundingRect();
-    }
 
     public RectData(int frameId) {
         this.frameId = frameId;
