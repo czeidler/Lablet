@@ -9,11 +9,9 @@ import org.opencv.core.Size;
 
 import nz.ac.auckland.lablet.camera.VideoData;
 
-/**
- * Created by jdip004 on 25/08/2015.
- */
 
-public class RectData extends Data {
+public class RectData {
+    final private int frameId;
     private PointF centre = new PointF();
     private float width = 0;
     private float height = 0;
@@ -29,7 +27,11 @@ public class RectData extends Data {
     }
 
     public RectData(int frameId) {
-        super(frameId);
+        this.frameId = frameId;
+    }
+
+    public int getFrameId() {
+        return frameId;
     }
 
     public PointF getCentre() {

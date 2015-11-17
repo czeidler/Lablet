@@ -7,29 +7,29 @@
  */
 package nz.ac.auckland.lablet.vision;
 
+import nz.ac.auckland.lablet.experiment.FrameDataModel;
+import nz.ac.auckland.lablet.views.marker.AbstractPointDataModel;
 import nz.ac.auckland.lablet.views.marker.MarkerGroupTreePainter;
 import nz.ac.auckland.lablet.views.plotview.IPlotPainter;
-import nz.ac.auckland.lablet.vision.data.Data;
-import nz.ac.auckland.lablet.vision.data.DataList;
 import nz.ac.auckland.lablet.vision.data.RoiData;
 import nz.ac.auckland.lablet.vision.data.RoiDataList;
 
 
 public class RoiListPainter extends MarkerGroupTreePainter {
     final private RoiDataList dataList;
+    final private FrameDataModel frameDataModel;
 
-    final private RoiDataList.IListener<RoiDataList> listener = new DataList.IListener<RoiDataList>() {
+    final private RoiDataList.IListener<RoiDataList, RoiData> listener = new AbstractPointDataModel.IListener<RoiDataList, RoiData>() {
         @Override
         public void onDataAdded(RoiDataList dataList, int index) {
-            addRoiPainter(dataList.getDataAt(index));
+            addRoiPainter(dataList.getAt(index));
         }
 
         @Override
-        public void onDataRemoved(RoiDataList dataList, int index, Data data) {
-            RoiData roiData = (RoiData)data;
+        public void onDataRemoved(RoiDataList model, int index, RoiData data) {
             for (IPlotPainter child : childList) {
                 RoiPainter roiPainter = (RoiPainter)child;
-                if (roiPainter.getRoiData().getFrameId() == roiData.getFrameId()) {
+                if (roiPainter.getRoiData().getFrameId() == data.getFrameId()) {
                     removeChild(roiPainter);
                     break;
                 }
@@ -52,17 +52,19 @@ public class RoiListPainter extends MarkerGroupTreePainter {
         }
     };
 
-    public RoiListPainter(RoiDataList dataList) {
+    public RoiListPainter(RoiDataList dataList, FrameDataModel frameDataModel) {
         this.dataList = dataList;
         this.dataList.addListener(listener);
+        this.frameDataModel = frameDataModel;
 
         for (int i = 0; i < dataList.size(); i++) {
-            RoiData data = dataList.getDataAt(i);
+            RoiData data = dataList.getAt(i);
             addRoiPainter(data);
         }
     }
 
     private void addRoiPainter(RoiData data) {
-        addChild(new RoiPainter(new RoiModel(data)));
+        addChild(new RoiPainter(new RoiModel(data), frameDataModel));
     }
 }
+

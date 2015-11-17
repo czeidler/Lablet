@@ -11,6 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.views.marker.*;
 import nz.ac.auckland.lablet.views.plotview.PlotPainterContainerView;
 import nz.ac.auckland.lablet.vision.data.RoiData;
@@ -103,8 +104,12 @@ public class RoiPainter extends AbstractMarkerPainter<PointF> {
     // pixel sizes, set in the constructor
     private float LINE_WIDTH;
 
-    public RoiPainter(RoiModel model) {
+    final private FrameDataModel frameDataModel;
+
+    public RoiPainter(RoiModel model, FrameDataModel frameDataModel) {
         super(model);
+
+        this.frameDataModel = frameDataModel;
     }
 
     @Override
@@ -126,6 +131,8 @@ public class RoiPainter extends AbstractMarkerPainter<PointF> {
 
     @Override
     public void onDraw(Canvas canvas) {
+        if (getRoiData().getFrameId() != frameDataModel.getCurrentFrame())
+            return;
 
         int priority = 1;
 
@@ -157,7 +164,22 @@ public class RoiPainter extends AbstractMarkerPainter<PointF> {
                 data.getBottom()));
         canvas.drawRect(rect, paint);
 
-        for (IMarker marker : markerList)
-            marker.onDraw(canvas, 1);
+        for (IMarker marker : markerList) {
+            if (marker.isSelectedForDrag())
+                marker.onDraw(canvas, 1);
+        }
+    }
+
+    @Override
+    public void markerMoveRequest(DraggableMarker<PointF> marker, PointF newPosition, boolean isDragging) {
+        int row = markerList.lastIndexOf(marker);
+        if (row < 0)
+            return;
+
+        sanitizeScreenPoint(newPosition);
+
+        PointF newReal = new PointF();
+        containerView.fromScreen(newPosition, newReal);
+        markerData.setPosition(newReal, row);
     }
 }

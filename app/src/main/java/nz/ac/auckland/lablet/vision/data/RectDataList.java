@@ -3,26 +3,12 @@ package nz.ac.auckland.lablet.vision.data;
 import android.graphics.PointF;
 import android.os.Bundle;
 
-import nz.ac.auckland.lablet.experiment.FrameDataModel;
+import nz.ac.auckland.lablet.views.marker.AbstractPointDataList;
 
-/**
- * Created by Jamie on 26/08/2015.
- */
-public class RectDataList extends DataList<RectData> {
 
-    private FrameDataModel frameDataList;
+public class RectDataList extends AbstractPointDataList<RectData> {
+    private boolean visibility;
 
-    public void addFrameDataList(FrameDataModel frameDataList)
-    {
-        this.frameDataList = frameDataList;
-    }
-
-    public FrameDataModel getFrameDataList()
-    {
-        return frameDataList;
-    }
-
-    @Override
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
 
@@ -34,7 +20,7 @@ public class RectDataList extends DataList<RectData> {
         boolean visibility = this.isVisible();
 
         for (int i = 0; i < size(); i++) {
-            RectData data = getDataAt(i);
+            RectData data = getAt(i);
             frameIds[i] = data.getFrameId();
             centreXs[i] = data.getCentre().x;
             centreYs[i] = data.getCentre().y;
@@ -51,7 +37,6 @@ public class RectDataList extends DataList<RectData> {
         return bundle;
     }
 
-    @Override
     public void fromBundle(Bundle bundle) {
         clear();
         int[] frameIds = bundle.getIntArray("runIds");
@@ -68,17 +53,26 @@ public class RectDataList extends DataList<RectData> {
             data.setCentre(new PointF(centreXs[i], centreYs[i]));
             data.setWidth(widths[i]);
             data.setHeight(heights[i]);
-            addData(data, false);
+            addData(data);
         }
     }
 
     @Override
-    public void sortXAscending() {
-
+    public PointF getPosition(int index) {
+        return getAt(index).getCentre();
     }
 
     @Override
-    public void sortYAscending() {
+    public void setPositionNoNotify(PointF point, int index) {
+        getAt(index).setCentre(point);
+    }
 
+    public void setVisibility(boolean visibility) {
+        this.visibility = visibility;
+        notifyAllDataChanged();
+    }
+
+    public boolean isVisible() {
+        return visibility;
     }
 }

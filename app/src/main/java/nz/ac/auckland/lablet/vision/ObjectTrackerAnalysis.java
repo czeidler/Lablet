@@ -68,7 +68,7 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
             RoiData roiData = roiDataList.getDataByFrameId(data.getId());
             if (roiData == null)
                 return;
-            roiDataList.removeData(roiData);
+            roiDataList.removeData(roiDataList.indexOf(roiData));
         }
 
         @Override
@@ -87,32 +87,32 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
         }
     };
 
-    RoiDataList.IListener roiDataListener = new DataList.IListener() {
+    RoiDataList.IListener<RoiDataList, RoiData> roiDataListener = new RoiDataList.IListener<RoiDataList, RoiData>() {
         @Override
-        public void onDataAdded(DataList dataList, int index) {
+        public void onDataAdded(RoiDataList model, int index) {
 
         }
 
         @Override
-        public void onDataRemoved(DataList dataList, int index, Data data) {
+        public void onDataRemoved(RoiDataList model, int index, RoiData data) {
 
         }
 
         @Override
-        public void onDataChanged(DataList dataList, int index, int number) {
+        public void onDataChanged(RoiDataList model, int index, int number) {
 
         }
 
         @Override
-        public void onAllDataChanged(DataList dataList) {
+        public void onAllDataChanged(RoiDataList model) {
 
         }
 
         @Override
-        public void onDataSelected(DataList dataList, int index) {
+        public void onDataSelected(RoiDataList model, int index) {
             if (index < 0)
                 return;
-            motionAnalysis.getFrameDataModel().setCurrentFrame(dataList.getDataAt(index).getFrameId());
+            motionAnalysis.getFrameDataModel().setCurrentFrame(model.getAt(index).getFrameId());
         }
     };
 
@@ -121,7 +121,6 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
         tracker = new CamShiftTracker();
 
         roiDataList = new RoiDataList(motionAnalysis.getTagMarkers());
-        rectDataList.addFrameDataList(frameDataModel);
         rectDataList.setVisibility(false);
 
         roiDataList.addListener(roiDataListener);
@@ -156,7 +155,7 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
 
     public RoiData getRoiForFrame(int frameId) {
         for (int i = 0; i < roiDataList.size(); i++) {
-            RoiData roiData = roiDataList.getDataAt(i);
+            RoiData roiData = roiDataList.getAt(i);
             if (roiData.getFrameId() == frameId)
                 return roiData;
         }
@@ -180,7 +179,8 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
         data.setTopRight(new PointF(centre.x + width, centre.y + height));
         data.setBtmRight(new PointF(centre.x + width, centre.y - height));
         data.setBtmLeft(new PointF(centre.x - width, centre.y - height));
-        roiDataList.addData(data);
+        int index = roiDataList.addData(data);
+        roiDataList.selectMarkerData(index);
     }
 
     public void removeRegionOfInterest(RoiData roiData) {
@@ -317,12 +317,12 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
             }
 
             if (roiDataList.size() > 0) {
-                currentRoi = roiDataList.getDataAt(nextRoiIndex);
+                currentRoi = roiDataList.getAt(nextRoiIndex);
 
                 for (int i = currentRoi.getFrameId(); i <= endFrame && isTracking; i++) {
 
                     if (roiDataList.size() > nextRoiIndex) {
-                        RoiData nextRoi = roiDataList.getDataAt(nextRoiIndex);
+                        RoiData nextRoi = roiDataList.getAt(nextRoiIndex);
 
                         if (nextRoi.getFrameId() == i) {
                             currentRoi = nextRoi;
@@ -336,8 +336,8 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
                         Bitmap roiBmp = getFrame(frameTimeMicroseconds);
 
                         if (roiBmp != null) {
-                            PointF topLeft = videodata.toVideoPoint(currentRoi.getTopLeft().getPosition());
-                            PointF btmRight = videodata.toVideoPoint(currentRoi.getBtmRight().getPosition());
+                            PointF topLeft = videodata.toVideoPoint(currentRoi.getTopLeft());
+                            PointF btmRight = videodata.toVideoPoint(currentRoi.getBtmRight());
 
                             int x = (int) topLeft.x;
                             int y = (int) topLeft.y;
@@ -414,7 +414,7 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
                 int roiIndex = roiDataList.getIndexByFrameId(i);
 
                 if (roiIndex != -1) {
-                    data = roiDataList.getDataAt(roiIndex);
+                    data = roiDataList.getAt(roiIndex);
                     break;
                 }
             }

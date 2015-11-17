@@ -215,7 +215,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                     boolean found = false;
 
                     for (int i = 0; i < rois.size(); i++) {
-                        int roiFrameId = rois.getDataAt(i).getFrameId();
+                        int roiFrameId = rois.getAt(i).getFrameId();
 
                         if (roiFrameId > currentFrame) {
                             getSensorAnalysis().getFrameDataModel().setCurrentFrame(roiFrameId);
@@ -225,7 +225,7 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                     }
 
                     if (!found)
-                        getSensorAnalysis().getFrameDataModel().setCurrentFrame(rois.getDataAt(0).getFrameId());
+                        getSensorAnalysis().getFrameDataModel().setCurrentFrame(rois.getAt(0).getFrameId());
 
                 } else if (item == R.id.debug_tracking) {
                     objectTrackerAnalysis.setDebuggingEnabled(!menuItem.isChecked());

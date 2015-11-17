@@ -4,8 +4,7 @@ import android.graphics.PointF;
 import nz.ac.auckland.lablet.views.marker.MarkerData;
 
 
-//TODO: remove Data
-public class RoiData extends Data {
+public class RoiData {
     private float left;
     private float top;
     private float right;
@@ -13,7 +12,6 @@ public class RoiData extends Data {
     private MarkerData markerData;
 
     public RoiData(MarkerData markerData) {
-        super(-1);
         this.markerData = markerData;
     }
 
@@ -25,13 +23,15 @@ public class RoiData extends Data {
         return top - bottom;
     }
 
-    private PointData getPointData(float x, float y) {
-        PointData pointData = new PointData(-1);
-        pointData.setPosition(new PointF(x, y));
-        return pointData;
+    private PointF getPointData(float x, float y) {
+        return new PointF(x, y);
     }
 
-    public PointData getTopLeft() {
+    public MarkerData getMarkerData() {
+        return markerData;
+    }
+
+    public PointF getTopLeft() {
         return getPointData(left, top);
     }
 
@@ -40,7 +40,7 @@ public class RoiData extends Data {
         this.top = topLeft.y;
     }
 
-    public PointData getTopRight() {
+    public PointF getTopRight() {
         return getPointData(right, top);
     }
 
@@ -49,7 +49,7 @@ public class RoiData extends Data {
         this.top = topRight.y;
     }
 
-    public PointData getBtmLeft() {
+    public PointF getBtmLeft() {
         return getPointData(left, bottom);
     }
 
@@ -58,7 +58,7 @@ public class RoiData extends Data {
         this.bottom = btmLeft.y;
     }
 
-    public PointData getBtmRight() {
+    public PointF getBtmRight() {
         return getPointData(right, bottom);
     }
 

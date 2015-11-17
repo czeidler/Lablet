@@ -40,6 +40,12 @@ public abstract class AbstractPointDataList<T> extends AbstractPointDataModel<T>
         return getPosition(indexOf(data));
     }
 
+    public boolean removeData(T data) {
+        if (removeData(indexOf(data)) != null)
+            return true;
+        return false;
+    }
+
     @Override
     protected int addDataNoNotify(T data) {
         int i = list.size();

@@ -21,19 +21,9 @@ public class MarkerData {
     final private int id;
     private PointF positionReal;
 
-    private boolean visible = true;
-
     public MarkerData(int id) {
         this.id = id;
         positionReal = new PointF();
-    }
-
-    public boolean isVisible() {
-        return visible;
-    }
-
-    public void setVisible(boolean visible) {
-        this.visible = visible;
     }
 
     public int getId() {

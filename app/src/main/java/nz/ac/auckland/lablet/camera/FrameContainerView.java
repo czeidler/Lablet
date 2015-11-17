@@ -34,8 +34,7 @@ import nz.ac.auckland.lablet.experiment.CalibrationXY;
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.views.marker.MarkerData;
 import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
-import nz.ac.auckland.lablet.vision.markers.RectMarkerListPainter;
-import nz.ac.auckland.lablet.vision.markers.RoiMarkerListPainter;
+import nz.ac.auckland.lablet.vision.RectMarkerListPainter;
 
 
 /**
@@ -358,14 +357,14 @@ public class FrameContainerView extends RelativeLayout {
 
         //Region of interest markers
         RoiDataList roiDataList = motionAnalysis.getObjectTrackerAnalysis().getRoiDataList();
-        RoiListPainter roiListPainter = new RoiListPainter(roiDataList);
+        RoiListPainter roiListPainter = new RoiListPainter(roiDataList, frameDataModel);
         roiListPainter.setMarkerGroup(painter.getMarkerPainterGroup());
         markerView.addPlotPainter(roiListPainter);
 
         //Rectangle markers
         RectDataList rectDataList = motionAnalysis.getObjectTrackerAnalysis().getRectDataList();
-        RectMarkerListPainter rectMarkerList = new RectMarkerListPainter(rectDataList);
-        markerView.addPlotPainter(rectMarkerList);
+        RectMarkerListPainter debugTrackingPainter = new RectMarkerListPainter(rectDataList, frameDataModel);
+        markerView.addPlotPainter(debugTrackingPainter);
 
         // origin markers
         if (motionAnalysis.getShowCoordinateSystem())
