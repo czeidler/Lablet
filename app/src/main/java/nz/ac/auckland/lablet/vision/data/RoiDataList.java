@@ -7,6 +7,9 @@ import nz.ac.auckland.lablet.views.marker.AbstractPointDataList;
 import nz.ac.auckland.lablet.views.marker.MarkerData;
 import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 
+import java.util.Collections;
+import java.util.Comparator;
+
 
 public class RoiDataList extends AbstractPointDataList<RoiData> {
     private MarkerDataModel markerDataModel;
@@ -107,6 +110,19 @@ public class RoiDataList extends AbstractPointDataList<RoiData> {
             data.setBtmLeft(new PointF(left, top - height));
             addData(data);
         }
+    }
+
+    @Override
+    public int addData(RoiData data) {
+        super.addDataNoNotify(data);
+        Collections.sort(list, new Comparator<RoiData>() {
+            @Override
+            public int compare(RoiData roiData, RoiData t1) {
+                return new Integer(roiData.getFrameId()).compareTo(t1.getFrameId());
+            }
+        });
+        notifyAllDataChanged();
+        return indexOf(data);
     }
 
     @Override
