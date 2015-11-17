@@ -9,6 +9,7 @@ package nz.ac.auckland.lablet.vision;
 
 import nz.ac.auckland.lablet.experiment.FrameDataModel;
 import nz.ac.auckland.lablet.views.marker.AbstractPointDataModel;
+import nz.ac.auckland.lablet.views.marker.MarkerDataModel;
 import nz.ac.auckland.lablet.views.marker.MarkerGroupTreePainter;
 import nz.ac.auckland.lablet.views.plotview.IPlotPainter;
 import nz.ac.auckland.lablet.vision.data.RoiData;
@@ -17,9 +18,11 @@ import nz.ac.auckland.lablet.vision.data.RoiDataList;
 
 public class RoiListPainter extends MarkerGroupTreePainter {
     final private RoiDataList dataList;
+    final private MarkerDataModel markerDataModel;
     final private FrameDataModel frameDataModel;
 
-    final private RoiDataList.IListener<RoiDataList, RoiData> listener = new AbstractPointDataModel.IListener<RoiDataList, RoiData>() {
+    final private RoiDataList.IListener<RoiDataList, RoiData> listener
+            = new AbstractPointDataModel.IListener<RoiDataList, RoiData>() {
         @Override
         public void onDataAdded(RoiDataList dataList, int index) {
             addRoiPainter(dataList.getAt(index));
@@ -52,9 +55,10 @@ public class RoiListPainter extends MarkerGroupTreePainter {
         }
     };
 
-    public RoiListPainter(RoiDataList dataList, FrameDataModel frameDataModel) {
+    public RoiListPainter(RoiDataList dataList, MarkerDataModel markerDataModel, FrameDataModel frameDataModel) {
         this.dataList = dataList;
         this.dataList.addListener(listener);
+        this.markerDataModel = markerDataModel;
         this.frameDataModel = frameDataModel;
 
         for (int i = 0; i < dataList.size(); i++) {
@@ -64,7 +68,7 @@ public class RoiListPainter extends MarkerGroupTreePainter {
     }
 
     private void addRoiPainter(RoiData data) {
-        addChild(new RoiPainter(new RoiModel(data), frameDataModel));
+        addChild(new RoiPainter(new RoiModel(data), markerDataModel, frameDataModel));
     }
 }
 

@@ -357,7 +357,7 @@ public class FrameContainerView extends RelativeLayout {
 
         //Region of interest markers
         RoiDataList roiDataList = motionAnalysis.getObjectTrackerAnalysis().getRoiDataList();
-        RoiListPainter roiListPainter = new RoiListPainter(roiDataList, frameDataModel);
+        RoiListPainter roiListPainter = new RoiListPainter(roiDataList, tagMarkers, frameDataModel);
         roiListPainter.setMarkerGroup(painter.getMarkerPainterGroup());
         markerView.addPlotPainter(roiListPainter);
 

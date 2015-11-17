@@ -15,12 +15,26 @@ public class RoiData {
         this.markerData = markerData;
     }
 
+    public void centerOnMarker() {
+        float width = getWidth();
+        float height = getHeight();
+        PointF center = markerData.getPosition();
+        left = center.x - width / 2;
+        top = center.y + height / 2;
+        right = center.x + width / 2;
+        bottom = center.y - height / 2;
+    }
+
     public float getWidth() {
         return right - left;
     }
 
     public float getHeight() {
         return top - bottom;
+    }
+
+    public PointF getCenter() {
+        return getPointData(left + getWidth() / 2, bottom + getHeight() / 2);
     }
 
     private PointF getPointData(float x, float y) {

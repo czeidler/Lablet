@@ -109,11 +109,13 @@ public class RoiPainter extends AbstractMarkerPainter<PointF> {
     // pixel sizes, set in the constructor
     private float LINE_WIDTH;
 
+    final private MarkerDataModel markerDataModel;
     final private FrameDataModel frameDataModel;
 
-    public RoiPainter(RoiModel model, FrameDataModel frameDataModel) {
+    public RoiPainter(RoiModel model, MarkerDataModel markerDataModel, FrameDataModel frameDataModel) {
         super(model);
 
+        this.markerDataModel = markerDataModel;
         this.frameDataModel = frameDataModel;
     }
 
@@ -183,6 +185,13 @@ public class RoiPainter extends AbstractMarkerPainter<PointF> {
         PointF newReal = new PointF();
         containerView.fromScreen(newPosition, newReal);
         markerData.setPosition(newReal, row);
+
+        // update marker position
+        RoiData data = getRoiData();
+        int markerIndex = markerDataModel.findMarkerDataById(data.getFrameId());
+        if (markerIndex < 0)
+            return;
+        markerDataModel.setPosition(data.getCenter(), markerIndex);
     }
 
     @Override

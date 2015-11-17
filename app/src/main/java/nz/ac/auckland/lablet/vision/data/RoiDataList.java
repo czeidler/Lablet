@@ -18,12 +18,19 @@ public class RoiDataList extends AbstractPointDataList<RoiData> {
 
         @Override
         public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
-
+            RoiData roiData = getDataByFrameId(data.getId());
+            if (roiData == null)
+                return;
+            removeData(roiData);
         }
 
         @Override
         public void onDataChanged(MarkerDataModel model, int index, int number) {
-
+            int roiIndex = getIndexByFrameId(model.getAt(index).getId());
+            if (roiIndex < 0)
+                return;
+            getAt(roiIndex).centerOnMarker();
+            notifyDataChanged(roiIndex, 1);
         }
 
         @Override
@@ -80,6 +87,8 @@ public class RoiDataList extends AbstractPointDataList<RoiData> {
         float[] widths = bundle.getFloatArray("widths");
         float[] heights = bundle.getFloatArray("heights");
 
+        if (frameIds == null || lefts == null || tops == null || widths == null || heights == null)
+            return;
         if (frameIds.length != lefts.length || frameIds.length != tops.length || frameIds.length != widths.length
                 || frameIds.length != heights.length)
             return;
@@ -100,10 +109,6 @@ public class RoiDataList extends AbstractPointDataList<RoiData> {
         }
     }
 
-    public int getCurrentFrame() {
-        return markerDataModel.getSelectedMarkerData();
-    }
-
     @Override
     public PointF getPosition(int index) {
         return getAt(index).getMarkerData().getPosition();
@@ -111,7 +116,7 @@ public class RoiDataList extends AbstractPointDataList<RoiData> {
 
     @Override
     public void setPositionNoNotify(PointF point, int index) {
-
+        // ignore
     }
 
     public int getIndexByFrameId(int frameId) {

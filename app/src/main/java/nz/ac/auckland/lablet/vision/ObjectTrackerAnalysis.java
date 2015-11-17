@@ -57,36 +57,6 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
     private BackgroundTask task;
     private long startTimeMs;
 
-    MarkerDataModel.IListener markerDataListener = new MarkerDataModel.IListener() {
-        @Override
-        public void onDataAdded(MarkerDataModel model, int index) {
-
-        }
-
-        @Override
-        public void onDataRemoved(MarkerDataModel model, int index, MarkerData data) {
-            RoiData roiData = roiDataList.getDataByFrameId(data.getId());
-            if (roiData == null)
-                return;
-            roiDataList.removeData(roiDataList.indexOf(roiData));
-        }
-
-        @Override
-        public void onDataChanged(MarkerDataModel model, int index, int number) {
-
-        }
-
-        @Override
-        public void onAllDataChanged(MarkerDataModel model) {
-
-        }
-
-        @Override
-        public void onDataSelected(MarkerDataModel model, int index) {
-
-        }
-    };
-
     RoiDataList.IListener<RoiDataList, RoiData> roiDataListener = new RoiDataList.IListener<RoiDataList, RoiData>() {
         @Override
         public void onDataAdded(RoiDataList model, int index) {
@@ -124,8 +94,6 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
         rectDataList.setVisibility(false);
 
         roiDataList.addListener(roiDataListener);
-
-        motionAnalysis.getTagMarkers().addListener(markerDataListener);
     }
 
     public RectDataList getRectDataList() {
@@ -222,7 +190,7 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
         //Add point marker
         PointF centre = videoData.toMarkerPoint(point);
 
-        int index = pointDataList.findMarkerDataByRun(frameId);
+        int index = pointDataList.findMarkerDataById(frameId);
         if (index >= 0)
             pointDataList.setMarkerPosition(centre, index);
         else {
