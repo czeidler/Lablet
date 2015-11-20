@@ -155,6 +155,9 @@ public class RoiDataList extends AbstractPointDataList<RoiData> {
     }
 
     public RoiData getDataByFrameId(int frameId) {
-        return getAt(getIndexByFrameId(frameId));
+        int index = getIndexByFrameId(frameId);
+        if (index < 0)
+            return null;
+        return getAt(index);
     }
 }
