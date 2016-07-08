@@ -138,7 +138,8 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
     public void addRegionOfInterestMarker(int frameId) {
         RoiDataList roiDataList = motionAnalysis.getObjectTrackerAnalysis().getRoiDataList();
 
-        MarkerData markerData = motionAnalysis.getTagMarkers().getMarkerDataById(frameId);
+        MarkerDataModel markerDataModel = motionAnalysis.getTagMarkers();
+        MarkerData markerData = markerDataModel.getMarkerDataById(frameId);
         RoiData data = new RoiData(markerData);
         PointF centre = markerData.getPosition();
         int width = 5;
@@ -148,6 +149,12 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
         data.setBtmRight(new PointF(centre.x + width, centre.y - height));
         data.setBtmLeft(new PointF(centre.x - width, centre.y - height));
         int index = roiDataList.addData(data);
+
+        // Hacky way to prevent the LastInsertMarkerManager to remove unmoved tag markers: change the marker position by
+        // epsilon.
+        PointF updateMarkerPosition = new PointF(Math.nextUp(centre.x), Math.nextUp(centre.y));
+        markerDataModel.setMarkerPosition(updateMarkerPosition, markerDataModel.indexOf(markerData));
+
         roiDataList.selectMarkerData(index);
     }
 

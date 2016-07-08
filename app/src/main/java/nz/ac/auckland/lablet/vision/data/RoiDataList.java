@@ -64,6 +64,8 @@ public class RoiDataList extends AbstractPointDataList<RoiData> {
         Bundle bundle = new Bundle();
 
         int[] frameIds = new int[size()];
+        float[] xArray = new float[size()];
+        float[] yArray = new float[size()];
         float[] lefts = new float[size()];
         float[] tops = new float[size()];
         float[] widths = new float[size()];
@@ -72,6 +74,9 @@ public class RoiDataList extends AbstractPointDataList<RoiData> {
         for (int i = 0; i < size(); i++) {
             RoiData data = getAt(i);
             frameIds[i] = data.getFrameId();
+            PointF markerPosition = data.getMarkerData().getPosition();
+            xArray[i] = markerPosition.x;
+            yArray[i] = markerPosition.y;
             lefts[i] = data.getLeft();
             tops[i] = data.getTop();
             widths[i] = data.getWidth();
@@ -80,6 +85,8 @@ public class RoiDataList extends AbstractPointDataList<RoiData> {
 
         bundle.putIntArray("runIds", frameIds);
 
+        bundle.putFloatArray("x", xArray);
+        bundle.putFloatArray("y", yArray);
         bundle.putFloatArray("lefts", lefts);
         bundle.putFloatArray("tops", tops);
 
@@ -92,16 +99,20 @@ public class RoiDataList extends AbstractPointDataList<RoiData> {
     public void fromBundle(Bundle bundle) {
         clear();
         int[] frameIds = bundle.getIntArray("runIds");
+        float[] xArray = bundle.getFloatArray("x");
+        float[] yArray = bundle.getFloatArray("y");
         float[] lefts = bundle.getFloatArray("lefts");
         float[] tops = bundle.getFloatArray("tops");
 
         float[] widths = bundle.getFloatArray("widths");
         float[] heights = bundle.getFloatArray("heights");
 
-        if (frameIds == null || lefts == null || tops == null || widths == null || heights == null)
+        if (frameIds == null || xArray == null || yArray == null || lefts == null || tops == null || widths == null
+                || heights == null)
             return;
         if (frameIds.length != lefts.length || frameIds.length != tops.length || frameIds.length != widths.length
-                || frameIds.length != heights.length)
+                || frameIds.length != heights.length || frameIds.length != xArray.length
+                || frameIds.length != yArray.length)
             return;
 
         for (int i = 0; i < frameIds.length; i++) {
@@ -110,7 +121,15 @@ public class RoiDataList extends AbstractPointDataList<RoiData> {
             float width = widths[i];
             float height = heights[i];
 
-            MarkerData markerData = markerDataModel.getMarkerDataById(frameIds[i]);
+            int markerIndex = markerDataModel.findMarkerDataById(frameIds[i]);
+            MarkerData markerData;
+            if (markerIndex >= 0)
+                markerData = markerDataModel.getMarkerDataAt(markerIndex);
+            else {
+                markerData = new MarkerData(frameIds[i]);
+                markerData.setPosition(new PointF(xArray[i], yArray[i]));
+                markerDataModel.addMarkerData(markerData, true);
+            }
             RoiData data = new RoiData(markerData);
             data.setTopLeft(new PointF(left, top));
             data.setTopRight(new PointF(left + width, top));
