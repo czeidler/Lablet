@@ -22,7 +22,7 @@ public abstract class DataTableColumn {
     abstract public Number getValue(int index);
     public String getStringValue(int index) {
         Number number = getValue(index);
-        return String.format(Locale.US, "%.2f", number.floatValue());
+        return String.format(Locale.US, "%f", number.floatValue());
     }
     abstract public String getHeader();
 
