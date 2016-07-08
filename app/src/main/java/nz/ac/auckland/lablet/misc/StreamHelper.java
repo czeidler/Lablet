@@ -14,10 +14,10 @@ import java.io.OutputStream;
 
 public class StreamHelper {
     public interface IProgressListener {
-        public void onNewProgress(int totalProgress);
+        void onNewProgress(long totalProgress);
     }
 
-    static public int BUFFER_SIZE = 1024;
+    static public int BUFFER_SIZE = 32 * 1024;
 
     static public void copyBytes(InputStream inputStream, OutputStream outputStream, int size) throws IOException {
         int bufferLength = BUFFER_SIZE;
@@ -39,8 +39,8 @@ public class StreamHelper {
     static public void copy(InputStream inputStream, OutputStream outputStream, IProgressListener listener,
                             int reportingStep)
             throws IOException {
-        int totalProgress = 0;
-        int lastReportedProgress = 0;
+        long totalProgress = 0;
+        long lastReportedProgress = 0;
 
         byte[] buffer = new byte[BUFFER_SIZE];
         int length;

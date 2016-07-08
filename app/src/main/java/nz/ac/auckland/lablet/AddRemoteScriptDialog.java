@@ -220,7 +220,7 @@ public class AddRemoteScriptDialog extends AlertDialog {
                     FileOutputStream outputStream = new FileOutputStream(targetFile);
                     StreamHelper.copy(inputStream, outputStream, new StreamHelper.IProgressListener() {
                         @Override
-                        public void onNewProgress(int totalProgress) {
+                        public void onNewProgress(long totalProgress) {
                             publishProgress("Progress: " + totalProgress + " / " + size + "bytes");
                         }
                     });

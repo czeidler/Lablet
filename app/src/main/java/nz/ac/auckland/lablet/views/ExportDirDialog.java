@@ -119,11 +119,8 @@ public class ExportDirDialog extends AlertDialog {
                     try {
                         ZipHelper helper = new ZipHelper(outFile);
                         helper.addDir(dir, new StreamHelper.IProgressListener() {
-                            int totalProgress = 0;
-
                             @Override
-                            public void onNewProgress(int progress) {
-                                totalProgress += progress;
+                            public void onNewProgress(long totalProgress) {
                                 String status = "Zipping: " + dir.getName() + " " + totalProgress / 1000 + "/"
                                         + totalSize / 1000 + "kBytes";
                                 publishProgress(status);

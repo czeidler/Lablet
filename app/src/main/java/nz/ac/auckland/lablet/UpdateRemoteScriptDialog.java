@@ -84,7 +84,7 @@ public class UpdateRemoteScriptDialog extends AlertDialog {
                         FileOutputStream outputStream = new FileOutputStream(metaData.file);
                         StreamHelper.copy(inputStream, outputStream, new StreamHelper.IProgressListener() {
                             @Override
-                            public void onNewProgress(int totalProgress) {
+                            public void onNewProgress(long totalProgress) {
                                 publishProgress("Progress (" + metaData.file.getName() + "):" + totalProgress + " / "
                                         + size + "bytes");
                             }

@@ -40,7 +40,7 @@ public class WavImportPlugin extends AbstractFileImportPlugin {
         try {
             StorageLib.copyFile(importFile, new File(dataStorageDir, fileName), new StreamHelper.IProgressListener() {
                 @Override
-                public void onNewProgress(int totalProgress) {
+                public void onNewProgress(long totalProgress) {
 
                 }
             }, 32 * 1024);
