@@ -17,8 +17,8 @@ android {
         applicationId "nz.ac.auckland.lablet"
         minSdkVersion 18
         targetSdkVersion 18
-        versionCode 312
-        versionName "3.1.1"
+        versionCode 313
+        versionName "3.1.2"
         renderscriptTargetApi 18
         renderscriptSupportModeEnabled true
     }
