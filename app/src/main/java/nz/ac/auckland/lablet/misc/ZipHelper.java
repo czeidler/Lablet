@@ -7,8 +7,6 @@
  */
 package nz.ac.auckland.lablet.misc;
 
-import nz.ac.auckland.lablet.misc.StreamHelper;
-
 import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
