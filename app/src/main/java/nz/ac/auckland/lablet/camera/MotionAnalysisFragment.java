@@ -198,11 +198,21 @@ public class MotionAnalysisFragment extends ExperimentAnalysisFragment {
                     int end = timeData.getClosestFrame(timeData.getAnalysisVideoEnd());
 
                     //Reset point markers and rectangles
-                    getSensorAnalysis().getTagMarkers().clear();
-                    getSensorAnalysis().getObjectTrackerAnalysis().getRectDataList().clear();
+                    MotionAnalysis motionAnalysis = getSensorAnalysis();
+                    MarkerDataModel markerDataModel = motionAnalysis.getTagMarkers();
+                    // remove all tag markers that do not belong to a ROI
+                    RoiDataList roiDataList = motionAnalysis.getObjectTrackerAnalysis().getRoiDataList();
+                    for (int i = 0; i < markerDataModel.getMarkerCount(); i++) {
+                        MarkerData markerData = markerDataModel.getMarkerDataAt(i);
+                        if (roiDataList.getDataByFrameId(markerData.getId()) == null) {
+                            markerDataModel.removeMarkerData(i);
+                            i--;
+                        }
+                    }
+                    motionAnalysis.getObjectTrackerAnalysis().getRectDataList().clear();
 
                     //Start object tracking
-                    getSensorAnalysis().getObjectTrackerAnalysis().trackObjects(start, end);
+                    motionAnalysis.getObjectTrackerAnalysis().trackObjects(start, end);
 
                 } else if (item == R.id.set_roi) {
                     if (!roiExists)

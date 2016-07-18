@@ -46,7 +46,8 @@ public class RoiDataList extends AbstractPointDataList<RoiData> {
 
         @Override
         public void onAllDataChanged(MarkerDataModel model) {
-
+            // TODO remove invalid ROI, i.e. remove the ROI because it may point to an invalid MarkerData
+            assert false;
         }
 
         @Override
