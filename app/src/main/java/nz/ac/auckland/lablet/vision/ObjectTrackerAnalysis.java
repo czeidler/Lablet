@@ -172,7 +172,7 @@ public class ObjectTrackerAnalysis extends WeakListenable<ObjectTrackerAnalysis.
      */
     public void trackObjects(int startFrame, int endFrame) {
         if (motionAnalysis.getObjectTrackerAnalysis().getRoiDataList().size() > 0) {
-            // TODO: don't allow to start to background threads!!
+            // TODO: don't allow to start multiple background threads!!
             startTimeMs = System.currentTimeMillis();
 
             for (IListener listener : getListeners())
