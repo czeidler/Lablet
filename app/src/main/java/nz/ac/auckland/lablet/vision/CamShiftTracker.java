@@ -106,6 +106,16 @@ public class CamShiftTracker {
      */
 
     public void setRegionOfInterest(Bitmap frame, int x, int y, int width, int height) {
+        // validate/ fix input values
+        if (x < 0)
+            x = 0;
+        if (y < 0)
+            y = 0;
+        if (width <= 0)
+            width = 1;
+        if (height <= 0)
+            height = 1;
+
         size = new Size(frame.getWidth(), frame.getHeight());
         hsv = new Mat(size, CvType.CV_8UC3);
         hue = new Mat(size, CvType.CV_8UC3);
